@@ -49,7 +49,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    * maximum profile fields that will be displayed
    *
    */
-  protected $_maxFields = 9;
+  protected $_maxFields = 25;
 
   /**
    * variable to store redirect path
