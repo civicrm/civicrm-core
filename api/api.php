@@ -107,12 +107,8 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     if (CRM_Utils_Array::value('format.is_success', $apiRequest['params']) == 1) {
       return 0;
     }
-    $error = $e->getCause();
-    if ($error instanceof DB_Error) {
-      $data["error_code"] = DB::errorMessage($error->getCode());
-      $data["sql"] = $error->getDebugInfo();
-    }
     if (CRM_Utils_Array::value('debug', $apiRequest['params'])) {
+      $error = $e->getCause();
       $data['debug_info'] = $error->getUserInfo();
       $data['trace'] = $e->getTraceAsString();
     }
