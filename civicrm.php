@@ -120,11 +120,12 @@ function civicrm_wp_add_menu_items() {
 
     add_menu_page('CiviCRM', 'CiviCRM', 'access_civicrm', 'CiviCRM', 'civicrm_wp_invoke', $civilogo);
   }
-
-  add_options_page('CiviCRM Settings', 'CiviCRM Settings', 'manage_options', 'civicrm-settings', 'civicrm_db_settings');
+  else {
+    add_options_page('CiviCRM Installer', 'CiviCRM Installer', 'manage_options', 'civicrm-install', 'civicrm_run_installer');
+  }
 }
 
-function civicrm_db_settings() {
+function civicrm_run_installer() {
   $installFile =
     WP_PLUGIN_DIR . DIRECTORY_SEPARATOR .
     'civicrm' . DIRECTORY_SEPARATOR .
@@ -140,7 +141,7 @@ function civicrm_wp_set_title($title = '') {
 }
 
 function civicrm_setup_warning() {
-  $installLink = admin_url() . "options-general.php?page=civicrm-settings";
+  $installLink = admin_url() . "options-general.php?page=civicrm-install";
   echo '<div id="civicrm-warning" class="updated fade"><p><strong>' . t('CiviCRM is almost ready.') . '</strong> ' . t('You must <a href="!1">configure CiviCRM</a> for it to work.', array(
     '!1' => $installLink)) . '</p></div>';
 }
@@ -185,7 +186,7 @@ function civicrm_wp_initialize() {
     CRM_Core_ClassLoader::singleton()->register();
 
     // get ready for problems
-    $installLink    = admin_url() . "options-general.php?page=civicrm-settings";
+    $installLink    = admin_url() . "options-general.php?page=civicrm-install";
     $docLinkInstall = "http://wiki.civicrm.org/confluence/display/CRMDOC/WordPress+Installation+Guide";
     $docLinkTrouble = "http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Configuration+Trouble-shooting";
     $forumLink      = "http://forum.civicrm.org/index.php/board,6.0.html";
@@ -197,7 +198,7 @@ function civicrm_wp_initialize() {
     $installMessage = t("Click <a href='!1'>here</a> for fresh install.", array('!1' => $installLink));
 
     if ($error == FALSE) {
-      header('Location: ' . admin_url() . 'options-general.php?page=civicrm-settings');
+      header('Location: ' . admin_url() . 'options-general.php?page=civicrm-install');
       return FALSE;
     }
 
@@ -582,7 +583,7 @@ function civicrm_wp_main() {
 
     // check if settings file exist, do not show configuration link on
     // install / settings page
-    if (isset($_GET['page']) && $_GET['page'] != 'civicrm-settings') {
+    if (isset($_GET['page']) && $_GET['page'] != 'civicrm-install') {
       $settingsFile = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
 
       if (!file_exists($settingsFile)) {
