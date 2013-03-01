@@ -61,5 +61,12 @@ Developers are highly encouraged to join the CiviCRM forums and post
 questions and ideas on the Developer Discussion board:
 http://forum.civicrm.org/index.php/board,20.0.html
 
-You can check out the CiviCRM source from
-http://svn.civicrm.org/
+You can check out the CiviCRM source from https://github.com/civicrm/civicrm-core
+
+Quick install Drupal7 located in {your drupal root}:
+$cd /tmp
+$wget https://github.com/civicrm/civicrm-core/raw/master/bin/gitify
+$gitify Drupal git://github.com/civicrm {your drupal root}/sites/all/modules/civicrm --l10n
+
+longer version:
+http://wiki.civicrm.org/confluence/display/CRMDOC42/GitHub+for+CiviCRM
