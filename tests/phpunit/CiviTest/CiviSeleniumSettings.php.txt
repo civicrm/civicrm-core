@@ -1,0 +1,33 @@
+<?php
+
+class CiviSeleniumSettings {
+
+  var $publicSandbox  = false;
+
+  var $browser = '*firefox';
+
+  var $sandboxURL = 'http://devel.drupal.tests.dev.civicrm.org';
+
+  var $sandboxPATH = '';
+  
+  var $username = 'demo';
+
+  var $password = 'demo';
+
+  var $adminUsername = 'USERNAME';
+  
+  var $adminPassword = 'PASSWORD';
+
+  var $UFemail = 'noreply@civicrm.org';
+
+  /**
+   * @var int seconds
+   */
+  var $timeout = 30;
+
+  function __construct() {
+    $this->fullSandboxPath = $this->sandboxURL . $this->sandboxPATH;
+  }
+
+}
+?>

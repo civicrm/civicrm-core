@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Project</base>
+  <class>TaskStatus</class>
+  <name>civicrm_task_status</name>
+  <comment>Tracks the responsible entity, optional target entity and status of a task. Tasks can have multiple task_status entries if assigned to multiple responsible entities and-or there are multiple targets.</comment>
+  <add>1.5</add>
+  <log>true</log>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Task ID</comment>
+      <add>1.5</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+      <name>task_id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Status is for which task.</comment>
+       <add>1.5</add>
+  </field>
+  <foreignKey>
+       <name>task_id</name>
+       <table>civicrm_task</table>
+       <key>id</key>
+       <add>1.5</add>
+  </foreignKey>
+  <field>
+       <name>responsible_entity_table</name>
+       <type>varchar</type>
+       <length>64</length>
+       <required>true</required>
+       <comment>Entity responsible for this task_status instance (table where entity is stored e.g. civicrm_contact or civicrm_group).</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>responsible_entity_id</name>
+       <title>Responsible</title>
+       <type>int unsigned</type>
+       <required>true</required>
+       <comment>Foreign key to responsible entity (contact, group, etc.).</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>target_entity_table</name>
+       <type>varchar</type>
+       <length>64</length>
+       <required>true</required>
+       <comment>Optional target entity for this task_status instance, i.e. review this membership application-prospect member contact record is target (table where entity is stored e.g. civicrm_contact or civicrm_group).</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>target_entity_id</name>
+       <title>Target</title>
+       <type>int unsigned</type>
+       <required>true</required>
+       <comment>Foreign key to target entity (contact, group, etc.).</comment>
+       <add>1.5</add>
+  </field>
+  <field> 
+      <name>status_detail</name> 
+      <title>Status Details</title>
+      <type>text</type> 
+      <comment>Encoded array of status details used for programmatic progress reporting and tracking.</comment> 
+      <add>1.5</add> 
+  </field>
+  <field>
+       <name>status_id</name>
+       <title>Status</title>
+       <type>int unsigned</type>
+       <comment>Configurable status value (e.g. Not Started, In Progress, Completed, Deferred...). FK to civicrm_option_value.</comment>
+      <add>1.5</add>
+  </field>
+  <field> 
+      <name>create_date</name> 
+      <title>Created</title>
+      <type>datetime</type> 
+      <comment>Date this record was created (date work on task started).</comment> 
+      <add>1.5</add> 
+  </field> 
+  <field>
+      <name>modified_date</name> 
+      <title>Last Modified</title>
+      <type>datetime</type> 
+      <comment>Date-time of last update to this task_status record.</comment> 
+      <add>1.5</add> 
+  </field> 
+  <index>
+    <name>index_task_status_responsible</name>
+    <fieldName>task_id</fieldName>
+    <fieldName>responsible_entity_table</fieldName>
+    <fieldName>responsible_entity_id</fieldName>
+    <add>1.5</add> 
+  </index>
+  <index>
+    <name>index_task_status_target</name>
+    <fieldName>task_id</fieldName>
+    <fieldName>target_entity_table</fieldName>
+    <fieldName>target_entity_id</fieldName>
+    <add>1.5</add> 
+  </index>
+</table>
+

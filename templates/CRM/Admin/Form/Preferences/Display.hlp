@@ -1,0 +1,37 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-editor_id-title"}
+  {ts}WYSIWYG Editor{/ts}
+{/htxt}
+{htxt id="id-editor_id"}
+<p>{ts}Select the HTML WYSIWYG Editor provided for fields that allow HTML formatting. Select 'Textarea' if you don't want to provide a WYSIWYG Editor (users will type text and / or HTML code into plain text fields).{/ts}</p>
+<p>{ts}<strong>Spell-checking:</strong> ckEditor includes a Spell-check button by default. There is also an optional plugin which does spell-checking automatically (as you type). However, this plugin is not enabled by default since it sends user input to a 3rd party service (spellchecker.net) without informing the user - and this may pose privacy issues for some sites.{/ts}
+<p>{ts}To enable auto spell check, in packages/ckeditor/config.js - change this value to true:{/ts}<br />
+config.scayt_autoStartup = false;
+<p>{ts}To remove the Spell Check button, in packages/ckeditor/config.js - remove this item in the config.toolbar_Full list:{/ts}<br />
+'SpellChecker'
+<p>{ts}<strong>NOTE:</strong> If you are modifying config.js you should first have configured a Custom PHP Path under Global Settings > Directories, and place your modified version in the custom path.{/ts}</p>
+{/htxt}

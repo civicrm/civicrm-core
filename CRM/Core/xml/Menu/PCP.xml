@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<menu>
+  <item>
+     <path>civicrm/pcp</path>
+     <page_callback>CRM_PCP_Form_PCP</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+  </item>
+  <item>
+     <path>civicrm/pcp/campaign</path>
+     <title>Setup a Personal Campaign Page - Account Information</title>
+     <page_callback>CRM_PCP_Controller_PCP</page_callback>
+     <access_arguments>make online contributions</access_arguments>
+     <is_public>true</is_public>
+     <weight>0</weight>
+  </item>
+  <item>
+     <path>civicrm/pcp/info</path>
+     <page_callback>CRM_PCP_Page_PCPInfo</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+  </item>
+  <item>
+     <path>civicrm/admin/pcp</path>
+     <title>Personal Campaign Pages</title>
+     <page_callback>CRM_PCP_Page_PCP</page_callback>
+     <desc>View and manage existing personal campaign pages.</desc>
+  </item>
+</menu>

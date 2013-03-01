@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_value_email_greeting.xml 30511 2010-11-03 11:36:36Z shot $  -->
+<dataset>
+  <table name="civicrm_option_value">
+    <column>id</column>
+    <column>option_group_id</column>
+    <column>label</column>
+    <column>value</column>
+    <column>name</column>
+    <column>grouping</column>
+    <column>filter</column>
+    <column>is_default</column>
+    <column>weight</column>
+    <column>description</column>
+    <column>is_optgroup</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <column>component_id</column>
+    <column>visibility_id</column>
+(245,42,'Dear {contact.first_name}','1','Dear {contact.first_name}',NULL,1,1,1,NULL,0,0,1,NULL,NULL),
+(246,42,'Dear {contact.individual_prefix} {contact.first_name} {contact.last_name}','2','Dear {contact.individual_prefix} {contact.first_name} {contact.last_name}',NULL,1,0,2,NULL,0,0,1,NULL,NULL),
+(247,42,'Dear {contact.individual_prefix} {contact.last_name}','3','Dear {contact.individual_prefix} {contact.last_name}',NULL,1,0,3,NULL,0,0,1,NULL,NULL),
+(248,42,'Customized','4','Customized',NULL,NULL,0,4,NULL,0,1,1,NULL,NULL),
+(249,42,'Dear {contact.household_name}','5','Dear {contact.househols_name}',NULL,2,1,5,NULL,0,0,1,NULL,NULL)
+    <row>
+      <value>245</value>        <!--  id  -->
+      <value>42</value>         <!--  option_group_id  -->
+      <value>Dear {contact.first_name}</value>       <!--  label  -->
+      <value>1</value>          <!--  value  -->
+      <value>Dear {contact.first_name}</value>       <!--  name  -->
+      <null />                  <!--  grouping  -->
+      <value>1</value>          <!--  filter  -->
+      <value>1</value>          <!--  is_default  -->
+      <value>1</value>          <!--  weight  -->
+      <null />                  <!--  description  -->
+      <value>0</value>          <!--  is_optgroup  -->
+      <value>0</value>          <!--  is_reserved  -->
+      <value>1</value>          <!--  is_active  -->
+      <null />                  <!--  component_id  -->
+      <null />                  <!--  visibility_id  -->
+    </row>
+    <row>
+      <value>246</value>        <!--  id  -->
+      <value>42</value>         <!--  option_group_id  -->
+      <value>Dear {contact.individual_prefix} {contact.first_name} {contact.last_name}</value>  <!--  label  -->
+      <value>2</value>          <!--  value  -->
+      <value>Dear {contact.individual_prefix} {contact.first_name} {contact.last_name}</value>  <!--  name  -->
+      <null />                  <!--  grouping  -->
+      <value>1</value>          <!--  filter  -->
+      <value>0</value>          <!--  is_default  -->
+      <value>2</value>          <!--  weight  -->
+      <null />                  <!--  description  -->
+      <value>0</value>          <!--  is_optgroup  -->
+      <value>0</value>          <!--  is_reserved  -->
+      <value>1</value>          <!--  is_active  -->
+      <null />                  <!--  component_id  -->
+      <null />                  <!--  visibility_id  -->
+    </row>
+    <row>
+      <value>247</value>        <!--  id  -->
+      <value>42</value>         <!--  option_group_id  -->
+      <value>Dear {contact.individual_prefix} {contact.last_name}</value>   <!--  label  -->
+      <value>3</value>          <!--  value  -->
+      <value>Dear {contact.individual_prefix} {contact.last_name}</value>   <!--  name  -->
+      <null />                  <!--  grouping  -->
+      <value>1</value>          <!--  filter  -->
+      <value>0</value>          <!--  is_default  -->
+      <value>3</value>          <!--  weight  -->
+      <null />                  <!--  description  -->
+      <value>0</value>          <!--  is_optgroup  -->
+      <value>0</value>          <!--  is_reserved  -->
+      <value>1</value>          <!--  is_active  -->
+      <null />                  <!--  component_id  -->
+      <null />                  <!--  visibility_id  -->
+    </row>
+  </table>
+</dataset>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<menu>
+  <item>
+     <path>civicrm/report</path>
+     <title>CiviReport</title>
+     <page_callback>CRM_Report_Page_Report</page_callback>
+     <access_arguments>access CiviReport</access_arguments>
+     <page_type>1</page_type>
+     <weight>1200</weight>
+     <component>CiviReport</component>
+  </item>
+  <item>
+     <path>civicrm/report/list</path>
+     <title>CiviCRM Reports</title>
+     <page_callback>CRM_Report_Page_InstanceList</page_callback>
+     <access_callback>1</access_callback>
+  </item>
+  <item>
+     <path>civicrm/report/template/list</path>
+     <title>Create New Report from Template</title>
+     <page_callback>CRM_Report_Page_TemplateList</page_callback>
+     <access_arguments>administer Reports</access_arguments>
+     <page_type>1</page_type>
+     <weight>1220</weight>
+  </item>
+  <item>
+     <path>civicrm/report/options/report_template</path>
+     <title>Manage Templates</title>
+     <page_callback>CRM_Report_Page_Options</page_callback>
+     <access_arguments>administer Reports</access_arguments>
+     <page_type>1</page_type>
+     <weight>1241</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/report/register</path>
+     <title>Register Report</title>
+     <page_callback>CRM_Report_Form_Register</page_callback>
+     <desc>Register the Report templates.</desc>
+     <access_arguments>administer Reports</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/report/instance</path>
+     <title>Report</title>
+     <page_callback>CRM_Report_Page_Instance</page_callback>
+     <access_callback>1</access_callback>
+  </item>
+  <item>
+     <path>civicrm/admin/report/template/list</path>
+     <title>Create New Report from Template</title>
+     <page_callback>CRM_Report_Page_TemplateList</page_callback>
+     <desc>Component wise listing of all available templates</desc>
+     <access_arguments>access CiviReport</access_arguments>
+     <adminGroup>CiviReport</adminGroup>
+     <icon>admin/small/report_template.gif</icon>
+  </item>
+  <item>
+     <path>civicrm/admin/report/options/report_template</path>
+     <title>Manage Templates</title>
+     <page_callback>CRM_Report_Page_Options</page_callback>
+     <desc>Browse, Edit and Delete the Report templates.</desc>
+     <access_arguments>access CiviReport</access_arguments>
+     <adminGroup>CiviReport</adminGroup>
+     <icon>admin/small/template.png</icon>
+  </item>
+  <item>
+     <path>civicrm/admin/report/list</path>
+     <title>Reports Listing</title>
+     <page_callback>CRM_Report_Page_InstanceList</page_callback>
+     <desc>Browse existing report, change report criteria and settings.</desc>
+     <adminGroup>CiviReport</adminGroup>
+     <icon>admin/small/report_list.gif</icon>
+  </item>
+</menu>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table>
+  <base>CRM/Event</base>
+  <class>ParticipantStatusType</class>
+  <name>civicrm_participant_status_type</name>
+  <comment>various types of CiviEvent participant statuses</comment>
+  <add>3.0</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>unique participant status type id</comment>
+    <add>3.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <uniqueName>participant_status</uniqueName>
+    <title>Participant Status</title>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <unique>true</unique>
+    <comment>non-localized name of the status type</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>label</name>
+    <type>varchar</type>
+    <length>255</length>
+    <unique>true</unique>
+    <localizable>true</localizable>
+    <comment>localized label for display of this status type</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>class</name>
+    <type>enum</type>
+    <values>Positive, Pending, Waiting, Negative</values>
+    <comment>the general group of status type this one belongs to</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <type>boolean</type>
+    <comment>whether this is a status type required by the system</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>whether this status type is active</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>is_counted</name>
+    <type>boolean</type>
+    <comment>whether this status type is counted against event size limit</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>weight</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>controls sort order</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>visibility_id</name>
+    <type>int unsigned</type>
+    <comment>whether the status type is visible to the public, an implicit foreign key to option_value.value related to the `visibility` option_group</comment>
+    <add>3.0</add>
+  </field>
+</table>

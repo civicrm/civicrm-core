@@ -1,0 +1,8 @@
+name = CiviCRM GiftAid Alpha
+description = Additional features for Gift Aid for Alpha
+version = 3.4
+dependencies[] = civicrm
+dependencies[] = civicrm_giftaid
+package = CiviCRM
+core = 6.x
+php = 5.2

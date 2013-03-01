@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Project</base>
+  <class>Task</class>
+  <name>civicrm_task</name>
+  <comment>To-do items. Can be assigned to self or other entities.</comment>
+  <add>1.5</add>
+  <log>true</log>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Task ID</comment>
+      <add>1.5</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+       <name>title</name>
+       <title>Title</title>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Task name.</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>description</name>
+       <title>Description</title>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>Optional verbose description of the Task. May be used for display - HTML allowed.</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>task_type_id</name>
+       <title>Task Type</title>
+       <type>int unsigned</type>
+       <comment>Configurable task type values (e.g. App Submit, App Review...). FK to civicrm_option_value.</comment>
+      <add>1.5</add>
+  </field>
+  <field>
+       <name>owner_entity_table</name>
+       <type>varchar</type>
+       <length>64</length>
+       <required>true</required>
+       <comment>Name of table where Task owner being referenced is stored (e.g. civicrm_contact or civicrm_group).</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>owner_entity_id</name>
+       <title>Task Owner ID</title>
+       <type>int unsigned</type>
+       <required>true</required>
+       <comment>Foreign key to Task owner (contact, group, etc.).</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>parent_entity_table</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Name of table where optional Task parent is stored (e.g. civicrm_project, or civicrm_task for sub-tasks).</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>parent_entity_id</name>
+       <title>Task Parent</title>
+       <type>int unsigned</type>
+       <comment>Optional foreign key to Task Parent (project, another task, etc.).</comment>
+       <add>1.5</add>
+  </field>
+  <field> 
+      <name>due_date</name> 
+      <title>Due Date</title>
+      <type>datetime</type> 
+      <comment>Task due date.</comment> 
+      <add>1.5</add> 
+  </field>
+  <field>
+       <name>priority_id</name>
+       <title>Priority</title>
+       <type>int unsigned</type>
+       <comment>Configurable priority value (e.g. Critical, High, Medium...). FK to civicrm_option_value.</comment>
+      <add>1.5</add>
+  </field>
+  <field>   
+      <name>task_class</name>
+      <title>Task Class</title>
+      <type>varchar</type>   
+      <length>255</length>
+      <comment>Optional key to a process class related to this task (e.g. CRM_Quest_PreApp).</comment>   
+      <add>1.5</add>   
+  </field>
+  <field>
+       <name>is_active</name>
+       <title>Active?</title>
+       <type>boolean</type>
+       <comment>Is this record active? For tasks: can it be assigned, does it appear on open task listings, etc.</comment>
+       <add>1.5</add>
+  </field>
+
+  <index>
+    <name>UI_task_parent</name>
+    <fieldName>id</fieldName>
+    <fieldName>parent_entity_table</fieldName>
+    <fieldName>parent_entity_id</fieldName>
+    <unique>true</unique>
+    <add>1.5</add> 
+  </index>
+  <index>
+    <name>UI_task_owner</name>
+    <fieldName>id</fieldName>
+    <fieldName>owner_entity_table</fieldName>
+    <fieldName>owner_entity_id</fieldName>
+    <unique>true</unique>
+    <add>1.5</add> 
+  </index>
+</table>

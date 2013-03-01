@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<tables xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<xi:include href="MembershipType.xml"          parse="xml" />
+<xi:include href="Membership.xml"              parse="xml" />
+<xi:include href="MembershipStatus.xml"        parse="xml" />
+<xi:include href="MembershipPayment.xml"       parse="xml" />
+<xi:include href="MembershipBlock.xml"         parse="xml" />
+<xi:include href="MembershipLog.xml"           parse="xml" />
+</tables>

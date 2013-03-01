@@ -1,0 +1,55 @@
+.description {
+  display: block;
+  margin: 4px 20px 15px 0px;
+  color: #999999;
+}
+
+.ui-widget label {
+/*  font-size: 0.90em; */
+  display: block;
+  margin: 2px;
+}
+
+.checkboxgroup {
+  display: table;
+}
+
+.checkboxgroup label {
+  font-size: 0.90em;
+  display: inline;
+  float: none;
+}
+
+
+.description img {
+    border: 10px;
+}
+
+textarea.huge {
+  width: 75%; 
+  height: 12em;
+  font-weight: bold;
+}
+
+input.huge {
+    width: 30em;
+  font-weight: bold;
+}
+
+
+h2, .helpicon, #recently-viewed, #printer-friendly, #access {
+  display: none;
+}
+
+tr.border-bottom {
+    border-bottom: 1px solid #CCCCCC;
+}
+
+
+th.label {
+    width: 25%;
+    background-color: #EEEEEE;
+    border-bottom: 1px solid #CCCCCC;
+    font-weight: normal;
+}
+

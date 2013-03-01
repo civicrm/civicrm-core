@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: uf_group_25.xml 2011-05-30 11:36:36IST rajan $  -->
+<dataset>
+  <table name="civicrm_uf_group">
+    <column>id</column>
+    <column>is_active</column>
+    <column>group_type</column>
+    <column>title</column>
+    <column>help_pre</column>
+    <column>help_post</column>
+    <column>limit_listings_group_id</column>
+    <column>post_URL</column>
+    <column>add_to_group_id</column>
+    <column>add_captcha</column>
+    <column>is_map</column>
+    <column>is_edit_link</column>
+    <column>is_uf_link</column>
+    <column>is_update_dupe</column>
+    <column>cancel_URL</column>
+    <column>is_cms_user</column>
+    <column>notify</column>
+    <column>is_reserved</column>
+    <column>name</column>
+    <column>created_id</column>
+    <column>created_date</column>
+    <column>is_proximity_search</column>
+    <row>
+      <value>25</value>  <!--  id  -->
+      <value>1</value>   <!--  is_active  -->
+      <value>Individual,Contact</value>  <!--  group_type  -->
+      <value>Test Individual-Contact Profile</value>  <!--  title  -->
+      <null />           <!--  help_pre  -->
+      <null />           <!--  help_post  -->
+      <null />           <!--  limit_listings_group_id  -->
+      <null />           <!--  post_URL  -->
+      <null />           <!--  add_to_group_id  -->
+      <null />           <!--  add_captcha  -->
+      <null />                     <!--  is_map  -->
+      <null /><!--  is_edit_link  -->
+      <null /><!--  is_uf_link  -->
+      <null /><!--  is_update_dupe  -->
+      <null /><!--  cancel_URL  -->
+      <null /><!--  is_cms_user  -->
+      <null /><!--  notify  -->
+      <null /><!--  is_reserved  -->
+      <value>test_individual_contact_profile</value><!--  name  -->
+      <null /><!--  created_id  -->
+      <null /><!--  created_date  -->
+      <null /><!--  is_proximity_search  -->
+    </row>
+  </table>
+</dataset>

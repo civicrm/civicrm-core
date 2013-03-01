@@ -1,0 +1,65 @@
+#All {
+    font-family: Arial;
+    width: auto;
+  margin: 2em auto;
+  padding: 1em;
+    border: 1px #CCC solid;
+}
+form {
+  margin: 0;
+}
+h1 {
+  margin-top: 0;
+}
+
+li {
+    padding-bottom: 1.5em;
+}
+
+label span {
+  float: left;
+  width: 12em;
+}
+
+.good td {
+  color: green;
+}
+
+.warning td {
+  color: orange;
+}
+
+.testResults .error td {
+  background-color: #C00;
+  border: 1px #700 solid;
+  color: white;
+}
+
+p.error {
+  padding: 0.5em;
+  background-color: #C00;
+  border: 1px #700 solid;
+  color: white;
+}
+p.warning {
+  padding: 0.5em;
+  background-color: #E70;
+  border: 1px #A70 solid;
+  color: white;
+}
+p.good {
+  padding: 0.5em;
+  background-color: #0C0;
+  border: 1px #070 solid;
+  color: white;
+}
+
+.testResults {
+  border-collapse: collapse;
+  font-size: 80%;
+}
+.testResults td {
+  border: 1px #CCC solid;
+  width: 400px;
+  padding: 0.2em;
+}

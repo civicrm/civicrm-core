@@ -1,0 +1,1243 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CustomData>
+  <CustomGroups>
+    <CustomGroup>
+      <name>CiviCRM_Site_Registration</name>
+      <title>CiviCRM Site Registration</title>
+      <extends>Organization</extends>
+      <style>Tab</style>
+      <collapse_display>0</collapse_display>
+      <help_pre></help_pre>
+      <help_post></help_post>
+      <weight>2</weight>
+      <is_active>1</is_active>
+      <table_name>civicrm_value_civicrm_site_registration_4</table_name>
+      <is_multiple>0</is_multiple>
+      <collapse_adv_display>0</collapse_adv_display>
+      <created_date>0000-00-00 00:00:00</created_date>
+    </CustomGroup>
+    <CustomGroup>
+      <name>Event_Survey</name>
+      <title>Event Survey</title>
+      <extends>Participant</extends>
+      <extends_entity_column_value_option_group>ParticipantEventType</extends_entity_column_value_option_group>
+      <extends_entity_column_value_option_value>Fundraiser</extends_entity_column_value_option_value>
+      <style>Inline</style>
+      <help_pre></help_pre>
+      <help_post></help_post>
+      <is_active>1</is_active>
+      <table_name>civicrm_value_Event_Survey</table_name>
+      <is_multiple>0</is_multiple>
+      <collapse_adv_display>0</collapse_adv_display>
+    </CustomGroup>
+  </CustomGroups>
+  <CustomFields>
+    <CustomField>
+      <label>Number of Employees</label>
+      <data_type>String</data_type>
+      <html_type>Select</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>1</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>number_of_employees_8</column_name>
+      <option_group_name>number_of_employees_20100908143104</option_group_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Annual Budget (USD)</label>
+      <data_type>String</data_type>
+      <html_type>Select</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>2</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>annual_budget__usd__9</column_name>
+      <option_group_name>annual_budget__usd__20100908143601</option_group_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Organization Category</label>
+      <data_type>String</data_type>
+      <html_type>CheckBox</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>3</weight>
+      <help_post>Select one or more categories that most closely describe your organization's the focus area(s).</help_post>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <options_per_line>3</options_per_line>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>organization_sector_10</column_name>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Other Category</label>
+      <data_type>String</data_type>
+      <html_type>Text</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>4</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>other_sector_11</column_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>CiviCRM Components</label>
+      <data_type>String</data_type>
+      <html_type>CheckBox</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>5</weight>
+      <help_post>Mark the CiviCRM components that your organization uses.</help_post>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <options_per_line>3</options_per_line>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>civicrm_components_12</column_name>
+      <option_group_name>civicrm_components_20100908150826</option_group_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>How are you using CiviCRM</label>
+      <data_type>Memo</data_type>
+      <html_type>TextArea</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>6</weight>
+      <help_post>Briefly describe how your organization uses CiviCRM.</help_post>
+      <attributes>rows=4, cols=60</attributes>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>how_are_you_using_civicrm_13</column_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Consulting Firm?</label>
+      <data_type>String</data_type>
+      <html_type>Text</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>7</weight>
+      <help_post>If your organization used a consultant to assist in installing, configuring or customizing CiviCRM enter the consulting firm name here.</help_post>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>civicrm_consulting_firm__14</column_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Satisfaction with CiviCRM?</label>
+      <data_type>String</data_type>
+      <html_type>Radio</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>8</weight>
+      <help_post>Rate your organization's overall satisfaction level with CiviCRM from A (very satisfied) to F (extremely unsatisfied).</help_post>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <options_per_line>5</options_per_line>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>satisfaction_with_civicrm__15</column_name>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Usability Rating</label>
+      <data_type>String</data_type>
+      <html_type>Radio</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>9</weight>
+      <help_post>Rate the overall usability of CiviCRM  from A (high usability) to F (extremely difficult to use).</help_post>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <options_per_line>5</options_per_line>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>usability_rating_16</column_name>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Recommend to others?</label>
+      <data_type>Boolean</data_type>
+      <html_type>Radio</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>10</weight>
+      <help_post>Would you recommend CiviCRM to other organizations like yours?</help_post>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>recommend_to_others__17</column_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Date Added</label>
+      <data_type>Date</data_type>
+      <html_type>Select Date</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>11</weight>
+      <is_active>1</is_active>
+      <is_view>1</is_view>
+      <text_length>255</text_length>
+      <date_format>yy-mm-dd</date_format>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>date_added_18</column_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Added By</label>
+      <data_type>ContactReference</data_type>
+      <html_type>Autocomplete-Select</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>12</weight>
+      <is_active>1</is_active>
+      <is_view>1</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>added_by_19</column_name>
+      <custom_group_name>CiviCRM_Site_Registration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Training space and environment</label>
+      <data_type>String</data_type>
+      <html_type>Radio</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>1</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>training_space_and_environment</column_name>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Presentation quality</label>
+      <data_type>String</data_type>
+      <html_type>Radio</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>2</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>presentation_quality</column_name>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Presenters/Speakers</label>
+      <data_type>String</data_type>
+      <html_type>Radio</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>3</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>presenters_speakers</column_name>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Training materials (exercises and other wiki resources)</label>
+      <data_type>String</data_type>
+      <html_type>Radio</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>4</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>training_materials_exercises</column_name>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Food</label>
+      <data_type>String</data_type>
+      <html_type>Radio</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>5</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>food_14</column_name>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Were your expectations for the event met? If not, what were you hoping to get out of the training but did not?</label>
+      <data_type>Memo</data_type>
+      <html_type>TextArea</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>6</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>were_your_expectations_met</column_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>What areas of improvement would you suggest?</label>
+      <data_type>Memo</data_type>
+      <html_type>TextArea</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>7</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>what_areas_of_improvement</column_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Did you find the case studies helpful? Would you want more or less, and should they be more or less technical?</label>
+      <data_type>Memo</data_type>
+      <html_type>TextArea</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>8</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>find_case_studies_helpful</column_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>What other resources would be helpful as you work with CiviCRM?</label>
+      <data_type>Memo</data_type>
+      <html_type>TextArea</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>9</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>what_other_resources</column_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <label>Other comments</label>
+      <data_type>Memo</data_type>
+      <html_type>TextArea</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>10</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>other_comments</column_name>
+      <custom_group_name>Event_Survey</custom_group_name>
+    </CustomField>
+  </CustomFields>
+  <OptionGroups>
+    <OptionGroup>
+      <name>number_of_employees_20100908143104</name>
+      <label>Number of Employees</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+    <OptionGroup>
+      <name>annual_budget__usd__20100908143601</name>
+      <label>Annual Budget (USD)</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+    <OptionGroup>
+      <name>organization_sector_20100908145433</name>
+      <label>Organization Sector</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+    <OptionGroup>
+      <name>civicrm_components_20100908150826</name>
+      <label>CiviCRM Components</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+    <OptionGroup>
+      <name>satisfaction_with_civicrm__20100908151542</name>
+      <label>Satisfaction with CiviCRM?</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+  </OptionGroups>
+  <OptionValues>
+    <OptionValue>
+      <label>10 or Under</label>
+      <value>10 or Under</value>
+      <name>10_or_Under</name>
+      <is_default>0</is_default>
+      <weight>1</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>number_of_employees_20100908143104</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>11 to 29</label>
+      <value>11 to 29</value>
+      <name>11_to_29</name>
+      <is_default>0</is_default>
+      <weight>2</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>number_of_employees_20100908143104</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>199 to 249</label>
+      <value>100 to 249</value>
+      <name>199_to_249</name>
+      <is_default>0</is_default>
+      <weight>4</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>number_of_employees_20100908143104</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>250 or More</label>
+      <value>250 or More</value>
+      <name>250_or_More</name>
+      <is_default>0</is_default>
+      <weight>5</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>number_of_employees_20100908143104</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>30 to 99</label>
+      <value>30 to 99</value>
+      <name>30_to_99</name>
+      <is_default>0</is_default>
+      <weight>3</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>number_of_employees_20100908143104</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Don't know</label>
+      <value>Don't know</value>
+      <name>Don_t_know</name>
+      <is_default>0</is_default>
+      <weight>6</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>number_of_employees_20100908143104</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>$3 million to $10 million</label>
+      <value>$3 million to $10 million</value>
+      <name>_3_million_to__10_million</name>
+      <is_default>0</is_default>
+      <weight>3</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>annual_budget__usd__20100908143601</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>$500k to $3 million</label>
+      <value>$500k to $3 million</value>
+      <name>_500k_to__3_million</name>
+      <is_default>0</is_default>
+      <weight>2</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>annual_budget__usd__20100908143601</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Don't know</label>
+      <value>Don't know</value>
+      <name>Don_t_know</name>
+      <is_default>0</is_default>
+      <weight>5</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>annual_budget__usd__20100908143601</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>More then $10 million</label>
+      <value>More then $10 million</value>
+      <name>More_then__10_million</name>
+      <is_default>0</is_default>
+      <weight>4</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>annual_budget__usd__20100908143601</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Under $500k</label>
+      <value>Under $500k</value>
+      <name>Under__500k</name>
+      <is_default>0</is_default>
+      <weight>1</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>annual_budget__usd__20100908143601</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Civil Rights, Social Action and Advocacy</label>
+      <value>Civil Rights, Social Action and Advocacy</value>
+      <is_default>0</is_default>
+      <weight>3</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Community Improvement and Capacity Building</label>
+      <value>Community Improvement and Capacity Building</value>
+      <is_default>0</is_default>
+      <weight>4</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Diseases, Disorders and Medical Disciplines</label>
+      <value>Diseases, Disorders and Medical Disciplines</value>
+      <is_default>0</is_default>
+      <weight>6</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Human Rights, International, Foreign Affairs</label>
+      <value>Human Rights, International, Foreign Affairs</value>
+      <is_default>0</is_default>
+      <weight>15</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Mental Health and Crisis Intervention</label>
+      <value>Mental Health and Crisis Intervention</value>
+      <is_default>0</is_default>
+      <weight>19</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Public Safety, Disaster Preparedness and Relief</label>
+      <value>Public Safety, Disaster Preparedness and Relief</value>
+      <is_default>0</is_default>
+      <weight>24</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Animal-related</label>
+      <value>Animal-related</value>
+      <name>Animal_related</name>
+      <is_default>0</is_default>
+      <weight>1</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Arts, Culture, Humanities</label>
+      <value>Arts, Culture, Humanities</value>
+      <name>Arts_Culture_Humanities</name>
+      <is_default>0</is_default>
+      <weight>2</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Crime and Legal-related</label>
+      <value>Crime and Legal-related</value>
+      <name>Crime_and_Legal_related</name>
+      <is_default>0</is_default>
+      <weight>5</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Education</label>
+      <value>Education</value>
+      <name>Education</name>
+      <is_default>0</is_default>
+      <weight>7</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Employment</label>
+      <value>Employment</value>
+      <name>Employment</name>
+      <is_default>0</is_default>
+      <weight>8</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Environment</label>
+      <value>Environment</value>
+      <name>Environment</name>
+      <is_default>0</is_default>
+      <weight>9</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Food, Agriculture and Nutrition</label>
+      <value>Food, Agriculture and Nutrition</value>
+      <name>Food_Agriculture_and_Nutrition</name>
+      <is_default>0</is_default>
+      <weight>10</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Foundation</label>
+      <value>Foundation</value>
+      <name>Foundation</name>
+      <is_default>0</is_default>
+      <weight>11</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Government Entity</label>
+      <value>Government Entity</value>
+      <name>Government_Entity</name>
+      <is_default>0</is_default>
+      <weight>12</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Health Care</label>
+      <value>Health Care</value>
+      <name>Health_Care</name>
+      <is_default>0</is_default>
+      <weight>13</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Housing and Shelter</label>
+      <value>Housing and Shelter</value>
+      <name>Housing_and_Shelter</name>
+      <is_default>0</is_default>
+      <weight>14</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Human Services</label>
+      <value>Human Services</value>
+      <name>Human_Services</name>
+      <is_default>0</is_default>
+      <weight>16</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Library</label>
+      <value>Library</value>
+      <name>Library</name>
+      <is_default>0</is_default>
+      <weight>17</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Medical Research</label>
+      <value>Medical Research</value>
+      <name>Medical_Research</name>
+      <is_default>0</is_default>
+      <weight>18</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Other (please specify)</label>
+      <value>Other</value>
+      <name>Other__please_specify_</name>
+      <is_default>0</is_default>
+      <weight>30</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Political Campaign</label>
+      <value>Political Campaign</value>
+      <name>Political_Campaign</name>
+      <is_default>0</is_default>
+      <weight>20</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Political Group / Party</label>
+      <value>Political Group / Party</value>
+      <name>Political_Group__Party</name>
+      <is_default>0</is_default>
+      <weight>21</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Professional Society</label>
+      <value>Professional Society</value>
+      <name>Professional_Society</name>
+      <is_default>0</is_default>
+      <weight>22</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Public and Societal Benefit</label>
+      <value>Public and Societal Benefit</value>
+      <name>Public_and_Societal_Benefit</name>
+      <is_default>0</is_default>
+      <weight>23</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Recreation and Sports</label>
+      <value>Recreation and Sports</value>
+      <name>Recreation_and_Sports</name>
+      <is_default>0</is_default>
+      <weight>25</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Religion-related</label>
+      <value>Religion-related</value>
+      <name>Religion_related</name>
+      <is_default>0</is_default>
+      <weight>26</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Science and Technology</label>
+      <value>Science and Technology</value>
+      <name>Science_and_Technology</name>
+      <is_default>0</is_default>
+      <weight>27</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Trade Association</label>
+      <value>Trade Association</value>
+      <name>Trade_Association</name>
+      <is_default>0</is_default>
+      <weight>28</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Youth Development</label>
+      <value>Youth Development</value>
+      <name>Youth_Development</name>
+      <is_default>0</is_default>
+      <weight>29</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>organization_sector_20100908145433</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>CiviCase</label>
+      <value>CiviCase</value>
+      <name>CiviCase</name>
+      <is_default>0</is_default>
+      <weight>1</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>civicrm_components_20100908150826</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>CiviContribute</label>
+      <value>CiviContribute</value>
+      <name>CiviContribute</name>
+      <is_default>0</is_default>
+      <weight>2</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>civicrm_components_20100908150826</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>CiviEvent</label>
+      <value>CiviEvent</value>
+      <name>CiviEvent</name>
+      <is_default>0</is_default>
+      <weight>3</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>civicrm_components_20100908150826</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>CiviGrant</label>
+      <value>CiviGrant</value>
+      <name>CiviGrant</name>
+      <is_default>0</is_default>
+      <weight>4</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>civicrm_components_20100908150826</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>CiviMail</label>
+      <value>CiviMail</value>
+      <name>CiviMail</name>
+      <is_default>0</is_default>
+      <weight>5</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>civicrm_components_20100908150826</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>CiviMember</label>
+      <value>CiviMember</value>
+      <name>CiviMember</name>
+      <is_default>0</is_default>
+      <weight>6</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>civicrm_components_20100908150826</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Excellent</label>
+      <value>Excellent</value>
+      <is_default>0</is_default>
+      <weight>1</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Good</label>
+      <value>Good</value>
+      <is_default>0</is_default>
+      <weight>2</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Average</label>
+      <value>Average</value>
+      <is_default>0</is_default>
+      <weight>3</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Below Average</label>
+      <value>Below Average</value>
+      <is_default>0</is_default>
+      <weight>4</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Poor</label>
+      <value>Poor</value>
+      <is_default>0</is_default>
+      <weight>5</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>satisfaction_with_civicrm__20100908151542</option_group_name>
+    </OptionValue>
+  </OptionValues>
+  <ProfileGroups>
+    <ProfileGroup>
+      <is_active>1</is_active>
+      <group_type>Organization,Contact</group_type>
+      <title>Register Your Site Profile</title>
+      <add_captcha>0</add_captcha>
+      <is_map>0</is_map>
+      <is_edit_link>0</is_edit_link>
+      <is_uf_link>0</is_uf_link>
+      <is_update_dupe>0</is_update_dupe>
+      <created_date>2010-09-08 15:14:24</created_date>
+      <is_proximity_search>0</is_proximity_search>
+    </ProfileGroup>
+  </ProfileGroups>
+  <ProfileFields>
+    <ProfileField>
+      <field_name>organization_name</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>1</is_required>
+      <weight>1</weight>
+      <help_post></help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>1</is_searchable>
+      <label>Organization Name</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>email</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>2</weight>
+      <help_post></help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>1</in_selector>
+      <is_searchable>1</is_searchable>
+      <label>Email</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+11    </ProfileField>
+    <ProfileField>
+      <field_name>url-1</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>1</is_required>
+      <weight>3</weight>
+      <help_post></help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>1</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Website</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>city</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>4</weight>
+      <help_post></help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>1</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>City</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>state_province</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>5</weight>
+      <help_post></help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>1</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>State</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>country</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>6</weight>
+      <help_post></help_post>
+      <visibility>Public Pages and Listings</visibility>
+      <in_selector>1</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Country</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.annual_budget__usd__9</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>7</weight>
+      <help_post></help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Annual Budget (USD)</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.civicrm_components_12</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>12</weight>
+      <help_post>Mark the CiviCRM components that your organization uses.</help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>CiviCRM Components</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.civicrm_consulting_firm__14</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>16</weight>
+      <help_post>If your organization used a consultant to assist in installing, configuring or customizing CiviCRM enter the consulting firm name here.</help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Consulting Firm?</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.how_are_you_using_civicrm_13</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>11</weight>
+      <help_post>Briefly describe how your organization uses CiviCRM.</help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>How are you using CiviCRM</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.number_of_employees_8</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>8</weight>
+      <help_post></help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Number of Employees</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.organization_sector_10</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>9</weight>
+      <help_post>Select one or more categories that most closely describe your organization's focus area(s).</help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Organization Category</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.other_sector_11</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>10</weight>
+      <help_post></help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Other Category</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.recommend_to_others__17</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>15</weight>
+      <help_post>Would you recommend CiviCRM to other organizations like yours?</help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Recommend to others?</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.satisfaction_with_civicrm__15</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>13</weight>
+      <help_post>Rate your organization's overall satisfaction level with CiviCRM.</help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Satisfaction with CiviCRM?</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>custom.civicrm_value_civicrm_site_registration_4.usability_rating_16</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>14</weight>
+      <help_post>Rate the overall usability of CiviCRM.</help_post>
+      <visibility>Public Pages</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Usability Rating</label>
+      <field_type>Organization</field_type>
+      <profile_group_name>Register Your Site Profile</profile_group_name>
+    </ProfileField>
+  </ProfileFields>
+</CustomData>

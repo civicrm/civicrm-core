@@ -1,0 +1,4 @@
+<extension key='test.extension.manager.moduletest' type='module'>
+  <file>moduletest</file>
+  <name>test_extension_manager_moduletest</name>
+</extension>

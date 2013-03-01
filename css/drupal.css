@@ -1,0 +1,554 @@
+/* $Id$ */
+
+/*
+** HTML elements
+*/
+fieldset {
+  margin-bottom: 1em;
+  padding: .5em;
+}
+form {
+  margin: 0;
+  padding: 0;
+}
+hr {
+  height: 1px;
+  border: 1px solid gray;
+}
+img {
+  border: 0;
+}
+table {
+  border-collapse: collapse;
+}
+th {
+  text-align: left;
+  padding-right: 1em;
+  border-bottom: 3px solid #ccc;
+  white-space: nowrap;
+}
+th.active img {
+  display: inline;
+}
+tr.dark, tr.light {
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
+}
+tr.dark, tr.light {
+  padding: 0.1em 0.6em;
+}
+td.active {
+  background-color: #ddd;
+}
+
+/*
+** Menu styles
+*/
+.menu {
+  padding: 0 0 0 0.5em;
+}
+.menu ul {
+  list-style: none;
+  border: none;
+  text-align:left;
+}
+.menu li a {
+  width: 100%;
+  text-decoration: none;
+}
+li.expanded {
+  list-style-type: circle;
+  list-style-image: url(menu-expanded.png);
+  padding: 0.2em 0.5em 0 0;
+  margin: 0;
+}
+li.collapsed {
+  list-style-type: disc;
+  list-style-image: url(menu-collapsed.png);
+  padding: 0.2em 0.5em 0 0;
+  margin: 0;
+}
+li.leaf {
+  list-style-type: square;
+  list-style-image: url(menu-leaf.png);
+  padding: 0.2em 0.5em 0 0;
+  margin: 0;
+}
+li a.active {
+  color: #000;
+}
+td.menu-disabled {
+  background: #ccc;
+}
+
+/*
+** Other common styles
+*/
+.breadcrumb {
+  padding-bottom: .5em
+}
+.block ul {
+  margin: 0;
+  padding: 0 0 0.25em 1em;
+}
+br.clear {
+  clear: both;
+  height: 0px;
+}
+.container-inline div {
+  display: inline;
+}
+.container-inline .form-submit {
+  margin: 0;
+}
+.error {
+  color: red;
+}
+.item-list .icon {
+  color: #555;
+  float: right;
+  padding-left: 0.25em;
+  clear: right;
+}
+.item-list .icon a {
+  color: #000;
+  text-decoration: none;
+}
+.item-list .icon a:hover {
+  color: #000;
+  text-decoration: none;
+}
+.item-list .title {
+  font-weight: bold;
+}
+.item-list ul {
+  margin: 0 0 0.75em 0;
+  padding: 0;
+}
+.item-list ul li {
+  margin: 0 0 0.25em 1.5em;
+  padding: 0;
+  list-style: disc;
+}
+.form-item {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+tr.light .form-item, tr.dark .form-item {
+  margin-top: 0;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+.form-item input.error, .form-item textarea.error {
+  border: 2px solid red;
+}
+.form-item .description {
+  font-size: 0.85em;
+}
+.form-item label {
+  font-weight: bold;
+}
+.form-item label.option {
+  font-weight: normal;
+}
+.form-submit {
+  margin: 0.5em 0;
+}
+.marker, .form-required {
+  color: #f00;
+}
+.more-link {
+  text-align: right;
+}
+.node-form .form-text {
+  display: block;
+  width: 95%;
+}
+.node-form .standard {
+  clear: both;
+}
+.node-form textarea {
+  display: block;
+  width: 95%;
+}
+.node-form fieldset {
+  display: inline;
+}
+.node-form .admin .form-item .title {
+  margin-top: 0;
+}
+.node-form .admin .authored .form-item {
+  margin-bottom: 1.1em;
+}
+.node-form .admin .authored .form-text  {
+  width: auto;
+}
+.node-form .admin .authored, .node-form .admin .options, .node-form .admin .extra {
+  float: left;
+  margin-right: 2em;
+  margin-bottom: 1em;
+}
+.node-form .attachments fieldset {
+  float: none;
+  display: block;
+}
+.ok {
+  color: #080;
+}
+#pager {
+  clear: both;
+  text-align: center;
+}
+#pager div {
+  padding: 0.5em;
+}
+.path {
+  padding-bottom: 0.7em;
+  font-size: 1.1em;
+}
+
+/*
+** Module specific styles
+*/
+#aggregator .feed img {
+  float: right;
+}
+#aggregator .news-item {
+  clear: both;
+  padding-bottom: 1em;
+}
+#aggregator .news-item .date {
+  float: left;
+}
+#aggregator .news-item .body {
+  margin-top: 1em;
+  margin-left: 4em;
+}
+#aggregator .news-item .body .feed {
+  font-size: 0.9em;
+}
+#aggregator .news-item .title {
+  float: left;
+}
+#aggregator .news-item .description {
+  clear: both;
+}
+#aggregator td {
+  vertical-align: bottom;
+}
+#aggregator td.categorize-item {
+  white-space: nowrap;
+}
+#aggregator .categorize-item .news-item .body {
+  margin-top: 0;
+}
+#aggregator .categorize-item h3 {
+  margin-bottom: 1em;
+  margin-top: 0;
+}
+.book {
+  margin: 1em 0 1em 0;
+}
+.book .title {
+  font-weight: bold;
+  font-size: 1.3em;
+  margin-bottom:1em;
+}
+.book .tree {
+  padding-top:1em;
+  border-top: 1px solid #888;
+  padding-bottom: 1em;
+}
+.book .name {
+  padding-top:1em;
+  font-weight: bold;
+  font-size: 1em;
+}
+.book .nav {
+  border-top: 1px solid #888;
+  border-bottom: 1px solid #888;
+  padding-bottom: 3em;
+  padding-top: 1em;
+  clear: both;
+}
+.book .nav .links {
+  clear: both;
+}
+.book .nav .titles {
+  clear: both;
+}
+.book .nav .prev {
+  float: left;
+  text-align: left;
+  width: 45%;
+}
+.book .nav .next {
+  float: right;
+  text-align: right;
+  width: 45%;
+}
+.book .nav .up {
+  text-align: center;
+}
+.calendar .row-week td a {
+  display: block;
+}
+.calendar .row-week td a:hover {
+  background-color: #888; color: #fff;
+}
+.calendar a {
+  text-decoration: none;
+}
+.calendar a:hover {
+  text-decoration: none;
+}
+.calendar table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #000;
+}
+.calendar td, .calendar th {
+  text-align: center;
+  border: 1px solid #000;
+  padding: 1px;
+  margin: 0;
+  font-size: 0.8em;
+}
+.calendar td.day-blank {
+  border: 0;
+}
+.tips {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 0.9em;
+}
+#forum .description {
+  font-size: 0.9em;
+  margin: 0.5em;
+}
+#forum td.created, #forum td.posts, #forum td.topics, #forum td.last-reply, #forum td.replies, #forum td.pager {
+  white-space: nowrap;
+}
+#forum td.posts, #forum td.topics, #forum td.replies, #forum td.pager {
+  text-align: center;
+}
+
+#node-admin-filter ul {
+  list-style-type: none;
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+}
+#node-admin-buttons {
+  float: left;
+  margin-left: 0.5em;
+  clear: right;
+}
+dl.multiselect dd.b, dl.multiselect dd.b .form-item, dl.multiselect dd.b select {
+  font-family: inherit;
+  font-size: inherit;
+  width: 14em;
+}
+dl.multiselect dd.a, dl.multiselect dd.a .form-item {
+  width: 8em;
+}
+dl.multiselect dt, dl.multiselect dd {
+  float: left;
+  line-height: 1.75em;
+  padding: 0px;
+  margin: 0px 1em 0px 0px;
+}
+dl.multiselect .form-item {
+  height: 1.75em;
+  margin: 0px;
+}
+#permissions td.module, #blocks td.region {
+  font-weight: bold;
+}
+#permissions td.permission, #blocks td.block {
+  padding-left: 2em;
+}
+#access-rules .access-type, #access-rules .rule-type {
+  margin-right: 1em;
+  float: left;
+}
+#access-rules .access-type .form-item, #access-rules .rule-type .form-item {
+  margin-top: 0;
+}
+#access-rules .mask {
+  clear: both;
+}
+.poll .bar {
+  height: 1em;
+  margin: 1px 0;
+  background-color: #ddd;
+}
+.poll .bar .foreground {
+  background-color: #000;
+  height: 1em;
+  clear: left;
+  float: left;
+}
+.poll .links {
+  text-align: center;
+}
+.poll .percent {
+  text-align: right;
+}
+.poll .total {
+  text-align: center;
+}
+.poll .vote-form {
+  text-align: center;
+}
+.poll .vote-form .choices {
+  text-align: left;
+  margin: 0 auto;
+  display: table;
+}
+.profile {
+  clear: both;
+  margin: 1em 0 1em 0;
+}
+.profile .picture {
+  float: right;
+  margin: 0 1em 1em 0;
+}
+.node-form .poll-form fieldset {
+  display: block;
+}
+img.screenshot {
+  border: 1px solid #808080;
+  display: block;
+  margin: 2px;
+}
+.search-form {
+  margin-bottom: 1em;
+}
+.search-form p {
+  margin-top: 0;
+  margin-bottom: 0.2em;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.search-form input {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.search-results p {
+  margin-top: 0;
+}
+.search-results dt {
+  font-size: 1.1em;
+}
+.search-results dd {
+  margin-bottom: 1em;
+}
+.search-results .search-info {
+  font-size: 0.85em;
+}
+.tips table {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+#tracker td.replies {
+  text-align: center;
+}
+#tracker table {
+  width: 100%;
+}
+.user-login-block {
+  text-align: center;
+}
+.more-help-link {
+  font-size: 0.85em;
+  text-align: right;
+}
+tr.watchdog-user {
+  background: #ffd;
+}
+tr.watchdog-user .active {
+  background: #eed;
+}
+tr.watchdog-content {
+  background: #ddf;
+}
+tr.watchdog-content .active {
+  background: #cce;
+}
+tr.watchdog-page-not-found, tr.watchdog-access-denied {
+  background: #dfd;
+}
+tr.watchdog-page-not-found .active, tr.watchdog-access-denied .active {
+  background: #cec;
+}
+tr.watchdog-error {
+  background: #ffc9c9;
+}
+tr.watchdog-error .active {
+  background: #eeb9b9;
+}
+.comment .links .form-item {
+  display: inline;
+  white-space: nowrap;
+}
+.comment .links .form-item br {
+  display: none;
+}
+#comment-moderation-button {
+  text-align: center;
+}
+
+/* Tab navigation */
+ul.primary {
+  border-collapse: collapse;
+  padding: 0 0 0 1em;
+  white-space: nowrap;
+  list-style: none;
+  margin: 5px;
+  height: auto;
+  line-height: normal;
+  border-bottom: 1px solid #bbb;
+}
+ul.primary li {
+  display: inline;
+}
+ul.primary li a {
+  background-color: #ddd;
+  border-color: #bbb;
+  border-width: 1px;
+  border-style: solid solid none solid;
+  height: auto;
+  margin-right: 0.5em;
+  padding: 0 1em;
+  text-decoration: none;
+}
+ul.primary li.active a {
+  background-color: #fff;
+  border: 1px solid #bbb;
+  border-bottom: #fff 1px solid;
+}
+ul.primary li a:hover {
+  background-color: #eee;
+  border-color: #ccc;
+  border-bottom-color: #eee;
+}
+ul.secondary {
+  border-bottom: 1px solid #bbb;
+  padding: 0.5em 1em 0.5em 1em;
+  margin: 5px;
+}
+ul.secondary li {
+  display: inline;
+  padding: 0 1em;
+  border-right: 1px solid #ccc;
+}
+ul.secondary a {
+  padding: 0;
+  text-decoration: none;
+}
+ul.secondary a.active {
+  border-bottom: 4px solid #999;
+}

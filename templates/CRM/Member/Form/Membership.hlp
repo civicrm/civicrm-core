@@ -1,0 +1,41 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-auto_renew-title"}
+  {ts}Auto Renew{/ts}
+{/htxt}
+{htxt id="id-auto_renew"}
+<p>{ts}A recurring payment (subscription) request will be submitted to the selected payment processor. If the request is
+successful, this membership will be automatically renewed on the last day of the membership period until the recurring payment is
+cancelled. Membership payment receipt emails will include a link for the member to cancel the auto-renewal.{/ts}</p>
+{if $params.action eq 2}
+    {ts}To cancel automatic renewal ...
+    <ul><li>If this recurring payment uses a processor which has support for integrated cancellation, click "Cancel" on this form, and use the
+    "Cancel Auto-renew Subscription" action (click "more" in the membership listing row).</li>
+    <li>If you do not see the "Cancel Auto-renew Subscription" action, you will need to cancel the associated Recurring Contribution record from the
+    Contributions tab. <strong>In this case you must also manually cancel the recurring payment from the payment processor website</strong>.</li>
+    </ul>{/ts}
+{/if}
+{/htxt}

@@ -1,0 +1,1 @@
+{ts}Contribution Receipt{/ts}

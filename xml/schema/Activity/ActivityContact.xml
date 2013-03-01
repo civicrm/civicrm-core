@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table>
+  <base>CRM/Activity</base>
+  <class>ActivityContact</class>
+  <name>civicrm_activity_contact</name>
+  <comment>Activity Contact</comment>
+  <archive>true</archive>
+  <add>4.3</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Activity Contact ID</title>
+    <required>true</required>
+    <comment>Activity contact id</comment>
+    <add>4.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+   <field>
+    <name>activity_id</name>
+    <type>int unsigned</type>
+    <title>Activity ID</title>
+    <required>true</required>
+    <comment>Foreign key to the activity for this record.</comment>
+    <add>4.3</add>
+   </field>
+   <foreignKey>
+    <name>activity_id</name>
+    <table>civicrm_activity</table>
+    <key>id</key>
+    <add>4.3</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+   <field>
+    <name>contact_id</name>
+    <title>Contact ID (match to contact)</title>
+    <import>true</import>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to the contact for this record.</comment>
+    <add>4.3</add>
+   </field>
+   <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.3</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>record_type</name>
+    <type>enum</type>
+    <title>Record Type</title>
+    <values>Source, Assignee, Target</values>
+    <comment>The record type for this row</comment>
+    <add>4.3</add>
+  </field>
+  <index>
+       <name>UI_activity_target_contact_id</name>
+       <fieldName>target_contact_id</fieldName>
+       <fieldName>activity_id</fieldName>
+       <unique>true</unique>
+       <add>4.3</add>
+  </index>
+
+
+</table>

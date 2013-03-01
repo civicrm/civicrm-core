@@ -1,0 +1,40 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-upload-title"}
+  {ts}Activity Import{/ts}
+{/htxt}
+{htxt id="id-upload"}
+    <p>
+    {ts}The Activity Import Wizard allows you to easily upload activity from other applications into CiviCRM. Contacts must already exist in your CiviCRM database prior to importing activities for them. Use Import Contacts to create contact records first, if necessary. Then you can match activities to contacts by Email Address, CiviCRM Contact ID, or an External Identifier (see the TIP below).{/ts}
+    </p>
+    <p>
+    {ts}Files to be imported must be in the 'comma-separated-values' format (CSV). Most applications will allow you to export records in this format. Consult the documentation for your application if you're not sure how to do this. Save this file to your local hard drive (or an accessible drive on your network) - and you are now ready for step 1 (Upload Data).{/ts}
+    </p>
+    <p>
+        <strong>{ts}TIP - Matching Activities to Contact Records{/ts}</strong><br />
+        {ts}CiviCRM allows you to indicate which contact each activity record belongs to using either the unique CiviCRM-assigned Contact ID, a unique External ID which you assign, OR your configured 'strict' Dedupe Rule set (which uses email addresses by default). You must include at least one of these values as a column in your import file. If you are synchronizing (or migrating) contacts from another application to CiviCRM, and that application has assigned a unique ID to each contact, you can import that value into CiviCRM's External ID field. Then you can use that unique key as the 'match to contact' value when importing related data such as Activities.{/ts}
+    <p>
+{/htxt}

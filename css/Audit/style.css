@@ -1,0 +1,141 @@
+/* Note there will also be a bunch of classes specific to the site for each activity they've configured. The class name is "civicase-audit-" plus the name they've given the activity with any non-alphanumeric characters removed. */
+
+#civicase-audit {
+}
+
+#civicase-audit table {
+  border: 0px;
+}
+
+#civicase-audit td {
+  margin: 0px;
+}
+
+#civicase-audit td.leftpane {
+}
+
+#civicase-audit table.report{
+  width: 100%;
+  margin-top: -4px;
+}
+
+#civicase-audit tr.selected td a:link, tr.selected td a:visited, tr.selected td a:active {
+  color: #027AC6;
+  background-color: #FFFF99;
+  font-weight: bold;
+}
+
+#civicase-audit .indicator{
+  width: 30px;
+  text-align: center;
+}
+
+#civicase-audit .separator{
+  width: 10px;
+}
+
+#civicase-audit td.rightpane {
+  background-color: #CCE3F1;
+  border: #333333 solid 1px;
+  padding: 2%;
+  width: 60%;
+}
+
+.rightpaneheader {
+}
+
+.rightpanebody {
+}
+
+#civicase-audit label {
+  font-weight: bold;
+}
+
+.activity {
+}
+
+.auditmenu {
+  padding-bottom: 20px;
+}
+
+.editlink {
+  background: #EEEEEE;
+  border: #333333  solid 1px;
+  padding: 2px 3px 2px 3px;
+  font-size: xx-small;
+  text-transform: uppercase;
+  width: 30px;
+}
+
+.editlink a {
+  text-decoration: none;
+  color: #0000CC;
+  font-weight: bold;
+}
+
+.editlink a:hover {
+  color: #CC0000;
+}
+
+.activity a {
+  text-decoration: none;
+}
+
+.activity a:link, .activity a:visited {
+} 
+
+.activityheader {
+  display: none;
+  padding-bottom: 20px;
+  font-size: smaller;
+}
+
+.activityheader span {
+   display: list-item;
+  list-style-type: none;
+  margin-left: 20px;
+}
+
+.auditmenu span {
+  display: inline;
+  margin-left: 0px;
+}
+
+.activitybody {
+  background: #FFFFFF;
+  padding: 2px;
+  display: none;
+}
+
+.activitybody span {
+  display: list-item;
+  list-style-type: none;
+  margin-left: 20px;
+}
+
+/* The right pane starts off hidden except for the first activity. */
+#civicase-audit-header-1 {
+  display: block;
+}
+
+#civicase-audit-body-1 {
+  display: block;
+}
+
+.String {
+}
+
+.Date {
+}
+
+.File {
+}
+
+.Int {
+}
+
+.Memo {
+}
+
+.Boolean {
+}

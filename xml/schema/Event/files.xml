@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<tables xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="Event.xml"                 parse="xml" />
+  <xi:include href="Participant.xml"           parse="xml" />
+  <xi:include href="ParticipantPayment.xml"    parse="xml" />
+  <xi:include href="ParticipantStatusType.xml" parse="xml" />
+</tables>

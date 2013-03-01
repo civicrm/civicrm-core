@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Navigation</class>
+  <name>civicrm_navigation</name>
+  <comment>Table to store navigation.</comment>
+  <add>3.0</add>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <add>3.0</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+      <name>domain_id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Which Domain is this navigation item for</comment>
+      <add>3.0</add>
+  </field>
+  <foreignKey>
+       <name>domain_id</name>
+       <table>civicrm_domain</table>
+       <key>id</key>
+       <add>3.0</add>
+  </foreignKey>
+  <field>
+       <name>label</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>Navigation Title</comment>
+       <add>3.0</add>
+  </field>
+  <field>
+       <name>name</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>Internal Name</comment>
+       <add>3.0</add>
+  </field>
+  <field>
+    <name>url</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>url in case of custom navigation link</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+       <name>permission</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>Permission for menu item</comment>
+       <add>3.0</add>
+  </field>
+  <field>
+       <name>permission_operator</name>
+       <type>varchar</type>
+       <length>3</length>
+       <comment>Permission Operator</comment>
+       <add>3.0</add>
+  </field>
+  <field>
+       <name>parent_id</name>
+       <type>int unsigned</type>
+       <comment>Parent navigation item, used for grouping</comment>
+       <add>3.0</add>
+  </field>
+  <foreignKey>
+       <name>parent_id</name>
+       <table>civicrm_navigation</table>
+       <key>id</key>
+       <onDelete>CASCADE</onDelete>
+       <add>3.0</add>
+  </foreignKey>
+  <field>
+       <name>is_active</name>
+       <type>boolean</type>
+       <comment>Is this navigation item active?</comment>
+       <add>3.0</add>
+  </field>
+  <field>
+       <name>has_separator</name>
+       <type>boolean</type>
+       <comment>If separator needs to be added after this menu item</comment>
+       <add>3.0</add>
+  </field>
+  <field>
+    <name>weight</name>
+    <type>int</type>
+    <comment>Ordering of the navigation items in various blocks.</comment>
+    <add>3.0</add>
+  </field>
+</table>

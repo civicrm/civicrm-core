@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/SMS</base>
+  <class>Provider</class>
+  <name>civicrm_sms_provider</name>
+  <comment>Table to add different sms providers </comment>
+  <add>4.2</add>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>SMS Provider ID</comment>
+      <add>4.2</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+       <name>name</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Provider internal name points to option_value of option_group sms_provider_name</comment>
+       <add>4.2</add>
+  </field>
+  <field>
+       <name>title</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Provider name visible to user</comment>
+       <add>4.2</add>
+  </field>
+  <field>
+       <name>username</name>
+       <type>varchar</type>
+       <length>255</length>
+       <add>4.2</add>
+  </field>
+  <field>
+       <name>password</name>
+       <type>varchar</type>
+       <length>255</length>
+       <add>4.2</add>
+  </field>
+  <field>
+       <name>api_type</name>
+       <type>int unsigned</type>
+       <required>true</required>
+       <comment>points to value in civicrm_option_value for group sms_api_type</comment>
+       <add>4.2</add>
+  </field>
+  <field>
+       <name>api_url</name>
+       <type>varchar</type>
+       <length>128</length>
+       <add>4.2</add>
+  </field>
+  <field>
+       <name>api_params</name>
+       <type>text</type>
+       <comment>the api params in xml, http or smtp format</comment>
+       <add>4.2</add>
+  </field>
+   <field>
+       <name>is_default</name>
+       <type>boolean</type>
+       <default>0</default>
+       <add>4.2</add>
+  </field>
+   <field>
+       <name>is_active</name>
+       <type>boolean</type>
+       <default>0</default>
+       <add>4.2</add>
+  </field>
+</table>

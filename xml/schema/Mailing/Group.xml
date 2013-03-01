@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>Group</class>
+  <name>civicrm_mailing_group</name>
+  <comment>Stores information about the groups that participate in this mailing..</comment>
+  <archive>true</archive>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+      <name>mailing_id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>The ID of a previous mailing to include/exclude recipients.</comment>
+  </field>
+  <foreignKey>
+       <name>mailing_id</name>
+       <table>civicrm_mailing</table>
+       <key>id</key>
+       <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+       <name>group_type</name>
+       <type>enum</type>
+       <values>Include, Exclude, Base</values>
+       <comment>Are the members of the group included or excluded?.</comment>
+  </field>
+  <field>
+       <name>entity_table</name>
+       <type>varchar</type>
+       <length>64</length>
+       <required>true</required>
+       <comment>Name of table where item being referenced is stored.</comment>
+  </field>
+  <field>
+       <name>entity_id</name>
+       <type>int unsigned</type>
+       <required>true</required>
+       <comment>Foreign key to the referenced item.</comment>
+  </field>
+  <field>
+        <name>search_id</name>
+        <type>int</type>
+        <comment>The filtering search. custom search id or -1 for civicrm api search</comment>
+  </field>
+  <field>
+        <name>search_args</name>
+        <type>text</type>
+        <comment>The arguments to be sent to the search function</comment>
+  </field>
+</table>

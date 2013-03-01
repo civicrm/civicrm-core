@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_group_activity.xml 29583 2010-09-07 10:15:49Z shot $  -->
+<dataset>
+  <civicrm_option_group
+    id="1"
+    name="activity_status"
+    description="Activity Status"
+    is_reserved="0"
+    is_active="1"
+   />
+   <civicrm_option_group
+     id="2"
+     name="activity_type"
+     description="Activity Type"
+     is_reserved="0"
+     is_active="1"
+    />
+    <civicrm_option_group
+      id="3"
+      name="priority"
+      description="Priority"
+      is_reserved="0"
+      is_active="1"
+     />
+</dataset>

@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * Hook to add user to civicrm group when professional form is submitted
+ *
+ */
+function civicrm_professionals_node_insert($node) {
+
+  if ($node->type == 'professionals') {
+    civicrm_initialize();
+    global $user;
+
+    // get the contact id of logged in user
+    require_once 'CRM/Core/BAO/UFMatch.php';
+    $contactId = CRM_Core_BAO_UFMatch::getContactId($user->uid);
+
+    if (!$contactId) {
+      drupal_set_message(t("Contact record for '@contact' not found in civicrm.", array('@contact' => $user->name)), 'error');
+      return;
+    }
+
+    require_once "api/api.php";
+    $params = array('version' => 3);
+
+    // make sure the group name Professional_Services match with the name in civicrm_group table
+    $params['name'] = 'Professional_Services';
+    $result = civicrm_api('Group', 'get', $params);
+
+    if (empty($params) || civicrm_error($result)) {
+      drupal_set_message(t("Group '@grp' not found in civicrm.", array('@grp' => CIVICRM_PROFESSIONALS_GROUP_NAME)), 'error');
+      return;
+    }
+
+    $groupId = $result['id'];
+
+    $params = array('version' => 3,
+      'contact_id' => $contactId,
+      'group_id' => $groupId,
+    );
+
+    civicrm_api('GroupContact', 'create', $params);
+  }
+}
+

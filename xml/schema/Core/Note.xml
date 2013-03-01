@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Note</class>
+  <name>civicrm_note</name>
+  <comment>Notes can be linked to any object in the application.</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Note ID</comment>
+       <add>1.1</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+       <name>entity_table</name>
+       <type>varchar</type>
+       <length>64</length>
+       <required>true</required>
+       <comment>Name of table where item being referenced is stored.</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+       <name>entity_id</name>
+       <type>int unsigned</type>
+       <required>true</required>
+       <comment>Foreign key to the referenced item.</comment>
+       <add>1.1</add>
+  </field>
+  <index>
+       <name>index_entity</name>
+       <fieldName>entity_table</fieldName>
+       <fieldName>entity_id</fieldName>
+       <add>1.1</add>
+  </index>
+  <field>
+       <name>note</name>
+       <type>text</type>
+       <comment>Note and/or Comment.</comment>
+       <htmlType>textarea</htmlType>
+       <rows>4</rows>
+       <cols>60</cols>
+       <import>true</import>
+       <headerPattern>/Note|Comment/i</headerPattern>
+       <dataPattern>//</dataPattern>
+       <add>1.1</add>
+  </field>
+  <field>
+       <name>contact_id</name>
+       <type>int unsigned</type>
+       <comment>FK to Contact ID creator</comment>
+       <add>1.1</add>
+  </field>
+  <foreignKey>
+       <name>contact_id</name>
+       <table>civicrm_contact</table>
+       <key>id</key>
+       <add>1.1</add>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+       <name>modified_date</name>
+       <type>date</type>
+       <comment>When was this note last modified/edited</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+       <name>subject</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>subject of note description</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>privacy</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)</comment>
+       <add>3.3</add>
+  </field>
+</table>

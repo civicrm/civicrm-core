@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: custom_group_activity_type.xml 23352 2009-08-19 21:52:45Z walt $  -->
+<dataset>
+    <civicrm_custom_group
+        id="9"
+        name="activity_custom"
+        title="Activity Custom"
+        extends="Activity"
+        style="Inline"
+        extends_entity_column_value="1"
+        table_name="civicrm_value_activity_custom_9"
+        is_active="1"
+    />
+    <civicrm_custom_field
+        id="11"
+        custom_group_id="9"
+        label="Activity Custom"
+        column_name="activity_custom_11"
+        data_type="String"
+        html_type="Text"
+        is_active="1"
+    />
+</dataset>

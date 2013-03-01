@@ -1,0 +1,38 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="test-intro-title"}
+  {ts}Test Message{/ts}
+{/htxt}
+{htxt id="test-intro"}
+<p>{ts}It's a good idea to test your mailing by sending it to yourself and/or a selected group of people in your organization. You can also view your content in the preview panel below.{/ts}</p>
+<p>{ts}Enter a single email address or select an existing group and click "Send a Test Mailing." Once you receive the test mailing:{/ts}</p>
+<ul>
+<li>{ts}Verify the content and formattting.{/ts}</li>
+<li>{ts}If you are using mail-merge tokens, check that they have been replaced with expected values.{/ts}</li>
+<li>{ts}Click on each included link to make sure they go to the expected web pages.{/ts}</li>
+</ul>
+<p>{ts}If you need to make changes, you can click <strong>Previous</strong> to return to the content step, make your changes, and send another test.{/ts}</p>
+{/htxt}

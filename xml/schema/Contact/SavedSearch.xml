@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>SavedSearch</class>
+  <name>civicrm_saved_search</name>
+  <comment>Users can save their complex SQL queries and use them later.</comment>
+  <add>1.1</add>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Saved search ID</comment>
+       <add>1.1</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>false</autoincrement>
+  </primaryKey>
+  <field>
+       <name>query</name>
+       <title>SQL Query</title>
+       <type>text</type>
+       <import>true</import>
+       <comment>SQL query for this search</comment>
+       <add>1.1</add>
+       <drop>1.5</drop>
+  </field>
+  <field>
+       <name>form_values</name>
+       <title>Submitted Form Values</title>
+       <type>text</type>
+       <import>true</import>
+       <comment>Submitted form values for this search</comment>
+       <add>1.1</add>
+  </field>
+<field>
+       <name>is_active</name>
+       <type>boolean</type>
+       <comment>Is this entry active?</comment>
+       <add>1.1</add>
+       <drop>1.5</drop>
+  </field>
+  <field>
+       <name>mapping_id</name>
+       <type>int unsigned</type>
+       <comment>Foreign key to civicrm_mapping used for saved search-builder searches.</comment>
+       <add>1.5</add>
+  </field>
+  <foreignKey>
+       <name>mapping_id</name>
+       <table>civicrm_mapping</table>
+       <key>id</key>
+       <add>1.5</add>
+  </foreignKey>
+  <field>
+       <name>search_custom_id</name>
+       <type>int unsigned</type>
+       <comment>Foreign key to civicrm_option value table used for saved custom searches.</comment>
+       <add>2.0</add>
+  </field>
+  <field>
+       <name>where_clause</name>
+       <type>text</type>
+       <comment>the sql where clause if a saved search acl</comment>
+       <add>1.6</add>
+  </field>
+  <field>
+       <name>select_tables</name>
+       <type>text</type>
+       <comment>the tables to be included in a select data</comment>
+       <add>1.6</add>
+  </field>
+  <field>
+       <name>where_tables</name>
+       <type>text</type>
+       <comment>the tables to be included in the count statement</comment>
+       <add>1.6</add>
+  </field>
+</table>

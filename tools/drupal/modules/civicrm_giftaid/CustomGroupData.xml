@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CustomData>
+  <CustomGroups>
+    <CustomGroup>
+      <name>Gift_Aid_Declaration</name>
+      <title>Gift Aid Declaration</title>
+      <extends>Individual</extends>
+      <style>Tab</style>
+      <collapse_display>0</collapse_display>
+      <help_pre></help_pre>
+      <help_post></help_post>
+      <weight>1</weight>
+      <is_active>1</is_active>
+      <table_name>civicrm_value_gift_aid_declaration</table_name>
+      <is_multiple>1</is_multiple>
+      <collapse_adv_display>0</collapse_adv_display>
+      <created_date>2010-10-03 02:28:19</created_date>
+    </CustomGroup>
+    <CustomGroup>
+      <name>Gift_Aid</name>
+      <title>Gift Aid</title>
+      <extends>Contribution</extends>
+      <style>Inline</style>
+      <collapse_display>1</collapse_display>
+      <help_pre>Stores the values that are submitted in the Gift Aid Report</help_pre>
+      <help_post></help_post>
+      <weight>2</weight>
+      <is_active>1</is_active>
+      <table_name>civicrm_value_gift_aid_submission</table_name>
+      <is_multiple>0</is_multiple>
+      <collapse_adv_display>0</collapse_adv_display>
+      <created_date>2010-10-03 02:32:44</created_date>
+    </CustomGroup>
+  </CustomGroups>
+  <CustomFields>
+    <CustomField>
+      <name>Eligible_for_Gift_Aid</name>
+      <label>Eligible for Gift Aid?</label>
+      <data_type>Boolean</data_type>
+      <html_type>Radio</html_type>
+      <is_required>1</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>1</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>eligible_for_gift_aid</column_name>
+      <custom_group_name>Gift_Aid_Declaration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Start_Date</name>
+      <label>Start Date</label>
+      <data_type>Date</data_type>
+      <html_type>Select Date</html_type>
+      <is_required>1</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>2</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <date_format>dd-mm-yy</date_format>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>start_date</column_name>
+      <custom_group_name>Gift_Aid_Declaration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>End_Date</name>
+      <label>End Date</label>
+      <data_type>Date</data_type>
+      <html_type>Select Date</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>3</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <date_format>dd-mm-yy</date_format>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>end_date</column_name>
+      <custom_group_name>Gift_Aid_Declaration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Reason_Ended</name>
+      <label>Reason Ended</label>
+      <data_type>String</data_type>
+      <html_type>Radio</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>5</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>32</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>reason_ended</column_name>
+      <option_group_name>reason_ended</option_group_name>
+      <custom_group_name>Gift_Aid_Declaration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Source</name>
+      <label>Source</label>
+      <data_type>String</data_type>
+      <html_type>Text</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>6</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>32</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>source</column_name>
+      <custom_group_name>Gift_Aid_Declaration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Notes</name>
+      <label>Notes</label>
+      <data_type>Memo</data_type>
+      <html_type>TextArea</html_type>
+      <is_required>0</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>7</weight>
+      <attributes>rows=4, cols=60</attributes>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>notes</column_name>
+      <custom_group_name>Gift_Aid_Declaration</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Eligible_for_Gift_Aid</name>
+      <label>Eligible for Gift Aid?</label>
+      <data_type>Boolean</data_type>
+      <html_type>Radio</html_type>
+      <is_required>1</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>1</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>eligible_for_gift_aid</column_name>
+      <custom_group_name>Gift_Aid</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Contributor_Name</name>
+      <label>Contributor Name</label>
+      <data_type>String</data_type>
+      <html_type>Text</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>2</weight>
+      <is_active>1</is_active>
+      <is_view>1</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>name</column_name>
+      <custom_group_name>Gift_Aid</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Address</name>
+      <label>Address</label>
+      <data_type>Memo</data_type>
+      <html_type>TextArea</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>4</weight>
+      <attributes>rows=4, cols=60</attributes>
+      <is_active>1</is_active>
+      <is_view>1</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>address</column_name>
+      <custom_group_name>Gift_Aid</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Post_Code</name>
+      <label>Post Code</label>
+      <data_type>String</data_type>
+      <html_type>Text</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>6</weight>
+      <is_active>1</is_active>
+      <is_view>1</is_view>
+      <text_length>16</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>post_code</column_name>
+      <custom_group_name>Gift_Aid</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Amount</name>
+      <label>Amount</label>
+      <data_type>Money</data_type>
+      <html_type>Text</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>1</is_search_range>
+      <weight>7</weight>
+      <is_active>1</is_active>
+      <is_view>1</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>amount</column_name>
+      <custom_group_name>Gift_Aid</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>Gift_Aid_Amount</name>
+      <label>Gift Aid Amount</label>
+      <data_type>Money</data_type>
+      <html_type>Text</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>1</is_search_range>
+      <weight>8</weight>
+      <is_active>1</is_active>
+      <is_view>1</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>gift_aid_amount</column_name>
+      <custom_group_name>Gift_Aid</custom_group_name>
+    </CustomField>
+  </CustomFields>
+  <OptionGroups>
+    <OptionGroup>
+      <name>reason_ended</name>
+      <label>Reason Ended</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+  </OptionGroups>
+  <OptionValues>
+    <OptionValue>
+      <label>Contact Declined</label>
+      <value>Contact Declined</value>
+      <name>Contact_Declined</name>
+      <is_default>0</is_default>
+      <weight>2</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>reason_ended</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>HMRC Declined</label>
+      <value>HMRC Declined</value>
+      <name>HMRC_Declined</name>
+      <is_default>0</is_default>
+      <weight>1</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>reason_ended</option_group_name>
+    </OptionValue>
+  </OptionValues>
+  <ProfileGroups>
+    <ProfileGroup>
+      <is_active>1</is_active>
+      <group_type>Contribution,Individual,Contact</group_type>
+      <title>Gift Aid</title>
+      <add_captcha>0</add_captcha>
+      <is_map>0</is_map>
+      <is_edit_link>0</is_edit_link>
+      <is_uf_link>0</is_uf_link>
+      <is_update_dupe>2</is_update_dupe>
+      <name>Gift_Aid</name>
+      <created_date>2010-10-03 14:54:18</created_date>
+      <is_proximity_search>0</is_proximity_search>
+    </ProfileGroup>
+  </ProfileGroups>
+  <ProfileFields>
+    <ProfileField>
+      <field_name>custom.civicrm_value_gift_aid_submission.eligible_for_gift_aid</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>1</is_required>
+      <weight>1</weight>
+      <help_post>&lt;p&gt;By selecting 'Yes' above you are confirming that
+&lt;ol&gt;
+&lt;li&gt;you are a UK taxpayer and&lt;/li&gt;
+&lt;li&gt;the amount of income and/or capital gains tax you pay is at least as much as we will reclaim on your donations in this tax year.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;b&gt;About Gift Aid&lt;/b&gt;&lt;p&gt;
+&lt;p&gt;Gift Aid increases the value of donations to charities by allowing them to reclaim basic rate tax on your gift.  We would like to reclaim gift aid on your behalf.  We can only reclaim Gift Aid if you are a UK taxpayer.  Please confirm that you are a eligible for gift aid above.  &lt;a href="http://www.hmrc.gov.uk/individuals/giving/gift-aid.htm"&gt;More about Gift Aid&lt;/a&gt;.&lt;/p&gt;</help_post>
+      <visibility>User and User Admin Only</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Can we reclaim gift aid on your donation?</label>
+      <field_type>Contribution</field_type>
+      <profile_group_name>Gift_Aid</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>first_name</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>1</is_required>
+      <weight>2</weight>
+      <help_post></help_post>
+      <visibility>User and User Admin Only</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>First Name</label>
+      <field_type>Individual</field_type>
+      <profile_group_name>Gift_Aid</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>last_name</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>1</is_required>
+      <weight>3</weight>
+      <help_post></help_post>
+      <visibility>User and User Admin Only</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Last Name</label>
+      <field_type>Individual</field_type>
+      <profile_group_name>Gift_Aid</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>street_address</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>1</is_required>
+      <weight>4</weight>
+      <help_post></help_post>
+      <visibility>User and User Admin Only</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Street Address</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Gift_Aid</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>supplemental_address_1</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>5</weight>
+      <help_post></help_post>
+      <visibility>User and User Admin Only</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Supplemental Address 1</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Gift_Aid</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>supplemental_address_2</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>6</weight>
+      <help_post></help_post>
+      <visibility>User and User Admin Only</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Supplemental Address 2</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Gift_Aid</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>city</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>7</weight>
+      <help_post></help_post>
+      <visibility>User and User Admin Only</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>City</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Gift_Aid</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>state_province</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>0</is_required>
+      <weight>8</weight>
+      <help_post></help_post>
+      <visibility>User and User Admin Only</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>County</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Gift_Aid</profile_group_name>
+    </ProfileField>
+    <ProfileField>
+      <field_name>postal_code</field_name>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <is_required>1</is_required>
+      <weight>9</weight>
+      <help_post></help_post>
+      <visibility>User and User Admin Only</visibility>
+      <in_selector>0</in_selector>
+      <is_searchable>0</is_searchable>
+      <label>Post code</label>
+      <field_type>Contact</field_type>
+      <profile_group_name>Gift_Aid</profile_group_name>
+    </ProfileField>
+  </ProfileFields>
+</CustomData>

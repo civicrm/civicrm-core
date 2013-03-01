@@ -1,0 +1,620 @@
+-- /************************************************************************
+-- *
+-- * MySQL Script for civicrm database/tables - upgradation from 2.0 -> 2.1
+-- *
+-- *************************************************************************/
+
+-- Please add script for all the schema / fixed-data related modifications to 
+-- this sql script as you resolve 2.1 issues. Include the issue number which 
+-- is the source of the change, as part of the comment.
+
+
+-- lower case all email addresses
+
+UPDATE civicrm_email    SET email   = LOWER( email   );
+UPDATE civicrm_uf_match SET uf_name = LOWER( uf_name );
+
+
+-- Add new tinyint column to civicrm_tag
+ALTER TABLE `civicrm_tag`
+    ADD `is_selectable` tinyint DEFAULT 1 AFTER `parent_id`;
+
+-- Add new tinyint columns in civicrm_relationship
+
+ALTER TABLE `civicrm_relationship`
+    ADD `is_permission_a_b` tinyint DEFAULT 0 AFTER `description`;
+ALTER TABLE `civicrm_relationship`
+    ADD `is_permission_b_a` tinyint DEFAULT 0 AFTER `is_permission_a_b`;
+
+
+-- Add 'My Contacts / Organizations' option in user dashboard options
+
+UPDATE civicrm_preferences SET user_dashboard_options  = CONCAT(user_dashboard_options, '56'), 
+                               contact_view_options    = CONCAT(contact_view_options, '1113'),
+			       advanced_search_options = CONCAT(advanced_search_options, '121315');
+
+
+-- make the dates in civicrm_contribution_recur optional
+
+ALTER TABLE `civicrm_contribution_recur`
+  MODIFY modified_date           datetime DEFAULT NULL,
+  MODIFY cancel_date             datetime DEFAULT NULL,
+  MODIFY end_date                datetime DEFAULT NULL,
+  MODIFY next_sched_contribution datetime DEFAULT NULL;
+
+
+-- extend civicrm_dedupe_rule_group to the current schema
+
+ALTER TABLE civicrm_dedupe_rule_group 
+  ADD level enum('Strict', 'Fuzzy'),
+  ADD is_default tinyint;
+
+
+-- make the current dedupe rule groups into default and fuzzy ones
+
+UPDATE civicrm_dedupe_rule_group SET level = 'Fuzzy', is_default = true;
+
+
+-- insert the new strict dedupe_rule_group dupe rules
+
+INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, level, is_default) 
+VALUES ('Individual', 10, 'Strict', true);
+
+SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
+INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
+VALUES (@drgid, 'civicrm_email', 'email', 10);
+
+INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, level, is_default) 
+VALUES ('Organization', 10, 'Strict', true);
+
+SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
+INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
+VALUES (@drgid, 'civicrm_contact', 'organization_name', 10),
+       (@drgid, 'civicrm_email'  , 'email',             10);
+
+INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, level, is_default) 
+VALUES ('Household', 10, 'Strict', true);
+
+SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
+INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
+VALUES (@drgid, 'civicrm_contact', 'household_name', 10),
+       (@drgid, 'civicrm_email'  , 'email',          10);
+
+
+-- Edited indexing of custom group table
+
+ALTER TABLE `civicrm_custom_group` 
+  DROP INDEX `UI_title_domain_id` ,
+  ADD UNIQUE `UI_title_extends` ( `title` , `extends` ),
+  DROP INDEX `UI_name_domain_id` ,
+  ADD UNIQUE `UI_name_extends` ( `name` , `extends` );
+
+ALTER TABLE `civicrm_custom_group`
+  MODIFY `extends` enum('Contact','Individual','Household','Organization','Location','Address','Contribution','Activity','Relationship','Group','Membership','Participant','Event','Grant','Pledge') collate utf8_unicode_ci default 'Contact' COMMENT 'Type of object this group extends (can add other options later e.g. contact_address, etc.).';
+
+-- change the default value of is_email_confirm to 0 from 1 in civicrm_event_page table, CRM-3109
+
+ALTER TABLE `civicrm_event_page`
+    MODIFY `is_email_confirm` tinyint(4) default '0' COMMENT 'If true, confirmation is automatically emailed to contact on successful registration.';
+
+
+-- CRM-2488
+
+ALTER TABLE `civicrm_contribution_page` 
+    ADD `is_recur_interval` tinyint(4) NULL DEFAULT '0' AFTER is_recur,
+    ADD `recur_frequency_unit` varchar(128) NULL DEFAULT NULL AFTER is_recur;
+
+
+UPDATE civicrm_country SET name = 'Moldova' WHERE id = 1143;
+
+
+-- *FIXME*
+-- we need to update option value table for cvOpt, ceOpt, asOpt, udOpt and adOpt. Not sure the best way to do this
+-- since translations are involved. The easiest option might be to delete the rows and then readd them
+-- CRM-2734
+
+
+-- CRM-2781
+
+ALTER TABLE `civicrm_mapping` ADD `mapping_type_id` int(10) unsigned NULL DEFAULT NULL AFTER mapping_type;
+
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
+	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Export Contact';
+UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Export';
+
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
+	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Export Contribution';
+UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Export Contributions';
+
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
+	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Activity';
+UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import Activity';
+
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
+	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Contact';
+UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import';
+
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
+	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Contribution';
+UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import Contributions';
+
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
+	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Membership';
+UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import Memberships';
+
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
+	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Participant';
+UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import Participants';
+
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
+	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Search Builder';
+UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Search Builder';
+
+ALTER TABLE `civicrm_mapping` DROP `mapping_type`;
+
+-- CRM-2964
+
+ALTER TABLE `civicrm_contribution_page` 
+    ADD `for_organization` text NULL DEFAULT NULL AFTER thankyou_footer,
+    ADD `is_for_organization` tinyint(4) NULL DEFAULT '0' AFTER thankyou_footer;
+
+
+-- add the language column to civicrm_uf_match
+
+ALTER TABLE civicrm_uf_match ADD language VARCHAR(5) COMMENT 'UI language preferred by the given user/contact';
+
+
+-- CRM-3217
+
+ALTER TABLE `civicrm_custom_field` MODIFY `label` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Text for form field label (also friendly name for administering this custom property).';
+
+ALTER TABLE `civicrm_price_set` 
+   MODIFY `title` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Displayed title for Price Set.',
+   MODIFY `name` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Variable name/programmatic handle for this set of price fields.';
+
+ALTER TABLE `civicrm_price_field` 
+   MODIFY `label` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Text for form field label (also friendly name for administering this field).',
+   MODIFY `name` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Variable name/programmatic handle for this field.';
+
+
+-- Modify civicrm_acl_cache
+
+ALTER TABLE civicrm_acl_cache 
+    DROP FOREIGN KEY FK_civicrm_acl_cache_contact_id,
+    DROP FOREIGN KEY FK_civicrm_acl_cache_acl_id;
+
+ALTER TABLE civicrm_acl_cache
+    ADD CONSTRAINT FK_civicrm_acl_cache_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id) ON DELETE CASCADE,      
+    ADD CONSTRAINT FK_civicrm_acl_cache_acl_id FOREIGN KEY (acl_id) REFERENCES civicrm_acl(id) ON DELETE CASCADE;
+
+
+-- CRM-3261
+
+UPDATE civicrm_relationship_type SET is_reserved = 1 WHERE id IN (4,6,7);
+
+
+-- CRM-3281
+
+UPDATE civicrm_state_province SET name = "Frederiksberg"   WHERE id = 2261;
+UPDATE civicrm_state_province SET name = "Copenhagen City" WHERE id = 2262;
+UPDATE civicrm_state_province SET name = "Vestsjælland"    WHERE id = 2266;
+UPDATE civicrm_state_province SET name = "Fyn"             WHERE id = 2269;
+UPDATE civicrm_state_province SET name = "South Jutland"   WHERE id = 2270;
+UPDATE civicrm_state_province SET name = "Ringkjøbing"     WHERE id = 2273;
+UPDATE civicrm_state_province SET name = "Århus"           WHERE id = 2274;
+UPDATE civicrm_state_province SET name = "North Jutland"   WHERE id = 2276;
+
+INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES 
+(5196, 1016, "13", "Al Manāmah (Al ‘Āşimah)"),
+(5197, 1016, "14", "Al Janūbīyah"),
+(5199, 1016, "16", "Al Wusţá"),
+(5200, 1016, "17", "Ash Shamālīyah");
+
+
+-- CRM-3435
+
+INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES 
+(5201, 1165, "_A", "Jenin"),
+(5202, 1165, "_B", "Tubas"),
+(5203, 1165, "_C", "Tulkarm"),
+(5204, 1165, "_D", "Nablus"),
+(5205, 1165, "_E", "Qalqilya"),
+(5206, 1165, "_F", "Salfit"),
+(5207, 1165, "_G", "Ramallah and Al-Bireh"),
+(5208, 1165, "_H", "Jericho"),
+(5209, 1165, "_I", "Jerusalem"),
+(5210, 1165, "_J", "Bethlehem"),
+(5211, 1165, "_K", "Hebron"),
+(5212, 1165, "_L", "North Gaza"),
+(5213, 1165, "_M", "Gaza"),
+(5214, 1165, "_N", "Deir el-Balah"),
+(5215, 1165, "_O", "Khan Yunis"),
+(5216, 1165, "_P", "Rafah");
+
+
+-- CRM-3441
+
+INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES 
+(10000, 1107, "CI", "Carbonia-Iglesias"),
+(10001, 1107, "OT", "Olbia-Tempio"),
+(10002, 1107, "VS", "Medio Campidano"),
+(10003, 1107, "OG", "Ogliastra");
+
+UPDATE civicrm_state_province SET name = "Forlì-Cesena" WHERE id = 3206;
+UPDATE civicrm_state_province SET abbreviation = "FC"   WHERE id = 3206;
+UPDATE civicrm_state_province SET abbreviation = "MC"   WHERE id = 3221;
+UPDATE civicrm_state_province SET abbreviation = "PU"   WHERE id = 3237;
+
+
+-- CRM-3609
+
+INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES (5217, 1020, "BRU", "Brussels");
+
+
+-- Following wasn't done by 2.0 upgrade script, so adding here (also added to 2.0 script)
+
+ALTER TABLE `civicrm_loc_block`
+DROP FOREIGN KEY `FK_civicrm_loc_block_email_id`,
+DROP FOREIGN KEY `FK_civicrm_loc_block_email_2_id`,
+DROP FOREIGN KEY `FK_civicrm_loc_block_phone_id`,
+DROP FOREIGN KEY  `FK_civicrm_loc_block_phone_2_id`,
+DROP FOREIGN KEY `FK_civicrm_loc_block_im_id`,
+DROP FOREIGN KEY  `FK_civicrm_loc_block_im_2_id`;
+
+ALTER TABLE `civicrm_loc_block`
+ADD CONSTRAINT `FK_civicrm_loc_block_email_id`   FOREIGN KEY (`email_id`)   REFERENCES `civicrm_email` (`id`) ON DELETE SET NULL,
+ADD CONSTRAINT `FK_civicrm_loc_block_email_2_id` FOREIGN KEY (`email_2_id`) REFERENCES `civicrm_email` (`id`) ON DELETE SET NULL,
+ADD CONSTRAINT `FK_civicrm_loc_block_phone_id`   FOREIGN KEY (`phone_id`)   REFERENCES `civicrm_phone` (`id`) ON DELETE SET NULL,
+ADD CONSTRAINT `FK_civicrm_loc_block_phone_2_id` FOREIGN KEY (`phone_2_id`) REFERENCES `civicrm_phone` (`id`) ON DELETE SET NULL,
+ADD CONSTRAINT `FK_civicrm_loc_block_im_id`      FOREIGN KEY (`im_id`)      REFERENCES `civicrm_im` (`id`)    ON DELETE SET NULL,
+ADD CONSTRAINT `FK_civicrm_loc_block_im_2_id`    FOREIGN KEY (`im_2_id`)    REFERENCES `civicrm_im` (`id`)    ON DELETE SET NULL;
+
+
+
+-- add the new civicrm_domain.locales column
+
+ALTER TABLE civicrm_domain ADD locales text COMMENT 'list of locales supported by the current db state (NULL for single-lang install)';
+
+
+
+-- new tables added to 2.0
+
+CREATE TABLE `civicrm_cache` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `group_name` varchar(32) collate utf8_unicode_ci NOT NULL COMMENT 'group name for cache element, useful in cleaning cache elements',
+  `path` varchar(64) collate utf8_unicode_ci default NULL COMMENT 'Unique path name for cache element',
+  `data` text collate utf8_unicode_ci COMMENT 'data associated with this path',
+  `component_id` int(10) unsigned default NULL COMMENT 'Component that this menu item belongs to',
+  `created_date` datetime default NULL COMMENT 'When was the cache item created',
+  `expired_date` datetime default NULL COMMENT 'When should cache item expire',
+  PRIMARY KEY  (`id`),
+  UNIQUE `UI_group_path` (`group_name`,`path`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `civicrm_cache`
+  ADD CONSTRAINT `FK_civicrm_cache_component_id` FOREIGN KEY (`component_id`) REFERENCES `civicrm_component` (`id`);
+
+
+CREATE TABLE `civicrm_group_contact_cache` (
+  `id` int(10) unsigned NOT NULL auto_increment COMMENT 'primary key',
+  `group_id` int(10) unsigned NOT NULL COMMENT 'FK to civicrm_group',
+  `contact_id` int(10) unsigned NOT NULL COMMENT 'FK to civicrm_contact',
+  PRIMARY KEY  (`id`),
+  UNIQUE `UI_contact_group` (`contact_id`,`group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `civicrm_group_contact_cache`
+  ADD CONSTRAINT `FK_civicrm_group_contact_cache_group_id` FOREIGN KEY (`group_id`) REFERENCES `civicrm_group` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_civicrm_group_contact_cache_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE;
+
+-- create discount table
+CREATE TABLE `civicrm_discount` (
+    `id` int(10) unsigned NOT NULL COMMENT 'primary key' auto_increment,
+    `entity_table` varchar(64) collate utf8_unicode_ci default NULL COMMENT 'physical tablename for entity being joined to discount, e.g. civicrm_event',
+    `entity_id` int(10) unsigned NOT NULL COMMENT 'FK to entity table specified in entity_table column.',
+    `option_group_id` int(10) unsigned NOT NULL  COMMENT 'FK to civicrm_option_group',
+    `start_date` date default NULL COMMENT 'Date when discount starts.',
+    `end_date` date default NULL COMMENT 'Date when discount ends.',
+    PRIMARY KEY (id),
+    INDEX index_entity (entity_table, entity_id),
+    INDEX index_entity_option_id (entity_table, entity_id, option_group_id),
+    CONSTRAINT `FK_civicrm_discount_option_group_id` FOREIGN KEY (`option_group_id`) REFERENCES `civicrm_option_group` (`id`) ON DELETE CASCADE
+   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+
+
+-- menu table
+
+CREATE TABLE `civicrm_menu` (
+  id int unsigned NOT NULL AUTO_INCREMENT  ,
+  path varchar(255)    COMMENT 'Path Name',
+  path_arguments text    COMMENT 'Arguments to pass to the url',
+  title varchar(255)    COMMENT 'Menu Title',
+  access_callback varchar(255)    COMMENT 'Function to call to check access permissions',
+  access_arguments text    COMMENT 'Arguments to pass to access callback',
+  page_callback varchar(255)    COMMENT 'function to call for this url',
+  page_arguments text    COMMENT 'Arguments to pass to page callback',
+  breadcrumb text    COMMENT 'Breadcrumb for the path.',
+  return_url varchar(255)    COMMENT 'Url where a page should redirected to, if next url not known.',
+  return_url_args varchar(255)    COMMENT 'Arguments to pass to return_url',
+  component_id int unsigned    COMMENT 'Component that this menu item belongs to',
+  is_active tinyint    COMMENT 'Is this menu item active?',
+  is_public tinyint    COMMENT 'Is this menu accessible to the public?',
+  is_exposed tinyint    COMMENT 'Is this menu exposed to the navigation system?',
+  is_ssl tinyint    COMMENT 'Should this menu be exposed via SSL if enabled?',
+  weight int NOT NULL  DEFAULT 1 COMMENT 'Ordering of the menu items in various blocks.',
+  type int NOT NULL  DEFAULT 1 COMMENT 'Drupal menu type.',
+  page_type int NOT NULL  DEFAULT 1 COMMENT 'CiviCRM menu type.',
+  PRIMARY KEY  (`id`),
+  UNIQUE `UI_path` (`path`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `civicrm_menu`
+  ADD CONSTRAINT `FK_civicrm_menu_component_id` FOREIGN KEY (`component_id`) REFERENCES `civicrm_component` (`id`);
+
+-- pledge component insert
+
+INSERT INTO civicrm_component (name, namespace) VALUES ('CiviPledge', 'CRM_Pledge' );
+
+-- pledge tables
+
+CREATE TABLE `civicrm_pledge` (
+  `id` int(10) unsigned NOT NULL auto_increment COMMENT 'Pledge ID',
+  `contact_id` int(10) unsigned NOT NULL COMMENT 'Foreign key to civicrm_contact.id .',
+  `contribution_type_id` int(10) unsigned default NULL COMMENT 'FK to Contribution Type. This is propagated to contribution record when pledge payments are made.',
+  `contribution_page_id` int(10) unsigned default NULL COMMENT 'The Contribution Page which triggered this contribution',
+  `amount` decimal(20,2) NOT NULL COMMENT 'Total pledged amount.',
+  `frequency_unit` enum('day','week','month','year') collate utf8_unicode_ci default 'month' COMMENT 'Time units for recurrence of pledge payments.',
+  `frequency_interval` int(10) unsigned NOT NULL default '1' COMMENT 'Number of time units for recurrence of pledge payments.',
+  `frequency_day` int(10) unsigned NOT NULL default '3' COMMENT 'Day in the period when the pledge payment is due e.g. 1st of month, 15th etc. Use this to set the scheduled dates for pledge payments.',
+  `installments` int(10) unsigned default '1' COMMENT 'Total number of payments to be made.',
+  `start_date` datetime NOT NULL COMMENT 'The date the first scheduled pledge occurs.',
+  `create_date` datetime NOT NULL COMMENT 'When this pledge record was created.',
+  `acknowledge_date` datetime default NULL COMMENT 'When a pledge acknowledgement message was sent to the contributor.',
+  `modified_date` datetime default NULL COMMENT 'Last updated date for this pledge record.',
+  `cancel_date` datetime default NULL COMMENT 'Date this pledge was cancelled by contributor.',
+  `end_date` datetime default NULL COMMENT 'Date this pledge finished successfully (total pledge payments equal to or greater than pledged amount).',
+  `honor_contact_id` int(10) unsigned default NULL COMMENT 'FK to contact ID. Used when pledge is made in honor of another contact. This is propagated to contribution records when pledge payments are made.',
+  `honor_type_id` int(10) unsigned default NULL COMMENT 'Implicit FK to civicrm_option_value.',
+  `max_reminders` int(10) unsigned default '1' COMMENT 'The maximum number of payment reminders to send for any given payment.',
+  `initial_reminder_day` int(10) unsigned default '5' COMMENT 'Send initial reminder this many days prior to the payment due date.',
+  `additional_reminder_day` int(10) unsigned default '5' COMMENT 'Send additional reminder this many days after last one sent, up to maximum number of reminders.',
+  `status_id` int(10) unsigned default NULL COMMENT 'Implicit foreign key to civicrm_option_values in the contribution_status option group.',
+  `is_test` tinyint(4) default '0',
+  PRIMARY KEY  (`id`),
+  INDEX `index_status` (`status_id`),
+  CONSTRAINT `FK_civicrm_pledge_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_civicrm_pledge_contribution_type_id` FOREIGN KEY (`contribution_type_id`) REFERENCES `civicrm_contribution_type` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `FK_civicrm_pledge_contribution_page_id` FOREIGN KEY (`contribution_page_id`) REFERENCES `civicrm_contribution_page` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `FK_civicrm_pledge_honor_contact_id` FOREIGN KEY (`honor_contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `civicrm_pledge_block` (
+  `id` int(10) unsigned NOT NULL auto_increment COMMENT 'Pledge ID',
+  `entity_table` varchar(64) collate utf8_unicode_ci default NULL COMMENT 'physical tablename for entity being joined to pledge, e.g. civicrm_contact',
+  `entity_id` int(10) unsigned NOT NULL COMMENT 'FK to entity table specified in entity_table column.',
+  `pledge_frequency_unit` varchar(128) collate utf8_unicode_ci default NULL COMMENT 'Delimited list of supported frequency units',
+  `is_pledge_interval` tinyint(4) default '0' COMMENT 'Is frequency interval exposed on the contribution form.',
+  `max_reminders` int(10) unsigned default '1' COMMENT 'The maximum number of payment reminders to send for any given payment.',
+  `initial_reminder_day` int(10) unsigned default '5' COMMENT 'Send initial reminder this many days prior to the payment due date.',
+  `additional_reminder_day` int(10) unsigned default '5' COMMENT 'Send additional reminder this many days after last one sent, up to maximum number of reminders.',
+  PRIMARY KEY  (`id`),
+  INDEX `index_entity` (`entity_table`,`entity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `civicrm_pledge_payment` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `pledge_id` int(10) unsigned NOT NULL COMMENT 'FK to Pledge table',
+  `contribution_id` int(10) unsigned default NULL COMMENT 'FK to contribution table.',
+  `scheduled_amount` decimal(20,2) NOT NULL COMMENT 'Pledged amount for this payment (the actual contribution amount might be different).',
+  `scheduled_date` datetime NOT NULL COMMENT 'The date the pledge payment is supposed to happen.',
+  `reminder_date` datetime default NULL COMMENT 'The date that the most recent payment reminder was sent.',
+  `reminder_count` int(10) unsigned default '0' COMMENT 'The number of payment reminders sent.',
+  `status_id` int(10) unsigned default NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE `UI_contribution_pledge` (`contribution_id`, `pledge_id`),
+  INDEX `index_status` (`status_id`),
+  CONSTRAINT `FK_civicrm_pledge_payment_pledge_id` FOREIGN KEY (`pledge_id`) REFERENCES `civicrm_pledge` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_civicrm_pledge_payment_contribution_id` FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `civicrm_case_contact` (
+    id int(10) unsigned NOT NULL auto_increment,
+    `case_id` int(10) unsigned NOT NULL,
+    `contact_id` int(10) unsigned NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT `FK_civicrm_case_contact_case_id` FOREIGN KEY (`case_id`) REFERENCES `civicrm_case` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `FK_civicrm_case_contact_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE,
+    UNIQUE `UI_case_contact_id` (`case_id`, `contact_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO civicrm_case_contact (case_id, contact_id)
+SELECT ca.id, ca.contact_id
+FROM   civicrm_case ca
+ON DUPLICATE KEY UPDATE case_id=ca.id;
+
+
+-- fixes noticed via db diff
+
+ALTER TABLE `civicrm_contact`
+    ADD `employer_id` int(10) unsigned NULL DEFAULT NULL AFTER user_unique_id,
+    ADD INDEX `index_contact_type` (`contact_type`),
+    ADD INDEX `index_contact_sub_type` (`contact_sub_type`),
+    ADD INDEX `index_sort_name` (`sort_name`),
+    ADD INDEX `index_hash` (`hash`),
+    DROP INDEX index_contact_type_domain,
+    DROP INDEX index_contact_sub_type_domain,
+    DROP INDEX index_sort_name_domain,
+    DROP INDEX index_hash_domain;
+
+
+UPDATE civicrm_contact cc1
+LEFT JOIN civicrm_contact cc2 ON cc1.mail_to_household_id=cc2.id
+SET cc1.mail_to_household_id=NULL
+WHERE cc2.id IS NULL;
+
+ALTER TABLE `civicrm_contact`
+  ADD CONSTRAINT `FK_civicrm_contact_mail_to_household_id` FOREIGN KEY (`mail_to_household_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `FK_civicrm_contact_employer_id` FOREIGN KEY (`employer_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE SET NULL;
+
+
+ALTER TABLE `civicrm_contribution_recur`
+    ADD UNIQUE `UI_contrib_trxn_id` (`trxn_id`),
+    ADD UNIQUE `UI_contrib_invoice_id` (`invoice_id`);
+
+
+ALTER TABLE `civicrm_contribution_type`
+    ADD UNIQUE `UI_name` (name);
+
+ALTER TABLE `civicrm_custom_field`
+    ADD `is_view` tinyint(4) NULL DEFAULT NULL AFTER is_active,
+    MODIFY `html_type` enum('Text','TextArea','Select','Multi-Select','Radio','CheckBox','Select Date','Select State/Province','Select Country','Multi-Select Country','Multi-Select State/Province','File','Link','RichTextEditor') NOT NULL DEFAULT 'Text';
+
+ALTER TABLE `civicrm_dedupe_rule_group`
+    ADD name varchar(64) NULL DEFAULT NULL AFTER is_default;
+
+DROP TABLE `civicrm_dupe_match`;
+
+ALTER TABLE `civicrm_event`
+    DROP `receipt_text`;
+
+ALTER TABLE `civicrm_event_page`
+    ADD `is_multiple_registrations` tinyint(4) NULL DEFAULT '0' AFTER pay_later_receipt,
+    ADD `default_discount_id` int(10) unsigned NULL DEFAULT NULL AFTER default_fee_id;
+
+ALTER TABLE `civicrm_financial_trxn`
+    ADD UNIQUE `UI_ft_trxn_id` (`trxn_id`);
+
+ALTER TABLE `civicrm_grant`
+    MODIFY `amount_requested` decimal(20,2) NULL DEFAULT NULL,
+    MODIFY `amount_granted` decimal(20,2) NULL DEFAULT NULL;
+
+ALTER TABLE `civicrm_group`
+    ADD `cache_date` datetime NULL DEFAULT NULL AFTER group_type,
+    ADD parents text NULL DEFAULT NULL AFTER cache_date,
+    ADD children text NULL DEFAULT NULL AFTER parents,
+    MODIFY description text NULL DEFAULT NULL,
+    ADD UNIQUE `UI_title` (title),
+    ADD UNIQUE `UI_name` (name);
+
+ALTER TABLE `civicrm_location_type`
+    ADD UNIQUE `UI_name` (name);
+
+ALTER TABLE `civicrm_mailing`
+    MODIFY `body_text` longtext NULL DEFAULT NULL,
+    MODIFY `body_html` longtext NULL DEFAULT NULL;
+
+ALTER TABLE `civicrm_membership_type`
+    ALTER `fixed_period_start_day`  DROP DEFAULT,
+    ALTER `fixed_period_rollover_day`  DROP DEFAULT;
+
+ALTER TABLE `civicrm_note`
+    MODIFY `contact_id` int(10) unsigned NULL DEFAULT NULL;
+
+ALTER TABLE `civicrm_participant`
+    CHANGE `event_level` `fee_level` varchar(255) NULL DEFAULT NULL,
+    ADD `is_pay_later` tinyint(4) NULL DEFAULT '0' AFTER is_test,
+    ADD `fee_amount` decimal(20,2) NULL DEFAULT NULL AFTER is_pay_later,
+    ADD `registered_by_id` int(10) unsigned NULL DEFAULT NULL AFTER fee_amount,
+    ADD `discount_id` int(10) unsigned NULL DEFAULT NULL AFTER registered_by_id;
+
+ALTER TABLE `civicrm_participant`
+    ADD CONSTRAINT `FK_civicrm_participant_registered_by_id` FOREIGN KEY (`registered_by_id`) REFERENCES `civicrm_participant` (`id`) ON DELETE SET NULL,
+    ADD CONSTRAINT `FK_civicrm_participant_discount_id` FOREIGN KEY (`discount_id`) REFERENCES `civicrm_discount` (`id`) ON DELETE SET NULL;
+
+ALTER TABLE `civicrm_preferences`
+    ADD `editor_id` int(10) unsigned NULL DEFAULT NULL AFTER address_standardization_url;
+
+ALTER TABLE `civicrm_price_field`
+    MODIFY name varchar(255) NOT NULL DEFAULT '',
+    MODIFY label varchar(255) NOT NULL DEFAULT '';
+
+ALTER TABLE `civicrm_price_set`
+    MODIFY name varchar(255) NOT NULL DEFAULT '',
+    MODIFY title varchar(255) NOT NULL DEFAULT '';
+
+ALTER TABLE `civicrm_relationship`
+    MODIFY `is_permission_a_b` tinyint(4) NULL DEFAULT '0',
+    MODIFY `is_permission_b_a` tinyint(4) NULL DEFAULT '0';
+
+ALTER TABLE `civicrm_relationship_type`
+    ADD UNIQUE `UI_name_a_b` (`name_a_b`),
+    ADD UNIQUE `UI_name_b_a` (`name_b_a`);
+
+ALTER TABLE `civicrm_tag`
+    ADD UNIQUE `UI_name` (name);
+
+ALTER TABLE `civicrm_uf_group`
+    ADD `group_type` varchar(255) NULL DEFAULT NULL AFTER is_active,
+    DROP `form_type`;
+
+ALTER TABLE `civicrm_uf_match`
+    ADD UNIQUE `UI_uf_name` (`uf_name`);
+
+ALTER TABLE `civicrm_contribution`
+    ADD `is_pay_later` tinyint(4) NULL DEFAULT '0' AFTER is_test,
+    ADD UNIQUE `UI_contrib_trxn_id` (`trxn_id`),
+    ADD UNIQUE `UI_contrib_invoice_id` (`invoice_id`);
+
+ALTER TABLE `civicrm_membership`
+    ADD `is_pay_later` tinyint(4) NULL DEFAULT '0' AFTER is_test;
+
+ALTER TABLE `civicrm_membership_status`
+    ADD `is_reserved` tinyint(4) NULL DEFAULT '0' AFTER is_active;
+
+ALTER TABLE `civicrm_payment_processor_type`
+    ADD UNIQUE `UI_name` (name);
+
+UPDATE civicrm_dedupe_rule SET rule_table='civicrm_contact' WHERE rule_table IN ('civicrm_individual', 'civicrm_household', 'civicrm_organization');
+
+ALTER TABLE `civicrm_case`
+    DROP FOREIGN KEY `FK_civicrm_case_contact_id`;
+ALTER TABLE `civicrm_case`
+    DROP `contact_id`;
+	
+ALTER TABLE `civicrm_case_activity`
+    DROP FOREIGN KEY `FK_civicrm_case_activity_case_id`;
+ALTER TABLE `civicrm_case_activity`
+    ADD CONSTRAINT `FK_civicrm_case_activity_case_id` FOREIGN KEY (`case_id`) REFERENCES `civicrm_case` (`id`) ON DELETE CASCADE;
+
+
+-- current employer data upgrade
+
+SELECT @relTypeId := id FROM civicrm_relationship_type WHERE name_a_b='Employee of';
+
+UPDATE civicrm_relationship cr
+INNER JOIN civicrm_contact cci ON (cr.contact_id_a=cci.id)  
+INNER JOIN civicrm_contact cco ON (cr.contact_id_b=cco.id)  
+SET   cci.employer_id = cr.contact_id_b, 
+      cci.organization_name = cco.organization_name
+WHERE cr.relationship_type_id=@relTypeId AND cr.is_active=1 AND IF(cr.end_date IS NULL, 1, (DATEDIFF(CURDATE( ), cr.end_date) <= 0));
+
+-- table civicrm_mailing_event_forward, adding on delete set null
+
+ALTER TABLE `civicrm_mailing_event_forward`	
+    MODIFY dest_queue_id   int(10) unsigned DEFAULT NULL COMMENT 'FK to EventQueue for destination',
+    DROP FOREIGN KEY `FK_civicrm_mailing_event_forward_dest_queue_id`;
+ALTER TABLE `civicrm_mailing_event_forward`
+    ADD CONSTRAINT `FK_civicrm_mailing_event_forward_dest_queue_id` FOREIGN KEY (`dest_queue_id`) REFERENCES `civicrm_mailing_event_queue` (`id`) ON DELETE SET NULL;
+
+-- table civicrm_payment_processor_type, insert ebay record
+
+INSERT INTO `civicrm_payment_processor_type` 
+ (name, title, description, is_active, is_default, user_name_label, password_label, signature_label, subject_label, class_name, url_site_default, url_api_default, url_recur_default, url_button_default, url_site_test_default, url_api_test_default, url_recur_test_default, url_button_test_default, billing_mode, is_recur )
+VALUES 
+('eWAY', 'eWAY (Single Currency)',NULL,1,0,'Customer ID',NULL,NULL,NULL,'Payment_eWAY','https://www.eway.com.au/gateway_cvn/xmlpayment.asp',NULL,NULL,NULL,'https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp',NULL,NULL,NULL,1,0);
+
+UPDATE `civicrm_payment_processor_type`
+SET is_recur = NULL WHERE title = 'Authorize.Net - AIM';
+
+--address name field in civicrm_address table
+
+ALTER TABLE `civicrm_address`
+ ADD `name` varchar(255) collate utf8_unicode_ci DEFAULT NULL ;
+
+-- fix for CRM-3469
+ALTER TABLE `civicrm_line_item`
+  DROP FOREIGN KEY FK_civicrm_line_item_price_field_id;
+
+ALTER TABLE `civicrm_line_item`
+  ADD CONSTRAINT `FK_civicrm_line_item_price_field_id` FOREIGN KEY (`price_field_id`) REFERENCES `civicrm_price_field` (`id`) ON DELETE CASCADE;
+

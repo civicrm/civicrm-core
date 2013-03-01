@@ -1,0 +1,35 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id='id-activity-types-title'}
+  {ts}Activity Types{/ts}
+{/htxt}
+{htxt id='id-activity-types'}
+  {capture assign=docLink}{docURL page="CiviCRM Public APIs" text="API Documentation" resource="wiki"}{/capture}
+  <p>{ts}Activities are 'interactions with contacts' which you want to record and track. CiviCRM has several reserved (e.g. 'built-in') activity types (meetings, phone calls, emails sent). Create additional 'activity types' here if you need to record other types of activities. For example, you might want to add 'Job Interview', or 'Site Audit', etc.{/ts}</p>
+  {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group' q='reset=1'}{/capture}
+  <p>{ts 1=$crmURL}Subject, location, date/time and description fields are provided for all activity types. You can add custom fields for tracking additional information about activities <a href='%1'>here</a>.{/ts}</p>
+  <p>{ts 1=$docLink}Scheduled and Completed Activities are searchable by type and/or activity date using 'Advanced Search'. Other applications may record activities for CiviCRM contacts using our APIs. For more information, refer to the online %1.{/ts}</p>
+{/htxt}

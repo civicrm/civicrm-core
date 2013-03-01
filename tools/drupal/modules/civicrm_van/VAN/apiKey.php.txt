@@ -1,0 +1,3 @@
+<?php
+
+define( 'VAN_API_KEY', 'PUT YOUR VAN API KEY HERE' );

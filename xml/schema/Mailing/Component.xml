@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>Component</class>
+  <name>civicrm_mailing_component</name>
+  <comment>Stores information about the mailing components (header/footer).</comment>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+       <name>name</name>
+       <title>Component Name</title>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>The name of this component</comment>
+  </field>
+  <field>
+       <name>component_type</name>
+       <type>enum</type>
+       <values>Header, Footer, Subscribe, Welcome, Unsubscribe, OptOut, Reply, Resubscribe</values>
+       <comment>Type of Component.</comment>
+  </field>
+  <field>
+       <name>subject</name>
+       <type>varchar</type>
+       <length>255</length>
+  </field>
+  <field>
+       <name>body_html</name>
+       <type>text</type>
+       <comment>Body of the component in html format.</comment>
+       <htmlType>textarea</htmlType>
+       <rows>8</rows>
+       <cols>80</cols>
+  </field>
+  <field>
+       <name>body_text</name>
+       <type>text</type>
+       <comment>Body of the component in text format.</comment>
+       <htmlType>textarea</htmlType>
+       <rows>8</rows>
+       <cols>80</cols>
+  </field>
+  <field>
+       <name>is_default</name>
+       <type>boolean</type>
+       <default>0</default>
+       <comment>Is this the default component for this component_type?</comment>
+  </field>
+  <field>
+       <name>is_active</name>
+       <type>boolean</type>
+       <comment>Is this property active?</comment>
+  </field>
+</table>

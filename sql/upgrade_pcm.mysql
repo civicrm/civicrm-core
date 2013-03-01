@@ -1,0 +1,40 @@
+-- +--------------------------------------------------------------------+
+-- | CiviCRM version 3.2                                                |
+-- +--------------------------------------------------------------------+
+-- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- +--------------------------------------------------------------------+
+-- | This file is a part of CiviCRM.                                    |
+-- |                                                                    |
+-- | CiviCRM is free software; you can copy, modify, and distribute it  |
+-- | under the terms of the GNU Affero General Public License           |
+-- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+-- |                                                                    |
+-- | CiviCRM is distributed in the hope that it will be useful, but     |
+-- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+-- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+-- | See the GNU Affero General Public License for more details.        |
+-- |                                                                    |
+-- | You should have received a copy of the GNU Affero General Public   |
+-- | License and the CiviCRM Licensing Exception along                  |
+-- | with this program; if not, contact CiviCRM LLC                     |
+-- | at info[AT]civicrm[DOT]org. If you have questions about the        |
+-- | GNU Affero General Public License or the licensing of CiviCRM,     |
+-- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- +--------------------------------------------------------------------+
+-- Inserts values for Preferred Communication Method which are missing in some upgraded 1.5 sites
+
+INSERT INTO 
+   `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`) 
+VALUES 
+   (1, 'preferred_communication_method', 'Preferred Communication Method'     , 0, 1);
+
+SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
+
+INSERT INTO 
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`) 
+VALUES
+   (@option_group_id_pcm, 'Phone', 1, NULL, NULL, 0, NULL, 1, NULL, 0, 0, 1),
+   (@option_group_id_pcm, 'Email', 2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1),
+   (@option_group_id_pcm, 'Postal Mail', 3, NULL, NULL, 0, NULL, 3, NULL, 0, 0, 1),
+   (@option_group_id_pcm, 'SMS', 4, NULL, NULL, 0, NULL, 4, NULL, 0, 0, 1),
+   (@option_group_id_pcm, 'Fax', 5, NULL, NULL, 0, NULL, 5, NULL, 0, 0, 1);

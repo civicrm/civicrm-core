@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<tables xmlns:xi="http://www.w3.org/2001/XInclude">
+<xi:include href="ContributionRecur.xml"    parse="xml" />
+<xi:include href="Contribution.xml"         parse="xml" />
+<xi:include href="ContributionPage.xml"     parse="xml" />
+<xi:include href="ContributionProduct.xml"  parse="xml" />
+<xi:include href="ContributionSoft.xml"     parse="xml" />
+<xi:include href="Premium.xml"              parse="xml" />
+<xi:include href="Product.xml"              parse="xml" />
+<xi:include href="PremiumsProduct.xml"      parse="xml" />
+<xi:include href="Widget.xml"               parse="xml" />
+
+</tables>

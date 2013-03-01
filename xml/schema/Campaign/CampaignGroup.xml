@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Campaign</base>
+  <class>CampaignGroup</class>
+  <name>civicrm_campaign_group</name>
+  <comment>Campaign Group Details.</comment>
+  <add>3.3</add>
+  
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Campaign Group id.</comment>
+    <add>3.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  
+  <field>
+    <name>campaign_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to the activity Campaign.</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>campaign_id</name>
+    <table>civicrm_campaign</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>group_type</name>
+    <type>enum</type>
+    <values>Include, Exclude</values>
+    <default>NULL</default>
+    <comment>Type of Group.</comment>
+  </field>
+
+  <field> 
+    <name>entity_table</name>
+    <type>varchar</type>
+    <length>64</length> 
+    <default>NULL</default>
+    <comment>Name of table where item being referenced is stored.</comment>
+    <add>3.3</add>
+  </field>
+
+  <field>
+    <name>entity_id</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Entity id of referenced table.</comment>
+    <add>3.3</add>
+  </field>
+</table>

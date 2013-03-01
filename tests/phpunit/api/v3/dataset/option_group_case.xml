@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_group_case.xml 36085 2011-09-09 13:15:49Z daved $  -->
+<dataset>
+  <civicrm_option_group
+    id="27"
+    name="case_status"
+    description="Case Status"
+    is_reserved="0"
+    is_active="1"
+   />
+   <civicrm_option_group
+     id="26"
+     name="case_type"
+     description="Case Type"
+     is_reserved="0"
+     is_active="1"
+    />
+</dataset>

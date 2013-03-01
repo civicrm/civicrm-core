@@ -1,0 +1,88 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id='id-enable_ssl-title'}
+  {ts}Force SSL{/ts}
+{/htxt}
+{htxt id='id-enable_ssl'}
+<p>{ts}This setting forces a redirect of all online contribution / member / event and CiviCRM administrator page requests to SSL secured URLs (https).{/ts}</p>
+<p>{ts}If you use a payment processor service where credit card and billing information is collected ON YOUR SITE (PayPal Website Payments Pro or Moneris as of now) <strong>it is strongly recommended that you create or obtain an SSL certificate and configure your webserver to support SSL connections</strong>. Consult your hosting provider or web-server documentation for more information on obtaining and installing SSL certificates.{/ts}</p>
+<p>{ts}Once you have your certificate installed, test that is working by navigating to one of your online contribution pages and changing the URL prefix from 'http://' to 'https://'. If your browser loads the page and indicates a valid security certificate - then you can change this setting to <strong>Yes</strong> and CiviCRM will automatically redirect requests for all online contribution / member / event / admin pages to the corresponding SSL secured URLs.{/ts}</p>
+{/htxt}
+
+{htxt id='id-verify_ssl-title'}
+  {ts}Verify SSL Certificates{/ts}
+{/htxt}
+{htxt id='id-verify_ssl'}
+<p>{ts}This setting will verify the SSL certificates received when making secure HTTPS connections to payment processors.{/ts}</p>
+<p>{ts}For example, in order to process a payment through Authorize.net, CiviCRM must make a request to https://secure.authorize.net/gateway/transact.dll. Using https to connect to secure.authorize.net insures that the connection is encrypted, but it's possible that CiviCRM is actually connecting to an attacker and the attacker is connecting to secure.authorize.net.{/ts}</p>
+<p>{ts}Verifying the SSL certificate helps confirm that CiviCRM is securely communicating directly to payment processors.{/ts}</p>
+{/htxt}
+
+{htxt id='id-resource_url-title'}
+  {ts}Resource URL{/ts}
+{/htxt}
+{htxt id='id-resource_url'}
+{ts}Absolute URL of the location where the civicrm module or component has been installed.{/ts}
+<table class="form-layout-compressed">
+    <tr><td>
+    <strong>{ts}Example{/ts}</strong><br />
+    {ts 1=http://www.example.com/}If your site's home url is %1 ... then your CiviCRM Resource URL would be:{/ts} 
+    <div class="font-italic description">
+    {if $config->userSystem->is_drupal EQ '1'}
+     &nbsp;&nbsp; http://www.example.com/sites/all/modules/civicrm/
+    {elseif $config->userFramework EQ 'Joomla'}
+     &nbsp;&nbsp; http://www.example.com/administrator/components/com_civicrm/civicrm/
+    {else}
+     &nbsp;&nbsp; http://www.example.com/
+    {/if}
+    </div>
+    </td></tr>
+</table>
+{/htxt}
+
+{htxt id='id-image_url-title'}
+  {ts}Image URL{/ts}
+{/htxt}
+{htxt id='id-image_url'}
+{ts}URL of the location for uploaded image files.{/ts}
+{/htxt}
+
+{htxt id='id-extensions_url-title'}
+  {ts}Extensions URL{/ts}
+{/htxt}
+{htxt id='id-extensions_url'}
+{ts}Base URL for extension resources (images, stylesheets, etc).{/ts}<br/>
+{capture assign=civicrmAdminSettingPath}{crmURL p="civicrm/admin/setting/path" q="reset=1"}{/capture}
+{ts 1=$civicrmAdminSettingPath 2=`$config->extensionsDir`}This should match the <a href="%1">"CiviCRM Extensions Directory"</a> ("%2").{/ts}
+{/htxt}
+
+{htxt id='id-css_url-title'}
+  {ts}Custom CSS{/ts}
+{/htxt}
+{htxt id='id-css_url'}
+<p>{ts}If you want to modify the look and feel of CiviCRM screens beyond what your CMS theme does, you can replace CiviCRM's primary CSS file (css/civicrm.css) with a customized version. Use this field to specify the URL of the replacement CSS file.{/ts}</p>
+<p>{ts}You can also define additional CSS styles to be applied to all or specific page elements by adding CSS styles to the 'extra CSS' file: <em>css/extras.css</em>. This file is included in the downloaded codebase, but is empty by default. If you can accomplish required theming results with this approach, you can avoid the work of merging your custom CSS file changes with upgraded versions.{/ts}</p>
+{/htxt}

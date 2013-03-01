@@ -1,0 +1,180 @@
+#!/bin/bash
+
+SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
+
+case $1 in
+
+	stable-3.4)
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§ EXECUTING TESTS FOR STABLE
+		echo
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§ Updating Selenium tests repository
+		echo
+        cd /var/www/drupal6.dev.civicrm.org/public/sites/devel.drupal6.tests.dev.civicrm.org/modules/civicrm/
+		find . -name *~ -delete
+		svn up
+		echo  §§§§§§§§§§§§§§§§§§§§  ...done.
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§ Resetting Selenium tests database and template files
+		echo
+        rm -rf /tmp/templates_c/
+        cd /var/www/drupal6.dev.civicrm.org/public/sites/devel.drupal6.tests.dev.civicrm.org/modules/civicrm/bin
+		./setup.sh
+		rm -rf /var/www/drupal6.dev.civicrm.org/public/sites/devel.drupal6.tests.dev.civicrm.org/files/civicrm/
+		chmod -R 777 /var/www/drupal6.dev.civicrm.org/public/sites/devel.drupal6.tests.dev.civicrm.org/files/
+        
+        echo  §§§§§§§§§§§§§§§§§§§§  ...done.
+		echo
+ 
+        CODE_DIR="/home/tests/stable-suite"
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§  Running test suite
+		echo
+        
+        rm -rf /tmp/templates_c/
+
+         for testName in api_v2 api_v3 CRM WebTest; do 
+  		  cd $CODE_DIR/tools
+          scripts/phpunit --tap --log-junit tests/reports/logfile.$testName.xml -u tests -ptests -h localhost ${testName}_AllTests
+		  cd $CODE_DIR/tools/scripts/
+
+		  echo
+		  echo  §§§§§§§§§§§§§§§§§§§§  Generating test results.
+		  echo
+		  phing $testName
+		  echo  §§§§§§§§§§§§§§§§§§§§  All finished.        
+      done
+
+	;;
+
+	stable)
+
+        echo
+		echo  §§§§§§§§§§§§§§§§§§§§ EXECUTING TESTS FOR TRUNK 
+		echo
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§ Updating test suite repository
+		echo
+        cd /var/www/drupal7.dev.civicrm.org/public/sites/stable.drupal7.tests.dev.civicrm.org/modules/civicrm/
+		find . -name *~ -delete
+		svn up
+		echo  §§§§§§§§§§§§§§§§§§§§  ...done.
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§ Resetting Selenium tests database and template files
+		echo
+        rm -rf /tmp/templates_c/
+        cd /var/www/drupal7.dev.civicrm.org/public/sites/stable.drupal7.tests.dev.civicrm.org/modules/civicrm/bin
+		./setup.sh
+       
+        echo  §§§§§§§§§§§§§§§§§§§§  ...done.
+        
+        rm -rf /var/www/drupal7.dev.civicrm.org/public/sites/stable.drupal7.tests.dev.civicrm.org/files/civicrm/
+        chmod -R 777 /var/www/drupal7.dev.civicrm.org/public/sites/stable.drupal7.tests.dev.civicrm.org/files/
+ 
+        CODE_DIR="/home/tests/stable-suite"
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§  Running test suite
+		echo
+
+#       for testName in api_v3; do 
+#       for testName in WebTest; do 
+#       for testName in api_v3 CRM; do 
+       for testName in api_v3 CRM WebTest; do 
+#        for testName in CRM; do
+  		  cd $CODE_DIR/tools
+         
+          rm -rf /tmp/templates_c/
+          
+          #reset the db before running webtest
+          if [ $testName == WebTest ] ; then
+              echo 
+              echo ============== reloading db for Webtest ===============================
+              echo 
+             /var/www/drupal7.dev.civicrm.org/public/sites/stable.drupal7.tests.dev.civicrm.org/modules/civicrm/bin/setup.sh
+          fi
+
+          scripts/phpunit --tap --log-junit tests/reports/logfile.$testName.xml -u tests -ptests -bstable_drupal7_tests_dev_civicrm -h localhost ${testName}_AllTests
+		  cd $CODE_DIR/tools/scripts/
+
+		  echo
+		  echo  §§§§§§§§§§§§§§§§§§§§  Generating test results.
+		  echo
+		  phing $testName
+		  echo  §§§§§§§§§§§§§§§§§§§§  All finished.        
+      done
+
+    ;;
+
+	trunk)
+
+        echo
+		echo  §§§§§§§§§§§§§§§§§§§§ EXECUTING TESTS FOR TRUNK 
+		echo
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§ Updating test suite repository
+		echo
+        cd /var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/modules/civicrm/
+		find . -name *~ -delete
+		svn up
+		echo  §§§§§§§§§§§§§§§§§§§§  ...done.
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§ Resetting Selenium tests database and template files
+		echo
+        rm -rf /tmp/templates_c/
+        cd /var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/modules/civicrm/bin
+		./setup.sh
+       
+        echo  §§§§§§§§§§§§§§§§§§§§  ...done.
+        
+        rm -rf /var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/files/civicrm/
+        chmod -R 777 /var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/files/
+ 
+        CODE_DIR="/home/tests/devel-suite"
+
+		echo
+		echo  §§§§§§§§§§§§§§§§§§§§  Running test suite
+		echo
+
+#       for testName in api_v3; do 
+#       for testName in WebTest; do 
+#       for testName in api_v2 api_v3 CRM; do 
+       for testName in api_v3 CRM WebTest; do 
+#        for testName in CRM; do
+  		  cd $CODE_DIR/tools
+         
+          rm -rf /tmp/templates_c/
+          
+          #reset the db before running webtest
+          if [ $testName == WebTest ] ; then
+              echo 
+              echo ============== reloading db for Webtest ===============================
+              echo 
+             /var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/modules/civicrm/bin/setup.sh
+          fi
+
+          scripts/phpunit --tap --log-junit tests/reports/logfile.$testName.xml -u tests -ptests -bdevel_drupal7_tests_dev_civicrm -h localhost ${testName}_AllTests
+		  cd $CODE_DIR/tools/scripts/
+
+		  echo
+		  echo  §§§§§§§§§§§§§§§§§§§§  Generating test results.
+		  echo
+		  phing $testName
+		  echo  §§§§§§§§§§§§§§§§§§§§  All finished.        
+      done
+
+    ;;
+	
+	*)
+		$SELF trunk 
+	;;
+esac

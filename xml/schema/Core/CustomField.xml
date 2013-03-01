@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>CustomField</class>
+  <name>civicrm_custom_field</name>
+  <comment>Stores info about an extended (custom) property (data and form field info).</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Unique Custom Field ID</comment>
+       <add>1.1</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+      <name>custom_group_id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>FK to civicrm_custom_group.</comment>
+       <add>1.1</add>
+  </field>
+  <foreignKey>
+       <name>custom_group_id</name>
+       <table>civicrm_custom_group</table>
+       <key>id</key>
+       <add>1.1</add>
+       <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+     <name>name</name>
+     <type>varchar</type>
+     <length>64</length>
+     <comment>Variable name/programmatic handle for this group.</comment>
+     <add>3.3</add>
+  </field>
+  <field>
+     <name>label</name>
+     <type>varchar</type>
+     <length>255</length>
+     <required>true</required>
+     <localizable>true</localizable>
+     <comment>Text for form field label (also friendly name for administering this custom property).</comment>
+     <add>1.1</add>
+  </field>
+  <field>
+     <name>data_type</name>
+     <type>enum</type>
+     <values>String, Int, Float, Money, Memo, Date, Boolean, StateProvince, Country, File, Link, ContactReference</values>
+     <required>true</required>
+     <comment>Controls location of data storage in extended_data table.</comment>
+     <add>1.1</add>
+  </field>
+  <field>
+     <name>html_type</name>
+     <type>enum</type>
+     <values>Text, TextArea, Select, Multi-Select, AdvMulti-Select, Radio, CheckBox, Select Date, Select State/Province, Select Country, Multi-Select Country, Multi-Select State/Province, File, Link, RichTextEditor, Autocomplete-Select</values>
+     <required>true</required>
+     <comment>HTML types plus several built-in extended types.</comment>
+     <add>1.1</add>
+  </field>
+  <field>
+     <name>default_value</name>
+     <type>varchar</type>
+     <length>255</length>
+     <comment>Use form_options.is_default for field_types which use options.</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+     <name>is_required</name>
+     <type>boolean</type>
+     <comment>Is a value required for this property.</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+     <name>is_searchable</name>
+     <type>boolean</type>
+     <comment>Is this property searchable.</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+     <name>is_search_range</name>
+     <type>boolean</type>
+     <comment>Is this property range searchable.</comment>
+       <add>1.4</add>
+     <default>0</default>
+  </field>
+  <field>
+      <name>weight</name>
+      <type>int</type>
+      <required>true</required>
+      <default>1</default>
+      <comment>Controls field display order within an extended property group.</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+     <name>help_pre</name>
+     <type>text</type>
+     <localizable>true</localizable>
+     <comment>Description and/or help text to display before this field.</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+     <name>help_post</name>
+     <type>text</type>
+     <localizable>true</localizable>
+     <comment>Description and/or help text to display after this field.</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+     <name>mask</name>
+     <type>varchar</type>
+     <length>64</length>
+     <comment>Optional format instructions for specific field types, like date types.</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+     <name>attributes</name>
+     <type>varchar</type>
+     <length>255</length>
+     <comment>Store collection of type-appropriate attributes, e.g. textarea  needs rows/cols attributes</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+     <name>javascript</name>
+     <type>varchar</type>
+     <length>255</length>
+     <comment>Optional scripting attributes for field.</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+       <name>is_active</name>
+       <type>boolean</type>
+       <comment>Is this property active?</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+       <name>is_view</name>
+       <type>boolean</type>
+       <comment>Is this property set by PHP Code? A code field is viewable but not editable</comment>
+       <add>1.1</add>
+  </field>
+  <field>
+       <name>options_per_line</name>
+       <type>int unsigned</type>
+       <comment>number of options per line for checkbox and radio</comment>
+  </field>
+  <field>
+       <name>text_length</name>
+       <type>int unsigned</type>
+       <comment>field length if alphanumeric</comment>
+       <add>2.2</add>
+  </field>
+  <field>
+       <name>start_date_years</name>
+       <type>int</type>
+       <comment>Date may be up to start_date_years years prior to the current date.</comment>
+       <add>1.4</add>
+  </field>
+  <field>
+       <name>end_date_years</name>
+       <type>int</type>
+       <comment>Date may be up to end_date_years years after the current date.</comment>
+       <add>1.4</add>
+  </field>
+  <field>
+       <name>date_parts</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>which date part included in display </comment>
+       <add>1.4</add>
+       <drop>3.1</drop>
+  </field>
+  <field>
+       <name>date_format</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>date format for custom date</comment>
+       <add>3.1</add>
+  </field>
+  <field>
+       <name>time_format</name>
+       <type>int unsigned</type>
+       <comment>time format for custom date</comment>
+       <add>3.1</add>
+  </field>
+  <field>
+       <name>note_columns</name>
+       <type>int unsigned</type>
+       <comment> Number of columns in Note Field </comment>
+       <add>1.4</add>
+  </field>
+  <field>
+       <name>note_rows</name>
+       <type>int unsigned</type>
+       <comment> Number of rows in Note Field </comment>
+       <add>1.4</add>
+  </field>
+  <field>
+     <name>column_name</name>
+     <type>varchar</type>
+     <length>255</length>
+     <comment>Name of the column that holds the values for this field.</comment>
+     <add>2.0</add>
+  </field>
+  <field>
+       <name>option_group_id</name>
+       <type>int unsigned</type>
+       <comment>For elements with options, the option group id that is used</comment>
+       <add>1.4</add>
+  </field>
+  <field>
+       <name>filter</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>Stores Contact Get API params contact reference custom fields. May be used for other filters in the future.</comment>
+       <add>4.1</add>
+  </field>
+  <index>
+    <name>UI_label_custom_group_id</name>
+    <fieldName>label</fieldName>
+    <fieldName>custom_group_id</fieldName>
+    <unique>true</unique>
+    <add>1.1</add>
+  </index>
+  <index>
+    <name>UI_name_custom_group_id</name>
+    <fieldName>name</fieldName>
+    <fieldName>custom_group_id</fieldName>
+    <unique>true</unique>
+    <add>4.3</add>
+  </index>
+</table>

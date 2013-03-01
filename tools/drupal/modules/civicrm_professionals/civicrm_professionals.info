@@ -1,0 +1,6 @@
+name = CiviCRM Professional List
+description = Contains hooks used for professional list
+version = 4.1
+package = CiviCRM
+core = 7.x
+php = 5.2

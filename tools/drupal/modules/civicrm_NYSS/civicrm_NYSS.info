@@ -1,0 +1,6 @@
+name = CiviCRM NYSS
+description = "Do not allow user to edit the addresses of location type 'Board Of Election' through contact edit form"
+dependencies[] = civicrm
+package = CiviCRM
+core = 6.x
+version = 3.4

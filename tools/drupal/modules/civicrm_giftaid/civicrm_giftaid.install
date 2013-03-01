@@ -1,0 +1,6 @@
+<?php
+//setting the default value
+function civicrm_giftaid_install() {
+variable_set('giftaid_value', 28);
+}
+

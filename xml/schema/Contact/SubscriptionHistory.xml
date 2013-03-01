@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+    <base>CRM/Contact</base>
+    <class>SubscriptionHistory</class>
+    <name>civicrm_subscription_history</name>
+    <comment>History information of subscribe/unsubscribe actions</comment>
+    <add>1.1</add>
+    <log>true</log>
+    <field>
+        <name>id</name>
+        <type>int unsigned</type>
+        <required>true</required>
+        <comment>Internal Id</comment>
+       <add>1.1</add>
+    </field>
+    <primaryKey>
+        <name>id</name>
+        <autoincrement>true</autoincrement>
+    </primaryKey>
+    <field>
+        <name>contact_id</name>
+        <type>int unsigned</type>
+        <required>true</required>
+        <comment>Contact Id</comment>
+       <add>1.1</add>
+    </field>
+    <foreignKey>
+        <name>contact_id</name>
+        <table>civicrm_contact</table>
+        <key>id</key>
+        <add>1.1</add>
+        <onDelete>CASCADE</onDelete>
+    </foreignKey>
+    <field>
+        <name>group_id</name>
+        <type>int unsigned</type>
+        <comment>Group Id</comment>
+       <add>1.1</add>
+    </field>
+    <foreignKey>
+       <name>group_id</name>
+       <table>civicrm_group</table>
+       <key>id</key>
+       <add>1.1</add>
+       <onDelete>CASCADE</onDelete>
+    </foreignKey>
+    <field>
+        <name>date</name>
+        <type>datetime</type>
+        <required>true</required>
+        <comment>Date of the (un)subscription</comment>
+       <add>1.1</add>
+    </field>
+    <field>
+        <name>method</name>
+        <type>enum</type>
+        <values>Admin, Email, Web, API</values>
+        <comment>How the (un)subscription was triggered</comment>
+       <add>1.1</add>
+    </field>
+    <field>
+        <name>status</name>
+        <type>enum</type>
+        <values>Added, Removed, Pending, Deleted</values>
+        <comment>The state of the contact within the group</comment>
+       <add>1.1</add>
+    </field>
+    <field>
+        <name>tracking</name>
+        <type>varchar</type>
+        <length>255</length>
+        <comment>IP address or other tracking info</comment>
+       <add>1.1</add>
+    </field>
+</table>

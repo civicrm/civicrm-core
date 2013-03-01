@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Member</base>
+  <class>MembershipBlock</class>
+  <name>civicrm_membership_block</name>
+  <comment>A Membership Block stores admin configurable status options and rules</comment>
+  <add>1.5</add>
+  <log>true</log>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Membership Id</comment>
+      <add>1.5</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+       <name>entity_table</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Name for Membership Status</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+      <name>entity_id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>FK to civicrm_contribution_page.id</comment>
+      <add>1.5</add>
+  </field>
+  <foreignKey> 
+      <name>entity_id</name> 
+      <table>civicrm_contribution_page</table> 
+      <key>id</key>
+      <add>1.5</add>
+  </foreignKey>
+  <field>
+       <name>membership_types</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>Membership types to be exposed by this block</comment>  
+       <add>1.5</add>
+  </field>
+  <field>  
+      <name>membership_type_default</name>  
+      <type>int unsigned</type>
+      <comment>Optional foreign key to membership_type</comment>  
+      <add>1.5</add>  
+  </field>
+ <foreignKey> 
+      <name>membership_type_default</name> 
+      <table>civicrm_membership_type</table> 
+      <key>id</key>
+      <add>1.5</add>
+  </foreignKey>
+  <field> 
+      <name>display_min_fee</name>  
+      <type>boolean</type> 
+      <default>1</default>           
+      <comment>Display minimum membership fee</comment>  
+      <add>1.5</add>  
+  </field> 
+  <field>  
+      <name>is_separate_payment</name>     
+      <type>boolean</type>
+      <default>1</default>
+      <comment>Should membership transactions be processed separately</comment>                
+      <add>1.5</add>  
+  </field> 
+  <field>  
+      <name>new_title</name>
+      <type>varchar</type>
+      <length>255</length>
+      <localizable>true</localizable>
+      <comment>Title to display at top of block</comment>  
+      <add>1.5</add>  
+  </field> 
+  <field>  
+      <name>new_text</name>
+      <type>text</type>
+      <localizable>true</localizable>
+      <comment>Text to display below title</comment>  
+      <add>1.5</add>     
+  </field> 
+<field>  
+      <name>renewal_title</name>
+      <type>varchar</type>
+      <length>255</length>
+      <localizable>true</localizable>
+      <comment>Title for renewal</comment>  
+      <add>1.5</add>  
+  </field>
+<field>  
+      <name>renewal_text</name>
+      <type>text</type>
+      <localizable>true</localizable>
+      <comment>Text to display for member renewal</comment>  
+      <add>1.5</add>  
+  </field>  
+ <field>  
+      <name>is_required</name>     
+      <title>Is Required</title>
+      <type>boolean</type>
+      <default>0</default>
+      <comment>Is membership sign up optional</comment>                
+      <add>1.5</add>  
+  </field>  
+  <field>  
+      <name>is_active</name>     
+      <title>Is Active</title>
+      <type>boolean</type>
+      <default>1</default>
+      <comment>Is this membership_block enabled</comment>                
+      <add>1.5</add>  
+  </field> 
+</table>

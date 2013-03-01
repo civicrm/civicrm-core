@@ -1,0 +1,6 @@
+name = CiviCRM Register Your Site Project
+description = Helper module to collect individual and organization info for CiviCRM install
+dependencies[] = civicrm
+package = CiviCRM
+core = 7.x
+version = 4.1

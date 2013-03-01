@@ -1,0 +1,7 @@
+-- /**********************************************************************
+-- *
+-- * Additional Location Type for civicrm_NYSS module
+-- * Location Type - Board Of Election
+-- *
+-- **********************************************************************/
+INSERT INTO civicrm_location_type( name, vcard_name, description, is_reserved, is_active ) VALUES( 'Board of Election', NULL, 'Board of Election', 0, 1 );

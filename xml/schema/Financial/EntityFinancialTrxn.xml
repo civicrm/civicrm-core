@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>  
+
+<table>  
+  <base>CRM/Financial</base>  
+  <class>EntityFinancialTrxn</class>  
+  <name>civicrm_entity_financial_trxn</name>  
+  <add>3.2</add>  
+  <field>  
+    <name>id</name>  
+    <type>int unsigned</type>  
+    <required>true</required>  
+    <comment>ID</comment>  
+    <add>3.2</add>  
+  </field>  
+  <primaryKey>  
+    <name>id</name>  
+    <autoincrement>true</autoincrement>  
+  </primaryKey>  
+  <field>
+    <name>entity_table</name>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required> 
+    <import>true</import>
+    <add>3.2</add>
+    <comment>May contain civicrm_order, civicrm_order_line_itme, civicrm_order_line_sub_item, civicrm_grant, civicrm_credit_adjustment</comment>
+  </field>
+  <field>  
+    <name>entity_id</name>  
+    <type>int unsigned</type>  
+    <required>true</required>  
+    <add>3.2</add>  
+  </field>
+  <field>  
+    <name>financial_trxn_id</name>  
+    <type>int unsigned</type>  
+    <add>3.2</add>  
+  </field>  
+  <foreignKey> 
+    <name>financial_trxn_id</name> 
+    <table>civicrm_financial_trxn</table> 
+    <key>id</key> 
+    <add>3.2</add> 
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>    
+    <name>amount</name>    
+    <type>decimal</type>    
+    <required>true</required>
+    <comment>allocated amount of transaction to this entity</comment>
+    <add>3.2</add>    
+  </field> 
+  <field>
+    <name>currency</name>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <drop>4.3</drop>
+  </field>
+</table>
+

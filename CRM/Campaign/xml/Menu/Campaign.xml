@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+    <path>civicrm/campaign</path>
+    <title>Campaign Dashboard</title>
+    <page_callback>CRM_Campaign_Page_DashBoard</page_callback>
+    <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+    <component>CiviCampaign</component>
+  </item>
+  <item>
+    <path>civicrm/campaign/add</path>
+    <title>New Campaign</title>
+    <page_callback>CRM_Campaign_Form_Campaign</page_callback>
+    <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+    <component>CiviCampaign</component>
+  </item>
+  <item>
+    <path>civicrm/survey/add</path>
+    <title>New Survey</title>
+    <page_callback>CRM_Campaign_Form_Survey_Main</page_callback>
+    <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+    <component>CiviCampaign</component>
+  </item>
+  <item>
+    <path>civicrm/campaign/vote</path>
+    <title>Conduct Survey</title>
+    <page_callback>CRM_Campaign_Page_Vote</page_callback>
+    <access_arguments>administer CiviCampaign;manage campaign;reserve campaign contacts;interview campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+  </item>
+  <item>
+    <path>civicrm/admin/campaign/surveyType</path>
+    <title>Survey Types</title>
+    <page_callback>CRM_Campaign_Page_SurveyType</page_callback>
+    <access_arguments>administer CiviCampaign</access_arguments>
+    <icon>admin/small/05.png</icon>
+    <adminGroup>CiviCampaign</adminGroup>
+    <component>CiviCampaign</component>
+    <weight>1</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/campaign_type</path>
+     <title>Campaign Types</title>
+     <desc>categorize your campaigns using campaign types.</desc>
+     <path_arguments>group=campaign_type</path_arguments>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <adminGroup>CiviCampaign</adminGroup>
+     <icon>admin/small/05.png</icon>
+     <weight>2</weight>
+     <component>CiviCampaign</component>
+  </item>
+  <item>
+     <path>civicrm/admin/options/campaign_status</path>
+     <title>Campaign Status</title>
+     <desc>Define statuses for campaign here.</desc>
+     <path_arguments>group=campaign_status</path_arguments>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <adminGroup>CiviCampaign</adminGroup>
+     <icon>admin/small/05.png</icon>
+     <weight>3</weight>
+     <component>CiviCampaign</component>
+  </item>
+  <item>
+     <path>civicrm/admin/options/engagement_index</path>
+     <title>Engagement Index</title>
+     <desc>Engagement levels.</desc>
+     <path_arguments>group=engagement_index</path_arguments>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <adminGroup>CiviCampaign</adminGroup>
+     <icon>admin/small/05.png</icon>
+     <weight>4</weight>
+     <component>CiviCampaign</component>
+  </item>
+  <item>
+     <path>civicrm/admin/setting/preferences/campaign</path>
+     <title>CiviCampaign Component Settings</title>
+     <page_callback>CRM_Admin_Form_Preferences_Campaign</page_callback>
+     <desc>Configure global CiviCampaign behaviors.</desc>
+     <adminGroup>CiviCampaign</adminGroup>
+     <weight>10</weight>
+     <component>CiviCampaign</component>
+  </item>
+  <item>
+    <path>civicrm/survey/search</path>
+    <title>Reserve Respondents</title>
+    <path_arguments>op=reserve</path_arguments>
+    <page_callback>CRM_Campaign_Controller_Search</page_callback>
+    <access_arguments>administer CiviCampaign;manage campaign;reserve campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+  </item>
+  <item>
+    <path>civicrm/survey/search</path>
+    <title>Release Respondents</title>
+    <path_arguments>op=release</path_arguments>
+    <page_callback>CRM_Campaign_Controller_Search</page_callback>
+    <access_arguments>administer CiviCampaign;manage campaign;release campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+  </item>
+  <item>
+    <path>civicrm/survey/search</path>
+    <title>Record Respondents Interview</title>
+    <path_arguments>op=interview</path_arguments>
+    <page_callback>CRM_Campaign_Controller_Search</page_callback>
+    <access_arguments>administer CiviCampaign;manage campaign;interview campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+  </item>
+  <item>
+    <path>civicrm/campaign/gotv</path>
+    <title>GOTV (Track Voters)</title>
+    <page_callback>CRM_Campaign_Form_Gotv</page_callback>
+    <access_arguments>administer CiviCampaign;manage campaign;release campaign contacts;gotv campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+  </item>
+  <item>
+    <path>civicrm/petition/add</path>
+    <title>New Petition</title>
+    <page_callback>CRM_Campaign_Form_Petition</page_callback>
+    <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+  </item>  
+  <item>
+    <path>civicrm/petition/sign</path>
+    <title>Sign Petition</title>
+    <page_callback>CRM_Campaign_Form_Petition_Signature</page_callback>
+    <access_arguments>sign CiviCRM Petition</access_arguments>
+     <is_public>true</is_public>
+  </item>   
+  <item>
+    <path>civicrm/petition/browse</path>
+    <title>View Petition Signatures</title>
+    <page_callback>CRM_Campaign_Page_Petition</page_callback>
+  </item>
+  <item>
+     <path>civicrm/petition/confirm</path>
+     <title>Email address verified</title>
+     <page_callback>CRM_Campaign_Page_Petition_Confirm</page_callback>
+     <access_arguments>sign CiviCRM Petition</access_arguments>
+     <is_public>true</is_public>
+  </item>
+   <item>
+     <path>civicrm/petition/thankyou</path>
+     <title>Thank You</title>
+     <page_callback>CRM_Campaign_Page_Petition_ThankYou</page_callback>
+     <access_arguments>sign CiviCRM Petition</access_arguments>
+     <is_public>true</is_public>
+  </item>
+  <item>
+     <path>civicrm/campaign/registerInterview</path>
+     <page_callback>CRM_Campaign_Page_AJAX::registerInterview</page_callback>
+     <access_arguments>administer CiviCampaign;manage campaign;interview campaign contacts</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/survey/configure/main</path>
+     <title>Configure Survey</title>
+     <page_callback>CRM_Campaign_Form_Survey_Main</page_callback>
+     <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/survey/configure/questions</path>
+     <title>Configure Survey</title>
+     <page_callback>CRM_Campaign_Form_Survey_Questions</page_callback>
+     <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/survey/configure/results</path>
+     <title>Configure Survey</title>
+     <page_callback>CRM_Campaign_Form_Survey_Results</page_callback>
+     <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/survey/delete</path>
+     <title>Delete Survey</title>
+     <page_callback>CRM_Campaign_Form_Survey_Delete</page_callback>
+     <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+  </item>
+ </menu>

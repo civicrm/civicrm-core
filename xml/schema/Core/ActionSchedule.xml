@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>ActionSchedule</class>
+  <name>civicrm_action_schedule</name>
+  <comment>Table to store the reminders.</comment>
+  <add>3.4</add>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <add>3.4</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+       <name>name</name>
+       <title>Name</title>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Name of the action(reminder)</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>title</name>
+       <title>Title</title>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Title of the action(reminder)</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>recipient</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Recipient</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>entity_value</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Entity value</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>entity_status</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Entity status</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>start_action_offset</name>
+       <type>int unsigned</type>
+       <comment>Reminder Interval.</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>start_action_unit</name>
+       <type>enum</type> 
+       <values>hour,day,week,month,year</values>
+       <comment>Time units for reminder.</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>start_action_condition</name>
+       <type>varchar</type>
+       <length>32</length>
+       <comment>Reminder Action</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>start_action_date</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Entity date</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>is_repeat</name>
+       <title>Repeat?</title>
+       <type>boolean</type>
+       <default>0</default>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>repetition_frequency_unit</name>
+       <type>enum</type> 
+       <values>hour,day,week,month,year</values>
+       <comment>Time units for repetition of reminder.</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>repetition_frequency_interval</name>
+       <type>int unsigned</type>
+       <comment>Time interval for repeating the reminder.</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>end_frequency_unit</name>
+       <type>enum</type> 
+       <values>hour,day,week,month,year</values>
+       <comment>Time units till repetition of reminder.</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>end_frequency_interval</name>
+       <type>int unsigned</type>
+       <comment>Time interval till repeating the reminder.</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>end_action</name>
+       <type>varchar</type>
+       <length>32</length>
+       <comment>Reminder Action till repeating the reminder.</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>end_date</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Entity end date</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>is_active</name>
+       <type>boolean</type>
+       <default>1</default>
+       <comment>Is this option active?</comment>
+       <add>3.4</add>
+  </field>
+ <field> 
+      <name>recipient_manual</name> 
+      <title>Recipient Manual</title>
+      <type>varchar</type>  
+      <length>128</length> 
+      <comment>Contact IDs to which reminder should be sent.</comment> 
+      <add>3.4</add> 
+  </field>
+  <field> 
+      <name>recipient_listing</name> 
+      <title>Recipient Listing</title>
+      <type>varchar</type>  
+      <length>128</length> 
+      <comment>listing based on recipient field.</comment> 
+      <add>4.1</add> 
+  </field>
+  <field>
+       <name>body_text</name>
+       <type>longtext</type>
+       <comment>Body of the mailing in text format.</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>body_html</name>
+       <type>longtext</type>
+       <comment>Body of the mailing in html format.</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+       <name>subject</name>
+       <type>varchar</type>
+       <length>128</length>
+       <comment>Subject of mailing</comment>
+       <add>3.4</add>
+  </field>
+ <field>
+       <name>record_activity</name>
+       <type>boolean</type>
+       <default>NULL</default>
+       <comment>Record Activity for this reminder?</comment>
+       <add>3.4</add>
+  </field>
+  <field>
+      <name>mapping_id</name>
+      <type>int unsigned</type>
+      <comment>FK to mapping which is being used by this reminder</comment>
+      <add>3.4</add>
+  </field>
+  <foreignKey>
+       <name>mapping_id</name>
+       <table>civicrm_action_mapping</table>
+       <key>id</key>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey> 
+  <field>
+        <name>group_id</name>
+        <type>int unsigned</type>
+        <comment>FK to Group</comment>
+	<add>3.4</add>
+    </field>
+    <foreignKey>
+        <name>group_id</name>
+        <table>civicrm_group</table>
+        <key>id</key>
+        <onDelete>SET NULL</onDelete>
+    </foreignKey>
+    <field>
+          <name>msg_template_id</name>
+	  <type>int unsigned</type>
+	  <comment>FK to the message template.</comment>
+    </field>
+    <foreignKey>
+          <name>msg_template_id</name>
+	  <table>civicrm_msg_template</table>
+	  <key>id</key>
+	  <onDelete>SET NULL</onDelete>
+    </foreignKey>
+    <field>
+       <name>absolute_date</name>
+       <type>date</type>
+       <comment>Date on which the reminder be sent.</comment>
+       <add>4.1</add>
+  </field>
+</table>

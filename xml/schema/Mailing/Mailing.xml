@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>Mailing</class>
+  <name>civicrm_mailing</name>
+  <comment>Stores information about a mailing.</comment>
+  <archive>true</archive>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+      <name>domain_id</name>
+      <type>int unsigned</type>
+      <comment>Which site is this mailing for</comment>
+      <add>3.4</add>
+  </field>
+  <foreignKey>
+       <name>domain_id</name>
+       <table>civicrm_domain</table>
+       <key>id</key>
+       <onDelete>SET NULL</onDelete>
+       <add>3.4</add>
+  </foreignKey>
+  <field>
+      <name>header_id</name>
+      <type>int unsigned</type>
+      <comment>FK to the header component.</comment>
+  </field>
+  <foreignKey>
+       <name>header_id</name>
+       <table>civicrm_mailing_component</table>
+       <key>id</key>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+      <name>footer_id</name>
+      <type>int unsigned</type>
+      <comment>FK to the footer component.</comment>
+  </field>
+  <foreignKey>
+       <name>footer_id</name>
+       <table>civicrm_mailing_component</table>
+       <key>id</key>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+        <name>reply_id</name>
+        <type>int unsigned</type>
+        <comment>FK to the auto-responder component.</comment>
+  </field>
+  <foreignKey>
+        <name>reply_id</name>
+        <table>civicrm_mailing_component</table>
+        <key>id</key>
+        <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+        <name>unsubscribe_id</name>
+        <type>int unsigned</type>
+        <comment>FK to the unsubscribe component.</comment>
+  </field>
+  <foreignKey>
+        <name>unsubscribe_id</name>
+        <table>civicrm_mailing_component</table>
+        <key>id</key>
+        <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+        <name>resubscribe_id</name>
+        <type>int unsigned</type>
+  </field>
+  <foreignKey>
+        <name>optout_id</name>
+        <table>civicrm_mailing_component</table>
+        <key>id</key>
+        <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+        <name>optout_id</name>
+        <type>int unsigned</type>
+        <comment>FK to the opt-out component.</comment>
+  </field>
+  <foreignKey>
+        <name>optout_id</name>
+        <table>civicrm_mailing_component</table>
+        <key>id</key>
+        <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+       <name>name</name>
+       <type>varchar</type>
+       <length>128</length>
+       <comment>Mailing Name.</comment>
+  </field>
+  <field>
+       <name>from_name</name>
+       <type>varchar</type>
+       <length>128</length>
+       <comment>From Header of mailing</comment>
+  </field>
+  <field>
+       <name>from_email</name>
+       <type>varchar</type>
+       <length>128</length>
+       <comment>From Email of mailing</comment>
+  </field>
+  <field>
+       <name>replyto_email</name>
+       <type>varchar</type>
+       <length>128</length>
+       <comment>Reply-To Email of mailing</comment>
+  </field>
+  <field>
+       <name>subject</name>
+       <type>varchar</type>
+       <length>128</length>
+       <comment>Subject of mailing</comment>
+  </field>
+  <field>
+       <name>body_text</name>
+       <type>longtext</type>
+       <comment>Body of the mailing in text format.</comment>
+  </field>
+  <field>
+       <name>body_html</name>
+       <type>longtext</type>
+       <comment>Body of the mailing in html format.</comment>
+  </field>
+  <field>
+       <name>url_tracking</name>
+       <type>boolean</type>
+       <comment>Should we track URL click-throughs for this mailing?</comment>
+  </field>
+  <field>
+       <name>forward_replies</name>
+       <type>boolean</type>
+       <comment>Should we forward replies back to the author?</comment>
+  </field>
+  <field>
+        <name>auto_responder</name>
+        <type>boolean</type>
+        <comment>Should we enable the auto-responder?</comment>
+  </field>
+  <field>
+       <name>open_tracking</name>
+       <type>boolean</type>
+       <comment>Should we track when recipients open/read this mailing?</comment>
+  </field>
+  <field>
+       <name>is_completed</name>
+       <type>boolean</type>
+       <comment>Has at least one job associated with this mailing finished?</comment>
+  </field>
+  <field>
+      <name>msg_template_id</name>
+      <type>int unsigned</type>
+      <comment>FK to the message template.</comment>
+  </field>
+  <foreignKey>
+       <name>msg_template_id</name>
+       <table>civicrm_msg_template</table>
+       <key>id</key>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+      <name>override_verp</name>
+      <type>boolean</type>
+      <default>0</default>
+      <add>2.2</add>    
+      <comment>Should we overrite VERP address in Reply-To</comment>
+  </field>
+  <field>
+      <name>created_id</name>
+      <type>int unsigned</type>
+      <comment>FK to Contact ID who first created this mailing</comment>
+  </field>
+  <foreignKey>
+       <name>created_id</name>
+       <table>civicrm_contact</table>
+       <key>id</key>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+      <name>created_date</name>
+      <type>datetime</type>
+      <title>Mailing Created Date</title>
+      <comment>Date and time this mailing was created.</comment>
+      <add>3.0</add>
+  </field>
+  <field>
+      <name>scheduled_id</name>
+      <type>int unsigned</type>
+      <comment>FK to Contact ID who scheduled this mailing</comment>
+  </field>
+  <foreignKey>
+       <name>scheduled_id</name>
+       <table>civicrm_contact</table>
+       <key>id</key>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+      <name>scheduled_date</name>
+      <type>datetime</type>
+      <title>Mailing Scheduled Date</title>
+      <comment>Date and time this mailing was scheduled.</comment>
+      <add>3.3</add>
+  </field>
+  <field>
+      <name>approver_id</name>
+      <type>int unsigned</type>
+      <comment>FK to Contact ID who approved this mailing</comment>
+  </field>
+  <foreignKey>
+       <name>approver_id</name>
+       <table>civicrm_contact</table>
+       <key>id</key>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+      <name>approval_date</name>
+      <type>datetime</type>
+      <title>Mailing Approved Date</title>
+      <comment>Date and time this mailing was approved.</comment>
+      <add>3.3</add>
+  </field>
+  <field>
+      <name>approval_status_id</name>
+      <type>int unsigned</type>
+      <title>Approval Status</title>
+      <comment>The status of this mailing. Values: none, approved, rejected</comment>
+      <add>3.3</add>
+  </field>
+  <field>
+      <name>approval_note</name>
+      <type>longtext</type>
+      <title>Approval Note</title>
+      <comment>Note behind the decision.</comment>
+      <add>3.3</add>
+  </field>
+  <field>
+       <name>is_archived</name>
+       <type>boolean</type>
+       <default>0</default>
+       <comment>Is this mailing archived?</comment>
+       <add>2.2</add>
+  </field>
+  <field> 
+       <name>visibility</name> 
+       <type>enum</type> 
+       <values>User and User Admin Only,Public Pages</values> 
+       <default>'User and User Admin Only'</default> 
+       <comment>In what context(s) is the mailing contents visible (online viewing)</comment> 
+       <add>3.3</add> 
+  </field>
+  <field> 
+       <name>campaign_id</name> 
+       <type>int unsigned</type>                 
+       <comment>The campaign for which this mailing has been initiated.</comment> 
+       <add>3.4</add> 
+  </field> 
+  <foreignKey> 
+       <name>campaign_id</name> 
+       <table>civicrm_campaign</table> 
+       <key>id</key> 
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+      <name>dedupe_email</name>
+      <type>boolean</type>
+      <default>0</default>
+      <add>4.1</add>    
+      <comment>Remove duplicate emails?</comment>
+  </field>
+  <field> 
+       <name>sms_provider_id</name> 
+       <type>int unsigned</type>                 
+       <add>4.2</add> 
+  </field> 
+  <foreignKey> 
+       <name>sms_provider_id</name> 
+       <table>civicrm_sms_provider</table> 
+       <key>id</key> 
+       <onDelete>SET NULL</onDelete>
+       <add>4.2</add>
+  </foreignKey>
+</table>

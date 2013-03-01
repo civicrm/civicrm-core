@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/custom/add</path>
+     <page_callback>CRM_Custom_Form_CustomData</page_callback>
+  </item>
+</menu>

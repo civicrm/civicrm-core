@@ -1,0 +1,6 @@
+name = CiviCRM ICIRR 
+description = "This module contains implementation of civicrm hooks specific to ICIRR needs."
+dependencies[] = civicrm
+package = CiviCRM
+core = 6.x
+version = 3.4

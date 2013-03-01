@@ -1,0 +1,7 @@
+name = CiviCRM GiftAid
+description = Gift Aid Support for CiviCRM
+version = 4.1
+dependencies[] = civicrm
+package = CiviCRM
+core = 7.x
+php = 5.2

@@ -1,0 +1,25 @@
+-- /*******************************************************
+-- *
+-- * Relationship Types
+-- *
+-- *******************************************************/
+INSERT INTO `civicrm_relationship_type` ( `name_a_b`, `label_a_b`, `name_b_a`, `label_b_a`, `description`, `contact_type_a`, `contact_type_b`, `is_reserved`, `is_active` ) (SELECT 'Homeless Services Coordinator is', 'Homeless Services Coordinator is', 'Homeless Services Coordinator', 'Homeless Services Coordinator',  'Homeless Services Coordinator', 'Individual', 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Homeless Services Coordinator is'));
+
+
+INSERT INTO `civicrm_relationship_type` ( `name_a_b`, `label_a_b`, `name_b_a`, `label_b_a`, `description`, `contact_type_a`, `contact_type_b`, `is_reserved`, `is_active` ) (SELECT  
+'Health Services Coordinator is', 'Health Services Coordinator is', 'Health Services Coordinator', 'Health Services Coordinator',  'Health Services Coordinator', 'Individual', 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Health Services Coordinator is'));
+
+
+INSERT INTO `civicrm_relationship_type` ( `name_a_b`, `label_a_b`, `name_b_a`, `label_b_a`, `description`, `contact_type_a`, `contact_type_b`, `is_reserved`, `is_active` ) (SELECT 
+'Senior Services Coordinator is', 'Senior Services Coordinator is', 'Senior Services Coordinator', 'Senior Services Coordinator', 'Senior Services Coordinator', 'Individual', 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Senior Services Coordinator is'));
+
+INSERT INTO `civicrm_relationship_type` ( `name_a_b`, `label_a_b`, `name_b_a`, `label_b_a`, `description`, `contact_type_a`, `contact_type_b`, `is_reserved`, `is_active` ) (SELECT 
+'Benefits Specialist is', 'Benefits Specialist is', 'Benefits Specialist', 'Benefits Specialist', 'Benefits Specialist', 'Individual', 'Individual', 0, 1 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_relationship_type`  WHERE `name_a_b` = 'Benefits Specialist is'));
+
+-- /*******************************************************
+-- *
+-- * Case Resources Group
+-- *
+-- *******************************************************/
+
+INSERT INTO `civicrm_group` (  `name`, `title`, `description`, `source`, `saved_search_id`, `is_active`, `visibility`, `where_clause`, `select_tables`, `where_tables`, `group_type`, `cache_date`, `parents`, `children`, `is_hidden` ) (SELECT 'Case_Resources', 'Case Resources', 'Contacts in this group are listed with their phone number and email when viewing case. You also can send copies of case activities to these contacts.', NULL, NULL, 1, 'User and User Admin Only', ' ( `civicrm_group_contact-5`.group_id IN ( 5 ) AND `civicrm_group_contact-5`.status IN ("Added") ) ', 'a:10:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:22:"civicrm_state_province";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-5`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-5` ON contact_a.id = `civicrm_group_contact-5`.contact_id ";s:6:"gender";i:1;}', 'a:2:{s:15:"civicrm_contact";i:1;s:25:"`civicrm_group_contact-5`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-5` ON contact_a.id = `civicrm_group_contact-5`.contact_id ";}', '2', NULL, NULL, NULL, 0 FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_group`  WHERE `name` = 'Case_Resources'));

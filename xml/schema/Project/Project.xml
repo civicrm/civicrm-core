@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Project</base>
+  <class>Project</class>
+  <name>civicrm_project</name>
+  <comment>Instantiate projects, programs, campaigns, etc.</comment>
+  <add>1.5</add>
+  <log>true</log>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Project ID</comment>
+      <add>1.5</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+       <name>title</name>
+       <title>Title</title>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Project name.</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>description</name>
+       <type>text</type>
+       <htmlType>textarea</htmlType>
+       <rows>6</rows>
+       <cols>50</cols>
+       <comment>Optional verbose description of the project. May be used for display - HTML allowed.</comment>
+       <add>1.5</add>
+  </field>
+  <field>   
+      <name>logo</name>
+      <title>Logo</title>
+      <type>varchar</type>   
+      <length>255</length>
+      <comment>Full or relative URL to optional uploaded logo image for project.</comment>   
+      <add>1.5</add>   
+  </field>
+  <field>
+       <name>owner_entity_table</name>
+       <type>varchar</type>
+       <length>64</length>
+       <required>true</required>
+       <comment>Name of table where project owner being referenced is stored (e.g. civicrm_contact or civicrm_group).</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>owner_entity_id</name>
+       <title>Project Owner ID</title>
+       <type>int unsigned</type>
+       <required>true</required>
+       <comment>Foreign key to project owner (contact, group, etc.).</comment>
+       <add>1.5</add>
+  </field>
+  <field> 
+      <name>start_date</name> 
+      <title>Start Date</title>
+      <type>datetime</type> 
+      <comment>Project start date.</comment> 
+      <add>1.5</add> 
+  </field> 
+  <field>
+      <name>end_date</name> 
+      <title>End Date</title>
+      <type>datetime</type> 
+      <comment>Project end date.</comment> 
+      <add>1.5</add> 
+  </field> 
+  <field>
+       <name>is_active</name>
+       <title>Active?</title>
+       <type>boolean</type>
+       <comment>Is this record active? For Projects: can tasks be created for it, does it appear on project listings, etc.</comment>
+       <add>1.5</add>
+  </field>
+  <field>
+       <name>status_id</name>
+       <title>Status</title>
+       <type>int unsigned</type>
+       <comment>Configurable status value (e.g. Planned, Active, Closed...). FK to civicrm_option_value.</comment>
+      <add>1.5</add>
+  </field>
+  <index>
+    <name>UI_project_owner</name>
+    <fieldName>id</fieldName>
+    <fieldName>owner_entity_table</fieldName>
+    <fieldName>owner_entity_id</fieldName>
+    <unique>true</unique>
+    <add>1.5</add> 
+  </index>
+</table>

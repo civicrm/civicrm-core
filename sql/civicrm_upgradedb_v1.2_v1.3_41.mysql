@@ -1,0 +1,457 @@
+-- +--------------------------------------------------------------------+
+-- | CiviCRM version 3.2                                                |
+-- +--------------------------------------------------------------------+
+-- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- +--------------------------------------------------------------------+
+-- | This file is a part of CiviCRM.                                    |
+-- |                                                                    |
+-- | CiviCRM is free software; you can copy, modify, and distribute it  |
+-- | under the terms of the GNU Affero General Public License           |
+-- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+-- |                                                                    |
+-- | CiviCRM is distributed in the hope that it will be useful, but     |
+-- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+-- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+-- | See the GNU Affero General Public License for more details.        |
+-- |                                                                    |
+-- | You should have received a copy of the GNU Affero General Public   |
+-- | License and the CiviCRM Licensing Exception along                  |
+-- | with this program; if not, contact CiviCRM LLC                     |
+-- | at info[AT]civicrm[DOT]org. If you have questions about the        |
+-- | GNU Affero General Public License or the licensing of CiviCRM,     |
+-- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- +--------------------------------------------------------------------+
+
+-- /*******************************************************
+-- *
+-- * adding of new tables
+-- *
+-- *******************************************************/
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_accept_credit_card
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_accept_credit_card (
+
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT ' Accept Credit Card ID',
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this credit card.',
+     name varchar(64)    COMMENT ' Credit Card Type as defined by the payment processor.',
+     title varchar(64)    COMMENT 'Descriptive Credit Card Name.',
+     is_reserved tinyint    COMMENT 'Is this a predefined system object?',
+     is_active tinyint    COMMENT 'Is this property active?' 
+,
+    PRIMARY KEY ( id )
+ 
+ 
+,      
+     FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_contribtion_type
+-- *
+-- *******************************************************/
+
+CREATE TABLE civicrm_contribution_type (
+
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Contribution Type ID',
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this contribution type.',
+     name varchar(64)    COMMENT 'Contribution Type Name.',
+     accounting_code varchar(64)    COMMENT 'Optional value for mapping contributions to accounting system codes for each type/category of contribution.',
+     description varchar(255)    COMMENT 'Contribution Type Description.',
+     is_deductible tinyint   DEFAULT 1 COMMENT 'Is this contribution type tax-deductible? If true, contributions of this type may be fully OR partially deductible - non-deductible amount is stored in the Contribution record.',
+     is_reserved tinyint    COMMENT 'Is this a predefined system object?',
+     is_active tinyint    COMMENT 'Is this property active?' 
+,
+    PRIMARY KEY ( id )
+ 
+    ,     UNIQUE INDEX UI_name_domain_id(
+        name
+      , domain_id
+  )
+  
+,      
+     FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+-- /*******************************************************
+-- *
+-- * civicrm_payment_instrument
+-- *
+-- * 
+-- *
+-- *******************************************************/
+
+CREATE TABLE civicrm_payment_instrument (
+
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT ' Payment Instrument ID',
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this  payment instrument.',
+     name varchar(64)    COMMENT ' Payment Instrument Name.',
+     description varchar(255)    COMMENT ' Payment Instrument Description.',
+     is_reserved tinyint    COMMENT 'Is this a predefined system object?',
+     is_active tinyint    COMMENT 'Is this property active?' 
+,
+    PRIMARY KEY ( id )
+ 
+    ,     UNIQUE INDEX UI_name_domain_id(
+        name
+      , domain_id
+  )
+  
+,      
+     FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_contribution
+-- *
+-- *
+-- *
+-- *******************************************************/
+   
+CREATE TABLE civicrm_contribution (
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Contribution ID',
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this contribution class.',
+     contact_id int unsigned NOT NULL   COMMENT 'FK to Contact ID',
+     contribution_type_id int unsigned    COMMENT 'FK to Contribution Type',
+     payment_instrument_id int unsigned    COMMENT 'FK to Payment Instrument',
+     receive_date datetime NOT NULL   COMMENT 'when was gift received',
+     non_deductible_amount decimal(20,2)   DEFAULT 0 COMMENT 'Portion of total amount which is NOT tax deductible. Equal to total_amount for non-deductible contribution types.',
+     total_amount decimal(20,2) NOT NULL   COMMENT 'Total amount of this contribution. Use market value for non-monetary gifts.',
+     fee_amount decimal(20,2) COMMENT 'actual processor fee if known - may be 0.',
+     net_amount decimal(20,2) COMMENT 'actual funds transfer amount; total less fees; if processor does not report actual fee during transaction, this is set to total_amount.',
+     trxn_id varchar(255)    COMMENT 'unique transaction id; may be processor id, bank id + trans id, or account number + check number... depending on payment_method',
+     invoice_id varchar(255)    COMMENT 'unique invoice id, system generated or passed in',
+     currency varchar(64) NOT NULL   COMMENT '3 character string, value derived from payment processor config setting.',
+     cancel_date datetime    COMMENT 'when was gift cancelled',
+     cancel_reason text    ,
+     receipt_date datetime    COMMENT 'when (if) receipt was sent; populated automatically for online donations w/ automatic receipting',
+     thankyou_date datetime    COMMENT 'when (if) was donor thanked',
+     source varchar(255)    COMMENT 'Origin of this Contribution.' 
+,
+    PRIMARY KEY ( id )
+ 
+    ,     UNIQUE INDEX UI_contrib_trxn_id_domain_id(
+        trxn_id
+      , domain_id
+  )
+    ,     UNIQUE INDEX UI_contrib_invoice_id_domain_id(
+        invoice_id
+      , domain_id
+  )
+  
+  
+,      
+     FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+,      
+     FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id)
+,      
+     FOREIGN KEY (contribution_type_id) REFERENCES civicrm_contribution_type(id)
+,      
+     FOREIGN KEY (payment_instrument_id) REFERENCES civicrm_payment_instrument(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_contribution_page
+-- *
+-- *******************************************************/
+   CREATE TABLE civicrm_contribution_page (
+
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Contribution Id',
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this page',
+     title varchar(255)    COMMENT 'Contribution Page title. For top of page display',
+     intro_text text    COMMENT 'Text and html allowed. Displayed below title.',
+     contribution_type_id int unsigned NOT NULL   COMMENT 'default Contribution type assigned to contributions submitted via this page, e.g. Contribution, Campaign Contribution',
+     is_credit_card_only tinyint   DEFAULT 0 COMMENT 'if true - processing logic must reject transaction at confirmation stage if pay method != credit card',
+     is_allow_other_amount tinyint   DEFAULT 0 COMMENT 'if true, page will include an input text field where user can enter their own amount',
+     default_amount decimal(20,2)    COMMENT 'the default amount allowed.',
+     min_amount decimal(20,2)    COMMENT 'if other amounts allowed, user can configure minimum allowed.',
+     max_amount decimal(20,2)    COMMENT 'if other amounts allowed, user can configure maximum allowed.',
+     thankyou_title varchar(255)    COMMENT 'Title for Thank-you page (header title tag, and display at the top of the page).',
+     thankyou_text text    COMMENT 'text and html allowed; displayed above result on success page',
+     thankyou_footer text    COMMENT 'Text and html allowed; displayed at the bottom of the success page. Common usage is to include link(s) to other pages such as tell-a-friend, etc.',
+     is_email_receipt tinyint   DEFAULT 1 COMMENT 'if true, receipt is automatically emailed to contact on success',
+     receipt_from_name varchar(255)    COMMENT 'FROM email name used for receipts generated by contributions to this contribution page.',
+     receipt_from_email varchar(255)    COMMENT 'FROM email address used for receipts generated by contributions to this contribution page.',
+     cc_receipt varchar(255)    COMMENT 'comma-separated list of email addresses to cc each time a receipt is sent',
+     bcc_receipt varchar(255)    COMMENT 'comma-separated list of email addresses to bcc each time a receipt is sent',
+     receipt_text text    COMMENT 'text to include above standard receipt info on receipt email; emails are text-only, so do not allow html for now',
+     is_active tinyint    COMMENT 'Is this property active?' 
+,
+    PRIMARY KEY ( id )
+ 
+ 
+,      
+     FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+,      
+     FOREIGN KEY (contribution_type_id) REFERENCES civicrm_contribution_type(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+ 
+
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_dupe_match
+-- *
+-- * 
+-- *
+-- *******************************************************/
+  CREATE TABLE civicrm_dupe_match (
+
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique DupeMatch ID',
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this contact',
+     entity_table varchar(64) NOT NULL   COMMENT 'Name Of Entity Table',
+     rule varchar(255) NOT NULL   COMMENT 'String that can Contains valid civicrm core or custom field name,parenthesis,,AND,OR ' 
+,
+    PRIMARY KEY ( id )
+ 
+ 
+,      
+     FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+  
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_financial_trxn
+-- *
+-- * 
+-- *
+-- *******************************************************/
+	
+  CREATE TABLE civicrm_financial_trxn (
+
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Gift ID',
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this gift class.',
+     entity_table varchar(64)    COMMENT 'physical tablename for entity being extended by this data, e.g. civicrm_contact',
+     entity_id int unsigned NOT NULL   COMMENT 'FK to record in the entity table specified by entity_table column.',
+     trxn_date datetime NOT NULL   ,
+     trxn_type enum('Debit', 'Credit') NOT NULL   ,
+     total_amount decimal(20,2) NOT NULL   COMMENT 'amount of transaction',
+     fee_amount decimal(20,2) COMMENT 'actual processor fee if known - may be 0.',
+     net_amount decimal(20,2) COMMENT 'actual funds transfer amount; total less fees; if processor does not report actual fee during transaction, this is set to total_amount.',
+     currency varchar(64) NOT NULL   COMMENT '3 character string, value derived from payment processor config setting.',
+     payment_processor varchar(64) NOT NULL   COMMENT 'derived from Processor setting in civicrm.settings.php.',
+     trxn_id varchar(255) NOT NULL   COMMENT 'unique processor transaction id, bank id + trans id,... depending on payment_method',
+     trxn_result_code varchar(255)    COMMENT 'processor result code' 
+,
+    PRIMARY KEY ( id )
+ 
+    ,     INDEX index_entity(
+        entity_table
+      , entity_id
+  )
+  ,     UNIQUE INDEX UI_ft_trxn_id_domain_id(
+        trxn_id
+      , domain_id
+  )
+  
+,      
+     FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_module_profile
+-- *
+-- * 
+-- *
+-- *******************************************************/
+
+  CREATE TABLE civicrm_module_profile (
+
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique ID',
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this module profile entry.',
+     module varchar(255)    COMMENT 'Module Name.',
+     entity_table varchar(64)    COMMENT 'physical tablename for entity being extended by this data, e.g. civicrm_contact',
+     entity_id int unsigned NOT NULL   COMMENT 'FK to record in the entity table specified by entity_table column.',
+     uf_group_id int unsigned NOT NULL   COMMENT 'Which form does this field belong to.',
+     weight int NOT NULL  DEFAULT 1 COMMENT 'each internal or external module uses this to order multiple profiles associated with an entity_id' 
+,
+    PRIMARY KEY ( id )
+ 
+    ,     INDEX index_entity(
+        entity_table
+      , entity_id
+  )
+  
+,      
+     FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+,      
+     FOREIGN KEY (uf_group_id) REFERENCES civicrm_uf_group(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+	
+
+-- /*******************************************************
+-- *
+-- * civicrm_uf_join
+-- *
+-- * 
+-- *
+-- *******************************************************/
+ 
+    CREATE TABLE civicrm_uf_join (
+
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique table ID',
+     is_active tinyint   DEFAULT 1 COMMENT 'Is this join currently active?',
+     module varchar(64) NOT NULL   COMMENT 'Module which owns this uf_join instance, e.g. User Registration, CiviDonate, etc.',
+     entity_table varchar(64)    COMMENT 'Name of table where item being referenced is stored. Modules which only need a single collection of uf_join instances may choose not to populate entity_table and entity_id.',
+     entity_id int unsigned    COMMENT 'Foreign key to the referenced item.',
+     weight int NOT NULL  DEFAULT 1 COMMENT 'Controls display order when multiple user framework groups are setup for concurrent display.',
+     uf_group_id int unsigned NOT NULL   COMMENT 'Which form does this field belong to.' 
+,
+    PRIMARY KEY ( id )
+ 
+    ,     INDEX index_entity(
+        entity_table
+      , entity_id
+  )
+  
+,      
+     FOREIGN KEY (uf_group_id) REFERENCES civicrm_uf_group(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+
+
+-- /*******************************************************
+-- *
+-- * Insert Default Data in newly created tables
+-- *
+-- *******************************************************/
+
+   INSERT INTO `civicrm_contribution_type` VALUES (1, 1, 'Donation', NULL, NULL, 1, 0, 1);
+   INSERT INTO `civicrm_contribution_type` VALUES (2, 1, 'Member Dues', NULL, NULL, 1, 0, 1);
+   INSERT INTO `civicrm_contribution_type` VALUES (3, 1, 'Campaign Contribution', NULL, NULL, 0, 0, 1);   
+
+   INSERT INTO `civicrm_payment_instrument` VALUES (1, 1, 'Credit Card', NULL, 1, 1);
+   INSERT INTO `civicrm_payment_instrument` VALUES (2, 1, 'Debit Card', NULL, 1, 1);
+   INSERT INTO `civicrm_payment_instrument` VALUES (3, 1, 'Cash', NULL, 1, 1);
+   INSERT INTO `civicrm_payment_instrument` VALUES (4, 1, 'Check', NULL, 1, 1); 
+   INSERT INTO `civicrm_payment_instrument` VALUES (5, 1, 'EFT', NULL, 1, 1);
+
+   INSERT INTO `civicrm_dupe_match` VALUES (1, 1, 'contact_individual', 'first_name AND last_name AND email');
+   
+
+
+-- /*******************************************************
+-- *
+-- * Modify the civicrm_uf_group  Table Structure
+-- *
+-- *******************************************************/
+	
+    ALTER TABLE `civicrm_uf_group` DROP `weight` ;
+
+
+-- /*******************************************************
+-- *
+-- * Modify the civicrm_uf_field  Table Structure
+-- *
+-- *******************************************************/
+
+   ALTER TABLE `civicrm_uf_field` DROP `is_registration` ,
+                                  DROP `is_match` ;
+   
+   ALTER TABLE `civicrm_uf_field` ADD `location_type_id` INT UNSIGNED COMMENT 'Location type of this mapping, if required';
+   ALTER TABLE `civicrm_uf_field` ADD FOREIGN KEY (`location_type_id`) REFERENCES `civicrm_location_type` (`id`);
+
+   ALTER TABLE `civicrm_uf_field` ADD `phone_type` VARCHAR( 64 )   COMMENT 'Phone type, if required';
+ 
+   
+
+-- /*******************************************************
+-- *
+-- * Modify the  civicrm_custom_option Table Structure
+-- *
+-- *******************************************************/
+
+    ALTER TABLE `civicrm_custom_option` ADD `entity_table` VARCHAR( 64 )  COMMENT 'Name of table where item being referenced is stored.' ;
+    UPDATE `civicrm_custom_option` SET `entity_table` = 'civicrm_custom_field' ;
+
+    ALTER TABLE `civicrm_custom_option` ADD `entity_id`  INT( 10 ) UNSIGNED DEFAULT '0' NOT NULL; 
+    UPDATE `civicrm_custom_option` SET entity_id = custom_field_id;
+
+    ALTER TABLE `civicrm_custom_option` DROP KEY `UI_label_custom_field_id`;
+
+    ALTER TABLE `civicrm_custom_option` DROP FOREIGN KEY `civicrm_custom_option_ibfk_1`;
+
+    ALTER TABLE `civicrm_custom_option` DROP `custom_field_id`;
+
+    ALTER TABLE `civicrm_custom_option` ADD INDEX `index_entity` ( `entity_table`, `entity_id` ) ;
+
+
+
+-- /*******************************************************
+-- *
+-- * Insert Default data in to civicrm_accept_credit_card
+-- *
+-- *******************************************************/
+
+  INSERT INTO `civicrm_accept_credit_card` VALUES (1,1,'Visa','Visa',0,1),
+					          (2,1,'MasterCard','Master Card',0,1),
+						  (3,1,'Amex','American Express',0,1),
+						  (4,1,'Discover','Discover',0,1);
+
+
+-- /*******************************************************
+-- *
+-- * Modify the  civicrm_custom_group Table Structure
+-- *
+-- *******************************************************/
+
+  ALTER TABLE `civicrm_custom_group` CHANGE `extends` `extends` ENUM( 'Contact', 'Individual', 'Household', 'Organization', 'Location', 'Address', 'Contribution', 'Activity', 'Phonecall', 'Meeting', 'Group' ) DEFAULT 'Contact' COMMENT 'Type of object this group extends (can add other options later e.g. contact_address, etc.).';
+
+
+-- /*******************************************************
+-- *
+-- * Modify the  civicrm_custom_field Table Structure
+-- *
+-- *******************************************************/
+   
+   ALTER TABLE `civicrm_custom_field` CHANGE `html_type` `html_type` ENUM( 'Text', 'TextArea', 'Select', 'Multi-Select', 'Radio', 'CheckBox', 'Select Date', 'Select State/Province', 'Select Country' ) DEFAULT NULL COMMENT 'HTML types plus several built-in extended types.';
+
+
+
+-- /*******************************************************
+-- *
+-- * Drop Old Tables
+-- *
+-- *******************************************************/
+ 
+   DROP TABLE IF EXISTS civicrm_donation_page;
+
+

@@ -1,0 +1,229 @@
+************************************************
+Sponsors and key contributors for 4.2
+************************************************
+The following people and organizations sponsored and/or contributed new and improved features for the 4.2 release.
+
+Abril Rocabert
+Adam Wight
+Alice Aguilar
+Allen Shaw
+Andres Spagarino
+Andrew Hunt
+Anthony Camilleri
+Ariel Gold
+Brian Shaughnessy
+Chris Ward
+Dave Moreton
+Eileen McNaughton
+Eliet Henderson
+Erik Hommel
+Frank Gomez
+Graylin Kim
+Jamie McClelland
+Jane Hanley
+Jason Bertolacci
+Joe Murray
+John Derry
+Jon Goldberg
+Kasia Wakarecy
+Katie Horn
+Katy Jockelson
+Kellie Brownell
+Ken Zalewski
+Lisa Jervis
+Mathieu Lutfy
+Matt Neimayer
+Micah Lee
+Michael Daryabeygi
+Michael McAndrew
+Nicolas Ganivet
+Noah Miller
+Parvez Saleh
+Peter Gehres
+Peter McAndrew
+Robyn Perry
+Samuel Vanhove
+Simon West
+Stéphane Lussier
+Stuart Gaston
+Xavier Dutoit
+
+Art of Living
+Backoffice Thinking
+Community Builders
+DC Road Runners
+EE atWork
+Electronic Frontier Foundation
+Freeform Solutions
+Free Software Foundation
+Fuzion NZ
+Gingko Street Consulting
+JMA Consulting
+Korlon
+Koumbit
+Lighthouse Consulting
+National Democratic Institute
+New York State Senate
+NS Web Solutions
+Progressive Technology Project
+San Francisco Baykeeper
+Tech to the People
+The Monthly.com
+Veda Consulting
+Xstreme Media
+Zing
+
+************************************************
+Sponsors and key contributors for 4.1
+************************************************
+The following people and organizations sponsored and/or contributed new and improved features for the 4.1 release.
+
+Adam Wight
+Andrew Harris
+Alice Aguilar
+Andre Gurgel
+Brian Shaugnessy
+Coleman Watts
+Dave D
+Dave Moreton
+Eileen McNaughton
+Erik Brower
+Erik Hommel
+Henry Bennett
+Jamie McClelland
+Jim Taylor
+Jonathan Mark
+Joe Murray
+Marianela Zucotti Bozzano
+Michael McAndrew
+Steve Colson
+Stuart Gaston
+Tim Otten
+Tom Kirkpatrick
+Xavier Dutoit
+
+AGH Strategies
+Amigos Library Services
+Association for Learning Technology
+Attendee Management
+Benton Consulting
+Circle Interactive
+CivicActions
+Community Builders
+EE-atWork
+Fuzion (NZ)
+Giant Rabbit
+Kindling Trust
+Korlon
+International Mountain Biking Association
+International Society for Bayesian Analysis
+Josiesque Designs
+Michigan Parents for Schools
+New York State Senate
+Nonprofit Association of Oregon
+Nonprofit Solutions
+Powered by Action
+Progressive Technology Project
+Resolutions Northwest
+River Pool at Beacon
+Rooty Hollow
+San Francisco Baykeeper
+Scotland's Colleges
+Switchback
+System Seed
+Tech to the People
+The San Francisco Orff-Schulwerk
+Third Sector Design
+Voluntary Action Westminster
+Vpod Schweiz
+Woven
+
+************************************************
+Sponsors for 3.4 / 4.0 Make-it-Happen Projects
+************************************************
+The following people and organizations sponsored new and improved features for the 3.4 / 4.0 release.
+
+ACORN Canada http://acorncanada.org 
+Allora Consulting http://alloraconsulting.com
+American Friends Service Committee http://afsc.org/
+Australian Greens http://greens.org.au
+BREAZE http://breaze.org.au
+Canadian Paramedics http://www.peelparamedics.com
+Community Builders Australia Pty Ltd 
+Corvair Society of America (CORSA) http://www.corvair.org/
+Donor Depot http://donordepot.com 
+Energetica http://energetica.com.au
+Fuzion http://fuzion.co.nz
+Gold Strategy Group http://www.goldstrategygroup.com 
+JMA Consulting http://jmaconsulting.biz
+Joomkit Ltd http://joomkit.com
+Kabissa - Space for Change in Africa http://kabissa.org
+NS Web Solutions http://nswebsolutions.com
+NAMI Louisville  http://namilouisville.org
+Progressive Technology Project http://www.progressivetech.org
+RVTC http://rvtc.us
+Volunteer Honduras http://www.volunteerhonduras.org
+
+Briney, Matthew
+Brownsberger, Will
+Burden, Monica
+Calleeuw, Bart
+Cimpian, Casti
+Clarke, Jill
+Cheryl
+Day, Janette
+Gold, Ariel
+Kehilat Hadar 
+Malkoun, Anthony
+Matsushita, Jun
+McNaughton, Eileen
+Murray, Joe
+Peter Davis
+Shaughnessy, Brian
+Spagarino, Andres
+Speleo
+Stuart, josh
+Tabletguy
+Watts, Danny
+Wistreich, Nic
+
+****************************************
+Sponsors for 3.3 Make-it-Happen Projects
+****************************************
+The following people and organizations sponsored new and improved features for the 3.3 release.
+
+JMA Consulting: http://jmaconsulting.biz/
+Emergency Picnic: http://emergencypicnic.net/
+Thomas Carlson
+Micheas Herman
+T.J. Hellman
+Gold Strategy Group: http://www.goldstrategygroup.com
+Laura Velkei
+John Barclay
+Matthew Briney: http://emotivellc.com
+2020Media: http://www.2020media.com/
+Social Contxt: http://socialcontxt.com/
+Impari Systems Inc: http://www.imparisystems.com/
+Alpha: http://uk.alpha.org
+Cambridge Union: http://www.cus.org
+St Ethelburga's: http://stethelburgas.org
+Joomkit: http://www.joomkit.com
+International Mountain Biking Assocation: http://www.imba.com/
+Niro Solutions: http://www.nirosolutions.com/
+Fuzion: http://fuzion.co.nz
+ArtD Webdesign
+CivicActions: http://civicactions.com/
+NES Alumni and Friends Nonprofit Partnership: https://www.nesalumni.org/en
+Gold Strategy Group: http://www.goldstrategygroup.com
+Creative Commons: http://creativecommons.org/
+Community Builders Australia Pty Ltd: http://www.communitybuilders.com.au/
+Australian Greens: http://greens.org.au/
+NES Alumni and Friends Nonprofit Partnership: https://www.nesalumni.org/en
+Data-Scribe: http://www.datascribe.biz/
+Rayogram: http://www.rayogram.com/
+GingerFeet LLC: http://www.gingerfeet.com/
+Kabissa: http://kabissa.org
+Beth Hynes-Ciernia
+
+More details at:
+http://wiki.civicrm.org/confluence/display/CRMDOC33/Make+it+Happen!

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/grant</path>
+     <title>CiviGrant Dashboard</title>
+     <page_callback>CRM_Grant_Page_DashBoard</page_callback>
+     <access_arguments>access CiviGrant</access_arguments>
+     <page_type>1</page_type>
+     <weight>1000</weight>
+     <component>CiviGrant</component>
+  </item>
+  <item>
+     <path>civicrm/grant/info</path>
+     <access_arguments>access CiviGrant</access_arguments>
+     <weight>0</weight>
+  </item>
+  <item>
+     <path>civicrm/grant/search</path>
+     <title>Find Grants</title>
+     <page_callback>CRM_Grant_Controller_Search</page_callback>
+     <access_arguments>access CiviGrant</access_arguments>
+     <page_type>1</page_type>
+     <weight>1010</weight>
+  </item>
+  <item>
+     <path>civicrm/grant/add</path>
+     <title>New Grant</title>
+     <page_callback>CRM_Grant_Page_Tab</page_callback>
+     <path_arguments>action=add</path_arguments>
+     <access_arguments>access CiviGrant</access_arguments>
+     <page_type>1</page_type>
+     <component>CiviGrant</component>
+  </item>
+  <item>
+     <path>civicrm/contact/view/grant</path>
+     <page_callback>CRM_Grant_Page_Tab</page_callback>
+     <access_arguments>access CiviGrant</access_arguments>
+  </item>
+</menu>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<project name="CiviCRM" basedir="." default="report">
+  <target name="report">
+    <phpunitreport infile="../tests/reports/logfile.xml"
+                    styledir="phpunit-xslt"
+                    format="frames"
+                    todir="../tests/reports/results"/>
+  </target>
+  <target name="api_v2">
+    <phpunitreport infile="../tests/reports/logfile.api_v2.xml"
+                    styledir="phpunit-xslt"
+                    format="frames"
+                    todir="../tests/reports/results-api_v2/"/>
+  </target>
+  <target name="api_v3">
+    <phpunitreport infile="../tests/reports/logfile.api_v3.xml"
+                    styledir="phpunit-xslt"
+                    format="frames"
+                    todir="../tests/reports/results-api_v3/"/>
+  </target>
+  <target name="CRM">
+    <phpunitreport infile="../tests/reports/logfile.CRM.xml"
+                    styledir="phpunit-xslt"
+                    format="frames"
+                    todir="../tests/reports/results-CRM/"/>
+  </target>
+  <target name="WebTest">
+    <phpunitreport infile="../tests/reports/logfile.WebTest.xml"
+                    styledir="phpunit-xslt"
+                    format="frames"
+                    todir="../tests/reports/results-Web/"/>
+  </target>
+</project>

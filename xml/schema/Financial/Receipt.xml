@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+  
+<table>  
+  <base>CRM/Financial</base>  
+  <class>OfficialReceipt</class>  
+  <name>civicrm_official_receipt</name>  
+  <add>4.1</add>  
+  <log>true</log>
+  <field>  
+      <name>id</name>  
+      <type>int unsigned</type>  
+      <required>true</required>  
+      <comment>Receipt ID</comment>  
+       <add>4.1</add>  
+  </field>  
+  <primaryKey>  
+       <name>id</name>  
+       <autoincrement>true</autoincrement>  
+  </primaryKey>  
+  <field> 
+      <name>contact_id</name> 
+      <uniqueName>receipt_contact_id</uniqueName>
+      <title>Contact ID</title>
+      <type>int unsigned</type> 
+      <required>true</required> 
+      <import>true</import>
+      <headerPattern>/contact(.?id)?/i</headerPattern>
+      <dataPattern>/^\d+$/</dataPattern>
+      <comment>FK to Contact ID</comment> 
+      <add>4.1</add> 
+  </field> 
+  <foreignKey> 
+       <name>contact_id</name> 
+       <table>civicrm_contact</table> 
+       <key>id</key> 
+       <add>4.1</add> 
+  </foreignKey> 
+  <field> 
+    <name>contact_snapshot</name> 
+    <type>text</type>
+    <htmlType>textarea</htmlType>
+    <rows>4</rows>
+    <cols>80</cols>
+    <comment>Serialized array of contact info of payor at time receipt is created</comment> 
+    <add>4.1</add>
+    <writeOnce>true</writeOnce>
+  </field>
+  <field>  
+      <name>issued_date</name>  
+      <type>datetime</type>  
+      <required>true</required>  
+      <add>4.1</add>  
+  </field>
+  <index>
+      <name>UI_issued_date</name>
+      <fieldName>issued_date</fieldName>
+      <add>4.1</add>
+  </index>
+  <field>
+      <name>start_date</name>  
+      <type>datetime</type>  
+      <required>true</required>  
+      <add>4.1</add>  
+  </field>
+  <index>
+      <name>UI_start_date</name>
+      <fieldName>start_date</fieldName>
+      <add>4.1</add>
+  </index>
+  <field>
+      <name>end_date</name>  
+      <type>datetime</type>  
+      <required>true</required>  
+      <add>4.1</add>  
+  </field>
+  <index>
+      <name>UI_end_date</name>
+      <fieldName>end_date</fieldName>
+      <add>4.1</add>
+  </index>
+  <field>  
+      <name>receipt_status_id</name>  
+      <type>int unsigned</type>  
+      <required>true</required>  
+      <add>4.1</add>
+      <comment>pseudo FK to civicrm_option_value</comment>
+  </field>
+  <index>
+    <name>UI_receipt_status_id</name>
+    <fieldName>receipt_status_id</fieldName>
+    <add>4.1</add>
+  </index>
+  <field>  
+      <name>receipt_type_id</name>  
+      <type>int unsigned</type>  
+      <required>true</required>  
+      <add>4.1</add>
+      <comment>pseudo FK to civicrm_option_value</comment>
+  </field>  
+  <index>
+    <name>UI_receipt_type_id</name>
+    <fieldName>receipt_type_id</fieldName>
+    <add>4.1</add>
+  </index>
+  <field>    
+      <name>total_amount</name>    
+      <type>decimal</type>    
+      <required>true</required>
+      <comment>Total amount for this receipt.</comment>
+      <add>4.1</add>    
+  </field> 
+  <field>    
+      <name>non_deductible_amount</name>    
+      <type>decimal</type>    
+      <comment>Portion of total amount which is NOT tax deductible. Equal to total_amount for non-deductible financial types.</comment>
+      <add>4.1</add>    
+  </field>
+  <field>
+      <name>currency</name>
+      <type>varchar</type>
+      <length>3</length>
+      <default>NULL</default> 
+      <import>true</import>
+      <headerPattern>/cur(rency)?/i</headerPattern>
+      <dataPattern>/^[A-Z]{3}$/</dataPattern>
+      <comment>3 character string, value from config setting or input via user.</comment>
+      <add>4.1</add>
+  </field>
+  <field> 
+      <name>msg_template_id</name> 
+      <type>int unsigned</type>
+      <comment>template used to generate receipt</comment> 
+      <add>4.1</add>
+  </field>
+  <foreignKey> 
+       <name>msg_template_id</name> 
+       <table>civicrm_msg_template</table> 
+       <key>id</key>
+       <add>4.1</add>
+       <onDelete>Set Null</onDelete>
+  </foreignKey> 
+
+</table>
+

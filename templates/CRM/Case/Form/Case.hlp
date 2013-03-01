@@ -1,0 +1,65 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{* Help file is currently only used for "New Case" activity.
+    - However, it may be invoked by other special case activities at some point so use $params.activityTypeFile condition
+      when adding help specific to "New Cases". *}
+
+
+{htxt id="id-details-title"}
+  {ts}Details{/ts}
+{/htxt}
+{htxt id="id-details"}
+{if $params.activityTypeFile EQ 'OpenCase'}
+    <ul>
+    <li>{ts}Introduce yourself and your role within our organization.{/ts}</li>
+    <li>{ts}&quot;All of the information that you provide to us or any of our representatives and service providers will be held in strictest confidence. It will not be used for any purpose other than to help you, and for any other purpose that you authorize in writing, or which is required by law.&quot;{/ts}</li>
+    <li>{ts}&quot;Please tell me what you would like to discuss.&quot;{/ts}</li>
+    <li>{ts}Reflect client's story back to them.{/ts}</li>
+    <li>{ts}Guess client's feelings and needs.{/ts}</li>
+    <li>{ts}&quot;May I now ask you some screening questions?&quot;{/ts}</li> 
+    </ul>
+{else}
+    {ts}Record details about this activity here.{/ts}
+{/if}
+{/htxt}
+
+{htxt id="id-activity_subject-title"}
+  {ts}Title{/ts}
+{/htxt}
+{htxt id="id-activity_subject"}
+{if $params.activityTypeFile EQ 'OpenCase'}
+  {ts}Provide a one-line summary of what this case is about.{/ts}
+{/if}
+{/htxt}
+
+{htxt id="id-case_type-title"}
+  {ts}Case Type{/ts}
+{/htxt}
+{htxt id="id-case_type"}
+{if $params.activityTypeFile EQ 'OpenCase'}
+  {ts}Offer the appropriate service from the list. If the service requires coordination, contact the Director.{/ts}
+{/if}
+{/htxt}

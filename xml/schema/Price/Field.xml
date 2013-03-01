@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Price</base>
+  <class>Field</class>
+  <name>civicrm_price_field</name>
+  <add>1.8</add>
+  <log>true</log>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Price Field</comment>
+      <add>1.8</add>
+  </field>
+  <primaryKey>
+      <name>id</name>
+      <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+      <name>price_set_id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>FK to civicrm_price_set</comment>
+      <add>1.8</add>
+  </field>
+  <foreignKey>
+      <name>price_set_id</name>
+      <table>civicrm_price_set</table>
+      <key>id</key>
+      <add>1.8</add>
+  </foreignKey>
+  <field>
+      <name>name</name>
+      <type>varchar</type>
+      <title>Name</title>
+      <length>255</length>
+      <required>true</required>
+      <comment>Variable name/programmatic handle for this field.</comment>
+      <add>1.8</add>
+  </field>
+  <index>
+      <name>index_name</name>
+      <fieldName>name</fieldName>
+      <add>1.8</add>
+  </index>
+  <field>
+      <name>label</name>
+      <type>varchar</type>
+      <title>Label</title>
+      <length>255</length>
+      <required>true</required>
+      <localizable>true</localizable>
+      <comment>Text for form field label (also friendly name for administering this field).</comment>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>html_type</name>
+      <type>enum</type>
+      <values>Text, Select, Radio, CheckBox</values>
+      <required>true</required>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>is_enter_qty</name>
+      <type>boolean</type>
+      <default>0</default>
+      <comment>Enter a quantity for this field?</comment>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>help_pre</name>
+      <type>text</type>
+      <localizable>true</localizable>
+      <comment>Description and/or help text to display before this field.</comment>
+      <htmlType>textarea</htmlType>
+      <rows>4</rows>
+      <cols>80</cols>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>help_post</name>
+      <type>text</type>
+      <localizable>true</localizable>
+      <comment>Description and/or help text to display after this field.</comment>
+      <htmlType>textarea</htmlType>
+      <rows>4</rows>
+      <cols>80</cols>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>weight</name>
+      <type>int</type>
+      <default>1</default>
+      <comment>Order in which the fields should appear</comment>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>is_display_amounts</name>
+      <type>boolean</type>
+      <default>1</default>
+      <comment>Should the price be displayed next to the label for each option?</comment>
+  </field>
+  <field>
+      <name>options_per_line</name>
+      <type>int unsigned</type>
+      <default>1</default>
+      <comment>number of options per line for checkbox and radio</comment>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>is_active</name>
+      <type>boolean</type>
+      <comment>Is this price field active</comment>
+      <default>1</default>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>is_required</name>
+      <type>boolean</type>
+      <comment>Is this price field required (value must be > 1)</comment>
+      <default>1</default>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>active_on</name>
+      <type>datetime</type>
+      <default>NULL</default>
+      <comment>If non-zero, do not show this field before the date specified</comment>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>expire_on</name>
+      <type>datetime</type>
+      <default>NULL</default>
+      <comment>If non-zero, do not show this field after the date specified</comment>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>javascript</name>
+      <type>varchar</type>
+      <length>255</length>
+      <comment>Optional scripting attributes for field</comment>
+      <add>1.8</add>
+  </field>
+  <field>
+      <name>visibility_id</name>
+      <type>int unsigned</type>
+      <default>1</default>
+      <comment>Implicit FK to civicrm_option_group with name = \'visibility\'</comment>
+      <add>3.2</add>
+   </field>   
+   <field>
+      <name>count</name>
+      <type>int unsigned</type>
+      <default>NULL</default>
+      <comment>Number of Participants Per field</comment>
+      <add>3.2</add>
+      <drop>3.3</drop>
+   </field>
+</table>
+

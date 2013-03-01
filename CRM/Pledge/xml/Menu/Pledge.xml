@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/pledge</path>
+     <title>CiviPledge Dashboard</title>
+     <page_callback>CRM_Pledge_Page_DashBoard</page_callback>
+     <access_arguments>access CiviPledge</access_arguments>
+     <page_type>1</page_type>
+     <weight>550</weight>
+     <component>CiviPledge</component>
+  </item>
+  <item>
+     <path>civicrm/pledge/search</path>
+     <title>Find Pledges</title>
+     <page_callback>CRM_Pledge_Controller_Search</page_callback>
+     <access_arguments>access CiviPledge</access_arguments>
+     <page_type>1</page_type>
+     <weight>560</weight>
+  </item>
+  <item>
+     <path>civicrm/contact/view/pledge</path>
+     <path_arguments>force=1,cid=%%cid%%</path_arguments>
+     <title>Pledges</title>
+     <page_callback>CRM_Pledge_Page_Tab</page_callback>
+     <access_arguments>access CiviPledge</access_arguments>
+     <weight>570</weight>
+  </item>
+  <item>
+     <path>civicrm/pledge/add</path>
+     <path_arguments>action=add</path_arguments>
+     <title>New Pledge</title>
+     <page_callback>CRM_Pledge_Page_Tab</page_callback>
+     <access_arguments>access CiviPledge</access_arguments>
+     <page_type>1</page_type>
+     <component>CiviPledge</component>
+  </item>
+  <item>
+     <path>civicrm/pledge/payment</path>
+     <title>Pledge Payments</title>
+     <page_callback>CRM_Pledge_Page_Payment</page_callback>
+     <access_arguments>access CiviPledge</access_arguments>
+     <weight>580</weight>
+  </item>
+  <item>
+    <path>civicrm/ajax/pledgeName</path>
+    <page_callback>CRM_Pledge_Page_AJAX::pledgeName</page_callback>
+    <access_arguments>access CiviCRM,access CiviPledge</access_arguments>
+  </item>
+</menu>

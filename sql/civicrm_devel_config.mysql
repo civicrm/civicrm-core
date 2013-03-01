@@ -1,0 +1,31 @@
+-- +--------------------------------------------------------------------+
+-- | CiviCRM version 3.2                                                |
+-- +--------------------------------------------------------------------+
+-- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- +--------------------------------------------------------------------+
+-- | This file is a part of CiviCRM.                                    |
+-- |                                                                    |
+-- | CiviCRM is free software; you can copy, modify, and distribute it  |
+-- | under the terms of the GNU Affero General Public License           |
+-- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+-- |                                                                    |
+-- | CiviCRM is distributed in the hope that it will be useful, but     |
+-- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+-- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+-- | See the GNU Affero General Public License for more details.        |
+-- |                                                                    |
+-- | You should have received a copy of the GNU Affero General Public   |
+-- | License and the CiviCRM Licensing Exception along                  |
+-- | with this program; if not, contact CiviCRM LLC                     |
+-- | at info[AT]civicrm[DOT]org. If you have questions about the        |
+-- | GNU Affero General Public License or the licensing of CiviCRM,     |
+-- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- +--------------------------------------------------------------------+
+SELECT @domainId := MAX(id) FROM civicrm_domain;
+
+INSERT INTO civicrm_payment_processor
+  (domain_id, name,    payment_processor_type, is_active, is_default, is_test, user_name, class_name,      billing_mode) VALUES
+  (@domainId, 'dummy', 'Dummy',                1,         1,          0,       'dummy',   'Payment_Dummy', 1),
+  (@domainId, 'dummy', 'Dummy',                1,         0,          1,       'dummy',   'Payment_Dummy', 1);
+
+UPDATE civicrm_preferences SET mailing_backend = 'a:4:{s:15:\"outBound_option\";s:1:\"0\";s:10:\"smtpServer\";s:9:\"localhost\";s:8:\"smtpPort\";s:2:\"25\";s:8:\"smtpAuth\";s:1:\"0\";}';

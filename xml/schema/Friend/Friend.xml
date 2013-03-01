@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+ 
+<table> 
+  <base>CRM/Friend</base> 
+  <class>Friend</class> 
+  <name>civicrm_tell_friend</name> 
+  <add>2.0</add> 
+  <field> 
+      <name>id</name> 
+      <type>int unsigned</type> 
+      <required>true</required> 
+      <comment>Friend ID</comment> 
+       <add>2.0</add> 
+  </field> 
+  <primaryKey> 
+       <name>id</name> 
+       <autoincrement>true</autoincrement> 
+  </primaryKey> 
+  <field>
+       <name>entity_table</name>
+       <type>varchar</type>
+       <length>64</length>
+       <required>true</required>
+       <comment>Name of table where item being referenced is stored.</comment>
+       <add>2.0</add>
+  </field>
+  <field>
+       <name>entity_id</name>
+       <type>int unsigned</type>
+       <required>true</required>
+       <comment>Foreign key to the referenced item.</comment>
+       <add>2.0</add>
+  </field>  
+  <field>     
+      <name>title</name>  
+      <type>varchar</type>
+      <length>255</length>
+      <localizable>true</localizable>
+      <add>2.0</add>  
+  </field>
+  <field>     
+      <name>intro</name>  
+      <type>text</type>  
+      <localizable>true</localizable>
+      <comment>Introductory message to contributor or participant displayed on the Tell a Friend form.</comment>  
+      <add>2.0</add>  
+  </field>
+  <field>    
+      <name>suggested_message</name>    
+      <type>text</type>    
+      <localizable>true</localizable>
+      <comment>Suggested message to friends, provided as default on the Tell A Friend form.</comment>
+      <add>2.0</add>    
+  </field> 
+  <field>    
+      <name>general_link</name>    
+      <type>varchar</type> 
+      <length>255</length>  
+      <import>true</import>
+      <comment>URL for general info about the organization - included in the email sent to friends.</comment>
+      <add>2.0</add>    
+  </field>
+  <field>        
+      <name>thankyou_title</name>     
+      <type>varchar</type>     
+      <length>255</length>  
+      <localizable>true</localizable>
+      <comment>Text for Tell a Friend thank you page header and HTML title.</comment>
+      <add>2.0</add>     
+  </field>   
+  <field>        
+      <name>thankyou_text</name>     
+      <type>text</type>     
+      <localizable>true</localizable>
+      <comment>Thank you message displayed on success page.</comment>
+      <add>2.0</add>     
+  </field>    
+  <field> 
+    <name>is_active</name> 
+    <type>boolean</type> 
+    <add>2.0</add> 
+  </field>   
+</table>

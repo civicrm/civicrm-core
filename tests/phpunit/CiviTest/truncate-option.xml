@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: truncate.xml 23782 2009-09-24 06:33:03Z dgg $  -->
+<!--  Truncate all tables that will be used in the tests  -->
+<dataset>
+  <civicrm_option_value />
+  <civicrm_option_group />
+</dataset>

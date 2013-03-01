@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: uf_field_uf_group_25.xml 2011-05-30 11:36:36IST rajan $ -->
+<dataset>
+  <table name="civicrm_uf_field">
+    <column>id</column>
+    <column>uf_group_id</column>
+    <column>field_name</column>
+    <column>is_active</column>
+    <column>is_view</column>
+    <column>is_required</column>
+    <column>weight</column>
+    <column>help_post</column>
+    <column>help_pre</column>
+    <column>visibility</column>
+    <column>in_selector</column>
+    <column>is_searchable</column>
+    <column>location_type_id</column>
+    <column>phone_type_id</column>
+    <column>label</column>
+    <column>field_type</column>
+    <column>is_reserved</column>
+    <row>
+      <value>100</value>  <!--  id  -->
+      <value>25</value>  <!-- uf_group_id   -->
+      <value>first_name</value>  <!-- field_name   -->
+      <value>1</value>  <!--  is_active  -->
+      <value>0</value>  <!--  is_view  -->
+      <value>1</value>  <!--  is_required  -->
+      <value>1</value>  <!--  weight  -->
+      <null />          <!--  help_post  -->
+      <null />          <!--  help_pre  -->
+      <value>Public Pages and Listings</value>  <!--  visibility  -->
+      <value>0</value>  <!-- in_selector   -->
+      <value>1</value>  <!--  is_searchable  -->
+      <null />  <!--  location_type_id  -->
+      <null />  <!--  phone_type_id  -->
+      <value>First Name</value>  <!--  label  -->
+      <value>Individual</value>  <!--  field_type  -->
+      <value>0</value>  <!--  is_reserved  -->
+    </row>
+    <row>
+      <value>101</value>  <!--  id  -->
+      <value>25</value>  <!-- uf_group_id   -->
+      <value>last_name</value>  <!-- field_name   -->
+      <value>1</value>  <!--  is_active  -->
+      <value>0</value>  <!--  is_view  -->
+      <value>1</value>  <!--  is_required  -->
+      <value>2</value>  <!--  weight  -->
+      <null />          <!--  help_post  -->
+      <null />          <!--  help_pre  -->
+      <value>Public Pages and Listings</value>  <!--  visibility  -->
+      <value>0</value>  <!-- in_selector   -->
+      <value>1</value>  <!--  is_searchable  -->
+      <null />  <!--  location_type_id  -->
+      <null />  <!--  phone_type_id  -->
+      <value>Last Name</value>  <!--  label  -->
+      <value>Individual</value>  <!--  field_type  -->
+      <value>0</value>  <!--  is_reserved  -->
+    </row>
+    <row>
+      <value>102</value>  <!--  id  -->
+      <value>25</value>  <!-- uf_group_id   -->
+      <value>email</value>  <!-- field_name   -->
+      <value>1</value>  <!--  is_active  -->
+      <value>0</value>  <!--  is_view  -->
+      <value>1</value>  <!--  is_required  -->
+      <value>3</value>  <!--  weight  -->
+      <null />          <!--  help_post  -->
+      <null />          <!--  help_pre  -->
+      <value>Public Pages and Listings</value>  <!--  visibility  -->
+      <value>0</value>  <!-- in_selector   -->
+      <value>1</value>  <!--  is_searchable  -->
+      <null />  <!--  location_type_id  -->
+      <null />  <!--  phone_type_id  -->
+      <value>Email</value>  <!--  label  -->
+      <value>Contact</value>  <!--  field_type  -->
+      <value>0</value>  <!--  is_reserved  -->
+    </row>
+    <row>
+      <value>103</value>  <!--  id  -->
+      <value>25</value>  <!-- uf_group_id   -->
+      <value>phone</value>  <!-- field_name   -->
+      <value>1</value>  <!--  is_active  -->
+      <value>0</value>  <!--  is_view  -->
+      <value>1</value>  <!--  is_required  -->
+      <value>4</value>  <!--  weight  -->
+      <null />          <!--  help_post  -->
+      <null />          <!--  help_pre  -->
+      <value>Public Pages and Listings</value>  <!--  visibility  -->
+      <value>0</value>  <!-- in_selector   -->
+      <value>1</value>  <!--  is_searchable  -->
+      <value>1</value>  <!--  location_type_id  -->
+      <value>1</value>  <!--  phone_type_id  -->
+      <value>Phone</value>  <!--  label  -->
+      <value>Contact</value>  <!--  field_type  -->
+      <value>0</value>  <!--  is_reserved  -->
+    </row>
+    <row>
+      <value>104</value>  <!--  id  -->
+      <value>25</value>  <!-- uf_group_id   -->
+      <value>country</value>  <!-- field_name   -->
+      <value>1</value>  <!--  is_active  -->
+      <value>0</value>  <!--  is_view  -->
+      <value>0</value>  <!--  is_required  -->
+      <value>5</value>  <!--  weight  -->
+      <null />          <!--  help_post  -->
+      <null />          <!--  help_pre  -->
+      <value>Public Pages and Listings</value>  <!--  visibility  -->
+      <value>0</value>  <!-- in_selector   -->
+      <value>1</value>  <!--  is_searchable  -->
+      <value>1</value>  <!--  location_type_id  -->
+      <null />  <!--  phone_type_id  -->
+      <value>Country</value>  <!--  label  -->
+      <value>Contact</value>  <!--  field_type  -->
+      <value>0</value>  <!--  is_reserved  -->
+    </row>
+    <row>
+      <value>105</value>  <!--  id  -->
+      <value>25</value>  <!-- uf_group_id   -->
+      <value>state_province</value>  <!-- field_name   -->
+      <value>1</value>  <!--  is_active  -->
+      <value>0</value>  <!--  is_view  -->
+      <value>1</value>  <!--  is_required  -->
+      <value>6</value>  <!--  weight  -->
+      <null />          <!--  help_post  -->
+      <null />          <!--  help_pre  -->
+      <value>Public Pages and Listings</value>  <!--  visibility  -->
+      <value>0</value>  <!-- in_selector   -->
+      <value>1</value>  <!--  is_searchable  -->
+      <value>1</value>  <!--  location_type_id  -->
+      <null />  <!--  phone_type_id  -->
+      <value>State</value>  <!--  label  -->
+      <value>Contact</value>  <!--  field_type  -->
+      <value>0</value>  <!--  is_reserved  -->
+    </row>
+    <row>
+      <value>106</value>  <!--  id  -->
+      <value>25</value>  <!-- uf_group_id   -->
+      <value>postal_code</value>  <!-- field_name   -->
+      <value>1</value>  <!--  is_active  -->
+      <value>0</value>  <!--  is_view  -->
+      <value>0</value>  <!--  is_required  -->
+      <value>7</value>  <!--  weight  -->
+      <null />          <!--  help_post  -->
+      <null />          <!--  help_pre  -->
+      <value>Public Pages and Listings</value>  <!--  visibility  -->
+      <value>0</value>  <!-- in_selector   -->
+      <value>1</value>  <!--  is_searchable  -->
+      <value>1</value>  <!--  location_type_id  -->
+      <null />  <!--  phone_type_id  -->
+      <value>Postal Code</value>  <!--  label  -->
+      <value>Contact</value>  <!--  field_type  -->
+      <value>0</value>  <!--  is_reserved  -->
+    </row>	
+  </table>
+</dataset>

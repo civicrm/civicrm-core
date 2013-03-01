@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/auction</path>
+     <title>CiviAuction</title>
+     <page_callback>CRM_Auction_Page_DashBoard</page_callback>
+     <access_arguments>access CiviAuction</access_arguments>
+     <page_type>1</page_type>
+     <weight>1000</weight>
+     <component>CiviAuction</component>
+  </item>
+  <item>
+     <path>civicrm/auction/info</path>
+     <page_callback>CRM_Auction_Page_AuctionInfo</page_callback>
+     <title>Auction Information</title>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+  </item>
+  <item>
+     <path>civicrm/auction/item</path>
+     <title>Item Listing</title>
+     <page_callback>CRM_Auction_Page_Item</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+     <is_ssl>true</is_ssl>
+  </item>
+  <item>
+     <path>civicrm/auction/item/manage</path>
+     <title>Auction Item</title>
+     <page_callback>CRM_Auction_Page_ManageItem</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+     <is_ssl>true</is_ssl>
+  </item>
+  <item>
+     <path>civicrm/auction/item/add</path>
+     <title>Auction Item</title>
+     <page_callback>CRM_Auction_Page_AddItem</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+     <is_ssl>true</is_ssl>
+  </item>
+  <item>
+     <path>civicrm/admin/auction</path>
+     <title>Manage Auctions</title>
+     <page_callback>CRM_Auction_Page_Manage</page_callback>
+     <desc>Create and edit auction configuration including times.</desc>
+     <access_arguments>access CiviAuction</access_arguments>
+     <adminGroup>CiviAuction</adminGroup>
+     <icon>admin/small/auction_manage.png</icon>
+     <weight>370</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/auction/add</path>
+     <title>Add Auctions</title>
+     <page_callback>CRM_Auction_Form_Auction</page_callback>
+     <desc>Create and edit auction configuration including times.</desc>
+     <access_arguments>access CiviAuction</access_arguments>
+     <adminGroup>CiviAuction</adminGroup>
+     <icon>admin/small/auction_manage.png</icon>
+     <weight>370</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/auction_type</path>
+     <title>Auction Types</title>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <desc>Use Auction Types to categorize your auction items.</desc>
+     <path_arguments>group=auction_type</path_arguments>
+     <access_arguments>administer CiviCRM,access CiviAuction</access_arguments>
+     <adminGroup>CiviAuction</adminGroup>
+     <icon>admin/small/auction_type.png</icon>
+     <weight>375</weight>
+  </item>
+  <item>
+     <path>civicrm/auction/search</path>
+     <title>Find Auction Items</title>
+     <page_callback>CRM_Auction_Controller_Search</page_callback>
+     <access_arguments>access CiviAuction</access_arguments>
+     <page_type>1</page_type>
+     <weight>1010</weight>
+  </item>
+  <item>
+     <path>civicrm/auction/manage</path>
+     <title>Manage Auctions</title>
+     <page_callback>CRM_Auction_Page_Manage</page_callback>
+     <access_arguments>access CiviAuction</access_arguments>
+     <page_type>1</page_type>
+     <weight>1020</weight>
+  </item>
+  <item>
+     <path>civicrm/auction/add</path>
+     <path_arguments>action=add</path_arguments>
+     <title>New Auction</title>
+     <page_callback>CRM_Auction_Form_Auction</page_callback>
+     <access_arguments>access CiviAuction</access_arguments>
+     <page_type>1</page_type>
+     <weight>1030</weight>
+  </item>
+</menu>

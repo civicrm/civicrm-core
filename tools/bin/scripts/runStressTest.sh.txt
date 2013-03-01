@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+ 
+# define your database name here, will be overriden by 
+# FIRST command line argument if given
+DBNAME=
+# define your database usernamename here, will be overriden by 
+# SECOND command line argument if given
+DBUSER=
+# define your database password here, will be overriden by 
+# THIRD command line argument if given
+DBPASS=
+# set your PHP5 bin dir path here, if it's not in PATH
+# The path should be terminated with dir separator!
+PHP5PATH=
+
+# ==========================================================
+# No changes below, please.
+# ==========================================================
+
+CALLEDPATH=`dirname $0`
+
+if [ "$1" == '-h' ] || [ "$1" == '--help' ]; then
+	echo; echo Usage: setup.sh [database name] [database user] [database password]; echo
+	exit 0
+fi
+
+
+# fetch command line arguments if available
+if [ ! -z $1 ] ; then DBNAME=$1; fi
+if [ ! -z $2 ] ; then DBUSER=$2; fi
+if [ ! -z $3 ] ; then DBPASS=$3; fi
+
+# verify if we have at least DBNAME given
+if [ -z $DBNAME ] ; then
+	echo "No database name defined!"
+	exit 1
+fi
+if [ -z $DBUSER ] ; then
+	echo "No database username defined!"
+	exit 1
+fi
+if [ -z $DBPASS ] ; then
+	read -p "Database password:"
+	DBPASS=$REPLY
+fi
+
+# run code generator if it's there - which means it's
+# checkout, not packaged code
+if [ -d $CALLEDPATH/../xml ]; then
+	cd $CALLEDPATH/../xml
+	"$PHP5PATH"php GenCode.php
+fi
+
+# someone might want to use empty password for development,
+# let's make it possible - we asked before.
+if [ -z $DBPASS ]; then # password still empty
+	PASSWDSECTION=""
+else
+	PASSWDSECTION="-p$DBPASS"
+fi
+
+cd $CALLEDPATH/../sql
+echo; echo Dropping $DBNAME database
+mysqladmin -f -u $DBUSER $PASSWDSECTION drop $DBNAME
+echo; echo Creating $DBNAME database
+mysqladmin -f -u $DBUSER $PASSWDSECTION create $DBNAME
+echo; echo Creating database structure
+mysql -u $DBUSER $PASSWDSECTION $DBNAME < civicrm.mysql
+
+mysql -u $DBUSER $PASSWDSECTION $DBNAME < civicrm_data.mysql
+
+mysql -u $DBUSER $PASSWDSECTION $DBNAME < zipcodes.mysql
+cd ../test/RSTest/
+php Run.php
+
+echo; echo "DONE!"
+
+# to generate a new data file do the foll:
+# mysqladmin -f -uYourDBUser -pYourDBPassword drop YourDBName
+# mysqladmin -f -uYourDBUser -pYourDBPassword create YourDBName
+# mysql -uYourDBUser -pYourDBPassword YourDBName < civicrm.mysql
+# mysql -uYourDBUser -pYourDBPassword YourDBName < civicrm_data.mysql
+# mysql -uYourDBUser -pYourDBPassword YourDBName < zipcodes.mysql
+# php GenerateContactData.php
+# echo "drop table zipcodes" | mysql -uYourDBUser -pYourDBPassword YourDBName
+# mysqldump -t -n -uYourDBUser -pYourDBPassword YourDBName  > GeneratedData.sql

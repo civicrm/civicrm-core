@@ -1,0 +1,632 @@
+-- +--------------------------------------------------------------------+
+-- | CiviCRM version 3.2                                                |
+-- +--------------------------------------------------------------------+
+-- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- +--------------------------------------------------------------------+
+-- | This file is a part of CiviCRM.                                    |
+-- |                                                                    |
+-- | CiviCRM is free software; you can copy, modify, and distribute it  |
+-- | under the terms of the GNU Affero General Public License           |
+-- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+-- |                                                                    |
+-- | CiviCRM is distributed in the hope that it will be useful, but     |
+-- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+-- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+-- | See the GNU Affero General Public License for more details.        |
+-- |                                                                    |
+-- | You should have received a copy of the GNU Affero General Public   |
+-- | License and the CiviCRM Licensing Exception along                  |
+-- | with this program; if not, contact CiviCRM LLC                     |
+-- | at info[AT]civicrm[DOT]org. If you have questions about the        |
+-- | GNU Affero General Public License or the licensing of CiviCRM,     |
+-- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- +--------------------------------------------------------------------+
+-- /*******************************************************
+-- *
+-- * Select DomainID
+-- *
+-- *******************************************************/
+	SELECT @domain_id := id from civicrm_domain;
+
+-- /*******************************************************
+-- *
+-- * civicrm_dedupe_rule_group
+-- *
+-- * Dedupe rule groups
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_dedupe_rule_group (
+
+     id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique dedupe rule group id',
+     domain_id int unsigned NOT NULL COMMENT 'The id of the domain this rule group belongs to',
+     contact_type enum('Individual', 'Organization', 'Household')    COMMENT 'The type of contacts this group applies to',
+     threshold int NOT NULL COMMENT 'The weight threshold the sum of the rule weights has to cross to consider two contacts the same' 
+
+,    PRIMARY KEY ( id )
+
+,    CONSTRAINT FK_civicrm_dedupe_rule_group_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+-- /*******************************************************
+-- *
+-- * civicrm_dedupe_rule
+-- *
+-- * Dedupe rules for use by rule groups
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_dedupe_rule (
+
+     id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique dedupe rule id',
+     dedupe_rule_group_id int unsigned NOT NULL COMMENT 'The id of the rule group this rule belongs to',
+     rule_table varchar(64) NOT NULL COMMENT 'The name of the table this rule is about',
+     rule_field varchar(64) NOT NULL COMMENT 'The name of the field of the table referenced in rule_table',
+     rule_length int unsigned COMMENT 'The lenght of the matching substring',
+     rule_weight int NOT NULL COMMENT 'The weight of the rule' 
+
+,    PRIMARY KEY ( id )
+
+,    CONSTRAINT FK_civicrm_dedupe_rule_dedupe_rule_group_id FOREIGN KEY (dedupe_rule_group_id) REFERENCES civicrm_dedupe_rule_group(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+-- /*******************************************************
+-- *
+-- * civicrm_participant
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_participant
+	    ADD INDEX index_status_id (status_id),
+	    ADD INDEX index_role_id (role_id);
+
+-- /*******************************************************
+-- *
+-- * civicrm_payment_processor
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_payment_processor (
+
+     id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Payment Processor ID',
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this payment processor.',
+     name varchar(64) COMMENT 'Payment Processor Name.',
+     description varchar(255) COMMENT 'Payment Processor Description.',
+     payment_processor_type varchar(255) COMMENT 'Payment Processor Type.',
+     is_active tinyint COMMENT 'Is this processor active?',
+     is_default tinyint COMMENT 'Is this processor the default?',
+     is_test tinyint COMMENT 'Is this processor for a test site?',
+     user_name varchar(255),
+     password varchar(255),
+     signature varchar(255),
+     url_site varchar(255),
+     url_recur varchar(255),
+     url_button varchar(255),
+     subject varchar(255),
+     class_name varchar(255),
+     billing_mode int unsigned NOT NULL COMMENT 'Billing Mode',
+     is_recur tinyint COMMENT 'Can process recurring contributions' 
+
+,    PRIMARY KEY ( id )
+ 
+,    UNIQUE INDEX UI_name_test( name, is_test )
+  
+,    CONSTRAINT FK_civicrm_payment_processor_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+-- /*******************************************************
+-- *
+-- * civicrm_payment_processor_type
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_payment_processor_type (
+    
+     id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Payment Processor Type ID',
+     domain_id int unsigned NOT NULL COMMENT 'Which Domain owns this payment processor.',
+     name varchar(64) COMMENT 'Payment Processor Name.',
+     title varchar(64) COMMENT 'Payment Processor Name.',
+     description varchar(255) COMMENT 'Payment Processor Description.',
+     is_active tinyint COMMENT 'Is this processor active?',
+     is_default tinyint COMMENT 'Is this processor the default?',
+     user_name_label varchar(255),
+     password_label varchar(255),
+     signature_label varchar(255),
+     subject_label varchar(255),
+     class_name varchar(255),
+     url_site_default varchar(255),
+     url_recur_default varchar(255),
+     url_button_default varchar(255),
+     url_site_test_default varchar(255),
+     url_recur_test_default varchar(255),
+     url_button_test_default varchar(255),
+     billing_mode int unsigned NOT NULL COMMENT 'Billing Mode',
+     is_recur tinyint COMMENT 'Can process recurring contributions' 
+,
+    PRIMARY KEY ( id )
+ 
+,   UNIQUE INDEX UI_name( name )
+  
+,   CONSTRAINT FK_civicrm_payment_processor_type_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_preferences
+-- *
+-- * Define preferences for the site and users
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_preferences (
+
+
+     id int unsigned NOT NULL AUTO_INCREMENT  ,
+     domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this contact',
+     contact_id int unsigned    COMMENT 'FK to Contact ID',
+     is_domain tinyint    COMMENT 'Is this the record for the domain setting?',
+     location_count int unsigned    COMMENT 'Number of locations to be displayed on edit page?',
+     contact_view_options varchar(128)    COMMENT 'What tabs are displayed in the contact summary',
+     contact_edit_options varchar(128)    COMMENT 'What tabs are displayed in the contact edit',
+     advanced_search_options varchar(128)    COMMENT 'What tabs are displayed in the advanced search screen',
+     user_dashboard_options varchar(128)    COMMENT 'What tabs are displayed in the contact edit',
+     address_options varchar(128)    COMMENT 'What fields are displayed from the address table',
+     address_format text    COMMENT 'Format to display the address',
+     mailing_format text    COMMENT 'Format to display a mailing label',
+     individual_name_format text    COMMENT 'Format to display a individual name',
+     address_standardization_provider varchar(64)    COMMENT 'object name of provider for address standarization',
+     address_standardization_userid varchar(64)    COMMENT 'user id for provider login',
+     address_standardization_url varchar(255)    COMMENT 'url of address standardization service' 
+,
+    PRIMARY KEY ( id )
+ 
+    ,     INDEX index_contact_view_options(
+        contact_view_options
+  )
+  ,     INDEX index_contact_edit_options(
+        contact_edit_options
+  )
+  ,     INDEX index_advanced_search_options(
+        advanced_search_options
+  )
+  ,     INDEX index_user_dashboard_options(
+        user_dashboard_options
+  )
+  ,     INDEX index_address_options(
+        address_options
+  )
+  
+,      
+     CONSTRAINT FK_civicrm_preferences_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+,      
+     CONSTRAINT FK_civicrm_preferences_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_price_set
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_price_set (
+
+     id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Price Set',
+     domain_id int unsigned NOT NULL COMMENT 'Which domain owns this price set',
+     name varchar(64) NOT NULL  COMMENT 'Variable name/programmatic handle for this group',
+     title varchar(64) NOT NULL COMMENT 'Friendly name',
+     is_active tinyint DEFAULT 1 COMMENT 'Is this price set active',
+     help_pre text COMMENT 'Description and/or help text to display before fields in form.',
+     help_post text COMMENT 'Description and/or help text to display after fields in form.',
+     javascript varchar(64) COMMENT 'Optional Javascript script function(s) included on the form with this price_set. Can be used for conditional' 
+
+,    PRIMARY KEY ( id )
+ 
+,    UNIQUE INDEX UI_name( name )
+
+,    UNIQUE INDEX UI_title( title )
+  
+,    CONSTRAINT FK_civicrm_price_set_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+-- /*******************************************************
+-- *
+-- * civicrm_price_field
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_price_field (
+
+     id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Price Field',
+     price_set_id int unsigned NOT NULL COMMENT 'FK to civicrm_price_set',
+     name varchar(64) NOT NULL COMMENT 'Variable name/programmatic handle for this field',
+     label varchar(64) NOT NULL COMMENT 'Text for form field label (also friendly name for administering this field)',
+     html_type enum('Text', 'Select', 'Radio', 'CheckBox') NOT NULL   ,
+     is_enter_qty tinyint DEFAULT 0 COMMENT 'Enter a quantity for this field?',
+     help_pre text COMMENT 'Description and/or help text to display before this field.',
+     help_post text COMMENT 'Description and/or help text to display after this field.',
+     weight int DEFAULT 1 COMMENT 'Order in which the fields should appear',
+     is_display_amounts tinyint DEFAULT 1 COMMENT 'Should the price be displayed next to the label for each option?',
+     options_per_line int unsigned DEFAULT 1 COMMENT 'number of options per line for checkbox and radio',
+     is_active tinyint DEFAULT 1 COMMENT 'Is this price field active',
+     is_required tinyint DEFAULT 1 COMMENT 'Is this price field required (value must be > 1)',
+     active_on datetime DEFAULT 0 COMMENT 'If non-zero, do not show this field before the date specified',
+     expire_on datetime DEFAULT 0 COMMENT 'If non-zero, do not show this field after the date specified',
+     javascript varchar(255) COMMENT 'Optional scripting attributes for field' 
+
+,    PRIMARY KEY ( id )
+
+,    INDEX index_name( name )
+  
+,    CONSTRAINT FK_civicrm_price_field_price_set_id FOREIGN KEY (price_set_id) REFERENCES civicrm_price_set(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_price_set_entity
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_price_set_entity (
+
+     id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Price Set Entity',
+     entity_table varchar(64) NOT NULL COMMENT 'Table which uses this price set',
+     entity_id int unsigned NOT NULL COMMENT 'Item in table',
+     price_set_id int unsigned NOT NULL COMMENT 'price set being used' 
+
+,    PRIMARY KEY ( id )
+ 
+,    UNIQUE INDEX UI_entity( entity_table, entity_id )
+  
+,    CONSTRAINT FK_civicrm_price_set_entity_price_set_id FOREIGN KEY (price_set_id) REFERENCES civicrm_price_set(id)
+  
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_line_item
+-- *
+-- *******************************************************/
+CREATE TABLE civicrm_line_item (
+
+     id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Line Item',
+     entity_table varchar(64) NOT NULL COMMENT 'table which has the transaction',
+     entity_id int unsigned NOT NULL COMMENT 'entry in table',
+     price_field_id int unsigned NOT NULL COMMENT 'FK to price_field',
+     custom_option_id int unsigned NOT NULL COMMENT 'FK to custom_option',
+     label varchar(255) NOT NULL COMMENT 'descriptive label for item - from custom_option.label',
+     qty int unsigned NOT NULL COMMENT 'How many items ordered',
+     unit_price decimal(20,2) NOT NULL COMMENT 'price of each item',
+     line_total decimal(20,2) NOT NULL COMMENT 'qty * unit_price'
+
+,    PRIMARY KEY ( id )
+
+,    CONSTRAINT FK_civicrm_line_item_price_field_id FOREIGN KEY (price_field_id) REFERENCES civicrm_price_field(id)
+
+,    CONSTRAINT FK_civicrm_line_item_custom_option_id FOREIGN KEY (custom_option_id) REFERENCES civicrm_custom_option(id)
+
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+-- /*******************************************************
+-- *
+-- * Modifying Tables
+-- *
+-- *******************************************************/
+
+-- /*******************************************************
+-- *
+-- * civicrm_activity_history
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_activity_history 
+	    ADD is_test tinyint(4) NULL DEFAULT '0';
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_contribution_page
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_contribution_page
+	    ADD `start_date` datetime NULL DEFAULT NULL,
+	    ADD `end_date` datetime NULL DEFAULT NULL,
+	    ADD payment_processor_id int(10) unsigned NULL DEFAULT NULL,
+	    ADD CONSTRAINT FK_civicrm_contribution_page_payment_processor_id FOREIGN KEY (payment_processor_id) REFERENCES civicrm_payment_processor(id);
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_custom_field
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_custom_field
+	    MODIFY data_type enum('String','Int','Float','Money','Memo','Date','Boolean','StateProvince','Country','File','Link') NULL DEFAULT NULL,
+    	    MODIFY html_type enum('Text','TextArea','Select','Multi-Select','Radio','CheckBox','Select Date','Select State/Province','Select Country','File','Link') NULL DEFAULT NULL;
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_event
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_event
+	    ADD registration_start_date datetime NULL DEFAULT NULL,
+	    ADD registration_end_date datetime NULL DEFAULT NULL,
+	    ADD fee_label varchar(255) NULL DEFAULT NULL,
+	    ADD is_show_location tinyint(4) NULL DEFAULT '1',
+	    ADD payment_processor_id int(10) unsigned NULL DEFAULT NULL AFTER contribution_type_id,
+	    ADD CONSTRAINT FK_civicrm_event_payment_processor_id FOREIGN KEY (payment_processor_id) REFERENCES civicrm_payment_processor(id),
+    	    ADD INDEX index_event_type_id (event_type_id);
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_household
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_household
+	    ADD INDEX index_household_name (household_name);
+
+-- /*******************************************************
+-- *
+-- * civicrm_individual
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_individual
+	    ADD INDEX index_first_name (first_name),
+	    ADD INDEX index_last_name (last_name);
+
+-- /*******************************************************
+-- *
+-- * civicrm_line_item
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_line_item
+	    ADD INDEX index_entity (entity_table, entity_id);
+
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_location
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_location
+	    MODIFY location_type_id int(10) unsigned NULL DEFAULT NULL;
+   
+
+-- /*******************************************************
+-- *
+-- * civicrm_membership
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_membership
+	    ADD is_test tinyint(4) NULL DEFAULT '0';
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_membership_type
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_membership_type ALTER fixed_period_start_day    DROP DEFAULT;
+	ALTER TABLE civicrm_membership_type ALTER fixed_period_rollover_day DROP DEFAULT;
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_option_group
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_option_group
+    	    ADD label varchar(255) NULL DEFAULT NULL;
+
+-- /*******************************************************
+-- *
+-- * civicrm_option_value
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_option_value
+             MODIFY filter int(10) unsigned DEFAULT NULL;
+
+-- /*******************************************************
+-- *
+-- * civicrm_organization
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_organization
+	    ADD INDEX index_organization_name (organization_name);
+
+
+
+-- /*******************************************************
+-- *
+-- * Insert data into civicrm_payment_processor_type
+-- *
+-- *******************************************************/
+
+	INSERT INTO civicrm_payment_processor_type 
+	    (domain_id, name, title, description, is_active, is_default, user_name_label, password_label, signature_label, subject_label, class_name, url_site_default, url_recur_default, url_button_default, url_site_test_default, url_recur_test_default, url_button_test_default, billing_mode, is_recur )
+	VALUES 
+	    (@domain_id,'Dummy','Dummy Payment Processor',NULL,1,1,'User Name',NULL,NULL,NULL,'Payment_Dummy',NULL,NULL,NULL,NULL,NULL,NULL,1,NULL),
+	    (@domain_id,'PayPal_Standard','PayPal - Website Payments Standard',NULL,1,0,'Merchant Account Email',NULL,NULL,NULL,'Payment_PayPalImpl','https://www.paypal.com/','https://www.paypal.com/',NULL,'https://www.sandbox.paypal.com/','https://www.sandbox.paypal.com/',NULL,4,1),
+	    (@domain_id,'PayPal','PayPal - Website Payments Pro',NULL,1,0,'User Name','Password','Signature',NULL,'Payment_PayPalImpl','https://www.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',3,NULL),
+	    (@domain_id,'PayPal_Express','PayPal - Express',NULL,1,0,'User Name','Password','Signature',NULL,'Payment_PayPalImpl','https://www.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',3,NULL),
+	    (@domain_id,'Google_Checkout','Google Checkout',NULL,1,0,'Merchant ID','Key',NULL,NULL,'Payment_Google','https://checkout.google.com/',NULL,'http://checkout.google.com/buttons/checkout.gif','https://sandbox.google.com/checkout',NULL,'http://sandbox.google.com/checkout/buttons/checkout.gif',4,NULL),
+	    (@domain_id,'Moneris','Moneris',NULL,1,0,'User Name','Password','Store ID',NULL,'Payment_Moneris','https://www3.moneris.com/',NULL,NULL,'https://esqa.moneris.com/',NULL,NULL,1,1),
+	    (@domain_id,'AuthNet_AIM','Authorize.Net - AIM',NULL,1,0,'API Login','Payment Key','MD5 Hash',NULL,'Payment_AuthorizeNet','https://secure.authorize.net/gateway/transact.dll','https://api.authorize.net/xml/v1/request.api',NULL,'https://secure.authorize.net/gateway/transact.dll','https://apitest.authorize.net/xml/v1/request.api',NULL,1,1);
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_uf_group
+-- *
+-- *******************************************************/
+	ALTER TABLE civicrm_uf_group 
+  	    ADD is_cms_user tinyint(4) NULL DEFAULT '0',
+	    ADD notify varchar(255) NULL DEFAULT NULL COMMENT 'If you want member(s) of your organization to receive a notification email whenever this Profile form is used to enter or update contact information, enter one or more email addresses here separated by a comma';
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_option_group and civicrm_option_value
+-- *
+-- *******************************************************/
+
+	INSERT INTO 
+	  civicrm_option_group (domain_id, name, description, is_reserved, is_active) 
+	VALUES 
+	  (@domain_id, 'contact_view_options', 'Contact View Options', 0, 1),
+	  (@domain_id, 'contact_edit_options', 'Contact Edit Options', 0, 1),
+ 	  (@domain_id, 'advanced_search_options', 'Advanced Search Options', 0, 1),
+	  (@domain_id, 'user_dashboard_options', 'User Dashboard Options', 0, 1),
+	  (@domain_id, 'address_options', 'Addressing Options', 0, 1);
+   
+	SELECT @option_group_id_cvOpt := max(id) from civicrm_option_group where name = 'contact_view_options';
+	SELECT @option_group_id_ceOpt := max(id) from civicrm_option_group where name = 'contact_edit_options';
+	SELECT @option_group_id_asOpt := max(id) from civicrm_option_group where name = 'advanced_search_options';
+	SELECT @option_group_id_udOpt := max(id) from civicrm_option_group where name = 'user_dashboard_options';
+	SELECT @option_group_id_adOpt := max(id) from civicrm_option_group where name = 'address_options';
+
+	INSERT INTO 
+	   civicrm_option_value (option_group_id, label, value, name, grouping, filter, is_default, weight, description, is_optgroup, is_reserved, is_active) 
+	VALUES	
+	  (@option_group_id_cvOpt, 'Activities'   ,   1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
+	  (@option_group_id_cvOpt, 'Relationships',   2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
+	  (@option_group_id_cvOpt, 'Groups'       ,   3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
+	  (@option_group_id_cvOpt, 'Notes'        ,   4, NULL, NULL, 0, NULL,  4, NULL, 0, 0, 1 ),
+	  (@option_group_id_cvOpt, 'Tags'         ,   5, NULL, NULL, 0, NULL,  5, NULL, 0, 0, 1 ),
+	  (@option_group_id_cvOpt, 'Change Log'   ,   6, NULL, NULL, 0, NULL,  6, NULL, 0, 0, 1 ),
+	  (@option_group_id_cvOpt, 'Contributions',   7, NULL, NULL, 0, NULL,  7, NULL, 0, 0, 1 ),
+	  (@option_group_id_cvOpt, 'Memberships'  ,   8, NULL, NULL, 0, NULL,  8, NULL, 0, 0, 1 ),
+	  (@option_group_id_cvOpt, 'Events'       ,   9, NULL, NULL, 0, NULL,  9, NULL, 0, 0, 1 ),
+
+	  (@option_group_id_ceOpt, 'Communication Preferences',   1, NULL, NULL, 0, NULL, 1, NULL, 0, 0, 1 ),
+	  (@option_group_id_ceOpt, 'Demographics'             ,   2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
+	  (@option_group_id_ceOpt, 'Tags and Groups'          ,   3, NULL, NULL, 0, NULL, 3, NULL, 0, 0, 1 ),
+	  (@option_group_id_ceOpt, 'Notes'                    ,   4, NULL, NULL, 0, NULL, 4, NULL, 0, 0, 1 ),
+	
+	  (@option_group_id_asOpt, 'Address Fields'      ,   1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
+	  (@option_group_id_asOpt, 'Custom Fields'       ,   2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
+	  (@option_group_id_asOpt, 'Activity History'    ,   3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
+	  (@option_group_id_asOpt, 'Scheduled Activities',   4, NULL, NULL, 0, NULL,  4, NULL, 0, 0, 1 ),
+	  (@option_group_id_asOpt, 'Relationships'       ,   5, NULL, NULL, 0, NULL,  5, NULL, 0, 0, 1 ),
+	  (@option_group_id_asOpt, 'Notes'               ,   6, NULL, NULL, 0, NULL,  6, NULL, 0, 0, 1 ),
+	  (@option_group_id_asOpt, 'Change Log'          ,   7, NULL, NULL, 0, NULL,  7, NULL, 0, 0, 1 ),
+	  (@option_group_id_asOpt, 'Contributions'       ,   8, NULL, NULL, 0, NULL,  8, NULL, 0, 0, 1 ),
+	  (@option_group_id_asOpt, 'Memberships'         ,   9, NULL, NULL, 0, NULL,  9, NULL, 0, 0, 1 ),
+	  (@option_group_id_asOpt, 'Events'              ,  10, NULL, NULL, 0, NULL, 10, NULL, 0, 0, 1 ),
+
+	  (@option_group_id_udOpt, 'Groups'       , 1, NULL, NULL, 0, NULL, 1, NULL, 0, 0, 1 ),
+	  (@option_group_id_udOpt, 'Contributions', 2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
+	  (@option_group_id_udOpt, 'Memberships'  , 3, NULL, NULL, 0, NULL, 3, NULL, 0, 0, 1 ),
+	  (@option_group_id_udOpt, 'Events'       , 4, NULL, NULL, 0, NULL, 4, NULL, 0, 0, 1 ),
+
+	  (@option_group_id_adOpt, 'Street Address'   ,  1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'Addt\'l Address 1' , 2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'Addt\'l Address 2' , 3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'City'             ,  4, NULL, NULL, 0, NULL,  4, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'Zip / Postal Code',  5, NULL, NULL, 0, NULL,  5, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'Postal Code Suffix', 6, NULL, NULL, 0, NULL,  6, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'County'           ,  7, NULL, NULL, 0, NULL,  7, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'State / Province' ,  8, NULL, NULL, 0, NULL,  8, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'Country'          ,  9, NULL, NULL, 0, NULL,  9, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'Latitude'         , 10, NULL, NULL, 0, NULL, 10, NULL, 0, 0, 1 ),
+	  (@option_group_id_adOpt, 'Longitude'        , 11, NULL, NULL, 0, NULL, 11, NULL, 0, 0, 1 );
+
+
+-- /*******************************************************
+-- *
+-- * civicrm_preferences
+-- *
+-- *******************************************************/
+        INSERT INTO 
+          civicrm_preferences(domain_id, contact_id, is_domain, location_count, contact_view_options, contact_edit_options, advanced_search_options, user_dashboard_options, address_options, address_format, mailing_format, individual_name_format, address_standardization_provider, address_standardization_userid, address_standardization_url )
+        VALUES 
+          (@domain_id,NULL,1,1,'123456789','1234','12345678910','1234','123456891011','{street_address}\n{supplemental_address_1}\n{supplemental_address_2}\n{city}{, }{state_province}{ }{postal_code}\n{country}','{street_address}\n{supplemental_address_1}\n{supplemental_address_2}\n{city}{, }{state_province}{ }{postal_code}\n{country}','{individual_prefix}{ } {first_name}{ }{middle_name}{ }{last_name}{ }{individual_suffix}',NULL,NULL,NULL);
+
+-- /*******************************************************
+-- *
+-- * CRM-2064
+-- *
+-- *******************************************************/
+UPDATE civicrm_location_type SET name = 'Billing' WHERE name IN ('Facturering', 'Facturation', 'Faturamento');
+
+
+-- /*******************************************************
+-- *
+-- * dupe rule defaults
+-- *
+-- *******************************************************/
+
+INSERT INTO civicrm_dedupe_rule_group (domain_id, contact_type, threshold) VALUES (@domain_id, 'Individual', 20);
+
+SELECT @dedupe_rule_group_id := MAX(id) FROM civicrm_dedupe_rule_group;
+
+INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
+ VALUES 
+ (@dedupe_rule_group_id, 'civicrm_individual', 'first_name', 5),
+ (@dedupe_rule_group_id, 'civicrm_individual', 'last_name',  7),
+ (@dedupe_rule_group_id, 'civicrm_email',      'email',     10);
+
+INSERT INTO civicrm_dedupe_rule_group (domain_id, contact_type, threshold) VALUES (@domain_id, 'Organization', 10);
+
+SELECT @dedupe_rule_group_id := MAX(id) FROM civicrm_dedupe_rule_group;
+
+INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
+VALUES
+  (@dedupe_rule_group_id, 'civicrm_organization', 'organization_name', 5),
+  (@dedupe_rule_group_id, 'civicrm_email',        'email',             5);
+
+INSERT INTO civicrm_dedupe_rule_group (domain_id, contact_type, threshold) VALUES (@domain_id, 'Household', 10);
+
+SELECT @dedupe_rule_group_id := MAX(id) FROM civicrm_dedupe_rule_group;
+
+INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
+VALUES
+  (@dedupe_rule_group_id, 'civicrm_household', 'household_name', 5),
+  (@dedupe_rule_group_id, 'civicrm_email',     'email',          5);
+
+-- /*******************************************************
+-- *
+-- * CRM-2125
+-- *
+-- *******************************************************/
+INSERT IGNORE INTO civicrm_state_province (id,country_id, abbreviation, name) VALUES
+(5177, 1098, "CW", "Central and Western"),
+(5178, 1098, "EA", "Eastern"),
+(5179, 1098, "SO", "Southern"),
+(5180, 1098, "WC", "Wan Chai"),
+(5181, 1098, "KC", "Kowloon City"),
+(5182, 1098, "KU", "Kwun Tong"),
+(5183, 1098, "SS", "Sham Shui Po"),
+(5184, 1098, "WT", "Wong Tai Sin"),
+(5185, 1098, "YT", "Yau Tsim Mong"),
+(5186, 1098, "IS", "Islands"),
+(5187, 1098, "KI", "Kwai Tsing"),
+(5188, 1098, "NO", "North"),
+(5189, 1098, "SK", "Sai Kung"),
+(5190, 1098, "ST", "Sha Tin"),
+(5191, 1098, "TP", "Tai Po"),
+(5192, 1098, "TW", "Tsuen Wan"),
+(5193, 1098, "TM", "Tuen Mun"),
+(5194, 1098, "YL", "Yuen Long");
+
+-- /*******************************************************
+-- *
+-- * CRM-2130
+-- *
+-- *******************************************************/
+INSERT IGNORE INTO civicrm_country (id, name, iso_code) VALUES ("1242", "Serbia", "RS");
+INSERT IGNORE INTO civicrm_country (id, name, iso_code) VALUES ("1243", "Montenegro", "ME");
+
+-- /*******************************************************
+-- *
+-- * CRM-2131
+-- *
+-- *******************************************************/
+INSERT IGNORE INTO civicrm_country (id, name, iso_code) VALUES ("1244", "Jersey", "JE");
+INSERT IGNORE INTO civicrm_country (id, name, iso_code) VALUES ("1245", "Guernsey", "GG");
+INSERT IGNORE INTO civicrm_country (id, name, iso_code) VALUES ("1246", "Isle of Man", "IM");

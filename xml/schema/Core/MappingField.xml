@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>MappingField</class>
+  <name>civicrm_mapping_field</name>
+  <comment>Individual field mappings for Mapping</comment>
+  <add>1.2</add>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>Mapping Field ID</comment>
+      <add>1.2</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+      <add>1.2</add>
+  </primaryKey>
+  <field>
+        <name>mapping_id</name>
+        <type>int unsigned</type>
+        <required>true</required>
+        <comment>Mapping to which this field belongs</comment>
+      <add>1.2</add>
+  </field>
+  <foreignKey>
+        <name>mapping_id</name>
+        <table>civicrm_mapping</table>
+        <key>id</key>
+      <add>1.2</add>
+  </foreignKey>
+  <field>
+       <name>name</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>Mapping field key</comment>
+      <add>1.2</add>
+  </field>
+  <field>
+       <name>contact_type</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Contact Type in mapping</comment>
+      <add>1.2</add>
+  </field>
+  <field>
+        <name>column_number</name>
+        <type>int unsigned</type>
+        <required>true</required>
+        <comment>Column number for mapping set</comment>
+      <add>1.2</add>
+  </field>
+  <field>
+       <name>location_type_id</name>
+       <type>int unsigned</type>
+       <comment>Location type of this mapping, if required</comment>
+      <add>1.2</add>
+  </field>
+  <foreignKey>
+       <name>location_type_id</name>
+       <table>civicrm_location_type</table>
+       <key>id</key>
+      <add>1.2</add>
+  </foreignKey>
+  <field>
+       <name>phone_type</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Phone type, if required</comment>
+      <add>1.2</add>
+      <drop>2.2</drop>
+  </field>
+  <field>
+       <name>phone_type_id</name>
+       <type>int unsigned</type>
+       <comment>Which type of phone does this number belongs.</comment>
+       <add>2.2</add>
+  </field> 
+   <field>
+       <name>im_provider_id</name>
+       <type>int unsigned</type>
+       <comment>Which type of IM Provider does this name belong.</comment>
+       <add>3.0</add>
+  </field>
+  <field>
+       <name>website_type_id</name>
+       <type>int unsigned</type>
+       <comment>Which type of website does this site belong</comment>
+       <add>3.2</add>
+  </field> 
+  <field>
+       <name>relationship_type_id</name>
+       <type>int unsigned</type>
+       <comment>Relationship type, if required</comment>
+      <add>1.2</add>
+  </field>
+  <foreignKey>
+       <name>relationship_type_id</name>
+       <table>civicrm_relationship_type</table>
+       <key>id</key>
+      <add>1.2</add>
+  </foreignKey>
+  <field> 
+      <name>relationship_direction</name>     
+      <type>varchar</type>  
+      <length>6</length>                  
+      <add>1.7</add>  
+  </field> 
+  <field>
+        <name>grouping</name>
+        <type>int unsigned</type>
+	<default>1</default>
+        <comment>Used to group mapping_field records into related sets (e.g. for criteria sets in search builder mappings).</comment>
+      <add>1.5</add>
+  </field>
+  <field>
+       <name>operator</name>
+       <type>enum</type>
+       <values>&#61;, !&#61;, &#62;, &#60;, &#62;&#61;, &#60;&#61;,
+       IN, NOT IN, LIKE, NOT LIKE, IS NULL, IS NOT NULL</values>
+       <comment>SQL WHERE operator for search-builder mapping fields (search criteria).</comment>
+      <add>1.5</add>
+  </field>
+  <field>
+       <name>value</name>
+       <type>varchar</type>
+       <length>255</length>
+       <comment>SQL WHERE value for search-builder mapping fields.</comment>
+      <add>1.5</add>
+  </field>
+</table>
