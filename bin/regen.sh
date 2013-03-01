@@ -11,11 +11,11 @@ else
 fi
 
 pushd .
-cd $SVNROOT
+cd $CIVISOURCEDIR
 svn up .
-cd $SVNROOT/bin
+cd $CIVISOURCEDIR/bin
 ./setup.sh
-cd $SVNROOT/sql
+cd $CIVISOURCEDIR/sql
 
 echo; echo "Dropping civicrm_* tables from database $DBNAME"
 # mysqladmin -f -u $DBUSER $PASSWDSECTION $DBARGS drop $DBNAME
@@ -38,12 +38,12 @@ mysql -u$DBUSER $PASSWDSECTION $DBARGS $DBNAME < zipcodes.mysql
 php GenerateData.php
 
 # run the cli script to build the menu and the triggers
-cd $SVNROOT
+cd $CIVISOURCEDIR
 "$PHP5PATH"php bin/cli.php -e System -a flush --triggers 1 --session 1
 
 mysql -u$DBUSER $PASSWDSECTION $DBARGS $DBNAME -e "DROP TABLE zipcodes; UPDATE civicrm_domain SET config_backend = NULL; UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL'  OR name = 'imageUploadURL';"
 
-cd $SVNROOT/sql
+cd $CIVISOURCEDIR/sql
 mysqldump -cent --skip-triggers -u $DBUSER $PASSWDSECTION $DBARGS $DBNAME > civicrm_generated.mysql
 #cat civicrm_sample_report.mysql >> civicrm_generated.mysql
 cat civicrm_sample_custom_data.mysql >> civicrm_generated.mysql
