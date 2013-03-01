@@ -44,19 +44,19 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
-    
+
     // Add new individual using Quick Add block on the main page
     $firstName1 = "John_" . substr(sha1(rand()), 0, 7);
     $lastName1  = "Smiths_x" . substr(sha1(rand()), 0, 7);
     $Name1      = $lastName1 . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName1, "$firstName1.$lastName1@example.com");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     // Add new individual using Quick Add block on the main page
     $firstName2 = "James_" . substr(sha1(rand()), 0, 7);
     $lastName2  = "Smiths_x" . substr(sha1(rand()), 0, 7);
     $Name2 = $lastName2 . ', ' . $firstName2;
-    
+
     $firstName3 = "James_" . substr(sha1(rand()), 0, 7);
     $lastName3  = "Smiths_x" . substr(sha1(rand()), 0, 7);
     $Name3 = $lastName3 . ', ' . $firstName3;
@@ -73,9 +73,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
                                    'label' => 'Last Name'
                                    ));
     $this->addProfile($profileTitle, $profileFields);
-        
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh');
+    $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name', "Smiths_x");
     $this->click('_qf_Basic_refresh');
     $this->waitForElementPresent('_qf_Basic_next_print');
@@ -96,9 +94,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->isElementPresent("xpath=//form[@id='Batch']/div[2]/table/tbody//tr/td[text()='{$Name2}']");
     $this->isElementPresent("xpath=//form[@id='Batch']/div[2]/table/tbody//tr/td[text()='{$Name1}']");
     $this->isElementPresent("xpath=//form[@id='Batch']/div[2]/table/tbody//tr/td[text()='{$Name3}']");
-    // selecting first check of profile                                                                                                                                                                     
+    // selecting first check of profile
     $this->click("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[2]/input");
-    
+
     $this->waitForElementPresent('_qf_Batch_next');
     $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[2]/img");
     sleep(5);
@@ -108,28 +106,24 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Result_done');
     $this->click('_qf_Result_done');
 
-    // Find contact and assert for contact sub type                                                                                                                                                            
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh');
-
+    // Find contact and assert for contact sub type
+    $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name',  $firstName2);
     $this->click('_qf_Basic_refresh');
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']/table/tbody//td/span/a[text()='View']");
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody//td/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec()); 
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $xpath = "xpath=//div[@id='contact-summary']/div/div[2]/div/div/div[2]/div[@class='crm-content crm-contact_type_label']";
     $this->verifyText($xpath, preg_quote("Student"));
 
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh');
-    
+    $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name',  $firstName3);
     $this->click('_qf_Basic_refresh');
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']/table/tbody//td/span/a[text()='View']");
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody//td/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec()); 
-    
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
     $xpath = "xpath=//div[@id='contact-summary']/div/div[2]/div/div/div[2]/div[@class='crm-content crm-contact_type_label']";
     $this->verifyText($xpath, preg_quote("Staff"));
   }
@@ -161,15 +155,13 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->_addProfile($profileTitle, $customDataArr, $profileFor);
 
     //setting ckeditor as WYSIWYG
-    $this->open($this->sboxPath . "civicrm/admin/setting/preferences/display?reset=1");
-    $this->waitForElementPresent('_qf_Display_next-bottom');
+    $this->openCiviPage('admin/setting/preferences/display', 'reset=1', '_qf_Display_next-bottom');
     $this->select('editor_id', 'CKEditor');
     $this->click('_qf_Display_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Find Contact
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh');
+    $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
     $this->waitForElementPresent('_qf_Basic_next_print');
@@ -192,7 +184,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     // selecting first check of profile
     $this->click("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[2]/table/tbody/tr/td/input[2]");
-    
+
     // selecting second check of profile
     $this->click("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[3]/input[2]");
     // clicking copy values to rows of first check and verifying
@@ -314,15 +306,13 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->assertTrue($assertCheck, 'copy rows for field two failed[radio button]');
 
     //test with tinymce editor
-    $this->open($this->sboxPath . "civicrm/admin/setting/preferences/display?reset=1");
-    $this->waitForElementPresent('_qf_Display_next-bottom');
+    $this->openCiviPage('admin/setting/preferences/display', 'reset=1', '_qf_Display_next-bottom');
     $this->select('editor_id', 'TinyMCE');
     $this->click('_qf_Display_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Find Contact
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh');
+    $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
     $this->waitForElementPresent('_qf_Basic_next_print');
@@ -361,10 +351,8 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->assertTrue($assertCheck, 'Rich Text Area coping failed [TinyMCE]');
 
     //campaign test for interview
-    // Enable CiviCampaign module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
+    //enable CiviCampaign module if necessary
+    $this->openCiviPage('admin/setting/component', 'reset=1', '_qf_Component_next-bottom');
     $enabledComponents = $this->getSelectOptions("enableComponents-t");
     if (!in_array("CiviCampaign", $enabledComponents)) {
       $this->addSelection("enableComponents-f", "label=CiviCampaign");
@@ -372,12 +360,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
       $this->click("add");
       $this->click("_qf_Component_next-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent("Your changes have been saved."));
+      $this->assertElementContainsText('crm-notification-container', 'Changes Saved');
     }
 
     //Adding a survey
-    $this->open($this->sboxPath . "civicrm/survey/add?reset=1");
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+    $this->openCiviPage('survey/add', 'reset=1', '_qf_Main_upload-bottom');
     $surveyTitle = "BatchUpdateTest Survey" . substr(sha1(rand()), 0, 7);
     $this->type("title", $surveyTitle);
     $this->select('activity_type_id', 'label=Survey');
@@ -619,7 +606,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     //setting options per line to check CRM-9938
     $this->type("options_per_line", 2);
-    
+
     //clicking save
     $this->click('_qf_Field_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -773,4 +760,3 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     return $returnArray;
   }
 }
-
