@@ -1,5 +1,5 @@
-# Define the root of your svn directory here
-SVNROOT=
+# Define the path for civicrm source directory here
+CIVISOURCEDIR=
 
 # define your schema file name here, will be overriden by
 # FIRST command line argument if given
