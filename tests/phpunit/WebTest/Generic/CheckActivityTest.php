@@ -50,10 +50,8 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     // We're using Quick Add block on the main page for this.
     $contactFirstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($contactFirstName2, "Anderson", TRUE);
-    $this->open($this->sboxPath . "civicrm/activity?reset=1&action=add&context=standalone");
+    $this->openCiviPage("activity", "reset=1&action=add&context=standalone", "_qf_Activity_upload");
 
-    // make sure the form loaded, check the end element
-    $this->waitForElementPresent("_qf_Activity_upload");
     $this->select("activity_type_id", "label=Meeting");
 
     $this->click("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1");
