@@ -93,10 +93,10 @@ do_gitify "${GIT_BASE_URL}/civicrm-core.git" "$CIVICRM_ROOT" -b "${CIVICRM_BRANC
 do_gitify "${GIT_BASE_URL}/civicrm-packages.git" "$CIVICRM_ROOT/packages" -b "${CIVICRM_BRANCH}"
 case "$CIVICRM_CMS" in
   Drupal)
-    do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "${CIVICRM_BRANCH}-7.x"
+    do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "7.x-${CIVICRM_BRANCH}"
     ;;
   Drupal6)
-    do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "${CIVICRM_BRANCH}-6.x"
+    do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "6.x-${CIVICRM_BRANCH}"
     ;;
   Joomla)
     do_gitify "${GIT_BASE_URL}/civicrm-joomla.git" "$CIVICRM_ROOT/joomla" -b "${CIVICRM_BRANCH}"
@@ -105,7 +105,7 @@ case "$CIVICRM_CMS" in
     do_gitify "${GIT_BASE_URL}/civicrm-wordpress.git" "$CIVICRM_ROOT/WordPress" -b "${CIVICRM_BRANCH}"
     ;;
   all)
-    do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "${CIVICRM_BRANCH}-7.x"
+    do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "7.x-${CIVICRM_BRANCH}"
     do_gitify "${GIT_BASE_URL}/civicrm-joomla.git" "$CIVICRM_ROOT/joomla" -b "${CIVICRM_BRANCH}"
     do_gitify "${GIT_BASE_URL}/civicrm-wordpress.git" "$CIVICRM_ROOT/WordPress" -b "${CIVICRM_BRANCH}"
     ;;
