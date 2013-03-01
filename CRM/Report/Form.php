@@ -274,10 +274,12 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   function preProcessCommon() {
-    $this->_force = CRM_Utils_Request::retrieve('force',
-                    'Boolean',
-                    CRM_Core_DAO::$_nullObject
-    );
+    $this->_force =
+      CRM_Utils_Request::retrieve(
+        'force',
+        'Boolean',
+        CRM_Core_DAO::$_nullObject
+      );
 
     $this->_section = CRM_Utils_Request::retrieve('section', 'Integer', CRM_Core_DAO::$_nullObject);
 
@@ -381,17 +383,21 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->_chartButtonName = $this->getButtonName('submit', 'chart');
   }
 
-  function addBreadCrumb() {
-    $breadCrumbs = array(array('title' => ts('Report Templates'),
-                     'url' => CRM_Utils_System::url('civicrm/admin/report/template/list', 'reset=1'),
-                   ));
+  static function addBreadCrumb() {
+    $breadCrumbs =
+      array(
+        array(
+          'title' => ts('Report Templates'),
+          'url' => CRM_Utils_System::url('civicrm/admin/report/template/list', 'reset=1'),
+        )
+      );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumbs);
   }
 
   function preProcess() {
+    $this->preProcessCommon();
 
-    self::preProcessCommon();
     if (!$this->_id) {
       self::addBreadCrumb();
     }
@@ -509,15 +515,9 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->setDefaultValues(FALSE);
     }
 
-    CRM_Report_Utils_Get::processFilter($this->_filters,
-      $this->_defaults
-    );
-    CRM_Report_Utils_Get::processGroupBy($groupBys,
-      $this->_defaults
-    );
-    CRM_Report_Utils_Get::processFields($reportFields,
-      $this->_defaults
-    );
+    CRM_Report_Utils_Get::processFilter($this->_filters, $this->_defaults);
+    CRM_Report_Utils_Get::processGroupBy($groupBys, $this->_defaults);
+    CRM_Report_Utils_Get::processFields($reportFields, $this->_defaults);
     CRM_Report_Utils_Get::processChart($this->_defaults);
 
     if ($this->_force) {
@@ -542,9 +542,7 @@ class CRM_Report_Form extends CRM_Core_Form {
               if ($freeze) {
                 // find element object, so that we could use quickform's freeze method
                 // for required elements
-                $obj = $this->getElementFromGroup("fields",
-                       $fieldName
-                );
+                $obj = $this->getElementFromGroup("fields", $fieldName);
                 if ($obj) {
                   $freezeGroup[] = $obj;
                 }
@@ -591,16 +589,16 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
 
-      if (array_key_exists('order_bys', $table) &&
+      if (
+        array_key_exists('order_bys', $table) &&
         is_array($table['order_bys'])
       ) {
-
         if (!array_key_exists('order_bys', $this->_defaults)) {
-
           $this->_defaults['order_bys'] = array();
         }
         foreach ($table['order_bys'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('default', $field) ||
+          if (
+            CRM_Utils_Array::value('default', $field) ||
             CRM_Utils_Array::value('default_order', $field) ||
             CRM_Utils_Array::value('default_is_section', $field) ||
             CRM_Utils_Array::value('default_weight', $field)
@@ -702,8 +700,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     foreach ($this->_filters as $table => $attributes) {
       foreach ($attributes as $fieldName => $field) {
         // get ready with option value pair
-        $operations = $this->getOperationPair(CRM_Utils_Array::value('operatorType', $field),
-                      $fieldName
+        $operations = self::getOperationPair(
+          CRM_Utils_Array::value('operatorType', $field),
+          $fieldName
         );
 
         $filters[$table][$fieldName] = $field;
@@ -984,7 +983,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   // Note: $fieldName param allows inheriting class to build operationPairs
   // specific to a field.
-  function getOperationPair($type = "string", $fieldName = NULL) {
+  static function getOperationPair($type = "string", $fieldName = NULL) {
     // FIXME: At some point we should move these key-val pairs
     // to option_group and option_value table.
 
@@ -1276,7 +1275,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
   ) {
     $clauses = array();
-    if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_FORM::OP_DATE)))) {
+    if (in_array($relative, array_keys(self::getOperationPair(CRM_Report_FORM::OP_DATE)))) {
       $sqlOP = self::getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
     }
@@ -1533,7 +1532,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
     foreach ($rows as $key => $list) {
       foreach ($list as $colName => $colVal) {
-        if (array_key_exists($colName, $checkList) && 
+        if (array_key_exists($colName, $checkList) &&
           $checkList[$colName] == $colVal) {
           $rows[$key][$colName] = "";
         }
@@ -2231,12 +2230,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE && CRM_Utils_Array::value('operatorType', $field) != CRM_Report_Form::OP_MONTH) {
-            list($from, $to) = $this->getFromTo(CRM_Utils_Array::value("{$fieldName}_relative", $this->_params),
-                               CRM_Utils_Array::value("{$fieldName}_from", $this->_params),
-                               CRM_Utils_Array::value("{$fieldName}_to", $this->_params),
-                               CRM_Utils_Array::value("{$fieldName}_from_time", $this->_params),
-                               CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params)
-            );
+            list($from, $to) =
+              $this->getFromTo(
+                CRM_Utils_Array::value("{$fieldName}_relative", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_from", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_to", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_from_time", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params)
+              );
             $from_time_format = CRM_Utils_Array::value("{$fieldName}_from_time", $this->_params) ? 'h' : 'd';
             $from = CRM_Utils_Date::customFormat($from, null, array($from_time_format));
 
@@ -2246,18 +2247,19 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             if ($from || $to) {
               $statistics['filters'][] = array(
                 'title' => $field['title'],
-                'value' => ts("Between %1 and %2",
-                         array(
-                           1 => $from,
-                           2 => $to,
-                         )
+                'value' => ts(
+                  "Between %1 and %2",
+                  array(
+                    1 => $from,
+                    2 => $to,
+                  )
                 ),
               );
             }
             elseif (in_array($rel = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params),
-                array_keys($this->getOperationPair(CRM_Report_FORM::OP_DATE))
+                array_keys(self::getOperationPair(CRM_Report_FORM::OP_DATE))
               )) {
-              $pair = $this->getOperationPair(CRM_Report_FORM::OP_DATE);
+              $pair = self::getOperationPair(CRM_Report_FORM::OP_DATE);
               $statistics['filters'][] = array(
                 'title' => $field['title'],
                 'value' => $pair[$rel],
@@ -2268,8 +2270,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             $value = NULL;
             if ($op) {
-              $pair = $this->getOperationPair(CRM_Utils_Array::value('operatorType', $field),
-                      $fieldName
+              $pair = self::getOperationPair(
+                CRM_Utils_Array::value('operatorType', $field),
+                $fieldName
               );
               $min = CRM_Utils_Array::value("{$fieldName}_min", $this->_params);
               $max = CRM_Utils_Array::value("{$fieldName}_max", $this->_params);
@@ -2412,7 +2415,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       CRM_Report_Form_Instance::postProcess($this);
     }
   }
-  
+
   /*
    * Get Template file name - use default form template if a specific one has not been set up for this report
    *
