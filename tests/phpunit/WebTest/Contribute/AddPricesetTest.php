@@ -86,7 +86,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     }
 
     if ($financialType) {
-      $this->select("css=select.form-select", "label={$financialType}");
+      $this->select("financial_type_id", "label={$financialType}");
     }
     $this->type('help_pre', $setHelp);
 
@@ -385,7 +385,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     //add financial type of account type expense
     $financialType = $this->_testAddFinancialType();
-    
+
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
     $usedFor  = 'Contribution';
     $setHelp  = 'Select your conference options.';
@@ -516,7 +516,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       8 => 'Completed',
     );
     foreach($expected as $label => $value) {
-      $this->verifyText("xpath=//form[@id='ContributionView']/div[2]/table/tbody/tr[$label]/td[2]", preg_quote($value));
+      $this->verifyText("xpath=//form[@id='ContributionView']/div[2]/table/tbody/tr[$label]/td[2]", preg_quote($value), "On line __LINE__");
     }
   }
 
