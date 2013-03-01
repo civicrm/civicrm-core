@@ -524,5 +524,205 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
   }
+
+  /**
+   * Function to test to regiter participant for event with 
+   * multiple price fields in price-set
+   * CRM-11986 
+   *
+   */
+  function testEventWithPriceSet() {
+    // This is the path where our testing install resides.
+    // The rest of URL is defined in CiviSeleniumTestCase base class, in
+    // class attributes.
+    $this->open($this->sboxPath);
+    
+    // Log in using webtestLogin() method
+    $this->webtestLogin();
+    
+    // Adding contact with randomized first name (so we can then select that contact when creating event registration)
+    // We're using Quick Add block on the main page for this.
+    $firstName = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, 'Anderson', TRUE);
+    $contactName = "Anderson, $firstName";
+    $displayName = "$firstName Anderson";
+    
+    $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
+    $usedFor  = 'Event';
+    $setHelp  = 'Select your conference options.';
+    $this->_testAddSet($setTitle, $usedFor, $setHelp);
+
+    // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
+    // which is where we are after adding Price Set.
+    $elements = $this->parseURL();
+    $sid = $elements['queryString']['sid'];
+    $this->assertType('numeric', $sid);
+
+    $validStrings = array();
+    $fields = array(
+      'Full Conference' => 'Text',
+      'Pre-conference Meetup?' => 'Radio',
+      'Evening Sessions' => 'CheckBox',
+    );
+    $this->_testAddPriceFields($fields, $validateStrings);
+    
+    // load the Price Set Preview and check for expected values
+    $this->_testVerifyPriceSet($validateStrings, $sid);
+    
+    // Go directly to the URL of the screen that you will be testing (New Event).
+    $this->open($this->sboxPath . 'civicrm/event/add?reset=1&action=add');
+
+    $eventTitle       = 'My Conference - ' . substr(sha1(rand()), 0, 7);
+    $email            = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
+    $eventDescription = 'Here is a description for this conference.';
+    
+    $this->waitForElementPresent('_qf_EventInfo_upload-bottom');
+
+    // Let's start filling the form with values.
+    $this->select('event_type_id', 'value=1');
+    
+    // Attendee role s/b selected now.
+    $this->select('default_role_id', 'value=1');
+    
+    // Enter Event Title, Summary and Description
+    $this->type('title', $eventTitle);
+    $this->type('summary', 'This is a great conference. Sign up now!');
+    
+    // Type description in ckEditor (fieldname, text to type, editor)
+    $this->fillRichTextField('description', $eventDescription);
+    
+    // Choose Start and End dates.
+    // Using helper webtestFillDate function.
+    $this->webtestFillDateTime("start_date", "+1 week");
+    $this->webtestFillDateTime("end_date", "+1 week 1 day 8 hours ");
+
+    $this->type('max_participants', '50');
+    $this->click('is_map');
+    $this->click('_qf_EventInfo_upload-bottom');
+
+    // Wait for Location tab form to load
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // Go to Fees tab
+    $this->click('link=Fees');
+    $this->waitForElementPresent('_qf_Fee_upload-bottom');
+    $this->click('CIVICRM_QFID_1_is_monetary');
+    $this->select('financial_type_id','label=Event Fee');
+    $this->select('price_set_id', 'label=' . $setTitle);
+    
+    $this->click('_qf_Fee_upload-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
+    $this->open($this->sboxPath . 'civicrm/participant/add?reset=1&action=add&context=standalone'); 
+    
+    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
+    // button at the end of this page to show up, to make sure it's fully loaded.
+    $this->waitForElementPresent('_qf_Participant_upload-bottom');
+
+    // Let's start filling the form with values.
+    // Type contact last name in contact auto-complete, wait for dropdown and click first result
+    $this->webtestFillAutocomplete($firstName);
+    $this->select('event_id', "label=regexp:$eventTitle");
+    // Select role
+    $this->click('role_id[2]');
+    
+    // Choose Registration Date.
+    // Using helper webtestFillDate function.
+    $this->webtestFillDate('register_date', 'now');
+    $today = date('F jS, Y', strtotime('now'));
+    // May 5th, 2010
+    
+    // Select participant status
+    $this->select('status_id', 'value=1');
+
+    // Setting registration source
+    $this->type('source', 'Event StandaloneAddTest Webtest');
+    
+    // Select an event fee
+    $this->waitForElementPresent('priceset');
+    $this->type("//div[@id='priceset']//div[@class='crm-section Full_Conference-section']/div[2]/input", '5');
+    $this->fireEvent("//div[@id='priceset']//div[@class='crm-section Full_Conference-section']/div[2]/input", 'blur');
+    $this->click("xpath=//div[@id='priceset']//div[@class='crm-section Pre_conference_Meetup_-section']/div[2]/div[1]/span/input");
+    $this->click("xpath=//div[@id='priceset']//div[@class='crm-section Evening_Sessions-section']/div[2]/div[1]/span/input");
+    $this->click("xpath=//div[@id='priceset']//div[@class='crm-section Evening_Sessions-section']/div[2]/div[2]/span/input");
+    
+    // Select payment method = Check and enter chk number
+    $this->select('payment_instrument_id', 'value=4');
+    $this->waitForElementPresent('check_number');
+    $this->type('check_number', '1044'); 
+    
+    // Clicking save.
+    $this->click('_qf_Participant_upload-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    
+    // Is status message correct?
+    $this->assertTrue($this->isTextPresent("Event registration for $displayName has been added"), "Status message didn't show up after saving!");
+    
+    $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    //click through to the participant view screen
+    $this->click("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
+    
+    $this->webtestVerifyTabularData(
+      array(
+        'Event' => $eventTitle,
+        'Participant Role' => 'Attendee',
+        'Status' => 'Registered',
+        'Event Source' => 'Event StandaloneAddTest Webtest',
+        'Event Fees' => 'Event Total: $ 2,705.00',
+      )
+    );
+    $expectedLineItems = array(
+      2 => array(
+        1 => 'Full Conference',
+        2 => '5',
+        3 => '$ 525.00',
+        4 => '$ 2,625.00',
+      ),
+      3 => array(
+        2 => '1',
+        3 => '$ 50.00',
+        4 => '$ 50.00',
+      ),
+      4 => array(
+        1 => 'Evening Sessions - First Night',
+        2 => '1',
+        3 => '$ 15.00',
+        4 => '$ 15.00',
+      ),
+      5 => array(
+        1 => 'Evening Sessions - Second Night',
+        2 => '1',
+        3 => '$ 15.00',
+        4 => '$ 15.00',
+      ),
+    );
+    $this->_checkLineItems($expectedLineItems);
+    // check contribution record as well
+    // click through to the contribution view screen
+    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+
+    $this->webtestVerifyTabularData(
+      array(
+        'From' => $displayName,
+        'Financial Type' => 'Event Fee',
+        'Contribution Status' => 'Completed',
+        'Paid By' => 'Check',
+        'Check Number' => '1044',
+        'Total Amount' => '$ 2,705.00',
+        'Received Into' => 'Deposit Bank Account',
+      )
+    );
+  }
+  
+  function _checkLineItems($expectedLineItems) {
+    foreach ($expectedLineItems as $lineKey => $lineValue) { 
+      foreach ($lineValue as $key => $value) { 
+        $this->verifyText("xpath=//table/tbody/tr/td[text()='Event Fees']/following-sibling::td/table/tbody/tr[$lineKey]/td[$key]", preg_quote($value));
+      }
+    }
+  }
 }
 
