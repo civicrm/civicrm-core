@@ -90,7 +90,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Visit contact search page.
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
+    $this->openCiviPage("contact/search", "reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Select contact type as Indiividual.
@@ -173,7 +173,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // We're using Quick Add block on the main page for this.
     $houseHold = 'H' . substr(sha1(rand()), 0, 5) . ' House';
 
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Household');
+    $this->openCiviPage("contact/add", "reset=1&ct=Household");
     $this->click('household_name');
     $this->type('household_name', $houseHold);
 
@@ -221,8 +221,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     $firstName2 = 'bb' . substr(sha1(rand()), 0, 5);
 
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Individual');
-    $this->waitForElementPresent('_qf_Contact_upload_view-bottom');
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual", "_qf_Contact_upload_view-bottom");
     $this->type('first_name', $firstName2);
     $this->type('last_name', "Smith");
     $this->type('email_1_email', "{$firstName2}.smith@example.org");
@@ -254,7 +253,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
+    $this->openCiviPage("contact/search", "reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Select group.
@@ -319,11 +318,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
   }
 
   function addContactGroup($groupName = 'New Group', $parentGroupName = "- select -") {
-    $this->open($this->sboxPath . "civicrm/group/add?reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     // Fill group name.
     $this->type("title", $groupName);

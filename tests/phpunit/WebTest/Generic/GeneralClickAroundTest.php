@@ -108,9 +108,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
   function testContributionDashboard() {
     $this->login();
     // Enable CiviContribute module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
+    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
     $enabledComponents = $this->getSelectOptions("enableComponents-t");
     if (!in_array("CiviContribute", $enabledComponents)) {
       $this->addSelection("enableComponents-f", "label=CiviContribute");
@@ -135,9 +133,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Enable CiviEvent module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
+    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
     $enabledComponents = $this->getSelectOptions("enableComponents-t");
     if (!in_array("CiviEvent", $enabledComponents)) {
       $this->addSelection("enableComponents-f", "label=CiviEvent");
@@ -170,9 +166,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Enable CiviMember module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
+    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
     $enabledComponents = $this->getSelectOptions("enableComponents-t");
     if (!in_array("CiviMember", $enabledComponents)) {
       $this->addSelection("enableComponents-f", "label=CiviMember");
@@ -197,9 +191,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Enable CiviContribute module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
+    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
     $enabledComponents = $this->getSelectOptions("enableComponents-t");
     if (!in_array("CiviContribute", $enabledComponents)) {
       $this->addSelection("enableComponents-f", "label=CiviContribute");
@@ -233,9 +225,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Enable CiviMail module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
+    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
     $enabledComponents = $this->getSelectOptions("enableComponents-t");
     if (!in_array("CiviMail", $enabledComponents)) {
       $this->addSelection("enableComponents-f", "label=CiviMail");
@@ -246,8 +236,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     }
 
     // configure default mail-box
-    $this->open($this->sboxPath . "civicrm/admin/mailSettings?action=update&id=1&reset=1");
-    $this->waitForElementPresent('_qf_MailSettings_cancel-bottom');
+    $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", "_qf_MailSettings_cancel-bottom");
     $this->type('name', 'Test Domain');
     $this->type('domain', 'example.com');
     $this->select('protocol', 'value=1');
