@@ -1,0 +1,118 @@
+#!/bin/bash
+
+## Take an existing, tar-based CiviCRM directory and convert it to a git working directory
+
+#### Helpers ####
+
+## usage: do_gitify <repo-url> <existing-dir> [git-checkout-options]
+function do_gitify() {
+  REPO="$1"
+  TGT="$2"
+  TMP="${TGT}.tmp"
+  shift 2
+
+  if [ -d "$TGT/.git" ]; then
+    echo "[[Already checked out git repo ($TGT) -- skip $REPO]]"
+    return
+  fi
+  [ -d $TGT ] || mkdir -p "$TGT"
+  [ -d $TMP ] && rm -rf "$TMP"
+  echo "[[Checkout $REPO ($TMP)]]"
+  echo "[git clone "$@" "$REPO" "$TMP"]"
+  git clone "$@" "$REPO" "$TMP"
+
+  echo "[[Swap metadata]]"
+  mv "$TMP/.git" "$TGT/.git"
+
+  echo "[[Remove local modifications]]"
+  pushd "$TGT" > /dev/null
+  git checkout -- .
+  popd > /dev/null
+
+  rm -rf "$TMP"
+}
+
+## usage: do_svnify <repo-url> <existing-dir>
+function do_svnify() {
+  REPO="$1"
+  TGT="$2"
+  shift 2
+
+  if [ -d "$TGT/.svn" ]; then
+    echo "[[Already checked out SVN repo ($TGT) -- skip $REPO]]"
+    return
+  fi
+  [ -d $TGT ] || mkdir -p "$TGT"
+  [ -d $TMP ] && rm -rf "$TMP"
+  echo "[[Checkout $REPO ($TMP)]]"
+
+  echo "[svn co \"$REPO\" \"$TGT\"]"
+  svn co "$REPO" "$TGT"
+}
+
+function check_dep() {
+  if [ -z `which git` ]; then
+    echo "command not found: git"
+    exit
+  fi
+}
+
+#### Main ####
+
+set -e
+
+CIVICRM_CMS="$1"
+GIT_BASE_URL="$2"
+CIVICRM_ROOT="$3"
+CIVICRM_L10N="$4"
+CIVICRM_BRANCH="master"
+if [ -z "$CIVICRM_ROOT" -o ! -d "$CIVICRM_ROOT" -o -z "$GIT_BASE_URL" -o -z "$CIVICRM_CMS" ]; then
+  echo "Convert a directory into a set of CiviCRM git clones"
+  echo "usage: $0 <Drupal|Drupal6|Joomla|WordPress|all> <git-base-url> <existing-civicrm-root> [--l10n]"
+  echo "  <cms-name>: one of: Drupal|Drupal6|Joomla|WordPress|all"
+  echo "  <git-base-url>: a base URL shared by the desiried git repos (e.g. git://github.com/civicrm)"
+  echo "  <existing-civicrm-root>: the main directory containing CiviCRM"
+  echo "  [l10n]: optionally fetch localization data; currently requires svn"
+  echo ""
+  echo "Note: If pointing to a pre-existing directory, your local changes may be replaced by"
+  echo "the pristine code from git/svn. If you've made changes, then make sure there's a backup!"
+  echo ""
+  echo "example: $0 Drupal git://github.com/wariocrm /var/www/drupal7/sites/all/modules/civicrm"
+  echo "  (checkout core code plus Drupal 7.x integration code using Git's read-only protocol)"
+  echo ""
+  echo "example: $0 Drupal6 https://github.com/wariocrm /var/www/drupal6/sites/all/modules/civicrm"
+  echo "  (checkout core code plus Drupal 6.x integration code using read-only HTTP protocol)"
+  echo ""
+  echo "example: $0 all git@github.com:wariocrm ~/src/civicrm l10n"
+  echo "  (checkout core code plus Drupal 7.x, Joomla, and WordPress integration code and l10n using SSH)"
+  exit 1
+fi
+
+check_dep
+do_gitify "${GIT_BASE_URL}/civicrm-core.git" "$CIVICRM_ROOT" -b "${CIVICRM_BRANCH}"
+do_gitify "${GIT_BASE_URL}/civicrm-packages.git" "$CIVICRM_ROOT/packages" -b "${CIVICRM_BRANCH}"
+case "$CIVICRM_CMS" in
+  Drupal)
+    do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "${CIVICRM_BRANCH}-7.x"
+    ;;
+  Drupal6)
+    do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "${CIVICRM_BRANCH}-6.x"
+    ;;
+  Joomla)
+    do_gitify "${GIT_BASE_URL}/civicrm-joomla.git" "$CIVICRM_ROOT/joomla" -b "${CIVICRM_BRANCH}"
+    ;;
+  WordPress)
+    do_gitify "${GIT_BASE_URL}/civicrm-wordpress.git" "$CIVICRM_ROOT/WordPress" -b "${CIVICRM_BRANCH}"
+    ;;
+  all)
+    do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "${CIVICRM_BRANCH}-7.x"
+    do_gitify "${GIT_BASE_URL}/civicrm-joomla.git" "$CIVICRM_ROOT/joomla" -b "${CIVICRM_BRANCH}"
+    do_gitify "${GIT_BASE_URL}/civicrm-wordpress.git" "$CIVICRM_ROOT/WordPress" -b "${CIVICRM_BRANCH}"
+    ;;
+  *)
+    echo "Unrecognized CMS: $CIVICRM_CMS"
+esac
+
+if [ "$CIVICRM_L10N" == "--l10n" ]; then
+  do_svnify "http://svn.civicrm.org/l10n/trunk" "$CIVICRM_ROOT/l10n"
+fi

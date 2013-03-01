@@ -33,7 +33,7 @@
  ?>
 
  */
-$include_path = "packages/:" . get_include_path();
+$include_path = "../packages/:" . get_include_path();
 set_include_path($include_path);
 class civicrm_CLI {
 

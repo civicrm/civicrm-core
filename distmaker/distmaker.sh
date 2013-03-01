@@ -149,6 +149,17 @@ case $1 in
 
 esac
 
+## Make sure we have the right branch or tag
+pushd "$DM_SOURCEDIR"
+git checkout "$DM_REF_CORE"
+popd
+pushd "$DM_SOURCEDIR/packages"
+git checkout "$DM_REF_PACKAGES"
+popd
+## in theory, this shouldn't matter, but GenCode is CMS-dependent, and we've been doing our past builds based on D7
+pushd "$DM_SOURCEDIR/drupal"
+git checkout "$DM_REF_DRUPAL"
+popd
 
 # Before anything - regenerate DAOs
 

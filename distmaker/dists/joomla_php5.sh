@@ -20,6 +20,11 @@ RSYNCCOMMAND="$DM_RSYNC $RSYNCOPTIONS"
 SRC=$DM_SOURCEDIR
 TRG=$DM_TMPDIR/civicrm
 
+# checkout the right code revisions
+pushd "$DM_SOURCEDIR/joomla"
+git checkout "$DM_REF_JOOMLA"
+popd
+
 # make sure and clean up before
 if [ -d $TRG ] ; then
 	rm -rf $TRG/*

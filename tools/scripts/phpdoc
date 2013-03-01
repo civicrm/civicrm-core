@@ -42,5 +42,5 @@ $base_dir = dirname( dirname( __FILE__ ) );
 // require config to get CiviCRM related include paths straight
 require_once '../civicrm.config.php';
 
-require "$base_dir/packages/PhpDocumentor/phpDocumentor/phpdoc.inc";
+require "$base_dir/../packages/PhpDocumentor/phpDocumentor/phpdoc.inc";
 ?>

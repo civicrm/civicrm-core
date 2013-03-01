@@ -38,13 +38,11 @@
  */
 
 $GLOBALS['base_dir'] = dirname( dirname( dirname( __FILE__ ) ) );
-$tools_pkgs_dir = $GLOBALS['base_dir'] . DIRECTORY_SEPARATOR . 'tools' . DIRECTORY_SEPARATOR . 'packages';
 $tests_dir = $GLOBALS['base_dir']  . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'phpunit';
 $civi_pkgs_dir = $GLOBALS['base_dir'] .   DIRECTORY_SEPARATOR . 'packages';
 ini_set('safe_mode', 0);
 ini_set('include_path',
         "{$GLOBALS['base_dir']}" . PATH_SEPARATOR .
-        "$tools_pkgs_dir"       . PATH_SEPARATOR .
         "$tests_dir"            . PATH_SEPARATOR .
         "$civi_pkgs_dir"        . PATH_SEPARATOR
         . ini_get( 'include_path') );
@@ -68,6 +66,7 @@ require 'PHPUnit/TextUI/Command.php';
 define('PHPUnit_MAIN_METHOD', 'PHPUnit_TextUI_Command::main');
 
 require dirname(__FILE__) . DIRECTORY_SEPARATOR .
+	'..' . DIRECTORY_SEPARATOR .
 	'..' . DIRECTORY_SEPARATOR .
 	'packages' . DIRECTORY_SEPARATOR .
 	'PHPUnit' . DIRECTORY_SEPARATOR .
