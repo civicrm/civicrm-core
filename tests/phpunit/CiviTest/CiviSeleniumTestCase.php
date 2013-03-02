@@ -215,6 +215,27 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * Ensures the required CiviCRM components are enabled
+   */
+  function enableComponents($components) {
+    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
+    $enabledComponents = $this->getSelectOptions("enableComponents-t");
+    $added = FALSE;
+    foreach ((array) $components as $comp) {
+      if (!in_array($comp, $enabledComponents)) {
+        $this->click("//option[@value='$comp']");
+        $this->click("add");
+        $added = TRUE;
+      }
+    }
+    if ($added) {
+      $this->click("_qf_Component_next-bottom");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->assertElementContainsText("crm-notification-container", "Saved");
+    }
+  }
+
+  /**
    * Add a contact with the given first and last names and either a given email
    * (when specified), a random email (when true) or no email (when unspecified or null).
    *

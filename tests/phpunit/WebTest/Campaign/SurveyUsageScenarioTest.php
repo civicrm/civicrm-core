@@ -66,17 +66,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Enable CiviCampaign module if necessary
-    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertElementContainsText("crm-notification-container", "Saved");
-    }
+    $this->enableComponents(array('CiviCampaign'));
 
     // add the required Drupal permission
     $permissions = array('edit-2-administer-civicampaign');
