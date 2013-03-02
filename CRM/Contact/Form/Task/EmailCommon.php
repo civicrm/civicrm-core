@@ -97,8 +97,6 @@ class CRM_Contact_Form_Task_EmailCommon {
       $emails[$emailId] = htmlspecialchars($emails[$emailId]);
     }
 
-    CRM_Core_Error::debug($form->_noEmails, $emails); exit();
-
     $form->assign('noEmails', $form->_noEmails);
 
     if ($form->_noEmails) {
