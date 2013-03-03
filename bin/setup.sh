@@ -9,6 +9,12 @@ case "$CALLEDPATH" in
     ;;
 esac
 
+if [ ! -f "$CALLEDPATH/setup.conf" ]; then
+  echo
+  echo "Missing configuration file. Please copy $CALLEDPATH/setup.conf.txt to $CALLEDPATH/setup.conf and edit it."
+  exit 1
+fi
+
 source "$CALLEDPATH/setup.conf"
 
 if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
