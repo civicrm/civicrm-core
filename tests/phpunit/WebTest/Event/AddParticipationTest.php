@@ -49,11 +49,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $displayName = "$firstName Anderson";
 
     // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
-    $this->open($this->sboxPath . 'civicrm/participant/add?reset=1&action=add&context=standalone');
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent('_qf_Participant_upload-bottom');
+    $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
     // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
@@ -101,7 +97,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Event registration for $displayName has been added"), "Status message didn't show up after saving!");
+    $this->assertElementContainsText("crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
 
     $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
@@ -153,8 +149,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $displayName = "$firstName Anderson";
 
     // add custom data for participant role
-    $this->open($this->sboxPath . 'civicrm/admin/custom/group?reset=1 ');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/custom/group", "reset=1");
 
     //add new custom data
     $this->click("//a[@id='newCustomDataGroup']/span");
@@ -177,7 +172,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '$customGroupTitle' has been added. You can add custom fields now."));
+    $this->assertElementContainsText("crm-notification-container", "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
 
     //add custom field - alphanumeric checkbox
     $checkboxFieldLabel = 'custom_field' . substr(sha1(rand()), 0, 4);
@@ -215,7 +210,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent("Your custom field '$checkboxFieldLabel' has been saved."));
+    $this->assertElementContainsText("crm-notification-container", "Your custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Integer Radio
     $this->click("//a[@id='newCustomField']/span");
@@ -257,11 +252,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
-    $this->open($this->sboxPath . 'civicrm/participant/add?reset=1&action=add&context=standalone');
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent('_qf_Participant_upload-bottom');
+    $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
     // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
@@ -312,9 +303,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Event registration for $displayName has been added"),
-      "Status message didn't show up after saving!"
-    );
+    $this->assertElementContainsText("crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
 
     $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
@@ -369,7 +358,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $lastName2 = 'Last' . $rand;
     
     // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
-    $this->open($this->sboxPath . 'civicrm/participant/add?reset=1&action=add&context=standalone&mode=test&eid=3');
+    $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone&mode=test&eid=3");
     
     $this->assertTrue($this->isTextPresent("Register New Participant"), "Page title 'Register New Participant' missing");
     $this->assertTrue($this->isTextPresent("A TEST transaction will be submitted"), "test mode status 'A TEST transaction will be submitted' missing");
@@ -384,7 +373,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     
     //searching the paricipants
-    $this->open($this->sboxPath . 'civicrm/event/search?reset=1');
+    $this->openCiviPage("event/search", "reset=1");
     $this->type('sort_name', $firstName);
     $eventName = "Rain-forest Cup Youth Soccer Tournament";
     $this->type("event_name", $eventName);

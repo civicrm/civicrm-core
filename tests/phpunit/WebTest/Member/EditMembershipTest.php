@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
   protected function setUp() {
@@ -45,9 +44,7 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $membershipTypes = $this->webtestAddMembershipType();
 
     // now add membership
-    $this->open($this->sboxPath . "civicrm/member/add?reset=1&action=add&context=standalone");
-
-    $this->waitForElementPresent("_qf_Membership_upload");
+    $this->openCiviPage("member/add", "reset=1&action=add&context=standalone", "_qf_Membership_upload");
 
     // select contact
     $this->webtestFillAutocomplete($contactName);
@@ -69,13 +66,11 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='memberships']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
     $expected = array(
-      2 => $membershipTypes['membership_type'],
-      3 => 'New',
-      4 => 'Membership StandaloneAddTest Webtest',
+      'Membership Type'  => $membershipTypes['membership_type'],
+      'Status' => 'New',
+      'Source' => 'Membership StandaloneAddTest Webtest',
     );
-    foreach ($expected as $label => $value) {
-      $this->verifyText("xpath=id('MembershipView')/div[2]/div/table[1]/tbody/tr[$label]/td[2]", preg_quote($value));
-    }
+    $this->webtestVerifyTabularData($expected);
 
     // now edit and update type and status
     $this->click("crm-membership-edit-button-top");
@@ -90,8 +85,8 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("access");
 
     // Use activity search to find the expected activities
-    $this->open($this->sboxPath . "civicrm/activity/search?reset=1");
-    $this->waitForElementPresent("_qf_Search_refresh");
+    $this->openCiviPage('activity/search', 'reset=1', "_qf_Search_refresh");
+
     $this->type("sort_name", $contactName);
     $this->click('activity_type_id[35]');
     $this->click('activity_type_id[36]');
@@ -106,4 +101,3 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[3]/td[5]/a[text()='{$contactName}']"));
   }
 }
-

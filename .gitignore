@@ -138,5 +138,6 @@ joomla
 packages/
 tests/phpunit/CiviTest/civicrm.settings.local.php
 l10n
-
 vendor
+civicrm.settings.php
+sql/dummy_processor.mysql
