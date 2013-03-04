@@ -33,7 +33,7 @@ function {/literal}{$list}{literal}viewActivity( activityID, contactID, list ) {
     cj("#view-activity" + list ).show( );
 
     cj("#view-activity" + list ).dialog({
-        title: "View Activity",
+        title: {/literal}{ts escape="js"}View Activity{/ts}{literal}",
         modal: true,
         width : "680px", // don't remove px
         height: "560",
@@ -56,7 +56,7 @@ function {/literal}{$list}{literal}viewActivity( activityID, contactID, list ) {
         },
 
         buttons: {
-            "Done": function() {
+            "{/literal}{ts escape="js"}Done{/ts}{literal}": function() {
                 cj(this).dialog("destroy");
             }
         }
