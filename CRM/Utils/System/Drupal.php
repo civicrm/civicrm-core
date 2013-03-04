@@ -83,7 +83,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
     $config->inCiviCRM = TRUE;
 
     $form = drupal_retrieve_form('user_register_form', $form_state);
-    $form['#array_parents'] = array(); // CRM-12008
+
+    // CRM-12008, avoid drupal notices
+    $form['#array_parents'] = array();
+    $form['#tree'] = FALSE;
 
     $form_state['process_input'] = 1;
     $form_state['submitted'] = 1;
