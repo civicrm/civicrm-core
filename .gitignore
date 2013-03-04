@@ -141,3 +141,6 @@ l10n
 vendor
 civicrm.settings.php
 sql/dummy_processor.mysql
+.buildpath
+.project
+.settings
