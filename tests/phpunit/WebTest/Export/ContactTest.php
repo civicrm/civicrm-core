@@ -91,7 +91,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Visit contact search page.
     $this->openCiviPage("contact/search", "reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Select contact type as Indiividual.
     $this->select("contact_type", "value=Individual");
