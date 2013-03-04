@@ -54,8 +54,7 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
     $this->assertNotEmpty( $cid, 'Could not find cid after adding contact' );
 
     // Send an email to the added contact
-    $this->open( $this->sboxPath . 'civicrm/activity/email/add?action=add&reset=1&cid=' . $cid . '&selectedChild=activity&atype=3' );
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("activity/email/add", "action=add&reset=1&cid={$cid}&selectedChild=activity&atype=3");
     $this->type( 'subject', 'test spool' );
     $this->fillRichTextField( 'html_message', 'Unit tests keep children safe.' );
     $this->click( "_qf_Email_upload" );
