@@ -52,7 +52,7 @@
           {/if}
           </td>
         </tr>
-	<tr id="financial_type_id" class="crm-price-set-form-block-contribution_type_id crm-price-set-form-block-financial_type_id">
+	<tr id="financial_type_id_row" class="crm-price-set-form-block-contribution_type_id crm-price-set-form-block-financial_type_id">
 	   <td class="label">{$form.financial_type_id.label}</td>
            <td>{$form.financial_type_id.html}</td>
            <td>&nbsp;</td>

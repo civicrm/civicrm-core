@@ -12,7 +12,7 @@ fi
 
 pushd .
 cd $CIVISOURCEDIR
-svn up .
+# svn up .
 cd $CIVISOURCEDIR/bin
 ./setup.sh
 cd $CIVISOURCEDIR/sql
