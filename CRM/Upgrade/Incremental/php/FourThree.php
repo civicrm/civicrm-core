@@ -68,6 +68,11 @@ class CRM_Upgrade_Incremental_php_FourThree {
       elseif ($context == 'merged') {
         $postUpgradeMessage .= '<br />' . ts("The existing organization contact record for '{$orgName}' has marked as the default domain contact, and has been updated with information from your Organization Address and Contact Info settings.");
       }
+
+      $providerExists = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_sms_provider LIMIT 1");
+      if ($providerExists) {
+        $postUpgradeMessage .= '<br />' . ts('SMS providers were found to setup. Please note Clickatell / Twilio are now shipped as extensions and will require installing them to continue working. Extension could be downloaded and installed from <a href="%1">github</a>.', array(1 => 'https://github.com/civicrm/civicrm-core/tree/master/tools/extensions'));
+      }
     }
 
     if ($rev == '4.3.alpha2') {
