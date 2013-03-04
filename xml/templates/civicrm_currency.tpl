@@ -74,7 +74,7 @@ INSERT INTO civicrm_currency (id, name, symbol, numeric_code, full_name) VALUES
 ( 49, "COP",  "$", "170", "Colombian Peso"),
 ( 50, "COU", NULL, "970", "Unidad de Valor Real"),
 ( 51, "CRC",  "₡", "188", "Costa Rican Colon"),
-( 52, "CSD","Дин.","891", "Serbian Dinar"),
+( 52, "RSD", "Дин.","941", "Serbian Dinar"),
 ( 53, "CUP",  "₱", "192", "Cuban Peso"),
 ( 54, "CVE", NULL, "132", "Cape Verde Escudo"),
 ( 55, "CYP",  "£", "196", "Cyprus Pound"),
@@ -184,7 +184,7 @@ INSERT INTO civicrm_currency (id, name, symbol, numeric_code, full_name) VALUES
 (160, "USS", NULL, "998", "US Dollar (Same day)"),
 (161, "UYU", "$U", "858", "Peso Uruguayo"),
 (162, "UZS", "лв", "860", "Uzbekistan Sum"),
-(163, "VEB", "Bs", "862", "Venezuela Bolivar"),
+(163, "VEF", "Bs", "937", "Venezuela Bolivar"),
 (164, "VUV", NULL, "548", "Vanuatu Vatu"),
 (165, "WST", NULL, "882", "Samoan Tala"),
 (166, "XAF", NULL, "950", "CFA Franc BEAC"),
@@ -207,3 +207,4 @@ INSERT INTO civicrm_currency (id, name, symbol, numeric_code, full_name) VALUES
 (183, "YER",  "﷼", "886", "Yemeni Rial"),
 (184, "ZMK", NULL, "894", "Zambian Kwacha"),
 (185, "ZWD", "Z$", "716", "Zimbabwe Dollar");
+
