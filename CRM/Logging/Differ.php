@@ -236,6 +236,7 @@ AND (id = (select activity_id FROM civicrm_activity_target WHERE target_contact_
           'website_type_id' => CRM_Core_PseudoConstant::websiteType(),
           'activity_type_id' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           'case_type_id' => CRM_Case_PseudoConstant::caseType('label', FALSE),
+          'priority_id'  => CRM_Core_PseudoConstant::priority(),
         );
 
         // for columns that appear in more than 1 table
