@@ -77,13 +77,13 @@ if [ -z "$CIVICRM_ROOT" -o ! -d "$CIVICRM_ROOT" -o -z "$GIT_BASE_URL" -o -z "$CI
   echo "Note: If pointing to a pre-existing directory, your local changes may be replaced by"
   echo "the pristine code from git/svn. If you've made changes, then make sure there's a backup!"
   echo ""
-  echo "example: $0 Drupal git://github.com/wariocrm /var/www/drupal7/sites/all/modules/civicrm"
+  echo "example: $0 Drupal git://github.com/civicrm /var/www/drupal7/sites/all/modules/civicrm"
   echo "  (checkout core code plus Drupal 7.x integration code using Git's read-only protocol)"
   echo ""
-  echo "example: $0 Drupal6 https://github.com/wariocrm /var/www/drupal6/sites/all/modules/civicrm"
+  echo "example: $0 Drupal6 https://github.com/civicrm /var/www/drupal6/sites/all/modules/civicrm"
   echo "  (checkout core code plus Drupal 6.x integration code using read-only HTTP protocol)"
   echo ""
-  echo "example: $0 all git@github.com:wariocrm ~/src/civicrm l10n"
+  echo "example: $0 all git@github.com:civicrm ~/src/civicrm l10n"
   echo "  (checkout core code plus Drupal 7.x, Joomla, and WordPress integration code and l10n using SSH)"
   exit 1
 fi

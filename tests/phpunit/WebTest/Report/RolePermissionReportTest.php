@@ -53,7 +53,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->type("edit-name", $role1);
     $this->click("edit-add");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->waitForElementPresent("edit-add");
     $this->type("edit-name", $role2);
@@ -114,7 +114,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->_roleDelete($role1);
     $this->_roleDelete($role2);
   }
-  
+
   /*
    *check for CRM-10148
    */
@@ -139,7 +139,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->type("edit-name", $role);
     $this->click("edit-add");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role}']");
     $roleId = explode('/', $this->getAttribute("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role}']/../td[4]/a[text()='edit permissions']/@href"));
@@ -157,9 +157,9 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
       "edit-{$roleId}-view-all-contacts",
       "edit-{$roleId}-administer-reports",
       "edit-{$roleId}-access-civicrm"
-     );
+    );
     $this->changePermissions($permissions);
-    
+
     $this->open($this->sboxPath . "civicrm/logout?reset=1");
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
@@ -185,7 +185,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
       "edit-{$roleId}-administer-reserved-reports"
     );
     $this->changePermissions($permissions);
-    
+
     $this->open($this->sboxPath . "civicrm/report/instance/1?reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -193,7 +193,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->click("is_reserved");
     $this->click("_qf_Summary_submit_save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->open($this->sboxPath . "civicrm/logout?reset=1");
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
@@ -207,14 +207,14 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     //check if the report criteria and settings is accessible
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='id_default']//input[@id='fields_email']"));
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']/table//input[@id='title']"));
-    
+
     //login as admin and remove reserved permission
     $this->open($this->sboxPath . "civicrm/logout?reset=1");
     $this->open($this->sboxPath);
     $this->webtestLogin(TRUE);
     $this->open($this->sboxPath . "admin/people/permissions");
     $this->waitForElementPresent("edit-submit");
-    
+
     if ($this->isChecked("edit-2-administer-reserved-reports")) {
       $this->click("edit-2-administer-reserved-reports");
     } else {
@@ -228,19 +228,19 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
     $this->type('edit-name', $user);
-    $this->type('edit-pass', 'Test12345');    
+    $this->type('edit-pass', 'Test12345');
     $this->click('edit-submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->open($this->sboxPath . "civicrm/report/instance/1?reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     if ($this->isElementPresent("xpath=//form[@id='Summary']/div[2]/div/div/div")) {
-      $this->verifyNotText("xpath=//form[@id='Summary']/div[2]/div/div/div", "Report Criteria");  
+      $this->verifyNotText("xpath=//form[@id='Summary']/div[2]/div/div/div", "Report Criteria");
     }
     if ($this->isElementPresent("xpath=//form[@id='Summary']/div[2]/div[2]/div")) {
-      $this->verifyNotText("xpath=//form[@id='Summary']/div[2]/div[2]/div", "Report Settings");  
+      $this->verifyNotText("xpath=//form[@id='Summary']/div[2]/div[2]/div", "Report Settings");
     }
-    
+
     $this->assertFalse($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']//input[@id='title']"));
 
     //login as admin and turn the is_reserved flag off for the instance
@@ -252,12 +252,12 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->click("is_reserved");
     $this->click("_qf_Summary_submit_save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->open($this->sboxPath . "civicrm/logout?reset=1");
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
     $this->type('edit-name', $user);
-    $this->type('edit-pass', 'Test12345');    
+    $this->type('edit-pass', 'Test12345');
     $this->click('edit-submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->open($this->sboxPath . "civicrm/report/instance/1?reset=1");
@@ -265,7 +265,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='id_default']//input[@id='fields_email']"));
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']//input[@id='title']"));
-    
+
     //login as admin and delete the role
     $this->open($this->sboxPath . "civicrm/logout?reset=1");
     $this->open($this->sboxPath);
@@ -273,7 +273,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->_roleDelete($role);
   }
-  
+
   function _roleDelete($role) {
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->click("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
@@ -319,5 +319,3 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     return $name;
   }
 }
-
-

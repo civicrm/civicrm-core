@@ -71,10 +71,8 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     foreach ($contactEmails as $emailId => $item) {
       $email = $item['email'];
-      if (!$email &&
-        (count($emails) <= 1)
-      ) {
-        $emails[$emailId] = '"' . $fromDisplayName . '"';
+      if (!$email && (count($emails) < 1)) {
+        // set it if no emails are present at all
         $form->_noEmails = TRUE;
       }
       else {
@@ -86,11 +84,11 @@ class CRM_Contact_Form_Task_EmailCommon {
 
           $emails[$emailId] = '"' . $fromDisplayName . '" <' . $email . '> ';
           $form->_onHold[$emailId] = $item['on_hold'];
+          $form->_noEmails = FALSE;
         }
       }
 
       $form->_emails[$emailId] = $emails[$emailId];
-
       $emails[$emailId] .= $item['locationType'];
 
       if ($item['is_primary']) {
