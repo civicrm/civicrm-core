@@ -501,7 +501,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->click('_qf_Participant_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Event registration for $displayName has been added"), "Status message didn't show up after saving!");
+    $this->assertElementContainsText("css=#crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
 
     $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
 
@@ -638,7 +638,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     
     // Is status message correct?
+<<<<<<< HEAD
     $this->assertTrue($this->isTextPresent("Event registration for $displayName has been added"), "Status message didn't show up after saving!");
+=======
+    $this->assertElementContainsText("css=#crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
+>>>>>>> f7d82456e09042a3c8ca7d2ffc24be1ea05fdb12
     
     $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
