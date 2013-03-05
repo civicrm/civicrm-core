@@ -316,14 +316,11 @@
         cj.post( postUrl, {contactID: contactID,caseID: caseID,
           key: {/literal}"{crmKey name='civicrm/case/ajax/addclient'}"{literal} },
           function( data ) {
+            //due to caching issues we use redirection rather than reload
+            document.location = {/literal}'{crmURL q="action=view&reset=1&id=$caseID&cid=$contactID&context=$context" h=0 }'{literal};
           },
           'json'
         );
-
-          cj(this).dialog("close");
-          cj(this).dialog("destroy");
-          //due to caching issues we use redirection rather than reload
-          document.location = {/literal}'{crmURL q="action=view&reset=1&id=$caseID&cid=$contactID&context=$context" h=0 }'{literal};
         },
 
         "Cancel": function() {
