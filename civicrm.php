@@ -112,7 +112,7 @@ function civicrm_wp_add_menu_items() {
 
   if (file_exists($settingsFile)) {
     $civilogo =
-      WP_PLUGIN_URL . DIRECTORY_SEPARATOR .
+      plugins_url() . DIRECTORY_SEPARATOR .
       'civicrm'     . DIRECTORY_SEPARATOR .
       'civicrm'     . DIRECTORY_SEPARATOR .
       'i'           . DIRECTORY_SEPARATOR .
@@ -327,11 +327,12 @@ function civicrm_wp_scripts() {
   if (!civicrm_wp_initialize()) {
     return;
   }
+  $pluginUrl = plugins_url();
 
   $files = CRM_Core_Resources::parseTemplate('CRM/common/jquery.files.tpl');
   foreach ($files as $file => $type) {
     if ($type == 'js') {
-      wp_enqueue_script($file, WP_PLUGIN_URL . "/civicrm/civicrm/$file");
+      wp_enqueue_script($file, $pluginUrl . "/civicrm/civicrm/$file");
     }
   }
 
@@ -341,11 +342,11 @@ function civicrm_wp_scripts() {
   $localizationFile = '/civicrm/civicrm/packages/jquery/jquery-ui-1.9.0/development-bundle/ui/i18n/jquery.ui.datepicker-' . $localisation[0] . '.js';
 
   if (file_exists( WP_PLUGIN_DIR . $localizationFile)) {
-    wp_enqueue_script('civicrm-datepicker', WP_PLUGIN_URL . $localizationFile);
+    wp_enqueue_script('civicrm-datepicker', $pluginUrl . $localizationFile);
   }
 
   //add namespacing js
-  wp_enqueue_script('js/jquery.conflict.js', WP_PLUGIN_URL . '/civicrm/civicrm/js/jquery.conflict.js');
+  wp_enqueue_script('js/jquery.conflict.js', $pluginUrl . '/civicrm/civicrm/js/jquery.conflict.js');
 
   return;
 }
@@ -354,18 +355,19 @@ function civicrm_wp_styles() {
   if (!civicrm_wp_initialize()) {
     return;
   }
+  $pluginUrl = plugins_url();
 
   $files = CRM_Core_Resources::parseTemplate('CRM/common/jquery.files.tpl');
   foreach ($files as $file => $type) {
     if ($type == 'css') {
-      wp_register_style($file, WP_PLUGIN_URL . "/civicrm/civicrm/$file");
+      wp_register_style($file, $pluginUrl . "/civicrm/civicrm/$file");
       wp_enqueue_style($file);
     }
   }
 
-  wp_register_style('civicrm/css/civicrm.css', WP_PLUGIN_URL . "/civicrm/civicrm/css/civicrm.css");
+  wp_register_style('civicrm/css/civicrm.css', $pluginUrl . "/civicrm/civicrm/css/civicrm.css");
   wp_enqueue_style('civicrm/css/civicrm.css');
-  wp_register_style('civicrm/css/extras.css', WP_PLUGIN_URL . "/civicrm/civicrm/css/extras.css");
+  wp_register_style('civicrm/css/extras.css',  $pluginUrl . "/civicrm/civicrm/css/extras.css");
   wp_enqueue_style('civicrm/css/extras.css');
 
  return;
