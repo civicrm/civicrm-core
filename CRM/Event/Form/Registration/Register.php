@@ -220,6 +220,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
     }
+
+    if (!empty($fields)) {
+      CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $this->_defaults);
+    }
+
     //if event is monetary and pay later is enabled and payment
     //processor is not available then freeze the pay later checkbox with
     //default check
