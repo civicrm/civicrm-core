@@ -15,7 +15,7 @@ else
 	. $CFFILE
 fi
 
-RSYNCOPTIONS="-avC --exclude=svn --exclude=.git --exclude=_ORIGINAL_ --include=core"
+RSYNCOPTIONS="-avC $DM_EXCLUDES_RSYNC --include=core"
 RSYNCCOMMAND="$DM_RSYNC $RSYNCOPTIONS"
 SRC=$DM_SOURCEDIR
 TRG=$DM_TMPDIR/civicrm
