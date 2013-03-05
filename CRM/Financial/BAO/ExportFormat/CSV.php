@@ -85,7 +85,11 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       c.source AS source,
       ft.currency AS currency,
       cov_status.label AS status,
-      eftc.amount AS amount,
+      CASE 
+        WHEN efti.entity_id IS NOT NULL
+        THEN efti.amount
+        ELSE eftc.amount
+      END AS amount,
       fa_from.account_type_code AS credit_account_type_code,
       fa_from.accounting_code AS credit_account,
       fa_from.name AS credit_account_name,
