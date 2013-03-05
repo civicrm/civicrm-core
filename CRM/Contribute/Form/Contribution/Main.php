@@ -1169,7 +1169,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     return empty($errors) ? TRUE : $errors;
   }
 
-  public function computeAmount(&$params, &$form) {
+  public static function computeAmount(&$params, &$form) {
     $amount = NULL;
 
     // first clean up the other amount field if present

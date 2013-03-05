@@ -69,7 +69,11 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         'entity_table' => 'civicrm_contribution_page',
         'entity_id' => $this->_id,
       );
-      $defaults['onbehalf_profile_id'] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+      $onBehalfIDs = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+      if ($onBehalfIDs) {
+        // get the first one only
+        $defaults['onbehalf_profile_id'] = $onBehalfIDs[0];
+      }
     }
     else {
       CRM_Utils_System::setTitle(ts('Title and Settings'));
@@ -202,7 +206,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     ) {
       $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this contribution page.');
     }
-    
+
     //CRM-11494
     $start = CRM_Utils_Date::processDate($values['start_date']);
     $end = CRM_Utils_Date::processDate($values['end_date']);
@@ -211,14 +215,14 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     }
 
     //dont allow on behalf of save when
-    //pre or post profile consists of membership fields 
+    //pre or post profile consists of membership fields
     if ($contributionPageId && CRM_Utils_Array::value('is_organization', $values)) {
       $ufJoinParams = array(
         'module' => 'CiviContribute',
         'entity_table' => 'civicrm_contribution_page',
         'entity_id' => $contributionPageId,
       );
-      
+
       list($contributionProfiles['custom_pre_id'],
         $contributionProfiles['custom_post_id']
       ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
@@ -234,7 +238,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       if ($contributionProfiles['custom_post_id']) {
         $postProfileType = CRM_Core_BAO_UFField::getProfileType($contributionProfiles['custom_post_id']);
         if ($postProfileType == 'Membership') {
-          $conProfileType  = empty($conProfileType) ? "'Includes Profile (bottom of page)'" : "{$conProfileType} and 'Includes Profile (bottom of page)'";          
+          $conProfileType  = empty($conProfileType) ? "'Includes Profile (bottom of page)'" : "{$conProfileType} and 'Includes Profile (bottom of page)'";
         }
       }
       if (!empty($conProfileType)) {
