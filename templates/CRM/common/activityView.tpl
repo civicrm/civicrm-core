@@ -25,42 +25,41 @@
 *}
 {literal}
 <script type="text/javascript">
-function {/literal}{$list}{literal}viewActivity( activityID, contactID, list ) {
-    if ( list ) {
-        list = "-" + list;
+function {/literal}{$list}{literal}viewActivity(activityID, contactID, list) {
+  if (list) {
+    list = "-" + list;
+  }
+
+  cj("#view-activity" + list ).show( );
+
+  cj("#view-activity" + list ).dialog({
+    title: {/literal}"{ts escape="js"}View Activity{/ts}"{literal},
+    modal: true,
+    width : "680px", // don't remove px
+    height: "560",
+    resizable: true,
+    bgiframe: true,
+    overlay: {
+      opacity: 0.5,
+      background: "black"
+    },
+
+    beforeclose: function(event, ui) {
+      cj(this).dialog("destroy");
+    },
+
+    open:function() {
+      cj("#activity-content" + list , this).html("");
+      var viewUrl = {/literal}"{crmURL p='civicrm/case/activity/view' h=0 q="snippet=4" }"{literal};
+      cj("#activity-content" + list , this).load( viewUrl + "&cid="+contactID + "&aid=" + activityID + "&type="+list);
+    },
+
+    buttons: {
+      "{/literal}{ts escape="js"}Done{/ts}{literal}": function() {
+        cj(this).dialog("destroy");
+      }
     }
-
-    cj("#view-activity" + list ).show( );
-
-    cj("#view-activity" + list ).dialog({
-        title: {/literal}{ts escape="js"}View Activity{/ts}{literal}",
-        modal: true,
-        width : "680px", // don't remove px
-        height: "560",
-        resizable: true,
-        bgiframe: true,
-        overlay: {
-            opacity: 0.5,
-            background: "black"
-        },
-
-        beforeclose: function(event, ui) {
-            cj(this).dialog("destroy");
-        },
-
-        open:function() {
-            cj("#activity-content" + list , this).html("");
-            var viewUrl = {/literal}"{crmURL p='civicrm/case/activity/view' h=0 q="snippet=4" }"{literal};
-            cj("#activity-content" + list , this).load( viewUrl + "&cid="+contactID + "&aid=" + activityID + "&type="+list);
-
-        },
-
-        buttons: {
-            "{/literal}{ts escape="js"}Done{/ts}{literal}": function() {
-                cj(this).dialog("destroy");
-            }
-        }
-    });
+  });
 }
 </script>
 {/literal}
