@@ -29,7 +29,6 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   function testContributionPageAdd() {
     // open browser, login
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // a random 7-char string and an even number to make this pass unique
@@ -78,7 +77,6 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
      */
   function testContributionPageSeparatePayment() {
     // open browser, login
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // a random 7-char string and an even number to make this pass unique
@@ -129,7 +127,6 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
      */
   function testContributionPageSeparatePaymentPayLater() {
     // open browser, login
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // a random 7-char string and an even number to make this pass unique
@@ -188,23 +185,45 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('contribution_date_low');
 
     $this->type('sort_name', "$firstName $lastName");
+    $this->select('financial_type_id',"label=Member Dues");
     $this->click('_qf_Search_refresh');
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
+    //View Contribution for membership fee
     $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
-    //View Contribution Record
     $expected = array(
-      2 => 'Donation',
-      7 => 'Pending : Pay Later',
-      1 => "{$firstName} {$lastName}",
+      'From'                => "{$firstName} {$lastName}",
+      'Financial Type'      => 'Member Dues',
+      'Total Amount' => '$ 50.00',
+      'Contribution Status' => 'Pending : Pay Later',
     );
-    foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[$value]/td[2]", preg_quote($label));
-    }
+    $this->webtestVerifyTabularData($expected);
+    $this->click('_qf_ContributionView_cancel-bottom');
+
+    //View Contribution for separate contribution
+    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    // Open search criteria again
+    $this->click("xpath=id('Search')/x:div[2]/x:div/x:div[1]");
+    $this->waitForElementPresent("financial_type_id");
+    $this->select('financial_type_id',"label=Donation");
+    $this->click('_qf_Search_refresh');
+
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+
+    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $expected = array(
+      'From'                => "{$firstName} {$lastName}",
+      'Financial Type'      => 'Donation',
+      'Contribution Status' => 'Pending : Pay Later',
+    );
+    $this->webtestVerifyTabularData($expected);
     $this->click('_qf_ContributionView_cancel-bottom');
 
 
@@ -223,12 +242,11 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     //View Membership Record
     $expected = array(
-      3 => 'Pending',
-      1 => "{$firstName} {$lastName}",
+      'Member' => "{$firstName} {$lastName}",
+      'Membership Type' => 'Student',
+      'Status' => 'Pending',
     );
-    foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('MembershipView')/div[2]/div/table/tbody/tr[$value]/td[2]", preg_quote($label));
-    }
+    $this->webtestVerifyTabularData($expected);
     $this->click('_qf_MembershipView_cancel-bottom');
   }
 }
