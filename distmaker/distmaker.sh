@@ -29,6 +29,17 @@ P=`dirname $0`
 # Current dir
 ORIGPWD=`pwd`
 
+# List of files to exclude from all tarballs
+DM_EXCLUDES=".git .svn packages/_ORIGINAL_ packages/SeleniumRC packages/PHPUnit packages/PhpDocumentor packages/SymfonyComponents packages/amavisd-new"
+for DM_EXCLUDE in $DM_EXCLUDES ; do
+  DM_EXCLUDES_RSYNC="--exclude=${DM_EXCLUDE} ${DM_EXCLUDES_RSYNC}"
+done
+## Note: These small folders have items that previously were not published,
+## but there's no real cost to including them, and excluding them seems
+## likely to cause confusion as the codebase evolves:
+##   packages/Files packages/PHP packages/Text
+export DM_EXCLUDES DM_EXCLUDES_RSYNC
+
 # Set no actions by default
 D5PACK=0
 D56PACK=0
