@@ -74,13 +74,20 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
     $form_state['programmed'] = TRUE;
     $form_state['method'] = 'post';
     $form_state['build_info']['args'] = array();
+    $form_state['complete form'] = FALSE;
 
     $config = CRM_Core_Config::singleton();
 
-    // we also need to redirect b
+    // we set this so we dont get into infinite loops of hooks
+    // calling each other
     $config->inCiviCRM = TRUE;
 
     $form = drupal_retrieve_form('user_register_form', $form_state);
+
+    // CRM-12008, avoid drupal notices
+    $form['#array_parents'] = array();
+    $form['#tree'] = FALSE;
+
     $form_state['process_input'] = 1;
     $form_state['submitted'] = 1;
 
