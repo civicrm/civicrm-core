@@ -34,7 +34,6 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
 
   function testStandaloneMemberAdd() {
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // create contact
@@ -46,9 +45,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $membershipTypes = $this->webtestAddMembershipType();
 
     // now add membership
-    $this->open($this->sboxPath . "civicrm/member/add?reset=1&action=add&context=standalone");
-
-    $this->waitForElementPresent("_qf_Membership_upload");
+    $this->openCiviPage("member/add", "reset=1&action=add&context=standalone", "_qf_Membership_upload");
 
     // select contact
     $this->webtestFillAutocomplete($firstName);
@@ -78,19 +75,17 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->click("xpath=//div[@id='memberships']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+
     $expected = array(
-      2 => $membershipTypes['membership_type'],
-      3 => 'New',
-      4 => 'Membership StandaloneAddTest Webtest',
+      'Membership Type' => $membershipTypes['membership_type'],
+      'Status' => 'New',
+      'Source' => 'Membership StandaloneAddTest Webtest',
     );
-    foreach ($expected as $label => $value) {
-      $this->verifyText("xpath=id('MembershipView')/div[2]/div/table[1]/tbody/tr[$label]/td[2]", preg_quote($value));
-    }
+    $this->webtestVerifyTabularData($expected);
   }
 
   function testStandaloneMemberOverrideAdd() {
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // add contact
@@ -102,9 +97,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $membershipTypes = $this->webtestAddMembershipType();
 
     // add membership
-    $this->open($this->sboxPath . "civicrm/member/add?reset=1&action=add&context=standalone");
-
-    $this->waitForElementPresent("_qf_Membership_upload");
+    $this->openCiviPage("member/add", "reset=1&action=add&context=standalone", "_qf_Membership_upload");
 
     // select contact
     $this->webtestFillAutocomplete($firstName);
@@ -163,13 +156,11 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     $expected = array(
-      2 => $membershipTypes['membership_type'],
-      3 => 'Grace',
-      4 => 'Membership StandaloneAddTest Webtest',
+      'Membership Type' => $membershipTypes['membership_type'],
+      'Status' => 'Grace',
+      'Source' => 'Membership StandaloneAddTest Webtest',
     );
-    foreach ($expected as $label => $value) {
-      $this->verifyText("xpath=id('MembershipView')/div[2]/div/table[1]/tbody/tr[$label]/td[2]", preg_quote($value));
-    }
+    $this->webtestVerifyTabularData($expected);
   }
 }
 
