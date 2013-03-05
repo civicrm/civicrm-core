@@ -226,7 +226,7 @@ WHERE
           $ids = implode(',', $entities);
           $queryString = "SELECT cp.id as id, cp.title as title, cp.start_date as startDate, cp.end_date as endDate,ct.name as type
 FROM      civicrm_contribution_page cp, civicrm_financial_type ct
-WHERE     ct.id = cp.financial_type_id AND 
+WHERE     ct.id = cp.financial_type_id AND
           cp.id IN ($ids) AND
           cp.is_active = 1;";
           $crmDAO = CRM_Core_DAO::executeQuery($queryString);
@@ -677,7 +677,13 @@ WHERE  id = %1";
           }
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           $totalPrice += $lineItem[$optionValueId]['line_total'];
-          if ($component) {
+          if (
+            $component &&
+            // auto_renew exists and is empty in some workflows, which php treat as a 0
+            // and hence we explicity check to see if auto_renew is numeric
+            isset($lineItem[$optionValueId]['auto_renew']) &&
+            is_numeric($lineItem[$optionValueId]['auto_renew'])
+          ) {
             $autoRenew[$lineItem[$optionValueId]['auto_renew']] += $lineItem[$optionValueId]['line_total'];
           }
           break;
@@ -696,7 +702,11 @@ WHERE  id = %1";
           }
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           $totalPrice += $lineItem[$optionValueId]['line_total'];
-          if ($component) {
+          if (
+            $component &&
+            isset($lineItem[$optionValueId]['auto_renew']) &&
+            is_numeric($lineItem[$optionValueId]['auto_renew'])
+          ) {
             $autoRenew[$lineItem[$optionValueId]['auto_renew']] += $lineItem[$optionValueId]['line_total'];
           }
           break;
@@ -721,7 +731,11 @@ WHERE  id = %1";
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           foreach ($optionIds as $optionId) {
             $totalPrice += $lineItem[$optionId]['line_total'];
-            if ($component) {
+            if (
+              $component &&
+              isset($lineItem[$optionId]['auto_renew']) &&
+              is_numeric($lineItem[$optionId]['auto_renew'])
+            ) {
               $autoRenew[$lineItem[$optionId]['auto_renew']] += $lineItem[$optionId]['line_total'];
             }
           }
@@ -751,7 +765,7 @@ WHERE  id = %1";
     if ($component) {
       foreach ($autoRenew as $dontCare => $eachAmount) {
         if (!$eachAmount) {
-          unset($autoRenew[$dontCare]);  
+          unset($autoRenew[$dontCare]);
         }
       }
       if (count($autoRenew) > 1 ) {
@@ -1124,15 +1138,15 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Check if price set id provides option for 
+   * Check if price set id provides option for
    * user to select both auto-renew and non-auto-renew memberships
    *
-   * @access public                                                                                                                                                                                     
+   * @access public
    * @static
    *
    */
   public static function checkMembershipPriceSet($id) {
-    $query = 
+    $query =
 "
 SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
 FROM        civicrm_price_field_value pfv
@@ -1150,7 +1164,7 @@ WHERE       ps.id = %1
     //2 membership types can be selected
     //instead of comparing all of them
     while ($dao->fetch()) {
-      //temp fix for #CRM-10370 
+      //temp fix for #CRM-10370
       //if its NULL consider it '0' i.e. 'No auto-renew option'
       $daoAutoRenew = $dao->auto_renew;
       if ($daoAutoRenew === NULL) {
