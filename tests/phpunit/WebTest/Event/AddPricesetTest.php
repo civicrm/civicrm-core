@@ -64,9 +64,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   }
 
   function _testAddSet($setTitle, $usedFor, $setHelp, $financialType = 'Event Fee') {
-    $this->openCiviPage('admin/price', 'reset=1&action=add');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Set_next-bottom');
+    $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
     $this->type('title', $setTitle);
@@ -175,7 +173,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
     $this->openCiviPage('admin/price', 'reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Use the price set id ($sid) to pick the correct row
     $this->click("css=tr#row_{$sid} a[title='Preview Price Set']");
@@ -221,13 +218,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestAddPaymentProcessor($processorName);
 
     // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->openCiviPage('event/add', 'reset=1&action=add');
+    $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
     $eventTitle       = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $email            = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
     $eventDescription = 'Here is a description for this conference.';
-
-    $this->waitForElementPresent('_qf_EventInfo_upload-bottom');
 
     // Let's start filling the form with values.
     $this->select('event_type_id', 'value=1');
@@ -295,7 +290,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $eventInfoUrl = $this->getLocation();
 
     $this->openCiviPage('logout', 'reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->open($eventInfoUrl);
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');
@@ -333,9 +327,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     //Find Participant
-    $this->openCiviPage('event/search', 'reset=1');
-
-    $this->waitForElementPresent('_qf_Search_refresh');
+    $this->openCiviPage('event/search', 'reset=1', '_qf_Search_refresh');
 
     $this->type('sort_name', "$email");
     $this->click('_qf_Search_refresh');
@@ -392,13 +384,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestAddPaymentProcessor($processorName);
 
     // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->openCiviPage('event/add', 'reset=1&action=add');
+    $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
     $eventTitle       = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $email            = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
     $eventDescription = 'Here is a description for this conference.';
-
-    $this->waitForElementPresent('_qf_EventInfo_upload-bottom');
 
     // Let's start filling the form with values.
     $this->select('event_type_id', 'value=1');
@@ -471,11 +461,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $displayName = "$firstName Anderson";
 
     // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
-    $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone');
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent('_qf_Participant_upload-bottom');
+    $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom');
 
     // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
@@ -551,13 +537,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->_testVerifyPriceSet($validateStrings, $sid);
     
     // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->openCiviPage('event/add', 'reset=1&action=add');
+    $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
     $eventTitle       = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $email            = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
     $eventDescription = 'Here is a description for this conference.';
-    
-    $this->waitForElementPresent('_qf_EventInfo_upload-bottom');
 
     // Let's start filling the form with values.
     $this->select('event_type_id', 'value=1');
@@ -595,11 +579,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
-    $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone'); 
-    
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent('_qf_Participant_upload-bottom');
+    $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom'); 
 
     // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
