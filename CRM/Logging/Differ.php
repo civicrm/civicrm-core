@@ -65,7 +65,7 @@ class CRM_Logging_Differ {
       2 => array($this->log_date, 'String'),
     );
 
-    $contactIdClause = '';
+    $contactIdClause = $join = '';
     if ( $contactID ) {
       $params[3] = array($contactID, 'Integer');
       switch ($table) {
@@ -82,10 +82,11 @@ class CRM_Logging_Differ {
         $contactIdClause = "AND (contact_id_a = %3 OR contact_id_b = %3)";
         break;
       case 'civicrm_activity':
-        $contactIdClause = "
-AND (id = (select activity_id FROM civicrm_activity_target WHERE target_contact_id = %3 LIMIT 1) OR 
-     id = (select activity_id FROM civicrm_activity_assignment WHERE assignee_contact_id = %3 LIMIT 1) OR 
-     source_contact_id = %3)";
+        $join  = "
+LEFT JOIN civicrm_activity_target at ON at.activity_id = lt.id     AND at.target_contact_id = %3
+LEFT JOIN civicrm_activity_assignment aa ON aa.activity_id = lt.id AND aa.assignee_contact_id = %3
+LEFT JOIN civicrm_activity source ON source.id = lt.id             AND source.source_contact_id = %3";
+        $contactIdClause = "AND (at.id IS NOT NULL OR aa.id IS NOT NULL OR source.id IS NOT NULL)";
         break;
       case 'civicrm_case':
         $contactIdClause = "AND id = (select case_id FROM civicrm_case_contact WHERE contact_id = %3 LIMIT 1)";
@@ -99,8 +100,12 @@ AND (id = (select activity_id FROM civicrm_activity_target WHERE target_contact_
     }
 
     // find ids in this table that were affected in the given connection (based on connection id and a ±10 s time period around the date)
-    $sql = "SELECT DISTINCT id FROM `{$this->db}`.`log_$table` WHERE log_conn_id = %1 AND log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval}) {$contactIdClause}";
-
+    $sql = "
+SELECT DISTINCT lt.id FROM `{$this->db}`.`log_$table` lt 
+{$join} 
+WHERE log_conn_id = %1 AND 
+      log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval}) 
+      {$contactIdClause}";
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
       $diffs = array_merge($diffs, $this->diffsInTableForId($table, $dao->id));
