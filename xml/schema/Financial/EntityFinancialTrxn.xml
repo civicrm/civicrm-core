@@ -47,6 +47,9 @@
     <name>amount</name>    
     <type>decimal</type>    
     <required>true</required>
+    <import>true</import>
+    <headerPattern>/amount/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>allocated amount of transaction to this entity</comment>
     <add>3.2</add>    
   </field> 
