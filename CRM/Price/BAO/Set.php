@@ -679,6 +679,8 @@ WHERE  id = %1";
           $totalPrice += $lineItem[$optionValueId]['line_total'];
           if (
             $component &&
+            // auto_renew exists and is empty in some workflows, which php treat as a 0
+            // and hence we explicity check to see if auto_renew is numeric
             isset($lineItem[$optionValueId]['auto_renew']) &&
             is_numeric($lineItem[$optionValueId]['auto_renew'])
           ) {
