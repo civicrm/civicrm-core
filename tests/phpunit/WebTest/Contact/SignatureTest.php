@@ -107,9 +107,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     // Select Your Editor
     $this->_selectEditor('CKEditor');
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&action=update&cid={$contactId}");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->openCiviPage("contact/add", "reset=1&action=update&cid={$contactId}");
     $this->click("//tr[@id='Email_Block_1']/td[1]/div[2]/div[1]");
     
     // HTML format message
@@ -123,7 +121,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("{$name} has been updated."));
+    $this->assertElementContainsText("crm-notification-container", "{$name} has been updated.");
 
     // Go for Ckeck Your Editor, Click on Send Mail
     $this->click("//a[@id='crm-contact-actions-link']/span");
@@ -150,8 +148,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
    */
   function _selectEditor($editor) {
     // Go directly to the URL of Set Default Editor.
-    $this->open($this->sboxPath . 'civicrm/admin/setting/preferences/display?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
 
     // Select your Editor
     $this->click('editor_id');
