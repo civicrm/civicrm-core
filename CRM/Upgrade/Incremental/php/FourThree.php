@@ -149,7 +149,8 @@ WHERE    entity_value = '' OR entity_value IS NULL
     $this->addTask(ts('Upgrade DB to 4.3.alpha3: SQL'), 'task_4_3_x_runSql', $rev);
   }
 
-  function upgrade_4_3_beta2($rev2) {
+  function upgrade_4_3_beta2($rev) {
+    $this->addTask(ts('Upgrade DB to 4.3.beta2: SQL'), 'task_4_3_x_runSql', $rev);
     // CRM-12002
     if (
       CRM_Core_DAO::checkTableExists('log_civicrm_line_item') &&
