@@ -16,7 +16,7 @@ if [ -z "$version" -o -z "$start_point" ]; then
   echo
   echo "Usage: $0 <start_point> <version>"
   echo "  <start_point> is a branch name (e.g. \"master\")"
-  echo "  <version> is Civi release (e.g. \"4.2.beta2\"); it will become a tag name"
+  echo "  <version> is Civi release (e.g. \"4.3.beta2\"); it will become a tag name"
   exit 2
 fi
 

@@ -1,6 +1,8 @@
 #!/bin/bash
 
 ## The GIT repo where we can find branches and create tags
+## Note: Choose https or SSH depending on whether you've
+## configured HTTP credential cache or SSH keys.
 #git_base_url=https://github.com/civicrm
 #git_base_url=git@github.com:civicrm
 
