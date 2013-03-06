@@ -33,7 +33,6 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testContactMemberAdd() {
-
     $this->open($this->sboxPath);
     $this->webtestLogin();
 
@@ -42,7 +41,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $lifeTimeMemTypeParams = $this->webtestAddMembershipType('rolling', 1, 'lifetime');
 
     // Go directly to the URL of the screen that you will be testing (New Individual).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 
@@ -50,7 +49,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->type("first_name", $firstName);
 
     //fill in last name
-    $lastName = "Smith_" . substr(sha1(rand()), 0, 7);;
+    $lastName = "Smith_" . substr(sha1(rand()), 0, 7);
     $this->type("last_name", $lastName);
 
     //fill in email
@@ -60,8 +59,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertTrue($this->isTextPresent("$firstName $lastName has been created."));
+    $this->assertElementContainsText('crm-notification-container', "$firstName $lastName has been created.");
 
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
@@ -95,9 +93,8 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("membership for $firstName $lastName has been added."),
-      "Status message didn't show up after saving!"
-    );
+    $this->assertElementContainsText('crm-notification-container', "membership for $firstName $lastName has been added.",
+      "Status message didn't show up after saving!");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -108,11 +105,8 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
       'Status' => 'New',
       'Source' => $sourceText,
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
+
     $this->click("_qf_MembershipView_cancel-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     // page was loaded
@@ -132,18 +126,12 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
       'Status' => 'New',
       'Source' => $sourceText,
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
-
+    $this->webtestVerifyTabularData($verifyData);
     $this->click("_qf_MembershipView_cancel-bottom");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[7]");
     $this->click("xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[9]/span/a[2][text()='Edit']");
-
     $this->waitForElementPresent("_qf_Membership_cancel-bottom");
 
     // fill in Membership Organization and Type
@@ -168,11 +156,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
       'Source' => $sourceText,
       'End date' => '',
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
   }
 
   function testMemberAddWithLifeTimeMembershipType() {
@@ -183,7 +167,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $lifeTimeMemTypeParams = $this->webtestAddMembershipType('rolling', 1, 'lifetime');
 
     // Go directly to the URL of the screen that you will be testing (New Individual).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 
@@ -201,8 +185,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertTrue($this->isTextPresent("$firstName $lastName has been created."));
+    $this->assertElementContainsText('crm-notification-container', "$firstName $lastName has been created.");
 
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
@@ -237,9 +220,8 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("membership for $firstName $lastName has been added."),
-      "Status message didn't show up after saving!"
-    );
+    $this->assertElementContainsText('crm-notification-container', "membership for $firstName $lastName has been added.",
+      "Status message didn't show up after saving!");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -250,11 +232,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
       'Source' => $sourceText,
       'End date' => '',
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
     $this->click("_qf_MembershipView_cancel-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
