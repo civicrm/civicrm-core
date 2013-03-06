@@ -137,6 +137,7 @@ WordPress
 joomla
 packages/
 tests/phpunit/CiviTest/civicrm.settings.local.php
+tools/scripts/releaser/releaser.conf
 l10n
 vendor
 civicrm.settings.php
