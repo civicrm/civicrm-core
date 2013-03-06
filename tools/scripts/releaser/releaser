@@ -132,7 +132,7 @@ function do_publish() {
   cd $workdir/$version/tarballs
 
   $cmd_md5sum *.tar.gz *.zip > civicrm-$version.MD5SUMS
-  echo $cmd_gpg_pass | $cmd_gpg --armor --batch --passphrase-fd 0 --sign civicrm-$version.MD5SUMS
+  echo $gpg_pass | $cmd_gpg --armor --batch --passphrase-fd 0 --sign civicrm-$version.MD5SUMS
 
   if [ "$is_stable" ]; then
     echo mkdir ${publish_stable_dir}/$version | $cmd_sftp ${publish_ssh}
