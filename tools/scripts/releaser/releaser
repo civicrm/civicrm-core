@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 confdir=$(dirname $0)
 start_point="$1"
@@ -25,6 +25,8 @@ if [ "`echo -n $version | tr -d 0-9.`" = '' ]; then
 else
   is_stable=
 fi
+
+set -ex
 
 #################################################
 ## Git setup
