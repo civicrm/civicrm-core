@@ -78,34 +78,21 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Enable CiviCampaign module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent("Changes Saved."));
-    }
+    $this->enableComponents(array('CiviCampaign'));
 
     // add the required Drupal permission
     $permissions = array('edit-2-administer-civicampaign');
     $this->changePermissions($permissions);
 
-    $this->open($this->sboxPath . 'civicrm/campaign?reset=1');
-    $this->waitForElementPresent("link=Add Campaign");
+    $this->openCiviPage('campaign', 'reset=1', "link=Add Campaign");
     if ($this->isTextPresent('No campaigns found.')) {
       // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
-      $this->open($this->sboxPath . "civicrm/contribute/add?reset=1&action=add&context=standalone");
-      $this->waitForElementPresent("_qf_Contribution_cancel-bottom");
-      $this->assertTrue($this->isTextPresent('There are currently no active Campaigns.'));
+      $this->openCiviPage('contribute/add', 'reset=1&action=add&context=standalone', '_qf_Contribution_cancel-bottom');
+      $this->assertElementContainsText('crm-container', 'There are currently no active Campaigns.');
     }
 
     // Go directly to the URL of the screen that you will be testing
-    $this->open($this->sboxPath . "civicrm/campaign/add?reset=1");
+    $this->openCiviPage('campaign/add', 'reset=1');
 
     // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
     // button at the end of this page to show up, to make sure it's fully loaded.
@@ -135,7 +122,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Campaign $campaignTitle has been saved."),
+    $this->assertElementContainsText('crm-notification-container', "Campaign $campaignTitle has been saved.",
       "Status message didn't show up after saving campaign!"
     );
 
@@ -234,7 +221,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The contribution record has been saved"));
+    $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved");
 
     $this->waitForElementPresent("xpath=//div[@id='Contributions']//table/tbody/tr/td[8]/span/a[text()='View']");
 
@@ -247,8 +234,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
     if ($past) {
       // when campaign component is disabled
-      $this->open($this->sboxPath . 'civicrm/admin/setting/component?reset=1');
-      $this->waitForElementPresent("_qf_Component_next-bottom");
+      $this->openCiviPage('admin/setting/component', 'reset=1', '_qf_Component_next-bottom');
       $this->addSelection("enableComponents-t", "label=CiviCampaign");
       $this->click("//option[@value='CiviCampaign']");
       $this->click("remove");
@@ -256,8 +242,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->assertTrue($this->isTextPresent("Changes Saved."));
 
-      $this->open($this->sboxPath . 'civicrm/contribute/search?reset=1');
-      $this->waitForElementPresent("_qf_Search_refresh");
+      $this->openCiviPage('contribute/search', 'reset=1', '_qf_Search_refresh');      
 
       $this->type('sort_name', $firstName);
       $this->click("_qf_Search_refresh");
@@ -270,11 +255,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
   function pastCampaignsTest($groupName) {
     // Go directly to the URL of the screen that you will be testing
-    $this->open($this->sboxPath . "civicrm/campaign/add?reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Campaign_upload-bottom");
+    $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
     // Let's start filling the form with values.
     $pastTitle = substr(sha1(rand()), 0, 7);

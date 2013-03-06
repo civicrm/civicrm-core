@@ -36,19 +36,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->webtestLogin(TRUE);
 
     // Enable CiviCampaign module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      sleep(1);
-      $this->assertTrue($this->isTextPresent("Changes Saved."));
-    }
+    $this->enableComponents(array('CiviCampaign'));
 
     // add the required Drupal permission
     $permissions = array('edit-2-administer-civicampaign');
@@ -87,11 +75,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go directly to the URL of the screen that you will be testing
-    $this->open($this->sboxPath . "civicrm/campaign/add?reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Campaign_upload-bottom");
+    $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
     // Let's start filling the form with values.
     $campaignTitle = "Campaign " . $title;
@@ -118,7 +102,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Campaign Campaign $title has been saved."),
+    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.", 
       "Status message didn't show up after saving campaign!"
     );
 
@@ -151,7 +135,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // Let's start filling the form with values.
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertTrue($this->isTextPresent("Anderson, " . $firstName2), "Contact not found in line " . __LINE__);
+    $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook','Anderson, ' . $firstName2, 'Contact not found in line ' . __LINE__);
 
     // Now we're filling the "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
@@ -169,7 +153,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertTrue($this->isTextPresent("Summerson, " . $firstName1), "Contact not found in line " . __LINE__);
+    $this->assertElementContainsText('css=tr.crm-activity-form-block-assignee_contact_id td ul li.token-input-token-facebook', 'Summerson, ' . $firstName1, 'Contact not found in line ' . __LINE__);
 
     // Since we're here, let's check if screen help is being displayed properly
     // $this->assertTrue($this->isTextPresent("A copy of this activity will be emailed to each Assignee"));
@@ -217,7 +201,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Activity '$subject' has been saved."), "Status message didn't show up after saving!");
+    $this->assertElementContainsText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving!");
 
     $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
 

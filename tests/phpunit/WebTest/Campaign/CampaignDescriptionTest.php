@@ -47,25 +47,10 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $groupName = $this->WebtestAddGroup();
 
     // Enable CiviCampaign module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent("Your changes have been saved."));
-    }
+    $this->enableComponents(array('CiviCampaign'));
 
     //Creating a new Campaign
-    $this->open($this->sboxPath . "civicrm/campaign/add?reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Campaign_upload-bottom");
+    $this->openCivipage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
     // Let's start filling the form with values.
     $campaignTitle = "Campaign $title";
@@ -93,7 +78,7 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Campaign Campaign $title has been saved."),
+    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
       "Status message didn't show up after saving campaign!"
     );
 
