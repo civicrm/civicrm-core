@@ -43,7 +43,7 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
     $this->changePermissions($permission);
 
     // Go directly to the URL of the screen that you will beadding New Individual.
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     $firstName = "John" . substr(sha1(rand()), 0, 7);
     $lastName  = "Smith" . substr(sha1(rand()), 0, 7);
@@ -61,12 +61,10 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $individualName = $this->getText("xpath=//div[@class='crm-summary-display_name']");
-    $this->assertTrue($this->isTextPresent("$individualName has been created."));
+    $this->assertElementContainsText('crm-notification-container', "$individualName has been created.");
 
     // submit dupe using profile/create as anonymous
-    $this->open($this->sboxPath . "civicrm/profile/create?gid=4&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Edit_next");
+    $this->openCiviPage('profile/create', 'gid=4&reset=1', '_qf_Edit_next');
 
     $firstName = "John" . substr(sha1(rand()), 0, 7);
     $lastName = "Smith" . substr(sha1(rand()), 0, 7);
@@ -85,5 +83,3 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("A record already exists with the same information.");
   }
 }
-
-
