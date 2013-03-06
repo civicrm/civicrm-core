@@ -92,14 +92,14 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         'dao' => 'CRM_Contribute_DAO_Contribution',
         'fields' =>
         array(
-          'receive_date' => array('default' => TRUE),
-          'trxn_id' => array('title' => ts('Trans #'),
+          'receive_date' => array(
+            'default' => TRUE
+          ),
+          'invoice_id' => array(
+            'title' => ts('Invoice ID'),
             'default' => TRUE,
           ),
-          'invoice_id' => array('title' => ts('Invoice ID'),
-            'default' => TRUE,
-          ),
-          'contribution_status_id' => array('title' => ts('Status'),
+          'contribution_status_id' => array('title' => ts('Contribution Status'),
             'default' => TRUE,
           ),
           'id' => array('title' => ts('Contribution #'),
@@ -144,13 +144,26 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'payment_instrument_id' => array('title' => ts('Payment Instrument'),
             'default' => TRUE,
           ),
+          'trxn_date' => array(
+            'title' => ts('Transaction Date'),
+            'default' => TRUE
+          ),
+          'trxn_id' => array(
+            'title' => ts('Trans #'),
+            'default' => TRUE,
+          ),
         ),
         'filters' =>
         array(
           'payment_instrument_id' => array(
-            'title' => ts('Paid By'),
+            'title' => ts('Payment Instrument'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
+          ),
+          'trxn_date' => array( 
+            'title' => ts('Transaction Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
       ), 
@@ -172,13 +185,13 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         'dao' => 'CRM_Financial_DAO_FinancialAccount',
         'fields' => array(
           'debit_accounting_code' => array(
-            'title' => ts('Financial Account Code- Debit'),
+            'title' => ts('Financial Account Code - Debit'),
             'name'  => 'accounting_code',
             'alias' => 'financial_account_civireport_debit',
             'default' => TRUE,
           ),
           'credit_accounting_code' => array(
-            'title' => ts('Financial Account Code- Credit'),
+            'title' => ts('Financial Account Code - Credit'),
             'name'  => 'accounting_code',
             'alias' => 'financial_account_civireport_credit',
             'default' => TRUE,
