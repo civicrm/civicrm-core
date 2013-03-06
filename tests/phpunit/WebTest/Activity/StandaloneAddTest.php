@@ -54,11 +54,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestAddContact("$firstName2", "Summerson", $firstName2 . "@summerson.com");
 
     // Go directly to the URL of the screen that you will be testing (New Activity-standalone).
-    $this->open($this->sboxPath . "civicrm/activity?reset=1&action=add&context=standalone");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Activity_upload");
+    $this->openCiviPage("activity", "reset=1&action=add&context=standalone", "_qf_Activity_upload");
 
     // Let's start filling the form with values.
 
@@ -83,7 +79,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=tr.crm-activity-form-block-target_contact_id td ul li span.token-input-delete-token-facebook");
 
     //..and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertTrue($this->isTextPresent("Anderson, $firstName1"), "Contact not found in line " . __LINE__);
+    $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', "Anderson, $firstName1", 'Contact not found in line ' . __LINE__);
 
     // Now we're doing the same for "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
@@ -102,10 +98,10 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertTrue($this->isTextPresent("Summerson, $firstName2"), "Contact not found in line " . __LINE__);
+    $this->assertElementContainsText('css=tr.crm-activity-form-block-assignee_contact_id td ul li.token-input-token-facebook', "Summerson, $firstName2", 'Contact not found in line ' . __LINE__);
 
     // Since we're here, let's check of screen help is being displayed properly
-    $this->assertTrue($this->isTextPresent("You can optionally assign this activity to someone"), "Help text is missing.");
+    $this->assertElementContainsText('css=tr.crm-activity-form-block-assignee_contact_id td span.description', 'You can optionally assign this activity to someone', 'Help text is missing.');
 
     // Putting the contents into subject field - assigning the text to variable, it'll come in handy later
     $subject = "This is subject of test activity being added through standalone screen.";
@@ -152,8 +148,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->assertTrue($this->isTextPresent("Activity '$subject' has been saved."), "Status message didn't show up after saving!");
 
-    $this->open($this->sboxPath . "civicrm/activity/search?reset=1");
-    $this->waitForElementPresent("_qf_Search_refresh");
+    $this->openCiviPage("activity/search", "reset=1", "_qf_Search_refresh");
 
     $this->type("sort_name", $firstName1);
     $this->click("_qf_Search_refresh");
