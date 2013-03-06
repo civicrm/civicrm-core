@@ -45,11 +45,10 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
         $this->open($this->sboxPath);
         $this->webtestLogin();
 
-        $this->open($this->sboxPath . "civicrm/admin/setting/preferences/display?reset=1");
-        $this->waitForElementPresent("name=activity_assignee_notification_ics");
+        $this->openCivipage("admin/setting/preferences/display", "reset=1", "name=activity_assignee_notification_ics");
 
         // Notify assignees should be checked by default, so we just need to click the ical setting which is off by default.
-        $this->click("name=activity_assignee_notification_ics");
+        $this->check("name=activity_assignee_notification_ics");
         $this->click("_qf_Display_next");
         $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -60,8 +59,7 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
         $firstName1 = substr(sha1(rand()), 0, 7);
         $this->webtestAddContact("$firstName1", "Anderson", $firstName1 . "@anderson.com");
 
-        $this->open($this->sboxPath . "civicrm/activity?reset=1&action=add&context=standalone");
-        $this->waitForElementPresent("_qf_Activity_upload");
+        $this->openCivipage("activity", "reset=1&action=add&context=standalone", "_qf_Activity_upload");
 
         $this->select("activity_type_id", "value=1");
 
@@ -85,7 +83,7 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
         $this->click("_qf_Activity_upload");
         $this->waitForPageToLoad($this->getTimeoutMsec());
 
-        $this->assertTrue($this->isTextPresent("Activity '$subject' has been saved."), "Status message didn't show up after saving!");
+        $this->assertElementContainsText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving!");
 
         // check the resulting email
         $mail = $mailer->getMostRecentEmail( 'ezc' );
