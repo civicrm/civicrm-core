@@ -46,7 +46,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     //enable the logging
-    $this->open($this->sboxPath . "civicrm/admin/setting/misc?reset=1");
+    $this->openCiviPage('admin/setting/misc', 'reset=1');
     $this->click("xpath=//tr[@class='crm-miscellaneous-form-block-logging']/td[2]/label[text()='Yes']");
     $this->click("_qf_Miscellaneous_next-top");
     $this->waitForTextPresent("Changes Saved");
@@ -190,8 +190,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //visit the logging contact summary report
-    $this->open($this->sboxPath . "civicrm/report/logging/contact/summary?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('report/logging/contact/summary', 'reset=1');
     $this->type('altered_contact_value', $firstName);
     $this->click("_qf_LoggingSummary_submit");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -268,11 +267,11 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->detailReportCheck($dataForReportDetail, $filters);
 
     //delete contact check
-    $this->open($this->sboxPath . "civicrm/contact/view/delete?&reset=1&delete=1&cid={$cid[1]}");
+    $this->openCiviPage('contact/view/delete', "reset=1&delete=1&cid={$cid[1]}");
     $this->click("_qf_Delete_done");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->open($this->sboxPath . "civicrm/report/logging/contact/summary?reset=1");
+    $this->openCiviPage('report/logging/contact/summary', 'reset=1');
     $this->click("_qf_LoggingSummary_submit");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -280,7 +279,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->verifyReportData($contactDataDelete);
 
     //disable the logging
-    $this->open($this->sboxPath . "civicrm/admin/setting/misc?reset=1");
+    $this->openCiviPage('admin/setting/misc', 'reset=1');
     $this->click("xpath=//tr[@class='crm-miscellaneous-form-block-logging']/td[2]/label[text()='No']");
     $this->click("_qf_Miscellaneous_next-top");
     $this->waitForTextPresent("Changes Saved");
@@ -319,8 +318,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       }
 
     //visit the logging contact summary report
-    $this->open($this->sboxPath . "civicrm/report/logging/contact/summary?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('report/logging/contact/summary', 'reset=1');
     foreach ($filters as $type => $filter) {
       if ($type == 'text' ) {
         foreach ($filter as $filterName => $filterValue) {

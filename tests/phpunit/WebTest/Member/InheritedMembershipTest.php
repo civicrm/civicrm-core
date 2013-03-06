@@ -162,7 +162,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('quick-save');
     $this->waitForElementPresent('current-relationships');
     //check the status message
-    $this->assertTrue($this->isTextPresent('New relationship created.'));
+    $this->assertElementContainsText('crm-notification-container', 'New relationship created.');
 
     $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
 
@@ -213,7 +213,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     //verify inherited membership has been removed
     $this->openCiviPage("contact/view", "reset=1&cid=$id&selectedChild=member", "xpath=//div[@class='crm-container-snippet']/div/div[3]");
-    $this->assertTrue($this->isTextPresent('No memberships have been recorded for this contact.'));
+    $this->assertElementContainsText('Memberships', 'No memberships have been recorded for this contact.');
 
     // visit relationship tab and re-enable the relationship
     $this->click('css=li#tab_rel a');
@@ -250,7 +250,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     //verify inherited membership has been removed
     $this->openCiviPage("contact/view", "reset=1&cid={$id}&selectedChild=member", "xpath=//div[@class='crm-container-snippet']/div/div[3]");
-    $this->assertTrue($this->isTextPresent('No memberships have been recorded for this contact.'));
+    $this->assertElementContainsText('Memberships', 'No memberships have been recorded for this contact.');
 
     //enable relationship
     $this->click('css=li#tab_rel a');
