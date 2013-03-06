@@ -354,16 +354,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     //campaign test for interview
     //enable CiviCampaign module if necessary
-    $this->openCiviPage('admin/setting/component', 'reset=1', '_qf_Component_next-bottom');
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertElementContainsText('crm-notification-container', 'Changes Saved');
-    }
+    $this->enableComponents("CiviCampaign");
 
     //Adding a survey
     $this->openCiviPage('survey/add', 'reset=1', '_qf_Main_upload-bottom');

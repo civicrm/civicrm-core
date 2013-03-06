@@ -792,18 +792,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $fieldId = $url[1];
 
     // Enable CiviCampaign module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Component_next-bottom');
-    $enabledComponents = $this->getSelectOptions('enableComponents-t');
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection('enableComponents-f', "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click('add');
-      $this->click('_qf_Component_next-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent('Your changes have been saved.'));
-    }
+    $this->enableComponents("CiviCampaign");
 
     // add the required Drupal permission
     $permission = array('edit-2-administer-civicampaign');
@@ -1072,18 +1061,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $fieldId = $url[1];
 
     // Enable CiviCampaign module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Component_next-bottom');
-    $enabledComponents = $this->getSelectOptions('enableComponents-t');
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection('enableComponents-f', "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click('add');
-      $this->click('_qf_Component_next-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent('Your changes have been saved.'));
-    }
+    $this->enableComponents("CiviCampaign");
 
     // add the required Drupal permission
     $permission = array('edit-2-administer-civicampaign');

@@ -37,27 +37,11 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
   }
 
   function testStandaloneGrantAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in as admin first to verify permissions for CiviGrant
     $this->webtestLogin(TRUE);
 
     // Enable CiviGrant module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviGrant", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviGrant");
-      $this->click("//option[@value='CiviGrant']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent("Your changes have been saved."));
-    }
+    $this->enableComponents("CiviGrant");
 
     // let's give full CiviGrant permissions to demo user (registered user).
     $permission = array('edit-2-access-civigrant', 'edit-2-edit-grants', 'edit-2-delete-in-civigrant');
