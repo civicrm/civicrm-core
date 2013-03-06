@@ -56,7 +56,7 @@ function generateJoomlaConfig($version) {
 
   $smarty = new Smarty();
   $smarty->template_dir = $sourceCheckoutDir . '/xml/templates';
-  $smarty->compile_dir = '/tmp/templates_c';
+  $smarty->compile_dir = '/tmp/templates_c_u' . posix_geteuid();
   createDir($smarty->compile_dir);
 
   $smarty->assign('CiviCRMVersion', $version);
