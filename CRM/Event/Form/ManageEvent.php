@@ -80,6 +80,12 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   protected $_cancelURL = NULL;
 
   /**
+   * The campaign id of the existing event, we use this to know if we need to update
+   * the participant records
+   */
+  protected $_campaignID = NULL;
+
+  /**
    * Function to set variables up before form is built
    *
    * @return void
@@ -214,6 +220,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
       CRM_Event_BAO_Event::retrieve($params, $defaults);
+
+      $this->_campaignID = CRM_Utils_Array::value('campaign_id', $defaults);
     }
     elseif ($this->_templateId) {
       $params = array('id' => $this->_templateId);
@@ -332,6 +340,16 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
           array(1 => ($subPage == 'friend') ? 'Friend' : $className)
         ), ts('Saved'), 'success');
+
+      $config = CRM_Core_Config::singleton();
+      if (in_array('CiviCampaign', $config->enableComponents)) {
+        $values = $this->controller->exportValues($this->_name);
+        $newCampaignID = CRM_Utils_Array::value('campaign_id', $values);
+        $eventID = CRM_Utils_Array::value('id', $values);
+        if ($eventID && $this->_campaignID != $newCampaignID) {
+          CRM_Event_BAO_Event::updateParticipantCampaignID($eventID, $newCampaignID);
+        }
+      }
 
       $this->postProcessHook();
 
