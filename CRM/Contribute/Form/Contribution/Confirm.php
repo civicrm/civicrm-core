@@ -1277,7 +1277,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if ($params['amount']) {
       $contribParams['line_item'] = $form->_lineItem;
-      h//add contribution record
+      //add contribution record
       $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
     }
 
