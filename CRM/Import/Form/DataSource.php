@@ -45,6 +45,8 @@ class CRM_Import_Form_DataSource extends CRM_Core_Form {
 
   private $_dataSourceClassFile;
 
+  private $_dataSourceClass;
+
   /**
    * Function to set variables up before form is built
    *
@@ -125,7 +127,8 @@ class CRM_Import_Form_DataSource extends CRM_Core_Form {
     if ($this->_dataSourceIsValid) {
       $this->_dataSourceClassFile = str_replace('_', '/', $this->_dataSource) . ".php";
       require_once $this->_dataSourceClassFile;
-      eval("{$this->_dataSource}::buildQuickForm( \$this );");
+      $this->_dataSourceClass = new $this->_dataSource;
+      $this->_dataSourceClass->buildQuickForm( $this );
     }
 
     // Get list of data sources and display them as options
@@ -256,7 +259,8 @@ class CRM_Import_Form_DataSource extends CRM_Core_Form {
       ) {
         $dataSourceClass = "CRM_Import_DataSource_" . $matches[1];
         require_once $dataSourceDir . DIRECTORY_SEPARATOR . $dataSourceFile;
-        eval("\$object = new $dataSourceClass(); \$info = \$object->getInfo();");
+        $object = new $dataSourceClass;
+        $info   = $object->getInfo();
         $dataSources[$dataSourceClass] = $info['title'];
       }
     }
@@ -308,8 +312,7 @@ class CRM_Import_Form_DataSource extends CRM_Core_Form {
         $this->_params['import_table_name'] = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
       }
 
-      require_once $this->_dataSourceClassFile;
-      eval("$this->_dataSource::postProcess( \$this->_params, \$db, \$this );");
+      $this->_dataSourceClass->postProcess( $this->_params, $db, $this );
 
       // We should have the data in the DB now, parse it
       $importTableName = $this->get('importTableName');
