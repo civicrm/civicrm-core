@@ -115,7 +115,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * opening all civi pages, and using the $args param is also strongly encouraged
    * This will make it much easier to run webtests in other CMSs in the future
    */
-  function openCiviPage($url, $args = NULL, $waitFor = NULL) {
+  function openCiviPage($url, $args = NULL, $waitFor = 'civicrm-footer') {
     // Construct full url with args
     // This could be extended in future to work with other CMS style urls
     if ($args) {
@@ -223,6 +223,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $added = FALSE;
     foreach ((array) $components as $comp) {
       if (!in_array($comp, $enabledComponents)) {
+        $this->addSelection("enableComponents-f", "label=$comp");
         $this->click("//option[@value='$comp']");
         $this->click("add");
         $added = TRUE;
@@ -1645,7 +1646,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->webtestLogin(TRUE);
     $this->changeAdminLinks();
     $this->waitForElementPresent('edit-submit');
-    foreach ($permission as $key => $value) {
+    foreach ((array) $permission as $key => $value) {
       $this->check($value);
     }
     $this->click('edit-submit');
@@ -1654,7 +1655,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->open($this->sboxPath . "user/logout");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->webtestLogin();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
   function addProfile($profileTitle, $profileFields) {

@@ -69,11 +69,6 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
   }
 
   function testAnonymousAddUser() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Make sure Drupal account settings allow visitors to register for account w/o admin approval
     // login as admin
     $this->webtestLogin(TRUE);
@@ -85,8 +80,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->click('edit-submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     // logout
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('logout', 'reset=1', NULL);
 
     // Go directly to the URL of the screen that will Create User Anonymously.
     $this->open($this->sboxPath . "user/register");
@@ -96,7 +90,6 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->type("edit-name", $name);
     $emailId = substr(sha1(rand()), 0, 7) . '@web.com';
     $this->type("edit-mail", $emailId);
-
 
     //Add profile Details
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
@@ -113,12 +106,13 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
 
     $this->click("edit-submit");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("A welcome message with further instructions has been sent to your e-mail address."));
+
+    // In case the site is set up to login immediately upon registration
+    $this->open($this->sboxPath . "user/logout");
 
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent("_qf_Basic_refresh");
+    $this->openCiviPage("contact/search", "reset=1", "_qf_Basic_refresh");
     $this->type("sort_name", $emailId);
     $this->click("_qf_Basic_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
