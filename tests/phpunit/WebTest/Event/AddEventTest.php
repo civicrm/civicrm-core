@@ -296,6 +296,35 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->verifyElementNotPresent("css=div.paid_event-section");
   }
 
+  function testUnpaidPaid() {
+    $this->open($this->sboxPath);
+
+    // Log in using webtestLogin() method
+    $this->webtestLogin();
+
+    // Go directly to the URL of the screen that you will be testing (New Event).
+    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
+    $eventDescription = "Here is a description for this conference.";
+    $this->_testAddEventInfo($eventTitle, $eventDescription);
+
+    //add fee section with pay later checked
+    $this->_testAddFees(FALSE, FALSE, NULL, FALSE, TRUE);
+
+    //make the event unpaid
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
+    $this->assertChecked('is_pay_later');
+    $this->click("CIVICRM_QFID_0_is_monetary");
+    $this->click("_qf_Fee_upload-bottom");
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
+
+    //check if pay later option is disabled
+    $this->click('CIVICRM_QFID_1_is_monetary');
+    sleep(3);
+    $this->waitForElementPresent('is_pay_later');
+    $this->assertNotChecked('is_pay_later');
+  }
+
   function _testAddEventInfo($eventTitle, $eventDescription) {
     // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
     // button at the end of this page to show up, to make sure it's fully loaded.
@@ -323,6 +352,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->click("is_map");
     $this->click("is_public");
     $this->click("_qf_EventInfo_upload-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
   function _testAddEventInfoFromTemplate($eventTitle, $eventDescription, $templateID, $eventTypeID) {
@@ -378,14 +408,25 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Location' information has been saved.");
   }
 
-  function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro", $double = FALSE) {
+  function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro", $double = FALSE, $payLater = FALSE) {
     $discount1 = "Early-bird" . substr(sha1(rand()), 0, 7);
     $discount2 = "";
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->click("CIVICRM_QFID_1_is_monetary");
-    $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
+
+    if ($payLater) {
+      $this->check('is_pay_later');
+      $this->type('pay_later_receipt', 'testing later instructions');
+    }
+    else {
+      $this->uncheck('is_pay_later');
+    }
+
+    if ($processorName) {
+      $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
+    }
     $this->select("financial_type_id", "value=4");
     if ($priceSet) {
       // get one - TBD
@@ -431,7 +472,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     
     // Wait for "saved" status msg
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Fee' information has been saved.");
+    $this->assertElementContainsText("crm-notification-container", "'Fee' information has been saved");
     return array($discount1, $discount2);
   }
 
