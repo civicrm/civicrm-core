@@ -126,7 +126,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->assertType('numeric', $sid);
 
     $fields = array("National Membership $title", "Radio");
-    $this->open($this->sboxPath . "civicrm/admin/price/field?reset=1&action=add&sid={$sid}");
+    $this->openCiviPage('admin/price/field', "reset=1&action=add&sid={$sid}");
     
     $validateStrings[] = $fields[0];
     $this->type('label', $fields[0]);
@@ -168,7 +168,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Price Field '{$fields[0]}' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Price Field '{$fields[0]}' has been saved.");
  
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
@@ -199,9 +199,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   }
 
   function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
-    $this->open($this->sboxPath . 'civicrm/admin/price?reset=1&action=add');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Set_next-bottom');
+    $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
     $this->type('title', $setTitle);
@@ -224,7 +222,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_Field_next-bottom');
-    $this->assertTrue($this->isTextPresent("Your Set '{$setTitle}' has been added. You can add fields to this set now."));
+    $this->assertElementContainsText('crm-notification-container', "Your Set '{$setTitle}' has been added. You can add fields to this set now.");
   }
 
   function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
@@ -238,7 +236,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
     $memTypeId2     = $memTypeId2[1];
 
-    $this->open($this->sboxPath . "civicrm/admin/price/field?reset=1&action=add&sid={$sid}");
+    $this->openCiviPage('admin/price/field', "reset=1&action=add&sid={$sid}");
 
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
@@ -284,7 +282,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       $this->click('_qf_Field_next_new-bottom');
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->waitForElementPresent('_qf_Field_next-bottom');
-      $this->assertTrue($this->isTextPresent("Price Field '{$label}' has been saved."));
+      $this->assertElementContainsText('crm-notification-container', "Price Field '{$label}' has been saved.");
     }
     return array($memTypeTitle1, $memTypeTitle2);
   }
@@ -292,8 +290,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
-    $this->open($this->sboxPath . 'civicrm/admin/price?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/price', 'reset=1');
 
     // Use the price set id ($sid) to pick the correct row
     $this->click("css=tr#row_{$sid} a[title='Preview Price Set']");
@@ -307,23 +304,20 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   }
 
   function _testVerifyRegisterPage($contributionPageTitle) {
-    $this->open($this->sboxPath . 'civicrm/admin/contribute?reset=1');
-    $this->waitForElementPresent('_qf_SearchContribution_refresh');
+    $this->openCiviPage('admin/contribute', 'reset=1', '_qf_SearchContribution_refresh');
     $this->type('title', $contributionPageTitle);
     $this->click('_qf_SearchContribution_refresh');
     $this->waitForPageToLoad('50000');
     $id          = $this->getAttribute("//div[@id='configure_contribution_page']//div[@class='dataTables_wrapper']/table/tbody/tr@id");
     $id          = explode('_', $id);
-    $registerUrl = "civicrm/contribute/transact?reset=1&id=$id[1]";
+    $registerUrl = array('url' => 'contribute/transact', 'args' => "reset=1&id=$id[1]");
     return $registerUrl;
   }
 
   function _testSignUpOrRenewMembership($registerUrl, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('logout', 'reset=1');
 
-    $this->open($this->sboxPath . $registerUrl);
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+    $this->openCiviPage($registerUrl['url'], $registerUrl['args'], '_qf_Main_upload-bottom');
 
     //build the membership dates.
     require_once 'CRM/Core/Config.php';
@@ -385,14 +379,13 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/member/search?reset=1");
-    $this->waitForElementPresent("member_end_date_high");
+    $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
 
     $this->type("sort_name", "{$contactParams['first_name']} {$contactParams['last_name']}");
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("2 Results "));
+    $this->assertElementContainsText('crm-container', '2 Results');
 
     $this->waitForElementPresent("xpath=//div[@id='memberSearch']/table/tbody/tr");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[4][text()='{$memTypeTitle1}']/../td[11]/span/a[text()='View']");
@@ -434,8 +427,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   
   function _testMultilpeTermsMembershipRegistration($registerUrl, $contactParams, $memTypeTitle1, $term, $renew = FALSE){
     if($renew){
-      $this->open($this->sboxPath . "civicrm/member/search?reset=1");
-      $this->waitForElementPresent("member_end_date_high");
+      $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
       $this->type("sort_name", "{$contactParams['first_name']} {$contactParams['last_name']}");
       $this->click("_qf_Search_refresh");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -446,11 +438,9 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       $prevYear = substr($year, 0, 4);
     }
     
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('logout', 'reset=1');
 
-    $this->open($this->sboxPath . $registerUrl);
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+    $this->openCiviPage($registerUrl['url'], $registerUrl['args'], '_qf_Main_upload-bottom');
 
     //build the membership dates.
     require_once 'CRM/Core/Config.php';
@@ -514,14 +504,13 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/member/search?reset=1");
-    $this->waitForElementPresent("member_end_date_high");
+    $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
 
     $this->type("sort_name", "{$contactParams['first_name']} {$contactParams['last_name']}");
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("1 Result "));
+    $this->assertElementContainsText('crm-container', '1 Result ');
 
     $this->waitForElementPresent("xpath=//div[@id='memberSearch']/table/tbody/tr");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[4][text()='{$memTypeTitle1}']/../td[11]/span/a[text()='View']");
