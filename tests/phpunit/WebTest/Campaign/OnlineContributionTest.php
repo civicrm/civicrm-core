@@ -78,18 +78,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Enable CiviCampaign module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent("Changes Saved."));
-    }
+    $this->enableComponents(array('CiviCampaign'));
 
     // add the required Drupal permission
     $permissions = array(
@@ -100,11 +89,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->changePermissions($permissions);
 
     // Go directly to the URL of the screen that you will be testing
-    $this->open($this->sboxPath . "civicrm/campaign/add?reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Campaign_upload-bottom");
+    $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
 
     // Let's start filling the form with values.
     $campaignTitle = "Campaign $title";
@@ -131,7 +116,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Campaign Campaign $title has been saved."),
+    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
       "Status message didn't show up after saving campaign!"
     );
 
@@ -146,7 +131,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $paymentProcessorId = $this->webtestAddPaymentProcessor($processorName);
 
-    $this->open($this->sboxPath . "civicrm/admin/contribute/add?reset=1&action=add");
+    $this->openCiviPage("admin/contribute/add", "reset=1&action=add");
 
     $contributionTitle = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
@@ -169,7 +154,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
 
     //this contribution page for online contribution
     $this->check("payment_processor[{$paymentProcessorId}]");
-    $this->isTextPresent("Contribution Amounts section enabled");
+    $this->assertElementContainsText('crm-container', "Contribution Amounts section enabled");
     $this->type("label_1", "amount 1");
     $this->type("value_1", "100");
     $this->type("label_2", "amount 2");
@@ -269,13 +254,10 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
 
     //logout
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("logout", "reset=1");
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . $registerUrl);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
-
+    $this->openCiviPage($registerUrl['url'], $registerUrl['args']);
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
 
@@ -321,9 +303,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     //Find Contribution
-    $this->open($this->sboxPath . "civicrm/contribute/search?reset=1");
-
-    $this->waitForElementPresent("contribution_date_low");
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$firstName $lastName");
     $this->click("_qf_Search_refresh");
@@ -340,15 +320,13 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
   }
 
   function _testVerifyRegisterPage($contributionPageTitle) {
-    $this->open($this->sboxPath . "civicrm/admin/contribute?reset=1");
-    $this->waitForElementPresent("_qf_SearchContribution_refresh");
+    $this->openCiviPage("admin/contribute", "reset=1", "_qf_SearchContribution_refresh");
     $this->type('title', $contributionPageTitle);
     $this->click("_qf_SearchContribution_refresh");
     $this->waitForPageToLoad('50000');
     $id          = $this->getAttribute("//div[@id='configure_contribution_page']//table/tbody/tr/td/strong[text()='$contributionPageTitle']/../../td[5]/div/span/ul/li/a[text()='Title and Settings']@href");
     $id          = explode('id=', $id);
-    $registerUrl = "civicrm/contribute/transact?reset=1&id=$id[1]";
+    $registerUrl = array('url' => 'contribute/transact', 'args' => "reset=1&id=$id[1]");
     return $registerUrl;
   }
 }
-

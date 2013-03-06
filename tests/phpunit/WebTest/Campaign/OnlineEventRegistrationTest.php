@@ -78,29 +78,14 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Enable CiviCampaign module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent("Your changes have been saved."));
-    }
+    $this->enableComponents(array('CiviCampaign'));
 
     // add the required Drupal permission
     $permissions = array('edit-2-administer-civicampaign', 'edit-1-register-for-events');
     $this->changePermissions($permissions);
 
     // Go directly to the URL of the screen that you will be testing
-    $this->open($this->sboxPath . "civicrm/campaign/add?reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Campaign_upload-bottom");
+    $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
 
     // Let's start filling the form with values.
     $campaignTitle = "Campaign $title";
@@ -127,13 +112,13 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Campaign Campaign $title has been saved."),
+    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
       "Status message didn't show up after saving campaign!"
     );
 
     $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    
+
     $this->onlineParticipantAddTest($campaignTitle, $id);
   }
 
@@ -143,7 +128,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $paymentProcessorId = $this->webtestAddPaymentProcessor($processorName);
 
     // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -167,7 +152,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
 
     $numberRegistrations = 3;
     $anonymous = TRUE;
-    
+
     $this->_testOnlineRegistration($campaignTitle, $registerUrl, $numberRegistrations, $anonymous);
   }
 
@@ -280,7 +265,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings) {
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage("event/manage", "reset=1");
     $this->click("link=$eventTitle");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -301,8 +286,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
 
   function _testOnlineRegistration($campaignTitle, $registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
-      $this->open($this->sboxPath . "civicrm/logout?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("logout", "reset=1");
     }
     $this->open($registerUrl);
 
@@ -347,14 +331,13 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
 
     $this->open($this->sboxPath);
     $this->webtestLogin();
-    $this->open($this->sboxPath . 'civicrm/event/search?reset=1');
-    $this->waitForElementPresent("_qf_Search_refresh");
+    $this->openCiviPage('event/search', 'reset=1', '_qf_Search_refresh');
 
     $this->type('sort_name', $email);
     $this->click("_qf_Search_refresh");
     $this->waitForElementPresent("_qf_Search_next_print");
     $this->click("xpath=//div[@id='participantSearch']/table/tbody/tr/td[11]/span/a[text()='Edit']");
     $this->waitForElementPresent("_qf_Participant_cancel-bottom");
-    $this->assertTrue($this->isTextPresent("$campaignTitle"));
+    $this->assertElementContainsText('crm-container', "$campaignTitle");
   }
 }
