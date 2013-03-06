@@ -84,7 +84,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
 
     //go to block listing to enable Upcomming Events Block
     // you need to be admin user for below operation
-    $this->openCiviPage("logout", "reset=1");
+    $this->openCiviPage("logout", "reset=1", NULL);
     $this->webtestLogin(TRUE);
 
     $this->open($this->sboxPath . 'admin/structure/block/manage/civicrm/6/configure');
