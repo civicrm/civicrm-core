@@ -42,18 +42,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->webtestLogin(TRUE);
 
     // Enable CiviCampaign module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent("Your changes have been saved."));
-    }
+    $this->enableComponents(array('CiviCampaign'));
 
     // add the required Drupal permission
     $permissions = array('edit-2-administer-civicampaign');
@@ -79,11 +68,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go directly to the URL of the screen that you will be testing
-    $this->open($this->sboxPath . "civicrm/campaign/add?reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Campaign_upload-bottom");
+    $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
     // Let's start filling the form with values.
 
@@ -111,7 +96,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Campaign Campaign $title has been saved."),
+    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
       "Status message didn't show up after saving campaign!"
     );
 
@@ -132,8 +117,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
 
     // configure default mail-box
-    $this->open($this->sboxPath . "civicrm/admin/mailSettings?action=update&id=1&reset=1");
-    $this->waitForElementPresent('_qf_MailSettings_cancel-bottom');
+    $this->openCiviPage('admin/mailSettings', 'action=update&id=1&reset=1', '_qf_MailSettings_cancel-bottom');
     $this->type('name', 'Test Domain');
     $this->type('domain', 'example.com');
     $this->select('protocol', 'value=1');
@@ -141,8 +125,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go directly to Schedule and Send Mailing form
-    $this->open($this->sboxPath . "civicrm/mailing/send?reset=1");
-    $this->waitForElementPresent("_qf_Group_cancel");
+    $this->openCiviPage('mailing/send', 'reset=1', '_qf_Group_cancel');
 
     //-------select recipients----------
 
@@ -169,7 +152,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->assertChecked("open_tracking");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 2"));
+    $this->assertElementContainsText('crm-container', "Total Recipients: 2");
 
     // no need tracking for this test
 
@@ -197,7 +180,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->select("footer_id", "label=Mailing Footer");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 2"));
+    $this->assertElementContainsText('crm-container', "Total Recipients: 2");
 
     // click next with nominal content
     $this->click("_qf_Upload_upload");
@@ -221,7 +204,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     ////////
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 2"));
+    $this->assertElementContainsText('crm-container', "Total Recipients: 2");
 
     // click next
     $this->click("_qf_Test_next");
@@ -233,7 +216,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->assertChecked("now");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 2"));
+    $this->assertElementContainsText('crm-container', "Total Recipients: 2");
 
     // finally schedule the mail by clicking submit
     $this->click("_qf_Schedule_next");
@@ -242,8 +225,8 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     //----------end New Mailing-------------
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertTrue($this->isTextPresent("Scheduled and Sent Mailings"));
-    $this->assertTrue($this->isTextPresent("Mailing $mailingName Webtest"));
+    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
+    $this->assertElementContainsText('Search', "Mailing $mailingName Webtest");
 
     //--------- mail delivery verification---------
 
@@ -254,24 +237,23 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify undelivered status message
-    $this->assertTrue($this->isTextPresent("Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently."));
+    $this->assertElementContainsText('crm-container',"Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.");
 
     // do check for recipient group
-    $this->assertTrue($this->isTextPresent("Members of $groupName"));
+    $this->assertElementContainsText('crm-container', "Members of $groupName");
 
     // directly send schedule mailing -- not working right now
-    $this->open($this->sboxPath . "civicrm/mailing/queue?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('mailing/queue', 'reset=1');
 
     //click report link of created mailing
     $this->click("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // do check again for recipient group
-    $this->assertTrue($this->isTextPresent("Members of $groupName"));
+    $this->assertElementContainsText('crm-container', "Members of $groupName");
 
     // check for 100% delivery
-    $this->assertTrue($this->isTextPresent("2 (100.00%)"));
+    $this->assertElementContainsText('crm-container', "2 (100.00%)");
 
     // verify intended recipients
     $this->verifyText("xpath=//table//tr[td/a[text()='Intended Recipients']]/descendant::td[2]", preg_quote("2"));
@@ -296,10 +278,10 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // check for open page
-    $this->assertTrue($this->isTextPresent("Successful Deliveries"));
+    $this->assertElementContainsText('page-title', "Successful Deliveries");
 
     // verify email
-    $this->assertTrue($this->isTextPresent("mailino$firstName@mailson.co.in"));
+    $this->assertElementContainsText('mailing_event', "mailino$firstName@mailson.co.in");
     //------end delivery verification---------
   }
 }
