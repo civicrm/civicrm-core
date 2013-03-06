@@ -470,7 +470,7 @@ WHERE     cpse.price_set_id IS NULL";
       else {
         $options['membership'] = 1;
         $fieldParams['name'] = strtolower(CRM_Utils_String::munge("Contribution Amount", '_', 245));
-        $fieldParams['label'] = "Contribution Amount";
+        $fieldParams['label'] = ts('Contribution Amount');
         $defaultAmountColumn = 'default_amount_id';
         $options['otherAmount'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $addTo[2], 'is_allow_other_amount');
         if (CRM_Utils_Array::value('otherAmount', $options)) {
@@ -495,7 +495,7 @@ WHERE     cpse.price_set_id IS NULL";
         if ($dao->membership_types) {
           $fieldParams = array(
             'name'               => strtolower(CRM_Utils_String::munge("Membership Amount", '_', 245)),
-            'label'              => "Membership Amount",
+            'label'              => ts('Membership Amount'),
             'is_required'        => $dao->is_required,
             'is_display_amounts' => $dao->display_min_fee,
             'is_active'          => $dao->is_active,
@@ -531,7 +531,7 @@ WHERE     cpse.price_set_id IS NULL";
 
       $fieldParams = array(
         'name'               => strtolower(CRM_Utils_String::munge("Other Amount", '_', 245)),
-        'label'              => "Other Amount",
+        'label'              => ts('Other Amount'),
         'is_required'        => 0,
         'is_display_amounts' => 0,
         'is_active'          => 1,
@@ -539,7 +539,7 @@ WHERE     cpse.price_set_id IS NULL";
         'html_type'          => 'Text',
         'weight'             => 3,
       );
-      $fieldParams['option_label'][1]  = "Other Amount";
+      $fieldParams['option_label'][1]  = ts('Other Amount');
       $fieldParams['option_amount'][1] = 1;
       $fieldParams['option_weight'][1] = 1;
       $priceField = CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field::create($fieldParams);
@@ -621,7 +621,7 @@ WHERE     cpf.price_set_id = %1
         }
         else {
           $lineParams['price_field_id'] = CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $result->price_set_id, 'id', 'price_set_id');
-          $lineParams['label'] = 'Membership Amount';
+          $lineParams['label'] = ts('Membership Amount');
           $lineParams['qty'] = 1;
           $lineParams['unit_price'] = $lineParams['line_total'] = $result->total_amount;
           $lineParams['participant_count'] = 0;
@@ -661,7 +661,7 @@ WHERE     cpf.price_set_id = %1
           else {
             $lineParams['price_field_id'] =
               CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $result->price_set_id, 'id', 'price_set_id');
-            $lineParams['label'] = 'Contribution Amount';
+            $lineParams['label'] = ts('Contribution Amount');
           }
           $lineParams['qty'] = 1;
           $lineParams['participant_count'] = 0;
