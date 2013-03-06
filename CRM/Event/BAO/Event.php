@@ -2006,5 +2006,26 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     $defaults = array();
     return CRM_Event_BAO_Event::retrieve($params, $defaults);
   }
+
+  /*
+   * Update the Campaign Id of all the participants of the given event
+   *
+   * @params int $eventID event id.
+   * @params int $eventCampaignID campaign id of that event
+   *
+   */
+  static function updateParticipantCampaignID($eventID, $eventCampaignID) {
+    $params = array();
+    $params[1] = array($eventID, 'Integer');
+
+    if(empty($eventCampaignID)) {
+      $query = "UPDATE civicrm_participant SET campaign_id = NULL WHERE event_id = %1";
+    }
+    else {
+      $query = "UPDATE civicrm_participant SET campaign_id = %2 WHERE event_id = %1";
+      $params[2] = array($eventCampaignID, 'Integer');
+    }
+    CRM_Core_DAO::executeQuery($query, $params);
+  }
 }
 
