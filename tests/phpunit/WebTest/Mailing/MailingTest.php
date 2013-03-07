@@ -33,15 +33,13 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
   }
 
   function testAddMailing() {
-
     $this->open($this->sboxPath);
     $this->webtestLogin();
 
     //----do create test mailing group
 
     // Go directly to the URL of the screen that you will be testing (New Group).
-    $this->open($this->sboxPath . "civicrm/group/add?reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     // make group name
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
@@ -63,7 +61,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The Group '$groupName' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
 
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
@@ -83,9 +81,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_GroupContact_next");
 
     // configure default mail-box
-    $this->open($this->sboxPath . "civicrm/admin/mailSettings?action=update&id=1&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_MailSettings_cancel-bottom');
+    $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
     $this->type('name', 'Test Domain');
     $this->type('domain', 'example.com');
     $this->select('protocol', 'value=1');
@@ -93,8 +89,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go directly to Schedule and Send Mailing form
-    $this->open($this->sboxPath . "civicrm/mailing/send?reset=1");
-    $this->waitForElementPresent("_qf_Group_cancel");
+    $this->openCiviPage("mailing/send", "reset=1", "_qf_Group_cancel");
 
     //-------select recipients----------
 
@@ -117,14 +112,13 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertChecked("open_tracking");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // no need tracking for this test
 
     // click next with default settings
     $this->click("_qf_Settings_next");
     $this->waitForElementPresent("_qf_Upload_cancel");
-
 
     //--------Mailing content------------
     // let from email address be default
@@ -143,13 +137,12 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("//fieldset[@id='compose_id']/div[2]/div[1]");
     $this->type("text_message", "This is text formatted content for Mailing {$mailingName} Webtest.");
 
-
     // select default header and footer ( with label )
     $this->select("header_id", "label=Mailing Header");
     $this->select("footer_id", "label=Mailing Footer");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next with nominal content
     $this->click("_qf_Upload_upload");
@@ -173,7 +166,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     ////////
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next
     $this->click("_qf_Test_next");
@@ -185,7 +178,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertChecked("now");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // finally schedule the mail by clicking submit
     $this->click("_qf_Schedule_next");
@@ -194,12 +187,10 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     //----------end New Mailing-------------
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertTrue($this->isTextPresent("Scheduled and Sent Mailings"));
-    $this->assertTrue($this->isTextPresent("Mailing $mailingName Webtest"));
-
+    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
+    $this->assertElementContainsText("xpath=//table[@class='selector']/tbody//tr//td", "Mailing $mailingName Webtest");
 
     //--------- mail delivery verification---------
-
     // test undelivered report
 
     // click report link of created mailing
@@ -207,24 +198,20 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify undelivered status message
-    $this->assertTrue($this->isTextPresent("Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently."));
+    $this->assertElementContainsText('css=.messages', "Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.");
 
     // do check for recipient group
-    $this->assertTrue($this->isTextPresent("Members of $groupName"));
+    $this->assertElementContainsText("xpath=//fieldset/legend[text()='Recipients']/../table/tbody//tr/td", "Members of $groupName");
 
     // directly send schedule mailing -- not working right now
-    $this->open($this->sboxPath . "civicrm/mailing/queue?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
     $this->click("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // do check again for recipient group
-    $this->assertTrue($this->isTextPresent("Members of $groupName"));
-
-    // check for 100% delivery
-    $this->assertTrue($this->isTextPresent("1 (100.00%)"));
+    $this->assertElementContainsText("xpath=//fieldset/legend[text()='Recipients']/../table/tbody//tr/td", "Members of $groupName");
 
     // verify intended recipients
     $this->verifyText("xpath=//table//tr[td/a[text()='Intended Recipients']]/descendant::td[2]", preg_quote("1"));
@@ -247,10 +234,10 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // check for open page
-    $this->assertTrue($this->isTextPresent("Successful Deliveries"));
+    $this->assertElementContainsText( 'page-title', "Successful Deliveries");
 
     // verify email
-    $this->assertTrue($this->isTextPresent("mailino$firstName@mailson.co.in"));
+    $this->verifyText("xpath=//table[@id='mailing_event']/tbody//tr/td[2]", preg_quote("mailino$firstName@mailson.co.in"));
 
     require_once 'CRM/Mailing/Event/DAO/Queue.php';
     $eventQueue = new CRM_Mailing_Event_DAO_Queue();
@@ -262,9 +249,8 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->open($this->sboxPath . "civicrm/logout?reset=1");
 
     // build forward url
-    $forwardUrl = "civicrm/mailing/forward?reset=1&jid={$eventQueue->job_id}&qid={$eventQueue->id}&h={$eventQueue->hash}";
-    $this->open($this->sboxPath . $forwardUrl);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $forwardUrl = array("mailing/forward", "reset=1&jid={$eventQueue->job_id}&qid={$eventQueue->id}&h={$eventQueue->hash}");
+    $this->openCiviPage($forwardUrl[0], $forwardUrl[1]);
 
     $this->type("email_0", substr(sha1(rand()), 0, 7) . '@example.com');
     $this->type("email_1", substr(sha1(rand()), 0, 7) . '@example.com');
@@ -274,13 +260,13 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     $this->click("_qf_ForwardMailing_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->assertElementContainsText('css=div.messages', 'Mailing is forwarded successfully to 2 email addresses');
 
-    $this->assertTrue($this->isTextPresent('Mailing is forwarded successfully to 2 email addresses'));
     $this->open($this->sboxPath);
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/mailing/browse/scheduled?reset=1&scheduled=true");
+    $this->openCiviPage("mailing/browse/scheduled", "reset=1&scheduled=true");
 
     //click report link of created mailing
     $this->click("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
@@ -331,8 +317,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Go directly to the URL of the screen that you will be testing (New Group).
-    $this->open($this->sboxPath . "civicrm/group/add?reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     // make group name
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
@@ -354,7 +339,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The Group '$groupName' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
 
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
@@ -374,9 +359,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_GroupContact_next");
 
     // configure default mail-box
-    $this->open($this->sboxPath . "civicrm/admin/mailSettings?action=update&id=1&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_MailSettings_cancel-bottom');
+    $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
     $this->type('name', 'Test Domain');
     $this->type('domain', 'example.com');
     $this->select('protocol', 'value=1');
@@ -408,7 +391,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertChecked("open_tracking");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next with default settings
     $this->click("_qf_Settings_next");
@@ -433,14 +416,14 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->select("footer_id", "label=Mailing Footer");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next with nominal content
     $this->click("_qf_Upload_upload");
     $this->waitForElementPresent("_qf_Test_cancel");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next
     $this->click("_qf_Test_next");
@@ -452,7 +435,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertChecked("now");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // finally schedule the mail by clicking submit
     $this->click("_qf_Schedule_next");
@@ -461,23 +444,22 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     //----------end New Mailing-------------
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertTrue($this->isTextPresent("Scheduled and Sent Mailings"));
-    $this->assertTrue($this->isTextPresent("Mailing $mailingName Webtest"));
+    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
+    $this->assertElementContainsText("xpath=//table[@class='selector']/tbody//tr//td", "Mailing $mailingName Webtest");
 
     // directly send schedule mailing -- not working right now
-    $this->open($this->sboxPath . "civicrm/mailing/queue?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
     $this->click("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-   
+
     $mailingReportUrl = $this->getLocation();
     // do check again for recipient group
-    $this->assertTrue($this->isTextPresent("Members of $groupName"));
+    $this->assertElementContainsText("xpath=//fieldset/legend[text()='Recipients']/../table/tbody//tr/td", "Members of $groupName");
 
-    // check for 100% delivery
-    $this->assertTrue($this->isTextPresent("1 (100.00%)"));
+    // verify successful deliveries
+    $this->verifyText("xpath=//table//tr[td/a[text()='Successful Deliveries']]/descendant::td[2]", preg_quote("1 (100.00%)"));
 
     $summaryInfoLinks = array('Intended Recipients', 'Successful Deliveries', 'Tracked Opens', 'Click-throughs', 'Forwards', 'Replies', 'Bounces', 'Unsubscribe Requests','Opt-out Requests');
     
@@ -490,12 +472,12 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//table//tr[td[1]/text()='Mailing Name']/descendant::td[2]", preg_quote("Mailing $mailingName Webtest"));
 
     // verify mailing subject
-    $this->verifyText("xpath=//table//tr[td[1]/text()='Subject']/descendant::td[2]", preg_quote("Test subject $mailingName for Webtest"));    
+    $this->verifyText("xpath=//table//tr[td[1]/text()='Subject']/descendant::td[2]", preg_quote("Test subject $mailingName for Webtest"));
 
-    // after asserts do clicks and confirm filters 
-    $criteriaCheck = 
+    // after asserts do clicks and confirm filters
+    $criteriaCheck =
       array(
-        'Intended Recipients' => 
+        'Intended Recipients' =>
         array(
           'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest"),
           'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest")
@@ -503,7 +485,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
         'Successful Deliveries' =>
         array(
           'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                            "Delivery Status" => " Successful"),
+                    "Delivery Status" => " Successful"),
           'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing Delivery -' => "Successful")
         ),
         'Tracked Opens' =>
@@ -519,13 +501,13 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
         'Forwards' =>
         array(
           'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                            'Forwarded' => 'Is equal to Yes'),
+                    'Forwarded' => 'Is equal to Yes'),
           'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: -' => "Forwards")
         ),
         'Replies' =>
         array(
           'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                            'Replied' => 'Is equal to Yes'),
+                    'Replied' => 'Is equal to Yes'),
           'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: Trackable Replies -' => "Replied")
         ),
         'Bounces' =>
@@ -536,19 +518,19 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
         'Unsubscribe Requests' =>
         array(
           'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                            'Unsubscribed' => 'Is equal to Yes'),
+                    'Unsubscribed' => 'Is equal to Yes'),
           'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: -' => "Unsubscribe Requests")
         ),
         'Opt-out Requests' =>
         array(
           'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                            'Opted-out' => 'Is equal to Yes'),
+                    'Opted-out' => 'Is equal to Yes'),
           'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: -' => "Opt-out Requests")
         ),
       );
     $this->criteriaCheck($criteriaCheck, $mailingReportUrl);
   }
-  
+
   function criteriaCheck($criteriaCheck, $mailingReportUrl) {
     foreach($criteriaCheck as $key => $infoFilter) {
       foreach($infoFilter as $entity => $dataToCheck) {
@@ -563,17 +545,17 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
       }
     }
   }
-  
+
   function _verifyCriteria($summaryInfo, $dataToCheck, $entity) {
     foreach($dataToCheck as $key => $value) {
       if ($entity == 'report') {
         if ($key == 'report_name') {
-          $this->assertTrue($this->isTextPresent("{$value}"));
+          $this->assertElementContainsText('page-title', "{$value}");
           continue;
         }
         $this->assertTrue($this->isElementPresent("xpath=//form//div[3]/table/tbody//tr/th[contains(text(),'{$key}')]/../td[contains(text(),'{$value}')]"),"Criteria check for {$key} failed for Report for {$summaryInfo}");
       } else {
-        $this->assertTrue($this->isTextPresent("Advanced Search"));
+        $this->assertElementContainsText('page-title', "Advanced Search");
         $assertedValue = $this->isElementPresent("xpath=//div[@class='crm-results-block']//div[@class='qill'][contains(text(),'{$key} {$value}')]");
         if (!$assertedValue) {
           $assertedValue = $this->isTextPresent("{$key} {$value}");
@@ -581,5 +563,5 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
        $this->assertTrue($assertedValue,"Criteria check for {$key} failed for Advance Search for {$summaryInfo}");
       }
     }
-  } 
+  }
 }
