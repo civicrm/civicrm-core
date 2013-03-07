@@ -85,8 +85,13 @@ class CRM_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     $this->_dataSourceIsValid = FALSE;
-    $this->_dataSource = CRM_Utils_Request::retrieve('dataSource', 'String',
-      CRM_Core_DAO::$_nullObject
+    $this->_dataSource = CRM_Utils_Request::retrieve(
+      'dataSource',
+      'String',
+      CRM_Core_DAO::$_nullObject,
+      FALSE,
+      NULL,
+      'GET'
     );
 
     $this->_params = $this->controller->exportValues($this->_name);
