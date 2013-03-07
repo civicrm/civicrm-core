@@ -402,8 +402,11 @@ class CRM_Contact_Form_Task_EmailCommon {
       CRM_Core_Session::setStatus(ts('One message was sent successfully.', array('plural' => '%count messages were sent successfully.', 'count' => $count_success)), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
     }
 
-    //Display the name and number of contacts for those email is not sent.
-    $emailsNotSent = array_diff_assoc($form->_allContactDetails, $form->_contactDetails);
+    // Display the name and number of contacts for those email is not sent.
+    // php 5.4 throws out a notice since the values of these below arrays are arrays.
+    // the behavior is not documented in the php manual, but it does the right thing
+    // suppressing the notices to get things in good shape going forward
+    $emailsNotSent = @array_diff_assoc($form->_allContactDetails, $form->_contactDetails);
 
     if ($emailsNotSent) {
       $not_sent = array();
