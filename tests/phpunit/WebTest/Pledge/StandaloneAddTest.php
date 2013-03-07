@@ -41,11 +41,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Go directly to the URL of the screen that you will be testing (New Pledge-standalone).
-    $this->open($this->sboxPath . 'civicrm/pledge/add?reset=1&context=standalone');
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent('_qf_Pledge_upload');
+    $this->openCiviPage('pledge/add', 'reset=1&context=standalone', '_qf_Pledge_upload');
 
     // create new contact using dialog
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
@@ -84,7 +80,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_Pledge_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent('Pledge has been recorded and the payment schedule has been created.'));
+    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     // verify if Pledge is created
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");

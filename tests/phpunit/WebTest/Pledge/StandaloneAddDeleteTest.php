@@ -41,11 +41,7 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Go directly to the URL of the screen that you will be testing (New Pledge-standalone).
-    $this->open($this->sboxPath . 'civicrm/pledge/add?reset=1&context=standalone');
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent('_qf_Pledge_upload');
+    $this->openCiviPage('pledge/add', 'reset=1&context=standalone', '_qf_Pledge_upload');
 
     // create new contact using dialog
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
@@ -61,7 +57,7 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click('_qf_Pledge_upload-bottom');
     $this->waitForPageToLoad("30000");
 
-    $this->assertTrue($this->isTextPresent('Pledge has been recorded and the payment schedule has been created.'));
+    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     // verify if Pledge is created
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
@@ -92,8 +88,8 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->type('total_amount', '300.00');
     $this->click('_qf_Contribution_upload-bottom'); 
-    $this->waitForPageToLoad("30000"); 
-    $this->assertTrue($this->isTextPresent("The contribution record has been saved."));
+    $this->waitForPageToLoad("30000");
+    $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved.");
    
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
@@ -103,8 +99,8 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->type('total_amount', '250.00');
     $this->click('_qf_Contribution_upload-bottom');
-    $this->waitForPageToLoad("30000"); 
-    $this->assertTrue($this->isTextPresent("The contribution record has been saved."));
+    $this->waitForPageToLoad("30000");
+    $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved.");
     
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
@@ -114,8 +110,8 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a"); 
     $this->type('total_amount', '170.00');
     $this->click('_qf_Contribution_upload-bottom');
-    $this->waitForPageToLoad("30000"); 
-    $this->assertTrue($this->isTextPresent("The contribution record has been saved."));
+    $this->waitForPageToLoad("30000");
+    $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved.");
     
     // delete the contribution associated with the 2nd payment
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
