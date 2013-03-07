@@ -567,7 +567,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $elements[]  = &$this->createElement('radio', NULL, '', ts('Include my name and message'), 0, $extraOption);
       $elements[]  = &$this->createElement('radio', NULL, '', ts('List my contribution anonymously'), 1, $extraOption);
       $this->addGroup($elements, 'pcp_is_anonymous', NULL, '&nbsp;&nbsp;&nbsp;');
-      $this->_defaults['pcp_is_anonymous'] = 0;  
+      $this->_defaults['pcp_is_anonymous'] = 0;
 
       $this->add('text', 'pcp_roll_nickname', ts('Name'), array('maxlength' => 30));
       $this->add('textarea', 'pcp_personal_note', ts('Personal Note'), array('style' => 'height: 3em; width: 40em;'));
@@ -1169,7 +1169,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     return empty($errors) ? TRUE : $errors;
   }
 
-  public function computeAmount(&$params, &$form) {
+  public static function computeAmount(&$params, &$form) {
     $amount = NULL;
 
     // first clean up the other amount field if present
@@ -1309,7 +1309,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config');
       if ($is_quick_config) {
         foreach ($this->_priceSet['fields'] as $fieldKey => $fieldVal) {
-          if ($fieldVal['name'] == 'membership_amount') {
+          if ($fieldVal['name'] == 'membership_amount' && CRM_Utils_Array::value('price_' . $fieldId, $params)) {
             $fieldId     = $fieldVal['id'];
             $fieldOption = $params['price_' . $fieldId];
             $memPresent  = TRUE;
@@ -1320,7 +1320,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               if ($fieldVal['name'] == 'other_amount') {
                 $proceFieldAmount = $this->_submitValues['price_' . $fieldId];
               }
-              else $proceFieldAmount = $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
+              else {
+                $proceFieldAmount = $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
+              }
               unset($params['price_' . $fieldId]);
               break;
             }
@@ -1422,6 +1424,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // should we skip the confirm page?
     if (!CRM_Utils_Array::value('is_confirm_enabled', $this->_values)) {
+      // call the post process hook for the main page before we switch to confirm
+      $this->postProcessHook();
+
       // build the confirm page
       $confirmForm = &$this->controller->_pages['Confirm'];
       $confirmForm->preProcess();
@@ -1432,7 +1437,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $data['valid']['Confirm'] = 1;
 
       // confirm the contribution
-      $confirmForm->postProcess();
+      // mainProcess calls the hook also
+      $confirmForm->mainProcess();
       $qfKey = $this->controller->_key;
 
       // redirect to thank you page

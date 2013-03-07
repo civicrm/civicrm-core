@@ -56,9 +56,8 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     // Add membership for this individual
     $this->_addMembership($memTypeParams);
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("membership for $firstName1 $lastName has been added."),
-      "Status message didn't show up after saving!"
-    );
+    $this->assertElementContainsText('crm-notification-container', "membership for $firstName1 $lastName has been added.",
+      "Status message didn't show up after saving!");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -70,11 +69,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
       'Status' => 'New',
       'End date' => $endDate,
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
 
     // Add new individual using Quick Add block on the main page
     $firstName2 = "John_" . substr(sha1(rand()), 0, 7);
@@ -85,9 +80,9 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     // Add membership for this individual
     $this->_addMembership($memTypeParams);
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("membership for $firstName2 $lastName has been added."),
-      "Status message didn't show up after saving!"
-    );
+
+    $this->assertElementContainsText('crm-notification-container', "membership for $firstName2 $lastName has been added.",
+      "Status message didn't show up after saving!");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -99,18 +94,15 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
       'Status' => 'New',
       'End date' => $endDate,
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
+
     $profileTitle = 'Profile_' . substr(sha1(rand()), 0, 4);
     $customDataParams = $this->_addCustomData();
     $this->_addProfile($profileTitle, $customDataParams);
 
     // Find Members
-    $this->open($this->sboxPath . "civicrm/member/search?reset=1");
-    $this->waitForElementPresent('_qf_Search_refresh');
+    $this->openCiviPage("member/search", "reset=1", '_qf_Search_refresh');
+
     $this->type('sort_name', $lastName);
     $this->click('_qf_Search_refresh');
     $this->waitForElementPresent('_qf_Search_next_print');
@@ -147,11 +139,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
       'Status' => 'Current',
       'End date' => $endDate,
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
 
     $this->click('_qf_MembershipView_cancel-bottom');
     $this->waitForElementPresent('_qf_Search_next_print');
@@ -166,11 +154,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
       'Status' => 'Grace',
       'End date' => $endDate,
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
   }
 
   function _addMembership($memTypeParams) {
@@ -206,18 +190,16 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
   function _addProfile($profileTitle, $customDataParams) {
     // Go directly to the URL of the screen that you will be testing (New Profile).
-    $this->open($this->sboxPath . "civicrm/admin/uf/group?reset=1");
+    $this->openCiviPage("admin/uf/group", "reset=1");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('link=Add Profile');
-
     // Add membership custom data field to profile
     $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
     $this->click('_qf_Group_next-bottom');
 
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now."));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     $this->select('field_name[0]', "value=Membership");
     $this->select('field_name[1]', "label={$customDataParams[0]} :: {$customDataParams[1]}");
@@ -227,7 +209,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     // Clicking save and new
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile Field '{$customDataParams[0]}' has been saved to '{$profileTitle}'."));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field '{$customDataParams[0]}' has been saved to '{$profileTitle}'.");
 
     // Add membership status field to profile - CRM-8618
     $this->select('field_name[0]', "value=Membership");
@@ -237,7 +219,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     // Clicking save
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile Field 'Membership Status' has been saved to '{$profileTitle}'."));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Membership Status' has been saved to '{$profileTitle}'.");
   }
 
   function _addCustomData() {
@@ -261,7 +243,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     $textFieldLabel = 'Custom Field Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $textFieldLabel);
@@ -280,9 +262,8 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$textFieldLabel' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$textFieldLabel' has been saved.");
 
     return array($textFieldLabel, $customGroupTitle);
   }
 }
-

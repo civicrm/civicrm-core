@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 3.3                                                |
+ | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2010                                |
  +--------------------------------------------------------------------+
@@ -72,7 +72,7 @@
 {/htxt}
 {htxt id="id-allow_same_email"}
 <p>{ts}Check this box to allow a user to register multiple participants using the same email address. If you want additional participants to be registered <strong>without requiring an email address to be entered for each person</strong> - check the "Register multiple participants" option, AND include a profile in this registration form which <strong>includes First Name and Last Name fields</strong>.{/ts}</p>
-<p>{ts}You will also need to update the default strict duplicate contact matching rule for Individuals to include First Name and Last Name fields (Contacts &raquo; Find and Merge Duplicate Contacts).{/ts}</p>
+<p>{ts}You will also need to set the default supervised duplicate contact matching rule for Individuals to one that includes First Name and Last Name fields (Contacts &raquo; Find and Merge Duplicate Contacts).{/ts}</p>
 {/htxt}
 
 {htxt id="id-requires_approval-title"}

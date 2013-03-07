@@ -33,7 +33,9 @@
  *
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
-  CONST NUM_ROWS_TO_INSERT = 100;
+  CONST
+    NUM_ROWS_TO_INSERT = 100;
+
   function getInfo() {
     return array('title' => ts('Comma-Separated Values (CSV)'));
   }

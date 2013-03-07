@@ -42,8 +42,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //jump directly to relationship type selector.
-    $this->open($this->sboxPath . 'civicrm/admin/reltype?reset=1&action=browse');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/reltype', 'reset=1&action=browse');
 
     //load the form to add new relationship type.
     $this->click('link=Add Relationship Type');
@@ -63,7 +62,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //does data saved.
-    $this->assertTrue($this->isTextPresent('The Relationship Type has been saved.'),
+    $this->assertElementContainsText('crm-notification-container', 'The Relationship Type has been saved.',
       "Status message didn't show up after saving!"
     );
 
@@ -75,7 +74,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
       'Contact Type B' => 'Individual',
     );
     foreach ($data as $param => $val) {
-      $this->assertTrue($this->isTextPresent($val), "Could not able to save $param");
+      $this->assertElementContainsText('option11', $val, "Could not able to save $param");
     }
   }
 
@@ -89,8 +88,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //jump directly to relationship type selector.
-    $this->open($this->sboxPath . 'civicrm/admin/reltype?reset=1&action=browse');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/reltype', 'reset=1&action=browse');
 
     //validate form rules.
     $this->click('link=Add Relationship Type');
@@ -103,7 +101,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_RelationshipType_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent('Relationship Label-A to B is a required field.'),
+    $this->assertElementContainsText('crm-notification-container', 'Relationship Label-A to B is a required field.',
       'Required form rule for Label A - B seems to be broken.'
     );
 
@@ -118,16 +116,16 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_RelationshipType_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->open($this->sboxPath . 'civicrm/admin/reltype?reset=1&action=browse');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/reltype', 'reset=1&action=browse');
     $this->click('link=Add Relationship Type');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->type('label_a_b', $labelAB);
     $this->type('label_b_a', $labelBA);
     $this->click('_qf_RelationshipType_next-bottom');
+
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent('Label already exists in Database.'),
+    $this->assertElementContainsText('crm-notification-container', 'Label already exists in Database.',
       'Unique relationship type label form rule seems to be broken.'
     );
   }

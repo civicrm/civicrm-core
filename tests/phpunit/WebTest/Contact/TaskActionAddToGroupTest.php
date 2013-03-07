@@ -34,7 +34,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
   function testAddContactsToGroup() {
 
-    // Create a new group with a random name; included test provides login
+    $this->webtestLogin();
     $newGroupName = 'Group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($newGroupName);
 
@@ -81,8 +81,8 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check status messages are as expected
-    $this->assertTrue($this->isTextPresent("Added Contacts to {$newGroupName}"));
-    $this->assertTrue($this->isTextPresent("2 contacts added to group "));
+    $this->assertElementContainsText('crm-notification-container', "Added Contacts to {$newGroupName}");
+    $this->assertElementContainsText('crm-notification-container', "2 contacts added to group");
 
     // Search by group membership in newly created group
     $this->openCiviPage('contact/search/advanced', 'reset=1');
@@ -103,6 +103,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
   }
 
   function testMultiplePageContactSearchAddContactsToGroup() {
+    $this->webtestLogin();
     $newGroupName = 'Group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($newGroupName);
 
@@ -127,8 +128,8 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check status messages are as expected
-    $this->assertTrue($this->isTextPresent("Added Contacts to {$newGroupName}"));
-    $this->assertTrue($this->isTextPresent("50 contacts added to group"));
+    $this->assertElementContainsText('crm-notification-container', "Added Contacts to {$newGroupName}");
+    $this->assertElementContainsText('crm-notification-container', "50 contacts added to group");
 
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->select("crmasmSelect1", "label=" . $newGroupName);

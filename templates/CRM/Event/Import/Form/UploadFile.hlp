@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 3.3                                                |
+ | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2010                                |
  +--------------------------------------------------------------------+
@@ -40,7 +40,7 @@
 <h1>{ts}Matching Participant Data to Contacts{/ts}</h1>
     <p>{ts}Participant import files must contain data needed to <strong>match the participant to a contact record in your CiviCRM database</strong>. This 'matching' can be handled in several different ways:{/ts}</p>
     <ul>
-    <li>{ts}Include the data fields used for contact 'matching' based on your configured <strong>Strict Duplicate Matching</strong> rules. For the default duplicate matching rules, you would include a column in each row with the contributors' Email Address.{/ts}</li>
+    <li>{ts}Include the data fields used for contact 'matching' based on your configured <strong>Unsupervised Duplicate Matching</strong> rules. For the default duplicate matching rules, you would include a column in each row with the contributors' Email Address.{/ts}</li>
     <li>{ts}If you've stored a unique <strong>External Identifier</strong> for each contact in CiviCRM, you can include that value as a column in your import file. Participant data will then be matched to contact records using their External ID. Please note that you must use an "On Duplicate Entries" setting of "Skip" or "No Duplicate Checking" to be able to upload using the External ID field.{/ts}</li>
     <li>{ts}You can include a column with each contact's <strong>Internal Contact ID</strong>. This is the unique ID assigned by CiviCRM which is displayed at the bottom of the Contact Summary screen - and can be exported.{/ts}</li>
     </ul>

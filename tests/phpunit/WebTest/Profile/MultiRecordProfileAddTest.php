@@ -95,8 +95,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $params = $this->_testCustomAdd($checkSearchable);
     // Go directly to the URL of the screen that you will be
     // testing (Add new profile ).
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/uf/group', 'reset=1');
 
     $this->click('newCiviCRMProfile-top');
     $this->waitForElementPresent('_qf_Group_next-bottom');
@@ -140,7 +139,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '$profileTitle' has been added. You can add fields to this profile now"));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     //Add field to profile
     $this->waitForElementPresent('field_name[0]');
@@ -221,6 +220,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $recordNew = $this->_addRecords('Create');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $elements = $this->parseURL( );
+
     $gid = $elements['queryString']['gid'];
     $id = $elements['queryString']['id'];
 
@@ -242,9 +242,9 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->click('edit-submit');
       $this->waitForPageToLoad($this->getTimeoutMsec());
     }
-    $this->open($this->sboxPath . 'civicrm/profile/edit?reset=1&id='.$id.'&gid='.$gid);
+    $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid");
     if (!$checkMultiRecord) {
-      $this->assertTrue($this->isTextPresent('No multi-record entries found'));
+      $this->assertElementContainsText('crm-container', 'No multi-record entries found');
       return;
     }
     $this->waitForElementPresent("//div[@id='crm-profile-block']/a");
@@ -253,8 +253,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->verifyText("//div[@id='browseValues']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
     $this->verifyText("//div[@id='browseValues']/div/div/table/tbody/tr[2]/td[1]", preg_quote($record1['text']));
-    $this->open($this->sboxPath . 'civicrm/profile/edit?reset=1&id='.$id.'&gid='.$gid);
-    $this->waitForElementPresent("//div[@id='crm-profile-block']/a");
+    $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid", "//div[@id='crm-profile-block']/a");
     $this->click("//div[@id='crm-profile-block']/a");
     $record2 = $this->_addRecords();
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -277,15 +276,15 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='Delete']");
     $this->waitForElementPresent("//html/body/div[5]");
     sleep(3);
-    $this->assertTrue($this->isTextPresent('Are you sure you want to delete this record?'));
+    $this->assertElementContainsText('profile-dialog', 'Are you sure you want to delete this record?');
     $this->click('_qf_Edit_upload_delete');
 
     // Check the view functionality
     sleep(3);
     $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='View']");
     $this->waitForElementPresent("//html/body/div[5]");
-    $this->assertTrue($this->isTextPresent('View '.$params['customGroupTitle']));
-    $this->assertTrue($this->isTextPresent($params['textFieldLabel']));
+    $this->assertElementContainsText('ui-id-1', 'View '.$params['customGroupTitle']);
+    $this->assertElementContainsText('crm-container', $params['textFieldLabel']);
     if ($checkSearchable) {
       $this->verifyElementNotPresent("//div[@id='profile-dialog']/div/div/div/div[1]/div[2]/a");
       return;
@@ -296,8 +295,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->click("//div[@id='profile-dialog']/div/div/div/div/div[2]/a");
       $this->waitForElementPresent("//form[@id='Search']");
       $this->verifyText("//form[@id='Search']/div[3]/div[2]/table/tbody/tr[2]/td[2]", preg_quote($recordNew['firstname']));
-      $this->open($this->sboxPath . 'civicrm/profile/view?reset=1&id='.$id.'&gid='.$gid);
-      $this->waitForElementPresent("//div[@id='row-first_name']/div[2]/a");
+      $this->openCiviPage('profile/view', "reset=1&id=$id&gid=$gid", "//div[@id='row-first_name']/div[2]/a");
       $this->click("//div[@id='row-first_name']/div[2]/a");
       $this->waitForElementPresent("//form[@id='Search']");
       // Check that Email column is not present in selector results
@@ -310,10 +308,9 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
   function _testCustomAdd($checkSearchable) {
     // Go directly to the URL of the screen that you will be testing (Custom data for contacts).
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");
+    $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
     // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
     // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //fill custom group title
     $params['customGroupTitle'] = 'custom_group' . substr(sha1(rand()), 0, 3);
@@ -331,7 +328,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent($params['customGroupTitle']));
+    $this->assertElementContainsText('crm-container', $params['customGroupTitle']);
     //add custom field - alphanumeric text
     $params['textFieldLabel'] = 'test_text_field' . substr(sha1(rand()), 0, 3);
     $this->click("header");
@@ -373,7 +370,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent($params['selectFieldLabel']));
+    $this->assertElementContainsText('crm-container', $params['selectFieldLabel']);
     return $params;
   }
 
@@ -389,8 +386,8 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $params['email'] =  $params['firstname'].$params['lastname'].'@exa.com';
       $this->type('email-Primary', $params['email']);
     }
-    $this->waitForElementPresent("//div[@id='crm-profile-block']/div/div[3]/div[2]/select");
-    $this->select("//div[@id='crm-profile-block']/div/div[3]/div[2]/select",'value=1');
+    $this->waitForElementPresent("//div[@id='crm-profile-block']/div//div/div[2]/select");
+    $this->select("//div[@id='crm-profile-block']/div//div/div[2]/select",'value=1');
     $this->click('_qf_Edit_next');
     return $params;
   }

@@ -61,6 +61,8 @@ class CRM_Utils_PDF_Label extends TCPDF {
   public $width;
   // Height of label
   public $height;
+  // Line Height of label - used in event code
+  public $lineHeight = 0;
   // Space between text and left edge of label
   public $paddingLeft;
   // Space between text and top edge of label
@@ -124,7 +126,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
       $value = $this->format[$name];
       $metric = $this->format['metric'];
     }
-    else {      
+    else {
       $value = CRM_Utils_Array::value($name, $this->defaults);
       $metric = $this->defaults['metric'];
     }

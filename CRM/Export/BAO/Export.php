@@ -76,7 +76,7 @@ class CRM_Export_BAO_Export {
     $queryOperator = 'AND'
   ) {
     $headerRows = $returnProperties = array();
-    $primary    = $paymentFields = FALSE;
+    $primary    = $paymentFields    = $selectedPaymentFields = FALSE;
     $origFields = $fields;
     $queryMode  = $relationField = NULL;
 
@@ -225,6 +225,14 @@ class CRM_Export_BAO_Export {
           //hack to fix component fields
           if ($fieldName == 'event_id') {
             $returnProperties['event_title'] = 1;
+          }
+          else if (
+            $exportMode == CRM_Export_Form_Select::EVENT_EXPORT && 
+            array_key_exists( $fieldName, self::componentPaymentFields())
+          ) { 
+              $selectedPaymentFields = true;
+              $paymentTableId = 'participant_id';
+              $returnProperties[$fieldName] = 1;  
           }
           else {
             $returnProperties[$fieldName] = 1;
@@ -568,20 +576,16 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $addPaymentHeader = FALSE;
 
     $paymentDetails = array();
-    if ($paymentFields) {
-      //special return properties for event and members
-      $paymentHeaders = array(
-        'total_amount' => ts('Total Amount'),
-        'contribution_status' => ts('Contribution Status'),
-        'received_date' => ts('Received Date'),
-        'payment_instrument' => ts('Payment Instrument'),
-        'transaction_id' => ts('Transaction ID'),
-      );
+    if ($paymentFields || $selectedPaymentFields) {
 
       // get payment related in for event and members
       $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
-      if (!empty($paymentDetails)) {
-        $addPaymentHeader = TRUE;
+      //get all payment headers.
+      if (!$selectedPaymentFields) {
+        $paymentHeaders = self::componentPaymentFields();
+        if (!empty($paymentDetails)) {
+          $addPaymentHeader = TRUE;
+        }
       }
       $nullContributionDetails = array_fill_keys(array_keys($paymentHeaders), NULL);
     }
@@ -718,6 +722,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                   }
                 }
               }
+            }
+            elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
+              $headerRows[] = CRM_Utils_Array::value($field, self::componentPaymentFields());
             }
             else {
               $headerRows[] = $field;
@@ -956,6 +963,17 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             $campIdFld = "{$field}_id";
             $row[$field] = CRM_Utils_Array::value($dao->$campIdFld, $allCampaigns, '');
           }
+          elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
+            $paymentData = CRM_Utils_Array::value($dao->$paymentTableId, $paymentDetails);
+            $payFieldMapper = array(
+              'componentPaymentField_total_amount'        => 'total_amount',
+              'componentPaymentField_contribution_status' => 'contribution_status',
+              'componentPaymentField_payment_instrument'  => 'pay_instru',
+              'componentPaymentField_transaction_id'      => 'trxn_id',
+              'componentPaymentField_received_date'       => 'receive_date',
+            );
+            $row[$field] = CRM_Utils_Array::value($payFieldMapper[$field], $paymentData, '');
+          }
           else {
             // if field is empty or null
             $row[$field] = '';
@@ -979,8 +997,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $setHeader = FALSE;
 
         // add payment related information
-        if ($paymentFields && isset($paymentDetails[$row[$paymentTableId]])) {
-          $row = array_merge($row, $paymentDetails[$row[$paymentTableId]]);
+        if ($paymentFields) {
+          $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
+          if (!is_array($paymentData) || empty($paymentData)) {
+            $paymentData = $nullContributionDetails;
+          }
+          $row = array_merge($row, $paymentData);
         }
         elseif (!empty($paymentDetails)) {
           $row = array_merge($row, $nullContributionDetails);
@@ -1799,6 +1821,23 @@ WHERE  {$whereClause}";
         }
       }
     }
+  }
+
+  /**
+   * Build componentPayment fields.
+   */
+  static function componentPaymentFields() {
+    static $componentPaymentFields;
+    if (!isset( $componentPaymentFields)) {
+      $componentPaymentFields = array(
+        'componentPaymentField_total_amount'        => ts('Total Amount'),
+        'componentPaymentField_contribution_status' => ts('Contribution Status'),
+        'componentPaymentField_received_date'       => ts('Received Date'),
+        'componentPaymentField_payment_instrument'  => ts('Payment Instrument'),
+        'componentPaymentField_transaction_id'      => ts('Transaction ID'),
+      );
+    }
+    return $componentPaymentFields;
   }
 }
 

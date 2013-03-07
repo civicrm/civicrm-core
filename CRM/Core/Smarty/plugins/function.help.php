@@ -47,13 +47,6 @@ function smarty_function_help($params, &$smarty) {
     return;
   }
 
-  // Legacy support for old-style $params['text']
-  // TODO: This is probably no longer used, so remove
-  $help = '';
-  if (isset($params['text'])) {
-    $help = '<div class="crm-help">' . $params['text'] . '</div>';
-  }
-
   if (empty($params['file']) && isset($smarty->_tpl_vars['tplFile'])) {
     $params['file'] = $smarty->_tpl_vars['tplFile'];
   }
@@ -79,5 +72,5 @@ function smarty_function_help($params, &$smarty) {
   foreach ($params as &$param) {
     $param = is_bool($param) || is_numeric($param) ? (int) $param : (string) $param;
   }
-  return '<a class="helpicon" title="' . $title . '" href=\'javascript:CRM.help("' . $name . '", ' . json_encode($params) . ')\'>&nbsp;</a>';
+  return '<a class="helpicon" title="' . $title . '" href="#" onclick=\'CRM.help("' . $name . '", ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
 }

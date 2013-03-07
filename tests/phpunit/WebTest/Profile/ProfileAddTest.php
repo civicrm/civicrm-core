@@ -47,9 +47,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // Go directly to the URL of the screen that you will be
     // testing (Add new profile ).
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/uf/group', 'reset=1');
 
     $this->click('newCiviCRMProfile-top');
 
@@ -113,7 +111,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '$profileTitle' has been added. You can add fields to this profile now"));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     //Add field to profile
     $this->click('field_name[0]');
@@ -127,7 +125,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // delete the profile
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
+    $this->openCiviPage('admin/uf/group', 'reset=1');
     $this->_testdeleteProfile($profileTitle);
   }
 
@@ -139,8 +137,6 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('newCiviCRMProfile-bottom');
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '$profileTitle' has been deleted."));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
   }
 }
-
-

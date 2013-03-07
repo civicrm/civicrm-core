@@ -46,10 +46,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Go directly to the URL of the screen that you will be testing (Custom data for contacts).
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/custom/group", "action=add&reset=1");
 
     //fill custom group title
     $customGroupTitle = 'custom_group' . substr(sha1(rand()), 0, 3);
@@ -64,7 +61,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '$customGroupTitle' has been added. You can add custom fields now."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
     //add custom field - alphanumeric text
     $textFieldLabel = 'test_text_field' . substr(sha1(rand()), 0, 3);
     $this->click("header");
@@ -112,7 +109,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent("Your custom field '$checkboxFieldLabel' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Number Radio
     $this->click("data_type[0]");
@@ -148,67 +145,64 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
 
     //On New Individual contact form
-    $this->open($this->sboxPath . "civicrm/contact/add?ct=Individual&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("New Individual"));
+    $this->openCiviPage("contact/add", "ct=Individual&reset=1");
+    $this->assertElementContainsText('page-title', "New Individual");
 
     //expand all tabs
     $this->click("expand");
     $this->waitForElementPresent("address_1_street_address");
 
     //verify custom group fields are present on new Individual Contact Form
-    $this->assertTrue($this->isTextPresent($textFieldLabel));
-    $this->assertTrue($this->isTextPresent($checkboxFieldLabel));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel1));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel2));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel3));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel4));
-    $this->assertTrue($this->isTextPresent($radioFieldLabel));
-    $this->assertTrue($this->isTextPresent($radioOptionLabel1));
-    $this->assertTrue($this->isTextPresent($radioOptionLabel2));
+    $this->assertElementContainsText('customData', $textFieldLabel);
+    $this->assertElementContainsText('customData', $checkboxFieldLabel);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel1);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel2);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel3);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel4);
+    $this->assertElementContainsText('customData', $radioFieldLabel);
+    $this->assertElementContainsText('customData', $radioOptionLabel1);
+    $this->assertElementContainsText('customData', $radioOptionLabel2);
 
     //On New Household contact form
-    $this->open($this->sboxPath . "civicrm/contact/add?ct=Household&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("New Household"));
+    $this->openCiviPage("contact/add", "ct=Household&reset=1");
+    $this->assertElementContainsText('page-title', "New Household");
 
     //expand all tabs
     $this->click("expand");
     $this->waitForElementPresent("address_1_street_address");
 
     //verify custom group fields are present on new household Contact Form
-    $this->assertTrue($this->isTextPresent($textFieldLabel));
-    $this->assertTrue($this->isTextPresent($checkboxFieldLabel));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel1));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel2));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel3));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel4));
-    $this->assertTrue($this->isTextPresent($radioFieldLabel));
-    $this->assertTrue($this->isTextPresent($radioOptionLabel1));
-    $this->assertTrue($this->isTextPresent($radioOptionLabel2));
+    $this->assertElementContainsText('customData', $textFieldLabel);
+    $this->assertElementContainsText('customData', $checkboxFieldLabel);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel1);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel2);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel3);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel4);
+    $this->assertElementContainsText('customData', $radioFieldLabel);
+    $this->assertElementContainsText('customData', $radioOptionLabel1);
+    $this->assertElementContainsText('customData', $radioOptionLabel2);
 
     //On New Organization contact form
-    $this->open($this->sboxPath . "civicrm/contact/add?ct=Organization&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("New Organization"));
+    $this->openCiviPage("contact/add", "ct=Organization&reset=1");
+    $this->assertElementContainsText('page-title', "New Organization");
 
     //expand all tabs
     $this->click("expand");
     $this->waitForElementPresent("address_1_street_address");
 
     //verify custom group fields are present on new Organization Contact Form
-    $this->assertTrue($this->isTextPresent($textFieldLabel));
-    $this->assertTrue($this->isTextPresent($checkboxFieldLabel));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel1));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel2));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel3));
-    $this->assertTrue($this->isTextPresent($checkboxOptionLabel4));
-    $this->assertTrue($this->isTextPresent($radioFieldLabel));
-    $this->assertTrue($this->isTextPresent($radioOptionLabel1));
-    $this->assertTrue($this->isTextPresent($radioOptionLabel2));
+    $this->assertElementContainsText('customData', $textFieldLabel);
+    $this->assertElementContainsText('customData', $checkboxFieldLabel);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel1);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel2);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel3);
+    $this->assertElementContainsText('customData', $checkboxOptionLabel4);
+    $this->assertElementContainsText('customData', $radioFieldLabel);
+    $this->assertElementContainsText('customData', $radioOptionLabel1);
+    $this->assertElementContainsText('customData', $radioOptionLabel2);
   }
 }
 

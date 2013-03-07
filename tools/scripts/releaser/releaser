@@ -1,0 +1,173 @@
+#!/bin/bash
+set -e
+
+confdir=$(dirname $0)
+start_point="$1"
+version="$2"
+
+if [ ! -f "$confdir/releaser.conf" ]; then
+  echo
+  echo "Missing configuration file. Please copy $confdir/releaser.conf.txt to $confdir/releaser.conf and edit it."
+  exit 1
+fi
+source "$confdir/releaser.conf"
+
+if [ -z "$version" -o -z "$start_point" ]; then
+  echo
+  echo "Usage: $0 <start_point> <version>"
+  echo "  <start_point> is a branch name (e.g. \"master\")"
+  echo "  <version> is Civi release (e.g. \"4.3.beta2\"); it will become a tag name"
+  exit 2
+fi
+
+if [ "`echo -n $version | tr -d 0-9.`" = '' ]; then
+  is_stable=1
+else
+  is_stable=
+fi
+
+set -ex
+
+#################################################
+## Git setup
+function do_git_config() {
+  git config --global user.name "$git_author_name"
+  git config --global user.email "$git_author_email"
+}
+
+#################################################
+## Create build directories; checkout repos
+function do_mk_project() {
+  for dir in \
+    "$workdir" \
+    "$workdir/$version" \
+    "$workdir/$version/export" \
+    "$workdir/$version/gen" \
+    "$workdir/$version/tarballs" \
+    "$workdir/$version/tmp"
+  do
+    if [ ! -d "$dir" ]; then
+      mkdir -p "$dir"
+    fi
+  done
+
+  $cmd_gitify all "$git_base_url" "$workdir/$version/export" --l10n
+}
+
+#################################################
+## Tag all repos
+function do_git_tag() {
+  cd $workdir/$version
+  for dir in export export/joomla export/WordPress export/packages ; do
+    pushd $dir
+      git checkout "$start_point"
+      git tag "$version"
+    popd
+  done
+
+  for drupal_ver in 6.x 7.x ; do
+    pushd export/drupal
+      git checkout "${drupal_ver}-${start_point}"
+      git tag "${drupal_ver}-${version}"
+    popd
+  done
+}
+
+#################################################
+## Publish tags via git
+function do_git_tag_push() {
+  cd $workdir/$version
+  for dir in export export/joomla export/WordPress export/packages ; do
+    pushd $dir
+      git push -f origin "$version"
+    popd
+  done
+
+  for drupal_ver in 6.x 7.x ; do
+    pushd export/drupal
+      git push -f origin "${drupal_ver}-${version}"
+    popd
+  done
+}
+
+#################################################
+## Build
+function do_distmaker() {
+  cd $workdir/$version
+
+  ## Determine SCM revision of main codebase
+  pushd "export"
+    rev=$(git rev-parse HEAD | head -c10)
+  popd
+
+  # create the distmaker.conf file
+  echo "
+  DM_SOURCEDIR=$workdir/$version/export
+  DM_GENFILESDIR=$workdir/$version/gen
+  DM_TMPDIR=$workdir/$version/tmp
+  DM_TARGETDIR=$workdir/$version/tarballs
+  DM_PHP=$cmd_php
+  DM_RSYNC=$cmd_rsync
+  DM_VERSION=$version
+  DM_REVISION=$rev
+  DM_ZIP=$cmd_zip
+  " > $workdir/$version/export/distmaker/distmaker.conf
+
+  # create a minimal civicrm.settings.php file
+  mkdir -p $workdir/$version/export/default
+  echo "<?php define('CIVICRM_GETTEXT_RESOURCEDIR', '$workdir/$version/export/l10n/'); define('CIVICRM_UF', 'Drupal'); global \$civicrm_root; \$civicrm_root = '$workdir/$version/export'; ?>" > $workdir/$version/export/default/civicrm.settings.php
+
+  # create a minimal settings_location.php file
+  echo "<?php define('CIVICRM_CONFDIR', '$workdir/$version/export'); ?>" > $workdir/$version/export/settings_location.php
+
+  # run the exported distmaker
+  cd $workdir/$version/export/distmaker
+  ./distmaker.sh all > $workdir/$version/build.log
+}
+
+#################################################
+## Publish files
+function do_publish() {
+  # publish to sf.net
+  cd $workdir/$version/tarballs
+
+  $cmd_md5sum *.tar.gz *.zip > civicrm-$version.MD5SUMS
+  echo $gpg_pass | $cmd_gpg --armor --batch --passphrase-fd 0 --sign civicrm-$version.MD5SUMS
+
+  if [ "$is_stable" ]; then
+    echo mkdir ${publish_stable_dir}/$version | $cmd_sftp ${publish_ssh}
+    $cmd_rsync -aP --exclude='*starterkit.tgz' *.tar.gz *.zip *MD5SUMS* ${publish_ssh}:${publish_stable_dir}/$version
+  else
+    echo mkdir ${publish_latest_dir}/$version | $cmd_sftp ${publish_ssh}
+    $cmd_rsync -aP --exclude='*starterkit.tgz' *.tar.gz *.zip *MD5SUMS* ${publish_ssh}:${publish_latest_dir}/$version
+  fi
+
+  mv *.tar.gz *.zip *MD5SUMS* $build_dest
+
+  # publish to latest.civicrm.org
+  # FIXME: isn't this racy when doing concurrent security releases
+  if [ "$is_stable" ]; then
+    echo $version > $latest/stable.txt
+  fi
+  echo $version > $latest/latest.txt
+}
+
+#################################################
+## Cleanup
+function do_cleanup() {
+  cd $workdir/$version
+  rm -rf export gen tmp tarballs tmp
+}
+
+#################################################
+## Main
+
+## Refactoring note: this used to be one monolithic script
+
+do_git_config
+do_mk_project
+do_git_tag
+do_distmaker
+do_git_tag_push
+do_publish
+do_cleanup

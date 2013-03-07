@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
   protected function setUp() {
@@ -40,19 +39,17 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Organization');
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage('contact/add', 'reset=1&ct=Organization', '_qf_Contact_cancel');
 
     $title = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $title");
     $this->type('email_1_email', "$title@org.com");
     $this->click('_qf_Contact_upload_view');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Organization $title has been created."));
+    $this->assertElementContainsText('crm-notification-container', "Organization {$title} has been created.");
 
     // Go directly to the URL
-    $this->open($this->sboxPath . 'civicrm/admin/member/membershipType?reset=1&action=browse');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/member/membershipType', 'reset=1&action=browse');
 
     $this->click('link=Add Membership Type');
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -78,10 +75,9 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
 
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Organization');
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage('contact/add', 'reset=1&ct=Organization', '_qf_Contact_cancel');
 
     // creating another Orgnization
     $title1 = substr(sha1(rand()), 0, 7);
@@ -114,9 +110,8 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Membership Type $title membership for Organization $title1 has been added."),
-      "Status message didn't show up after saving!"
-    );
+    $this->assertElementContainsText('crm-notification-container', "Membership Type $title membership for Organization $title1 has been added.",
+      "Status message didn't show up after saving!");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -130,7 +125,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
       'joinDate', 'startDate', 'endDate') as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
-        
+
     $this->webtestVerifyTabularData(
       array(
         'Membership Type' => "Membership Type $title",
@@ -167,7 +162,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('quick-save');
     $this->waitForElementPresent('current-relationships');
     //check the status message
-    $this->assertTrue($this->isTextPresent('New relationship created.'));
+    $this->assertElementContainsText('crm-notification-container', 'New relationship created.');
 
     $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
 
@@ -211,21 +206,20 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('_qf_Relationship_upload');
     $this->waitForElementPresent('inactive-relationships');
     //check the status message
-    $this->assertTrue($this->isTextPresent('Relationship record has been updated.'));
+    $this->assertElementContainsText('crm-notification-container', 'Relationship record has been updated.');
 
     // click through to the membership view screen
     $this->click('css=li#tab_member a');
 
     //verify inherited membership has been removed
-    $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid=$id&selectedChild=member");
-    $this->waitForElementPresent("xpath=//div[@class='crm-container-snippet']/div/div[3]");
-    $this->assertTrue($this->isTextPresent('No memberships have been recorded for this contact.'));
+    $this->openCiviPage("contact/view", "reset=1&cid=$id&selectedChild=member", "xpath=//div[@class='crm-container-snippet']/div/div[3]");
+    $this->assertElementContainsText('Memberships', 'No memberships have been recorded for this contact.');
 
     // visit relationship tab and re-enable the relationship
     $this->click('css=li#tab_rel a');
     $this->waitForElementPresent('css=div.action-link');
     $this->click("//li[@id='tab_rel']/a");
- 
+
     $this->waitForElementPresent("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[7]/span/a[text()='Edit']");
     $this->click("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[7]/span/a[text()='Edit']");
     $this->waitForElementPresent('is_active');
@@ -235,7 +229,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('_qf_Relationship_upload');
     $this->waitForElementPresent('current-relationships');
     //check the status message
-    $this->assertTrue($this->isTextPresent('Relationship record has been updated.'));
+    $this->assertElementContainsText('crm-notification-container', 'Relationship record has been updated.');
 
     //check for memberships
     $this->click('css=li#tab_member a');
@@ -255,9 +249,8 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     sleep(10);
 
     //verify inherited membership has been removed
-    $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid=$id&selectedChild=member");
-    $this->waitForElementPresent("xpath=//div[@class='crm-container-snippet']/div/div[3]");
-    $this->assertTrue($this->isTextPresent('No memberships have been recorded for this contact.'));
+    $this->openCiviPage("contact/view", "reset=1&cid={$id}&selectedChild=member", "xpath=//div[@class='crm-container-snippet']/div/div[3]");
+    $this->assertElementContainsText('Memberships', 'No memberships have been recorded for this contact.');
 
     //enable relationship
     $this->click('css=li#tab_rel a');

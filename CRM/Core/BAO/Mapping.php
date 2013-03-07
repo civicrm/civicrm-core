@@ -403,6 +403,16 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT)) {
       if (CRM_Core_Permission::access('CiviEvent')) {
         $fields['Participant'] = CRM_Event_BAO_Participant::exportableFields();
+        //get the component payment fields
+        if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
+          require_once 'CRM/Export/BAO/Export.php';
+          $componentPaymentFields = array();
+          foreach (CRM_Export_BAO_Export::componentPaymentFields() as $payField => $payTitle) {
+            $componentPaymentFields[$payField] = array('title' => $payTitle);
+          }
+          $fields['Participant'] = array_merge($fields['Participant'], $componentPaymentFields);
+        }
+
         unset($fields['Participant']['participant_contact_id']);
         $compArray['Participant'] = ts('Participant');
       }

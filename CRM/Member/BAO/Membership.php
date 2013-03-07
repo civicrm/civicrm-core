@@ -1178,7 +1178,7 @@ AND civicrm_membership.is_test = %2";
    * @return void
    * @access public
    */
-  public function postProcessMembership($membershipParams, $contactID, &$form, &$premiumParams,
+  public static function postProcessMembership($membershipParams, $contactID, &$form, &$premiumParams,
     $customFieldsFormatted = NULL, $includeFieldTypes = NULL
   ) {
     $tempParams  = $membershipParams;

@@ -39,8 +39,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
   protected $_summary = NULL;
   protected $_noFields = TRUE;
-  
-  protected $_add2groupSupported = FALSE; 
+
+  protected $_add2groupSupported = FALSE;
+
   function __construct() {
 
     $this->_columns = array(
@@ -58,7 +59,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         ),
       ),
     );
-    
+
     parent::__construct();
   }
 
@@ -98,22 +99,22 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $sql = "
             SELECT  civicrm_event.id                    as event_id,
                     civicrm_event.title                 as event_title,
-                    civicrm_event.max_participants      as max_participants, 
+                    civicrm_event.max_participants      as max_participants,
                     civicrm_event.start_date            as start_date,
-                    civicrm_event.end_date              as end_date, 
-                    civicrm_option_value.label          as event_type, 
+                    civicrm_event.end_date              as end_date,
+                    civicrm_option_value.label          as event_type,
                     SUM(civicrm_participant.fee_amount) as total,
                     COUNT(civicrm_participant.id)       as participant
 
             FROM       civicrm_event
-            LEFT JOIN  civicrm_option_value 
+            LEFT JOIN  civicrm_option_value
                    ON  ( civicrm_event.event_type_id = civicrm_option_value.value AND
                          civicrm_option_value.option_group_id = {$optionGroupId} )
-            LEFT JOIN  civicrm_participant ON ( civicrm_event.id = civicrm_participant.event_id 
+            LEFT JOIN  civicrm_participant ON ( civicrm_event.id = civicrm_participant.event_id
                        {$activeParticipantClause} AND civicrm_participant.is_test  = 0 )
 
-            WHERE      civicrm_event.id IN( {$eventID}) 
-                      
+            WHERE      civicrm_event.id IN( {$eventID})
+
             GROUP BY   civicrm_event.id
             ";
     $eventDAO = CRM_Core_DAO::executeQuery($sql);
@@ -135,8 +136,8 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
             FROM     civicrm_participant
 
-            WHERE    civicrm_participant.event_id IN( {$eventID}) AND 
-                     civicrm_participant.is_test  = 0 
+            WHERE    civicrm_participant.event_id IN( {$eventID}) AND
+                     civicrm_participant.is_test  = 0
                      {$activeParticipantClause}
             GROUP BY civicrm_participant.event_id
              ";
@@ -148,15 +149,15 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
     //Count the Participant by Role ID for Event
     $role = "
-            SELECT civicrm_participant.role_id         as ROLEID, 
-                   COUNT( civicrm_participant.id )     as participant, 
+            SELECT civicrm_participant.role_id         as ROLEID,
+                   COUNT( civicrm_participant.id )     as participant,
                    SUM(civicrm_participant.fee_amount) as amount,
                    civicrm_participant.event_id        as event_id
 
             FROM     civicrm_participant
 
             WHERE    civicrm_participant.event_id IN ( {$eventID}) AND
-                     civicrm_participant.is_test  = 0 
+                     civicrm_participant.is_test  = 0
                      {$activeParticipantClause}
             GROUP BY civicrm_participant.role_id, civicrm_participant.event_id
             ";
@@ -189,15 +190,15 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
     //Count the Participant by status ID for Event
     $status = "
-            SELECT civicrm_participant.status_id       as STATUSID, 
-                   COUNT( civicrm_participant.id )     as participant, 
+            SELECT civicrm_participant.status_id       as STATUSID,
+                   COUNT( civicrm_participant.id )     as participant,
                    SUM(civicrm_participant.fee_amount) as amount,
                    civicrm_participant.event_id        as event_id
 
             FROM     civicrm_participant
 
             WHERE    civicrm_participant.event_id IN ({$eventID}) AND
-                     civicrm_participant.is_test  = 0 
+                     civicrm_participant.is_test  = 0
                      {$activeParticipantClause}
             GROUP BY civicrm_participant.status_id, civicrm_participant.event_id
             ";
@@ -215,8 +216,8 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     //Count the Participant by payment instrument ID for Event
     //e.g. Credit Card, Check,Cash etc
     $paymentInstrument = "
-            SELECT c.payment_instrument_id               as INSTRUMENT, 
-                   COUNT( c.id )                         as participant, 
+            SELECT c.payment_instrument_id               as INSTRUMENT,
+                   COUNT( c.id )                         as participant,
                    SUM(civicrm_participant.fee_amount)   as amount,
                    civicrm_participant.event_id          as event_id
 
@@ -274,7 +275,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->_limit = ($pageId - 1) * self::ROW_COUNT_LIMIT;
   }
 
-  function setPager() {
+  function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     $params = array(
       'total' => $this->_rowsFound,
       'rowCount' => self::ROW_COUNT_LIMIT,
@@ -307,15 +308,15 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         $this->_params['id_value'][] = $key;
       }
       $noSelection = TRUE;
-    } 
-    
+    }
+
     $this->_rowsFound = count($this->_params['id_value']);
 
     //set pager and limit if output mode is html
     if ($this->_outputMode == 'html') {
       $this->limit();
       $this->setPager();
-      
+
       $showEvents = array();
       $count      = 0;
       $numRows    = $this->_limit;
@@ -325,7 +326,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
           if (!isset($this->_params['id_value'][$numRows])) {
             break;
           }
-    
+
           $showEvents[] = $this->_params['id_value'][$numRows];
           $count++;
           $numRows++;
@@ -334,12 +335,12 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         $events = CRM_Event_PseudoConstant::event(NULL, NULL,
           "is_template IS NULL OR is_template = 0"
         );
-        
+
         $showEvents = array_diff(array_keys($events), $this->_params['id_value']);
       }
 
       $this->buildEventReport($showEvents);
-      
+
     }
     else {
       $this->buildEventReport($this->_params['id_value']);
