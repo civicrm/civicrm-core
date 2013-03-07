@@ -41,16 +41,5 @@ class CRM_Utils_Hook_Soap extends CRM_Utils_Hook {
     // suppress all hok calls during soap
     return;
   }
-
-  /**
-   * Get a list of modules implementing the given hook.
-   *
-   * Does nothing in Soap.
-   * 
-   * @return Array of module names.
-   */
-  function moduleImplements($fnSuffix) {
-    return;
-  }
 }
 

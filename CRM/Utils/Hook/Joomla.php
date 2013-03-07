@@ -81,13 +81,5 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
       return $result;
     }
   }
-
-  /**
-   * Get a list of modules implementing the given hook. Does nothing in Joomla.
-   * @return Array of module names.
-   */
-  function moduleImplements($fnSuffix) {
-    return array();
-  }
 }
 
