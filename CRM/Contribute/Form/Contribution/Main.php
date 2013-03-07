@@ -474,11 +474,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         self::buildRecur($this);
       }
     }
-    elseif (CRM_Utils_Array::value('amount_block_is_active', $this->_values)
-      && !CRM_Utils_Array::value('pledge_id', $this->_values)
-    ) {
-      $this->buildAmount($this->_separateMembershipPayment);
-    }
 
     if ($this->_priceSetId) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config');
@@ -605,78 +600,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution_Main', 'formRule'), $this);
 
-  }
-
-  /**
-   * build the radio/text form elements for the amount field
-   *
-   * @return void
-   * @access private
-   */
-  function buildAmount($separateMembershipPayment = FALSE) {
-    $elements = array();
-    if (!empty($this->_values['amount'])) {
-      // first build the radio boxes
-      CRM_Utils_Hook::buildAmount('contribution', $this, $this->_values['amount']);
-
-      foreach ($this->_values['amount'] as $amount) {
-        $elements[] = &$this->createElement('radio', NULL, '',
-          CRM_Utils_Money::format($amount['value']) . ' ' . $amount['label'],
-          $amount['amount_id'],
-          array('onclick' => 'clearAmountOther();')
-        );
-      }
-    }
-
-    if ($separateMembershipPayment) {
-      $elements[''] = $this->createElement('radio', NULL, NULL, ts('No thank you'), 'no_thanks', array('onclick' => 'clearAmountOther();'));
-      $this->assign('is_separate_payment', TRUE);
-    }
-
-    if (isset($this->_values['default_amount_id'])) {
-      $this->_defaults['amount'] = $this->_values['default_amount_id'];
-    }
-    $title = ts('Contribution Amount');
-    if ($this->_values['is_allow_other_amount']) {
-      if (!empty($this->_values['amount'])) {
-        $elements[] = &$this->createElement('radio', NULL, '',
-          ts('Other Amount'), 'amount_other_radio'
-        );
-
-        $this->addGroup($elements, 'amount', $title, '<br />');
-
-        if (!$separateMembershipPayment) {
-          $this->addRule('amount', ts('%1 is a required field.', array(1 => ts('Amount'))), 'required');
-        }
-        $this->add('text', 'amount_other', ts('Other Amount'), array('size' => 10, 'maxlength' => 10, 'onfocus' => 'useAmountOther();'));
-      }
-      else {
-        if ($separateMembershipPayment) {
-          $title = ts('Additional Contribution');
-        }
-        $this->add('text', 'amount_other', $title, array('size' => 10, 'maxlength' => 10, 'onfocus' => 'useAmountOther();'));
-        if (!$separateMembershipPayment) {
-          $this->addRule('amount_other', ts('%1 is a required field.', array(1 => $title)), 'required');
-        }
-      }
-
-      $this->assign('is_allow_other_amount', TRUE);
-
-      $this->addRule('amount_other', ts('Please enter a valid amount (numbers and decimal point only).'), 'money');
-    }
-    else {
-      if (!empty($this->_values['amount'])) {
-        if ($separateMembershipPayment) {
-          $title = ts('Additional Contribution');
-        }
-        $this->addGroup($elements, 'amount', $title, '<br />');
-
-        if (!$separateMembershipPayment) {
-          $this->addRule('amount', ts('%1 is a required field.', array(1 => ts('Amount'))), 'required');
-        }
-      }
-      $this->assign('is_allow_other_amount', FALSE);
-    }
   }
 
   /**
