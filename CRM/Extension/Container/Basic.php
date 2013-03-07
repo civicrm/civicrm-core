@@ -114,7 +114,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    * {@inheritdoc}
    */
   public function getResUrl($key) {
-    return $this->baseUrl . $this->getRelPath($key);
+    return $this->baseUrl . $this->getRelUrl($key);
   }
 
   /**
@@ -180,6 +180,20 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
       }
     }
     return $this->relPaths;
+  }
+
+  /**
+   * Determine the relative path of an extension directory
+   *
+   * @return string
+   * @throws CRM_Extension_Exception
+   */
+  protected function getRelUrl($key) {
+    $relUrls = $this->getRelUrls();
+    if (! isset($relUrls[$key])) {
+      throw new CRM_Extension_Exception_MissingException("Failed to find extension: $key");
+    }
+    return $relUrls[$key];
   }
 
   /**
