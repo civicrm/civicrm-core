@@ -131,16 +131,23 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
     if (function_exists($fn_name)) {
       $module_permissions = array();
       $fn_name($module_permissions);
-      foreach ($module_permissions as $key => $label) {
-        // Prepend the module name to the key.
-        $new_key = "$module|$key";
-        // Limit key length to maintain compatilibility with Drupal, which
-        // accepts permission keys no longer than 128 characters.
-        if (strlen($new_key) > 128) {
-          $new_key = "$module|". md5($key);
-        }
-        $return_permissions[$new_key] = $label;
+
+      $return_permissions = self::filterPermissions($module_permissions, $module);
+    }
+    return $return_permissions;
+  }
+
+  public static function filterPermissions($module_permissions, $module) {
+    $return_permissions = array();
+    foreach ($module_permissions as $key => $label) {
+      // Prepend the module name to the key.
+      $new_key = "$module|$key";
+      // Limit key length to maintain compatilibility with Drupal, which
+      // accepts permission keys no longer than 128 characters.
+      if (strlen($new_key) > 128) {
+        $new_key = "$module|" . md5($key);
       }
+      $return_permissions[$new_key] = $label;
     }
     return $return_permissions;
   }
