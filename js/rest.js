@@ -141,23 +141,23 @@ var CRM = CRM || {};
       params.json = 1;
     }
     // Pass copy of settings into closure to preserve its value during multiple requests
-    (function(stg) {
+    (function(stg, that) {
       $.ajax({
         url: stg.ajaxURL.indexOf('http') === 0 ? stg.ajaxURL : CRM.url(stg.ajaxURL),
         dataType: 'json',
         data: params,
         type: action.indexOf('get') < 0 ? 'POST' : 'GET',
         success: function(result) {
-          stg.callBack.call(this, result, stg);
+          stg.callBack.call(that, result, stg);
         }
       });
-    })($.extend({}, settings));
+    })($.extend({}, settings), this);
   };
 
   // Backwards compatible with jQuery fn
   $.fn.crmAPI = function(entity, action, params, options) {
     console && console.log && console.log('Calling crmAPI from jQuery is deprecated. Please use CRM.api() instead.');
-    return CRM.api(entity, action, params, options);
+    return CRM.api.call(this, entity, action, params, options);
   };
 
   $.fn.crmAutocomplete = function (params, options) {
