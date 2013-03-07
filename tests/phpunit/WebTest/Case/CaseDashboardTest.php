@@ -40,9 +40,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Enable CiviCase module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
+    $this->openCiviPage('admin/setting/component', 'reset=1', '_qf_Component_next-bottom');
     $enabledComponents = $this->getSelectOptions("enableComponents-t");
     if (!in_array("CiviCase", $enabledComponents)) {
       $this->addSelection("enableComponents-f", "label=CiviCase");
@@ -57,27 +55,22 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->changePermissions($permission);
 
     // Go directly to the URL of the screen that you will be testing (Dashboard).
-    $this->open($this->sboxPath . "civicrm/case?reset=1");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("css=a.button");
+    $this->openCiviPage('case', 'reset=1', 'css=a.button');
 
     // Should default to My Cases
     $this->assertTrue($this->isChecked("name=allupcoming value=0"), 'Case dashboard should default to My Cases.');
     // The header text of the table changes too
-    $this->assertTextPresent("Summary of Case Involvement");
+    $this->assertElementContainsText('crm-container', "Summary of Case Involvement");
 
     $this->click("name=allupcoming value=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("css=a.button");
 
     $this->assertTrue($this->isChecked("name=allupcoming value=1"), 'Selection of All Cases failed.');
-    $this->assertTextPresent("Summary of All Cases");
+    $this->assertElementContainsText('crm-container', "Summary of All Cases");
 
     // Go back to dashboard
-    $this->open($this->sboxPath . "civicrm/case?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("css=a.button");
+    $this->openCiviPage('case', 'reset=1', 'css=a.button');
 
     // Click on find my cases and check if right radio is checked
     $this->click("name=find_my_cases");
@@ -86,9 +79,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isChecked("name=case_owner value=2"), 'Find my cases button not properly setting search form value to my cases.');
 
     // Go back to dashboard
-    $this->open($this->sboxPath . "civicrm/case?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("css=a.button");
+    $this->openCivipage('case', 'reset=1', 'css=a.button');
 
     // Click on a drilldown cell and check if right radio is checked
     $this->click("css=a.crm-case-summary-drilldown");
@@ -97,9 +88,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isChecked("name=case_owner value=1"), 'Drilldown on dashboard summary cells not properly setting search form value to all cases.');
 
     // Go back to dashboard and reset to my cases
-    $this->open($this->sboxPath . "civicrm/case?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("css=a.button");
+    $this->openCiviPage('case', 'reset=1', 'css=a.button');
     $this->click("name=allupcoming value=0");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("css=a.button");

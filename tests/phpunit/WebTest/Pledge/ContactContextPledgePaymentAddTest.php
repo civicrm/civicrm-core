@@ -44,7 +44,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
     // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
-    $this->open($this->sboxPath . 'civicrm/admin/setting/localization?reset=1');
+    $this->openCiviPage('admin/setting/localization', 'reset=1');
     $this->select("currencyLimit-f","value=FJD");
     $this->click("add");
     $this->click("_qf_Localization_next-bottom");
@@ -73,7 +73,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->waitForElementPresent('_qf_Pledge_upload-bottom');
 
     // check contact name on pledge form
-    $this->assertTrue($this->isTextPresent("$firstName $lastName"));
+    $this->assertElementContainsText('css=tr.crm-pledge-form-block-displayName', "$firstName $lastName");
 
     // Let's start filling the form with values.
     $this->select("currency","value=FJD");
@@ -110,7 +110,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->click("_qf_Pledge_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Pledge has been recorded and the payment schedule has been created."));
+    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     //click through to the Pledge view screen
@@ -223,11 +223,11 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
         'Send additional reminders' => '4 days after the last one sent',
       )
     );
-     $this->open($this->sboxPath . 'civicrm/admin/setting/localization?reset=1');
-     $this->select("currencyLimit-t","value=FJD");
-     $this->click("remove");
-     $this->click("_qf_Localization_next-bottom");
-     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/setting/localization', 'reset=1');
+    $this->select("currencyLimit-t","value=FJD");
+    $this->click("remove");
+    $this->click("_qf_Localization_next-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
   function testAddPledgePaymentWithAdjustTotalPledgeAmount() {
@@ -266,7 +266,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->waitForElementPresent('_qf_Pledge_upload-bottom');
 
     // check contact name on pledge form
-    $this->assertTrue($this->isTextPresent("$firstName $lastName"));
+    $this->assertElementContainsText('css=tr.crm-pledge-form-block-displayName', "$firstName $lastName");
 
     // Let's start filling the form with values.
     $this->type("amount", "30");
@@ -301,7 +301,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->click("_qf_Pledge_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Pledge has been recorded and the payment schedule has been created."));
+    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     //click through to the Pledge view screen
@@ -441,7 +441,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->waitForElementPresent('_qf_Pledge_upload-bottom');
 
     // check contact name on pledge form
-    $this->assertTrue($this->isTextPresent("$firstName $lastName"));
+    $this->assertElementContainsText('css=tr.crm-pledge-form-block-displayName', "$firstName $lastName");
 
     // Let's start filling the form with values.
     $this->type("amount", "30");
@@ -476,7 +476,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->click("_qf_Pledge_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Pledge has been recorded and the payment schedule has been created."));
+    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     //Add payments
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
