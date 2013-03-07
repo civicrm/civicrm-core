@@ -99,6 +99,29 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   /**
    * {@inheritdoc}
    */
+  public function checkRequirements() {
+    $errors = array();
+
+    if (empty($this->baseDir) || !is_dir($this->baseDir)) {
+      $errors[] = array(
+        'title' => ts('Invalid Base Directory'),
+        'message' => ts('An extension container has been defined with a blank directory.'),
+      );
+    }
+    if (empty($this->baseUrl)) {
+      dpm($this);
+      $errors[] = array(
+        'title' => ts('Invalid Base URL'),
+        'message' => ts('An extension container has been defined with a blank URL.'),
+      );
+    }
+
+    return $errors;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getKeys() {
     return array_keys($this->getRelPaths());
   }
@@ -142,7 +165,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    */
   protected function getRelPath($key) {
     $keypaths = $this->getRelPaths();
-    if (! isset($keypaths[$key])) {
+    if (!isset($keypaths[$key])) {
       throw new CRM_Extension_Exception_MissingException("Failed to find extension: $key");
     }
     return $keypaths[$key];
@@ -190,7 +213,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    */
   protected function getRelUrl($key) {
     $relUrls = $this->getRelUrls();
-    if (! isset($relUrls[$key])) {
+    if (!isset($relUrls[$key])) {
       throw new CRM_Extension_Exception_MissingException("Failed to find extension: $key");
     }
     return $relUrls[$key];

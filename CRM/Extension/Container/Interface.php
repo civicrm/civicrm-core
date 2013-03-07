@@ -38,6 +38,13 @@
 interface CRM_Extension_Container_Interface {
 
   /**
+   * Determine if any unmet requirements prevent use of this container.
+   *
+   * @return array list of error messages; empty if OK
+   */
+  public function checkRequirements();
+
+  /**
    * Get a list of extensions available in this container
    *
    * @return array list of keys (strings)

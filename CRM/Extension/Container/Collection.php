@@ -79,6 +79,16 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   /**
    * {@inheritdoc}
    */
+  public function checkRequirements() {
+    $errors = array();
+    foreach ($this->containers as $container) {
+      $errors = array_merge($errors, $container->checkRequirements());
+    }
+    return $errors;
+  }
+    /**
+   * {@inheritdoc}
+   */
   public function getKeys() {
     $k2c = $this->getKeysToContainer();
     return array_keys($k2c);
