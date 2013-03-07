@@ -145,6 +145,9 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     if (empty($reqs)) {
       $reqs = CRM_Extension_System::singleton()->getBrowser()->checkRequirements();
     }
+    if (empty($reqs)) {
+      $reqs = CRM_Extension_System::singleton()->getDefaultContainer()->checkRequirements();
+    }
     $this->assign('extAddNewReqs', $reqs);
 
     $this->assign('extDbUpgrades', CRM_Extension_Upgrades::hasPending());

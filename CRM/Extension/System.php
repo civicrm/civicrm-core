@@ -113,12 +113,12 @@ class CRM_Extension_System {
    *
    * This container should be a particular, writeable directory.
    *
-   * @return CRM_Extension_Container_Basic|FALSE (false if not configured)
+   * @return CRM_Extension_Container_Default|FALSE (false if not configured)
    */
   public function getDefaultContainer() {
     if ($this->defaultContainer === NULL) {
       if ($this->parameters['extensionsDir']) {
-        $this->defaultContainer = new CRM_Extension_Container_Basic($this->parameters['extensionsDir'], $this->parameters['extensionsURL'], $this->getCache(), 'default');
+        $this->defaultContainer = new CRM_Extension_Container_Default($this->parameters['extensionsDir'], $this->parameters['extensionsURL'], $this->getCache(), 'default');
       } else {
         $this->defaultContainer = FALSE;
       }
