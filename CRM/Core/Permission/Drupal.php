@@ -122,24 +122,12 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   }
 
   /**
-   * Get the permissions defined in the hook_civicrm_permission implementation
-   * of the given module. Permission keys are prepended with the module name
-   * to facilitate cleanup of permissions later, and may be hashed to provide
-   * a unique value that fits storage limitations within Drupal 7.
-   * 
+   * Permission keys are prepended with the module name to facilitate cleanup
+   * of permissions later, and may be hashed to provide a unique value that
+   * fits storage limitations within Drupal 7.
+   *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
-  static function getModulePermissions($module) {
-    $return_permissions = array();
-    $fn_name = "{$module}_civicrm_permission";
-    if (function_exists($fn_name)) {
-      $module_permissions = array();
-      $fn_name($module_permissions);
-      $return_permissions = $module_permissions;
-    }
-    return $return_permissions;
-  }
-
   public static function filterPermissions($module_permissions, $module) {
     $return_permissions = array();
     foreach ($module_permissions as $key => $label) {

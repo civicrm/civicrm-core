@@ -188,10 +188,20 @@ class CRM_Core_Permission_Base {
    * Get the permissions defined in the hook_civicrm_permission implementation
    * of the given module.
    *
+   * Note: At time of writing, this is only used with native extension-modules, so
+   * there's one, predictable calling convention (regardless of CMS).
+   *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
   static function getModulePermissions($module) {
-    return array();
+    $return_permissions = array();
+    $fn_name = "{$module}_civicrm_permission";
+    if (function_exists($fn_name)) {
+      $module_permissions = array();
+      $fn_name($module_permissions);
+      $return_permissions = $module_permissions;
+    }
+    return $return_permissions;
   }
 
   /**
