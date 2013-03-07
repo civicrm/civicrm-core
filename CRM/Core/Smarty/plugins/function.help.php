@@ -47,13 +47,6 @@ function smarty_function_help($params, &$smarty) {
     return;
   }
 
-  // Legacy support for old-style $params['text']
-  // TODO: This is probably no longer used, so remove
-  $help = '';
-  if (isset($params['text'])) {
-    $help = '<div class="crm-help">' . $params['text'] . '</div>';
-  }
-
   if (empty($params['file']) && isset($smarty->_tpl_vars['tplFile'])) {
     $params['file'] = $smarty->_tpl_vars['tplFile'];
   }
