@@ -4,6 +4,7 @@ set -e
 confdir=$(dirname $0)
 start_point="$1"
 version="$2"
+distmaker_tgt=all
 
 if [ ! -f "$confdir/releaser.conf" ]; then
   echo
@@ -122,7 +123,7 @@ function do_distmaker() {
 
   # run the exported distmaker
   cd $workdir/$version/export/distmaker
-  ./distmaker.sh all > $workdir/$version/build.log
+  ./distmaker.sh $distmaker_tgt > $workdir/$version/build.log
 }
 
 #################################################
