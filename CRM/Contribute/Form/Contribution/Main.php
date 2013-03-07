@@ -962,7 +962,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $fieldId = $memPresent = $membershipLabel = $fieldOption = $proceFieldAmount = NULL;
       if ($self->_separateMembershipPayment == 0 && $self->_quickConfig) {
         foreach ($self->_priceSet['fields'] as $fieldKey => $fieldVal) {
-          if ($fieldVal['name'] == 'membership_amount') {
+          if ($fieldVal['name'] == 'membership_amount' && CRM_Utils_Array::value('price_' . $fieldId, $fields)) {
             $fieldId     = $fieldVal['id'];
             $fieldOption = $fields['price_' . $fieldId];
             $memPresent  = TRUE;
