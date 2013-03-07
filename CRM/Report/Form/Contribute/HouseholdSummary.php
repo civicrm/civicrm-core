@@ -234,25 +234,25 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
 
     $this->_from = NULL;
     $this->_from = "
-        FROM  civicrm_relationship {$this->_aliases['civicrm_relationship']} 
-            LEFT  JOIN civicrm_contact {$this->_aliases['civicrm_contact_household']} ON 
+        FROM  civicrm_relationship {$this->_aliases['civicrm_relationship']}
+            LEFT  JOIN civicrm_contact {$this->_aliases['civicrm_contact_household']} ON
                       ({$this->_aliases['civicrm_contact_household']}.id = {$this->_aliases['civicrm_relationship']}.$this->householdContact AND {$this->_aliases['civicrm_contact_household']}.contact_type='Household')
-            LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']} ON 
-                      ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_relationship']}.$this->otherContact )          
+            LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']} ON
+                      ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_relationship']}.$this->otherContact )
             {$this->_aclFrom}
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} ON
                       ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_relationship']}.$this->otherContact ) AND {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
 
     if ($this->_addressField) {
-      $this->_from .= " 
-            LEFT JOIN civicrm_address  {$this->_aliases['civicrm_address']} ON 
-                      {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND 
+      $this->_from .= "
+            LEFT JOIN civicrm_address  {$this->_aliases['civicrm_address']} ON
+                      {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
                       {$this->_aliases['civicrm_address']}.is_primary = 1\n ";
     }
     if ($this->_emailField) {
       $this->_from .= "
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} ON 
-                      {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND 
+            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} ON
+                      {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                       {$this->_aliases['civicrm_email']}.is_primary = 1\n ";
     }
   }
@@ -320,7 +320,10 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
     //hack filter display for relationship type
     $type = substr($this->_params['relationship_type_id_value'], -3);
     foreach ($statistics['filters'] as $id => $value) {
-      if ($value['title'] == 'Relationship Type') {
+      if (
+        $value['title'] == 'Relationship Type' &&
+        isset($this->relationTypes[$this->relationshipId . '_' . $type])
+      ) {
         $statistics['filters'][$id]['value'] = 'Is equal to ' . $this->relationTypes[$this->relationshipId . '_' . $type];
       }
     }
@@ -355,14 +358,14 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
     $this->relationTypes = $relationTypes = array();
 
     $params = array('contact_type_b' => 'Household', 'version' => 3);
-    $typesA = &civicrm_api('relationship_type', 'get', $params);
+    $typesA = civicrm_api('relationship_type', 'get', $params);
     if (!CRM_Utils_Array::value('is_error', $typesA)) {
       foreach ($typesA['values'] as $rel) {
         $relationTypes[$rel['id']][$rel['id'] . '_b_a'] = $rel['label_b_a'];
       }
     }
     $params = array('contact_type_a' => 'Household', 'version' => 3);
-    $typesB = &civicrm_api('relationship_type', 'get', $params);
+    $typesB = civicrm_api('relationship_type', 'get', $params);
     if (!CRM_Utils_Array::value('is_error', $typesB)) {
       foreach ($typesB['values'] as $rel) {
         $relationTypes[$rel['id']][$rel['id'] . '_a_b'] = $rel['label_a_b'];

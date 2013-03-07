@@ -2298,7 +2298,7 @@ LEFT JOIN civicrm_membership mem ON ( cr.id = mem.contribution_recur_id )
    *         whose join_date is between $startDate and $endDate and
    *         whose start_date is between $startDate and $endDate
    */
-  function getMembershipJoins($membershipTypeId, $startDate, $endDate, $isTest = 0) {
+  static function getMembershipJoins($membershipTypeId, $startDate, $endDate, $isTest = 0) {
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
       $testClause = '( membership.is_test IS NULL OR membership.is_test = 0 )';
@@ -2338,7 +2338,7 @@ INNER JOIN  civicrm_contact contact ON ( membership.contact_id = contact.id AND 
    *         whose join_date is before $startDate and
    *         whose start_date is between $startDate and $endDate
    */
-  function getMembershipRenewals($membershipTypeId, $startDate, $endDate, $isTest = 0) {
+  static function getMembershipRenewals($membershipTypeId, $startDate, $endDate, $isTest = 0) {
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
       $testClause = '( membership.is_test IS NULL OR membership.is_test = 0 )';
