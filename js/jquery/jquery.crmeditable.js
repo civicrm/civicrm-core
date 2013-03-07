@@ -82,7 +82,6 @@
         return fieldName;
       }
 
-      
       var checkable = function () {
         $(this).change (function() {
           var params={sequential:1};
