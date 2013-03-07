@@ -43,7 +43,8 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
     // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
-    $this->_addNewProfile();
+    list($id, $profileTitle) = $this->_addNewProfile();
+    $this->_deleteProfile($id, $profileTitle);
   }
 
   function testUserAddNewProfile() {
@@ -58,7 +59,8 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
     // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
-    $this->_addNewProfile(TRUE, FALSE, TRUE);
+    list($id, $profileTitle) = $this->_addNewProfile(TRUE, FALSE, TRUE);
+    $this->_deleteProfile($id, $profileTitle);
   }
 
   function testAddNewNonMultiProfile() {
@@ -73,22 +75,16 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
     // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
-    $this->_addNewProfile(FALSE);
+    list($id, $profileTitle) = $this->_addNewProfile(FALSE);
+    $this->_deleteProfile($id, $profileTitle);
   }
 
   function testNonSearchableMultiProfile() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
     $this->open($this->sboxPath);
 
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
-    $this->_addNewProfile(TRUE, TRUE);
+    list($id, $profileTitle) = $this->_addNewProfile(TRUE, TRUE);
+    $this->_deleteProfile($id, $profileTitle);
   }
 
   function _addNewProfile($checkMultiRecord = TRUE, $checkSearchable = FALSE, $userCheck = FALSE) {
@@ -105,7 +101,6 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->type('title', $profileTitle);
 
     //profile Used for
-    $this->click('uf_group_type_User Registration');
     $this->click('uf_group_type_User Account');
 
     //Profile Advance Settings
@@ -245,7 +240,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid");
     if (!$checkMultiRecord) {
       $this->assertElementContainsText('crm-container', 'No multi-record entries found');
-      return;
+      return array($gid, $profileTitle);
     }
     $this->waitForElementPresent("//div[@id='crm-profile-block']/a");
     $this->click("//div[@id='crm-profile-block']/a");
@@ -287,7 +282,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-container', $params['textFieldLabel']);
     if ($checkSearchable) {
       $this->verifyElementNotPresent("//div[@id='profile-dialog']/div/div/div/div[1]/div[2]/a");
-      return;
+      return array($gid, $profileTitle);
     }
 
     // Check Search Functionality
@@ -304,6 +299,14 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->verifyText("//form[@id='Search']/div[3]/div[2]/table/tbody/tr[2]/td[3]", preg_quote($record1['text']));
       $this->verifyText("//form[@id='Search']/div[3]/div[2]/table/tbody/tr[3]/td[3]", preg_quote($record2['text']));
     }
+    return array($gid, $profileTitle);
+  }
+
+  function _deleteProfile($gid, $profileTitle) {
+    $this->openCiviPage("admin/uf/group", "action=delete&id={$gid}", '_qf_Group_next-bottom');
+    $this->click('_qf_Group_next-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->assertElementContainsText('crm-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
   }
 
   function _testCustomAdd($checkSearchable) {
