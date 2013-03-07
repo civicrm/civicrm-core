@@ -53,7 +53,7 @@
         {*assign var="element_name" value=$element.custom_group_id|cat:_|cat:$field_id|cat:_|cat:$element.name*}
         {assign var="element_name" value=$element.element_name}
         <tr>
-         <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element_name text=$element.help_post}{/if}</td>
+         <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
          <td>
             {assign var="count" value="1"}
                 <table class="form-layout-compressed">
@@ -86,7 +86,7 @@
         {*assign var="element_name" value=$group_id|cat:_|cat:$field_id|cat:_|cat:$element.name*}
         {assign var="element_name" value=$element.element_name}
         <tr>
-          <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element_name text=$element.help_post}{/if}</td>
+          <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
         <td>
       {if $element.data_type neq 'Date'}
             {$form.$element_name.html}&nbsp;
