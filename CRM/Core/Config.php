@@ -662,7 +662,10 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     foreach ($module_files as $module_file) {
       // Clean up old module permissions that have been removed in the current
       // module version.
-      $this->userPermissionClass->upgradePermissions($module_file['prefix']);
+      $this->userPermissionClass->upgradePermissions(
+        $module_file['prefix'],
+        $this->userPermissionClass->getModulePermissions($module_file['prefix'])
+      );
     }
   }
 

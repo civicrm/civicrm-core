@@ -163,8 +163,12 @@ class CRM_Core_Permission_Base {
    * actually defined by that module. This is useful during module upgrade
    * when the newer module version has removed permission that were defined
    * in the older version.
+   *
+   * @param string $module short-name
+   * @param array $modulePermissions same format as CRM_Core_Permission::getCorePermissions().
+   * @see CRM_Core_Permission::getCorePermissions
    */
-  function upgradePermissions($module) {
+  function upgradePermissions($module, $modulePermissions) {
   }
 
   /**

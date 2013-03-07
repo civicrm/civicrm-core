@@ -95,15 +95,12 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   }
 
   /**
-   * Ensure that all cached permissions associated with the given module are
-   * actually defined by that module. This is useful during module upgrade
-   * when the newer module version has removed permission that were defined
-   * in the older version.
+   * {@inheritdoc}
    */
-  function upgradePermissions($module) {
+  function upgradePermissions($module, $modulePermissions) {
     $config = CRM_Core_Config::singleton();
     // Get all permissions defined by the module.
-    $module_permissions = self::filterPermissions($config->userPermissionClass->getModulePermissions($module), $module);
+    $module_permissions = self::filterPermissions($modulePermissions, $module);
     // Construct a delete query to remove permissions for this module.
     $query = db_delete('role_permission')
       ->condition('permission', "$module|%", 'LIKE')
