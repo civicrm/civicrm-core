@@ -230,7 +230,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @return int  Group ID (null if Group ID doesn't exist)
    * @access private
    */
-  private function _getGid() {
+  private static function _getGid() {
     if (!self::$_gid) {
       self::$_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'label_format', 'id', 'name');
       if (!self::$_gid) {

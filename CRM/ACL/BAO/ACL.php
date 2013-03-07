@@ -500,7 +500,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $rule->query($query);
 
     while ($rule->fetch()) {
-      $results[$rule->id] = &$rule->toArray();
+      $results[$rule->id] = $rule->toArray();
     }
 
     return $results;
@@ -699,7 +699,6 @@ SELECT count( a.id )
   }
 
   public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL) {
-
     $acls = CRM_ACL_BAO_Cache::build($contactID);
     //CRM_Core_Error::debug( "a: $contactID", $acls );
 
