@@ -73,6 +73,17 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   public $relPaths = FALSE;
 
   /**
+   * @var array($key => $relUrl)
+   *
+   * Derived from $relPaths. On Unix systems (where file-paths and
+   * URL-paths both use '/' separator), this isn't necessary. On Windows
+   * systems, this is derived from $relPaths.
+   *
+   * Note: Treat as private. This is only public to facilitate debugging.
+   */
+  public $relUrls = FALSE;
+
+  /**
    * @param string $baseDir local path to the container
    * @param string $baseUrl public URL of the container
    * @param CRM_Utils_Cache_Interface $cache
@@ -103,7 +114,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    * {@inheritdoc}
    */
   public function getResUrl($key) {
-    return $this->baseUrl . $this->getRelPath($key);
+    return $this->baseUrl . $this->getRelUrl($key);
   }
 
   /**
@@ -169,5 +180,52 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
       }
     }
     return $this->relPaths;
+  }
+
+  /**
+   * Determine the relative path of an extension directory
+   *
+   * @return string
+   * @throws CRM_Extension_Exception
+   */
+  protected function getRelUrl($key) {
+    $relUrls = $this->getRelUrls();
+    if (! isset($relUrls[$key])) {
+      throw new CRM_Extension_Exception_MissingException("Failed to find extension: $key");
+    }
+    return $relUrls[$key];
+  }
+
+  /**
+   * Scan $basedir for a list of extension-keys
+   *
+   * @param string $dirSep the local system's directory separator
+   * @return array($key => $relUrl)
+   */
+  protected function getRelUrls() {
+    if (DIRECTORY_SEPARATOR == '/') {
+      return $this->getRelPaths();
+    }
+    if (!is_array($this->relUrls)) {
+      $this->relUrls = self::convertPathsToUrls(DIRECTORY_SEPARATOR, $this->getRelPaths());
+    }
+    return $this->relUrls;
+  }
+
+  /**
+   * Convert a list of relative paths to relative URLs.
+   *
+   * Note: Treat as private. This is only public to facilitate testing.
+   *
+   * @param string $dirSep
+   * @param array $relPaths ($key => $relPath)
+   * @return array($key => $relUrl)
+   */
+  public static function convertPathsToUrls($dirSep, $relPaths) {
+    $relUrls = array();
+    foreach ($relPaths as $key => $relPath) {
+      $relUrls[$key] = str_replace($dirSep, '/', $relPath);
+    }
+    return $relUrls;
   }
 }

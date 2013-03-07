@@ -96,4 +96,17 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     $c = new CRM_Extension_Container_Basic($basedir . $appendPathGarbage, 'http://example/basedir' . $appendPathGarbage, $cache, $cacheKey);
     return array($basedir, $c);
   }
+
+  function testConvertPathsToUrls() {
+    $relPaths = array(
+      'foo.bar' => 'foo\bar',
+      'whiz.bang' => 'tests\extensions\whiz\bang'
+    );
+    $expectedRelUrls = array(
+      'foo.bar' => 'foo/bar',
+      'whiz.bang' => 'tests/extensions/whiz/bang',
+    );
+    $actualRelUrls = CRM_Extension_Container_Basic::convertPathsToUrls('\\', $relPaths);
+    $this->assertEquals($expectedRelUrls, $actualRelUrls);
+  }
 }
