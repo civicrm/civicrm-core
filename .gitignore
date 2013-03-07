@@ -138,6 +138,9 @@ joomla
 packages/
 tests/phpunit/CiviTest/civicrm.settings.local.php
 tools/scripts/releaser/releaser.conf
+tools/tests/reports/logfile.tap
+tools/tests/reports/testdox.html
+tools/tests/reports/testdox.txt
 l10n
 vendor
 civicrm.settings.php
