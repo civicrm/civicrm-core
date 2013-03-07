@@ -659,13 +659,34 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    */
   function cleanupPermissions() {
     $module_files = CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles();
-    foreach ($module_files as $module_file) {
-      // Clean up old module permissions that have been removed in the current
-      // module version.
-      $this->userPermissionClass->upgradePermissions(
-        $module_file['prefix'],
-        $this->userPermissionClass->getModulePermissions($module_file['prefix'])
-      );
+    if ($this->userPermissionClass->isModulePermissionSupported()) {
+      // Can store permissions -- so do it!
+      foreach ($module_files as $module_file) {
+        // Consider corner case: Cleaning up old module permissions that have been removed
+        // by unversioned source-code changes.
+        $this->userPermissionClass->upgradePermissions(
+          $module_file['prefix'],
+          $this->userPermissionClass->getModulePermissions($module_file['prefix'])
+        );
+      }
+    } else {
+      // Cannot store permissions -- warn if any modules require them
+      $modules_with_perms = array();
+      foreach ($module_files as $module_file) {
+        $perms = $this->userPermissionClass->getModulePermissions($module_file['prefix']);
+        if (!empty($perms)) {
+          $modules_with_perms[] = $module_file['prefix'];
+        }
+      }
+      if (!empty($modules_with_perms)) {
+        CRM_Core_Session::setStatus(
+          ts('Some modules define permissions, but the CMS cannot store them: %1', array(
+            array(1 => implode(', ', $modules_with_perms))
+          )),
+          ts('Permission Error'),
+          'error'
+        );
+      }
     }
   }
 

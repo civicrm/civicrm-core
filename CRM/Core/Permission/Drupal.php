@@ -85,6 +85,13 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public function isModulePermissionSupported() {
+    return TRUE;
+  }
+
+  /**
    * Remove all vestiges of permissions for the given module.
    */
   function uninstallPermissions($module) {

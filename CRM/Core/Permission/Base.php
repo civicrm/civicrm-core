@@ -153,9 +153,21 @@ class CRM_Core_Permission_Base {
   }
 
   /**
+   * Determine whether the permission store allows us to store
+   * a list of permissions generated dynamically (eg by
+   * hook_civicrm_permissions.)
+   *
+   * @return bool
+   */
+  public function isModulePermissionSupported() {
+    return FALSE;
+  }
+
+  /**
    * Remove all vestiges of permissions for the given module.
    */
   function uninstallPermissions($module) {
+    throw new CRM_Core_Exception("Unimplemented method: CRM_Core_Permission_*::uninstallPermissions");
   }
 
   /**
@@ -169,6 +181,7 @@ class CRM_Core_Permission_Base {
    * @see CRM_Core_Permission::getCorePermissions
    */
   function upgradePermissions($module, $modulePermissions) {
+    throw new CRM_Core_Exception("Unimplemented method: CRM_Core_Permission_*::upgradePermissions");
   }
 
   /**
