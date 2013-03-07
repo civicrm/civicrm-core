@@ -1309,7 +1309,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config');
       if ($is_quick_config) {
         foreach ($this->_priceSet['fields'] as $fieldKey => $fieldVal) {
-          if ($fieldVal['name'] == 'membership_amount') {
+          if ($fieldVal['name'] == 'membership_amount' && CRM_Utils_Array::value('price_' . $fieldId, $params)) {
             $fieldId     = $fieldVal['id'];
             $fieldOption = $params['price_' . $fieldId];
             $memPresent  = TRUE;
@@ -1320,7 +1320,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               if ($fieldVal['name'] == 'other_amount') {
                 $proceFieldAmount = $this->_submitValues['price_' . $fieldId];
               }
-              else $proceFieldAmount = $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
+              else {
+                $proceFieldAmount = $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
+              }
               unset($params['price_' . $fieldId]);
               break;
             }
