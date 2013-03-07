@@ -114,7 +114,7 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
         array(1 => $report['mailing']['name'])
       ));
 
-    return parent::run();
+    return CRM_Core_Page::run();
   }
 }
 
