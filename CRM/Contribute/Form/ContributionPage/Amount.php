@@ -567,7 +567,7 @@ SELECT id
               CRM_Price_BAO_Field::retrieve($editedFieldParams, $editedResults);
               if (!CRM_Utils_Array::value('id', $editedResults)) {
                 $fieldParams['name'] = strtolower(CRM_Utils_String::munge("Contribution Amount", '_', 245));
-                $fieldParams['label'] = "Contribution Amount";
+                $fieldParams['label'] = ts('Contribution Amount');
               }
               else {
                 $fieldParams['id'] = CRM_Utils_Array::value('id', $editedResults);
@@ -605,7 +605,7 @@ SELECT id
               if (!$priceFieldID = CRM_Utils_Array::value('id', $editedResults)) {
                 $fieldParams = array( 
                   'name' => 'other_amount',
-                  'label' => 'Other Amount',
+                  'label' => ts('Other Amount'),
                   'price_set_id' => $priceSetId,
                   'html_type' => 'Text',
                   'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $this->_values),
@@ -616,10 +616,10 @@ SELECT id
                 $fieldParams['option_amount'][1] = 1;
                 if (!$noContriAmount) {
                   $fieldParams['is_required'] = 1;
-                  $fieldParams['option_label'][1] = 'Contribution Amount'; 
+                  $fieldParams['option_label'][1] = ts('Contribution Amount'); 
                 } else {
                   $fieldParams['is_required'] = 0;
-                  $fieldParams['option_label'][1] = 'Other Amount';
+                  $fieldParams['option_label'][1] = ts('Other Amount');
                 }
 
                 $priceField = CRM_Price_BAO_Field::create($fieldParams);
@@ -631,13 +631,13 @@ SELECT id
             } elseif (!CRM_Utils_Array::value('is_allow_other_amount', $params) && CRM_Utils_Array::value('price_field_other', $params)) {
               CRM_Price_BAO_Field::setIsActive($params['price_field_other'], '0');
             } elseif ($priceFieldID = CRM_Utils_Array::value('price_field_other', $params)) {
-              $priceFieldValueID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_FieldValue', $priceFieldID, 'id', 'price_field_id' );
+              $priceFieldValueID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_FieldValue', $priceFieldID, 'id', 'price_field_id');
               if (!$noContriAmount) {
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_Field', $priceFieldID, 'is_required', 1);
-                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_FieldValue', $priceFieldValueID, 'label', 'Contribution Amount' );
+                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_FieldValue', $priceFieldValueID, 'label', ts('Contribution Amount'));
               } else {
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_Field', $priceFieldID, 'is_required', 0 );
-                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_FieldValue', $priceFieldValueID, 'label', 'Other Amount' );
+                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_FieldValue', $priceFieldValueID, 'label', ts('Other Amount'));
               }
             }
           }

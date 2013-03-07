@@ -666,7 +666,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     else {
       $fieldName = $previousID;
     }
-    $fieldLabel  = 'Membership Amount';
+    $fieldLabel  = ts('Membership Amount');
     $optionsIds  = NULL;
     $fieldParams = array(
       'price_set_id ' => $priceSetId,
