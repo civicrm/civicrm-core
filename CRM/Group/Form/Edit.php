@@ -99,9 +99,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
       $this->_groupValues = array();
       $params             = array('id' => $this->_id);
-      $this->_group       = &CRM_Contact_BAO_Group::retrieve($params,
-        $this->_groupValues
-      );
+      $this->_group       = CRM_Contact_BAO_Group::retrieve($params, $this->_groupValues);
       $this->_title = $this->_groupValues['title'];
     }
 
@@ -134,8 +132,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
             'search_custom_id'
           );
         }
-        if (CRM_Utils_Array::value('created_id', $this->_groupValues)) 
-          $groupValues['created_by'] = 
+        if (CRM_Utils_Array::value('created_id', $this->_groupValues))
+          $groupValues['created_by'] =
             CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['created_id'] , 'sort_name', 'id');
 
         $this->assign_by_ref('group', $groupValues);
