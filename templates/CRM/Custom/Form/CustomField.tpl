@@ -24,9 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {assign var="element_name" value=$element.element_name}
-{if $element.help_post}
-    {assign var="help_post" value=$element.help_post}
-{/if}
 
     {if $element.help_pre}
         <tr class="custom_field-help-pre-row {$element.element_name}-row-help-pre">
@@ -36,7 +33,7 @@
     {/if}
      {if $element.options_per_line != 0 }
         <tr class="custom_field-row {$element.element_name}-row">
-            <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element_name text=$help_post}{/if}</td>
+            <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
             <td class="html-adjust">
                 {assign var="count" value="1"}
                 <table class="form-layout-compressed" style="margin-top: -0.5em;">
@@ -67,7 +64,7 @@
 
     {else}
         <tr class="custom_field-row {$element.element_name}-row">
-            <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element_name text=$help_post}{/if}</td>
+            <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
             <td class="html-adjust">
                 {if $element.data_type neq 'Date' OR ($element.data_type eq 'Date' AND $element.is_view eq 1)}
                     {$form.$element_name.html}&nbsp;

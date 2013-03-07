@@ -23,12 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-status_change-title"}
-  {ts}Participant Status{/ts}
-{/htxt}
-{htxt id="id-status_change"}
-<p><strong>{ts}Enabling Waitlisting and Registration Approval{/ts}</strong><br />
-{ts}This screen is particularly useful for managing events with Waitlisting and / or Registration Approval features enabled. In order to use these features you must first enable the related Participant Statuses (Administer &raquo; CiviEvent &raquo; Participant Statuses).{/ts}</p>
-<p><strong>{ts}Tip: Managing waitlisted participants{/ts}</strong><br />
-{ts}If you are moving participants from "On waitlist" to "Pending from waitlist" status, make sure there are available spaces for the event. An email with a link to confirm their registration will be automatically sent. However, they will only be allowed to complete their registration if the event is not full (e.g. the number of registered participants is less than the maximum number of participants configured for the event).{/ts}</p>
+{* Dynamically fetch the help text for a custom field *}
+{htxt id=$id}
+  {crmAPI var='result' entity='CustomField' action='getsingle' id=$id}
+  {$result.help_post}
 {/htxt}
