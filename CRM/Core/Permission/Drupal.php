@@ -103,7 +103,7 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   function upgradePermissions($module) {
     $config = CRM_Core_Config::singleton();
     // Get all permissions defined by the module.
-    $module_permissions = $config->userPermissionClass->getModulePermissions($module);
+    $module_permissions = self::filterPermissions($config->userPermissionClass->getModulePermissions($module), $module);
     // Construct a delete query to remove permissions for this module.
     $query = db_delete('role_permission')
       ->condition('permission', "$module|%", 'LIKE')
@@ -131,8 +131,7 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
     if (function_exists($fn_name)) {
       $module_permissions = array();
       $fn_name($module_permissions);
-
-      $return_permissions = self::filterPermissions($module_permissions, $module);
+      $return_permissions = $module_permissions;
     }
     return $return_permissions;
   }
