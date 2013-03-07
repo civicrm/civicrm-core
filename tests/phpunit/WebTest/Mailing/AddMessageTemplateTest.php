@@ -85,12 +85,14 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct
-    $this->assertTrue($this->isTextPresent("The Message Template '$msgTitle' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "The Message Template '$msgTitle' has been saved.");
 
     // Verify text.
-    $this->assertTrue($this->isTextPresent($msgTitle));
+    $this->assertTrue($this->isElementPresent("xpath=id('user')/div[2]/div/table/tbody//tr/td[1][contains(text(), '$msgTitle')]"),
+      'Message Template Title not found!');
     if (!$useTokens) {
-      $this->assertTrue($this->isTextPresent($msgSubject));
+      $this->assertTrue($this->isElementPresent("xpath=id('user')/div[2]/div/table/tbody//tr/td[2][contains(text(), '$msgSubject')]"),
+        'Message Subject not found!');
     }
   }
 
@@ -137,7 +139,7 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->assertChecked("open_tracking");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
     $this->click("_qf_Settings_next");
     $this->waitForElementPresent("_qf_Upload_cancel");
 
@@ -152,13 +154,13 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->select('footer_id', "label=Mailing Footer");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next with nominal content
     $this->click("_qf_Upload_upload");
     $this->waitForElementPresent("_qf_Test_cancel");
 
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next
     $this->click("_qf_Test_next");
@@ -167,15 +169,15 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->assertChecked("now");
 
     // do check count for Recipient
-    $this->assertTrue($this->isTextPresent("Total Recipients: 1"));
+    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // finally schedule the mail by clicking submit
     $this->click("_qf_Schedule_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertTrue($this->isTextPresent("Scheduled and Sent Mailings"));
-    $this->assertTrue($this->isTextPresent("Mailing $mailingName Webtest"));
+    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
+    $this->assertElementContainsText("xpath=//table[@class='selector']/tbody//tr//td", "Mailing $mailingName Webtest");
     $this->openCiviPage('mailing/queue', 'reset=1');
 
     // verify status
@@ -190,6 +192,6 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
 
     $this->click("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ActivityView_next");
-    $this->assertTrue($this->isTextPresent("Bulk Email Sent."), "Status message didn't show up after saving!");
+    $this->assertElementContainsText('help', "Bulk Email Sent.", "Status message didn't show up after saving!");
   }
 }
