@@ -95,7 +95,7 @@ WHERE    entity_value = '' OR entity_value IS NULL
       }
     }
 
-    if ($rev == '4.3.beta1') {
+    if ($rev == '4.3.beta2') {
       $postUpgradeMessage .= '<br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li><li>Events - Registration Confirmation and Receipt (off-line)</li><li>Pledges - Acknowledgement</li><li>Pledges - Payment Reminder</li><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li><li>Memberships - Receipt (on-line)</li><li>Personal Campaign Pages - Admin Notification</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
     }
 
