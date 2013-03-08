@@ -42,31 +42,7 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     $this->webtestLogin(TRUE);
 
     // Enable CiviCampaign module and CiviPledge module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent("Your changes have been saved."));
-    }
-
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviPledge", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviPledge");
-      $this->click("//option[@value='CiviPledge']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent("Your changes have been saved."));
-    }
+    $this->enableComponents(array("CiviCampaign", "CiviPledge"));
 
     // add the required Drupal permission
     $permissions = array(

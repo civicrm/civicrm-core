@@ -108,15 +108,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
   function testContributionDashboard() {
     $this->login();
     // Enable CiviContribute module if necessary
-    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviContribute", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviContribute");
-      $this->click("//option[@value='CiviContribute']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-    }
+    $this->enableComponents("CiviContribute");
 
     // Contributions → Dashboard
     $this->click("css=ul#civicrm-menu li.crm-Contributions");
@@ -133,15 +125,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Enable CiviEvent module if necessary
-    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviEvent", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviEvent");
-      $this->click("//option[@value='CiviEvent']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-    }
+    $this->enableComponents("CiviEvent");
 
     // Events → Dashboard
     $this->click("css=ul#civicrm-menu li.crm-Events");
@@ -166,15 +150,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Enable CiviMember module if necessary
-    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviMember", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviMember");
-      $this->click("//option[@value='CiviMember']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-    }
+    $this->enableComponents("CiviMember");
 
     // Memberships → Dashboard
     $this->click("css=ul#civicrm-menu li.crm-Memberships");
@@ -191,15 +167,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Enable CiviContribute module if necessary
-    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviContribute", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviContribute");
-      $this->click("//option[@value='CiviContribute']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-    }
+    $this->enableComponents("CiviContribute");
 
     // Search → Find Contributions
     // Use class names for menu items since li array can change based on which components are enabled
@@ -225,15 +193,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Enable CiviMail module if necessary
-    $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviMail", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviMail");
-      $this->click("//option[@value='CiviMail']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-    }
+    $this->enableComponents("CiviMail");
 
     // configure default mail-box
     $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", "_qf_MailSettings_cancel-bottom");

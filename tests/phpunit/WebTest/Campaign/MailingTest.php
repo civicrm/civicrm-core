@@ -33,11 +33,6 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in as admin first to verify permissions for CiviCampaign
     $this->webtestLogin(TRUE);
 

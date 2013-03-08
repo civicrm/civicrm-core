@@ -33,23 +33,11 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
   }
 
   function testAddCase() {
-    $this->open($this->sboxPath);
-
-    // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin();
 
     // Enable CiviCase module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Component_next-bottom");
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCase", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCase");
-      $this->click("//option[@value='CiviCase']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-    }
+    $this->enableComponents("CiviCase");
+
     $customGrp1 = "CaseCustom_Data1_" . substr(sha1(rand()), 0, 7);
 
     // create custom group1
@@ -68,9 +56,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $customGrpId1 = $elements['queryString']['gid'];
 
     $customId = $this->_testGetCustomFieldId($customGrpId1);
-    $cusId_1  = 'custom_' . $customId[0] . '_-1';
-    $cusId_2  = 'custom_' . $customId[1] . '_-1';
-    $cusId_3  = 'custom_' . $customId[2] . '_-1';
+    $cusId_1 = 'custom_' . $customId[0] . '_-1';
+    $cusId_2 = 'custom_' . $customId[1] . '_-1';
+    $cusId_3 = 'custom_' . $customId[2] . '_-1';
 
     // let's give full CiviCase permissions.
     $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
@@ -86,9 +74,6 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("profilewrap4");
 
-    // Is status message correct?
-    $this->assertTextPresent("Thank you. Your information has been saved.", "Save successful status message didn't show up after saving profile to update testUserName!");
-
     // Go directly to the URL of the screen that you will be testing (New Case-standalone).
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
@@ -96,7 +81,6 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->click("_qf_Case_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("css=span.crm-error");
-    $this->assertTextPresent("Please select a contact or create new contact", "Expected form rule error for submit without selecting contact did not show up after clicking Save.");
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
@@ -114,10 +98,10 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $caseTypeLabel = "Adult Day Care Referral";
 
     // activity types we expect for this case type
-    $activityTypes   = array("ADC referral", "Follow up", "Medical evaluation", "Mental health evaluation");
-    $caseRoles       = array("Senior Services Coordinator", "Health Services Coordinator", "Benefits Specialist", "Client");
+    $activityTypes = array("ADC referral", "Follow up", "Medical evaluation", "Mental health evaluation");
+    $caseRoles = array("Senior Services Coordinator", "Health Services Coordinator", "Benefits Specialist", "Client");
     $caseStatusLabel = "Ongoing";
-    $subject         = "Safe daytime setting - senior female";
+    $subject = "Safe daytime setting - senior female";
     $this->select("medium_id", "value=1");
     $location = "Main offices";
     $this->type("activity_location", $location);
@@ -171,22 +155,19 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("xpath=//div[@id='{$customGrp1}']/div[2]");
+    $this->click("css=#{$customGrp1} .crm-accordion-header");
+    $this->waitForElementPresent("css=#{$customGrp1} a.button");
+    $cusId_1 = 'custom_' . $customId[0] . '_1';
+    $cusId_2 = 'custom_' . $customId[1] . '_1';
+    $cusId_3 = 'custom_' . $customId[2] . '_1';
+    $this->click("css=#{$customGrp1} a.button");
     sleep(2);
-    $this->waitForElementPresent("xpath=//div[@id='{$customGrp1}']/div[2]/div/a/span[text()='Edit']");
-    $this->click("xpath=//div[@id='{$customGrp1}']/div[2]/div/a/span[text()='Edit']");
-    sleep(3);
+    $this->waitForElementPresent("{$cusId_1}");
     $custFname = "Miky" . substr(sha1(rand()), 0, 7);
     $custMname = "Davy" . substr(sha1(rand()), 0, 7);
     $custLname = "Kristy" . substr(sha1(rand()), 0, 7);
-    $cusId_1   = 'custom_' . $customId[0] . '_1';
-    $cusId_2   = 'custom_' . $customId[1] . '_1';
-    $cusId_3   = 'custom_' . $customId[2] . '_1';
-    $this->click("xpath=//div[@id='{$customGrp1}']/div[2]");
-    sleep(3);
     $this->type("{$cusId_1}", $custFname);
     $this->type("{$cusId_2}", $custMname);
     $this->type("{$cusId_3}", $custLname);
@@ -225,13 +206,12 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $customId = array();
 
     // Create a custom data to add in profile
-
     $field1 = "Fname" . substr(sha1(rand()), 0, 7);
     $field2 = "Mname" . substr(sha1(rand()), 0, 7);
     $field3 = "Lname" . substr(sha1(rand()), 0, 7);
 
     // add custom fields for group 1
-    $this->openCiviPage('admin/custom/group/field/add', "reset=1&action=add&gid={$customGrpId1}");
+    $this->openCiviPage('admin/custom/group/field/add', array('reset' => 1, 'action' => 'add', 'gid' => $customGrpId1));
     $this->type("label", $field1);
     $this->check("is_searchable");
     $this->click("_qf_Field_next_new-bottom");
@@ -248,7 +228,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get id of custom fields
-    $this->openCiviPage('admin/custom/group/field', "reset=1&action=browse&gid={$customGrpId1}");
+    $this->openCiviPage("admin/custom/group/field", array('reset' => 1, 'action' => 'browse', 'gid' => $customGrpId1));
     $custom1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[1]/td[8]/span/a[text()='Edit Field']/@href"));
     $custom1 = $custom1[1];
     array_push($customId, $custom1);
@@ -264,19 +244,19 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
   function _testDeleteCustomData($customGrpId1, $customId) {
     // delete all custom data
-    $this->openCiviPage('admin/custom/group/field', "action=delete&reset=1&gid={$customGrpId1}&id={$customId[0]}");
+    $this->openCiviPage("admin/custom/group/field", array('action' => 'delete', 'reset' => '1', 'gid' => $customGrpId1, 'id' => $customId[0]));
     $this->click("_qf_DeleteField_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->openCiviPage('admin/custom/group/field', "action=delete&reset=1&gid={$customGrpId1}&id={$customId[1]}");
+    $this->openCiviPage("admin/custom/group/field", array('action' => 'delete', 'reset' => '1', 'gid' => $customGrpId1, 'id' => $customId[1]));
     $this->click("_qf_DeleteField_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->openCiviPage('admin/custom/group/field', "action=delete&reset=1&gid={$customGrpId1}&id={$customId[2]}");
+    $this->openCiviPage("admin/custom/group/field", array('action' => 'delete', 'reset' => '1', 'gid' => $customGrpId1, 'id' => $customId[2]));
     $this->click("_qf_DeleteField_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->openCiviPage('admin/custom/group', "action=delete&reset=1&id={$customGrpId1}");
+    $this->openCiviPage("admin/custom/group", "action=delete&reset=1&id=" . $customGrpId1);
     $this->click("_qf_DeleteGroup_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
@@ -285,7 +265,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     // search casecontact
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
     $this->click("CiviCase");
-    sleep(2);
+    $this->waitForElementPresent('case_from_relative');
     $cusId_1 = 'custom_' . $customId[0];
     $cusId_2 = 'custom_' . $customId[1];
     $cusId_3 = 'custom_' . $customId[2];
