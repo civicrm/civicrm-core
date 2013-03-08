@@ -1590,10 +1590,15 @@ class CRM_Contact_BAO_Query {
         }
         // check for both id and contact_id
         if ($this->_params[$id][0] == 'id' || $this->_params[$id][0] == 'contact_id') {
-          if ($this->_params[$id][1] == 'IS NULL' ||
+          if (
+            $this->_params[$id][1] == 'IS NULL' ||
             $this->_params[$id][1] == 'IS NOT NULL'
           ) {
             $this->_where[0][] = "contact_a.id {$this->_params[$id][1]}";
+          }
+          elseif (is_array($this->_params[$id][2])) {
+            $idList = implode("','", $this->_params[$id][2]);
+            $this->_where[0][] = "contact_a.id IN ({$idList})";
           }
           else {
             $this->_where[0][] = "contact_a.id {$this->_params[$id][1]} {$this->_params[$id][2]}";
