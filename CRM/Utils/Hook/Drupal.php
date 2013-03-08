@@ -68,25 +68,6 @@ class CRM_Utils_Hook_Drupal extends CRM_Utils_Hook {
   }
 
   /**
-   * Get a list of modules implementing the given hook.
-   * @return Array of module names.
-   */
-  function moduleImplements($hook_name) {
-    $return = array();
-
-    $this->buildModuleList();
-
-    // For each module, check if it defines a hook implementation.
-    foreach ($this->allModules as $module) {
-      $fnName = "{$module}_{$hook_name}";
-      if (function_exists($fnName)) {
-        $return[] = $module;
-      }
-    }
-    return $return;
-  }
-
-  /**
    * Build the list of modules to be processed for hooks.
    */
   function buildModuleList() {
