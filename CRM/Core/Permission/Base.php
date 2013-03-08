@@ -171,16 +171,15 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Ensure that all cached permissions associated with the given module are
-   * actually defined by that module. This is useful during module upgrade
-   * when the newer module version has removed permission that were defined
-   * in the older version.
+   * Ensure that the CMS supports all the permissions defined by CiviCRM
+   * and its extensions. If there are stale permissions, they should be
+   * deleted. This is useful during module upgrade when the newer module
+   * version has removed permission that were defined in the older version.
    *
-   * @param string $module short-name
-   * @param array $modulePermissions same format as CRM_Core_Permission::getCorePermissions().
+   * @param array $permissions same format as CRM_Core_Permission::getCorePermissions().
    * @see CRM_Core_Permission::getCorePermissions
    */
-  function upgradePermissions($module, $modulePermissions) {
+  function upgradePermissions($permissions) {
     throw new CRM_Core_Exception("Unimplemented method: CRM_Core_Permission_*::upgradePermissions");
   }
 

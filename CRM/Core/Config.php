@@ -661,14 +661,9 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     $module_files = CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles();
     if ($this->userPermissionClass->isModulePermissionSupported()) {
       // Can store permissions -- so do it!
-      foreach ($module_files as $module_file) {
-        // Consider corner case: Cleaning up old module permissions that have been removed
-        // by unversioned source-code changes.
-        $this->userPermissionClass->upgradePermissions(
-          $module_file['prefix'],
-          $this->userPermissionClass->getModulePermissions($module_file['prefix'])
-        );
-      }
+      $this->userPermissionClass->upgradePermissions(
+        CRM_Core_Permission::basicPermissions()
+      );
     } else {
       // Cannot store permissions -- warn if any modules require them
       $modules_with_perms = array();

@@ -162,7 +162,7 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    *
    * Does nothing in Drupal 6.
    */
-  function upgradePermissions($module, $modulePermissions) {
+  function upgradePermissions($permissions) {
   }
 
   /**

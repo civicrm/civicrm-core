@@ -104,17 +104,13 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   /**
    * {@inheritdoc}
    */
-  function upgradePermissions($module, $module_permissions) {
-    // Construct a delete query to remove permissions for this module.
-    $query = db_delete('role_permission')
-      ->condition('permission', "$module|%", 'LIKE')
-      ->condition('module', 'civicrm');
-    // Only if the module defines any permissions, exempt those from the delete
-    // process. This approach allows us to delete all permissions for the module
-    // even if the hook_civicrm_permisssion() implementation has been removed.
-    if (!empty($module_permissions)) {
-      $query->condition('permission', array_keys($module_permissions), 'NOT IN');
+  function upgradePermissions($permissions) {
+    if (empty($permissions)) {
+      throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");
     }
+    $query = db_delete('role_permission')
+      ->condition('module', 'civicrm')
+      ->condition('permission', array_keys($permissions), 'NOT IN');
     $query->execute();
   }
 }
