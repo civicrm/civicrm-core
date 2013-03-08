@@ -92,16 +92,6 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   }
 
   /**
-   * Remove all vestiges of permissions for the given module.
-   */
-  function uninstallPermissions($module) {
-    db_delete('role_permission')
-      ->condition('permission', "$module|%", 'LIKE')
-      ->condition('module', 'civicrm')
-      ->execute();
-  }
-
-  /**
    * {@inheritdoc}
    */
   function upgradePermissions($permissions) {
