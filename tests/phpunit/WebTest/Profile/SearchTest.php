@@ -47,10 +47,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // Go directly to the URL of the screen where you will be
     // Add new profile.
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->openCiviPage('admin/uf/group', 'reset=1');
+    
     $this->click('newCiviCRMProfile-bottom');
 
     $this->waitForElementPresent('_qf_Group_next-bottom');
@@ -64,7 +62,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '$profileTitle' has been added. You can add fields to this profile now"));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     // Get profile id (gid) from URL
     $elements = $this->parseURL();
@@ -84,9 +82,9 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile Field 'Last Name' has been saved to '$profileTitle'."));
-    $this->assertTrue($this->isTextPresent("You can add another profile field."));
-                                           
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Last Name' has been saved to '$profileTitle'.");
+    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.');
+
     // Add Email field.
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
@@ -101,8 +99,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'."));
-    $this->assertTrue($this->isTextPresent("You can add another profile field."));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
+    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.'); 
 
     // Add Sample Custom Field.
     $this->click('field_name[0]');
@@ -132,7 +130,9 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     // Select Custom option
     $this->click('CIVICRM_QFID_Edu_2');
     $this->click('_qf_Edit_next');
-    $this->isTextPresent('Thank you. Your information has been saved.');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->assertElementContainsText('css=span.msg-text', 'Your information has been saved.');
 
     // Search Contact via profile.
     $this->waitForElementPresent("xpath=//div[@id='crm-container']//div/a[text()='» Back to Listings']");
@@ -146,16 +146,16 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     // Select Custom option
     $this->click('CIVICRM_QFID_Edu_2');
     $this->click('_qf_Search_refresh');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Verify Data.
-    $this->waitForElementPresent("xpath=//table/tbody/tr[2]/td[2][text()='$lastName']");
-    $this->waitForElementPresent("xpath=//table/tbody/tr[2]/td[3][text()='$lastName']");
-    $this->waitForElementPresent("xpath=//table/tbody/tr[2]/td[4][text()='jhon@$lastName.com']");
-    $this->waitForElementPresent("xpath=//table/tbody/tr[2]/td[5][text()='Education']");
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[2][text()='$lastName']"));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[3][text()='$lastName']"));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[4][text()='jhon@$lastName.com']"));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[5][text()='Education']"));
 
     // Go back to Profile fields admin
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group/field?reset=1&action=browse&gid=' . $profileId);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/uf/group/field', "reset=1&action=browse&gid=$profileId");
 
     // Edit first profile field
     $this->waitForElementPresent("xpath=//table/tbody/tr[1]/td[9]");
@@ -170,9 +170,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("visibility"), 'Visibility field not present when editing existing profile field.');
     $this->click("xpath=//tr[@id='profile_visibility']/td[1]/a");
     $this->waitForElementPresent("xpath=//div[@id='crm-notification-container']/div/div[2]/p[2]");
-    $this->assertTrue($this->isTextPresent("Is this field hidden from other users"));
+    $this->assertElementContainsText('crm-notification-container', 'Is this field hidden from other users');
     $this->select('visibility', 'value=Public Pages and Listings');
   }
 }
-
-
