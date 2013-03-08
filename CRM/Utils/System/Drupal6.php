@@ -327,6 +327,10 @@ SELECT name, mail
    * @access public
    */
   public function addScriptUrl($url, $region) {
+    return FALSE;
+    // The below code does not prevent drupal's and civi's jquery from getting mixed up
+    // Dropping D6 support for drupal_add_js seems reasonable since we no longer officially support D6
+    // But leaving the code in place in case anyone really wants to tackle it.
     switch ($region) {
       case 'html-header':
       case 'page-footer':
@@ -359,6 +363,10 @@ SELECT name, mail
    * @access public
    */
   public function addScript($code, $region) {
+    return FALSE;
+    // The below code does not prevent drupal's and civi's jquery from getting mixed up
+    // Dropping D6 support for drupal_add_js seems reasonable since we no longer officially support D6
+    // But leaving the code in place in case anyone really wants to tackle it.
     switch ($region) {
       case 'html-header':
       case 'page-footer':
