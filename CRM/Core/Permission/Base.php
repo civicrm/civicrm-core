@@ -192,6 +192,7 @@ class CRM_Core_Permission_Base {
    * there's one, predictable calling convention (regardless of CMS).
    *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
+   * @see CRM_Core_Permission::getCorePermissions
    */
   static function getModulePermissions($module) {
     $return_permissions = array();
