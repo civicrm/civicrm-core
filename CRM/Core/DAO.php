@@ -743,7 +743,7 @@ FROM   civicrm_domain
    * @static
    * @access public
    */
-  static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = false) {
+  static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = FALSE) {
     if (
       empty($searchValue) ||
       trim(strtolower($searchValue)) == 'null'
@@ -1315,7 +1315,7 @@ SELECT contact_id
             }
             if(in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)){
               $depObject = new $FKClassName();
-              $depObject->find(true);
+              $depObject->find(TRUE);
             } elseif ($daoName == 'CRM_Member_DAO_MembershipType' && $name == 'member_of_contact_id') {
               // FIXME: the fields() metadata is not specific enough
               $depObject = CRM_Core_DAO::createTestObject($FKClassName, array('contact_type' => 'Organization'));
@@ -1711,6 +1711,25 @@ SELECT contact_id
     }
 
     return (empty($errors)) ? FALSE : TRUE;
+  }
+
+  /**
+   * Lookup the value of a MySQL global configuration variable.
+   *
+   * @param string $name e.g. "thread_stack"
+   * @param mixed $default
+   * @return mixed
+   */
+  public static function getGlobalSetting($name, $default = NULL) {
+    // Alternatively, SELECT @@GLOBAL.thread_stack, but
+    // that has been reported to fail under MySQL 5.0 for OS X
+    $escapedName = self::escapeString($name);
+    $dao = CRM_Core_DAO::executeQuery("SHOW VARIABLES LIKE '$escapedName'");
+    if ($dao->fetch()) {
+      return $dao->Value;
+    } else {
+      return $default;
+    }
   }
 }
 

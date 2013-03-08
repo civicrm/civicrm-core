@@ -403,8 +403,8 @@ SET    version = '$version'
       $error = ts('CiviCRM %1 requires MySQL trigger privileges.',
                array(1 => $latestVer));
     }
-    
-    if (CRM_Core_DAO::singleValueQuery('SELECT @@GLOBAL.thread_stack') < (1024*self::MINIMUM_THREAD_STACK)) {
+
+    if (CRM_Core_DAO::getGlobalSetting('thread_stack', 0) < (1024*self::MINIMUM_THREAD_STACK)) {
       $error = ts('CiviCRM %1 requires MySQL thread stack >= %2k', array(
         1 => $latestVer,
         2 => self::MINIMUM_THREAD_STACK,
