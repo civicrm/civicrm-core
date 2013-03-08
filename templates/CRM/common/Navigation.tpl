@@ -151,10 +151,11 @@ if (CRM.config.userFramework != 'Joomla') {
   if ( cj('#edit-shortcuts').length > 0 ) {
      cj('#civicrm-menu').css({ 'width': '97%' });
   }
-} else {
+}
+else {
      cj('div#toolbar-box div.m').html(cj("#menu-container").html());
      cj('#civicrm-menu').ready( function(){
-      cj('.outerbox').css({ 'margin-top': '6px'});
+      cj('.outerbox').css({ 'margin-top': '20px'});
       cj('#root-menu-div .menu-ul li').css({ 'padding-bottom' : '2px', 'margin-top' : '2px' });
       cj('img.menu-item-arrow').css({ 'top' : '4px' });
     });
