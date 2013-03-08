@@ -746,7 +746,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
                                       $honoreeSection = TRUE,
                                       $allowOtherAmmount = TRUE,
                                       $isConfirmEnabled = TRUE,
-                                      $financialType = 'Donation'
+                                      $financialType = 'Donation',
+                                      $fixedAmount = TRUE,
+                                      $membershipsRequired = TRUE
   ) {
     if (!$hash) {
       $hash = substr(sha1(rand()), 0, 7);
@@ -849,9 +851,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         //$this->type('min_amount', $rand / 2);
         //$this->type('max_amount', $rand * 10);
       }
-
-      $this->type('label_1', "Label $hash");
-      $this->type('value_1', "$rand");
+      if ($fixedAmount || !$allowOtherAmmount) {
+        $this->type('label_1', "Label $hash");
+        $this->type('value_1', "$rand");
+      }
       $this->click('CIVICRM_QFID_1_2');
     }
     else {
@@ -894,8 +897,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
             $this->select("auto_renew_{$mType['id']}", "label=Give option");
           }
         }
-
-        $this->click('is_required');
+        if ($membershipsRequired) {
+          $this->click('is_required');
+        }
         $this->waitForElementPresent('CIVICRM_QFID_2_4');
         $this->click('CIVICRM_QFID_2_4');
         if ($isSeparatePayment) {
