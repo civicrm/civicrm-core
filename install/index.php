@@ -904,14 +904,14 @@ class InstallRequirements {
       return;
     }
 
-    $result = mysql_query('SELECT @@GLOBAL.thread_stack', $conn); // bytes => kb
+    $result = mysql_query("SHOW VARIABLES LIKE 'thread_stack'", $conn); // bytes => kb
     if (!$result) {
       $testDetails[2] = 'Could not query thread_stack.';
       $this->error($testDetails);
     } else {
       $values = mysql_fetch_row($result);
-      if ($values[0] < (1024*$minValueKB)) {
-        $testDetails[2] = 'MySQL "thread_stack" is ' . ($values[0]/1024) . 'k';
+      if ($values[1] < (1024*$minValueKB)) {
+        $testDetails[2] = 'MySQL "thread_stack" is ' . ($values[1]/1024) . 'k';
         $this->error($testDetails);
       }
     }
