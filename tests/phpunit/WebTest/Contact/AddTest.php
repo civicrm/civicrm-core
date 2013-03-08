@@ -102,7 +102,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->isTextPresent("Latitude")) {
+    if($this->assertElementContainsText('address_1', "Latitude")) {    
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -117,7 +117,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_2_country_id");
     $this->select("address_2_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->isTextPresent("Latitude")) {
+    if($this->assertElementContainsText('address_2', "Latitude")) {
       $this->type("address_2_geo_code_1", "1234");
       $this->type("address_2_geo_code_2", "5678");
     }
@@ -147,7 +147,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("subject");
     $this->type("subject", "test note");
     $this->type("note", "this is a test note contact webtest");
-    $this->assertTrue($this->isTextPresent("Subject\n Notes"));
+    $this->assertElementContainsText('notesBlock', "Subject\n Notes");
 
     //Demographics section
     $this->click("//div[@class='crm-accordion-header' and contains(.,'Demographics')]");
@@ -200,7 +200,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
 
     //fill in IM
-    $this->assertTrue($this->isTextPresent("Yahoo MSN AIM GTalk Jabber Skype"));
+    $this->assertElementContainsText('im_1_provider_id', "Yahoo MSN AIM GTalk Jabber Skype");
     $this->type("im_1_name", "testSkype");
     $this->select("im_1_location_type_id", "value=3");
     $this->select("im_1_provider_id", "value=6");
@@ -232,7 +232,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->isTextPresent("Latitude")) {
+    if ($this->assertElementContainsText('address_1', "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -284,7 +284,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Display_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     // Go directly to the URL of the screen that you will be testing (New Organization).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Organization");
+    $this->openCiviPage('contact/add', 'reset=1&ct=Organization');
 
     //contact details section
     //fill in Organization name
@@ -337,7 +337,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->isTextPresent("Latitude")) {
+    if ($this->assertElementContainsText('address_1', "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -433,8 +433,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Edit_next");
 
     // Is new contact created?
-    $this->assertTrue(
-      $this->isTextPresent("$currentEmployer has been created."),
+    $this->assertElementContainsText('crm-notification-container', "$currentEmployer has been created.",
       "Status message didn't show up after saving!"
     );
 
@@ -466,8 +465,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Edit_next");
 
     // Is new contact created?
-    $this->assertTrue(
-      $this->isTextPresent("$sharedHousehold has been created."),
+    $this->assertElementContainsText('crm-notification-container', "$sharedHousehold has been created.",
       "Status message didn't show up after saving!"
     );
 
@@ -478,20 +476,21 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $name = $this->getText("xpath=//div[@class='crm-summary-display_name']");
-    $this->assertTrue($this->isTextPresent("$name has been created."));
+    $this->assertElementContainsText('crm-notification-container',  "$name has been created.");
 
     //make sure current employer is set
     $this->verifyText("xpath=id('contactinfo-block')/div/div/div[2]/div", 'Employer');
     $this->verifyText("xpath=id('contactinfo-block')/div/div/div[2]/div[2]/a[text()]", $currentEmployer);
 
     //make sure both shared address are set.
-    $this->assertTrue($this->isTextPresent("Address belongs to $currentEmployer"));
-    $this->assertTrue($this->isTextPresent("Address belongs to $sharedHousehold"));
+    $this->assertElementContainsText('address-block-1', "Address belongs to $currentEmployer");
+    $this->assertElementContainsText('address-block-2', "Address belongs to $sharedHousehold");
 
     // make sure relationships are created
     $this->click("xpath=id('tab_rel')/a");
-    $this->isTextPresent('Employee of');
-    $this->isTextPresent('Household Member of');
+    $this->waitForElementPresent('permission-legend');
+    $this->assertElementContainsText('option11', 'Employee of');
+    $this->assertElementContainsText('option11', 'Household Member of');
   }
 }
 

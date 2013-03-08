@@ -76,7 +76,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("edit-submit");
 
     $this->click('edit-user-register-1');
-    $this->click('edit-user-email-verification');
+    $this->check('edit-user-email-verification');
     $this->click('edit-submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     // logout

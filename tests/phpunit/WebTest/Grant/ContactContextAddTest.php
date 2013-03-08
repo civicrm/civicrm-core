@@ -66,7 +66,7 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('note');
 
     // check contact name on Grant form
-    $this->assertTrue($this->isTextPresent("$firstName $lastName"));
+    $this->assertElementContainsText('page-title', "$firstName $lastName");
 
     // Let's start filling the form with values.
 
