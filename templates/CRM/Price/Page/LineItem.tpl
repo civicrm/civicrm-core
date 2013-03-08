@@ -75,6 +75,7 @@
         {/if}
     {$totalAmount|crmMoney}
     </div>
+    <div class="clear"></div>
     <div class="content bold">
       {if $pricesetFieldsCount}
       {ts}Total Participants{/ts}:
@@ -93,7 +94,8 @@
       {/foreach}
       {$totalcount}
       {/if}
-     </div>
+    </div>
+    <div class="clear"></div>
 </div>
 
 {if $hookDiscount.message}
