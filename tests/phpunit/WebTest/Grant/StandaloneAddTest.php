@@ -48,11 +48,7 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->changePermissions($permission);
 
     // Go directly to the URL of the screen that you will be testing (New Contribution-standalone).
-    $this->open($this->sboxPath . "civicrm/grant/add?reset=1&context=standalone");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Grant_upload");
+    $this->openCiviPage('grant/add', 'reset=1&context=standalone', '_qf_Grant_upload');
 
     // Let's start filling the form with values.
 
@@ -106,16 +102,14 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_GrantView_cancel-bottom");
 
     $expected = array(
-      2 => 'Submitted',
-      3 => 'Emergency',
-      8 => '$ 100.00',
-      10 => '$ 90.00',
-      13 => 'Grant Note',
+      'Grant Status' => 'Submitted',
+      'Grant Type' => 'Emergency',
+      'Amount Requested' => '$ 100.00',
+      'Amount Granted' => '$ 90.00',
+      'Notes' => 'Grant Note',
     );
 
-    foreach ($expected as $label => $value) {
-      $this->verifyText("xpath=id('GrantView')/div[2]/table[1]/tbody/tr[$label]/td[2]", preg_quote($value));
-    }
+    $this->webtestVerifyTabularData($expected);
   }
 }
 
