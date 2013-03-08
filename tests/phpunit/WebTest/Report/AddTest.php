@@ -52,11 +52,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($firstName, "Anderson", $emailId);
 
     // Go directly to the URL of the screen that you will be testing (New Tag).
-    $this->open($this->sboxPath . "civicrm/report/contact/summary?reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Summary_submit");
+    $this->openCiviPage('report/contact/summary', 'reset=1', '_qf_Summary_submit' );
 
     // enable email field
     $this->click("fields[email]");
@@ -73,14 +69,14 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is filter statistics present?
-    $this->assertTrue($this->isTextPresent("Contains $firstName"), "Statistics did not found!");
-
+    $this->assertElementContainsText("xpath=//tr/th[@class='statistics'][text()='Contact Name']/../td", "Contains $firstName", "Statistics did not found!");
+    
     // Is Contact Name present in result?
-    $this->assertTrue($this->isTextPresent($displayName), "Contact Name did not found!");
+    $this->assertElementContainsText('css=td.crm-report-civicrm_contact_sort_name', $displayName, "Contact Name did not found!");
 
     // Is email Id present on result?
-    $this->assertTrue($this->isTextPresent($emailId), "Email did not found!");
-
+    $this->assertElementContainsText('css=td.crm-report-civicrm_email_email', $emailId, "Email did not found!");
+  
     // check criteria
     $this->click("css=div.crm-report_criteria-accordion div.crm-accordion-header");
     $this->waitForElementPresent("sort_name_value");
@@ -133,24 +129,24 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Open report list
-    $this->open($this->sboxPath . "civicrm/report/list?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->openCiviPage('report/list', 'reset=1');
+    
     // Is report is resent in list?
-    $this->assertTrue($this->isTextPresent($reportName));
+    $this->assertElementContainsText('css=table.report-layout', $reportName);
 
     // Visit report
     $this->click("link=$reportName");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Is filter statistics present?
-    $this->assertTrue($this->isTextPresent("Contains $firstName"), "Statistics did not found!");
 
+   // Is filter statistics present?
+    $this->assertElementContainsText("xpath=//tr/th[@class='statistics'][text()='Contact Name']/../td", "Contains $firstName", "Statistics did not found!");
+    
     // Is Contact Name present in result?
-    $this->assertTrue($this->isTextPresent($displayName), "Contact Name did not found!");
+    $this->assertElementContainsText('css=td.crm-report-civicrm_contact_sort_name', $displayName, "Contact Name did not found!");
 
     // Is email Id present on result?
-    $this->assertTrue($this->isTextPresent($emailId), "Email did not found!");
+    $this->assertElementContainsText('css=td.crm-report-civicrm_email_email', $emailId, "Email did not found!");
 
     // check report criteria
     $this->click("css=div.crm-report_criteria-accordion div.crm-accordion-header");
