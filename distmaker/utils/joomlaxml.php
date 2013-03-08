@@ -1,4 +1,5 @@
 <?php
+define('CIVICRM_MYSQL_STRICT', 0);
 if (isset($GLOBALS['_SERVER']['DM_SOURCEDIR'])) {
   $sourceCheckoutDir = $GLOBALS['_SERVER']['DM_SOURCEDIR'];
 }

@@ -85,64 +85,23 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   }
 
   /**
-   * Remove all vestiges of permissions for the given module.
+   * {@inheritDoc}
    */
-  function uninstallPermissions($module) {
-    db_delete('role_permission')
-      ->condition('permission', "$module|%", 'LIKE')
-      ->condition('module', 'civicrm')
-      ->execute();
+  public function isModulePermissionSupported() {
+    return TRUE;
   }
 
   /**
-   * Ensure that all cached permissions associated with the given module are
-   * actually defined by that module. This is useful during module upgrade
-   * when the newer module version has removed permission that were defined
-   * in the older version.
+   * {@inheritdoc}
    */
-  function upgradePermissions($module) {
-    $config = CRM_Core_Config::singleton();
-    // Get all permissions defined by the module.
-    $module_permissions = $config->userPermissionClass->getModulePermissions($module);
-    // Construct a delete query to remove permissions for this module.
+  function upgradePermissions($permissions) {
+    if (empty($permissions)) {
+      throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");
+    }
     $query = db_delete('role_permission')
-      ->condition('permission', "$module|%", 'LIKE')
-      ->condition('module', 'civicrm');
-    // Only if the module defines any permissions, exempt those from the delete
-    // process. This approach allows us to delete all permissions for the module
-    // even if the hook_civicrm_permisssion() implementation has been removed.
-    if (!empty($module_permissions)) {
-      $query->condition('permission', array_keys($module_permissions), 'NOT IN');
-    }
+      ->condition('module', 'civicrm')
+      ->condition('permission', array_keys($permissions), 'NOT IN');
     $query->execute();
-  }
-
-  /**
-   * Get the permissions defined in the hook_civicrm_permission implementation
-   * of the given module. Permission keys are prepended with the module name
-   * to facilitate cleanup of permissions later, and may be hashed to provide
-   * a unique value that fits storage limitations within Drupal 7.
-   * 
-   * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
-   */
-  static function getModulePermissions($module) {
-    $return_permissions = array();
-    $fn_name = "{$module}_civicrm_permission";
-    if (function_exists($fn_name)) {
-      $module_permissions = array();
-      $fn_name($module_permissions);
-      foreach ($module_permissions as $key => $label) {
-        // Prepend the module name to the key.
-        $new_key = "$module|$key";
-        // Limit key length to maintain compatilibility with Drupal, which
-        // accepts permission keys no longer than 128 characters.
-        if (strlen($new_key) > 128) {
-          $new_key = "$module|". md5($key);
-        }
-        $return_permissions[$new_key] = $label;
-      }
-    }
-    return $return_permissions;
   }
 }
 

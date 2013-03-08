@@ -53,9 +53,7 @@ class CRM_Contact_Form_Search_Criteria {
       // multiselect for groups
       if ($form->_group) {
         // Arrange groups into hierarchical listing (child groups follow their parents and have indentation spacing in title)
-        $ids = implode(',', array_keys($form->_group));
-        $ids = 'IN (' . $ids . ')';
-        $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($ids, NULL, '&nbsp;&nbsp;', TRUE);
+        $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($form->_group, NULL, '&nbsp;&nbsp;', TRUE);
 
         $form->add('select', 'group', ts('Groups'), $groupHierarchy, FALSE,
           array('id' => 'group', 'multiple' => 'multiple', 'title' => ts('- select -'))
@@ -80,7 +78,7 @@ class CRM_Contact_Form_Search_Criteria {
 
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE, TRUE);
-      
+
       $used_for = CRM_Core_OptionGroup::values('tag_used_for');
       $tagsTypes = array();
       $showAllTagTypes = false;
@@ -91,7 +89,7 @@ class CRM_Contact_Form_Search_Criteria {
         // we will hide searching contact by attachments tags until it will be implemented in core
         if (count($tags) && $key != 'civicrm_file' && $key != 'civicrm_contact') {
           //if tags exists then add type to display in adv search form help text
-          $tagsTypes[] = ts($value); 
+          $tagsTypes[] = ts($value);
           $showAllTagTypes = true;
         }
       }

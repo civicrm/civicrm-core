@@ -150,22 +150,19 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
   }
 
   /**
-   * Remove all vestiges of permissions for the given module.
-   *
-   * Does nothing in Drupal 6.
+   * {@inheritDoc}
    */
-  function uninstallPermissions($module) {
+  public function isModulePermissionSupported() {
+    return TRUE;
   }
 
   /**
-   * Ensure that all cached permissions associated with the given module are
-   * actually defined by that module. This is useful during module upgrade
-   * when the newer module version has removed permission that were defined
-   * in the older version.
+   * {@inheritdoc}
    *
    * Does nothing in Drupal 6.
    */
-  function upgradePermissions($module) {
+  function upgradePermissions($permissions) {
+    // D6 allows us to be really lazy... things get cleaned up when the admin form is next submitted...
   }
 
   /**

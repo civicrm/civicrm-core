@@ -46,12 +46,8 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // now create new donar detail report instance
-    $this->open($this->sboxPath . "civicrm/report/contribute/detail?reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Detail_submit");
-
+    $this->openCiviPage('report/contribute/detail', 'reset=1', '_qf_Detail_submit');
+    
     // preview result
     $this->click("_qf_Detail_submit");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -84,11 +80,10 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Open report list
-    $this->open($this->sboxPath . "civicrm/report/list?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('report/list', 'reset=1');
 
     // Is report is resent in list?
-    $this->assertTrue($this->isTextPresent($reportName));
+    $this->assertElementContainsText('css=div#Contribute > table.report-layout', $reportName);
 
     // Visit report
     $this->click("link=$reportName");
@@ -108,15 +103,13 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
 
     //Is greater than or equal to 100
     //check for criteria
-    $this->assertTrue($this->isTextPresent("Is greater than or equal to 10"), "Criteria is not selected");
+    $this->assertElementContainsText('css=table.statistics-table', "Is greater than or equal to 10", "Criteria is not selected");
 
     //click on next link
-    $this->click("_qf_Detail_submit_print");
+    $this->click("_qf_Detail_submit_save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // check if criteria still exits
-    $this->assertTrue($this->isTextPresent("Is greater than or equal to 10"), "Criteria is not selected");
+    $this->assertElementContainsText('css=table.statistics-table', "Is greater than or equal to 10", "Criteria is not selected");
   }
 }
-
-

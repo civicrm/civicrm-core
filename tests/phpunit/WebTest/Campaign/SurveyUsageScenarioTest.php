@@ -66,11 +66,11 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
+    // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
 
     // add the required Drupal permission
-    $permissions = array('edit-2-administer-civicampaign');
-    $this->changePermissions($permissions);
+    $this->changePermissions(array('edit-2-administer-civicampaign'));
 
     // Go directly to the URL of the screen that you will be testing
     $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
@@ -99,7 +99,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //$this->assertElementContainsText("crm-notification-container", "$title");
+    $this->assertElementContainsText("crm-notification-container", "$title");
 
     // create a custom data set for activities -> survey
     $this->openCiviPage('admin/custom/group', "action=add&reset=1", "_qf_Group_next-bottom");
@@ -113,7 +113,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     // save the custom group
     $this->click("_qf_Group_next-bottom");
-    $this->waitForPageToLoad();
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // add a custom field to the custom group
     $this->type("label", "Field $title");
@@ -180,7 +180,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("_qf_Main_upload-bottom");
     $this->waitForElementPresent("_qf_Questions_upload_next-bottom");
     
-    //Select the profile for the survey
+    // Select the profile for the survey
     $this->select("//form[@id='Questions']/div[2]/table/tbody/tr[1]/td[2]/div/div/span/select", "label=New Individual");
 
     // select the question created for the survey 
@@ -272,7 +272,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Reserve_done_reserve-bottom");
     $this->click("_qf_Reserve_done_reserve-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText("crm-notification-container", "3");
+    $this->assertElementContainsText("crm-notification-container", "Contact(s) have been reserved");
 
     // Release Respondents
     $this->openCiviPage("survey/search", "reset=1&op=release", "_qf_Search_refresh");
@@ -315,7 +315,6 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $groupName = $this->WebtestAddGroup();
 
     // Adding contact
-    // We're using Quick Add block on the main page for this.
     $firstName1 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName1, "Smith", "$firstName1.smith@example.org");
     $url1 = explode('cid=', $this->getLocation());
@@ -357,7 +356,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('extends[0]', "value=Contact");
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
-    $this->assertTrue($this->isTextPresent("Your custom field set '$customGroup' has been added. You can add custom fields now."));
+    $this->assertElementContainsText("crm-notification-container", $customGroup);
 
     // Add custom fields
     $field1 = "Checkbox $title";
@@ -385,7 +384,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Your custom field '$field1' has been saved."));
+    $this->assertElementContainsText("crm-notification-container", $field1);
 
     // Create a profile for survey
     $this->openCiviPage("admin/uf/group", "reset=1");
@@ -397,7 +396,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->type('title', $surveyProfile);
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '$surveyProfile' has been added. You can add fields to this profile now. "));
+    $this->assertElementContainsText("crm-notification-container", $surveyProfile);
 
     // Add fields to the profile
     // Phone ( Primary )
@@ -422,18 +421,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Enable CiviCampaign module if necessary
-    $this->openCiviPage("admin/setting/component", "reset=1");
-
-    $this->waitForElementPresent('_qf_Component_next-bottom');
-    $enabledComponents = $this->getSelectOptions('enableComponents-t');
-    if (!in_array("CiviCampaign", $enabledComponents)) {
-      $this->addSelection('enableComponents-f', "label=CiviCampaign");
-      $this->click("//option[@value='CiviCampaign']");
-      $this->click('add');
-      $this->click('_qf_Component_next-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertTrue($this->isTextPresent('Changes Saved.'));
-    }
+    $this->enableComponents(array('CiviCampaign'));
 
     // add the required Drupal permission
     $permissions = array('edit-2-administer-civicampaign');
@@ -495,7 +483,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('campaign_survey_id', "label=$surveyTitle");
 
     // need to wait for Groups field to reload dynamically
-    sleep(3);
+    $this->waitForElementPresent("//select[@class='campaignGroupsSelect']/option[text()='$groupName']");
 
     // select group
     $this->click('campaignGroupsSelect1');
@@ -511,7 +499,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     // wait for Access Keys div to appear at bottom of page - since this page may take a while
     $this->waitForElementPresent('access');
-    $this->assertTrue($this->isTextPresent("Reservation has been added for 2 Contact(s)."));
+    $this->assertElementContainsText("crm-notification-container", "2");
 
     $this->openCiviPage("report/survey/detail", "reset=1", '_qf_SurveyDetails_submit');
 
@@ -542,7 +530,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('campaign_survey_id', "label=$surveyTitle");
 
     // need to wait for Groups field to reload dynamically
-    sleep(3);
+    $this->waitForElementPresent("//select[@class='campaignGroupsSelect']/option[text()='$groupName']");
 
     // select group
     $this->click('campaignGroupsSelect1');
@@ -557,8 +545,8 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Interview_cancel_interview');
 
     $this->type("field_{$id1}_phone-Primary-1", 9876543210);
-    $this->click("xpath=//table[@id='voterRecords']/tbody//tr[@id='row_{$id1}']/td[5]/input[2]/../label[text()='$label1']");
-    $this->click("xpath=//table[@id='voterRecords']/tbody//tr[@id='row_{$id1}']/td[5]/input[6]/../label[text()='$label2']");
+    $this->click("//table[@id='voterRecords']/tbody//tr[@id='row_{$id1}']/td[5]/input[2]/../label[text()='$label1']");
+    $this->click("//table[@id='voterRecords']/tbody//tr[@id='row_{$id1}']/td[5]/input[6]/../label[text()='$label2']");
     $this->select("field_{$id1}_result", $optionLabel1);
     $this->click("interview_voter_button_{$id1}");
     sleep(3);
@@ -591,14 +579,14 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // select survey
     $this->select('campaign_survey_id', "label=$surveyTitle");
     // need to wait for Groups field to reload dynamically
-    sleep(3);
+    $this->waitForElementPresent("//select[@class='campaignGroupsSelect']/option[text()='$groupName']");
 
     // select group
     $this->click('campaignGroupsSelect1');
     $this->select('campaignGroupsSelect1', "label=$groupName");
     $this->waitForElementPresent("xpath=//ul[@id='crmasmList1']/li");
     $this->click("xpath=//div[@id='search_form_gotv']/div[2]/table/tbody/tr[6]/td/a[text()='Search']");
-    
+
     $this->waitForElementPresent("xpath=//table[@id='gotvVoterRecords']/tbody/tr/td[7]");
     $this->check("xpath=//table[@id='gotvVoterRecords']/tbody/tr/td[7]/input");
 

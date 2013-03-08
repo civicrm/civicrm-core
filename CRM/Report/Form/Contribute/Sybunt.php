@@ -135,7 +135,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'options' => $optionYear,
             'default' => date('Y'),
           ),
-                                  'financial_type_id'         => 
+                                  'financial_type_id'         =>
                                   array( 'title'   => ts( 'Financial Type' ),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
                                          'options'      => CRM_Contribute_PseudoConstant::financialType( )
@@ -229,15 +229,15 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
   function from() {
 
-    $this->_from = " 
+    $this->_from = "
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
-             INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']} 
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id 
+             INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
              {$this->_aclFrom}
-             LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']} 
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id  
+             LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
+                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
                          AND {$this->_aliases['civicrm_email']}.is_primary = 1
-             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']} 
+             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                             {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
   }
@@ -302,7 +302,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
     if (!empty($rows)) {
       $select = "
-                   SELECT 
+                   SELECT
                         SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
 
       $sql = "{$select} {$this->_from} {$this->_where}";
@@ -449,7 +449,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
-  function getOperationPair($type = "string", $fieldName = NULL) {
+  static function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'yid') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
     }

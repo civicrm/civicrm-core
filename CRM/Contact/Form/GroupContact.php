@@ -99,9 +99,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
     }
 
     // Arrange groups into hierarchical listing (child groups follow their parents and have indentation spacing in title)
-    $ids = implode(',', array_keys($allGroups));
-    $ids = 'IN (' . $ids . ')';
-    $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($ids, NULL, '&nbsp;&nbsp;', TRUE);
+    $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($allGroups, NULL, '&nbsp;&nbsp;', TRUE);
 
     // get the list of groups contact is currently in ("Added") or unsubscribed ("Removed").
     $currentGroups = CRM_Contact_BAO_GroupContact::getGroupList($this->_contactId);

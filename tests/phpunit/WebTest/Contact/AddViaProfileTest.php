@@ -46,7 +46,7 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Go directly to the URL of the screen that you will be testing (Create Profile).
-    $this->open($this->sboxPath . "civicrm/profile/create?reset=1&gid=1");
+    $this->openCiviPage('profile/create', 'reset=1&gid=1', '_qf_Edit_cancel');
 
     $firstName = 'Jo' . substr(sha1(rand()), 0, 4);
     $lastName = 'Ad' . substr(sha1(rand()), 0, 7);
@@ -62,14 +62,14 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     $this->type("street_address-1", "902C El Camino Way SW");
     $this->type("city-1", "Dumfries");
     $this->type("postal_code-1", "1234");
-    $this->assertTrue($this->isTextPresent("United States"));
+    $this->assertElementContainsText('country-1', "United States");
     $this->select("state_province-1", "value=1019");
 
     // Clicking save.
     $this->click("_qf_Edit_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Your information has been saved."));
+    $this->assertElementContainsText('css=.msg-text', "Your information has been saved.");
   }
 }
 

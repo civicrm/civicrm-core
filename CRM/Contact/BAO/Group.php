@@ -890,15 +890,21 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * This function to get hierarchical list of groups (parent followed by children)
    *
-   * @param  array   $params associated array for params
+   * @param  array   $groupIDs array of group ids
+   *
    * @access public
    */
   static function getGroupsHierarchy (
-    $groupIds,
+    $groupIDs,
     $parents  = NULL,
     $spacer = '<span class="child-indent"></span>',
     $titleOnly = FALSE
    ) {
+    if (empty($groupIDs)) {
+      return array();
+    }
+
+    $groupIdString = '(' . implode(',', array_keys($groupIDs)) . ')';
      // <span class="child-icon"></span>
      // need to return id, title (w/ spacer), description, visibility
 
@@ -908,10 +914,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
      // Instead of recursively making mysql queries, we'll make one big
      // query and build the heirarchy with the algorithm below.
      $groups = array();
-     $args = array(1 => array($groupIds, 'String'));
-     $query = "SELECT id, title, description, visibility, parents
-     FROM     civicrm_group
-     WHERE    id $groupIds";
+     $args = array(1 => array($groupIdString, 'String'));
+     $query = "
+SELECT id, title, description, visibility, parents
+FROM   civicrm_group
+WHERE  id IN $groupIdString
+";
      if ($parents) {
        // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5'). We just grab and match on 1st parent.
        $parentArray = explode(',', $parents);
@@ -982,9 +990,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
        if ($titleOnly) {
          $groupsReturn[$key] = $value[0] . $value[1];
        } else {
-         $groupsReturn[$key] = array('title' => $value[0] . $value[1],
-                                'description' => $allGroups[$key]['description'],
-                                'visibility' => $allGroups[$key]['visibility'],);
+         $groupsReturn[$key] = array(
+           'title' => $value[0] . $value[1],
+           'description' => $allGroups[$key]['description'],
+           'visibility' => $allGroups[$key]['visibility'],
+         );
        }
      }
 

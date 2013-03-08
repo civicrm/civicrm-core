@@ -68,7 +68,7 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Pledge_upload-bottom');
 
     // check contact name on pledge form
-    $this->assertTrue($this->isTextPresent("$firstName $lastName"));
+    $this->assertElementContainsText('css=tr.crm-pledge-form-block-displayName', "$firstName $lastName");
 
     // Let's start filling the form with values.
     $this->type("amount", "100");
@@ -103,7 +103,7 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Pledge_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Pledge has been recorded and the payment schedule has been created."));
+    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']");
     //click through to the Pledge view screen

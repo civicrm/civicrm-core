@@ -153,28 +153,48 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Remove all vestiges of permissions for the given module.
+   * Determine whether the permission store allows us to store
+   * a list of permissions generated dynamically (eg by
+   * hook_civicrm_permissions.)
+   *
+   * @return bool
    */
-  function uninstallPermissions($module) {
+  public function isModulePermissionSupported() {
+    return FALSE;
   }
 
   /**
-   * Ensure that all cached permissions associated with the given module are
-   * actually defined by that module. This is useful during module upgrade
-   * when the newer module version has removed permission that were defined
-   * in the older version.
+   * Ensure that the CMS supports all the permissions defined by CiviCRM
+   * and its extensions. If there are stale permissions, they should be
+   * deleted. This is useful during module upgrade when the newer module
+   * version has removed permission that were defined in the older version.
+   *
+   * @param array $permissions same format as CRM_Core_Permission::getCorePermissions().
+   * @see CRM_Core_Permission::getCorePermissions
    */
-  function upgradePermissions($module) {
+  function upgradePermissions($permissions) {
+    throw new CRM_Core_Exception("Unimplemented method: CRM_Core_Permission_*::upgradePermissions");
   }
 
   /**
    * Get the permissions defined in the hook_civicrm_permission implementation
    * of the given module.
    *
+   * Note: At time of writing, this is only used with native extension-modules, so
+   * there's one, predictable calling convention (regardless of CMS).
+   *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
+   * @see CRM_Core_Permission::getCorePermissions
    */
   static function getModulePermissions($module) {
-    return array();
+    $return_permissions = array();
+    $fn_name = "{$module}_civicrm_permission";
+    if (function_exists($fn_name)) {
+      $module_permissions = array();
+      $fn_name($module_permissions);
+      $return_permissions = $module_permissions;
+    }
+    return $return_permissions;
   }
 
   /**

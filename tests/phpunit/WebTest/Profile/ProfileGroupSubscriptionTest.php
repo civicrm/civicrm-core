@@ -47,10 +47,8 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
 
     // Go directly to the URL of the screen that you will be
     // testing (Add new profile ).
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->openCiviPage('admin/uf/group', 'reset=1');
+    
     $this->click('newCiviCRMProfile-top');
 
     $this->waitForElementPresent('_qf_Group_next-bottom');
@@ -82,7 +80,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '$profileTitle' has been added. You can add fields to this profile now"));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     //Add email field to profile
     $this->click('field_name[0]');
@@ -110,12 +108,12 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //now use profile create mode for group subscription
-    $this->click("xpath=id('field_page')/div[1]/a[4]/span");
+    $this->click("xpath=//div[@id='field_page']/div/a[4]/span");
 
     $this->waitForElementPresent('email-Primary');
 
     //check for group field
-    $this->assertTrue($this->isTextPresent('Group(s)'), "Groups field was not found.");
+    $this->assertElementContainsText('crm-profile-block', 'Group(s)', "Groups field was not found.");
 
     //fill the subscription form
     $radomEmail = substr(sha1(rand()), 0, 7) . "@example.com";
@@ -123,20 +121,20 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->type("email-Primary", $radomEmail);
 
     // check advisory group ( may be we should create a separate group to test this)
-    $this->click("group_4");
-
+    $this->click("group_3");
+    
     $this->click('_qf_Edit_next');
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // assert for subscription message
-    $this->assertTrue($this->isTextPresent("Your subscription request has been submitted for group "), "Subscription message is not shown");
+    $this->assertElementContainsText('messages', "Your subscription request has been submitted for group ", "Subscription message is not shown");
 
     //check if profile is saved
-    $this->assertTrue($this->isTextPresent("Your information has been saved."), "Profile is not saved");
+    $this->assertElementContainsText('css=span.msg-text', 'Your information has been saved.', 'Profile is not saved');
 
     // delete the profile
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
+    $this->openCiviPage('admin/uf/group', 'reset=1');
     $this->_testdeleteProfile($profileTitle);
   }
 
@@ -147,7 +145,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('newCiviCRMProfile-bottom');
-    $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '$profileTitle' has been deleted."));
+    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
   }
 }
 

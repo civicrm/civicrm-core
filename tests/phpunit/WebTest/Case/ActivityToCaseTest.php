@@ -39,29 +39,14 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Enable CiviCase module if necessary
-    $this->open($this->sboxPath . "civicrm/admin/setting/component?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Component_next-bottom');
-    $enabledComponents = $this->getSelectOptions('enableComponents-t');
-    if (!in_array('CiviCase', $enabledComponents)) {
-      $this->addSelection('enableComponents-f', "label=CiviCase");
-      $this->click("//option[@value='CiviCase']");
-      $this->click('add');
-      $this->click('_qf_Component_next-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-    }
+    $this->enableComponents("CiviCase");
 
     // let's give full CiviCase permissions to demo user (registered user).
     $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
     $this->changePermissions($permission);
 
     // Go directly to the URL of the screen that you will be testing (New Case-standalone).
-    $this->open($this->sboxPath . "civicrm/case/add?reset=1&action=add&atype=13&context=standalone");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Case_upload-bottom');
+    $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
@@ -96,7 +81,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
 
     // Is status message correct?
-    $this->assertTextPresent("Case opened successfully.", "Save successful status message didn't show up after saving!");
+    $this->assertElementContainsText('crm-notification-container', "Case opened successfully.", "Save successful status message didn't show up after saving!");
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 7);
 
     $this->_testAddNewActivity($firstName, $subject, $customGroupTitle, $contactName);
@@ -129,7 +114,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     // Let's start filling the form with values.
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertTrue($this->isTextPresent("Anderson, " . $firstName2), "Contact not found in line " . __LINE__);
+    $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', 'Anderson, ' . $firstName2, "Contact not found in line " . __LINE__);
 
     // Now we're filling the "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
@@ -148,7 +133,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertTrue($this->isTextPresent("Summerson, " . $firstName1), "Contact not found in line " . __LINE__);
+    $this->assertElementContainsText('css=tr.crm-activity-form-block-assignee_contact_id td ul li.token-input-token-facebook', 'Summerson, ' . $firstName1, "Contact not found in line " . __LINE__);
 
     // Putting the contents into subject field - assigning the text to variable, it'll come in handy later
     $subject = "This is subject of test activity being added through activity tab of contact summary screen.";
@@ -190,7 +175,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Activity '$subject' has been saved."),
+    $this->assertElementContainsText('crm-notification-container', "Activity '$subject' has been saved.",
       "Status message didn't show up after saving!"
     );
 
@@ -214,8 +199,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
 
     // verify if custom data is present
-    $this->open($this->sboxPath . "civicrm/case?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('case', 'reset=1');
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
 
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
@@ -225,9 +209,8 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent('view-activity');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
-
-    $this->isTextPresent($customDataParams[0]);
-    $this->isTextPresent($textField);
+    $this->assertElementContainsText('crm-activity-view-table', "$customDataParams[0]");
+    $this->assertElementContainsText('crm-activity-view-table', "$textField");
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Done']");
     $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='activities-selector']/tbody/tr[1]/td[2]");
 
@@ -240,8 +223,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->select('activity_change_status', 'value=2');
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Ok']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->open($this->sboxPath . "civicrm/case?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('case', 'reset=1');
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
     $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='activities-selector']/tbody/tr[1]/td[2]");
@@ -252,7 +234,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
   function _addCustomData($customGroupTitle) {
     // Go directly to the URL of the screen that you will be testing (New Custom Group).
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
+    $this->openCiviPage('admin/custom/group', 'reset=1');
 
     //add new custom data
     $this->click("//a[@id='newCustomDataGroup']/span");
@@ -270,7 +252,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     // create a custom field - Integer Radio
     $this->click("data_type[0]");
@@ -306,7 +288,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
 
     // create another custom field - text field
     $this->click("//a[@id='newCustomField']/span");
@@ -329,7 +311,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$textFieldLabel' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$textFieldLabel' has been saved.");
     $textFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$textFieldLabel']/../../td[8]/span/a[text()='Edit Field']/@href"));
     $textFieldId = $textFieldId[1];
 

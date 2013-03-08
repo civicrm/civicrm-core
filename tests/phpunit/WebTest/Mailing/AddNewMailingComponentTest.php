@@ -46,8 +46,7 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Go directly to the URL of the screen that you will be testing (Add New Mailing Component).
-    $this->open($this->sboxPath . "civicrm/admin/component?action=add&reset=1");
-
+    $this->openCiviPage("admin/component", "action=add&reset=1");
 
     // fill component name.
     $componentName = 'ComponentName_' . substr(sha1(rand()), 0, 7);
@@ -75,14 +74,10 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->assertTrue($this->isTextPresent("The mailing component '$componentName' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "The mailing component '$componentName' has been saved.");
 
     // Verify text.
-    $this->assertTrue($this->isTextPresent($componentName));
-    $this->assertTrue($this->isTextPresent("Header"));
-    $this->assertTrue($this->isTextPresent($subject));
-    $this->assertTrue($this->isTextPresent($txtMsg));
-    $this->assertTrue($this->isTextPresent($htmlMsg));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Header']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
   }
 
   function testFooterAdd() {
@@ -91,16 +86,10 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     // class attributes.
     $this->open($this->sboxPath);
 
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Go directly to the URL of the screen that you will be testing (Add New Mailing Component).
-    $this->open($this->sboxPath . "civicrm/admin/component?action=add&reset=1");
-
+    $this->openCiviPage("admin/component", "action=add&reset=1");
 
     // fill component name.
     $componentName = 'ComponentName_' . substr(sha1(rand()), 0, 7);
@@ -128,14 +117,10 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->assertTrue($this->isTextPresent("The mailing component '$componentName' has been saved."));
+    $this->assertElementContainsText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
 
     // Verify text.
-    $this->assertTrue($this->isTextPresent($componentName));
-    $this->assertTrue($this->isTextPresent("Footer"));
-    $this->assertTrue($this->isTextPresent($subject));
-    $this->assertTrue($this->isTextPresent($txtMsg));
-    $this->assertTrue($this->isTextPresent($htmlMsg));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Footer']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
   }
 
   function testAutomatedAdd() {
@@ -144,16 +129,10 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     // class attributes.
     $this->open($this->sboxPath);
 
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Go directly to the URL of the screen that you will be testing (Add New Mailing Component).
-    $this->open($this->sboxPath . "civicrm/admin/component?action=add&reset=1");
-
+    $this->openCiviPage("admin/component", "action=add&reset=1");
 
     // fill component name.
     $componentName = 'ComponentName_' . substr(sha1(rand()), 0, 7);
@@ -181,15 +160,9 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->assertTrue($this->isTextPresent("The mailing component '$componentName' has been saved."));
+    $this->assertElementContainsText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
 
     // Verify text
-    $this->assertTrue($this->isTextPresent($componentName));
-    $this->assertTrue($this->isTextPresent("Reply"));
-    $this->assertTrue($this->isTextPresent($subject));
-    $this->assertTrue($this->isTextPresent($txtMsg));
-    $this->assertTrue($this->isTextPresent($htmlMsg));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Reply']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
   }
 }
-
-

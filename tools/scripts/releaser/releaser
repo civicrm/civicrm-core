@@ -4,6 +4,7 @@ set -e
 confdir=$(dirname $0)
 start_point="$1"
 version="$2"
+distmaker_tgt=all
 
 if [ ! -f "$confdir/releaser.conf" ]; then
   echo
@@ -122,7 +123,7 @@ function do_distmaker() {
 
   # run the exported distmaker
   cd $workdir/$version/export/distmaker
-  ./distmaker.sh all > $workdir/$version/build.log
+  ./distmaker.sh $distmaker_tgt > $workdir/$version/build.log
 }
 
 #################################################
@@ -131,7 +132,7 @@ function do_publish() {
   # publish to sf.net
   cd $workdir/$version/tarballs
 
-  $cmd_md5sum *.tar.gz *.zip > civicrm-$version.MD5SUMS
+  $cmd_md5sum *.tar.gz *.tgz *.zip > civicrm-$version.MD5SUMS
   echo $gpg_pass | $cmd_gpg --armor --batch --passphrase-fd 0 --sign civicrm-$version.MD5SUMS
 
   if [ "$is_stable" ]; then
@@ -142,7 +143,7 @@ function do_publish() {
     $cmd_rsync -aP --exclude='*starterkit.tgz' *.tar.gz *.zip *MD5SUMS* ${publish_ssh}:${publish_latest_dir}/$version
   fi
 
-  mv *.tar.gz *.zip *MD5SUMS* $build_dest
+  mv *.tar.gz *.tgz *.zip *MD5SUMS* $build_dest
 
   # publish to latest.civicrm.org
   # FIXME: isn't this racy when doing concurrent security releases
