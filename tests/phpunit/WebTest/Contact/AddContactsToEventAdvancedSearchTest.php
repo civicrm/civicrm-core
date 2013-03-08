@@ -48,9 +48,7 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
 
 
     // Advanced Search
-    $this->open($this->sboxPath . 'civicrm/contact/search/advanced?reset=1');
-
-    $this->waitForElementPresent('_qf_Advanced_refresh');
+    $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
     $this->click('_qf_Advanced_refresh');
 
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_8');
@@ -72,7 +70,7 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
     // Setting registration source
     $this->type('source', 'Event StandaloneAddTest Webtest');
 
-    $this->assertTrue($this->isTextPresent('Source for this registration (if applicable).'));
+    $this->assertElementContainsText('css=tr.crm-participant-form-block-source span.description', 'Source for this registration (if applicable).');
 
 
     // Clicking save.

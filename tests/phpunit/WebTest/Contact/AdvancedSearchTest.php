@@ -75,9 +75,10 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=div#tagtree");
     $this->click("xpath=//ul/li/label[text()=\"$tagName\"]");
     $this->waitForElementPresent("css=.success");
+
     // is status message correct?
     $this->waitForTextPresent("Saved");
-    $this->assertTrue($this->isTextPresent("Saved"));
+    $this->assertElementContainsText('crm-notification-container', "Saved");
 
     // go to event tab and register for event ( auto add activity and contribution )
     $this->click("css=li#tab_participant a");
@@ -95,7 +96,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "trid$firstName");
     $this->click("_qf_Participant_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Event registration for $firstName adv$firstName has been added"));
+    $this->assertElementContainsText('crm-notification-container', "Event registration for $firstName adv$firstName has been added");
 
     // go to pledge tab and add pledge
     $this->click("css=li#tab_pledge a");
@@ -109,7 +110,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->click("_qf_Pledge_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Pledge has been recorded and the payment schedule has been created."));
+    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     // go to Membership tab and add membership
     $this->click("css=li#tab_member a");
@@ -124,7 +125,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->click("_qf_Membership_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Student membership for $firstName adv$firstName has been added"));
+    $this->assertElementContainsText('crm-notification-container', "Student membership for $firstName adv$firstName has been added");
 
     // go to relationship tab and add relationship
     $this->click("css=li#tab_rel a");
@@ -138,12 +139,12 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate("end_date", "+1 day");
     $this->click("details-save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("New relationship created."));
+    $this->assertElementContainsText('crm-notification-container', "New relationship created.");
 
     //-------------- advance search --------------
 
     // Go directly to the URL of the screen that you will be testing (Advance Search).
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
+    $this->openCiviPage('contact/search/advanced', 'reset=1');
 
     //also create a dummy name to test false
     $dummyName = substr(sha1(rand()), 0, 7);
@@ -195,7 +196,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("sort_name", "$dummyName");
     $this->click("_qf_Advanced_refresh");
     $this->waitForElementPresent("css=div.messages");
-    $this->assertTrue($this->isTextPresent("No matches found for"));
+    $this->assertElementContainsText('css=div.messages', "No matches found for");
   }
 
   /*
@@ -204,9 +205,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   function testActivitySearchByTypeTest() {
     $this->open($this->sboxPath);
     $this->webtestLogin();
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
+    $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->click("activity");
-    sleep(2);
+    $this->waitForElementPresent('activity_subject');
     $this->check("xpath=//div[@id='Activity']//div/label[text()='Tell a Friend']/../input");
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -440,9 +441,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // create contact type Individual with subtype
     // with most of values to required to search
     $Subtype = "Student";
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Contact_cancel");
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual', '_qf_Contact_cancel');
 
     // --- fill few values in Contact Detail block
     $this->type("first_name", "$firstName");
@@ -502,7 +501,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // save contact
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("$firstName adv$firstName"));
+    $this->assertElementContainsText('css=.crm-summary-display_name', "$firstName adv$firstName");
   }
 }
 
