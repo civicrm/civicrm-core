@@ -289,7 +289,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $eventInfoUrl = $this->getLocation();
 
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($eventInfoUrl);
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');

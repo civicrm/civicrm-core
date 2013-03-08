@@ -33,16 +33,6 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
   }
 
   function testLoggingReport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     //enable the logging
@@ -52,16 +42,8 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("Changes Saved");
 
     //enable CiviCase component
-    $this->openCiviPage('admin/setting/component', 'reset=1', '_qf_Component_next-bottom');
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCase", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCase");
-      $this->click("//option[@value='CiviCase']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertElementContainsText('crm-notification-container', "Changes Saved");
-    }
+    $this->enableComponents("CiviCase");
+
     //add new contact
     $orginalFirstName = $firstName = 'Anthony' . substr(sha1(rand()), 0, 7);
     $lastName  = 'Anderson' . substr(sha1(rand()), 0, 7);

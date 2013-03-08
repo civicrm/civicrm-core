@@ -40,15 +40,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Enable CiviCase module if necessary
-    $this->openCiviPage('admin/setting/component', 'reset=1', '_qf_Component_next-bottom');
-    $enabledComponents = $this->getSelectOptions("enableComponents-t");
-    if (!in_array("CiviCase", $enabledComponents)) {
-      $this->addSelection("enableComponents-f", "label=CiviCase");
-      $this->click("//option[@value='CiviCase']");
-      $this->click("add");
-      $this->click("_qf_Component_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-    }
+    $this->enableComponents("CiviCase");
 
     // let's give full CiviCase permissions to demo user (registered user).
     $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
