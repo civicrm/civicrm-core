@@ -104,11 +104,6 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
           ),
-          'grant_program_id' =>
-          array( 
-            'name' => 'grant_program_id' ,
-            'title' => ts( 'Grant Program' ),
-          ),
           'status_id' =>
           array(
             'name' => 'status_id',
@@ -169,13 +164,6 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Grant_PseudoConstant::grantType(),
           ),
-          'grant_program'     => 
-          array(
-            'name' =>'grant_program_id' ,
-            'title'      => ts( 'Grant Program' ),
-            'operatorType'   => CRM_Report_Form::OP_MULTISELECT,
-            'options'      => CRM_Grant_BAO_GrantProgram::grantPrograms( ),
-          ),
           'status_id' =>
           array(
             'name' => 'status_id',
@@ -221,10 +209,6 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
           'grant_type_id' =>
           array(
             'title' => ts('Grant Type'),
-          ),
-          'grant_program_id' => 
-          array( 
-            'title'        => ts( 'Grant Program' )
           ),
           'status_id' =>
           array(
@@ -286,13 +270,13 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   function from() {
     $this->_from = "
         FROM civicrm_grant {$this->_aliases['civicrm_grant']}
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']} 
+                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  ) ";
     if ($this->_addressField) {
       $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-                         ON {$this->_aliases['civicrm_contact']}.id = 
-                            {$this->_aliases['civicrm_address']}.contact_id AND 
+                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                         ON {$this->_aliases['civicrm_contact']}.id =
+                            {$this->_aliases['civicrm_address']}.contact_id AND
                             {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
   }
@@ -367,7 +351,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
         array_key_exists('civicrm_contact_id', $row)
       ) {
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          'reset=1&cid=' . $row['civicrm_contact_id'], 
+          'reset=1&cid=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
@@ -380,12 +364,6 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
           $rows[$rowNum]['civicrm_grant_grant_type_id'] = CRM_Grant_PseudoConstant::grantType($value);
         }
         $entryFound = TRUE;
-      }
-      if ( array_key_exists('civicrm_grant_grant_program_id', $row) ) {
-        if ( $value = $row['civicrm_grant_grant_program_id'] ) {
-          $rows[$rowNum]['civicrm_grant_grant_program_id'] = CRM_Grant_BAO_GrantProgram::grantPrograms( $value );
-        }
-        $entryFound = true;
       }
       if (array_key_exists('civicrm_grant_status_id', $row)) {
         if ($value = $row['civicrm_grant_status_id']) {

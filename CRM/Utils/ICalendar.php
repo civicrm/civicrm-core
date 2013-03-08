@@ -106,7 +106,7 @@ class CRM_Utils_ICalendar {
    * @return void
    *
    */
-  function send($calendar, $content_type = 'text/calendar', $charset = 'us-ascii', $fileName = NULL, $disposition = NULL) {
+  static function send($calendar, $content_type = 'text/calendar', $charset = 'us-ascii', $fileName = NULL, $disposition = NULL) {
     $config = CRM_Core_Config::singleton();
     $lang = $config->lcMessages;
     header("Content-Language: $lang");

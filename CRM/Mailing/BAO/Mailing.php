@@ -519,7 +519,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   private function _getMailingGroupIds($type = 'Include') {
     $mailingGroup = new CRM_Mailing_DAO_Group();
     $group = CRM_Contact_DAO_Group::getTableName();
-    if (!isset($this->id)) {
+    if (!isset($thi->sid)) {
       // we're just testing tokens, so return any group
       $query = "SELECT   id AS entity_id
                       FROM     $group
@@ -2682,7 +2682,7 @@ AND    e.id NOT IN ( SELECT email_id FROM civicrm_mailing_recipients mr WHERE ma
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
   }
 
-  function getMailingsList($isSMS = FALSE) {
+  static function getMailingsList($isSMS = FALSE) {
     static $list = array();
     $where = " WHERE ";
     if (!$isSMS) {
