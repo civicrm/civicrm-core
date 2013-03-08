@@ -164,13 +164,6 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Remove all vestiges of permissions for the given module.
-   */
-  function uninstallPermissions($module) {
-    throw new CRM_Core_Exception("Unimplemented method: CRM_Core_Permission_*::uninstallPermissions");
-  }
-
-  /**
    * Ensure that the CMS supports all the permissions defined by CiviCRM
    * and its extensions. If there are stale permissions, they should be
    * deleted. This is useful during module upgrade when the newer module
