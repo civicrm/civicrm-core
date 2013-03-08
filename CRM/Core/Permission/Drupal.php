@@ -104,10 +104,7 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   /**
    * {@inheritdoc}
    */
-  function upgradePermissions($module, $modulePermissions) {
-    $config = CRM_Core_Config::singleton();
-    // Get all permissions defined by the module.
-    $module_permissions = self::filterPermissions($modulePermissions, $module);
+  function upgradePermissions($module, $module_permissions) {
     // Construct a delete query to remove permissions for this module.
     $query = db_delete('role_permission')
       ->condition('permission', "$module|%", 'LIKE')
@@ -119,28 +116,6 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
       $query->condition('permission', array_keys($module_permissions), 'NOT IN');
     }
     $query->execute();
-  }
-
-  /**
-   * Permission keys are prepended with the module name to facilitate cleanup
-   * of permissions later, and may be hashed to provide a unique value that
-   * fits storage limitations within Drupal 7.
-   *
-   * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
-   */
-  public static function filterPermissions($module_permissions, $module) {
-    $return_permissions = array();
-    foreach ($module_permissions as $key => $label) {
-      // Prepend the module name to the key.
-      $new_key = "$module|$key";
-      // Limit key length to maintain compatilibility with Drupal, which
-      // accepts permission keys no longer than 128 characters.
-      if (strlen($new_key) > 128) {
-        $new_key = "$module|" . md5($key);
-      }
-      $return_permissions[$new_key] = $label;
-    }
-    return $return_permissions;
   }
 }
 
