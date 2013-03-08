@@ -244,21 +244,4 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
     return implode(', ', $emails);
   }
-
-  /**
-   * Get the permissions defined in the hook_civicrm_permission implementation
-   * in all enabled CiviCRM module extensions.
-   *
-   * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
-   */
-  function getAllModulePermissions() {
-    $permissions = array();
-    $hook_class = CRM_Utils_Hook::singleton();
-    $modules = $hook_class->moduleImplements('civicrm_permission');
-    foreach ($modules as $module) {
-      $module_permissions = $this->getModulePermissions($module);
-      $permissions = array_merge($permissions, $module_permissions);
-    }
-    return $permissions;
-  }
 }

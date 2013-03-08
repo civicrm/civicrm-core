@@ -91,12 +91,6 @@ abstract class CRM_Utils_Hook {
     $fnSuffix
   );
 
-  /**
-   * Get a list of modules implementing the given hook.
-   * @return Array of module names.
-   */
-  abstract function moduleImplements($hookName);
-
   function commonInvoke($numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
     $fnSuffix, $fnPrefix
@@ -130,24 +124,6 @@ abstract class CRM_Utils_Hook {
 
       $this->requireCiviModules($this->commonCiviModules);
     }
-  }
-
-  /**
-   * Get a list of modules implementing the given hook.
-   * @return Array of module names.
-   */
-  function commonModuleImplements($fnSuffix, $fnPrefix) {
-    $return = array();
-
-    $this->commonBuildModuleList($fnPrefix);
-
-    foreach ($this->commonCiviModules as $module) {
-      $fnName = "{$module}_{$fnSuffix}";
-      if (function_exists($fnName)) {
-        $return[] = $module;
-      }
-    }
-    return $return;
   }
 
   function runHooks(&$civiModules, $fnSuffix, $numParams,
