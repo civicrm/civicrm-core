@@ -150,11 +150,19 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public function isModulePermissionSupported() {
+    return TRUE;
+  }
+
+  /**
    * Remove all vestiges of permissions for the given module.
    *
    * Does nothing in Drupal 6.
    */
   function uninstallPermissions($module) {
+    // D6 allows us to be really lazy... things get cleaned up when the admin form is next submitted...
   }
 
   /**
@@ -163,6 +171,7 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * Does nothing in Drupal 6.
    */
   function upgradePermissions($permissions) {
+    // D6 allows us to be really lazy... things get cleaned up when the admin form is next submitted...
   }
 
   /**
