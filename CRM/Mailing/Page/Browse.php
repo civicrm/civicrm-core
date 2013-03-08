@@ -124,22 +124,19 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    *
    * @return void
    */
-  function run($newArgs) {
+  function run() {
     $this->preProcess();
 
+    $newArgs = func_get_args();
     if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
       $config = CRM_Core_Config::singleton();
-
-
       CRM_Mailing_BAO_Job::runJobs_pre($config->mailerJobSize);
       CRM_Mailing_BAO_Job::runJobs();
       CRM_Mailing_BAO_Job::runJobs_post();
     }
 
-    $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
-      'String',
-      $this
-    );
+    $this->_sortByCharacter =
+      CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
 
 
     // CRM-11920 all should set sortByCharacter to null, not empty string
