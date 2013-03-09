@@ -491,9 +491,7 @@ class CRM_Core_Session {
     $session->initialize();
 
     // default options
-    $options += array(
-      'unique' => TRUE
-    );
+    $options += array('unique' => TRUE);
 
     if (!isset(self::$_singleton->_session[self::$_singleton->_key]['status'])) {
       self::$_singleton->_session[self::$_singleton->_key]['status'] = array();
