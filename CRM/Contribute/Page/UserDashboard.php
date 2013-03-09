@@ -41,7 +41,12 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    * @access public
    */
   function listContribution() {
-    $controller = new CRM_Core_Controller_Simple('CRM_Contribute_Form_Search', ts('Contributions'), NULL);
+    $controller = new CRM_Core_Controller_Simple(
+      'CRM_Contribute_Form_Search',
+      ts('Contributions'),
+      NULL,
+      FALSE, FALSE, TRUE, FALSE
+    );
     $controller->setEmbedded(TRUE);
     $controller->reset();
     $controller->set('limit', 12);
