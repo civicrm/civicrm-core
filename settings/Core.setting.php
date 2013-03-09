@@ -126,7 +126,7 @@ return array (
     'group' => 'core',
     'name' => 'address_format',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'TextArea',
     'default' => "{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}",
     'add' => '4.1',
     'title' => 'Address Format',
@@ -239,6 +239,9 @@ return array (
     'name' => 'contact_autocomplete_options',
     'type' => 'String',
     'html_type' => 'checkboxes',
+    'pseudoconstant' => array(
+      'optionGroupName' => 'contact_autocomplete_options',
+    ),
     'default' => '1234567',
     'add' => '4.1',
     'title' => 'Contact Reference Autocomplete Options',
