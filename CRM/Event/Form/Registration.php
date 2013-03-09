@@ -1212,6 +1212,14 @@ WHERE  v.option_group_id = g.id
       return $tempID;
     }
 
+    // check if the user is logged in and has a contact ID
+    $session = CRM_Core_Session::singleton();
+    $userID = $session->get('userID');
+
+    if ($tempID == $userID) {
+      return $userID;
+    }
+
     //check if this is a checksum authentication
     $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
     if ($userChecksum) {
@@ -1221,10 +1229,12 @@ WHERE  v.option_group_id = g.id
         return $tempID;
       }
     }
+    // check if user has permission, CRM-12062
+    else if (CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
+      return $tempID;
+    }
 
-    // check if the user is registered and we have a contact ID
-    $session = CRM_Core_Session::singleton();
-    return $session->get('userID');
+    return $userID;
   }
 
   /* Validate price set submitted params for price option limit,
