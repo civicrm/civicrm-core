@@ -41,7 +41,12 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * @access public
    */
   function listPledges() {
-    $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Search', ts('Pledges'), NULL);
+    $controller = new CRM_Core_Controller_Simple(
+      'CRM_Pledge_Form_Search',
+      ts('Pledges'),
+      NULL,
+      FALSE, FALSE, TRUE, FALSE
+    );
     $controller->setEmbedded(TRUE);
     $controller->reset();
     $controller->set('limit', 12);

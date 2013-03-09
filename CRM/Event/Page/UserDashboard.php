@@ -45,7 +45,12 @@ class CRM_Event_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
    * @access public
    */
   function listParticipations() {
-    $controller = new CRM_Core_Controller_Simple('CRM_Event_Form_Search', ts('Events'), NULL);
+    $controller = new CRM_Core_Controller_Simple(
+      'CRM_Event_Form_Search',
+      ts('Events'),
+      NULL,
+      FALSE, FALSE, TRUE, FALSE
+    );
     $controller->setEmbedded(TRUE);
     $controller->reset();
     $controller->set('context', 'user');
