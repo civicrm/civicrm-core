@@ -327,10 +327,6 @@ SELECT name, mail
    * @access public
    */
   public function addScriptUrl($url, $region) {
-    return FALSE;
-    // The below code does not prevent drupal's and civi's jquery from getting mixed up
-    // Dropping D6 support for drupal_add_js seems reasonable since we no longer officially support D6
-    // But leaving the code in place in case anyone really wants to tackle it.
     switch ($region) {
       case 'html-header':
       case 'page-footer':
@@ -342,12 +338,9 @@ SELECT name, mail
     // If the path is within the drupal directory we can add in the normal way
     if (CRM_Utils_System_Drupal::formatResourceUrl($url)) {
       drupal_add_js($url, 'module', $scope);
+      return TRUE;
     }
-    // D6 hack for external js files
-    else {
-      drupal_add_js('document.write(unescape("%3Cscript src=\'' . $url . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline', $scope);
-    }
-    return TRUE;
+    return FALSE;
   }
 
   /**
@@ -363,10 +356,6 @@ SELECT name, mail
    * @access public
    */
   public function addScript($code, $region) {
-    return FALSE;
-    // The below code does not prevent drupal's and civi's jquery from getting mixed up
-    // Dropping D6 support for drupal_add_js seems reasonable since we no longer officially support D6
-    // But leaving the code in place in case anyone really wants to tackle it.
     switch ($region) {
       case 'html-header':
       case 'page-footer':
