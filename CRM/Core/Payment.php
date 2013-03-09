@@ -324,7 +324,7 @@ abstract class CRM_Core_Payment {
         $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
         $checksumValue = "&cs={$checksumValue}";
       }
-      return CRM_Utils_System::url($url, "reset=1&mid={$entityID}{$checksumValue}", TRUE, NULL, FALSE, FALSE);
+      return CRM_Utils_System::url($url, "reset=1&mid={$entityID}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
     }
 
     if ($entityID && $entity == 'contribution') {
@@ -333,7 +333,7 @@ abstract class CRM_Core_Payment {
         $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
         $checksumValue = "&cs={$checksumValue}";
       }
-      return CRM_Utils_System::url($url, "reset=1&coid={$entityID}{$checksumValue}", TRUE, NULL, FALSE, FALSE);
+      return CRM_Utils_System::url($url, "reset=1&coid={$entityID}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
     }
 
     if ($entityID && $entity == 'recur') {
@@ -348,7 +348,7 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
         $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
         $checksumValue = "&cs={$checksumValue}";
       }
-      return CRM_Utils_System::url($url, "reset=1&crid={$entityID}{$checksumValue}", TRUE, NULL, FALSE, FALSE);
+      return CRM_Utils_System::url($url, "reset=1&crid={$entityID}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
     }
 
     if ($this->isSupported('accountLoginURL')) {
