@@ -23,9 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="groupContact">
 <div class="view-content">
-{if $groupCount eq 0 }
+{if $groupCount eq 0 AND ! $groupSmart AND ! $groupParent}
   <div class="messages status no-popup">
     <div class="icon inform-icon"></div>&nbsp;{ts}This contact does not currently belong to any groups.{/ts}
   </div>
