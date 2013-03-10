@@ -389,7 +389,7 @@ SET    version = '$version'
 
     $phpVersion = phpversion();
     $minPhpVersion = '5.3.3';
-    if (version_compare($phpVersion, $minPhpVersion) <= 0) {
+    if (version_compare($phpVersion, $minPhpVersion) < 0) {
       $error = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
                array(
                  1 => $minPhpVersion,
@@ -601,7 +601,7 @@ SET    version = '$version'
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->setVersion($rev);
     CRM_Utils_System::flushCache();
-    
+
     if (version_compare($currentVer, '4.1.alpha1') >= 0) {
       CRM_Core_BAO_Setting::updateSettingsFromMetaData();
     }
