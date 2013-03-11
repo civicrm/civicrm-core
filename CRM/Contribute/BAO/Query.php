@@ -90,7 +90,7 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['civicrm_accounting_code'] = 1;
       $query->_tables['civicrm_financial_account'] = 1;
     }
-    
+
     if (CRM_Utils_Array::value('contribution_note', $query->_returnProperties)) {
       $query->_select['contribution_note'] = "civicrm_note.note as contribution_note";
       $query->_element['contribution_note'] = 1;
@@ -214,6 +214,20 @@ class CRM_Contribute_BAO_Query {
           $testCondition = $id;
           continue;
         }
+        // CRM-12065
+        if (
+          $query->_params[$id][0] == 'contribution_type_id' ||
+          $query->_params[$id][0] == 'contribution_type'
+        ) {
+          CRM_Core_Session::setStatus(
+            ts('The contribution type criteria is now obsolete, please update your smart group'),
+            '',
+            'alert'
+          );
+          continue;
+        }
+
+
         $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
@@ -299,7 +313,7 @@ class CRM_Contribute_BAO_Query {
         case 'financial_type':
         $cType = $value;
             $types = CRM_Contribute_PseudoConstant::financialType( );
-            $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause( "civicrm_contribution.financial_type_id", 
+            $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause( "civicrm_contribution.financial_type_id",
           $op, $value, "Integer"
         );
             $query->_qill[$grouping ][] = ts( 'Financial Type - %1', array( 1 => $types[$cType] ) );
@@ -526,7 +540,7 @@ class CRM_Contribute_BAO_Query {
         $batches = CRM_Batch_BAO_Batch::getBatches();
         $query->_where[$grouping][] = " civicrm_entity_batch.batch_id $op $value";
         $query->_qill[$grouping][] = ts('Batch Name %1 %2', array(1 => $op, 2 => $batches[$value]));
-        $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1; 
+        $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         $query->_tables['contribution_batch'] = $query->_whereTables['contribution_batch'] = 1;
         return;
 
@@ -591,7 +605,7 @@ class CRM_Contribute_BAO_Query {
         $from .= " INNER JOIN civicrm_financial_account ON civicrm_financial_account.id = civicrm_entity_financial_account.financial_account_id ";
         $from .= " INNER JOIN civicrm_option_value cov ON cov.value = civicrm_entity_financial_account.account_relationship AND cov.name = 'Income Account is' ";
         $from .= " INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id AND cog.name = 'account_relationship' ";
-        break;        
+        break;
 
       case 'civicrm_contribution_page':
         $from = " $side JOIN civicrm_contribution_page ON civicrm_contribution.contribution_page ON civicrm_contribution.contribution_page.id";
@@ -662,7 +676,7 @@ class CRM_Contribute_BAO_Query {
       case 'civicrm_contribution_soft_phone':
         $from .= " $side JOIN civicrm_phone as soft_phone ON (civicrm_contact_d.id = soft_phone.contact_id )";
         break;
-      
+
       case 'contribution_batch':
         $from .= " $side JOIN civicrm_entity_batch ON ( civicrm_entity_batch.entity_table = 'civicrm_contribution' AND
           civicrm_contribution.id = civicrm_entity_batch.entity_id )";
@@ -756,7 +770,7 @@ class CRM_Contribute_BAO_Query {
       CRM_Core_PseudoConstant::currencySymbols('name')
     );
 
-    $form->add('select', 'financial_type_id', 
+    $form->add('select', 'financial_type_id',
       ts('Financial Type'),
       array(
         '' => ts('- any -')) +
@@ -838,7 +852,7 @@ class CRM_Contribute_BAO_Query {
 
     // Add batch select
     $batches = CRM_Batch_BAO_Batch::getBatches();
-    
+
     if ( !empty( $batches ) ) {
       $form->add('select', 'contribution_batch_id',
         ts('Batch Name'),

@@ -244,6 +244,8 @@
           if ($i.data('action')) {
             params[params['field']]=value;//format for create at least
             action=$i.data('action');
+            delete params['field'];
+            delete params['value'];
           } else {
             action="setvalue";
           }

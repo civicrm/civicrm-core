@@ -32,6 +32,27 @@ function do_gitify() {
   rm -rf "$TMP"
 }
 
+## add hook shims to a repo
+## usage: do_hookify <repo-path> <relative-hook-path>
+function do_hookify() {
+  TGT="$1"
+  HOOK_DIR="$2"
+  if [ -n "$CIVICRM_GIT_HOOKS" ]; then
+    echo "[[Install recommended hooks ($TGT)]]"
+    for HOOK in commit-msg post-checkout post-merge pre-commit prepare-commit-msg post-commit pre-rebase post-rewrite ;do
+          cat << TMPL > "$TGT/.git/hooks/$HOOK"
+#!/bin/bash
+if [ -f "\$GIT_DIR/${HOOK_DIR}/${HOOK}" ]; then
+  source "\$GIT_DIR/${HOOK_DIR}/${HOOK}"
+fi
+TMPL
+      chmod +x "$TGT/.git/hooks/$HOOK"
+    done
+  else
+    echo "[[Skip hook installation ($TGT) -- use \"--hooks\" to enable]]"
+  fi
+}
+
 ## usage: do_svnify <repo-url> <existing-dir>
 function do_svnify() {
   REPO="$1"
@@ -51,9 +72,12 @@ function do_svnify() {
 }
 
 function check_dep() {
-  if [ -z `which git` ]; then
+  if [ -z "`which git`" ]; then
     echo "command not found: git"
-    exit
+    exit 3
+  fi
+  if [ -z `which php` ]; then
+    echo "command not found: php"
   fi
 }
 
@@ -61,18 +85,44 @@ function check_dep() {
 
 set -e
 
-CIVICRM_CMS="$1"
-GIT_BASE_URL="$2"
-CIVICRM_ROOT="$3"
-CIVICRM_L10N="$4"
+CIVICRM_CMS=""
+GIT_BASE_URL=""
+CIVICRM_ROOT=""
+CIVICRM_L10N=""
+CIVICRM_GIT_HOOKS=""
 CIVICRM_BRANCH="master"
+
+while [ -n "$1" ]; do
+  if [ "$1" == "--l10n" ]; then
+    CIVICRM_L10N="$1"
+  elif [ "$1" == "--hooks" ]; then
+    CIVICRM_GIT_HOOKS="$1"
+  elif [ -z "$CIVICRM_CMS" ]; then
+    ## First arg
+    CIVICRM_CMS="$1"
+  elif [ -z "$GIT_BASE_URL" ]; then
+    ## Second arg
+    GIT_BASE_URL="$1"
+  elif [ -z "$CIVICRM_ROOT" ]; then
+    ## Third arg
+    CIVICRM_ROOT="$1"
+  else
+    echo "unrecognized argument: $1"
+    exit 2
+  fi
+  shift
+done
+
 if [ -z "$CIVICRM_ROOT" -o ! -d "$CIVICRM_ROOT" -o -z "$GIT_BASE_URL" -o -z "$CIVICRM_CMS" ]; then
   echo "Convert a directory into a set of CiviCRM git clones"
-  echo "usage: $0 <Drupal|Drupal6|Joomla|WordPress|all> <git-base-url> <existing-civicrm-root> [--l10n]"
+  echo "usage: $0 <Drupal|Drupal6|Joomla|WordPress|all> <git-base-url> <existing-civicrm-root> [--l10n] [--hooks]"
   echo "  <cms-name>: one of: Drupal|Drupal6|Joomla|WordPress|all"
   echo "  <git-base-url>: a base URL shared by the desiried git repos (e.g. git://github.com/civicrm)"
   echo "  <existing-civicrm-root>: the main directory containing CiviCRM"
-  echo "  [l10n]: optionally fetch localization data; currently requires svn"
+  echo "  --l10n: optionally fetch localization data; currently requires svn"
+  echo "  --hooks: optionally install recommended git hooks; the hooks are mostly"
+  echo "           tested with git CLI under Linux and OSX; they haven't been"
+  echo "           tested with git GUIs or Windows"
   echo ""
   echo "Note: If pointing to a pre-existing directory, your local changes may be replaced by"
   echo "the pristine code from git/svn. If you've made changes, then make sure there's a backup!"
@@ -90,24 +140,33 @@ fi
 
 check_dep
 do_gitify "${GIT_BASE_URL}/civicrm-core.git" "$CIVICRM_ROOT" -b "${CIVICRM_BRANCH}"
+do_hookify "$CIVICRM_ROOT" "../tools/scripts/git"
 do_gitify "${GIT_BASE_URL}/civicrm-packages.git" "$CIVICRM_ROOT/packages" -b "${CIVICRM_BRANCH}"
+do_hookify "$CIVICRM_ROOT/packages" "../../tools/scripts/git"
 case "$CIVICRM_CMS" in
   Drupal)
     do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "7.x-${CIVICRM_BRANCH}"
+    do_hookify "$CIVICRM_ROOT/drupal" "../../tools/scripts/git"
     ;;
   Drupal6)
     do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "6.x-${CIVICRM_BRANCH}"
+    do_hookify "$CIVICRM_ROOT/drupal" "../../tools/scripts/git"
     ;;
   Joomla)
     do_gitify "${GIT_BASE_URL}/civicrm-joomla.git" "$CIVICRM_ROOT/joomla" -b "${CIVICRM_BRANCH}"
+    do_hookify "$CIVICRM_ROOT/joomla" "../../tools/scripts/git"
     ;;
   WordPress)
     do_gitify "${GIT_BASE_URL}/civicrm-wordpress.git" "$CIVICRM_ROOT/WordPress" -b "${CIVICRM_BRANCH}"
+    do_hookify "$CIVICRM_ROOT/WordPress" "../../tools/scripts/git"
     ;;
   all)
     do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "7.x-${CIVICRM_BRANCH}"
+    do_hookify "$CIVICRM_ROOT/drupal" "../../tools/scripts/git"
     do_gitify "${GIT_BASE_URL}/civicrm-joomla.git" "$CIVICRM_ROOT/joomla" -b "${CIVICRM_BRANCH}"
+    do_hookify "$CIVICRM_ROOT/joomla" "../../tools/scripts/git"
     do_gitify "${GIT_BASE_URL}/civicrm-wordpress.git" "$CIVICRM_ROOT/WordPress" -b "${CIVICRM_BRANCH}"
+    do_hookify "$CIVICRM_ROOT/WordPress" "../../tools/scripts/git"
     ;;
   *)
     echo "Unrecognized CMS: $CIVICRM_CMS"
@@ -116,3 +175,12 @@ esac
 if [ "$CIVICRM_L10N" == "--l10n" ]; then
   do_svnify "http://svn.civicrm.org/l10n/trunk" "$CIVICRM_ROOT/l10n"
 fi
+
+pushd "$CIVICRM_ROOT/xml" > /dev/null
+if [ -f "GenCode.php" ]; then
+  echo "[[Generate files]]"
+  php GenCode.php
+else
+  echo "[[Skip \"Generate files\"]]"
+fi
+popd > /dev/null

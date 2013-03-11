@@ -173,7 +173,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    *
    * $access public
    */
-  function del($groupContactId, $status, $contactID) {
+  static function del($groupContactId, $status, $contactID) {
     $groupId = CRM_Contact_BAO_GroupContact::getGroupId($groupContactId);
 
     switch ($status) {
@@ -194,9 +194,8 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
         break;
     }
 
-    $groupNum = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added',
-      NULL, TRUE, TRUE
-    );
+    $groupNum =
+      CRM_Contact_BAO_GroupContact::getContactGroup($contactID, 'Added', NULL, TRUE, TRUE);
     if ($groupNum == 1 &&
       $groupStatus == 'Removed' &&
       CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,

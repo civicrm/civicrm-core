@@ -137,8 +137,7 @@ function getSearchURLValue( )
         document.getElementById('id_search_block').action = url;
     }
 }
-
-if (CRM.config.userFramework != 'Joomla') {
+{/literal}{if $config->userFramework neq 'Joomla'}{literal}
   cj('body').prepend( cj("#menu-container").html() );
 
   //Track Scrolling
@@ -151,14 +150,15 @@ if (CRM.config.userFramework != 'Joomla') {
   if ( cj('#edit-shortcuts').length > 0 ) {
      cj('#civicrm-menu').css({ 'width': '97%' });
   }
-} else {
-     cj('div#toolbar-box div.m').html(cj("#menu-container").html());
-     cj('#civicrm-menu').ready( function(){
-      cj('.outerbox').css({ 'margin-top': '6px'});
-      cj('#root-menu-div .menu-ul li').css({ 'padding-bottom' : '2px', 'margin-top' : '2px' });
-      cj('img.menu-item-arrow').css({ 'top' : '4px' });
-    });
-}
+{/literal}{else}{* Special menu hacks for Joomla *}{literal}
+  cj('div#toolbar-box div.m').html(cj("#menu-container").html());
+  cj('#civicrm-menu').ready(function() {
+    cj('#root-menu-div .outerbox').css({ 'margin-top': '6px'});
+    cj('#root-menu-div .outerbox').first().css({ 'margin-top': '20px'});
+    cj('#root-menu-div .menu-ul li').css({ 'padding-bottom' : '2px', 'margin-top' : '2px' });
+    cj('img.menu-item-arrow').css({ 'top' : '4px' });
+  });
+{/literal}{/if}{literal}
   cj('#civicrm-menu').menu( {arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'} );
 </script>
 {/literal}

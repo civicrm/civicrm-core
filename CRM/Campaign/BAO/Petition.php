@@ -206,6 +206,7 @@ SELECT  petition.id                         as id,
         'activity_type_id' => $surveyInfo['activity_type_id'],
         'activity_date_time' => date("YmdHis"),
         'status_id' => $params['statusId'],
+        'activity_campaign_id' => $params['activity_campaign_id'],
       );
 
       //activity creation
