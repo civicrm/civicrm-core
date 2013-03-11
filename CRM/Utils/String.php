@@ -488,7 +488,11 @@ class CRM_Utils_String {
    */
   static function addJqueryFiles(&$html) {
     CRM_Core_Resources::singleton()->addCoreResources('html-header');
-    return CRM_Core_Region::instance('html-header')->render('', FALSE) . $html;
+    if (!defined('CIVICRM_UF_HEAD')) {
+      return CRM_Core_Region::instance('html-header')->render('', FALSE) . $html;
+    } else {
+      return $html;
+    }
   }
 
   /**

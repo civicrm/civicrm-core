@@ -137,7 +137,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
 
     $content = $template->fetch($controller->getTemplateFile());
 
-    if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
       CRM_Utils_System::addHTMLHead($region->render(''));
     }
     CRM_Utils_System::appendTPLFile($pageTemplateFile,

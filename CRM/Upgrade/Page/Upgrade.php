@@ -115,7 +115,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $template->assign('upgraded', FALSE);
 
     // Render page header
-    if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
       CRM_Utils_System::addHTMLHead($region->render(''));
     }
 
@@ -190,7 +190,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $template->assign('upgraded', TRUE);
 
     // Render page header
-    if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
       CRM_Utils_System::addHTMLHead($region->render(''));
     }
 
