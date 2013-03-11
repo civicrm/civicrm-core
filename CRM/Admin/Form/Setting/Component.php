@@ -122,7 +122,8 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
       CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample.mysql');
       CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample1.mysql');
       if (!CRM_Case_BAO_Case::createCaseViews()) {
-        CRM_Core_Error::fatal('Could not create Case views.');
+        $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
+        CRM_Core_Error::fatal($msg);
       }
     }
     parent::commonProcess($params);
