@@ -41,6 +41,7 @@
     <form method="post" id="id_fulltext_search">
     <div style="margin-bottom: 8px;">
     <input type="text" name="text" id='text' value="" style="width: 10em;" />&nbsp;<input type="submit" name="submit" id="fulltext_submit" value="{ts}Go{/ts}" class="form-submit"/ onclick='submitForm();'>
+    <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Controller_Search' addSequence=1}" />
   </div>
   <select class="form-select" id="fulltext_table" name="fulltext_table">
 {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
