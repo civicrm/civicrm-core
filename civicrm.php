@@ -335,56 +335,6 @@ function civicrm_wp_head() {
   }
 }
 
-function civicrm_wp_scripts() {
-  if (!civicrm_wp_initialize()) {
-    return;
-  }
-  $pluginUrl = plugins_url();
-
-  $files = CRM_Core_Resources::parseTemplate('CRM/common/jquery.files.tpl');
-  foreach ($files as $file => $type) {
-    if ($type == 'js') {
-      wp_enqueue_script($file, $pluginUrl . "/civicrm/civicrm/$file");
-    }
-  }
-
-  // add localized calendar js
-  $config = CRM_Core_Config::singleton();
-  $localisation = explode('_', $config->lcMessages);
-  $localizationFile = '/civicrm/civicrm/packages/jquery/jquery-ui-1.9.0/development-bundle/ui/i18n/jquery.ui.datepicker-' . $localisation[0] . '.js';
-
-  if (file_exists( WP_PLUGIN_DIR . $localizationFile)) {
-    wp_enqueue_script('civicrm-datepicker', $pluginUrl . $localizationFile);
-  }
-
-  //add namespacing js
-  wp_enqueue_script('js/jquery.conflict.js', $pluginUrl . '/civicrm/civicrm/js/jquery.conflict.js');
-
-  return;
-}
-
-function civicrm_wp_styles() {
-  if (!civicrm_wp_initialize()) {
-    return;
-  }
-  $pluginUrl = plugins_url();
-
-  $files = CRM_Core_Resources::parseTemplate('CRM/common/jquery.files.tpl');
-  foreach ($files as $file => $type) {
-    if ($type == 'css') {
-      wp_register_style($file, $pluginUrl . "/civicrm/civicrm/$file");
-      wp_enqueue_style($file);
-    }
-  }
-
-  wp_register_style('civicrm/css/civicrm.css', $pluginUrl . "/civicrm/civicrm/css/civicrm.css");
-  wp_enqueue_style('civicrm/css/civicrm.css');
-  wp_register_style('civicrm/css/extras.css',  $pluginUrl . "/civicrm/civicrm/css/extras.css");
-  wp_enqueue_style('civicrm/css/extras.css');
-
- return;
-}
-
 function civicrm_wp_frontend($shortcode = FALSE) {
   if (!civicrm_wp_initialize()) {
     return;
@@ -628,10 +578,6 @@ function civicrm_wp_main() {
   }
 
   if (!is_admin()) {
-    //x CRM_Core_Resources::singleton()->addCoreResources();
-    //x add_action('wp_print_styles', 'civicrm_wp_styles');
-    //x add_action('wp_print_scripts', 'civicrm_wp_scripts');
-
     add_action('wp_footer', 'civicrm_buffer_end');
 
     // we do this here rather than as an action, since we dont control
@@ -909,8 +855,6 @@ function civicrm_wp_shortcode_includes() {
   if (preg_match('/\[civicrm/', $post->post_content)) {
     civicrm_wp_initialize();
     CRM_Core_Resources::singleton()->addCoreResources();
-    //x add_action('wp_print_styles', 'civicrm_wp_styles');
-    //x add_action('wp_print_scripts', 'civicrm_wp_scripts');
   }
 }
 
