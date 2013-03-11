@@ -65,8 +65,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     }
 
     // Advanced Search
-    $this->open($this->sboxPath . 'civicrm/contact/search/advanced?reset=1');
-    $this->waitForElementPresent('_qf_Advanced_refresh');
+    $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
 
     // Select the group and check deceased contacts
     $this->select('crmasmSelect1', "label={$groupName}");
@@ -78,28 +77,27 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
 
     // Remove contacts from group
     $this->waitForElementPresent('Go');
-    $this->assertTrue($this->isTextPresent('2 Contacts'));
+    $this->assertElementContainsText('search-status', '2 Contacts');
     $this->click("toggleSelect");
     $this->waitForTextPresent('2 Selected records only');
     
     $this->select('task', 'label=Remove Contacts from Group');
     $this->click("xpath=//div[@id='search-status']/table/tbody/tr[3]/td/ul/input[2]");
     $this->waitForElementPresent('_qf_RemoveFromGroup_back-bottom');
-    $this->assertTrue($this->isTextPresent('Number of selected contacts: 2'));
+    $this->assertElementContainsText('crm-container', 'Number of selected contacts: 2');
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_RemoveFromGroup_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("2 contacts removed from '{$groupName}'"));
+    $this->assertElementContainsText('crm-notification-container', "2 contacts removed from '{$groupName}'");
 
     // Search for the contacts who are not deceased
-    $this->open($this->sboxPath . 'civicrm/contact/search/advanced?reset=1');
-    $this->waitForElementPresent('_qf_Advanced_refresh');
+    $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
     $this->select('crmasmSelect1', "label={$groupName}");
     $this->click('_qf_Advanced_refresh');
 
     // Check if non-deceased contacts are still present
     $this->waitForElementPresent('Go');
-    $this->assertTrue($this->isTextPresent('3 Contacts'));
+    $this->assertElementContainsText('search-status', '3 Contacts');
   }
 
   function _testAddContact($firstName, $lastName, $email, $groupName, $deceased = FALSE) {

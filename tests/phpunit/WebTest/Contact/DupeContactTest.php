@@ -46,8 +46,7 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Go directly to the URL of New Individual.
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     $firstName = substr(sha1(rand()), 0, 7);
     $lastName1 = substr(sha1(rand()), 0, 7);
@@ -78,8 +77,7 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Contact Saved");
 
     // Go directly to the URL of New Individual.
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('contact/add' , 'reset=1&ct=Individual');
 
     //contact details section
 
@@ -97,7 +95,7 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->isTextPresent("Please correct the following errors in the form fields below: One matching contact was found. You can View or Edit the existing contact, or Merge this contact with an existing contact.");
+    $this->assertElementContainsText("css=.notify-content", "Please correct the following errors in the form fields below: One matching contact was found. You can View or Edit the existing contact.");
   }
 }
 
