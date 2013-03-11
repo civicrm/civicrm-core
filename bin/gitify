@@ -55,6 +55,9 @@ function check_dep() {
     echo "command not found: git"
     exit
   fi
+  if [ -z `which php` ]; then
+    echo "command not found: php"
+  fi
 }
 
 #### Main ####
@@ -116,3 +119,12 @@ esac
 if [ "$CIVICRM_L10N" == "--l10n" ]; then
   do_svnify "http://svn.civicrm.org/l10n/trunk" "$CIVICRM_ROOT/l10n"
 fi
+
+pushd "$CIVICRM_ROOT/xml" > /dev/null
+if [ -f "GenCode.php" ]; then
+  echo "[[Generate files]]"
+  php GenCode.php
+else
+  echo "[[Skip \"Generate files\"]]"
+fi
+popd > /dev/null
