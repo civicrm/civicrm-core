@@ -96,7 +96,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
 
         $defaults[$per] = array();
         if ($date > 31) {
-          $date                 = ($date < 999) ? '0' . $date : $date;
+          $date                = ($date < 999) ? '0' . $date : $date;
           $defaults[$per]['M'] = substr($date, 0, 2);
           $defaults[$per]['d'] = substr($date, 2, 3);
         }
@@ -146,7 +146,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'duration_interval')
     );
 
-    $dataUrl = CRM_Utils_System::url("civicrm/ajax/rest",
+    $dataUrl = CRM_Utils_System::url(
+      "civicrm/ajax/rest",
       "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=membershipType&reset=1&org=1",
       FALSE, NULL, FALSE
     );
@@ -432,10 +433,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
         ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       if ($buttonName == $this->getButtonName('upload', 'new')) {
-        CRM_Core_Session::setStatus(ts(' You can add another membership type.'), '', 'info');
-        $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/member/membershipType',
-            'action=add&reset=1'
-          )
+        $session->replaceUserContext(
+          CRM_Utils_System::url('civicrm/admin/member/membershipType/add', 'action=add&reset=1')
         );
       }
     }
