@@ -39,7 +39,7 @@ function do_hookify() {
   HOOK_DIR="$2"
   if [ -n "$CIVICRM_GIT_HOOKS" ]; then
     echo "[[Install recommended hooks ($TGT)]]"
-    for HOOK in commit-msg post-checkout post-merge pre-commit prepare-commit-msg ;do
+    for HOOK in commit-msg post-checkout post-merge pre-commit prepare-commit-msg post-commit pre-rebase post-rewrite ;do
           cat << TMPL > "$TGT/.git/hooks/$HOOK"
 #!/bin/bash
 if [ -f "\$GIT_DIR/${HOOK_DIR}/${HOOK}" ]; then
