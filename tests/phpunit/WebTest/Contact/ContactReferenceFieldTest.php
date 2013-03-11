@@ -48,8 +48,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
 
     /* add new group */
 
-    $this->open($this->sboxPath . "civicrm/group/add?&reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload');
 
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
     $this->type("title", $groupName);
@@ -90,9 +89,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
 
     // Add Custom group //
     // Go directly to the URL of the screen that you will be testing (New Custom Group).
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
     //fill custom group title
     $customGroupTitle = 'custom_' . substr(sha1(rand()), 0, 7);
@@ -107,7 +104,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     $matches = array();
     preg_match('/gid=([0-9]+)/', $this->getLocation(), $matches);
@@ -127,7 +124,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent("Your custom field '$contactRefFieldLabel1' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$contactRefFieldLabel1' has been saved.");
 
     //add custom field - alphanumeric checkbox
     $contactRefFieldLabel2 = 'contact_ref_' . substr(sha1(rand()), 0, 4);
@@ -146,10 +143,9 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent("Your custom field '$contactRefFieldLabel2' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$contactRefFieldLabel2' has been saved.");
 
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field?reset=1&action=browse&gid={$customGroupId}");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/custom/group/field', "reset=1&action=browse&gid={$customGroupId}");
 
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[8]/span[1]/a[text()='Edit Field']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -159,8 +155,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $contactRefFieldID1 = $matches[1];
 
 
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field?reset=1&action=browse&gid={$customGroupId}");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/custom/group/field', "reset=1&action=browse&gid={$customGroupId}");
 
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/span[1]/a[text()='Edit Field']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -170,25 +165,23 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $contactRefFieldID2 = $matches[1];
 
     // Visit custom group preview page
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=preview&reset=1&id={$customGroupId}");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/custom/group', "action=preview&reset=1&id={$customGroupId}");
 
     $this->type("custom_{$contactRefFieldID1}_-1", "Anderson");
     $this->fireEvent("custom_{$contactRefFieldID1}_-1", "focus");
     $this->click("custom_{$contactRefFieldID1}_-1");
     $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->assertTrue($this->isTextPresent("{$contact1}@example.com"));
-    $this->assertTrue(!($this->isTextPresent("{$contact2}@example.com")));
+    $this->assertElementContainsText("css=div.ac_results-inner li", "{$contact1}@example.com");
+    $this->assertElementNotContainsText("css=div.ac_results-inner ul li", "{$contact2}@example.com");
 
 
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=preview&reset=1&id={$customGroupId}");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/custom/group', "action=preview&reset=1&id={$customGroupId}");
 
     $this->type("custom_{$contactRefFieldID2}_-1", $org1);
     $this->fireEvent("custom_{$contactRefFieldID2}_-1", "focus");
     $this->click("custom_{$contactRefFieldID2}_-1");
     $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->assertTrue($this->isTextPresent("{$org1}@example.com"));
+    $this->assertElementContainsText("css=div.ac_results-inner li", "{$org1}@example.com");
   }
 }
 

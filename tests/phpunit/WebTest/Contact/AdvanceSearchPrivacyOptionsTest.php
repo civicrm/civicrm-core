@@ -64,8 +64,7 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     $this->_addIndividual($contactsReffOptions['dn_trade_sms']['first_name'], $contactsReffOptions['dn_trade_sms']['last_name'], $privacyOptions['dn_trade_sms']);
 
     //advance search for created contacts
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
-    $this->waitForElementPresent('_qf_Advanced_refresh');
+    $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
     $allPrivacyOptions = array(
       'do_not_phone',
       'do_not_mail',
@@ -188,7 +187,7 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
 
   function _addIndividual($firstName, $lastName, $options) {
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
   
     //fill in first name
     $this->type("first_name", $firstName);
@@ -210,7 +209,7 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("{$firstName} {$lastName} has been created."));
+    $this->assertElementContainsText('crm-notification-container', "{$firstName} {$lastName} has been created.");
 
   }
 }
