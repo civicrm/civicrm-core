@@ -48,8 +48,7 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
 
     /* add new group */
 
-    $this->open($this->sboxPath . "civicrm/group/add?&reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload');
 
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
     $this->type("title", $groupName);
@@ -103,41 +102,40 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Added to Group");
 
     // Search contacts
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent("_qf_Basic_refresh");
+    $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
 
     $this->select('group', "label={$groupName}");
     $this->click("_qf_Basic_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("3 Contacts"));
+    $this->assertElementContainsText('search-status', "3 Contacts");
 
     $this->click("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[3]/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("{$contact1} AAA"));
-    $this->assertTrue($this->isTextPresent("Next"));
+    $this->assertElementContainsText('css=div.crm-summary-display_name', "{$contact1} AAA");
+    $this->assertElementContainsText('css=li.crm-next-action a span', "Next");
 
     $this->click("xpath=//ul[@id='actions']/li[@class='crm-next-action']/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("{$contact2} BBB"));
-    $this->assertTrue($this->isTextPresent("Next"));
-    $this->assertTrue($this->isTextPresent("Previous"));
+    $this->assertElementContainsText('css=div.crm-summary-display_name', "{$contact2} BBB");
+    $this->assertElementContainsText('css=li.crm-next-action a span', "Next");
+    $this->assertElementContainsText('css=li.crm-previous-action a span', "Previous");
 
     $this->click("xpath=//ul[@id='actions']/li[@class='crm-next-action']/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("{$contact3} CCC"));
-    $this->assertTrue($this->isTextPresent("Previous"));
+    $this->assertElementContainsText('css=div.crm-summary-display_name', "{$contact3} CCC");
+    $this->assertElementContainsText('css=li.crm-previous-action a span', "Previous");
 
     $this->click("xpath=//ul[@id='actions']/li[@class='crm-previous-action']/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("{$contact2} BBB"));
-    $this->assertTrue($this->isTextPresent("Next"));
-    $this->assertTrue($this->isTextPresent("Previous"));
+    $this->assertElementContainsText('css=div.crm-summary-display_name', "{$contact2} BBB");
+    $this->assertElementContainsText('css=li.crm-next-action a span', "Next");
+    $this->assertElementContainsText('css=li.crm-previous-action a span', "Previous");
 
     $this->click("xpath=//ul[@id='actions']/li[@class='crm-previous-action']/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("{$contact1} AAA"));
-    $this->assertTrue($this->isTextPresent("Next"));
+    $this->assertElementContainsText('css=div.crm-summary-display_name', "{$contact1} AAA");
+    $this->assertElementContainsText('css=li.crm-next-action a span', "Next");
   }
 }
 

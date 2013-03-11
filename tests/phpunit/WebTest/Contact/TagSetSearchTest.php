@@ -92,8 +92,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
 
 
     // Go to Advance search.
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('contact/search/advanced', 'reset=1');
 
     // Check both the tagset.
     $this->assertTrue($this->isElementPresent("token-input-contact_taglist_{$tagSet1}"));
@@ -131,15 +130,14 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
     // Check result.
-    $this->assertTrue($this->isTextPresent("2 Contacts"));
-    $this->assertTrue($this->isTextPresent("Anderson, $contact1"));
-    $this->assertTrue($this->isTextPresent("Anderson, $contact2"));
+    $this->assertElementContainsText('search-status', "2 Contacts");
+    $this->assertElementContainsText('css=.crm-search-results table.selector', "Anderson, $contact1");
+    $this->assertElementContainsText('css=.crm-search-results table.selector', "Anderson, $contact2");
   }
 
   function _testAddTagSet() {
     // Go to add tag set url.
-    $this->open($this->sboxPath . "civicrm/admin/tag?action=add&reset=1&tagset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/tag', 'action=add&reset=1&tagset=1');
 
     // take a tagset name
     $tagSetName = 'tagset_' . substr(sha1(rand()), 0, 7);
@@ -161,7 +159,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The tag '$tagSetName' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "The tag '$tagSetName' has been saved.");
 
     // sort by ID desc
     $this->click("xpath=//table//tr/th[text()=\"ID\"]");

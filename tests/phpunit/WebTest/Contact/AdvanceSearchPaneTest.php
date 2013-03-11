@@ -54,8 +54,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     // Test Individual panes.
     foreach (array_keys($allpanes) as $pane) {
       // Go to the Advance Search
-      $this->open($this->sboxPath . 'civicrm/contact/search/advanced?reset=1');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage('contact/search/advanced', 'reset=1');
 
       // Select some fields from pane.
       $this->_selectPaneFields($pane);
@@ -89,8 +88,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     $allpanes = $this->_advanceSearchPanes();
 
     // Go to the Advance Search
-    $this->open($this->sboxPath . 'civicrm/contact/search/advanced?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('contact/search/advanced', 'reset=1');
 
     // Select some fields from all default panes.
     foreach (array_keys($allpanes) as $pane) {

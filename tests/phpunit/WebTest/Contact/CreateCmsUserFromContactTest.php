@@ -234,8 +234,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->assertType('numeric', $cid);
 
     //got to the new cms user form
-    $this->open($this->sboxPath . "civicrm/contact/view/useradd?reset=1&action=add&cid=" . $cid);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('contact/view/useradd', "reset=1&action=add&cid={$cid}");
 
     return array($cid, $firstName, $lastName, $email);
   }
