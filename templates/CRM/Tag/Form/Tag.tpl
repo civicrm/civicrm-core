@@ -85,7 +85,10 @@
       });
 
       //load js tree.
-      cj("#tagtree").jstree({"plugins" : ["themes", "html_data"]});
+      cj("#tagtree").jstree({
+        "plugins" : ["themes", "html_data"],
+        "themes": {"url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/default/style.css'}
+      });
 
       {/literal}
       {if $permission neq 'edit'}
