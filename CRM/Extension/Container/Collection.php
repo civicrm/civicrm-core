@@ -86,7 +86,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
     }
     return $errors;
   }
-    /**
+
+  /**
    * {@inheritdoc}
    */
   public function getKeys() {
