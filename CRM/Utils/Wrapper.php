@@ -62,7 +62,7 @@ class CRM_Utils_Wrapper {
    *
    * @return none.
    * @access public
-   */ 
+   */
   function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {
       $mode         = CRM_Utils_Array::value('mode', $arguments);
