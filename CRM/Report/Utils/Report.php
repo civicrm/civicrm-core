@@ -347,11 +347,6 @@ WHERE  inst.report_id = %1";
     $obj          = new CRM_Report_Page_Instance();
     $is_error     = 0;
     if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form')) {
-      // get the last element which is the form name and emulate a post submit via _qf_default
-      $formName = CRM_Utils_String::getClassName($templateInfo['name']);
-      if ($formName) {
-        $_REQUEST['_qf_default'] = "{$formName}:submit";
-      }
       $instanceInfo = array();
       CRM_Report_BAO_Instance::retrieve(array('id' => $instanceId), $instanceInfo);
 
