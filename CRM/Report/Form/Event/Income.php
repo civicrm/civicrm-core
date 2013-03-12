@@ -103,6 +103,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
                     civicrm_event.start_date            as start_date,
                     civicrm_event.end_date              as end_date,
                     civicrm_option_value.label          as event_type,
+                    civicrm_participant.fee_currency    as currency,
                     SUM(civicrm_participant.fee_amount) as total,
                     COUNT(civicrm_participant.id)       as participant
 
@@ -117,6 +118,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
             GROUP BY   civicrm_event.id
             ";
+
     $eventDAO = CRM_Core_DAO::executeQuery($sql);
 
     while ($eventDAO->fetch()) {
@@ -125,7 +127,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       $eventSummary[$eventDAO->event_id]['Start Date'] = CRM_Utils_Date::customFormat($eventDAO->start_date);
       $eventSummary[$eventDAO->event_id]['End Date'] = CRM_Utils_Date::customFormat($eventDAO->end_date);
       $eventSummary[$eventDAO->event_id]['Event Type'] = $eventDAO->event_type;
-      $eventSummary[$eventDAO->event_id]['Event Income'] = CRM_Utils_Money::format($eventDAO->total);
+      $eventSummary[$eventDAO->event_id]['Event Income'] = CRM_Utils_Money::format($eventDAO->total, $eventDAO->currency);
       $eventSummary[$eventDAO->event_id]['Registered Participant'] = "{$eventDAO->participant} ({$activeparticipnatStutusLabel})";
     }
     $this->assign_by_ref('summary', $eventSummary);
