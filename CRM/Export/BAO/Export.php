@@ -1173,15 +1173,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   static function sqlColumnDefn(&$query, &$sqlColumns, $field) {
-    if (substr($field, -4) == '_a_b' ||
-      substr($field, -4) == '_b_a'
-    ) {
+    if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
       return;
     }
 
     $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
     if ($fieldName == 'id') {
       $fieldName = 'civicrm_primary_id';
+    }
+
+    // early exit for master_id, CRM-12100
+    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
+    if ($fieldName == 'master_id') {
+      $sqlColumns[$fieldName] = "$fieldName varchar(128)";
+      return;
     }
 
     // set the sql columns
