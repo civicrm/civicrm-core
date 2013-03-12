@@ -33,6 +33,9 @@ abstract class CRM_Utils_System_Base {
       if ($maintenance) {
         drupal_set_breadcrumb('');
         drupal_maintenance_theme();
+        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+          CRM_Utils_System::addHTMLHead($region->render(''));
+        }
         print theme('maintenance_page', array('content' => $content));
         exit();
       }
