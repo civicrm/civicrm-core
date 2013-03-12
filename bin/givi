@@ -93,9 +93,9 @@ class Givi {
     $this->dirStack = new DirStack();
     $this->repos = array(
       'core' => '.',
-      'packages' => 'packages',
-      'joomla' => 'joomla',
       'drupal' => 'drupal',
+      'joomla' => 'joomla',
+      'packages' => 'packages',
       'wordpress' => 'WordPress',
     );
   }
