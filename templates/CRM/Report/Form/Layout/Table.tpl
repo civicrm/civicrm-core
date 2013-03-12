@@ -119,7 +119,11 @@
                                 {/if}
                             {/if}
                         {elseif $header.type eq 1024}
-                            <span class="nowrap">{$row.$field|crmMoney}</span>
+                            {if $currencyColumn}
+                                <span class="nowrap">{$row.$field|crmMoney:$row.$currencyColumn}</span>
+                            {else}
+                                <span class="nowrap">{$row.$field|crmMoney}</span>
+				                   {/if}
                         {else}
                             {$row.$field}
                         {/if}

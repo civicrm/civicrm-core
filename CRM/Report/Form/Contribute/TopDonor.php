@@ -83,6 +83,10 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
               'avg' => ts('Average'),
             ),
           ),
+          'currency' => 
+          array('required' => TRUE,
+             'no_display' => TRUE,
+          ),
         ),
         'filters' =>
         array(
@@ -90,6 +94,11 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           array(
             'default' => 'this.year',
             'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'currency' =>
+          array('title' => ts('Currency'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'total_range' =>
           array('title' => ts('Show no. of Top Donors'),
@@ -156,6 +165,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     );
 
     $this->_tagFilter = TRUE;
+    $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
   }
 
@@ -300,7 +310,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   }
 
   function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id ";
+    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_contribution']}.currency";
   }
 
   function postProcess() {
@@ -404,10 +414,11 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
         $rows[$rowNum]['civicrm_donor_rank'] = $rank++;
         // convert display name to links
         if (array_key_exists('civicrm_contact_display_name', $row) &&
-          array_key_exists('civicrm_contact_id', $row)
+          array_key_exists('civicrm_contact_id', $row) &&
+            CRM_Utils_Array::value('civicrm_contribution_currency', $row)
         ) {
           $url = CRM_Report_Utils_Report::getNextUrl('contribute/detail',
-            'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'],
+            'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'] . "&currency_value=" . $row['civicrm_contribution_currency'],
             $this->_absoluteUrl, $this->_id, $this->_drilldownReport
           );
           $rows[$rowNum]['civicrm_contact_display_name_link'] = $url;
