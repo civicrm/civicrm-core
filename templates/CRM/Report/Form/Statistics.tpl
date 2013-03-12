@@ -54,6 +54,8 @@
                 <td>
                    {if $row.type eq 1024}
                        {$row.value|crmMoney}
+                   {elseif $row.type eq 2}
+                       {$row.value}
                    {else}
                        {$row.value|crmNumberFormat}
                    {/if}
