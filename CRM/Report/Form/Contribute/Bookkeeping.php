@@ -95,14 +95,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'name'  => 'accounting_code',
             'alias' => 'financial_account_civireport_debit',
             'default' => TRUE,
-            'required' => TRUE,
           ),
           'credit_accounting_code' => array(
             'title' => ts('Financial Account Code - Credit'),
             'name'  => 'accounting_code',
             'alias' => 'financial_account_civireport_credit',
             'default' => TRUE,
-            'required' => TRUE,
           ),
           'debit_name' => array(
             'title' => ts('Financial Account Name - Debit'),
