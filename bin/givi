@@ -264,6 +264,7 @@ class Givi {
     foreach ($this->repos as $repo => $relPath) {
       $filteredBranch = $this->filterBranchName($repo, $branches[$repo]);
       $filteredBaseBranch = $this->filterBranchName($repo, $baseBranch);
+
       if ($filteredBranch == $filteredBaseBranch) {
         $this->run($relPath, 'git', 'checkout', $filteredBranch);
       }
@@ -286,10 +287,12 @@ class Givi {
     }
 
     foreach ($this->repos as $repo => $relPath) {
-      $this->run($relPath, 'git', 'checkout', $branches[$repo]);
-      if ($branches[$repo] != $baseBranch && $this->rebase) {
-        // FIXME: assumes
-        list ($baseRemoteRepo, $baseRemoteBranch) = $this->parseBranchRepo($baseBranch);
+      $filteredBranch = $this->filterBranchName($repo, $branches[$repo]);
+      $filteredBaseBranch = $this->filterBranchName($repo, $baseBranch);
+
+      $this->run($relPath, 'git', 'checkout', $filteredBranch);
+      if ($filteredBranch != $filteredBaseBranch && $this->rebase) {
+        list ($baseRemoteRepo, $baseRemoteBranch) = $this->parseBranchRepo($filteredBaseBranch);
         $this->run($relPath, 'git', 'pull', '--rebase', $baseRemoteRepo, $baseRemoteBranch);
       }
     }
