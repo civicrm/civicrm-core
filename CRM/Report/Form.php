@@ -1864,16 +1864,18 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   function processReportMode() {
     $buttonName = $this->controller->getButtonName();
 
-    $output = CRM_Utils_Request::retrieve('output',
-              'String',
-              CRM_Core_DAO::$_nullObject
+    $output = CRM_Utils_Request::retrieve(
+      'output',
+      'String',
+      CRM_Core_DAO::$_nullObject
     );
 
     $this->_sendmail =
-      CRM_Utils_Request::retrieve('sendmail',
-                       'Boolean',
-                       CRM_Core_DAO::$_nullObject
-    );
+      CRM_Utils_Request::retrieve(
+        'sendmail',
+        'Boolean',
+        CRM_Core_DAO::$_nullObject
+      );
 
     $this->_absoluteUrl = FALSE;
     $printOnly = FALSE;

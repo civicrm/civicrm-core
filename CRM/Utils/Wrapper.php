@@ -97,7 +97,8 @@ class CRM_Utils_Wrapper {
           $abort      = CRM_Utils_Array::value('abort', $params, FALSE);
 
           $value = NULL;
-          $value = CRM_Utils_Request::retrieve($urlVar,
+          $value = CRM_Utils_Request::retrieve(
+            $urlVar,
             $type,
             $this->_controller,
             $abort,

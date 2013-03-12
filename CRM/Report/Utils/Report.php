@@ -330,12 +330,12 @@ WHERE  inst.report_id = %1";
   }
 
   static function processReport($params) {
-
     $instanceId = CRM_Utils_Array::value('instanceId', $params);
 
     // hack for now, CRM-8358
     $_REQUEST['instanceId'] = $instanceId;
     $_REQUEST['sendmail'] = CRM_Utils_Array::value('sendmail', $params, 1);
+
     // if cron is run from terminal --output is reserved, and therefore we would provide another name 'format'
     $_REQUEST['output'] = CRM_Utils_Array::value('format', $params, CRM_Utils_Array::value('output', $params, 'pdf'));
     $_REQUEST['reset'] = CRM_Utils_Array::value('reset', $params, 1);
@@ -347,6 +347,11 @@ WHERE  inst.report_id = %1";
     $obj          = new CRM_Report_Page_Instance();
     $is_error     = 0;
     if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form')) {
+      // get the last element which is the form name and emulate a post submit via _qf_default
+      $formName = CRM_Utils_String::getClassName($templateInfo['name']);
+      if ($formName) {
+        $_REQUEST['_qf_default'] = "{$formName}:submit";
+      }
       $instanceInfo = array();
       CRM_Report_BAO_Instance::retrieve(array('id' => $instanceId), $instanceInfo);
 
@@ -358,16 +363,17 @@ WHERE  inst.report_id = %1";
       }
 
       $wrapper = new CRM_Utils_Wrapper();
-      $arguments['urlToSession'] = array(
-        array(
-          'urlVar' => 'instanceId',
-          'type' => 'Positive',
-          'sessionVar' => 'instanceId',
-          'default' => 'null',
+      $arguments = array(
+        'urlToSession' => array(
+          array(
+            'urlVar' => 'instanceId',
+            'type' => 'Positive',
+            'sessionVar' => 'instanceId',
+            'default' => 'null',
+          ),
         ),
+        'ignoreKey' => TRUE
       );
-      $arguments['ignoreKey'] = TRUE;
-
       $messages[] = $wrapper->run($templateInfo['name'], NULL, $arguments);
     }
     else {
