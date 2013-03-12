@@ -877,7 +877,7 @@ abstract class CRM_Utils_Hook {
 
   /**
    * This hook is called when API permissions are checked (cf. civicrm_api3_api_check_permission()
-   * in api/v3/utils.php and _civicrm_api3_permissions() in CRM/Core/DAO/.permissions.php).
+   * in api/v3/utils.php and _civicrm_api3_permissions() in CRM/Core/DAO/permissions.php).
    *
    * @param string $entity       the API entity (like contact)
    * @param string $action       the API action (like get)

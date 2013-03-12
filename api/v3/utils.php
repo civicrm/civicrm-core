@@ -270,7 +270,7 @@ function _civicrm_api3_load_DAO($entity) {
 function _civicrm_api3_get_DAO($name) {
   static $dao = NULL;
   if (!$dao) {
-    require ('CRM/Core/DAO/.listAll.php');
+    require ('CRM/Core/DAO/listAll.php');
   }
 
   if (strpos($name, 'civicrm_api3') !== FALSE) {
@@ -904,7 +904,7 @@ function _civicrm_api3_api_check_permission($entity, $action, &$params, $throw =
 
   require_once 'CRM/Core/Permission.php';
 
-  require_once 'CRM/Core/DAO/.permissions.php';
+  require_once 'CRM/Core/DAO/permissions.php';
   $permissions = _civicrm_api3_permissions($entity, $action, $params);
 
   // $params might’ve been reset by the alterAPIPermissions() hook

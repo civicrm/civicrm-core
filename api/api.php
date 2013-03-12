@@ -533,7 +533,7 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
 function _civicrm_api_get_entity_name_from_dao($bao){
   $daoName = str_replace("BAO", "DAO", get_class($bao));
   $dao = array();
-  require ('CRM/Core/DAO/.listAll.php');
+  require ('CRM/Core/DAO/listAll.php');
   $daos = array_flip($dao);
   return _civicrm_api_get_entity_name_from_camel($daos[$daoName]);
 
