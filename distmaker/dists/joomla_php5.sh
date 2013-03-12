@@ -97,6 +97,9 @@ cp -r -p civicrm/joomla/admin/helpers/*          com_civicrm/admin/helpers
 cp -r -p civicrm/joomla/admin/plugins/*          com_civicrm/admin/plugins
 cp civicrm/joomla/admin/language/en-GB/*         com_civicrm/admin/language/en-GB
 
+# joomla 3.0 like admin.civicrm.php to be called civicrm.php
+# lets keep both versions there
+cp com_civicrm/admin/admin.civicrm.php com_civicrm/admin/civicrm.php
 
 # copying front end code
 cp civicrm/joomla/site/civicrm.html.php      com_civicrm/site
