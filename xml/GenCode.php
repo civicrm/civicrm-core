@@ -202,7 +202,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     }
 
     // TODO deal with the BAO's too ?
-    file_put_contents($this->CoreDAOCodePath . ".listAll.php", $allDAO);
+    file_put_contents($this->CoreDAOCodePath . "listAll.php", $allDAO);
   }
 
   function generateCiviTestTruncate($tables) {
