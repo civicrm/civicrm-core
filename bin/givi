@@ -217,6 +217,10 @@ class Givi {
     echo "  --joomla=X: Specify the branch to use on the joomla repository\n";
     echo "  --wordpress=X: Specify the branch to use on the wordpress repository\n";
     echo "  --rebase: Perform a rebase before starting work\n";
+    echo "Known repositories:\n";
+    foreach ($this->repos as $repo => $relPath) {
+      printf("  %-12s: %s\n", $repo, realpath($this->civiRoot . DIRECTORY_SEPARATOR . $relPath));
+    }
     echo "When using 'begin' or 'resume' with a remote base-branch, most repositories\n";
     echo "will have a detached HEAD. Only repos with an explicit branch will be real,\n";
     echo "local branches.\n";
