@@ -74,8 +74,8 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           array('title' => ts('Pledge Made'),
             'required' => TRUE,
           ),
-                                 'financial_type_id' =>
-                                 array( 'title'    => ts('Financial Type'),
+          'financial_type_id' =>
+          array( 'title'    => ts('Financial Type'),
             'requried' => TRUE,
           ),
           'amount' =>
@@ -101,13 +101,14 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           ),
           'currency' =>
           array('title' => 'Currency',
-             'default' =>  NULL,
-             'type' => CRM_Utils_Type::T_STRING,
-          ),
-                                 'financial_type_id' =>
-                                 array( 'title'        =>  ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-                                        'options'      => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Core_PseudoConstant::currencySymbols('name','name'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'financial_type_id' =>
+          array( 'title'   => ts('Financial Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options'      => CRM_Contribute_PseudoConstant::financialType(),
           ),
         ),
         'grouping' => 'pledge-fields',

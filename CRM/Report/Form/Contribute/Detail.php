@@ -205,10 +205,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           array('operatorType' => CRM_Report_Form::OP_DATE),
           'currency' =>
           array('title' => 'Currency',
-            'operatorType' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::currencySymbols('name','name'),
+            'type' => CRM_Utils_Type::T_STRING,
           ),
-                                 'financial_type_id'   =>
-                                    array( 'title'        => ts( 'Financial Type' ), 
+          'financial_type_id'   =>
+          array( 'title'        => ts( 'Financial Type' ), 
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
             'type' => CRM_Utils_Type::T_INT,
@@ -488,6 +490,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
 
     $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $sql = "{$select} {$this->_from} {$this->_where} {$group}";
+    crm_core_error::Debug( $sql);
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {

@@ -96,20 +96,21 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'currency' =>
-          array('title' => ts('Currency'),
-            'default' => NULL,
+          array('title' => 'Currency',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::currencySymbols('name','name'),
             'type' => CRM_Utils_Type::T_STRING,
-          ),
+            ),
           'total_range' =>
           array('title' => ts('Show no. of Top Donors'),
             'type' => CRM_Utils_Type::T_INT,
             'default_op' => 'eq',
           ),
-                                 'financial_type_id' =>
-                                 array( 'name'         => 'financial_type_id',
-                                        'title'        => ts( 'Financial Type' ),
+          'financial_type_id' =>
+          array( 'name'    => 'financial_type_id',
+            'title'        => ts( 'Financial Type' ),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-                                        'options'      => CRM_Contribute_PseudoConstant::financialType( ) 
+            'options'      => CRM_Contribute_PseudoConstant::financialType( ) 
           ),
           'contribution_status_id' =>
           array('title' => ts('Donation Status'),

@@ -134,7 +134,8 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           ),
           'currency' =>
           array('title' => 'Currency',
-            'default' =>  NULL,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::currencySymbols('name','name'),
             'type' => CRM_Utils_Type::T_STRING,
           ),
           'sid' =>
