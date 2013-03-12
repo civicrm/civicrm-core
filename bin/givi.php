@@ -138,6 +138,7 @@ class Givi {
         call_user_func_array(array($this, 'doResume'), $this->arguments);
         break;
       case 'help':
+      case '':
         $this->doHelp();
         break;
       default:
