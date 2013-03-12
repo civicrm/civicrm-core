@@ -74,14 +74,19 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           array('title' => ts('Pledge Made'),
             'required' => TRUE,
           ),
-                                 'financial_type_id' =>
-                                 array( 'title'    => ts('Financial Type'),
+          'financial_type_id' =>
+          array( 'title'    => ts('Financial Type'),
             'requried' => TRUE,
           ),
           'amount' =>
           array('title' => ts('Amount'),
             'required' => TRUE,
             'type' => CRM_Utils_Type::T_MONEY,
+          ),
+          'currency' =>
+          array(
+            'required' => TRUE,
+            'no_display' => TRUE,
           ),
           'status_id' =>
           array('title' => ts('Status'),
@@ -94,10 +99,16 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
             'title' => 'Pledge Made',
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
-                                 'financial_type_id' =>
-                                 array( 'title'        =>  ts('Financial Type'),
+          'currency' =>
+          array('title' => 'Currency',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-                                        'options'      => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Core_PseudoConstant::currencySymbols('name','name'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'financial_type_id' =>
+          array( 'title'   => ts('Financial Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options'      => CRM_Contribute_PseudoConstant::financialType(),
           ),
         ),
         'grouping' => 'pledge-fields',
@@ -159,6 +170,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     );
 
     $this->_tagFilter = TRUE;
+    $this->_currencyColumn = 'civicrm_pledge_currency';
     parent::__construct();
   }
 
@@ -240,7 +252,8 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   function groupBy() {
     $this->_groupBy = "
          GROUP BY {$this->_aliases['civicrm_pledge']}.contact_id, 
-                  {$this->_aliases['civicrm_pledge']}.id";
+                  {$this->_aliases['civicrm_pledge']}.id,
+                  {$this->_aliases['civicrm_pledge']}.currency";
   }
 
   function orderBy() {

@@ -228,6 +228,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_columnHeaders = array();
   public $_orderBy = NULL;
   public $_groupBy = NULL;
+  
+  /**
+   * Variable to hold the currency alias
+   */
+  protected $_currencyColumn = NULL;
 
   /**
    *
@@ -271,6 +276,9 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     // add / modify display columns, filters ..etc
     CRM_Utils_Hook::alterReportVar('columns', $this->_columns, $this);
+
+    //assign currencyColumn variable to tpl
+    $this->assign('currencyColumn', $this->_currencyColumn);
   }
 
   function preProcessCommon() {

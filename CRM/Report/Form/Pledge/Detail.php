@@ -94,6 +94,11 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
             'required' => TRUE,
             'type' => CRM_Utils_Type::T_MONEY,
           ),
+          'currency' =>
+          array(
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
           'frequency_unit' =>
           array('title' => ts('Frequency Unit'),
           ),
@@ -126,6 +131,12 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           'pledge_amount' =>
           array('title' => ts('Pledged Amount'),
             'operatorType' => CRM_Report_Form::OP_INT,
+          ),
+          'currency' =>
+          array('title' => 'Currency',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::currencySymbols('name','name'),
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'sid' =>
           array(
@@ -210,7 +221,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   function groupBy() {
     parent::groupBy();
     if (empty($this->_groupBy) && $this->_totalPaid) {
-      $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_pledge']}.id " ;
+      $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_pledge']}.id, {$this->_aliases['civicrm_pledge']}.currency" ;
     }
   }
   function from() {
@@ -252,31 +263,39 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
 
     if (!$this->_having) {
+      $totalAmount = $average = array();
+      $count = 0;
       $select = "
             SELECT COUNT({$this->_aliases['civicrm_pledge']}.amount )       as count,
                    SUM({$this->_aliases['civicrm_pledge']}.amount )         as amount,
-                   ROUND(AVG({$this->_aliases['civicrm_pledge']}.amount), 2) as avg
+                   ROUND(AVG({$this->_aliases['civicrm_pledge']}.amount), 2) as avg,
+                   {$this->_aliases['civicrm_pledge']}.currency as currency
             ";
 
-      $sql = "{$select} {$this->_from} {$this->_where}";
+      $group = "\nGROUP BY {$this->_aliases['civicrm_pledge']}.currency";
+      $sql = "{$select} {$this->_from} {$this->_where} {$group}";
       $dao = CRM_Core_DAO::executeQuery($sql);
 
-      if ($dao->fetch()) {
-        $statistics['counts']['amount'] = array(
-          'value' => $dao->amount,
-          'title' => 'Total Pledged',
-          'type' => CRM_Utils_Type::T_MONEY,
-        );
-        $statistics['counts']['count '] = array(
-          'value' => $dao->count,
-          'title' => 'Total No Pledges',
-        );
-        $statistics['counts']['avg   '] = array(
-          'value' => $dao->avg,
-          'title' => 'Average',
-          'type' => CRM_Utils_Type::T_MONEY,
-        );
+      while ($dao->fetch()) {
+       $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)."(".$dao->count.")";
+       $average[] =   CRM_Utils_Money::format($dao->avg, $dao->currency);
+       $count += $dao->count; 
       }
+
+      $statistics['counts']['amount'] = array(
+        'title' => ts('Total Pledged (Number of Pledge)'),
+        'value' => implode(',  ', $totalAmount),
+        'type' => CRM_Utils_Type::T_STRING,
+      );
+      $statistics['counts']['count'] = array(
+        'title' => ts('Total No Pledges'),
+        'value' => $count,
+      );
+      $statistics['counts']['avg'] = array(
+        'title' => ts('Average'),
+        'value' => implode(',  ', $average),
+        'type' => CRM_Utils_Type::T_STRING,
+     );
     }
     return $statistics;
   }
