@@ -325,6 +325,7 @@ function civicrm_wp_invoke() {
 }
 
 function civicrm_wp_head() {
+  // CRM-11823 - If Civi bootstrapped, then merge its HTML header with the CMS's header
   global $civicrm_root;
   if (empty($civicrm_root)) {
     return;
