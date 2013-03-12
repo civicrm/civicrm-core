@@ -30,7 +30,7 @@ class DirStack {
 class Givi {
 
   /**
-   * @var string 'checkout-all', 'begin', 'help', etc
+   * @var string 'checkout', 'begin', 'help', etc
    */
   protected $action;
 
@@ -122,13 +122,13 @@ class Givi {
 
     // Run the action
     switch ($this->action) {
-      case 'checkout-all':
+      case 'checkout':
         call_user_func_array(array($this, 'doCheckoutAll'), $this->arguments);
         break;
-      case 'fetch-all':
+      case 'fetch':
         call_user_func_array(array($this, 'doFetchAll'), $this->arguments);
         break;
-      case 'status-all':
+      case 'status':
         call_user_func_array(array($this, 'doStatusAll'), $this->arguments);
         break;
       case 'begin':
@@ -193,17 +193,19 @@ class Givi {
     $program = basename($this->program);
     echo "Givi - Coordinate git checkouts across CiviCRM repositories\n";
     echo "Usage:\n";
-    echo "  $program [options] checkout-all <branch>\n";
-    echo "  $program [options] fetch-all\n";
-    echo "  $program [options] status-all\n";
+    echo "  $program [options] checkout <branch>\n";
+    echo "  $program [options] fetch\n";
+    echo "  $program [options] status\n";
     echo "  $program [options] begin <base-branch> [--core=<new-branch>|--drupal=<new-branch>|...] \n";
     echo "  $program [options] resume [--rebase] <base-branch> [--core=<custom-branch>|--drupal=<custom-branch>|...] \n";
     echo "Actions:\n";
-    echo "  checkout-all: Checkout same branch name on all repos\n";
-    echo "  status-all: Display status on all repos\n";
+    echo "  checkout: Checkout same branch name on all repos\n";
+    echo "  fetch: Fetch remote changes on all repos\n";
+    echo "  status: Display status on all repos\n";
     echo "  begin: Begin work on a new branch on some repo (and use base-branch for all others)\n";
     echo "  resume: Resume work on an existing branch on some repo (and use base-branch for all others)\n";
     echo "Common options:\n";
+    echo "  --dry-run: Don't do anything; only print commands that would be run\n";
     echo "  --d6: Specify that Drupal branches should use 6.x-* prefixes\n";
     echo "  --d7: Specify that Drupal branches should use 7.x-* prefixes (default)\n";
     echo "  --fetch: Fetch the latest code before creating, updating, or checking-out anything\n";
