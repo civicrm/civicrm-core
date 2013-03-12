@@ -33,16 +33,19 @@ function do_gitify() {
 }
 
 ## add hook shims to a repo
-## usage: do_hookify <repo-path> <relative-hook-path>
+## usage: do_hookify <canonical-repo-name> <repo-path> <relative-hook-path>
 function do_hookify() {
-  TGT="$1"
-  HOOK_DIR="$2"
+  GIT_CANONICAL_REPO_NAME="$1"
+  TGT="$2"
+  HOOK_DIR="$3"
   if [ -n "$CIVICRM_GIT_HOOKS" ]; then
     echo "[[Install recommended hooks ($TGT)]]"
     for HOOK in commit-msg post-checkout post-merge pre-commit prepare-commit-msg post-commit pre-rebase post-rewrite ;do
           cat << TMPL > "$TGT/.git/hooks/$HOOK"
 #!/bin/bash
 if [ -f "\$GIT_DIR/${HOOK_DIR}/${HOOK}" ]; then
+  ## Note: GIT_CANONICAL_REPO_NAME was not provided by early hook-stubs
+  export GIT_CANONICAL_REPO_NAME="$GIT_CANONICAL_REPO_NAME"
   source "\$GIT_DIR/${HOOK_DIR}/${HOOK}"
 fi
 TMPL
@@ -140,33 +143,33 @@ fi
 
 check_dep
 do_gitify "${GIT_BASE_URL}/civicrm-core.git" "$CIVICRM_ROOT" -b "${CIVICRM_BRANCH}"
-do_hookify "$CIVICRM_ROOT" "../tools/scripts/git"
+do_hookify civicrm-core "$CIVICRM_ROOT" "../tools/scripts/git"
 do_gitify "${GIT_BASE_URL}/civicrm-packages.git" "$CIVICRM_ROOT/packages" -b "${CIVICRM_BRANCH}"
-do_hookify "$CIVICRM_ROOT/packages" "../../tools/scripts/git"
+do_hookify civicrm-packages "$CIVICRM_ROOT/packages" "../../tools/scripts/git"
 case "$CIVICRM_CMS" in
   Drupal)
     do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "7.x-${CIVICRM_BRANCH}"
-    do_hookify "$CIVICRM_ROOT/drupal" "../../tools/scripts/git"
+    do_hookify civicrm-drupal "$CIVICRM_ROOT/drupal" "../../tools/scripts/git"
     ;;
   Drupal6)
     do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "6.x-${CIVICRM_BRANCH}"
-    do_hookify "$CIVICRM_ROOT/drupal" "../../tools/scripts/git"
+    do_hookify civicrm-drupal "$CIVICRM_ROOT/drupal" "../../tools/scripts/git"
     ;;
   Joomla)
     do_gitify "${GIT_BASE_URL}/civicrm-joomla.git" "$CIVICRM_ROOT/joomla" -b "${CIVICRM_BRANCH}"
-    do_hookify "$CIVICRM_ROOT/joomla" "../../tools/scripts/git"
+    do_hookify civicrm-joomla "$CIVICRM_ROOT/joomla" "../../tools/scripts/git"
     ;;
   WordPress)
     do_gitify "${GIT_BASE_URL}/civicrm-wordpress.git" "$CIVICRM_ROOT/WordPress" -b "${CIVICRM_BRANCH}"
-    do_hookify "$CIVICRM_ROOT/WordPress" "../../tools/scripts/git"
+    do_hookify civicrm-wordpress "$CIVICRM_ROOT/WordPress" "../../tools/scripts/git"
     ;;
   all)
     do_gitify "${GIT_BASE_URL}/civicrm-drupal.git" "$CIVICRM_ROOT/drupal" -b "7.x-${CIVICRM_BRANCH}"
-    do_hookify "$CIVICRM_ROOT/drupal" "../../tools/scripts/git"
+    do_hookify civicrm-drupal "$CIVICRM_ROOT/drupal" "../../tools/scripts/git"
     do_gitify "${GIT_BASE_URL}/civicrm-joomla.git" "$CIVICRM_ROOT/joomla" -b "${CIVICRM_BRANCH}"
-    do_hookify "$CIVICRM_ROOT/joomla" "../../tools/scripts/git"
+    do_hookify civicrm-joomla "$CIVICRM_ROOT/joomla" "../../tools/scripts/git"
     do_gitify "${GIT_BASE_URL}/civicrm-wordpress.git" "$CIVICRM_ROOT/WordPress" -b "${CIVICRM_BRANCH}"
-    do_hookify "$CIVICRM_ROOT/WordPress" "../../tools/scripts/git"
+    do_hookify civicrm-wordpress "$CIVICRM_ROOT/WordPress" "../../tools/scripts/git"
     ;;
   *)
     echo "Unrecognized CMS: $CIVICRM_CMS"
