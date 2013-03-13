@@ -143,6 +143,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
+   * Adding discussion from CRM-11915 as code comments
+   * When multiple payment processors are configured for a event and user does any selection changes for them on online event registeration page :
+   * The 'Register' page gets loaded through ajax and following happens :
+   * the setDefaults function is called with the variable _ppType set with selected payment processor type,
+   * so in the 'if' condition checked whether the selected payment processor's billing mode is of 'billing form mode'. If its not, don't setDefaults for billing form and return instead.
+   *- For payment processors of billing mode 'Notify' - return from setDefaults before the code for billing profile population execution .
+   * (done this is because for payment processors with 'Notify' mode billing profile form doesn't get rendered on UI)
    *
    * @access public
    *
@@ -150,11 +157,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    */
   function setDefaultValues() {
     if ($this->_ppType && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
+      // see function comment block for explanation of this
       return;
     }
 
     $contactID = parent::getContactID();
     if ($contactID) {
+      //@todo CRM-11915 I observed that even when the billing block is not present the routine to retrieve the billing defaults is still called - which seems a bit redundant.
       $names = array(
         'first_name', 'middle_name', 'last_name',
         "street_address-{$this->_bltID}", "city-{$this->_bltID}", "postal_code-{$this->_bltID}",
