@@ -64,7 +64,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this);
     $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
-    if (!$this->_pageId && $config->userFramework == 'Joomla' && $config->userFrameworkFrontend) {
+    if (!$this->_pageId && $config->userFrameworkFrontend) {
       $this->_pageId = $this->_id;
     }
 
@@ -135,12 +135,12 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
         $stateCountryMap[$index][$fieldName] = $name;
       }
 
-      // also take care of state country widget                                                                                                                                                 
+      // also take care of state country widget
       if (!empty($stateCountryMap)) {
         CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap, $this->_defaults);
       }
     }
-    // now fix all state country selectors                                                                                                                                                                  
+    // now fix all state country selectors
     CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
     return $this->_defaults;
   }
