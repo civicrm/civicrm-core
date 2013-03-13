@@ -69,7 +69,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("{$memTypeParams['membership_type']} membership for $firstName Anderson has been added."),
+    $this->assertElementContainsText('crm-notification-container', "{$memTypeParams['membership_type']} membership for $firstName Anderson has been added.",
       "Status message didn't show up after saving!"
     );
 
@@ -102,8 +102,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
       'relationship_type' => '4_b_a',
     );
 
-    $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/member/membershipType', 'reset=1&action=browse');
 
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -130,9 +129,8 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
     // Clicking save
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type '$title' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "The membership type '$title' has been saved.");
 
     return $memTypeParams;
   }
 }
-
