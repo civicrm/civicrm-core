@@ -1,3 +1,4 @@
+{include file='../CRM/Upgrade/4.3.beta3.msg_template/civicrm_msg_template.tpl'}
 -- CRM-12077
 DELETE cog, cov FROM `civicrm_option_group` cog
 LEFT JOIN civicrm_option_value cov ON cov.option_group_id = cog.id
