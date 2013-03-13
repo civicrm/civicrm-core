@@ -571,9 +571,8 @@ ORDER BY parent_id, weight";
   static function createNavigation($contactID) {
     $config = CRM_Core_Config::singleton();
 
-    // For Joomla front end user, there is no need to create
-    // navigation menu items, CRM-5349
-    if ($config->userFramework == 'Joomla' && $config->userFrameworkFrontend) {
+    // if on frontend, do not create navigation menu items, CRM-5349
+    if ($config->userFrameworkFrontend) {
       return "<!-- $config->lcMessages -->";
     }
 
