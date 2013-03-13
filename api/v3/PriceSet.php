@@ -64,7 +64,7 @@ function civicrm_api3_price_set_create($params) {
   return $result;
 }
 
-/*
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation

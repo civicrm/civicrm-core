@@ -74,7 +74,8 @@ function civicrm_api3_membership_payment_create($params) {
 
   return civicrm_api3_create_success($mpArray, $params);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  * 
  * The metadata is used for setting defaults, documentation & validation

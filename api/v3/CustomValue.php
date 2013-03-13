@@ -113,12 +113,13 @@ function civicrm_api3_custom_value_create($params) {
   }
   return civicrm_api3_create_success(TRUE, $params);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
 function _civicrm_api3_custom_value_create_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
 }
@@ -136,8 +137,7 @@ function _civicrm_api3_custom_value_create_spec(&$params) {
  * @return array.
  *
  * @access public
- *
- **/
+ */
 function civicrm_api3_custom_value_get($params) {
 
   $getParams = array(
@@ -225,12 +225,12 @@ function civicrm_api3_custom_value_get($params) {
   }
 }
 
-/*
+/**
  * Adjust Metadata for Get action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
 function _civicrm_api3_custom_value_get_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
 }

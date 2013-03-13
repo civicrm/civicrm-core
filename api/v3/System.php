@@ -59,7 +59,7 @@ function civicrm_api3_system_flush($params) {
   return civicrm_api3_create_success();
 }
 
-/*
+/**
  * Adjust Metadata for Flush action
  *
  * The metadata is used for setting defaults, documentation & validation

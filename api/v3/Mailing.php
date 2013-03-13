@@ -52,12 +52,12 @@ function civicrm_api3_mailing_create($params, $ids = array()) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-/*
+/**
  * Adjust Metadata for Create action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
 function _civicrm_api3_mailing_create_spec(&$params) {
   $params['name']['api.required'] = 1;
   $params['subject']['api.required'] = 1;
@@ -100,12 +100,12 @@ function civicrm_api3_mailing_event_bounce($params) {
   }
 }
 
-/*
+/**
  * Adjust Metadata for bounce_spec action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
 function _civicrm_api3_mailing_event_bounce_spec(&$params) {
   $params['job_id']['api.required'] = 1;
   $params['event_queue_id']['api.required'] = 1;
@@ -152,12 +152,12 @@ function civicrm_api3_mailing_event_reply($params) {
   return civicrm_api3_create_success($params);
 }
 
-/*
+/**
  * Adjust Metadata for event_reply action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
 function _civicrm_api3_mailing_event_reply_spec(&$params) {
   $params['job_id']['api.required'] = 1;
   $params['event_queue_id']['api.required'] = 1;
@@ -189,12 +189,12 @@ function civicrm_api3_mailing_event_forward($params) {
   return civicrm_api3_create_error('Queue event could not be found');
 }
 
-/*
+/**
  * Adjust Metadata for event_forward action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
 function _civicrm_api3_mailing_event_forward_spec(&$params) {
   $params['job_id']['api.required'] = 1;
   $params['event_queue_id']['api.required'] = 1;

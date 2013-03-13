@@ -78,7 +78,8 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
   }
   return civicrm_api3_create_error('Subscription failed');
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  * 
  * The metadata is used for setting defaults, documentation & validation

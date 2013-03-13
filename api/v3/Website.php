@@ -58,9 +58,9 @@ function civicrm_api3_website_create($params) {
     $values = array();
     _civicrm_api3_object_to_array($websiteBAO, $values[$websiteBAO->id]);
     return civicrm_api3_create_success($values, $params, 'website', 'get');
+}
 
-  }
-/*
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation

@@ -78,7 +78,7 @@ function civicrm_api3_participant_create($params) {
   return civicrm_api3_create_success($participant, $params, 'participant', 'create', $participantBAO);
 }
 
-/*
+/**
  * Create a default participant line item
  */
 function _civicrm_api3_participant_createlineitem(&$params, $participant){
@@ -111,7 +111,7 @@ where ps.id is not null
 }
 
 
-/*
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
@@ -171,7 +171,7 @@ function civicrm_api3_participant_get($params) {
   return civicrm_api3_create_success($participant, $params, 'participant', 'get', $dao);
 }
 
-/*
+/**
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation

@@ -58,8 +58,9 @@ function civicrm_api3_price_field_value_create($params) {
   _civicrm_api3_object_to_array($bao, $values[$bao->id]);
   return civicrm_api3_create_success($values, $params, 'price_field_value', 'create', $bao);
 
-  }
-/*
+}
+
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
