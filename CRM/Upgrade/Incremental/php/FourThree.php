@@ -50,7 +50,7 @@ class CRM_Upgrade_Incremental_php_FourThree {
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    if (version_compare($rev, '4.3.beta3') >= 0) {
+    if ($rev == '4.3.beta3') {
       //CRM-12084
       //sql for checking orphaned contribution records
       $sql = "SELECT COUNT(ct.id) FROM civicrm_contribution ct LEFT JOIN civicrm_contact c ON ct.contact_id = c.id WHERE c.id IS NULL";
