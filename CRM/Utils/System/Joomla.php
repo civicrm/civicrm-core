@@ -475,7 +475,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
           'pass' => $password,
         );
       }
-      CRM_Utils_System::loadBootStrap($bootStrapParams);
+      CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, FALSE);
     }
 
     jimport('joomla.application.component.helper');
@@ -524,6 +524,22 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       return array($contactID, $dbId, mt_rand());
     }
     return FALSE;
+  }
+
+  /**
+   * Set a init session with user object
+   *
+   * @param array $data  array with user specific data
+   *
+   * @access public
+   */
+  function setUserSession($data) {
+    list($userID, $ufID) = $data;
+    $user = new JUser( $ufID );
+    $session = &JFactory::getSession();
+    $session->set('user', $user);
+
+    parent::setUserSession($data);
   }
 
   /**
@@ -581,13 +597,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param $loadUser boolean load cms user?
    * @param $throwError throw error on failure?
    */
-  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE) {
+  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $loadDefines = TRUE) {
     // Setup the base path related constant.
     $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
 
     // load BootStrap here if needed
     // We are a valid Joomla entry point.
-    if ( ! defined( '_JEXEC' ) ) {
+    if ( ! defined( '_JEXEC' ) && $loadDefines ) {
       define('_JEXEC', 1);
       define('DS', DIRECTORY_SEPARATOR);
       define('JPATH_BASE', $joomlaBase . '/administrator');
