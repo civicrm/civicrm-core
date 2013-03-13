@@ -70,7 +70,8 @@ function civicrm_api3_event_create($params) {
     _civicrm_api3_object_to_array($eventBAO, $event[$eventBAO->id]);
   return civicrm_api3_create_success($event, $params);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
@@ -83,7 +84,8 @@ function _civicrm_api3_event_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
 }
-/*
+
+/**
  * Support for schema changes made in 4.2
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
@@ -158,16 +160,18 @@ function civicrm_api3_event_get($params) {
 
   return civicrm_api3_create_success($event, $params, 'event', 'get', $eventDAO);
 }
-/*
+
+/**
  * Adjust Metadata for Get action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
 function _civicrm_api3_event_get_spec(&$params) {
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
 }
-/*
+
+/**
  * Support for schema changes made in 4.2
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
@@ -200,7 +204,7 @@ function civicrm_api3_event_delete($params) {
 }
 /*
 
-/*
+/**
  * Function to add 'is_full' & 'available_seats' to the return array. (this might be better in the BAO)
  * Default BAO function returns a string if full rather than a Bool - which is more appropriate to a form
  *

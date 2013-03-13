@@ -57,7 +57,8 @@ function civicrm_api3_grant_create($params) {
   $params = array_merge($values, $params);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'grant');
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation

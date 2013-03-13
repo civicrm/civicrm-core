@@ -317,7 +317,7 @@ function civicrm_api3_profile_apply($params) {
   return civicrm_api3_create_success($data);
 }
 
-/*
+/**
  * Return UFGroup fields
  */
 function civicrm_api3_profile_getfields($params) {

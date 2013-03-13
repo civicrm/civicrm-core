@@ -73,7 +73,7 @@ function civicrm_api3_membership_delete($params) {
 
 }
 
-/*
+/**
  * modify metadata
  */
 function _civicrm_api3_membership_delete_spec(&$params) {
@@ -153,7 +153,8 @@ function civicrm_api3_membership_create($params) {
   return civicrm_api3_create_success($membership, $params, 'membership', 'create', $membershipBAO);
 
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
@@ -317,7 +318,8 @@ function _civicrm_api3_membership_format_params($params, &$values, $create = FAL
 
   return NULL;
 }
-/*
+
+/**
  * When we copied apiv3 from api v2 we brought across some custom behaviours - in the case of
  * membership a complicated return array is constructed. The original
  * behaviour made contact_id a required field. We still need to keep this for v3 when contact_id

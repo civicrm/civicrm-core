@@ -72,7 +72,8 @@ function civicrm_api3_contribution_create(&$params) {
 
   return civicrm_api3_create_success($contributeArray, $params, 'contribution', 'create', $contribution);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
@@ -143,7 +144,8 @@ function civicrm_api3_contribution_delete($params) {
     return civicrm_api3_create_error('Could not delete contribution');
   }
 }
-/*
+
+/**
  * modify metadata. Legacy support for contribution_id
  */
 function _civicrm_api3_contribution_delete_spec(&$params) {
@@ -203,7 +205,8 @@ function civicrm_api3_contribution_get($params) {
   }
   return civicrm_api3_create_success($contribution, $params, 'contribution', 'get', $dao);
 }
-/*
+
+/**
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
@@ -360,7 +363,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
   $contribution->composeMessageArray($input, $ids, $cvalues, false, false);
 }
 
-/*
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation

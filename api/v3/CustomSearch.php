@@ -45,7 +45,7 @@ function civicrm_api3_custom_search_create($params) {
   return civicrm_api3_option_value_create($params);
 }
 
-/*
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
