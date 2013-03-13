@@ -1183,7 +1183,7 @@ WHERE 	line_item_civireport.id IS NOT NULL
    * Retrieve text for contribution type from pseudoconstant
    */
   function alterContributionType($value, &$row) {
-    return is_string( CRM_Contribute_PseudoConstant::financialType( $value, FALSE ) ) ? CRM_Contribute_PseudoConstant::financialType( $value, FALSE ) : '';
+    return is_string(CRM_Contribute_PseudoConstant::financialType($value, FALSE)) ? CRM_Contribute_PseudoConstant::financialType($value, FALSE) : '';
   }
 
   /*

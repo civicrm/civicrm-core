@@ -107,10 +107,10 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'default_op' => 'eq',
           ),
           'financial_type_id' =>
-          array( 'name'    => 'financial_type_id',
-            'title'        => ts( 'Financial Type' ),
+          array('name' => 'financial_type_id',
+            'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options'      => CRM_Contribute_PseudoConstant::financialType( ) 
+            'options' => CRM_Contribute_PseudoConstant::financialType() ,
           ),
           'contribution_status_id' =>
           array('title' => ts('Donation Status'),
