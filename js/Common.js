@@ -42,6 +42,7 @@ var cj = jQuery;
  * @return         string  the translated string
  */
 function ts(text, params) {
+  "use strict";
   text = CRM.strings[text] || text;
   if (params && typeof(params) === 'object') {
     for (var i in params) {
@@ -525,6 +526,7 @@ CRM.validate = CRM.validate || {
 };
 
 (function($, undefined) {
+  "use strict";
   $(document).ready(function() {
     advmultiselectResize();
     $().crmtooltip();
@@ -667,40 +669,40 @@ CRM.validate = CRM.validate || {
   /**
    * Prompt the user for confirmation.
    *
-   * @param {Object} with keys "title", "message", "onContinue", "onCancel", "continueButton", "cancelButton"
+   * @param buttons {object|function} key|value pairs where key == button label and value == callback function
+   *  passing in a function instead of an object is a shortcut for a sinlgle button labeled "Continue"
+   * @param options {object|void} Override defaults, keys include 'title', 'message',
+   *  see jQuery.dialog for full list of available params
    */
-  CRM.confirm = function(options) {
-    var isContinue = false;
-    options.title = options.title || ts('Confirm Action');
-    options.message = options.message || ts('Are you sure you want to continue?');
-    options.continueButton = options.continueButton || ts('Continue');
-    options.cancelButton = options.cancelButton || ts('Cancel');
-    var dialog = $('<div class="crm-container"></div>')
-      .attr('title', options.title)
-      .html(options.message)
-      .appendTo('body');
-    var buttons = {};
-    buttons[options.continueButton] = function() {
-      isContinue = true;
-      $(dialog).dialog('close');
-    };
-    buttons[options.cancelButton] = function() {
-      $(dialog).dialog('close');
-    };
-    $(dialog).dialog({
+  CRM.confirm = function(buttons, options) {
+    var dialog, callbacks = {};
+    var settings = {
+      title: ts('Confirm Action'),
+      message: ts('Are you sure you want to continue?'),
       resizable: false,
       modal: true,
-      buttons: buttons,
-      close: function() {
-        if (isContinue) {
-          options.onContinue && options.onContinue();
-        } else {
-          options.onCancel && options.onCancel();
-        }
-        $(dialog).remove();
+      close: function() {$(dialog).remove();},
+      buttons: {}
+    };
+    settings.buttons[ts('Cancel')] = function() {dialog.dialog('close');};
+    options = options || {};
+    $.extend(settings, options);
+    if (typeof(buttons) === 'function') {
+      callbacks[ts('Continue')] = buttons;
+    } else {
+      callbacks = buttons;
+    }
+    $.each(callbacks, function(label, callback) {
+      settings.buttons[label] = function() {
+        callback.call(dialog);
+        dialog.dialog('close');
       }
     });
-
+    dialog = $('<div class="crm-container crm-confirm-dialog"></div>')
+      .html(options.message)
+      .appendTo('body')
+      .dialog(settings);
+    return dialog;
   }
 
   /**
