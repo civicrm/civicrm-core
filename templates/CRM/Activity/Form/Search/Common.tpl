@@ -89,7 +89,7 @@
   {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
     &nbsp; {$form.activity_test.html}
     <span class="crm-clear-link">
-      (<a href="javascript:unselectRadio('activity_test','{$form.formName}')">{ts}clear{/ts}</a>)
+      (<a href="#" onclick="unselectRadio('activity_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
     </span>
   </td>
 </tr>

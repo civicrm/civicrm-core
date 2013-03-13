@@ -217,7 +217,7 @@
           <tr class="crm-participant-form-block-event_id">
             <td class="label">{$form.event_id.label}</td><td class="view-value bold">{$form.event_id.html}&nbsp;
             {if $action eq 1 && !$past }
-              <br /><a href='javascript:buildSelect( "event_id" );'
+              <br /><a href="#" onclick="buildSelect('event_id'); return false;"
                        id='past-event'>&raquo; {ts}Include past event(s) in this select list.{/ts}</a>
             {/if}
             {if $is_test}

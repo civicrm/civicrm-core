@@ -60,13 +60,13 @@
   {$form.participant_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
     &nbsp; {$form.participant_test.html}
     <span class="crm-clear-link">
-      (<a href="javascript:unselectRadio('participant_test','{$form.formName}')">{ts}clear{/ts}</a>)
+      (<a href="#" onclick="unselectRadio('participant_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
     </span>
   </td>
   <td class="crm-event-form-block-participant_pay_later">
   {$form.participant_pay_later.label} {$form.participant_pay_later.html}
     <span class="crm-clear-link">
-      (<a href="javascript:unselectRadio('participant_pay_later','{$form.formName}')">{ts}clear{/ts}</a>)
+      (<a href="#" onclick="unselectRadio('participant_pay_later','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
     </span>
   </td>
 </tr>

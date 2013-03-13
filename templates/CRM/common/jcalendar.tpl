@@ -64,7 +64,7 @@
 {/if}
 
 {if $action neq 1028}
-    <span class="crm-clear-link">(<a href="javascript:clearDateTime( '{$elementId}' );">{ts}clear{/ts}</a>)</span>
+    <span class="crm-clear-link">(<a href="#" onclick="clearDateTime( '{$elementId}' ); return false;">{ts}clear{/ts}</a>)</span>
 {/if}
 
 <script type="text/javascript">

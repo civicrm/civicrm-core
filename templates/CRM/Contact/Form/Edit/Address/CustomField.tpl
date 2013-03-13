@@ -86,7 +86,7 @@
                         <span class="html-adjust"><br />
                             &nbsp;{ts}Attached File{/ts}: &nbsp;
                             {if $element.element_value.displayURL }
-                                <a href="javascript:popUp('{$element.element_value.displayURL}')" ><img src="{$element.element_value.displayURL}" height = "100" width="100"></a>
+                                <a href="#" onclick="popUp('{$element.element_value.displayURL}'); return false;" ><img src="{$element.element_value.displayURL}" height = "100" width="100"></a>
                             {else}
                                 <a href="{$element.element_value.fileURL}">{$element.element_value.fileName}</a>
                             {/if}
