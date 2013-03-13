@@ -59,12 +59,12 @@ function civicrm_api3_membership_status_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-/*
+/**
  * Adjust Metadata for Create action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
 function _civicrm_api3_membership_status_create_spec(&$params) {
   $params['name']['api.aliases'] = array('label');
 }

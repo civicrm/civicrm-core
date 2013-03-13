@@ -88,7 +88,8 @@ function _civicrm_api3_pledge_delete_spec(&$params) {
   // set as not required as pledge_id also acceptable & no either/or std yet
   $params['id']['api.aliases'] = array('pledge_id');
 }
-/*
+
+/**
  * return field specification specific to get requests
  */
 function _civicrm_api3_pledge_get_spec(&$params) {
@@ -104,7 +105,7 @@ function _civicrm_api3_pledge_get_spec(&$params) {
 
 }
 
-/*
+/**
  * return field specification specific to get requests
  */
 function _civicrm_api3_pledge_create_spec(&$params) {
@@ -156,7 +157,7 @@ function civicrm_api3_pledge_get($params) {
   return civicrm_api3_create_success($pledge, $params, 'pledge', 'get', $dao);
 }
 
-/*
+/**
  * Set default to not return test params
  */
 function _civicrm_api3_pledge_get_defaults() {

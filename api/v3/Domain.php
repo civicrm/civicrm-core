@@ -109,7 +109,8 @@ function civicrm_api3_domain_get($params) {
 
   return civicrm_api3_create_success($domains, $params, 'domain', 'get', $bao);
 }
-/*
+
+/**
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
@@ -132,7 +133,8 @@ function civicrm_api3_domain_create($params) {
   $params['version'] = $params['domain_version'];
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation

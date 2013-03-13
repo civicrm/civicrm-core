@@ -68,7 +68,8 @@ function civicrm_api3_membership_type_create($params) {
   CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
   return civicrm_api3_create_success($membershipType, $params, 'membership_type', 'create', $membershipTypeBAO);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  * 
  * The metadata is used for setting defaults, documentation & validation

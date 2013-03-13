@@ -77,7 +77,7 @@ function civicrm_api3_survey_respondant_get(&$params) {
   return (civicrm_api3_create_success($respondants, $params));
 }
 
-/*
+/**
  * @deprecated - api currently not supported
  */
 function &civicrm_api3_survey_respondant_count($params) {

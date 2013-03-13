@@ -59,7 +59,8 @@ function civicrm_api3_entity_tag_get($params) {
   }
   return civicrm_api3_create_success($result, $params);
 }
-/*
+
+/**
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
@@ -130,7 +131,8 @@ function civicrm_api3_entity_tag_delete($params) {
 
   return _civicrm_api3_entity_tag_common($params, 'remove');
 }
-/*
+
+/**
  * modify metadata
  */
 function _civicrm_api3_entity_tag_delete_spec(&$params) {

@@ -108,7 +108,8 @@ function civicrm_api3_group_contact_create($params) {
   $action = CRM_Utils_Array::value('status', $params, 'Added');
   return _civicrm_api3_group_contact_common($params, $action);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  * 
  * The metadata is used for setting defaults, documentation & validation
@@ -130,7 +131,8 @@ function civicrm_api3_group_contact_delete($params) {
   $params['status'] = 'Removed';
   return civicrm_api('GroupContact', 'Create', $params);
 }
-/*
+
+/**
  * modify metadata
  */
 function _civicrm_api3_group_contact_delete_spec(&$params) {
@@ -219,7 +221,8 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
   $dao = null;// can't pass this by reference
   return civicrm_api3_create_success(1,$params,'group_contact','create',$dao,$extraReturnValues);
 }
-/*
+
+/**
  * @deprecated - this should be part of create but need to know we aren't missing something
  */
 function civicrm_api3_group_contact_update_status($params) {

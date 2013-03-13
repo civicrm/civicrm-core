@@ -68,7 +68,8 @@ function civicrm_api3_tag_create($params) {
     _civicrm_api3_object_to_array($tagBAO, $values[$tagBAO->id]);
     return civicrm_api3_create_success($values, $params, 'tag', 'create', $tagBAO);
   }
-/*
+
+/**
  * Specify Meta data for create. Note that this data is retrievable via the getfields function 
  * and is used for pre-filling defaults and ensuring mandatory requirements are met.
  */
