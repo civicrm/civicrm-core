@@ -1024,18 +1024,4 @@ AND    u.status = 1
       og_ungroup($ogID, 'user', user_load($drupalID));
     }
   }
-
-  /**
-   * Set a init session with user object
-   *
-   * @param array $data  array with user specific data
-   *
-   * @access public
-   */
-  function setUserSession($data) {
-    list($userID, $ufID) = $data;
-    $session = CRM_Core_Session::singleton();
-    $session->set('ufID', $ufID);
-    $session->set('userID', $userID);
-  }
 }
