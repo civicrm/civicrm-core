@@ -56,13 +56,13 @@ There's the potential for collisions (two different labels having the same short
     {if $activity.completed}
     <img src="{$config->resourceBase}i/spacer.gif" width="20" height="20">
     {else}
-    <a href="javascript:selectActivity({$smarty.foreach.activityloop.iteration})">
+    <a href="#" onclick="selectActivity({$smarty.foreach.activityloop.iteration}); return false;">
     <img src="{$config->resourceBase}i/contribute/incomplete.gif" width="20" height="20" alt="{ts}Incomplete{/ts}" title="{ts}Incomplete{/ts}">
     </a>
     {/if}
   </td>
   <td>
-  <a href="javascript:selectActivity({$smarty.foreach.activityloop.iteration})">
+  <a href="#" onclick="selectActivity({$smarty.foreach.activityloop.iteration}); return false;">
   {foreach from=$activity.leftpane item=field name=fieldloop}
     <span class="civicase-audit-{$field.label|lower|regex_replace:'/[^a-z0-9]+/':''} {$field.datatype}">
     {if $field.datatype == 'File'}<a href="{$field.value|escape}">{/if}
@@ -143,7 +143,7 @@ There's the potential for collisions (two different labels having the same short
 </tr>
 <tr>
    <td colspan=2>
-    &nbsp;<input type="button" accesskey="P" value="Print Report" name="case_report" onClick="printReport({$caseId}, this );"/>&nbsp;&nbsp;
+    &nbsp;<input type="button" accesskey="P" value="Print Report" name="case_report" onclick="printReport({$caseId}, this );"/>&nbsp;&nbsp;
     &nbsp;<input type="button" accesskey="B" value="Back to Case" name="back" onClick="printReport({$caseId}, this );"/>&nbsp;&nbsp;
    </td>
 </tr>

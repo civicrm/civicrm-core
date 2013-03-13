@@ -62,7 +62,7 @@
         <td>
           {$form.contribution_thankyou_date_is_not_null.html}
           <span class="crm-clear-link">
-            (<a href="javascript:unselectRadio('contribution_thankyou_date_is_not_null','{$form.formName}')">
+            (<a href="#" onclick="unselectRadio('contribution_thankyou_date_is_not_null','{$form.formName}')">
             {ts}clear{/ts}</a>)
           </span>
         </td>
@@ -72,7 +72,7 @@
         <td>
           {$form.contribution_receipt_date_is_not_null.html}
           <span class="crm-clear-link">
-            (<a href="javascript:unselectRadio('contribution_receipt_date_is_not_null','{$form.formName}')">
+            (<a href="#" onclick="unselectRadio('contribution_receipt_date_is_not_null','{$form.formName}')">
             {ts}clear{/ts}</a>)
           </span>
         </td>
@@ -82,7 +82,7 @@
         <td>
           {$form.contribution_test.html}
           <span class="crm-clear-link">
-            (<a href="javascript:unselectRadio('contribution_test','{$form.formName}')">
+            (<a href="#" onclick="unselectRadio('contribution_test','{$form.formName}')">
             {ts}clear{/ts}</a>)
           </span>
         </td>
@@ -98,7 +98,7 @@
         <td>
           {$form.contribution_pay_later.html}
             <span class="crm-clear-link">
-              (<a href="javascript:unselectRadio('contribution_pay_later','{$form.formName}')">{ts}clear{/ts}</a>)
+              (<a href="#" onclick="unselectRadio('contribution_pay_later','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
             </span>
         </td>
       </tr>
@@ -107,7 +107,7 @@
         <td>
           {$form.contribution_recurring.html}
             <span class="crm-clear-link">
-              (<a href="javascript:unselectRadio('contribution_recurring','{$form.formName}')">{ts}clear{/ts}</a>)
+              (<a href="#" onclick="unselectRadio('contribution_recurring','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
             </span>
         </td>
       </tr>
@@ -144,7 +144,7 @@
     {$form.contribution_pcp_display_in_roll.label}
     {$form.contribution_pcp_display_in_roll.html}
       <span class="crm-clear-link">
-        (<a href="javascript:unselectRadio('contribution_pcp_display_in_roll','{$form.formName}')">{ts}clear{/ts}</a>)
+        (<a href="#" onclick="unselectRadio('contribution_pcp_display_in_roll','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
       </span>
   </td>
 </tr>
