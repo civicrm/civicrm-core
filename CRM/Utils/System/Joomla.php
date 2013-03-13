@@ -539,9 +539,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $session = &JFactory::getSession();
     $session->set('user', $user);
 
-    $cSession = CRM_Core_Session::singleton();
-    $cSession->set('ufID', $ufID);
-    $cSession->set('userID', $userID);
+    parent::setUserSession($data);
   }
 
   /**
