@@ -77,7 +77,7 @@
     {if $isQuick}
     <tr id="quickConfigConvertMessage">
       <td></td>
-      <td><div class="status message">{ts}Click <a id = 'memQuickconfig' href='#'>here</a> if you want to configure the Membership Types below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}</div></td>
+      <td><div class="status message">{ts}Click <a id='memQuickconfig' href='#'>here</a> if you want to configure the Membership Types below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}</div></td>
     </tr>
     {/if}
           <tr id="membership_type-block" class="crm-member-membershipblock-form-block-membership_type">

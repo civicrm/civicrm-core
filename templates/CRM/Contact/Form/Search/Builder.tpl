@@ -31,7 +31,7 @@
       {ts}Search Criteria{/ts} {help id='builder-intro'}
     </div>
     <div class="crm-accordion-body">
-      <div id = "searchForm">
+      <div id="searchForm">
         {* Table for adding search criteria. *}
         {include file="CRM/Contact/Form/Search/table.tpl"}
         <div class="clear"></div>

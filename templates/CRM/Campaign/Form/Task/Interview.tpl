@@ -137,7 +137,7 @@
 
         <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=note}Click to copy %1 from row one to all rows.{/ts}" fname="note" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{ts}Note{/ts}</th>
         <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=result}Click to copy %1 from row one to all rows.{/ts}" fname="result" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{ts}Result{/ts}</th>
-        <th><a id = "interview_voter_button" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterviewforall( ); return false;">{ts}Record Responses for All{/ts}</a></th>
+        <th><a id="interview_voter_button" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterviewforall( ); return false;">{ts}Record Responses for All{/ts}</a></th>
       </tr>
       </thead>
 
@@ -178,7 +178,7 @@
           <td class='result'>{$form.field.$voterId.result.html}</td>
 
           <td>
-            <a id = "interview_voter_button_{$voterId}" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterview( {$voterId} ); return false;">
+            <a id="interview_voter_button_{$voterId}" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterview( {$voterId} ); return false;">
               {ts}record response{/ts}
             </a>
             {if $allowAjaxReleaseButton}

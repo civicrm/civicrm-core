@@ -36,7 +36,7 @@
   <tbody>
     <tr>
       {foreach from=$columnHeaders item=head key=rowKey}
-        <td id = "row_{$rowKey}" class="even-row"></td>
+        <td id="row_{$rowKey}" class="even-row"></td>
       {/foreach}
     </tr>
   </tbody>
