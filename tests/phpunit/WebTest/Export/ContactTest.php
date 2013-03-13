@@ -251,8 +251,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->openCiviPage("contact/search", "reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search", "reset=1", NULL);
 
     // Select group.
     $this->select("group", "label=$groupName");
