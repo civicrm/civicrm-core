@@ -55,7 +55,7 @@
         <div class="content">
           {$form.onbehalf.$fieldName.html|crmAddClass:big}
           <span>
-                ( <a id='createNewOrg' href="javascript:createNew( );">{ts}Enter a new organization{/ts}</a> )
+                ( <a id='createNewOrg' href="#" onclick="createNew( ); return false;">{ts}Enter a new organization{/ts}</a> )
             </span>
           <div id="id-onbehalf-orgname-enter-help" class="description">
             {ts}Organization details have been prefilled for you. If this is not the organization you want to use, click "Enter a new organization" above.{/ts}

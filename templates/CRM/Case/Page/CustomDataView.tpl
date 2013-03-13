@@ -48,7 +48,7 @@
               {if $element.field_type == 'File'}
                 {if $element.field_value.displayURL}
                   <td class="html-adjust">
-                    <a href="javascript:imagePopUp('{$element.field_value.imageURL}')">
+                    <a href="#" onclick="imagePopUp('{$element.field_value.imageURL}'); return false;">
                     <img src="{$element.field_value.displayURL}" height = "100" width="100">
                     </a>
                   </td>
@@ -95,7 +95,7 @@
   }
 
   function showDelete(valueID, elementID, groupID, contactID) {
-    var confirmMsg = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal} &nbsp; <a href="javascript:deleteCustomValue( ' + valueID + ',\'' + elementID + '\',' + groupID + ',' + contactID + ' );" style="text-decoration: underline;">{/literal}{ts escape='js'}Yes{/ts}{literal}</a>&nbsp;&nbsp;&nbsp;<a href="javascript:hideStatus( ' + valueID + ', ' +  groupID + ' );" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}</a>';
+    var confirmMsg = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal} &nbsp; <a href="#" onclick="deleteCustomValue( ' + valueID + ',\'' + elementID + '\',' + groupID + ',' + contactID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}Yes{/ts}{literal}</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="hideStatus( ' + valueID + ', ' +  groupID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}</a>';
     cj('tr#statusmessg_' + groupID + '_' + valueID).show( ).children().find('span').html( confirmMsg );
   }
 
@@ -108,7 +108,7 @@
       success: function(html){
         cj( '#' + elementID ).hide( );
         var resourceBase   = {/literal}"{$config->resourceBase}"{literal};
-        var successMsg = '{/literal}{ts escape='js'}The selected record has been deleted.{/ts}{literal} &nbsp;&nbsp;<a href="javascript:hideStatus( ' + valueID + ',' + groupID + ');"><img title="{/literal}{ts escape='js'}close{/ts}{literal}" src="' +resourceBase+'i/close.png"/></a>';
+        var successMsg = '{/literal}{ts escape='js'}The selected record has been deleted.{/ts}{literal} &nbsp;&nbsp;<a href="#" onclick="hideStatus( ' + valueID + ',' + groupID + '); return false;"><img title="{/literal}{ts escape='js'}close{/ts}{literal}" src="' +resourceBase+'i/close.png"/></a>';
         cj( 'tr#statusmessg_'  + groupID + '_' + valueID ).show( ).children().find('span').html( successMsg );
         var element = cj( '.ui-tabs-nav #tab_custom_' + groupID + ' a' );
         cj(element).html(cj(element).attr('title') + ' ('+ html+') ');

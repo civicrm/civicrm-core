@@ -28,7 +28,7 @@
     <tr class="crm-event-manage-registration-form-block-additional_custom_post_{$profileBottomNumAdd}">
       <td scope="row" class="label" width="20%">{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].label}</td>
       <td>{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].html}
-          &nbsp;<span class='profile_bottom_add_link_remove'><a href="javascript:removeProfileAdd('{$profileBottomNum}')">{ts}remove profile{/ts}</a></span>&nbsp;&nbsp;<span class='profile_bottom_add_link'>&nbsp;<a href="javascript:addProfileBottomAdd()">{ts}add profile{/ts}</a></span>
+          &nbsp;<span class='profile_bottom_add_link_remove'><a href="#" onclick="removeProfileAdd('{$profileBottomNum}'); return false;">{ts}remove profile{/ts}</a></span>&nbsp;&nbsp;<span class='profile_bottom_add_link'>&nbsp;<a href="#" onclick="addProfileBottomAdd(); return false;">{ts}add profile{/ts}</a></span>
             <br/>
             <span class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</span>
             <br/><span class="profile-links"></span>
@@ -39,7 +39,7 @@
      <tr class="crm-event-manage-registration-form-block-custom_post_{$profileBottomNum}">
        <td scope="row" class="label" width="20%">{$form.custom_post_id_multiple[$profileBottomNum].label}</td>
        <td>{$form.custom_post_id_multiple[$profileBottomNum].html}
-           &nbsp;<span class='profile_bottom_link_remove'><a href="javascript:removeProfile('{$profileBottomNum}')">{ts}remove profile{/ts}</a></span>&nbsp;&nbsp;<span class='profile_bottom_link'><a href="javascript:addProfileBottom()">{ts}add profile{/ts}</a></span>
+           &nbsp;<span class='profile_bottom_link_remove'><a href="#" onclick="removeProfile('{$profileBottomNum}'); return false;">{ts}remove profile{/ts}</a></span>&nbsp;&nbsp;<span class='profile_bottom_link'><a href="#" onclick="addProfileBottom(); return false;">{ts}add profile{/ts}</a></span>
            <br/>
             <span class="description">{ts}Include additional fields on this registration form by configuring and selecting a CiviCRM Profile to be included at the bottom of the page.{/ts}</span>
            <br/><span class="profile-links"></span>
@@ -139,7 +139,7 @@
          <tr id="profile_post" class="crm-event-manage-registration-form-block-custom_post_id">
             <td scope="row" class="label" width="20%">{$form.custom_post_id.label}</td>
             <td>{$form.custom_post_id.html}
-          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="javascript:addProfileBottom()">{ts}add profile{/ts}</a></span>
+          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="#" onclick="addProfileBottom(); return false;">{ts}add profile{/ts}</a></span>
           <br />
             <span class="description">{ts}Include additional fields on this registration form by configuring and selecting a CiviCRM Profile to be included at the bottom of the page.{/ts}</span>
                 <br/><span class="profile-links"></span>
@@ -151,9 +151,9 @@
         <tr id="custom_post_id_multiple_{$profilePostNum}_wrapper" class='crm-event-manage-registration-form-block-custom_post_multiple'>
            <td scope="row" class="label" width="20%">{$form.custom_post_id_multiple.$profilePostNum.label}</td>
                <td>{$form.custom_post_id_multiple.$profilePostNum.html}
-             &nbsp;<span class='profile_bottom_link_remove'><a href="javascript:removeProfile('{$profilePostNum}')">{ts}remove profile{/ts}</a></span>
+             &nbsp;<span class='profile_bottom_link_remove'><a href="#" onclick="removeProfile('{$profilePostNum}'); return false;">{ts}remove profile{/ts}</a></span>
              {if $smarty.foreach.profilePostIdName.last}
-               &nbsp;&nbsp;<span class='profile_bottom_link'><a href="javascript:addProfileBottom()">{ts}add profile{/ts}</a></span>
+               &nbsp;&nbsp;<span class='profile_bottom_link'><a href="#" onclick="addProfileBottom(); return false;">{ts}add profile{/ts}</a></span>
                {/if}
                 <br/><span class="profile-links"></span>
          </td>
@@ -172,7 +172,7 @@
         <tr id="additional_profile_post" class="crm-event-manage-registration-form-block-additional_custom_post_id">
              <td scope="row" class="label" width="20%">{$form.additional_custom_post_id.label}</td>
              <td>{$form.additional_custom_post_id.html}
-           &nbsp;<span class='profile_bottom_add_link_main {if $profilePostMultipleAdd}hiddenElement{/if}'><a href="javascript:addProfileBottomAdd()">{ts}add profile{/ts}</a></span>
+           &nbsp;<span class='profile_bottom_add_link_main {if $profilePostMultipleAdd}hiddenElement{/if}'><a href="#" onclick="addProfileBottomAdd(); return false;">{ts}add profile{/ts}</a></span>
      <br />
                 <span class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</span>
                <br/><span class="profile-links"></span>
@@ -183,9 +183,9 @@
        <tr id='additional_custom_post_id_multiple_{$profilePostNumA}_wrapper' class='crm-event-manage-registration-form-block-additional_custom_post_multiple'>
                <td scope="row" class="label" width="20%">{$form.additional_custom_post_id_multiple.$profilePostNumA.label}</td>
                <td>{$form.additional_custom_post_id_multiple.$profilePostNumA.html}
-                   &nbsp;<span class='profile_bottom_add_link_remove'><a href="javascript:removeProfileAdd('{$profilePostNumA}')">{ts}remove profile{/ts}</a></span>
+                   &nbsp;<span class='profile_bottom_add_link_remove'><a href="#" onclick="removeProfileAdd('{$profilePostNumA}'); return false;">{ts}remove profile{/ts}</a></span>
              {if $smarty.foreach.profilePostIdAName.last}
-         &nbsp;&nbsp;<span class='profile_bottom_add_link'><a href="javascript:addProfileBottomAdd()">{ts}add profile{/ts}</a></span>
+         &nbsp;&nbsp;<span class='profile_bottom_add_link'><a href="#" onclick="addProfileBottomAdd(); return false;">{ts}add profile{/ts}</a></span>
                {/if}
                <br/><span class="profile-links"></span>
          </td>

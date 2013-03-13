@@ -38,7 +38,7 @@
 {if isset($browserPrint) and $browserPrint}
 {* Javascript window.print link. Used for public pages where we can't do printer-friendly view. *}
 <div id="printer-friendly">
-<a href="javascript:window.print()" title="{ts}Print this page.{/ts}">
+<a href="#" onclick="window.print(); return false;" title="{ts}Print this page.{/ts}">
   <div class="ui-icon ui-icon-print"></div>
 </a>
 </div>

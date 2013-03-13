@@ -166,7 +166,7 @@ var responseFromServer = false;
 
 function noServerResponse( ) {
     if ( !responseFromServer ) {
-        var serverError =  '{/literal}{ts escape="js"}There is no response from server therefore selected record is not updated.{/ts}{literal}'  + '&nbsp;&nbsp;<a href="javascript:hideEnableDisableStatusMsg();"><img title="{/literal}{ts escape="js"}close{/ts}{literal}" src="' +resourceBase+'i/close.png"/></a>';
+        var serverError =  '{/literal}{ts escape="js"}There is no response from server therefore selected record is not updated.{/ts}{literal}'  + '&nbsp;&nbsp;<a href="#" onclick="hideEnableDisableStatusMsg(); return false;"><img title="{/literal}{ts escape="js"}close{/ts}{literal}" src="' +resourceBase+'i/close.png"/></a>';
         cj( '#enableDisableStatusMsg' ).show( ).html( serverError );
     }
 }

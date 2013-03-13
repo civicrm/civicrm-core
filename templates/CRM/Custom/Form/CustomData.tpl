@@ -36,7 +36,7 @@
     <div class="spacer"></div>
     {if $cd_edit.help_post}<div class="messages help">{$cd_edit.help_post}</div>{/if}
     {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple >= $cgCount ) ) }
-        <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id}-{$cgCount}"><a href="javascript:CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true );">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
+        <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id}-{$cgCount}"><a href="#" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
     {/if}
 {else}
 {foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
@@ -60,7 +60,7 @@
    </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
         {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple >= $cgCount ) ) }
-            <div id="add-more-link-{$cgCount}"><a href="javascript:CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true );">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
+            <div id="add-more-link-{$cgCount}"><a href="#" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
         {/if}
     <div id="custom_group_{$group_id}_{$cgCount}"></div>
 {/foreach}
