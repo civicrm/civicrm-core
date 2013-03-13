@@ -130,7 +130,7 @@ function civicrm_api3_contact_create($params) {
   return civicrm_api3_create_success($values, $params, 'Contact', 'create');
 }
 
-/*
+/**
  * Adjust Metadata for Create action
  *
  * @param array $params array or parameters determined by getfields
@@ -189,7 +189,8 @@ function civicrm_api3_contact_getcount($params) {
   $count = _civicrm_api3_get_using_query_object('contact', $params, $options,1);
   return $count;
 }
-/*
+
+/**
  * Adjust Metadata for Get action
  *
  * @param array $params array or parameters determined by getfields
@@ -228,7 +229,7 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['tag']['title'] = 'Assigned tags (filter, array)';
 }
 
-/*
+/**
  * We are supporting 'showAll' = 'all', 'trash' or 'active' for contact get
  * and for getcount
  * - hopefully some day we'll come up with a std syntax for the 3-way-boolean of

@@ -95,7 +95,8 @@ function civicrm_api3_custom_field_create($params) {
   _civicrm_api3_object_to_array_unique_fields($customField, $values[$customField->id]);
   return civicrm_api3_create_success($values, $params, 'custom_field', $customField);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  * 
  * @param array $params array or parameters determined by getfields
@@ -149,7 +150,7 @@ function civicrm_api3_custom_field_get($params) {
  * @return Array  Validation errors
  */
 
-/*
+/**
  * Helper function to validate custom field value
  * 
  * @params String $fieldName    Custom field name (eg: custom_8 )

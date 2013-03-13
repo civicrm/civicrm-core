@@ -51,12 +51,12 @@ function civicrm_api3_mailing_job_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-/*
+/**
  * Adjust Metadata for Create action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
 function _civicrm_api3_mailing_job_create_spec(&$params) {
   $params['status']['api.default'] = 'Scheduled';
   $params['scheduled_date']['api.default'] = 'now';

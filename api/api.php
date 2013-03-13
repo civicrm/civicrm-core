@@ -10,7 +10,7 @@
  * @version $Id: api.php 30486 2010-11-02 16:12:09Z shot $
  */
 
-/*
+/**
  * @param string $entity
  *   type of entities to deal with
  * @param string $action
@@ -370,7 +370,7 @@ function _civicrm_api_get_camel_name($entity, $version = NULL) {
   return implode('', $fragments);
 }
 
-/*
+/**
  * Call any nested api calls
  */
 function _civicrm_api_call_nested_api(&$params, &$result, $action, $entity, $version) {
@@ -465,7 +465,7 @@ function _civicrm_api_call_nested_api(&$params, &$result, $action, $entity, $ver
   }
 }
 
-/*
+/**
  * Swap out any $values vars - ie. the value after $value is swapped for the parent $result
  * 'activity_type_id' => '$value.testfield',
    'tag_id'  => '$value.api.tag.create.id',
@@ -507,7 +507,7 @@ function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResu
   }
 }
 
-/*
+/**
  * Convert possibly camel name to underscore separated entity name
  *
  * @param string $entity entity name in various formats e.g. Contribution, contribution, OptionValue, option_value, UFJoin, uf_join
@@ -526,7 +526,8 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
   }
   return $entity;
 }
-/*
+
+/**
  * Having a DAO object find the entity name
  * @param object $bao DAO being passed in
  */

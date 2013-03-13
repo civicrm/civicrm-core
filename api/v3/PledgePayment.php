@@ -84,7 +84,8 @@ function civicrm_api3_pledge_payment_create($params) {
 
   return civicrm_api3_create_success($result, $params, 'pledge_payment', 'create', $dao);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
@@ -139,7 +140,7 @@ function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
   return $result;
 }
 
-/*
+/**
  * Gets field for civicrm_pledge_payment functions
  *
  * @return array fields valid for other functions

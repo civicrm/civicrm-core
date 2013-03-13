@@ -74,7 +74,8 @@ function civicrm_api3_mailing_event_unsubscribe_create($params) {
 
   return civicrm_api3_create_error('Queue event could not be found');
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  * 
  * The metadata is used for setting defaults, documentation & validation

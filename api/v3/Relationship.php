@@ -82,7 +82,8 @@ function civicrm_api3_relationship_create($params) {
         'moreIDs' => implode(',', $relationshipBAO[4]),
       )));
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  *
  * @param array $params array or parameters determined by getfields
