@@ -3524,6 +3524,10 @@ WHERE  id IN ( $groupIDs )
 
   function modifiedDates($values) {
     $this->_useDistinct = TRUE;
+
+    // CRM-11281, default to added date if not set
+    $fieldTitle = 'Added Date';
+
     foreach (array_keys($this->_params) as $id) {
       if ($this->_params[$id][0] == 'log_date') {
         if ($this->_params[$id][2] == 1) {
