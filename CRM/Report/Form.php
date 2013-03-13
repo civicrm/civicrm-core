@@ -228,7 +228,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_columnHeaders = array();
   public $_orderBy = NULL;
   public $_groupBy = NULL;
-  
+
   /**
    * Variable to hold the currency alias
    */
@@ -338,7 +338,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       }
 
       // lets always do a force if reset is found in the url.
-      if (CRM_Utils_Array::value('reset', $_GET)) {
+      if (CRM_Utils_Array::value('reset', $_REQUEST)) {
         $this->_force = 1;
       }
 
@@ -1864,16 +1864,18 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   function processReportMode() {
     $buttonName = $this->controller->getButtonName();
 
-    $output = CRM_Utils_Request::retrieve('output',
-              'String',
-              CRM_Core_DAO::$_nullObject
+    $output = CRM_Utils_Request::retrieve(
+      'output',
+      'String',
+      CRM_Core_DAO::$_nullObject
     );
 
     $this->_sendmail =
-      CRM_Utils_Request::retrieve('sendmail',
-                       'Boolean',
-                       CRM_Core_DAO::$_nullObject
-    );
+      CRM_Utils_Request::retrieve(
+        'sendmail',
+        'Boolean',
+        CRM_Core_DAO::$_nullObject
+      );
 
     $this->_absoluteUrl = FALSE;
     $printOnly = FALSE;
@@ -2377,9 +2379,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           CRM_Core_Session::setStatus(ts("Report mail could not be sent."), ts('Mail Error'), 'error');
         }
 
-        CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(),
-            'reset=1'
-          ));
+        CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
       }
       elseif ($this->_outputMode == 'print') {
         echo $content;

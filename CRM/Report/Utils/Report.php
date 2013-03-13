@@ -103,10 +103,10 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
   static function getNextUrl($urlValue, $query = 'reset=1', $absolute = FALSE, $instanceID = NULL, $drilldownReport = array()) {
     if ($instanceID) {
       $drilldownInstanceID = false;
-      if (array_key_exists($urlValue, $drilldownReport)) 
+      if (array_key_exists($urlValue, $drilldownReport))
         $drilldownInstanceID = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_Instance', $instanceID, 'drilldown_id', 'id');
 
-      if (!$drilldownInstanceID) 
+      if (!$drilldownInstanceID)
         $drilldownInstanceID = self::getInstanceIDForValue($urlValue);
 
       if ($drilldownInstanceID) {
@@ -330,12 +330,12 @@ WHERE  inst.report_id = %1";
   }
 
   static function processReport($params) {
-
     $instanceId = CRM_Utils_Array::value('instanceId', $params);
 
     // hack for now, CRM-8358
     $_REQUEST['instanceId'] = $instanceId;
     $_REQUEST['sendmail'] = CRM_Utils_Array::value('sendmail', $params, 1);
+
     // if cron is run from terminal --output is reserved, and therefore we would provide another name 'format'
     $_REQUEST['output'] = CRM_Utils_Array::value('format', $params, CRM_Utils_Array::value('output', $params, 'pdf'));
     $_REQUEST['reset'] = CRM_Utils_Array::value('reset', $params, 1);
@@ -358,12 +358,17 @@ WHERE  inst.report_id = %1";
       }
 
       $wrapper = new CRM_Utils_Wrapper();
-      $arguments['urlToSession'] = array(
-        array('urlVar' => 'instanceId',
-          'type' => 'Positive',
-          'sessionVar' => 'instanceId',
-          'default' => 'null',
-        ));
+      $arguments = array(
+        'urlToSession' => array(
+          array(
+            'urlVar' => 'instanceId',
+            'type' => 'Positive',
+            'sessionVar' => 'instanceId',
+            'default' => 'null',
+          ),
+        ),
+        'ignoreKey' => TRUE
+      );
       $messages[] = $wrapper->run($templateInfo['name'], NULL, $arguments);
     }
     else {
@@ -465,7 +470,7 @@ WHERE  inst.report_id = %1";
 
   static function getInstanceList($reportUrl) {
     static $instanceDetails = array();
-    
+
     if (!array_key_exists($reportUrl, $instanceDetails )) {
       $instanceDetails[$reportUrl] = array();
 

@@ -21,6 +21,7 @@ CRM/Contact/DAO/SavedSearch.php
 CRM/Contact/DAO/SubscriptionHistory.php
 CRM/Contribute/DAO
 CRM/Core/DAO/.listAll.php
+CRM/Core/DAO/listAll.php
 CRM/Core/DAO/ActionLog.php
 CRM/Core/DAO/ActionMapping.php
 CRM/Core/DAO/ActionSchedule.php

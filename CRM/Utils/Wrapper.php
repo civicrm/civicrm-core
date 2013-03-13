@@ -62,7 +62,7 @@ class CRM_Utils_Wrapper {
    *
    * @return none.
    * @access public
-   */ 
+   */
   function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {
       $mode         = CRM_Utils_Array::value('mode', $arguments);
@@ -97,7 +97,8 @@ class CRM_Utils_Wrapper {
           $abort      = CRM_Utils_Array::value('abort', $params, FALSE);
 
           $value = NULL;
-          $value = CRM_Utils_Request::retrieve($urlVar,
+          $value = CRM_Utils_Request::retrieve(
+            $urlVar,
             $type,
             $this->_controller,
             $abort,
