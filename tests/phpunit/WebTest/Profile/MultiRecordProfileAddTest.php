@@ -237,7 +237,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->click('edit-submit');
       $this->waitForPageToLoad($this->getTimeoutMsec());
     }
-    $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid");
+    $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid", NULL);
     if (!$checkMultiRecord) {
       $this->assertElementContainsText('crm-container', 'No multi-record entries found');
       return array($gid, $profileTitle);
