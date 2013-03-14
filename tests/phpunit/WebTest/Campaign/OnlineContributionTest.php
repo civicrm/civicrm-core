@@ -254,7 +254,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
 
     //logout
-    $this->openCiviPage("logout", "reset=1");
+    $this->openCiviPage("logout", "reset=1", NULL);
 
     //Open Live Contribution Page
     $this->openCiviPage($registerUrl['url'], $registerUrl['args']);

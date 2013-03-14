@@ -286,7 +286,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
 
   function _testOnlineRegistration($campaignTitle, $registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
-      $this->openCiviPage("logout", "reset=1");
+      $this->openCiviPage("logout", "reset=1", NULL);
     }
     $this->open($registerUrl);
 
