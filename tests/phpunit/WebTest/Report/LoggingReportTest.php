@@ -59,8 +59,8 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='groupContact']/div/div[4]/table/tbody/tr/td[4]/a");
-    $this->click("xpath=//div[@id='groupContact']/div/div[4]/table/tbody/tr/td[4]/a");
+    $this->waitForElementPresent("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td[4]/a");
+    $this->click("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td[4]/a");
 
     // Check confirmation alert.
     $this->assertTrue((bool)preg_match("/^Are you sure you want to remove/",
