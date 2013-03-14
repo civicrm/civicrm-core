@@ -86,7 +86,9 @@ var CRM = CRM || {};
    */
   CRM.api = function(entity, action, params, options) {
     // Default settings
-    var settings = {
+    var json = false,
+    settings = {
+      context: null,
       success: function(result, settings) {
         return true;
       },
@@ -120,8 +122,6 @@ var CRM = CRM || {};
           return true;
         };
     }
-    $.extend(settings, options);
-    var json = false;
     for (var i in params) {
       if (i.slice(0, 4) == 'api.' || typeof(params[i]) == 'Object') {
         json = true;
@@ -141,17 +141,17 @@ var CRM = CRM || {};
       params.json = 1;
     }
     // Pass copy of settings into closure to preserve its value during multiple requests
-    (function(stg, that) {
+    (function(stg) {
       $.ajax({
         url: stg.ajaxURL.indexOf('http') === 0 ? stg.ajaxURL : CRM.url(stg.ajaxURL),
         dataType: 'json',
         data: params,
         type: action.indexOf('get') < 0 ? 'POST' : 'GET',
         success: function(result) {
-          stg.callBack.call(that, result, stg);
+          stg.callBack.call(stg.context, result, stg);
         }
       });
-    })($.extend({}, settings), this);
+    })($.extend({}, settings, options));
   };
 
   // Backwards compatible with jQuery fn
@@ -163,11 +163,11 @@ var CRM = CRM || {};
   $.fn.crmAutocomplete = function (params, options) {
     if (typeof params == 'undefined') params = {};
     if (typeof options == 'undefined') options = {};
-    params = $().extend( {
+    params = $().extend({
       rowCount:35,
       json:1,
       entity:'Contact',
-        action:'getquick',
+      action:'getquick',
       sequential:1
     }, params);
 
