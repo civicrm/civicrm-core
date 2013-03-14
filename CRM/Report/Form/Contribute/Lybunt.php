@@ -139,8 +139,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'options' => $optionYear,
             'default' => date('Y'),
           ),
-                                  'financial_type_id'         => 
-                                  array( 'title'   => ts( 'Financial Type' ),
+          'financial_type_id' => array( 
+            'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
@@ -271,7 +271,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
                 CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
                 CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
               );
-                            if ( ($fieldName == 'contribution_status_id' || $fieldName == 'financial_type_id') && !empty( $clause ) ) {
+              if (($fieldName == 'contribution_status_id' || $fieldName == 'financial_type_id') && !empty($clause)) {
                 $this->_statusClause .= " AND " . $clause;
               }
             }
@@ -435,7 +435,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
-  function getOperationPair($type = "string", $fieldName = NULL) {
+  static function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'yid') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
     }

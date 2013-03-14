@@ -137,11 +137,11 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
       ),
       'civicrm_financial_type' =>
       array(
-        'dao'       => 'CRM_Financial_DAO_FinancialType',
-        'fields'    => array('financial_type' => array('title' => ts('Financial Type'))),
+        'dao' => 'CRM_Financial_DAO_FinancialType',
+        'fields' => array('financial_type' => array('title' => ts('Financial Type'))),
         'grouping'  => 'contri-fields',
         'group_bys' =>
-        array( 'financial_type'   =>
+        array('financial_type' =>
         array(
           'name' => 'id',
           'title' => ts('Financial Type'),
@@ -212,15 +212,15 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
             'operatorType' => CRM_Report_Form::OP_INT,
             'name' => 'total_amount',
           ),
-          'financial_type_id'  =>
+          'financial_type_id' =>
           array(
-            'title'   => ts('Financial Type'),
+            'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options'      => CRM_Contribute_PseudoConstant::financialType( ) ,
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
           'contribution_status_id' =>
           array(
-            'title'   => ts('Financial Status'),
+            'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array('1'),
@@ -263,7 +263,7 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
     $select = array();
     $append = NULL;
     // since contact fields not related to financial type
-    if ( array_key_exists('financial_type', $this->_params['group_bys']) ||
+    if (array_key_exists('financial_type', $this->_params['group_bys']) ||
       array_key_exists('contribution_source', $this->_params['group_bys'])
     ) {
       unset($this->_columns['civicrm_contact']['fields']['id']);
@@ -337,8 +337,8 @@ LEFT JOIN civicrm_phone   {$this->_aliases['civicrm_phone']}
        ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND {$this->_aliases['civicrm_phone']}.is_primary = 1";
 
     }
-    else if ( $fromTable == 'civicrm_financial_type' ) {
-      $contriCol  = "financial_type_id";
+    else if ($fromTable == 'civicrm_financial_type') {
+      $contriCol = "financial_type_id";
     }
     elseif ($fromTable == 'civicrm_contribution') {
       $contriCol = $fromCol;
@@ -467,7 +467,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
       'country_id' => array('country_id'),
       'state_province_id' => array('country_id', 'state_province_id'),
       'contribution_source' => array('contribution_source'),
-      'financial_type'      => array( 'financial_type' ),
+      'financial_type' => array('financial_type'),
     );
 
     $idMapping = array(
@@ -475,7 +475,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
       'country_id' => ts('Country'),
       'state_province_id' => ts('State/Province'),
       'contribution_source' => ts('Contribution Source'),
-      'financial_type'      => ts('Financial Type'),
+      'financial_type' => ts('Financial Type'),
       'sort_name' => ts('Contact Name'),
       'email' => ts('Email'),
       'phone' => ts('Phone'),

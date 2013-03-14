@@ -172,7 +172,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
-                                 'financial_type_id' => array( 'title'   => ts('Financial Type'),
+          'financial_type_id' => array('title' => ts('Financial Type'),
             'default' => TRUE,
           ),
           'contribution_status_id' => array('title' => ts('Contribution Status'),
@@ -210,7 +210,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
           'financial_type_id'   =>
-          array( 'title'        => ts( 'Financial Type' ),
+          array('title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
             'type' => CRM_Utils_Type::T_INT,
@@ -526,7 +526,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $checkList          = array();
     $entryFound         = FALSE;
     $display_flag       = $prev_cid = $cid = 0;
-        $contributionTypes = CRM_Contribute_PseudoConstant::financialType( );
+    $contributionTypes  = CRM_Contribute_PseudoConstant::financialType();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $honorTypes         = CRM_Core_OptionGroup::values('honor_type', FALSE, FALSE, FALSE, NULL, 'label');
