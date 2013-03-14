@@ -218,6 +218,10 @@ class civicrm_cli {
     }
 
     if (!empty($this->_user)) {
+      if(!CRM_Utils_System::authenticateScript(TRUE, $this->_user, $this->_password, TRUE, FALSE, FALSE)) {
+        $this->_log(ts("Failed to login as %1. Wrong username or password.", array('1' => $this->_user)));
+        return FALSE;
+      }
       if (!$cms->loadUser($this->_user)) {
         $this->_log(ts("Failed to login as %1", array('1' => $this->_user)));
         return FALSE;
