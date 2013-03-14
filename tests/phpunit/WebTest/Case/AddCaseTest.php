@@ -44,7 +44,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->changePermissions($permission);
 
     // Go to reserved New Individual Profile to set value for logged in user's contact name (we'll need that later)
-    $this->openCiviPage('profile/edit', 'reset=1&gid=4');
+    $this->openCiviPage('profile/edit', 'reset=1&gid=4', NULL);
     $testUserFirstName = "Testuserfirst";
     $testUserLastName = "Testuserlast";
     $this->waitForPageToLoad($this->getTimeoutMsec());
