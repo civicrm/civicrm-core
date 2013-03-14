@@ -24,3 +24,8 @@ WHERE cog.name = 'account_type';
   END
   WHERE field_name = 'contribution_type';
 {/if}
+
+-- CRM-12065
+UPDATE `civicrm_mapping_field`
+SET name = replace(name, 'contribution_type', 'financial_type')
+where name LIKE '%contribution_type%';
