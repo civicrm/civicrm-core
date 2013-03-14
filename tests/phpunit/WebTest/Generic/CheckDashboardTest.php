@@ -67,6 +67,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("$widgetTitle");
 
     // click Full Screen icon and test full screen container
+    $this->waitForElementPresent("css=li#widget-2 a.fullscreen-icon");
     $this->click("css=li#widget-2 a.fullscreen-icon");
     $this->waitForElementPresent("ui-id-1");
     $this->assertTrue($this->isTextPresent($widgetTitle));
