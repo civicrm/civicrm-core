@@ -257,7 +257,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->openCiviPage("logout", "reset=1", NULL);
 
     //Open Live Contribution Page
-    $this->openCiviPage($registerUrl['url'], $registerUrl['args']);
+    $this->openCiviPage($registerUrl['url'], $registerUrl['args'], NULL);
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
 
