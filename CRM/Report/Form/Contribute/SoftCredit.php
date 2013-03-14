@@ -124,18 +124,19 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
-                   'civicrm_financial_type' =>
-                   array( 'dao'           => 'CRM_Financial_DAO_FinancialType',
-        'fields' =>
-                          array( 'financial_type' => null, ), 
+      'civicrm_financial_type' =>
+      array('dao' => 'CRM_Financial_DAO_FinancialType',
+        'fields' => array('financial_type' => null,), 
         'filters' =>
         array(
           'id' =>
           array(
             'name' => 'id',
-                                        'title'   => ts( 'Financial Type' ),
+            'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-                                        'options' => CRM_Contribute_PseudoConstant::financialType( ) ),),
+            'options' => CRM_Contribute_PseudoConstant::financialType()
+          ),
+        ),
         'grouping' => 'softcredit-fields',
       ),
       'civicrm_contribution' =>
