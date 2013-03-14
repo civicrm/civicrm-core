@@ -678,10 +678,16 @@
         fields: fields
       });
       this.form.on('change', this.onFormChange, this);
+      this.model.on('change', this.onModelChange, this);
     },
     render: function() {
       this.$el.html(this.form.render().el);
       this.onFormChange();
+    },
+    onModelChange: function() {
+      $.each(this.form.fields, function(i, field) {
+        this.form.setValue(field.key, this.model.get(field.key));
+      });
     },
     onFormChange: function() {
       this.form.commit();
