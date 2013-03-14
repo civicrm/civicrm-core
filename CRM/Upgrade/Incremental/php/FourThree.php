@@ -184,6 +184,15 @@ WHERE    entity_value = '' OR entity_value IS NULL
     }
   }
 
+  function upgrade_4_3_beta3($rev) {
+    $this->addTask(ts('Upgrade DB to 4.3.beta3: SQL'), 'task_4_3_x_runSql', $rev);
+    // CRM-12065
+    $query = "SELECT id, form_values FROM civicrm_report_instance WHERE form_values LIKE '%contribution_type%'";
+    $this->addTask('Replace contribution_type to financial_type in table civicrm_report_instance', 'replaceContributionTypeId', $query, 'reportInstance');
+    $query = "SELECT * FROM civicrm_saved_search WHERE form_values LIKE '%contribution_type%'";
+    $this->addTask('Replace contribution_type to financial_type in table civicrm_saved_search', 'replaceContributionTypeId', $query, 'savedSearch');
+  }
+  
   //CRM-11636
   function assignFinancialTypeToPriceRecords() {
     $upgrade = new CRM_Upgrade_Form();
@@ -668,6 +677,82 @@ AND TABLE_SCHEMA = '{$dbUf['database']}'";
       );
     }
 
+    return TRUE;
+  }
+
+  /**
+   * replace contribution_type to financial_type in table
+   * civicrm_saved_search and Structure civicrm_report_instance
+   */
+  function replaceContributionTypeId(CRM_Queue_TaskContext $ctx, $query, $table) {
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $formValues = unserialize($dao->form_values);
+      foreach (array('contribution_type_id_op', 'contribution_type_id_value', 'contribution_type_id') as $value) {
+        if (array_key_exists($value, $formValues)) {
+          $key = preg_replace('/contribution/', 'financial', $value);
+          $formValues[$key] = $formValues[$value];
+          unset($formValues[$value]);
+        }
+      }
+      if ($table != 'savedSearch') {
+        foreach (array('fields', 'group_bys') as $value) {
+          if (array_key_exists($value, $formValues)) {
+            if (array_key_exists('contribution_type_id', $formValues[$value])) {
+              $formValues[$value]['financial_type_id'] = $formValues[$value]['contribution_type_id'];
+              unset($formValues[$value]['contribution_type_id']);
+            }
+            else if (array_key_exists('contribution_type', $formValues[$value])) {
+              $formValues[$value]['financial_type'] = $formValues[$value]['contribution_type'];
+              unset($formValues[$value]['contribution_type']);
+            }
+          }
+        }
+        if (array_key_exists('order_bys', $formValues)) {
+          foreach ($formValues['order_bys'] as $key => $values) {
+            if (preg_grep('/contribution_type/', $values)) {
+              $formValues['order_bys'][$key]['column'] = preg_replace('/contribution_type/', 'financial_type', $values['column']);
+            }
+          }
+        }
+      }
+
+      if ($table == 'savedSearch') {
+        $saveDao = new CRM_Contact_DAO_SavedSearch();
+      }
+      else {
+        $saveDao = new CRM_Report_DAO_Instance();        
+      }
+      $saveDao->id = $dao->id;
+
+      if ($table == 'savedSearch') {
+        if (array_key_exists('mapper', $formValues)) { 
+          foreach ($formValues['mapper'] as $key => $values) {
+            foreach ($values as $k => $v) {
+              if (preg_grep('/contribution_/', $v)) {
+                $formValues['mapper'][$key][$k] = preg_replace('/contribution_type/', 'financial_type', $v);
+              }
+            }
+          }
+        }
+        foreach (array('select_tables', 'where_tables') as $value) {
+          if (preg_match('/contribution_type/', $dao->$value)) {
+            $tempValue = unserialize($dao->$value);
+            if (array_key_exists('civicrm_contribution_type', $tempValue)) {
+              $tempValue['civicrm_financial_type'] = $tempValue['civicrm_contribution_type'];
+              unset($tempValue['civicrm_contribution_type']);
+            }
+            $saveDao->$value = serialize($tempValue);
+          }
+        }
+        if (preg_match('/contribution_type/', $dao->where_clause)) {
+          $saveDao->where_clause = preg_replace('/contribution_type/', 'financial_type', $dao->where_clause);
+        }        
+      }
+      $saveDao->form_values = serialize($formValues);
+
+      $saveDao->save();
+    }
     return TRUE;
   }
 
