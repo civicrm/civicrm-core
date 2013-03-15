@@ -72,7 +72,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
       // store activity id for updating it later
       $form->openCaseActivityId = $openCaseInfo['id'];
 
-      list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($openCaseInfo['activity_date']);
+      list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($openCaseInfo['activity_date'], 'activityDateTime');
     }
     return $defaults;
   }
