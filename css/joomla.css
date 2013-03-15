@@ -254,7 +254,6 @@ body {
   padding: 0;
   color: #000;
   background-color: #fff;
-  font: 76%;
 }
 tr.dark td, tr.light td {
   padding: 0.3em;
@@ -502,6 +501,9 @@ ul#civicrm-menu li#crm-qsearch {
   padding-bottom: 0;
   border: 1px solid #999 !important;
 }
+#crm-container {
+  font-size: 11px;
+}
 #crm-container .col1 {
   margin: 0;
 }
@@ -514,4 +516,21 @@ ul#civicrm-menu li#crm-qsearch {
 
 #crm-notification-container {
   top: 100px;
+}
+
+#crm-container textarea,
+#crm-container input,
+#crm-container select {
+  font-size: 12px;
+  height: 16px;
+  margin-bottom: auto;
+  margin-right: 4px;
+  width: auto;
+  padding: 2px 4px;
+}
+#crm-container select {
+  height: 22px;
+}
+#crm-container input[type=submit] {
+  height: auto;
 }
