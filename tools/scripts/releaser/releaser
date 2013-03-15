@@ -4,6 +4,7 @@ set -e
 confdir=$(dirname $0)
 start_point="$1"
 version="$2"
+first_act="$3"
 distmaker_tgt=all
 
 if [ ! -f "$confdir/releaser.conf" ]; then
@@ -13,9 +14,14 @@ if [ ! -f "$confdir/releaser.conf" ]; then
 fi
 source "$confdir/releaser.conf"
 
-if [ -z "$version" -o -z "$start_point" ]; then
+if [ -z "$start_point" -o -z "$version" -o -z "$first_act" ]; then
   echo
-  echo "Usage: $0 <start_point> <version>"
+  echo "Usage:"
+  echo "  $0 <start_point> <version> --build"
+  echo "  $0 <start_point> <version> --publish"
+  echo "  $0 <start_point> <version> --clean"
+  echo "  $0 <start_point> <version> --build --publish --clean [[ORDER SIGNIFICANT]]"
+  echo "Arguments:"
   echo "  <start_point> is a branch name (e.g. \"master\")"
   echo "  <version> is Civi release (e.g. \"4.3.beta2\"); it will become a tag name"
   exit 2
@@ -26,8 +32,6 @@ if [ "`echo -n $version | tr -d 0-9.`" = '' ]; then
 else
   is_stable=
 fi
-
-set -ex
 
 #################################################
 ## Git setup
@@ -165,10 +169,32 @@ function do_cleanup() {
 
 ## Refactoring note: this used to be one monolithic script
 
-do_git_config
-do_mk_project
-do_git_tag
-do_distmaker
-do_git_tag_push
-do_publish
-do_cleanup
+shift ## start point
+shift ## version
+for ACT in "$@" ; do
+  case "$ACT" in
+    --build)
+      set -ex
+      do_git_config
+      do_mk_project
+      do_git_tag
+      do_distmaker
+      set +x
+      ;;
+    --publish)
+      set -ex
+      do_git_tag_push
+      do_publish
+      set +x
+      ;;
+    --clean)
+      set -ex
+      do_cleanup
+      set +x
+      ;;
+    *)
+      echo "unrecognized: $ACT"
+      ;;
+  esac
+done
+
