@@ -184,6 +184,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     ) + $this->addAddressFields(FALSE, FALSE);
 
     $this->_tagFilter = TRUE;
+    $this->_currencyColumn = 'civicrm_pledge_currency';
     parent::__construct();
   }
 

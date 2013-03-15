@@ -99,7 +99,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
         ),
       ),
     );
-
+    $this->_currencyColumn = 'civicrm_participant_fee_currency';
     parent::__construct();
   }
 
