@@ -522,7 +522,7 @@ FROM   civicrm_contribution con
                    AND efaPP.account_relationship = {$assetAccountIs})
        LEFT  JOIN {$tempTableName1} tpi
                ON ft.payment_instrument_id = tpi.instrument_id
-WHERE  con.fee_amount IS NOT NULL AND (con.contribution_status_id IN (%1, %3) OR (con.contribution_status_id =%2 AND con.is_pay_later = 1))
+WHERE  ft.fee_amount IS NOT NULL AND ft.fee_amount != 0 AND (con.contribution_status_id IN (%1, %3) OR (con.contribution_status_id =%2 AND con.is_pay_later = 1))
 GROUP  BY con.id";
     CRM_Core_DAO::executeQuery($sql, $queryParams);
 
