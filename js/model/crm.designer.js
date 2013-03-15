@@ -60,7 +60,7 @@
       name = this.get('fieldName').split('_');
       if (name[0] === 'custom') {
         CRM.api('custom_field', 'getsingle', {id: name[1]}, {success: function(field) {
-          ufFieldModel.set(field);
+          ufFieldModel.set(_.pick(field, 'help_pre', 'help_post', 'is_required'));
         }});
       }
       return ufFieldModel;
