@@ -575,9 +575,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     $this->_done = FALSE;
 
     /*
-         * we allow the controller to set force/reset externally, useful when we are being
-         * driven by the wizard framework
-         */
+     * we allow the controller to set force/reset externally, useful when we are being
+     * driven by the wizard framework
+     */
 
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean',
       CRM_Core_DAO::$_nullObject
@@ -789,10 +789,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
       $this->postProcess();
 
       /*
-             * Note that we repeat this, since the search creates and stores
-             * values that potentially change the controller behavior. i.e. things
-             * like totalCount etc
-             */
+       * Note that we repeat this, since the search creates and stores
+       * values that potentially change the controller behavior. i.e. things
+       * like totalCount etc
+       */
       $sortID = NULL;
       if ($this->get(CRM_Utils_Sort::SORT_ID)) {
         $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
