@@ -159,7 +159,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $participantCount = array();
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
-        $participantCount[] = $lineItem['participant_count'];
+        $participantCount[] = $lineItem[$k]['participant_count'];
       }
     }
     if ($participantCount) {
