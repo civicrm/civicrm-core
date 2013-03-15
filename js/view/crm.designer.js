@@ -396,14 +396,14 @@
       if (paletteView.hideAddFieldAlert) {
         openAddNewWindow();
       } else {
-        CRM.confirm({
-          title: ts('Add Field'),
-          message: ts('A new window or tab will open. Use the new window to add your field, and then return to this window and click "Refresh."'),
-          onContinue: function() {
+        CRM.confirm(function() {
             paletteView.hideAddFieldAlert = true;
             openAddNewWindow();
+          }, {
+            title: ts('Add Field'),
+            message: ts('A new window or tab will open. Use the new window to add your field, and then return to this window and click "Refresh."')
           }
-        });
+        );
       }
       return false;
     },

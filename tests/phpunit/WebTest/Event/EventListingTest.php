@@ -75,7 +75,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isTextPresent("{$eventTitle5}"));
 
     //go to ical and check for presence of ongoing and upcomming events
-    $this->openCiviPage("event/ical", "reset=1&page=1&html=1");
+    $this->openCiviPage("event/ical", "reset=1&page=1&html=1", NULL);
     $this->assertFalse($this->isTextPresent("{$eventTitle1}"));
     $this->assertFalse($this->isTextPresent("{$eventTitle2}"));
     $this->assertTrue($this->isTextPresent("{$eventTitle3}"));
