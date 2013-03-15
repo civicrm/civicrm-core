@@ -165,7 +165,7 @@
                       </div>
                       {/if}
                       <div class="{if !empty($imageURL)} float-left{/if}">
-                        <div class="crm-summary-block">
+                        <div class="crm-clear crm-summary-block">
                           <div class="crm-summary-row">
                             <div class="crm-label" id="tagLink">
                               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId&selectedChild=tag"}" title="{ts}Edit Tags{/ts}">{ts}Tags{/ts}</a>

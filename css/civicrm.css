@@ -2049,6 +2049,11 @@ div.grippie {
 #crm-container table.crm-inline-edit-form td,
 #crm-container div.crm-inline-edit-form {
   background-color: #E6E6DC;
+  white-space: nowrap;
+}
+#crm-container table.crm-inline-edit-form td.crm-label,
+#crm-container div.crm-inline-edit-form .crm-label {
+  white-space: normal;
 }
 
 #crm-container div.crm-inline-edit-field {
