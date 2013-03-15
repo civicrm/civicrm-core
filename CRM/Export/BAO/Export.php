@@ -581,11 +581,19 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // get payment related in for event and members
       $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
       //get all payment headers.
+      // If we haven't selected specific payment fields, load in all the
+      // payment headers.
       if (!$selectedPaymentFields) {
         $paymentHeaders = self::componentPaymentFields();
         if (!empty($paymentDetails)) {
           $addPaymentHeader = TRUE;
         }
+      }
+      // If we have seleted specific payment fields, leave the payment headers
+      // as an empty array; the headers for each selected field will be added
+      // elsewhere.
+      else {
+        $paymentHeaders = array();
       }
       $nullContributionDetails = array_fill_keys(array_keys($paymentHeaders), NULL);
     }
