@@ -205,6 +205,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'financial_type_id' => array('title' => ts('Financial Type')),
           'contribution_status_id' => array('title' => ts('Contribution Status')),
           'payment_instrument_id' => array('title' => ts('Payment Type')),
+          'currency' => array(
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
           'trxn_id' => NULL,
           'receive_date' => NULL,
           'receipt_date' => NULL,
@@ -231,6 +235,12 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
             'type' => CRM_Utils_Type::T_INT,
           ),
+          'currency' =>
+          array('title' => 'Currency',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'contribution_status_id' =>
           array('title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -245,6 +255,8 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
+
+    $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
   }
 
