@@ -3102,5 +3102,26 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       $relationshipTypes[] = $caseRelationships->relationship_type_id;
     }
   }
+
+  /**
+   * Function to get the list of clients for a case
+   *
+   * @param int $caseId
+   *
+   * @return array $clients associated array with client ids
+   * @static
+   */
+  static function getCaseClients($caseId) {
+    $clients = array();
+    $caseContact = new CRM_Case_DAO_CaseContact();
+    $caseContact->case_id = $caseId;
+    $caseContact->find();
+
+    while($caseContact->fetch()) {
+      $clients[] = $caseContact->contact_id;
+    }
+
+    return $clients;
+  }
 }
 
