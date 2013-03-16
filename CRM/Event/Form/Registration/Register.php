@@ -991,12 +991,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->assign('pay_later_text', $this->_values['event']['pay_later_text']);
       $this->assign('pay_later_receipt', $this->_values['event']['pay_later_receipt']);
     }
-    if (!$this->_allowConfirmation) {
-      // check if the participant is already registered
-      if (!$this->_skipDupeRegistrationCheck) {
-        $params['contact_id'] = self::checkRegistration($params, $this, FALSE, TRUE);
-      }
-    }
 
     if (CRM_Utils_Array::value('image_URL', $params)) {
       CRM_Contact_BAO_Contact::processImageParams($params);
