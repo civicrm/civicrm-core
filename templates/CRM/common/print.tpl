@@ -28,19 +28,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
 <head>
-  <title>{if $pageTitle}{$pageTitle|strip_tags}{else}{ts}Printer-Friendly View{/ts}{/if}</title>
+  <title>{if $pageTitle}{$pageTitle|strip_tags}{else}{ts}Printer-Friendly View{/ts} | {ts}CiviCRM{/ts}{/if}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <base href="{crmURL p="" a=true}" /><!--[if IE]></base><![endif]-->
   {crmRegion name='html-header' allowCmsOverride=0}{/crmRegion}
   <style type="text/css" media="print">@import url({$config->resourceBase}css/print.css);</style>
-  <style type="text/css">@import url({$config->resourceBase}css/skins/aqua/theme.css);</style>
 </head>
 
 <body>
+{include file="CRM/common/scripts.tpl"}
 {if $config->debug}
   {include file="CRM/common/debug.tpl"}
 {/if}
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+{crmRegion name='page-header' allowCmsOverride=0}{/crmRegion}
 {* Check for Status message for the page (stored in session->getStatus). Status is cleared on retrieval. *}
 {if $session->getStatus(false)}
 <div class="messages status no-popup">
@@ -49,18 +49,17 @@
 </div>
 {/if}
 
-{if isset($display_name) and $display_name}
-    <h3 style="margin: .25em;">{$display_name}</h3>
-{/if}
-
+{crmRegion name='page-body' allowCmsOverride=0}
 <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
-{if $isForm}
+  {if $isForm}
     {include file="CRM/Form/$formTpl.tpl"}
-{else}
+  {else}
     {include file=$tplFile}
-{/if}
+  {/if}
+{/crmRegion}
 
 
+{crmRegion name='page-footer' allowCmsOverride=0}{/crmRegion}
 </div> {* end crm-container div *}
 </body>
 </html>
