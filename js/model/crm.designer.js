@@ -41,7 +41,7 @@
      * @return {CRM.UF.UFFieldModel} or null (if the field is not addable)
      */
     addToUFCollection: function(ufFieldCollection, addOptions) {
-      var paletteFieldModel = this;
+      var name, paletteFieldModel = this;
       var ufFieldModel = paletteFieldModel.createUFFieldModel(ufFieldCollection.getRel('ufGroupModel'));
       ufFieldModel.set('uf_group_id', ufFieldCollection.uf_group_id);
       if (!ufFieldCollection.isAddable(ufFieldModel)) {
@@ -55,6 +55,14 @@
         return null;
       }
       ufFieldCollection.add(ufFieldModel, addOptions);
+      // Load metadata and set defaults
+      // TODO: currently only works for custom fields
+      name = this.get('fieldName').split('_');
+      if (name[0] === 'custom') {
+        CRM.api('custom_field', 'getsingle', {id: name[1]}, {success: function(field) {
+          ufFieldModel.set(_.pick(field, 'help_pre', 'help_post', 'is_required'));
+        }});
+      }
       return ufFieldModel;
     },
     createUFFieldModel: function(ufGroupModel) {
