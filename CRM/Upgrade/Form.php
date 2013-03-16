@@ -602,6 +602,9 @@ SET    version = '$version'
     $upgrade->setVersion($rev);
     CRM_Utils_System::flushCache();
 
+    $config = CRM_Core_Config::singleton();
+    $config->userSystem->flush();
+
     if (version_compare($currentVer, '4.1.alpha1') >= 0) {
       CRM_Core_BAO_Setting::updateSettingsFromMetaData();
     }
