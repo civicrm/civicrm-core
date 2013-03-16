@@ -3061,6 +3061,46 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         break;
     }
     return $sql;
+ }
+
+ /**
+  * Function to add/copy relationships, when new client is added for a case
+  *
+  * @param int $caseId case id
+  * @param int $contactId contact id / new client id
+  *
+  * @return void
+  */
+  static function addCaseRelationships($caseId, $contactId) {
+    // get the case role / relationships for the case
+    $caseRelationships = new CRM_Contact_DAO_Relationship();
+    $caseRelationships->case_id = $caseId;
+    $caseRelationships->find();
+    $relationshipTypes = array();
+
+    // make sure we don't add duplicate relationships of same relationship type.
+    while ($caseRelationships->fetch() && !in_array($caseRelationships->relationship_type_id, $relationshipTypes)) {
+      $values = array();
+      CRM_Core_DAO::storeValues($caseRelationships, $values);
+
+      // add relationship for new client.
+      $newRelationship = new CRM_Contact_DAO_Relationship();
+      $newRelationship->copyValues($values);
+      $newRelationship->id = NULL;
+      $newRelationship->case_id = $caseId;
+      $newRelationship->contact_id_a = $contactId;
+      $newRelationship->end_date = CRM_Utils_Date::isoToMysql($caseRelationships->end_date);
+      $newRelationship->start_date = CRM_Utils_Date::isoToMysql($caseRelationships->start_date);
+
+      // another check to avoid duplicate relationship, in cases where client is removed and re-added again.
+      if (!$newRelationship->find(TRUE)) {
+        $newRelationship->save();
+      }
+      $newRelationship->free();
+
+      // store relationship type of newly created relationship
+      $relationshipTypes[] = $caseRelationships->relationship_type_id;
+    }
   }
 }
 
