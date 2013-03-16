@@ -42,6 +42,7 @@ Author URI: http://civicrm.org/
 License: AGPL3
 */
 
+define('CIVICRM_UF_HEAD', TRUE);
 
 // there is no session handling in WP hence we start it for CiviCRM pages
 if (!session_id()) {
@@ -323,60 +324,24 @@ function civicrm_wp_invoke() {
   CRM_Core_Invoke::invoke($args);
 }
 
-function civicrm_wp_scripts() {
-  if (!civicrm_wp_initialize()) {
+function civicrm_wp_head() {
+  // CRM-11823 - If Civi bootstrapped, then merge its HTML header with the CMS's header
+  global $civicrm_root;
+  if (empty($civicrm_root)) {
     return;
   }
-  $pluginUrl = plugins_url();
-
-  $files = CRM_Core_Resources::parseTemplate('CRM/common/jquery.files.tpl');
-  foreach ($files as $file => $type) {
-    if ($type == 'js') {
-      wp_enqueue_script($file, $pluginUrl . "/civicrm/civicrm/$file");
-    }
+  $region = CRM_Core_Region::instance('html-header', FALSE);
+  if ($region) {
+    echo $region->render('');
   }
-
-  // add localized calendar js
-  $config = CRM_Core_Config::singleton();
-  $localisation = explode('_', $config->lcMessages);
-  $localizationFile = '/civicrm/civicrm/packages/jquery/jquery-ui-1.9.0/development-bundle/ui/i18n/jquery.ui.datepicker-' . $localisation[0] . '.js';
-
-  if (file_exists( WP_PLUGIN_DIR . $localizationFile)) {
-    wp_enqueue_script('civicrm-datepicker', $pluginUrl . $localizationFile);
-  }
-
-  //add namespacing js
-  wp_enqueue_script('js/jquery.conflict.js', $pluginUrl . '/civicrm/civicrm/js/jquery.conflict.js');
-
-  return;
-}
-
-function civicrm_wp_styles() {
-  if (!civicrm_wp_initialize()) {
-    return;
-  }
-  $pluginUrl = plugins_url();
-
-  $files = CRM_Core_Resources::parseTemplate('CRM/common/jquery.files.tpl');
-  foreach ($files as $file => $type) {
-    if ($type == 'css') {
-      wp_register_style($file, $pluginUrl . "/civicrm/civicrm/$file");
-      wp_enqueue_style($file);
-    }
-  }
-
-  wp_register_style('civicrm/css/civicrm.css', $pluginUrl . "/civicrm/civicrm/css/civicrm.css");
-  wp_enqueue_style('civicrm/css/civicrm.css');
-  wp_register_style('civicrm/css/extras.css',  $pluginUrl . "/civicrm/civicrm/css/extras.css");
-  wp_enqueue_style('civicrm/css/extras.css');
-
- return;
 }
 
 function civicrm_wp_frontend($shortcode = FALSE) {
   if (!civicrm_wp_initialize()) {
     return;
   }
+
+  CRM_Core_Resources::singleton()->addCoreResources();
 
   // set the frontend part for civicrm code
   $config = CRM_Core_Config::singleton();
@@ -599,6 +564,12 @@ function civicrm_wp_main() {
 
   add_shortcode('civicrm', 'civicrm_shortcode_handler');
 
+  if (is_admin()) {
+    add_action('admin_head', 'civicrm_wp_head');
+  } else {
+    add_action('wp_head', 'civicrm_wp_head');
+  }
+
   if (!is_admin()) {
     add_filter('get_header', 'civicrm_wp_shortcode_includes');
   }
@@ -608,9 +579,6 @@ function civicrm_wp_main() {
   }
 
   if (!is_admin()) {
-    add_action('wp_print_styles', 'civicrm_wp_styles');
-    add_action('wp_print_scripts', 'civicrm_wp_scripts');
-
     add_action('wp_footer', 'civicrm_buffer_end');
 
     // we do this here rather than as an action, since we dont control
@@ -886,8 +854,8 @@ function civicrm_wp_in_civicrm() {
 function civicrm_wp_shortcode_includes() {
   global $post;
   if (preg_match('/\[civicrm/', $post->post_content)) {
-    add_action('wp_print_styles', 'civicrm_wp_styles');
-    add_action('wp_print_scripts', 'civicrm_wp_scripts');
+    civicrm_wp_initialize();
+    CRM_Core_Resources::singleton()->addCoreResources();
   }
 }
 
