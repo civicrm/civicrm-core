@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # This script assumes
 # that DAOs are generated
@@ -65,23 +65,6 @@ cp $SRC/README.txt $TRG
 cp $SRC/Sponsors.txt $TRG
 cp $SRC/agpl-3.0.exception.txt $TRG
 cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
-
-# copy over drupal6 directory from svn for 3.4
-if [ -d $TRG/drupal ]; then
-  rm -rf $TRG/drupal
-  svn export -q http://svn.civicrm.org/civicrm/branches/v3.4/drupal $TRG/drupal
-  mv $TRG/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
-fi
-
-cd $TRG/drupal
-if [ $(uname) = "Darwin" ]; then
-  ## BSD sed
-  grep -lr -e 'version = 3.4' * | xargs sed -i '' 's/version = 3.4/version = '$DM_VERSION'/g'
-else
-  ## GNU sed
-  grep -lr -e 'version = 3.4' * | xargs sed -i'' 's/version = 3.4/version = '$DM_VERSION'/g'
-fi
-
 
 # final touch
 echo "<?php

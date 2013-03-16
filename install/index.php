@@ -1121,8 +1121,8 @@ class Installer extends InstallRequirements {
         // now enable civicrm module.
         module_enable(array('civicrm', 'civicrmtheme'));
 
-        // clear block and page cache, to make sure civicrm link is present in navigation block
-        cache_clear_all();
+        // clear block, page, theme, and hook caches
+        drupal_flush_all_caches();
 
         //add basic drupal permissions
         civicrm_install_set_drupal_perms();
@@ -1183,8 +1183,8 @@ class Installer extends InstallRequirements {
         // now enable civicrm module.
         module_enable(array('civicrm'));
 
-        // clear block and page cache, to make sure civicrm link is present in navigation block
-        cache_clear_all();
+        // clear block, page, theme, and hook caches
+        drupal_flush_all_caches();
 
         //add basic drupal permissions
         db_query('UPDATE {permission} SET perm = CONCAT( perm, \', access CiviMail subscribe/unsubscribe pages, access all custom data, access uploaded files, make online contributions, profile create, profile edit, profile view, register for events, view event info\') WHERE rid IN (1, 2)');
