@@ -155,14 +155,15 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $cnt = 1;
       $message = ts('This membership type cannot be deleted due to following reason(s):');
       if (in_array('Membership', $status)) {
-        $deleteURL = CRM_Utils_System::url('civicrm/member/search', 'reset=1');
-        $message .= '<br/>' . ts('%2. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type on the <a href=\'%1\'>CiviMember >> Find Members</a> page. If you delete all memberships of this type, you will then be able to delete the membership type on this page. To delete the membership type, all memberships of this type should be deleted.', array(1 => $deleteURL, 2 => $cnt));
+        $findMembersURL = CRM_Utils_System::url('civicrm/member/search', 'reset=1');
+        $deleteURL = CRM_Utils_System::url('civicrm/contact/search/advanced', 'reset=1');
+        $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', array(1 => $findMembersURL, 2 => $deleteURL, 3 => $cnt));
         $cnt++;
       }
 
       if (in_array('MembershipBlock', $status)) {
         $deleteURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
-        $message .= '<br/>' . ts('%2. This Membership Type is being link to <a href=\'%1\'>Online Contribution page</a>. Please change/delete it in order to delete this Membership Type.', array(1 => $deleteURL, 2 => $cnt));
+        $message .= '<br/>' . ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', array(1 => $deleteURL, 2 => $cnt));
       }
       if (!$skipRedirect) {
         $session = CRM_Core_Session::singleton();
