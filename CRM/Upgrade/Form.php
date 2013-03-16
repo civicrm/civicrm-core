@@ -614,6 +614,12 @@ SET    version = '$version'
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
 
+    // lets rebuild the config array in case we've made a few changes in the
+    // code base
+    // this also helps us always store the latest version of civi in the DB
+    $params = array();
+    CRM_Core_BAO_ConfigSetting::add($params);
+
     // cleanup caches CRM-8739
     $config = CRM_Core_Config::singleton();
     $config->cleanupCaches(1, FALSE);
