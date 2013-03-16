@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # This script assumes
 # that DAOs are generated
