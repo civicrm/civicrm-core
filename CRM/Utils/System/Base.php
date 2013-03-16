@@ -116,5 +116,13 @@ abstract class CRM_Utils_System_Base {
     $session->set('ufID', $ufID);
     $session->set('userID', $userID);
   }
+
+  /**
+   * Reset any system caches that may be required for proper CiviCRM
+   * integration.
+   */
+  function flush() {
+    // nullop by default
+  }
 }
 

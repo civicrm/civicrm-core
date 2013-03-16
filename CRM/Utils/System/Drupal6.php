@@ -924,5 +924,12 @@ SELECT name, mail
     }
   }
 
+  /**
+   * Reset any system caches that may be required for proper CiviCRM
+   * integration.
+   */
+  function flush() {
+    drupal_flush_all_caches();
+  }
 }
 
