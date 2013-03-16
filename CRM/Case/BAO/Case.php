@@ -772,7 +772,7 @@ AND civicrm_case.status_id != $closedId";
         $casesList[$result->case_id][$field] = $result->$field;
         if ($field == 'contact_type') {
           $casesList[$result->case_id]['contact_type_icon'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-            $result->contact_sub_type : $result->contact_type
+              $result->contact_sub_type : $result->contact_type
           );
           $casesList[$result->case_id]['action'] = CRM_Core_Action::formLink($actions['primaryActions'], $mask,
             array(
@@ -1521,8 +1521,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       !is_readable($file)
     ) {
       return CRM_Core_Error::fatal(ts('File %1 does not exist or is not readable',
-          array(1 => $file)
-        ));
+        array(1 => $file)
+      ));
     }
 
     $result = CRM_Utils_Mail_Incoming::parse($file);
@@ -1541,8 +1541,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
         //if caseId is invalid, return as error file
         if (!CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseId, 'id')) {
           return CRM_Core_Error::createAPIError(ts('Invalid case ID ( %1 ) in TO: field.',
-              array(1 => $caseId)
-            ));
+            array(1 => $caseId)
+          ));
         }
       }
       else {
@@ -1591,8 +1591,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       }
       else {
         return CRM_Core_Error::createAPIError(ts('FROM email contact %1 doesn\'t have a relationship to the referenced case.',
-            array(1 => $result['from']['email'])
-          ));
+          array(1 => $result['from']['email'])
+        ));
       }
     }
   }
@@ -1762,7 +1762,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
    * @static
    */
   static function getCaseActivityDates($caseID, $criteriaParams = array(
-    ), $latestDate = FALSE) {
+  ), $latestDate = FALSE) {
     $values     = array();
     $selectDate = " ca.activity_date_time";
     $where      = $groupBy = ' ';
@@ -1945,7 +1945,7 @@ SELECT civicrm_contact.id as casemanager_id,
    * @return array of case and related data keyed on case id
    */
   static function getUnclosedCases($params = array(
-    ), $excludeCaseIds = array(), $excludeDeleted = TRUE) {
+  ), $excludeCaseIds = array(), $excludeDeleted = TRUE) {
     //params from ajax call.
     $where = array('( ca.end_date is null )');
     if ($caseType = CRM_Utils_Array::value('case_type', $params)) {
@@ -2932,8 +2932,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
   /**
    * Function to get all the encounter medium ids currently in use
-   *
-   *
    * @return array
    */
   static function getUsedEncounterMediums() {
@@ -2955,7 +2953,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * Function to check case configuration.
    *
-   * @return an array $configured
+   * @return array $configured
    */
   static function isCaseConfigured($contactId = NULL) {
     $configured = array_fill_keys(array('configured', 'allowToAddNewCase', 'redirectToCaseAdmin'), FALSE);
@@ -3000,7 +2998,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     return $configured;
   }
 
-  /*
+  /**
    * Used during case component enablement and during ugprade
    */
   static function createCaseViews() {
@@ -3036,7 +3034,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     return TRUE;
   }
 
-  /*
+  /**
    * helper function, also used by the upgrade in case of error
    */
   static function createCaseViewsQuery($section = 'upcoming') {
@@ -3062,7 +3060,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
  AND a.is_current_revision = 1 AND a.is_deleted=0 AND a.status_id <> $scheduled_id";
         break;
     }
-
     return $sql;
   }
 }
