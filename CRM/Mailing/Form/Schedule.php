@@ -274,7 +274,6 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     // as it appeared to prevent mails being scheduled if they were
     // saved as a template, and this wasn't the documented behaviour.
     // $saveTemplate = $this->controller->exportValue('saveTemplate');
-    $job->status = 'Scheduled';
     if ($params['now']) {
       $params['scheduled_date'] = date('YmdHis');
     }
@@ -286,7 +285,6 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     // set the scheduled_id
     $params['scheduled_id'] = $session->get('userID');
     $params['scheduled_date'] = date('YmdHis');
-    //$params['created_date'] = CRM_Utils_Date::isoToMysql($params['created_date']);
 
     // set approval details if workflow is not enabled
     if (!CRM_Mailing_Info::workflowEnabled()) {
