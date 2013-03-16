@@ -50,7 +50,7 @@
 <table class="report">
   {if $multiClient}
     <tr class="crm-case-caseview-client">
-      <td colspan="4" class="label">
+      <td colspan="5" class="label">
         {ts}Clients:{/ts}
         {foreach from=$caseRoles.client item=client name=clients}
           <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}view contact record{/ts}">{$client.display_name}</a>{if not $smarty.foreach.clients.last}, &nbsp; {/if}
