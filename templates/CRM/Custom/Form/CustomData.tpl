@@ -25,50 +25,61 @@
 *}
 {* Custom Data form*}
 {if $formEdit}
-    {if $cd_edit.help_pre}
-        <div class="messages help">{$cd_edit.help_pre}</div>
-    {/if}
-    <table class="form-layout-compressed">
-        {foreach from=$cd_edit.fields item=element key=field_id}
-           {include file="CRM/Custom/Form/CustomField.tpl"}
-        {/foreach}
-    </table>
-    <div class="spacer"></div>
-    {if $cd_edit.help_post}<div class="messages help">{$cd_edit.help_post}</div>{/if}
-    {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple >= $cgCount ) ) }
-        <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id}-{$cgCount}"><a href="#" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
-    {/if}
-{else}
-{foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
- <div id="{$cd_edit.name}" class="crm-accordion-wrapper {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
-  {if !$skipTitle}
-  <div class="crm-accordion-header">
-    {$cd_edit.title}
-   </div><!-- /.crm-accordion-header -->
+  {if $cd_edit.help_pre}
+    <div class="messages help">{$cd_edit.help_pre}</div>
   {/if}
-  <div id="{$cd_edit.name}" class="crm-accordion-body">
-            {if $cd_edit.help_pre}
-                <div class="messages help">{$cd_edit.help_pre}</div>
-            {/if}
-            <table class="form-layout-compressed">
-                {foreach from=$cd_edit.fields item=element key=field_id}
-                   {include file="CRM/Custom/Form/CustomField.tpl"}
-                {/foreach}
-            </table>
-      <div class="spacer"></div>
-            {if $cd_edit.help_post}<div class="messages help">{$cd_edit.help_post}</div>{/if}
-   </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
-        {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple >= $cgCount ) ) }
-            <div id="add-more-link-{$cgCount}"><a href="#" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
+  <table class="form-layout-compressed">
+    {foreach from=$cd_edit.fields item=element key=field_id}
+      {include file="CRM/Custom/Form/CustomField.tpl"}
+    {/foreach}
+  </table>
+  <div class="spacer"></div>
+  {if $cd_edit.help_post}
+    <div class="messages help">{$cd_edit.help_post}</div>
+  {/if}
+  {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple >= $cgCount ) ) }
+    <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id}-{$cgCount}"><a href="#" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
+  {/if}
+{else}
+  {foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
+    <div id="{$cd_edit.name}" class="crm-accordion-wrapper {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
+      {if !$skipTitle}
+      <div class="crm-accordion-header">
+        {$cd_edit.title}
+       </div><!-- /.crm-accordion-header -->
+      {/if}
+      <div id="{$cd_edit.name}" class="crm-accordion-body">
+        {if $cd_edit.help_pre}
+          <div class="messages help">{$cd_edit.help_pre}</div>
         {/if}
+        <table class="form-layout-compressed">
+          {foreach from=$cd_edit.fields item=element key=field_id}
+            {include file="CRM/Custom/Form/CustomField.tpl"}
+          {/foreach}
+        </table>
+        <div class="spacer"></div>
+        {if $cd_edit.help_post}
+          <div class="messages help">{$cd_edit.help_post}</div>
+        {/if}
+      </div>
+    </div>
+    {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple >= $cgCount ) ) }
+      {if $skipTitle}
+        {* We don't yet support adding new records in inline-edit forms *}
+        <div class="messages help">
+          <em>{ts 1=$cd_edit.title}Click "Edit Contact" to add more %1 records{/ts}</em>
+        </div>
+      {else}
+        <div id="add-more-link-{$cgCount}"><a href="#" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
+      {/if}
+    {/if}
     <div id="custom_group_{$group_id}_{$cgCount}"></div>
-{/foreach}
-    <script type="text/javascript">
+  {/foreach}
+  <script type="text/javascript">
     {literal}
-        cj(function() {
-           cj().crmAccordions();
-        });
+      cj(function() {
+        cj().crmAccordions();
+      });
     {/literal}
-    </script>
+  </script>
 {/if}
