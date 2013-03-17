@@ -135,7 +135,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           'currency' =>
           array('title' => 'Currency',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::currencySymbols('name','name'),
+            'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'type' => CRM_Utils_Type::T_STRING,
           ),
           'sid' =>
@@ -184,6 +184,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     ) + $this->addAddressFields(FALSE, FALSE);
 
     $this->_tagFilter = TRUE;
+    $this->_currencyColumn = 'civicrm_pledge_currency';
     parent::__construct();
   }
 

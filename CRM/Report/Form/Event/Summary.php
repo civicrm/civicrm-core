@@ -99,7 +99,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
         ),
       ),
     );
-
+    $this->_currencyColumn = 'civicrm_participant_fee_currency';
     parent::__construct();
   }
 
@@ -121,7 +121,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
       }
     }
 
-    $this->_select = "SELECT " . implode(', ', $select);
+    $this->_select = 'SELECT ' . implode(', ', $select);
   }
 
   function from() {
@@ -167,7 +167,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
       }
     }
     $clauses[] = "({$this->_aliases['civicrm_event']}.is_template IS NULL OR {$this->_aliases['civicrm_event']}.is_template = 0)";
-    $this->_where = "WHERE  " . implode(' AND ', $clauses);
+    $this->_where = 'WHERE  ' . implode(' AND ', $clauses);
   }
 
   function groupBy() {
@@ -178,14 +178,15 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   //get participants information for events
   function participantInfo() {
 
-    $statusType1 = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
-    $statusType2 = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0");
+    $statusType1 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
+    $statusType2 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0');
 
     $sql = "
           SELECT civicrm_participant.event_id    AS event_id, 
                  civicrm_participant.status_id   AS statusId, 
                  COUNT( civicrm_participant.id ) AS participant, 
-                 SUM( civicrm_participant.fee_amount ) AS amount
+                 SUM( civicrm_participant.fee_amount ) AS amount,
+                 civicrm_participant.fee_currency
 
             FROM civicrm_participant
 
@@ -196,11 +197,12 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
                  civicrm_participant.status_id";
 
     $info = CRM_Core_DAO::executeQuery($sql);
-    $participant_data = $participant_info = array();
+    $participant_data = $participant_info = $currency = array();
 
     while ($info->fetch()) {
       $participant_data[$info->event_id][$info->statusId]['participant'] = $info->participant;
       $participant_data[$info->event_id][$info->statusId]['amount'] = $info->amount;
+      $currency[$info->event_id] = $info->fee_currency;
     }
 
     $amt = $particiType1 = $particiType2 = 0;
@@ -222,7 +224,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
         }
       }
 
-      $participant_info[$event_id]['totalAmount'] = $amt;
+      $participant_info[$event_id]['totalAmount'] = CRM_Utils_Money::format($amt, $currency[$event_id]);
       $participant_info[$event_id]['statusType1'] = $particiType1;
       $participant_info[$event_id]['statusType2'] = $particiType2;
       $amt = $particiType1 = $particiType2 = 0;
@@ -249,8 +251,8 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
       }
     }
 
-    $statusType1 = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
-    $statusType2 = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0");
+    $statusType1 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
+    $statusType2 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0');
 
     //make column header for participant status  Registered/Attended
     $type1_header = implode('/', $statusType1);
@@ -268,7 +270,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     );
     $this->_columnHeaders['totalAmount'] = array(
       'title' => 'Total Income',
-      'type' => CRM_Utils_Type::T_MONEY,
+      'type' => CRM_Utils_Type::T_STRING,
     );
   }
 
@@ -370,7 +372,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
               $this->_absoluteUrl, $this->_id, $this->_drilldownReport
             );
             $rows[$rowNum]['civicrm_event_title_link'] = $url;
-            $rows[$rowNum]['civicrm_event_title_hover'] = ts("View Event Income For this Event");
+            $rows[$rowNum]['civicrm_event_title_hover'] = ts('View Event Income For this Event');
           }
         }
 

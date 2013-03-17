@@ -42,11 +42,12 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
-  protected $_summary = NULL; function __construct() {
-
+  protected $_summary = NULL;
+  
+  function __construct() {
     self::validRelationships();
     $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    $campaignEnabled = in_array('CiviCampaign', $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
@@ -131,6 +132,10 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
             'title' => 'Contribution Status',
             'default' => TRUE,
           ),
+          'currency' => array(
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
           'trxn_id' => NULL,
           'receive_date' => array('default' => TRUE),
           'receipt_date' => NULL,
@@ -141,6 +146,12 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
           array('operatorType' => CRM_Report_Form::OP_DATE),
           'total_amount' =>
           array('title' => ts('Amount Between')),
+          'currency' =>
+          array('title' => 'Currency',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'contribution_status_id' =>
           array('title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -186,7 +197,8 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
         'options' => $this->activeCampaigns,
       );
     }
-
+    
+    $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
   }
 
@@ -433,14 +445,14 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
         ) &&
         array_key_exists('civicrm_contact_organization_id', $row)
       ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
+        $url = CRM_Utils_System::url('civicrm/contact/view',
           'reset=1&cid=' .
           $rows[$rowNum]['civicrm_contact_organization_id'],
           $this->_absoluteUrl
         );
 
         $rows[$rowNum]['civicrm_contact_organization_organization_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_organization_organization_name_hover'] = ts("View contact summary for this organization.");
+        $rows[$rowNum]['civicrm_contact_organization_organization_name_hover'] = ts('View contact summary for this organization.');
       }
 
       //remove duplicate Contact names and relationship type
@@ -511,12 +523,12 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
       if (($value = CRM_Utils_Array::value('civicrm_contribution_total_amount', $row)) &&
         CRM_Core_Permission::check('access CiviContribute')
       ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view/contribution",
+        $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
           "reset=1&id=" . $row['civicrm_contribution_id'] . "&cid=" . $row['civicrm_contact_id'] . "&action=view&context=contribution&selectedChild=contribute",
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contribution_total_amount_link'] = $url;
-        $rows[$rowNum]['civicrm_contribution_total_amount_hover'] = ts("View this contribution.");
+        $rows[$rowNum]['civicrm_contribution_total_amount_hover'] = ts('View this contribution.');
         $entryFound = TRUE;
       }
 

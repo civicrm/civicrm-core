@@ -49,7 +49,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
   function __construct() {
     $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    $campaignEnabled = in_array('CiviCampaign', $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
@@ -215,6 +215,10 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             'name' => 'source',
             'title' => ts('Contribution Source'),
           ),
+          'currency' => array(
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
           'trxn_id' => NULL,
           'receive_date' => array('default' => TRUE),
           'receipt_date' => NULL,
@@ -235,6 +239,12 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           array('title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
+          ),
+          'currency' =>
+          array('title' => 'Currency',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'payment_instrument_id' =>
           array('title' => ts('Payment Type'),
@@ -439,7 +449,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
       $this->_columns['civicrm_contribution']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
     }
 
-
+    $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
   }
 
@@ -505,7 +515,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
             }
@@ -514,7 +523,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
       }
     }
 
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
+    $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
   function from() {
@@ -603,11 +612,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
   function tempTable($applyLimit = TRUE) {
     // create temp table with contact ids,contribtuion id,membership id
-    $dropTempTable = "DROP TABLE IF EXISTS civireport_membership_contribution_detail";
+    $dropTempTable = 'DROP TABLE IF EXISTS civireport_membership_contribution_detail';
     CRM_Core_DAO::executeQuery($dropTempTable);
 
-    $sql = "CREATE TEMPORARY TABLE civireport_membership_contribution_detail
-            (contribution_id int, contact_id int, membership_id int, payment_id int) ENGINE=HEAP";
+    $sql = 'CREATE TEMPORARY TABLE civireport_membership_contribution_detail
+            (contribution_id int, contact_id int, membership_id int, payment_id int) ENGINE=HEAP';
     CRM_Core_DAO::executeQuery($sql);
 
     $fillTemp = "
@@ -663,35 +672,26 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    $select = "
-        SELECT ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as amt
-        ";
+    $select = "                                                                                                                                                                                                     SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount ) as count,                                                                                                                                   SUM( {$this->_aliases['civicrm_contribution']}.total_amount ) as amount,                                                                                                                                   ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,                                                                                                                              {$this->_aliases['civicrm_contribution']}.currency as currency                                                                                                                                       ";
 
-    $groupBy = "
-        GROUP BY contribution_id
-        ";
-
-    $sql = "{$select} {$this->_from} {$this->_where} {$groupBy}";
+    $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
+    $sql = "{$select} {$this->_from} {$this->_where} {$group}";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $amount = 0;
     while ($dao->fetch()) {
-      $amount = $amount + $dao->amt;
+      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)."(".$dao->count.")";
+      $average[] =   CRM_Utils_Money::format($dao->avg, $dao->currency);
     }
     $statistics['counts']['amount'] = array(
-      'value' => $amount,
-      'title' => 'Total Amount',
-      'type' => CRM_Utils_Type::T_MONEY,
+      'title' => ts('Total Amount'),
+      'value' => implode(',  ', $totalAmount),
+      'type' => CRM_Utils_Type::T_STRING,
     );
 
-    $avg = 0;
-    if ($dao->N) {
-      $avg = (float ) $amount / $dao->N;
-    }
     $statistics['counts']['avg'] = array(
-      'value' => $avg,
-      'title' => 'Average',
-      'type' => CRM_Utils_Type::T_MONEY,
+      'title' => ts('Average'),
+      'value' => implode(',  ', $average),
+      'type' => CRM_Utils_Type::T_STRING,
     );
 
     return $statistics;
@@ -822,13 +822,13 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
         CRM_Utils_Array::value('civicrm_contact_sort_name', $rows[$rowNum]) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
-               'reset=1&cid=' . $row['civicrm_contact_id'],
-               $this->_absoluteUrl
+        $url = CRM_Utils_System::url('civicrm/contact/view',
+          'reset=1&cid=' . $row['civicrm_contact_id'],
+          $this->_absoluteUrl
         );
 
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Summary for this Contact.');
       }
 
       // convert honoree sort name to link
@@ -837,12 +837,12 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
         array_key_exists('civicrm_contact_honor_id_honor', $row)
       ) {
 
-        $url = CRM_Utils_System::url("civicrm/contact/view",
-               'reset=1&cid=' . $row['civicrm_contact_honor_id_honor'],
-               $this->_absoluteUrl
+        $url = CRM_Utils_System::url('civicrm/contact/view',
+          'reset=1&cid=' . $row['civicrm_contact_honor_id_honor'],
+          $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_honor_sort_name_honor_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_honor_sort_name_honor_hover'] = ts("View Contact Summary for Honoree.");
+        $rows[$rowNum]['civicrm_contact_honor_sort_name_honor_hover'] = ts('View Contact Summary for Honoree.');
       }
 
       if ($value = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
@@ -864,12 +864,12 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
       if (($value = CRM_Utils_Array::value('civicrm_contribution_total_amount_sum', $row)) &&
         CRM_Core_Permission::check('access CiviContribute')
       ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view/contribution",
-               "reset=1&id=" . $row['civicrm_contribution_contribution_id'] . "&cid=" . $row['civicrm_contact_id'] . "&action=view&context=contribution&selectedChild=contribute",
-               $this->_absoluteUrl
+        $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
+          'reset=1&id=' . $row['civicrm_contribution_contribution_id'] . '&cid=' . $row['civicrm_contact_id'] . '&action=view&context=contribution&selectedChild=contribute',
+          $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contribution_total_amount_sum_link'] = $url;
-        $rows[$rowNum]['civicrm_contribution_total_amount_sum_hover'] = ts("View Details of this Contribution.");
+        $rows[$rowNum]['civicrm_contribution_total_amount_sum_hover'] = ts('View Details of this Contribution.');
         $entryFound = TRUE;
       }
 
