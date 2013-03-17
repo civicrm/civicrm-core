@@ -284,44 +284,56 @@ class CRM_Contact_Page_AJAX {
   static function relationship() {
     $relType         = CRM_Utils_Array::value('rel_type', $_REQUEST);
     $relContactID    = CRM_Utils_Array::value('rel_contact', $_REQUEST);
-    $sourceContactID = CRM_Utils_Array::value('contact_id', $_REQUEST);
-    $relationshipID  = CRM_Utils_Array::value('rel_id', $_REQUEST);
+    $sourceContactID = CRM_Utils_Array::value('contact_id', $_REQUEST); // we no longer need this.
+    $relationshipID  = CRM_Utils_Array::value('rel_id', $_REQUEST); // this used only to determine add or update mode
     $caseID          = CRM_Utils_Array::value('case_id', $_REQUEST);
 
-    $relationParams = array(
-      'relationship_type_id' => $relType . '_a_b',
-      'contact_check' => array($relContactID => 1),
-      'is_active' => 1,
-      'case_id' => $caseID,
-      'start_date' => date("Ymd"),
-    );
+    // check if there are multiple clients for this case, if so then we need create
+    // relationship and also activities for each contacts
 
-    $relationIds = array('contact' => $sourceContactID);
-    if ($relationshipID && $relationshipID != 'null') {
-      $relationIds['relationship'] = $relationshipID;
-      $relationIds['contactTarget'] = $relContactID;
-    }
+    // get case client list
+    $clientList = CRM_Case_BAO_Case::getCaseClients($caseID);
 
-    $return = CRM_Contact_BAO_Relationship::create($relationParams, $relationIds);
-    $status = 'process-relationship-fail';
-    if (CRM_Utils_Array::value(0, $return[4])) {
-      $relationshipID = $return[4][0];
-      $status = 'process-relationship-success';
-    }
-
-    $caseRelationship = array();
-    if ($relationshipID && $relationshipID != 'null') {
-      // we should return phone and email
-      $caseRelationship = CRM_Case_BAO_Case::getCaseRoles($sourceContactID,
-        $caseID, $relationshipID
+    foreach($clientList as $sourceContactID) {
+      $relationParams = array(
+        'relationship_type_id' => $relType . '_a_b',
+        'contact_check' => array($relContactID => 1),
+        'is_active' => 1,
+        'case_id' => $caseID,
+        'start_date' => date("Ymd"),
       );
 
-      //create an activity for case role assignment.CRM-4480
-      CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $relationshipID, $relContactID);
-    }
-    $relation = CRM_Utils_Array::value($relationshipID, $caseRelationship, array());
+      $relationIds = array('contact' => $sourceContactID);
 
-    $relation['rel_id'] = $relationshipID;
+      // check if we are editing/updating existing relationship
+      if ($relationshipID && $relationshipID != 'null') {
+        // here we need to retrieve appropriate relationshipID based on client id and relationship type id
+        $caseRelationships = new CRM_Contact_DAO_Relationship();
+        $caseRelationships->case_id = $caseID;
+        $caseRelationships->relationship_type_id = $relType;
+        $caseRelationships->contact_id_a = $sourceContactID;
+        $caseRelationships->find();
+
+        while($caseRelationships->fetch()) {
+          $relationIds['relationship'] = $caseRelationships->id;
+          $relationIds['contactTarget'] = $relContactID;
+        }
+        $caseRelationships->free();
+      }
+
+      // create new or update existing relationship
+      $return = CRM_Contact_BAO_Relationship::create($relationParams, $relationIds);
+
+      $status = 'process-relationship-fail';
+      if (CRM_Utils_Array::value(0, $return[4])) {
+        $relationshipID = $return[4][0];
+        $status = 'process-relationship-success';
+
+        //create an activity for case role assignment.CRM-4480
+        CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $relationshipID, $relContactID);
+      }
+    }
+
     $relation['status'] = $status;
     echo json_encode($relation);
     CRM_Utils_System::civiExit();
