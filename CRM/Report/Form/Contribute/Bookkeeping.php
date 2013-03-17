@@ -199,6 +199,10 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'payment_instrument_id' => array('title' => ts('Payment Instrument'),
             'default' => TRUE,
           ),
+          'currency' => array(
+             'required' => TRUE,
+             'no_display' => TRUE,
+          ), 
           'trxn_date' => array(
             'title' => ts('Transaction Date'),
             'default' => TRUE,
@@ -216,6 +220,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           ),
+          'currency' => array(
+             'title' => 'Currency',
+             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+             'type' => CRM_Utils_Type::T_STRING,
+          ),
           'trxn_date' => array( 
             'title' => ts('Transaction Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
@@ -229,6 +239,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'amount' => array(
             'title' => ts('Amount'),
             'default' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'filters' =>
@@ -288,7 +299,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
       }
     }
 
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
+    $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
   function from() {
@@ -370,10 +381,10 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
       }
     }
     if (empty($clauses)) {
-      $this->_where = "WHERE ( 1 )";
+      $this->_where = 'WHERE ( 1 )';
     }
     else {
-      $this->_where = "WHERE " . implode(' AND ', $clauses);
+      $this->_where = 'WHERE ' . implode(' AND ', $clauses);
     }
   }
 
@@ -387,28 +398,34 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
 
     $select = " SELECT COUNT({$this->_aliases['civicrm_financial_trxn']}.id ) as count,
+                {$this->_aliases['civicrm_contribution']}.currency,
                 SUM(CASE 
                   WHEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id IS NOT NULL
                   THEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.amount
                   ELSE {$this->_aliases['civicrm_entity_financial_trxn']}.amount
-                END) as amount ";
+                END) as amount 
+";
 
-    $sql = "{$select} {$this->_from} {$this->_where}";
+    $sql = "{$select} {$this->_from} {$this->_where} 
+            GROUP BY {$this->_aliases['civicrm_contribution']}.currency
+";
+
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $dao->fetch();
-    if ($dao->count) {
-      $statistics['counts']['amount'] = array(
-        'value' => $dao->amount,
-        'title' => 'Total Amount',
-        'type' => CRM_Utils_Type::T_MONEY,
-      );
-      $statistics['counts']['avg'] = array(
-        'value' => round(($dao->amount / $dao->count), 2),
-        'title' => 'Average',
-        'type' => CRM_Utils_Type::T_MONEY,
-      );
+    while ($dao->fetch()) {
+      $amount[] = CRM_Utils_Money::format($dao->amount, $dao->currency);
+      $avg[] =  CRM_Utils_Money::format(round(($dao->amount / $dao->count), 2), $dao->currency);
     }
 
+    $statistics['counts']['amount'] = array(
+       'value' => implode(', ', $amount),
+       'title' => 'Total Amount',
+       'type' => CRM_Utils_Type::T_STRING,
+    );
+    $statistics['counts']['avg'] = array(
+      'value' => implode(', ', $avg),
+      'title' => 'Average',
+      'type' => CRM_Utils_Type::T_STRING,
+    );
     return $statistics;
   }
 
@@ -422,12 +439,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         CRM_Utils_Array::value('civicrm_contact_sort_name', $rows[$rowNum]) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
+        $url = CRM_Utils_System::url('civicrm/contact/view',
           'reset=1&cid=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Summary for this Contact.');
       }
 
       // handle contribution status id
@@ -443,6 +460,9 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
       // handle financial type id
       if ($value = CRM_Utils_Array::value('civicrm_line_item_financial_type_id', $row)) {
         $rows[$rowNum]['civicrm_line_item_financial_type_id'] = $contributionTypes[$value];
+      }
+      if ($value = CRM_Utils_Array::value('civicrm_entity_financial_trxn_amount', $row)) {
+        $rows[$rowNum]['civicrm_entity_financial_trxn_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_entity_financial_trxn_amount'],$rows[$rowNum]['civicrm_financial_trxn_currency']);
       }
     }
   }

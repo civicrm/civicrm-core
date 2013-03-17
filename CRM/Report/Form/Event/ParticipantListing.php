@@ -138,6 +138,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'role_id' => array('title' => ts('Role'),
             'default' => TRUE,
           ),
+          'fee_currency' => array(
+             'required' => TRUE,
+             'no_display' => TRUE,
+          ),
           'participant_fee_level' => NULL,
           'participant_fee_amount' => NULL,
           'participant_register_date' => array('title' => ts('Registration Date')),
@@ -166,6 +170,13 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'title' => ' Registration Date',
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
+          'fee_currency' =>
+          array('title' => 'Currency',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+
         ),
         'order_bys' =>
         array(
@@ -223,6 +234,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         ),
       ),
     );
+    $this->_currencyColumn = 'civicrm_participant_fee_currency';
     parent::__construct();
   }
 

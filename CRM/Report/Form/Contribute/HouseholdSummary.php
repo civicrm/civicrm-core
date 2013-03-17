@@ -42,8 +42,9 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
-  protected $_summary = NULL; function __construct() {
-
+  protected $_summary = NULL;
+  
+  function __construct() {
     self::validRelationships();
 
     $config = CRM_Core_Config::singleton();
@@ -131,6 +132,10 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             'title' => 'Contribution Status',
             'default' => TRUE,
           ),
+          'currency' => array(
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
           'trxn_id' => NULL,
           'receive_date' => array('default' => TRUE),
           'receipt_date' => NULL,
@@ -141,6 +146,12 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
           array('operatorType' => CRM_Report_Form::OP_DATE),
           'total_amount' =>
           array('title' => ts('Amount Between')),
+          'currency' =>
+          array('title' => 'Currency',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'contribution_status_id' =>
           array('title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -186,7 +197,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
         'options' => $this->activeCampaigns,
       );
     }
-
+    $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
   }
 
@@ -387,7 +398,6 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
 
     $entryFound = FALSE;
     $flagHousehold = $flagContact = 0;
-
     foreach ($rows as $rowNum => $row) {
 
       //replace retionship id by relationship name
@@ -491,6 +501,10 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View contribution details for this individual');
 
         $entryFound = TRUE;
+      }
+
+      if (CRM_Utils_Array::value('civicrm_contribution_total_amount', $row)) {
+        $row['civicrm_contribution_total_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_total_amount'], $row['civicrm_contribution_currency']);
       }
 
       // Contribution amount links to view contribution
