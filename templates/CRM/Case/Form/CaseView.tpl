@@ -187,8 +187,33 @@
   var oTable;
 
   cj(function() {
+    cj().crmAccordions();
     buildCaseRoles(false);
   });
+
+  function deleteCaseRoles(caseselector) {
+    cj('.case-role-delete').click(function(){
+      var caseID = cj(this).attr('case_id');
+      var relType  = cj(this).attr('rel_type');
+
+      CRM.confirm(function() {
+        var postUrl = {/literal}"{crmURL p='civicrm/ajax/delcaserole' h=0 }"{literal};
+        cj.post( postUrl, {
+          rel_type: relType, case_id: caseID, key: {/literal}"{crmKey name='civicrm/ajax/delcaserole'}"{literal}},
+          function(data) {
+            // reloading datatable
+            var oTable = cj('#' + caseselector).dataTable();
+            oTable.fnDraw();
+          }
+        );
+      }
+      ,{
+        title: ts('Delete case role'),
+        message: ts('Are you sure you want to delete this case role.')
+      });
+      return false;
+    });
+  }
 
   function buildCaseRoles(filterSearch) {
     if(filterSearch) {
@@ -243,6 +268,9 @@
     cj("#caseRoles-selector td:last-child").each( function( ) {
       cj(this).parent().addClass(cj(this).text() );
     });
+
+    // also bind delete action once rows are rendered
+    deleteCaseRoles('caseRoles-selector');
   }
 
   function printCaseReport( ) {
@@ -254,10 +282,6 @@
 
     window.location = dataUrl;
   }
-  
-  cj(function() {
-    cj().crmAccordions();
-  });
 </script>
 {/literal}
  </div><!-- /.crm-accordion-body -->
