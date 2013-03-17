@@ -157,6 +157,9 @@ class CRM_Case_Page_AJAX {
 
     CRM_Case_BAO_Case::addCaseToContact($params);
 
+    // add case relationships
+    CRM_Case_BAO_Case::addCaseRelationships($caseId, $contactId);
+
     $session = CRM_Core_Session::singleton();
 
     $activityParams = array();
