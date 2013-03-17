@@ -1583,7 +1583,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     /**
      * 'approval_status_id' set in
-     * CRM_Mailing_Form_Mailing_Schedule::postProcess() or via API.
+     * CRM_Mailing_Form_Schedule::postProcess() or via API.
      */
     if (isset($params['approval_status_id']) && $params['approval_status_id']) {
       $job = new CRM_Mailing_BAO_Job();
