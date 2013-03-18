@@ -271,9 +271,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
       );
     }
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
-
-    $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
+    $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
     // Let's start filling the form with values.
     $this->select("event_type_id", "value={$params['event_type_id']}");
@@ -305,10 +303,9 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
 
     // select newly created processor
     $xpath = "xpath=//label[text() = '{$processorName}']/preceding-sibling::input[1]";
-    $this->assertTrue($this->isTextPresent($processorName));
+    $this->assertElementContainsText('paymentProcessor', $processorName);
     $this->check($xpath);
-
-        $this->select("financial_type_id", "value=4");
+    $this->select("financial_type_id", "value=4");
 
     $counter = 1;
     foreach ($params['fee_level'] as $label => $amount) {
@@ -340,7 +337,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
 
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage('event/manage', 'reset=1');
     $this->click("link=" . $params['title']);
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
