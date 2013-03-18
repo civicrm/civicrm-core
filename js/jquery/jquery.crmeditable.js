@@ -101,10 +101,10 @@
           CRM.api(entity,'setvalue',params,{
             context: this,
             error: function (data) {
-              editableSettings.error.call(this,entity,fieldName,checked,data);
+              editableSettings.error.call(this,entity,params.field,checked,data);
             },
             success: function (data) {
-              editableSettings.success.call(this,entity,fieldName,checked,data);
+              editableSettings.success.call(this,entity,params.field,checked,data);
             }
           });
         });
