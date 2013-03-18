@@ -40,7 +40,57 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   function __construct() {
     parent::__construct();
   }
-
+  /*
+   * Create email address - note that the create function calls 'add' but
+  * has more business logic
+  * Note that this is the right place to add pre & post hooks if we want them
+  * ? any reason not to?
+  *
+  * @param array $params input parameters
+  */
+  static function create($params) {
+    if (empty($params['id'])){
+      self::setDefaults($params);
+    }
+    $ids = array();
+    if (CRM_Utils_Array::value('id', $params)) {
+      $ids = array('optionValue' => $params['id']);
+    }
+    return  CRM_Core_BAO_OptionValue::add($params, $ids);
+    ;
+  }
+  /**
+   * Set default Parameters
+   * This functions sets default parameters if not set:
+   * - name & label are set to each other as required (it might make more sense for one
+   * to be required but this would mean a change to the api level)
+   * - ditto weight & value - but they both default to next weight
+   * NB am not sure that weight should be set to value as higher priority to
+   * setting it to the next weight - although this is existing logic
+   *
+   * @param unknown_type $params
+   */
+  static function setDefaults(&$params){
+    if(empty($params['label'])){
+      $params['label'] = $params['name'];
+    }
+    if(empty($params['name'])){
+      $params['name'] = $params['label'];
+    }
+    if(empty($params['weight'])){
+      //@todo consider this logic - see block comments
+      $params['weight'] = CRM_Utils_Array::value('value', $params,
+        (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
+          array('option_group_id' => $params['option_group_id']))
+      );
+    }
+    if(empty($params['value'])){
+      $params['value'] = CRM_Utils_Array::value('weight', $params,
+        (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
+          array('option_group_id' => $params['option_group_id']))
+      );
+    }
+  }
   /**
    * Takes a bunch of params that are needed to match certain criteria and
    * retrieves the relevant objects. Typically the valid params are only
