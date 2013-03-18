@@ -246,7 +246,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
      * @return int external id
      */
   function _addContact($firstName, $lastName, $externalId) {
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //fill in first name
     $this->type("first_name", $firstName);
@@ -294,9 +294,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
       );
     }
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
-
-    $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
+    $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
     // Let's start filling the form with values.
     $this->select("event_type_id", "value={$params['event_type_id']}");
@@ -358,7 +356,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
 
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage('event/manage', 'reset=1');
     $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input",$params['title']);
     $this->click("_qf_SearchEvent_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());

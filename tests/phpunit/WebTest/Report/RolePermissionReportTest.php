@@ -92,7 +92,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->click("add");
     $this->click("_qf_Summary_submit_save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->openCiviPage('logout','reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
     $this->type('edit-name', $user2);
@@ -102,7 +102,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->openCiviPage('report/instance/1', 'reset=1');
     $this->assertElementContainsText('crm-container', 'You do not have permission to access this report.');
     $this->openCiviPage('report/list', 'reset=1');
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
 
     //delete roles
     $this->webtestLogin(TRUE);
@@ -155,7 +155,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     );
     $this->changePermissions($permissions);
 
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
     $this->type('edit-name', $user);
@@ -167,7 +167,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     //check if the reserved report field is frozen
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='instanceForm']//table[3]/tbody//tr/td[2]/tt[text()='[ ]']"));
 
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->webtestLogin(TRUE);
     // let's give full CiviReport permissions.
@@ -187,7 +187,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->click("_qf_Summary_submit_save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
     $this->type('edit-name', $user);
@@ -201,7 +201,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']/table//input[@id='title']"));
 
     //login as admin and remove reserved permission
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->webtestLogin(TRUE);
     $this->open($this->sboxPath . "admin/people/permissions");
@@ -216,7 +216,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //login as user and check for absence of report criteria and settings
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
     $this->type('edit-name', $user);
@@ -235,7 +235,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']//input[@id='title']"));
 
     //login as admin and turn the is_reserved flag off for the instance
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->webtestLogin(TRUE);
     $this->openCiviPage('report/instance/1', 'reset=1');
@@ -243,7 +243,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->click("_qf_Summary_submit_save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
     $this->type('edit-name', $user);
@@ -256,7 +256,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']//input[@id='title']"));
 
     //login as admin and delete the role
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->webtestLogin(TRUE);
     $this->open($this->sboxPath . "admin/people/permissions/roles");
