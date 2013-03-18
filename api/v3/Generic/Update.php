@@ -25,6 +25,12 @@ function civicrm_api3_generic_update($apiRequest) {
   if (!array_key_exists($key_id, $apiRequest['params'])) {
     return $errorFnName("Mandatory parameter missing $key_id");
   }
+  // @fixme
+  // tests show that contribution works better with create
+  // this is horrible but to make it work we'll just handle it separately
+  if(strtolower($apiRequest['entity']) == 'contribution'){
+    return civicrm_api($apiRequest['entity'], 'create', $apiRequest['params']);
+  }
   $seek = array($key_id => $apiRequest['params'][$key_id], 'version' => $apiRequest['version']);
   $existing = civicrm_api($apiRequest['entity'], 'get', $seek);
   if ($existing['is_error']) {
