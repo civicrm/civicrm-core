@@ -607,9 +607,12 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     }
     self::deleteMembershipPayment($membershipId);
 
-    $membership     = new CRM_Member_DAO_Membership();
-    $membership->id = $membershipId;
-    $results        = $membership->delete();
+    // CRM-12147, retrieve membership data before we delete it for hooks
+    $params = array('id' => $membershipId);
+    $memberships = self::getValues($params, $values);
+    $membership = $memberships[$membershipId];
+
+    $results = $membership->delete();
     $transaction->commit();
 
     CRM_Utils_Hook::post('delete', 'Membership', $membership->id, $membership);
