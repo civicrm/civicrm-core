@@ -58,6 +58,8 @@ class CRM_Event_Page_ICalendar extends CRM_Core_Page {
     $html     = CRM_Utils_Request::retrieve('html', 'Positive', $this, FALSE, 0);
     $rss      = CRM_Utils_Request::retrieve('rss', 'Positive', $this, FALSE, 0);
 
+    CRM_Utils_System::setTitle(ts('Current and Upcoming Events'));
+
     $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
     $this->assign('events', $info);
     $this->assign('timezone', @date_default_timezone_get());

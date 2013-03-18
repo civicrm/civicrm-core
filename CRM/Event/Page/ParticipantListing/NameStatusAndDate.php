@@ -41,7 +41,7 @@ class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page 
   protected $_eventTitle;
 
   protected $_pager;
-  
+
   function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this, TRUE);
 
@@ -70,7 +70,7 @@ class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page 
 
     $fromClause = "
 FROM       civicrm_contact
-INNER JOIN civicrm_participant ON civicrm_contact.id = civicrm_participant.contact_id 
+INNER JOIN civicrm_participant ON civicrm_contact.id = civicrm_participant.contact_id
 INNER JOIN civicrm_event       ON civicrm_participant.event_id = civicrm_event.id
 ";
 
@@ -99,14 +99,15 @@ LIMIT    $offset, $rowCount";
     $object       = CRM_Core_DAO::executeQuery($query, $params);
     $statusLookup = CRM_Event_PseudoConstant::participantStatus();
     while ($object->fetch()) {
+      $status = CRM_Utils_Array::value($object->status_id, $statusLookup);
+      if ($status) {
+        $status = ts($status);
+      }
       $row = array(
         'id' => $object->contact_id,
         'participantID' => $object->participant_id,
         'name' => $object->name,
-        'email' => $object->email,
-        'status' => CRM_Utils_Array::value($object->status_id,
-          $statusLookup
-        ),
+        'status' => $status,
         'date' => $object->register_date,
       );
       $rows[] = $row;
