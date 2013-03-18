@@ -183,7 +183,7 @@ cj(function($) {
 <select id="action" data-id="action">
   <option value="" selected="selected">Choose...</option>
   <option value="get">get</option>
-  <option value="create">create</option>
+  <option value="create" title="used to update as well, if id is set">create</option>
   <option value="delete">delete</option>
   <option value="getfields">getfields</option>
   <option value="getactions">getactions</option>
@@ -191,7 +191,6 @@ cj(function($) {
   <option value="getsingle">getsingle</option>
   <option value="getvalue">getvalue</option>
   <option value="getoptions">getoptions</option>
-  <option value="update">update</option>
 </select>
 &nbsp;|&nbsp;
 
