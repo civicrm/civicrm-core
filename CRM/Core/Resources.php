@@ -433,14 +433,18 @@ class CRM_Core_Resources {
       }
 
       // Add localized calendar js
+      // Search for i18n file in order of specificity (try fr-CA, then fr)
       list($lang) = explode('_', $config->lcMessages);
-      $localizationFile = "packages/jquery/jquery-ui-1.9.0/development-bundle/ui/i18n/jquery.ui.datepicker-{$lang}.js";
-      if ($this->getPath('civicrm', $localizationFile)) {
-        $this->addScriptFile('civicrm', $localizationFile, $jsWeight++, $region, FALSE);
+      foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
+        $localizationFile = "packages/jquery/jquery-ui-1.9.0/development-bundle/ui/i18n/jquery.ui.datepicker-{$language}.js";
+        if ($this->getPath('civicrm', $localizationFile)) {
+          $this->addScriptFile('civicrm', $localizationFile, $jsWeight++, $region, FALSE);
+          break;
+        }
       }
 
       // Give control of jQuery back to the CMS - this loads last
-      $this->addScriptFile('civicrm', 'js/noconflict.js', 9999, $region);
+      $this->addScriptFile('civicrm', 'js/noconflict.js', 9999, $region, FALSE);
 
       $this->addCoreStyles($region);
     }
