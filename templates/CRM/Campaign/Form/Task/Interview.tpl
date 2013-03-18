@@ -66,7 +66,7 @@
           <tr id="optionField_{$index}" class="form-item {cycle values="odd-row,even-row"}">
             <td>
               {if $index GT 1}
-                <a onclick="hideRow({$index});" name="orderBy_{$index}" href="javascript:void(0)" class="form-link"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}hide field or section{/ts}"/></a>
+                <a onclick="hideRow({$index}); return false;" name="orderBy_{$index}" href="#" class="form-link"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}hide field or section{/ts}"/></a>
               {/if}
             </td>
             <td> {$form.order_bys.$index.column.html}</td>
@@ -80,7 +80,7 @@
         {/section}
       </table>
       <div id="optionFieldLink" class="add-remove-link">
-        <a onclick="showHideRow();" name="optionFieldLink" href="javascript:void(0)" class="form-link"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}show field or section{/ts}"/>{ts}another column{/ts}</a>
+        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}show field or section{/ts}"/>{ts}another column{/ts}</a>
       </div>
 
       <script type="text/javascript">
@@ -137,7 +137,7 @@
 
         <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=note}Click to copy %1 from row one to all rows.{/ts}" fname="note" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{ts}Note{/ts}</th>
         <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=result}Click to copy %1 from row one to all rows.{/ts}" fname="result" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{ts}Result{/ts}</th>
-        <th><a id = "interview_voter_button" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onClick="registerInterviewforall( );return false;">{ts}Record Responses for All{/ts}</a></th>
+        <th><a id="interview_voter_button" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterviewforall( ); return false;">{ts}Record Responses for All{/ts}</a></th>
       </tr>
       </thead>
 
@@ -178,11 +178,11 @@
           <td class='result'>{$form.field.$voterId.result.html}</td>
 
           <td>
-            <a id = "interview_voter_button_{$voterId}" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onClick="registerInterview( {$voterId} );return false;">
+            <a id="interview_voter_button_{$voterId}" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterview( {$voterId} ); return false;">
               {ts}record response{/ts}
             </a>
             {if $allowAjaxReleaseButton}
-              <a id="release_voter_button_{$voterId}" class='button'  href="#" title={ts}Release{/ts} onClick="releaseOrReserveVoter( {$voterId} );return false;">
+              <a id="release_voter_button_{$voterId}" class='button'  href="#" title={ts}Release{/ts} onclick="releaseOrReserveVoter( {$voterId} ); return false;">
                 {ts}release{/ts}
               </a>
             {/if}

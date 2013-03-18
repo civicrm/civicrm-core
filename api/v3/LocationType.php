@@ -48,7 +48,6 @@
  * {@getfields email_create}
  * @access public
  */
-
 function civicrm_api3_location_type_create($params) {
   //set display_name equal to name if it's not defined
   if (!array_key_exists('display_name', $params) && array_key_exists('name', $params)) {
@@ -58,13 +57,12 @@ function civicrm_api3_location_type_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-/*
+/**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */
-
 function _civicrm_api3_location_type_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
   $params['name']['api.required'] = 1;
@@ -81,7 +79,6 @@ function _civicrm_api3_location_type_create_spec(&$params) {
  * {@getfields LocationType_delete}
  * @access public
  */
-
 function civicrm_api3_location_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
@@ -100,9 +97,7 @@ function civicrm_api3_location_type_delete($params) {
  * {@getfields LocationType_get}
  * @access public
  */
-
 function civicrm_api3_location_type_get($params) {
-
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 

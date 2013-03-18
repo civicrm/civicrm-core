@@ -90,7 +90,7 @@ class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummar
             'default' => TRUE,
             'title' => ts('Action'),
           ),
-                    'financial_type_id' => array(
+          'financial_type_id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
           ),
@@ -123,15 +123,15 @@ class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummar
           ),
         ),
       ),
-            'civicrm_financial_type' => array(
-                'dao' => 'CRM_Financial_DAO_FinancialType',
+      'civicrm_financial_type' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialType',
         'fields' => array(
           'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
           ),
           'name' => array(
-                        'title' => ts('Financial Type'),
+            'title' => ts('Financial Type'),
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),

@@ -581,11 +581,19 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // get payment related in for event and members
       $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
       //get all payment headers.
+      // If we haven't selected specific payment fields, load in all the
+      // payment headers.
       if (!$selectedPaymentFields) {
         $paymentHeaders = self::componentPaymentFields();
         if (!empty($paymentDetails)) {
           $addPaymentHeader = TRUE;
         }
+      }
+      // If we have seleted specific payment fields, leave the payment headers
+      // as an empty array; the headers for each selected field will be added
+      // elsewhere.
+      else {
+        $paymentHeaders = array();
       }
       $nullContributionDetails = array_fill_keys(array_keys($paymentHeaders), NULL);
     }
@@ -996,16 +1004,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         //build header only once
         $setHeader = FALSE;
 
-        // add payment related information
-        if ($paymentFields) {
-          $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
-          if (!is_array($paymentData) || empty($paymentData)) {
-            $paymentData = $nullContributionDetails;
+        // If specific payment fields have been selected for export, payment
+        // data will already be in $row. Otherwise, add payment related 
+        // information, if appropriate.
+        if (!$selectedPaymentFields) {
+          if ($paymentFields) {
+            $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
+            if (!is_array($paymentData) || empty($paymentData)) {
+              $paymentData = $nullContributionDetails;
+            }
+            $row = array_merge($row, $paymentData);
           }
-          $row = array_merge($row, $paymentData);
-        }
         elseif (!empty($paymentDetails)) {
-          $row = array_merge($row, $nullContributionDetails);
+            $row = array_merge($row, $nullContributionDetails);
+          }
         }
 
         //remove organization name for individuals if it is set for current employer
@@ -1195,15 +1207,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   static function sqlColumnDefn(&$query, &$sqlColumns, $field) {
-    if (substr($field, -4) == '_a_b' ||
-      substr($field, -4) == '_b_a'
-    ) {
+    if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
       return;
     }
 
     $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
     if ($fieldName == 'id') {
       $fieldName = 'civicrm_primary_id';
+    }
+
+    // early exit for master_id, CRM-12100
+    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
+    if ($fieldName == 'master_id') {
+      $sqlColumns[$fieldName] = "$fieldName varchar(128)";
+      return;
     }
 
     // set the sql columns

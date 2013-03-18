@@ -315,7 +315,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   }
 
   function _testSignUpOrRenewMembership($registerUrl, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
 
     $this->openCiviPage($registerUrl['url'], $registerUrl['args'], '_qf_Main_upload-bottom');
 
@@ -438,7 +438,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       $prevYear = substr($year, 0, 4);
     }
     
-    $this->openCiviPage('logout', 'reset=1');
+    $this->openCiviPage('logout', 'reset=1', NULL);
 
     $this->openCiviPage($registerUrl['url'], $registerUrl['args'], '_qf_Main_upload-bottom');
 

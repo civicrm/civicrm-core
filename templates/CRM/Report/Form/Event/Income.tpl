@@ -72,7 +72,7 @@
                                             <td class="report-contents crm-report_{$keys}_breakdown" width="34%">{$role}</td>
                                             <td class="report-contents-right crm-report_{$keys}_total">{$row.total}</td>
                                             <td class="report-contents-right crm-report_{$keys}_percentage">{$row.round}</td>
-                                            <td class="report-contents-right crm-report_{$keys}_revenue">{$row.amount|crmMoney}</td>
+                                            <td class="report-contents-right crm-report_{$keys}_revenue">{$row.amount}</td>
                                         </tr>
                                     {/foreach}
                                 {/if}

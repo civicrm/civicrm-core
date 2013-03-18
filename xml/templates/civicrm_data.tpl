@@ -173,7 +173,6 @@ VALUES
    ('addressee'                     , '{ts escape="sql"}Addressee Type{/ts}'                     , 1, 1),
    ('contact_autocomplete_options'  , '{ts escape="sql"}Autocomplete Contact Search{/ts}'        , 1, 1),
    ('contact_reference_options'     , '{ts escape="sql"}Contact Reference Autocomplete Options{/ts}', 1, 1),
-   ('account_type'                  , '{ts escape="sql"}Account type{/ts}'                       , 1, 1),
    ('website_type'                  , '{ts escape="sql"}Website Type{/ts}'                       , 1, 1),
    ('tag_used_for'                  , '{ts escape="sql"}Tag Used For{/ts}'                       , 1, 1),
    ('currencies_enabled'            , '{ts escape="sql"}Currencies Enabled{/ts}'                 , 1, 1),
@@ -248,7 +247,6 @@ SELECT @option_group_id_addressee      := max(id) from civicrm_option_group wher
 SELECT @option_group_id_report         := max(id) from civicrm_option_group where name = 'report_template';
 SELECT @option_group_id_acsOpt         := max(id) from civicrm_option_group where name = 'contact_autocomplete_options';
 SELECT @option_group_id_acConRef       := max(id) from civicrm_option_group where name = 'contact_reference_options';
-SELECT @option_group_id_accTp          := max(id) from civicrm_option_group where name = 'account_type';
 SELECT @option_group_id_website        := max(id) from civicrm_option_group where name = 'website_type';
 SELECT @option_group_id_tuf            := max(id) from civicrm_option_group where name = 'tag_used_for';
 SELECT @option_group_id_currency       := max(id) from civicrm_option_group where name = 'currencies_enabled';
@@ -687,12 +685,6 @@ VALUES
   (@option_group_id_addressee, '{literal}{contact.household_name}{/literal}',    '2', '{literal}{contact.household_name}{/literal}',    NULL ,   '2', '1', '2', NULL , '0', '0', '1', NULL , NULL),
   (@option_group_id_addressee, '{literal}{contact.organization_name}{/literal}', '3', '{literal}{contact.organization_name}{/literal}', NULL ,   '3', '1', '3', NULL , '0', '0', '1', NULL , NULL),
   (@option_group_id_addressee, '{literal}Customized{/literal}',                  '4', '{literal}Customized{/literal}',                  NULL ,    0 , '0', '4', NULL , '0', '1', '1', NULL , NULL),
-
--- Account types
-   (@option_group_id_accTp, '{ts escape="sql"}Asset{/ts}', 1, 'Asset',  NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_accTp, '{ts escape="sql"}Liability{/ts}', 2, 'Liability',  NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_accTp, '{ts escape="sql"}Income{/ts}', 3, 'Income',  NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_accTp, '{ts escape="sql"}Expense{/ts}', 4, 'Expense',  NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
 
 -- website type
    (@option_group_id_website, 'Home',     1, 'Home',     NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),

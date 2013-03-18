@@ -60,7 +60,8 @@ function civicrm_api3_uf_join_create($params) {
   _civicrm_api3_object_to_array($ufJoin, $ufJoinArray[]);
   return civicrm_api3_create_success($ufJoinArray, $params, 'uf_join', 'create');
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  * 
  * @param array $params array or parameters determined by getfields

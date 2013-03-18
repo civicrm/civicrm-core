@@ -166,7 +166,7 @@ class CRM_Core_Block {
           'info' => ts('CiviCRM Full-text Search'),
           'subject' => ts('Full-text Search'),
           'active' => TRUE,
-          'cache' => BLOCK_CACHE_GLOBAL,
+          'cache' => BLOCK_NO_CACHE,
           'visibility' => 1,
           'weight' => -94,
           'status' => 0,
@@ -361,7 +361,7 @@ class CRM_Core_Block {
       if (!empty($config->enableComponents)) {
         // check if we can process credit card contribs
         $newCredit = CRM_Core_Payment::allowBackofficeCreditCard();
-        
+
         foreach ($components as $componentName => $obj) {
           if (in_array($componentName, $config->enableComponents)) {
             eval('$obj->creatNewShortcut( $shortCuts, $newCredit );');

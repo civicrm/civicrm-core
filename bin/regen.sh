@@ -49,6 +49,7 @@ mysqldump -cent --skip-triggers -u $DBUSER $PASSWDSECTION $DBARGS $DBNAME > civi
 cat civicrm_sample_custom_data.mysql >> civicrm_generated.mysql
 #cat civicrm_devel_config.mysql >> civicrm_generated.mysql
 cat ../CRM/Case/xml/configuration.sample/SampleConfig.mysql >> civicrm_generated.mysql
+cat civicrm_dummy_processor.mysql >> civicrm_generated.mysql
 mysqladmin -f -u$DBUSER $PASSWDSECTION $DBARGS drop $DBNAME
 mysqladmin -u$DBUSER $PASSWDSECTION $DBARGS create $DBNAME
 mysql -u$DBUSER $PASSWDSECTION $DBARGS $DBNAME < civicrm.mysql

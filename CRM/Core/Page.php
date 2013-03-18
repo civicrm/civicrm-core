@@ -206,7 +206,7 @@ class CRM_Core_Page {
     $content = self::$_template->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
 
     // Render page header
-    if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
       CRM_Utils_System::addHTMLHead($region->render(''));
     }
     CRM_Utils_System::appendTPLFile($pageTemplateFile, $content);

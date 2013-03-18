@@ -254,12 +254,12 @@ class CRM_Activity_Page_AJAX {
     foreach ($caseRelationships as $key => $row) {
       // view user links
       if ($caseRelationships[$key]['cid']) {
-      $caseRelationships[$key]['name'] = '<a href='.CRM_Utils_System::url('civicrm/contact/view',
+        $caseRelationships[$key]['name'] = '<a href='.CRM_Utils_System::url('civicrm/contact/view',
           'action=view&reset=1&cid='.$caseRelationships[$key]['cid']).'>'.$caseRelationships[$key]['name'].'</a>';
       }
       // email column links/icon
       if ($caseRelationships[$key]['email']) {
-      $caseRelationships[$key]['email'] = '<a href="'.CRM_Utils_System::url('civicrm/contact/view/activity', 'action=reset=1&action=add&atype=3&cid='.$caseRelationships[$key]['cid']).'" title="compose and send an email"><div class="icon email-icon" title="compose and send an email"></div>
+        $caseRelationships[$key]['email'] = '<a href="'.CRM_Utils_System::url('civicrm/contact/view/activity', 'action=reset=1&action=add&atype=3&cid='.$caseRelationships[$key]['cid']).'" title="compose and send an email"><div class="icon email-icon" title="compose and send an email"></div>
              </a>';
       }
       // edit links
@@ -267,12 +267,12 @@ class CRM_Activity_Page_AJAX {
         switch($caseRelationships[$key]['source']){
         case 'caseRel':
           $caseRelationships[$key]['actions'] = 
-            '<a href="#" title="edit case role" onclick="createRelationship( '.$caseRelationships[$key]['relation_type'].', '.$caseRelationships[$key]['cid'].', '.$caseRelationships[$key]['rel_id'].', '.$idx.', \''.$caseRelationships[$key]['relation'].'\' );return false;"><div class="icon edit-icon" ></div></a>&nbsp;&nbsp;<a href="'.CRM_Utils_System::url('civicrm/contact/view/rel', 'action=delete&reset=1&cid='. $caseRelationships[$key]['client_id'].'&id='.$caseRelationships[$key]['rel_id'].'&caseID='.$caseID.'').'" onclick = "if (confirm(\'Are you sure you want to remove this person from their case role?\') ) this.href+=\'&confirmed=1\'; else return false;"><div class="icon delete-icon" title="remove contact from case role"></div></a>';
+            '<a href="#" title="edit case role" onclick="createRelationship( '.$caseRelationships[$key]['relation_type'].', '.$caseRelationships[$key]['cid'].', '.$caseRelationships[$key]['rel_id'].', '.$idx.', \''.$caseRelationships[$key]['relation'].'\' );return false;"><div class="icon edit-icon" ></div></a>&nbsp;&nbsp;<a href="#" class="case-role-delete" case_id="'.$caseID.'" rel_type="'.$caseRelationships[$key]['relation_type'].'"><div class="icon delete-icon" title="remove contact from case role"></div></a>';
           break;
           
         case 'caseRoles':
           $caseRelationships[$key]['actions'] = 
-            '<a href="#" title="edit case role" onclick="createRelationship( '.$caseRelationships[$key]['relation_type'].', null, null, '.$idx.',  \''.$caseRelationships[$key]['relation'].'\');return false;"><div class="icon edit-icon"></div></a>';
+            '<a href="#" title="edit case role" onclick="createRelationship('.$caseRelationships[$key]['relation_type'].', null, null, '.$idx.',  \''.$caseRelationships[$key]['relation'].'\');return false;"><div class="icon edit-icon"></div></a>';
           break;
         }
       } else {

@@ -26,7 +26,8 @@
 }
 
 .crm-container a,
-.crm-container a:link {
+.crm-container a:link,
+.crm-container a:visited {
   color: #2786c2;
   text-decoration: none;
 }
@@ -2049,6 +2050,11 @@ div.grippie {
 #crm-container table.crm-inline-edit-form td,
 #crm-container div.crm-inline-edit-form {
   background-color: #E6E6DC;
+  white-space: nowrap;
+}
+#crm-container table.crm-inline-edit-form td.crm-label,
+#crm-container div.crm-inline-edit-form .crm-label {
+  white-space: normal;
 }
 
 #crm-container div.crm-inline-edit-field {
@@ -2272,6 +2278,7 @@ div.grippie {
 
 .crm-container a.button,
 .crm-container a.button:link,
+.crm-container a.button:visited,
 .crm-container input.form-submit,
 #crm-container input[type=button],
 #crm-container input.form-submit-inline,
@@ -2310,7 +2317,8 @@ div.grippie {
 }
 
 .crm-container a.button,
-.crm-container a.button:link {
+.crm-container a.button:link,
+.crm-container a.button:visited {
   display: block;
   float: left;
 }

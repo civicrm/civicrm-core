@@ -40,6 +40,42 @@ class CRM_Upgrade_Incremental_php_FourThree {
   }
 
   /**
+   * Compute any messages which should be displayed beforeupgrade
+   *
+   * Note: This function is called iteratively for each upcoming
+   * revision to the database.
+   *
+   * @param $postUpgradeMessage string, alterable
+   * @param $rev string, a version number, e.g. '4.3.alpha1', '4.3.beta3', '4.3.0'
+   * @return void
+   */
+  function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if ($rev == '4.3.beta3') {
+      //CRM-12084
+      //sql for checking orphaned contribution records
+      $sql = "SELECT COUNT(ct.id) FROM civicrm_contribution ct LEFT JOIN civicrm_contact c ON ct.contact_id = c.id WHERE c.id IS NULL";
+      $count = CRM_Core_DAO::singleValueQuery($sql, array(), TRUE, FALSE);
+
+      if ($count > 0) {
+        $error = ts("There is a data integrity issue with this CiviCRM database. It contains %1 contribution records which are linked to contact records that have been deleted. You will need to correct this manually before you can run the upgrade. Use the following MySQL query to identify the problem records: %2 These records will need to be deleted or linked to an existing contact record.", array(1 => $count, 2 => '<em>SELECT ct.* FROM civicrm_contribution ct LEFT JOIN civicrm_contact c ON ct.contact_id = c.id WHERE c.id IS NULL;</em>'));
+        CRM_Core_Error::fatal($error);
+        return FALSE;
+      }
+    }
+    if ($rev == '4.3.beta4' && CRM_Utils_Constant::value('CIVICRM_UF', FALSE) == 'Drupal6') {
+      // CRM-11823 - Make sure the D6 HTML HEAD technique will work on upgrade pages
+      theme('item_list', array()); // force-load theme registry
+      $theme_registry = theme_get_registry();
+      if (
+        !isset($theme_registry['page']['preprocess functions']) ||
+        FALSE === array_search('civicrm_preprocess_page_inject', $theme_registry['page']['preprocess functions'])
+      ) {
+        CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
+      }
+    }
+  }
+
+  /**
    * Compute any messages which should be displayed after upgrade
    *
    * @param $postUpgradeMessage string, alterable
@@ -66,7 +102,7 @@ class CRM_Upgrade_Incremental_php_FourThree {
         $postUpgradeMessage .= '<br />' . ts("A new organization contact has been added as the default domain contact using the information from your Organization Address and Contact Info settings: '{$orgName}'.");
       }
       elseif ($context == 'merged') {
-        $postUpgradeMessage .= '<br />' . ts("The existing organization contact record for '{$orgName}' has marked as the default domain contact, and has been updated with information from your Organization Address and Contact Info settings.");
+        $postUpgradeMessage .= '<br />' . ts("The existing organization contact record for '{$orgName}' has been marked as the default domain contact, and has been updated with information from your Organization Address and Contact Info settings.");
       }
 
       $providerExists = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_sms_provider LIMIT 1");
@@ -98,7 +134,6 @@ WHERE    entity_value = '' OR entity_value IS NULL
     if ($rev == '4.3.beta2') {
       $postUpgradeMessage .= '<br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li><li>Events - Registration Confirmation and Receipt (off-line)</li><li>Pledges - Acknowledgement</li><li>Pledges - Payment Reminder</li><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li><li>Memberships - Receipt (on-line)</li><li>Personal Campaign Pages - Admin Notification</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
     }
-
   }
 
   function upgrade_4_3_alpha1($rev) {
@@ -160,6 +195,15 @@ WHERE    entity_value = '' OR entity_value IS NULL
     }
   }
 
+  function upgrade_4_3_beta3($rev) {
+    $this->addTask(ts('Upgrade DB to 4.3.beta3: SQL'), 'task_4_3_x_runSql', $rev);
+    // CRM-12065
+    $query = "SELECT id, form_values FROM civicrm_report_instance WHERE form_values LIKE '%contribution_type%'";
+    $this->addTask('Replace contribution_type to financial_type in table civicrm_report_instance', 'replaceContributionTypeId', $query, 'reportInstance');
+    $query = "SELECT * FROM civicrm_saved_search WHERE form_values LIKE '%contribution_type%'";
+    $this->addTask('Replace contribution_type to financial_type in table civicrm_saved_search', 'replaceContributionTypeId', $query, 'savedSearch');
+  }
+  
   //CRM-11636
   function assignFinancialTypeToPriceRecords() {
     $upgrade = new CRM_Upgrade_Form();
@@ -489,7 +533,7 @@ FROM   civicrm_contribution con
                    AND efaPP.account_relationship = {$assetAccountIs})
        LEFT  JOIN {$tempTableName1} tpi
                ON ft.payment_instrument_id = tpi.instrument_id
-WHERE  con.fee_amount IS NOT NULL AND (con.contribution_status_id IN (%1, %3) OR (con.contribution_status_id =%2 AND con.is_pay_later = 1))
+WHERE  ft.fee_amount IS NOT NULL AND ft.fee_amount != 0 AND (con.contribution_status_id IN (%1, %3) OR (con.contribution_status_id =%2 AND con.is_pay_later = 1))
 GROUP  BY con.id";
     CRM_Core_DAO::executeQuery($sql, $queryParams);
 
@@ -644,6 +688,82 @@ AND TABLE_SCHEMA = '{$dbUf['database']}'";
       );
     }
 
+    return TRUE;
+  }
+
+  /**
+   * replace contribution_type to financial_type in table
+   * civicrm_saved_search and Structure civicrm_report_instance
+   */
+  function replaceContributionTypeId(CRM_Queue_TaskContext $ctx, $query, $table) {
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $formValues = unserialize($dao->form_values);
+      foreach (array('contribution_type_id_op', 'contribution_type_id_value', 'contribution_type_id') as $value) {
+        if (array_key_exists($value, $formValues)) {
+          $key = preg_replace('/contribution/', 'financial', $value);
+          $formValues[$key] = $formValues[$value];
+          unset($formValues[$value]);
+        }
+      }
+      if ($table != 'savedSearch') {
+        foreach (array('fields', 'group_bys') as $value) {
+          if (array_key_exists($value, $formValues)) {
+            if (array_key_exists('contribution_type_id', $formValues[$value])) {
+              $formValues[$value]['financial_type_id'] = $formValues[$value]['contribution_type_id'];
+              unset($formValues[$value]['contribution_type_id']);
+            }
+            else if (array_key_exists('contribution_type', $formValues[$value])) {
+              $formValues[$value]['financial_type'] = $formValues[$value]['contribution_type'];
+              unset($formValues[$value]['contribution_type']);
+            }
+          }
+        }
+        if (array_key_exists('order_bys', $formValues)) {
+          foreach ($formValues['order_bys'] as $key => $values) {
+            if (preg_grep('/contribution_type/', $values)) {
+              $formValues['order_bys'][$key]['column'] = preg_replace('/contribution_type/', 'financial_type', $values['column']);
+            }
+          }
+        }
+      }
+
+      if ($table == 'savedSearch') {
+        $saveDao = new CRM_Contact_DAO_SavedSearch();
+      }
+      else {
+        $saveDao = new CRM_Report_DAO_Instance();        
+      }
+      $saveDao->id = $dao->id;
+
+      if ($table == 'savedSearch') {
+        if (array_key_exists('mapper', $formValues)) { 
+          foreach ($formValues['mapper'] as $key => $values) {
+            foreach ($values as $k => $v) {
+              if (preg_grep('/contribution_/', $v)) {
+                $formValues['mapper'][$key][$k] = preg_replace('/contribution_type/', 'financial_type', $v);
+              }
+            }
+          }
+        }
+        foreach (array('select_tables', 'where_tables') as $value) {
+          if (preg_match('/contribution_type/', $dao->$value)) {
+            $tempValue = unserialize($dao->$value);
+            if (array_key_exists('civicrm_contribution_type', $tempValue)) {
+              $tempValue['civicrm_financial_type'] = $tempValue['civicrm_contribution_type'];
+              unset($tempValue['civicrm_contribution_type']);
+            }
+            $saveDao->$value = serialize($tempValue);
+          }
+        }
+        if (preg_match('/contribution_type/', $dao->where_clause)) {
+          $saveDao->where_clause = preg_replace('/contribution_type/', 'financial_type', $dao->where_clause);
+        }        
+      }
+      $saveDao->form_values = serialize($formValues);
+
+      $saveDao->save();
+    }
     return TRUE;
   }
 

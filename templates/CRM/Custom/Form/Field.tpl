@@ -171,7 +171,7 @@ function custom_option_html_type( ) {
             <td class="label">{$form.group_id.label}</td>
             <td class="html-adjust">
               {$form.group_id.html}
-            &nbsp;&nbsp;<span><a href="javascript:toggleContactRefFilter('Advance')">{ts}Advanced Filter{/ts}</a></span>
+            &nbsp;&nbsp;<span><a href="#" onclick="toggleContactRefFilter('Advance'); return false;">{ts}Advanced Filter{/ts}</a></span>
               {capture assign=searchPreferences}{crmURL p="civicrm/admin/setting/search" q="reset=1"}{/capture}
             <div class="messages status no-popup"><div class="icon alert-icon"></div> {ts 1=$searchPreferences}If you are planning on using this field in front-end profile, event registration or contribution forms, you should 'Limit List to Group' or configure an 'Advanced Filter'  (so that you do not unintentionally expose your entire set of contacts). Users must have either 'access contact reference fields' OR 'access CiviCRM' permission in order to use contact reference autocomplete fields. You can assign 'access contact reference fields' to the anonymous role if you want un-authenticated visitors to use this field. Use <a href='%1'>Search Preferences - Contact Reference Options</a> to control the fields included in the search results.{/ts}
           </td>
@@ -180,7 +180,7 @@ function custom_option_html_type( ) {
             <td class="label">{$form.filter.label}</td>
             <td class="html-adjust">
               {$form.filter.html}
-              &nbsp;&nbsp;<span><a href="javascript:toggleContactRefFilter('Group')">{ts}Filter by Group{/ts}</a></span>
+              &nbsp;&nbsp;<span><a href="#" onclick="toggleContactRefFilter('Group'); return false;">{ts}Filter by Group{/ts}</a></span>
         <br />
         <span class="description">{ts}Filter contact search results for this field using Contact Lookup API parameters. EXAMPLE: To list Students in group 3:{/ts} "action=lookup&group=3&contact_sub_type=Student" {docURL page="developer/techniques/api"}</span>
             </td>

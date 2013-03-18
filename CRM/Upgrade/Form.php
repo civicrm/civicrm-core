@@ -602,6 +602,9 @@ SET    version = '$version'
     $upgrade->setVersion($rev);
     CRM_Utils_System::flushCache();
 
+    $config = CRM_Core_Config::singleton();
+    $config->userSystem->flush();
+
     if (version_compare($currentVer, '4.1.alpha1') >= 0) {
       CRM_Core_BAO_Setting::updateSettingsFromMetaData();
     }
@@ -613,6 +616,12 @@ SET    version = '$version'
     list($ignore, $latestVer) = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
+
+    // lets rebuild the config array in case we've made a few changes in the
+    // code base
+    // this also helps us always store the latest version of civi in the DB
+    $params = array();
+    CRM_Core_BAO_ConfigSetting::add($params);
 
     // cleanup caches CRM-8739
     $config = CRM_Core_Config::singleton();

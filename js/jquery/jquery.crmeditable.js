@@ -98,8 +98,8 @@
             return false;
           params['value']=checked?'1':'0';//seems that the ajax backend gets lost with boolean
 
-          //CRM.api.call(this,entity,'create',params,{ create is still too buggy & perf
-          CRM.api.call(this,entity,'setvalue',params,{
+          CRM.api(entity,'setvalue',params,{
+            context: this,
             error: function (data) {
               editableSettings.error.call(this,entity,fieldName,checked,data);
             },
@@ -249,7 +249,8 @@
           } else {
             action="setvalue";
           }
-          CRM.api.call(this,entity,action,params,{
+          CRM.api(entity, action, params, {
+              context: this,
               error: function (data) {
                 editableSettings.error.call(this,entity,fieldName,value,data);
               },

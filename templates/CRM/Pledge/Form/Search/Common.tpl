@@ -81,7 +81,7 @@
     <br />{$form.pledge_in_honor_of.html}
   </td>
   <td>
-  {$form.pledge_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} &nbsp; {$form.pledge_test.html} <span class="crm-clear-link">(<a href="javascript:unselectRadio('pledge_test','{$form.formName}')">{ts}clear{/ts}</a>)</span>
+  {$form.pledge_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} &nbsp; {$form.pledge_test.html} <span class="crm-clear-link">(<a href="#" onclick="unselectRadio('pledge_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)</span>
   </td>
 </tr>
 <tr>

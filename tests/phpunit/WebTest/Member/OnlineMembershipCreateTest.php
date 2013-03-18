@@ -41,7 +41,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->changePermissions($permissions);
 
     // now logout and login with admin credentials
-    $this->openCiviPage("logout", "reset=1");
+    $this->openCiviPage("logout", "reset=1", NULL);
 
     // a random 7-char string and an even number to make this pass unique
     $hash = substr(sha1(rand()), 0, 7);
@@ -115,10 +115,10 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_MembershipBlock_next-bottom');
     $text = "'MembershipBlock' information has been saved.";
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
-
+    $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
+    
     //logout
-    $this->openCiviPage("logout", "reset=1");
+    $this->openCiviPage("logout", "reset=1", NULL);
 
     // signup for membership 1
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
@@ -153,11 +153,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     else { 
       $verifyData['Status'] = 'New';
     }
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
 
     // Click View action link on associated contribution record
     $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
@@ -174,15 +170,11 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     else {
       $verifyData['Contribution Status'] = 'Completed';
     }
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
 
     // CRM-8141 signup for membership 2 with same anonymous user info (should create 2 separate membership records because membership orgs are different)
     //logout
-    $this->openCiviPage("logout", "reset=1");
+    $this->openCiviPage("logout", "reset=1", NULL);
 
     $this->_testOnlineMembershipSignup($pageId, $memTypeTitle2, $firstName, $lastName, $payLater, $hash);
 
@@ -196,7 +188,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent('2 Results'), 'Missing text: ' . '2 Results');
+    $this->assertElementContainsText('search-status', '2 Results', 'Missing text: ' . '2 Results');
   }
 
   function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE) {
@@ -248,8 +240,6 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       $this->type("billing_postal_code-5", "94129");
     }
     $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
@@ -307,27 +297,26 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       TRUE,
       'Donation',
       $fixedAmount,
-      $membershipsRequired                                                    
+      $membershipsRequired
     );
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
-        
+
     //logout
-    $this->openCiviPage("logout", "reset=1");
-    
+    $this->openCiviPage("logout", "reset=1", NULL);
+
     $this->_testOnlineMembershipSignup($pageId, 'No thank you', $firstName, $lastName, FALSE, $hash, 50);
-    
+
     // Log in using webtestLogin() method
-    $this->webtestLogin(); 
+    $this->webtestLogin();
 
     //Find Contribution
     $this->openCiviPage("contribute/search","reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$firstName $lastName");
     $this->click("_qf_Search_refresh");
-
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -346,4 +335,3 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 }
-

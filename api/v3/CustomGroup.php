@@ -84,7 +84,7 @@ function civicrm_api3_custom_group_create($params) {
   return civicrm_api3_create_success($values, $params, 'custom_group', $customGroup);
 }
 
-/*
+/**
  * Adjust Metadata for Create action
  *
  * @param array $params array or parameters determined by getfields

@@ -202,8 +202,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Verify group merged
     $this->click("css=li#tab_group a");
-    $this->waitForElementPresent("xpath=//div[@id='groupContact']//table/tbody/tr");
-    $this->verifyText("xpath=//div[@id='groupContact']//table/tbody/tr/td/a",
+    $this->waitForElementPresent("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr");
+    $this->verifyText("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td/a",
       preg_quote("$group")
     );
 

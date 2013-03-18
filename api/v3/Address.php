@@ -93,7 +93,7 @@ function civicrm_api3_address_create(&$params) {
   }
 }
 
-/*
+/**
  * Adjust Metadata for Create action
  *
  * @param array $params array or parameters determined by getfields

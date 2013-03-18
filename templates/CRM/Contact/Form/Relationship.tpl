@@ -276,7 +276,7 @@
               {/if} {* end if searchDone *}
         {/if} {* end action = add *}
 
-            <div id = 'saveElements'>
+            <div id='saveElements'>
                 {if $action EQ 1}
                 <div id='addCurrentEmployer'>
                    <table class="form-layout-compressed">
@@ -321,7 +321,7 @@
                                 <strong>'{$sort_name_a}'</strong> {ts}can view and update information for {/ts} <strong>'{$sort_name_b}'</strong>
                             {/if}
                         </span>
-                        <span id ='permision_a_b-b_a' class="hiddenElement">
+                        <span id='permision_a_b-b_a' class="hiddenElement">
                             {if $action eq 1}
                                 <strong>{ts}Selected contact(s)</strong> can view and update information for {/ts} <strong>'{$sort_name_a}'</strong>
                             {else}
@@ -339,7 +339,7 @@
                                 <strong>'{$sort_name_a}'</strong> {ts}can view and update information for {/ts} <strong>'{$sort_name_b}'</strong>
                             {/if}
                         </span>
-                        <span id ='permision_b_a-a_b' class="hiddenElement">
+                        <span id='permision_b_a-a_b' class="hiddenElement">
                             {if $action eq 1}
                                 <strong>{ts}Selected contact(s)</strong> can view and update information for {/ts} <strong>'{$sort_name_a}'</strong>
                             {else}

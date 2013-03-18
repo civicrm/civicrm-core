@@ -329,7 +329,8 @@
         themes: {
           "theme": 'classic',
           "dots": false,
-          "icons": false
+          "icons": false,
+          "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
         },
         'plugins': ['themes', 'json_data', 'ui', 'search']
       }).bind('loaded.jstree', function () {
@@ -395,14 +396,14 @@
       if (paletteView.hideAddFieldAlert) {
         openAddNewWindow();
       } else {
-        CRM.confirm({
-          title: ts('Add Field'),
-          message: ts('A new window or tab will open. Use the new window to add your field, and then return to this window and click "Refresh."'),
-          onContinue: function() {
+        CRM.confirm(function() {
             paletteView.hideAddFieldAlert = true;
             openAddNewWindow();
+          }, {
+            title: ts('Add Field'),
+            message: ts('A new window or tab will open. Use the new window to add your field, and then return to this window and click "Refresh."')
           }
-        });
+        );
       }
       return false;
     },
@@ -677,10 +678,16 @@
         fields: fields
       });
       this.form.on('change', this.onFormChange, this);
+      this.model.on('change', this.onModelChange, this);
     },
     render: function() {
       this.$el.html(this.form.render().el);
       this.onFormChange();
+    },
+    onModelChange: function() {
+      $.each(this.form.fields, function(i, field) {
+        this.form.setValue(field.key, this.model.get(field.key));
+      });
     },
     onFormChange: function() {
       this.form.commit();

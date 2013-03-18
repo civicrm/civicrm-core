@@ -58,7 +58,7 @@
     </div>
 {/if}
 <div class="crm-submit-buttons">
-<a href="javascript:addDashlet( );" class="button show-add">
+<a href="#" id="crm-dashboard-configure" class="button show-add">
   <span><div class="icon settings-icon"></div>{ts}Configure Your Dashboard{/ts}</span></a>
 
 <a style="display:none;" href="{crmURL p="civicrm/dashboard" q="reset=1"}" class="button show-done" style="margin-left: 6px;">
@@ -88,21 +88,19 @@
 <div class="clear"></div>
 {literal}
 <script type="text/javascript">
-  function addDashlet(  ) {
-      var dataURL = {/literal}"{crmURL p='civicrm/dashlet' q='reset=1&snippet=1' h=0 }"{literal};
-
-      cj.ajax({
-         url: dataURL,
+  cj(function($) {
+    $('#crm-dashboard-configure').click(function() {
+      $.ajax({
+         url: CRM.url('civicrm/dashlet', 'reset=1&snippet=1'),
          success: function( content ) {
-             cj("#civicrm-dashboard").hide( );
-             cj('.show-add').hide( );
-             cj('.show-refresh').hide( );
-             cj('.show-done').show( );
-             cj("#empty-message").hide( );
-             cj("#configure-dashlet").show( ).html( content );
+           $("#civicrm-dashboard, #crm-dashboard-configure, .show-refresh, #empty-message").hide();
+           $('.show-done').show();
+           $("#configure-dashlet").show().html(content);
          }
       });
-  }
+      return false;
+    });
+  });
   cj().crmAccordions();
 </script>
 {/literal}

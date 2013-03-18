@@ -1031,4 +1031,12 @@ AND    u.status = 1
       og_ungroup($ogID, 'user', user_load($drupalID));
     }
   }
+
+  /**
+   * Reset any system caches that may be required for proper CiviCRM
+   * integration.
+   */
+  function flush() {
+    drupal_flush_all_caches();
+  }
 }

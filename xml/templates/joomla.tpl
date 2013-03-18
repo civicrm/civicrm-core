@@ -27,6 +27,7 @@
     <menu task="civicrm/dashboard&amp;reset=1">COM_CIVICRM_MENU</menu>
     <files folder="admin">
       <filename>admin.civicrm.php</filename>
+      <filename>civicrm.php</filename>
       <filename>toolbar.civicrm.php</filename>
       <filename>toolbar.civicrm.html.php</filename>
       <filename>configure.php</filename>

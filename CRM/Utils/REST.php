@@ -475,12 +475,7 @@ class CRM_Utils_REST {
   }
 
   static function ajaxDoc() {
-
-    CRM_Utils_System::setTitle("API explorer and generator");
-    $template = CRM_Core_Smarty::singleton();
-    return CRM_Utils_System::theme(
-      $template->fetch('CRM/Core/AjaxDoc.tpl')
-    );
+    return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/api/explorer'));
   }
 
   /** used to load a template "inline", eg. for ajax, without having to build a menu for each template */
@@ -520,7 +515,7 @@ class CRM_Utils_REST {
         $config = CRM_Core_Config::singleton();
         $content = $smarty->fetch( 'CRM/common/'. strtolower($config->userFramework) .'.tpl' );
 
-        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+        if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
           CRM_Utils_System::addHTMLHead($region->render(''));
         }
         CRM_Utils_System::appendTPLFile( $tpl, $content );

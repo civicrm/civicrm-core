@@ -43,6 +43,14 @@
     <div class="spacer"></div>
   </div>
   {literal}
+  <style type="text/css">
+    #navigation-tree li {
+      font-weight: normal;
+    }
+    #navigation-tree > ul > li {
+      font-weight: bold;
+    }
+  </style>
   <script type="text/javascript">
     cj(function () {
     cj("#navigation-tree").jstree({
@@ -54,6 +62,12 @@
         url : {/literal}"{crmURL p='civicrm/ajax/menu' h=0 q='key='}{crmKey name='civicrm/ajax/menu'}"{literal}
       }
     },
+    themes: {
+      "theme": 'classic',
+      "dots": true,
+      "icons": false,
+      "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+    },
     rules : {
       droppable : [ "tree-drop" ],
       multiple : true,
@@ -64,7 +78,6 @@
       move: {
         check_move: function(m) {
           var homeMenuId = {/literal}"{$homeMenuId}"{literal};
-
           if ( cj( m.r[0] ).attr('id').replace("node_","") == homeMenuId ||
             cj( m.o[0] ).attr('id').replace("node_","") == homeMenuId ) {
             return false;

@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {if $config->languageLimit|@count >= 2 and $translatePermission }
-<a href="javascript:" onClick="loadDialog('{crmURL p='civicrm/i18n' q="reset=1&table=$table&field=$field&id=$id&snippet=1&context=dialog" h=0}', '{$field}');"><img src="{$config->resourceBase}i/langs.png" /></a><div id="locale-dialog_{$field}" style="display:none"></div>
+<a href="#" onclick="loadDialog('{crmURL p='civicrm/i18n' q="reset=1&table=$table&field=$field&id=$id&snippet=1&context=dialog" h=0}', '{$field}'); return false;"><img src="{$config->resourceBase}i/langs.png" /></a><div id="locale-dialog_{$field}" style="display:none"></div>
 
 {literal}
 <script type="text/javascript">

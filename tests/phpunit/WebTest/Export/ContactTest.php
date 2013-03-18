@@ -103,11 +103,11 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is contact present in search result?
-    $this->assertTrue($this->isTextPresent("$sortName"), "Contact did not found in search result!");
-
+    $this->assertElementContainsText('css=div.crm-search-results', $sortName, "Contact did not found in search result!");
+       
     // Is contact present in search result?
-    $this->assertTrue($this->isTextPresent("$childSortName"), "Contact did not found in search result!");
-
+    $this->assertElementContainsText('css=div.crm-search-results', $childSortName, "Contact did not found in search result!");
+    
     // select to export all the contasct from search result.
     $this->click("CIVICRM_QFID_ts_all_4");
 
@@ -185,7 +185,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->type("address_1_street_address", "121A Sherman St. Apt. 12");
     $this->type("address_1_city", "Dumfries");
     $this->type("address_1_postal_code", "1234");
-    $this->assertTrue($this->isTextPresent("- select - United States"));
+    $this->assertElementContainsText('address_1', "- select - United States");
     $this->select("address_1_state_province_id", "value=1019");
 
     $this->click('_qf_Contact_upload_view');
@@ -200,7 +200,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     $firstName1 = 'aa' . substr(sha1(rand()), 0, 5);
     $this->webtestAddContact($firstName1, "Smith", "{$firstName1}.smith@example.org");
@@ -252,8 +251,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->openCiviPage("contact/search", "reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search", "reset=1", NULL);
 
     // Select group.
     $this->select("group", "label=$groupName");
@@ -263,14 +261,14 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is contact present in search result?
-    $this->assertTrue($this->isTextPresent("$sortName1"), "Contact did not found in search result!");
-
+    $this->assertElementContainsText('css=div.crm-search-results', $sortName1, "Contact did not found in search result!");
+   
     // Is contact present in search result?
-    $this->assertTrue($this->isTextPresent("$sortName2"), "Contact did not found in search result!");
-
+    $this->assertElementContainsText('css=div.crm-search-results', $sortName2, "Contact did not found in search result!");
+ 
     // Is contact present in search result?
-    $this->assertTrue($this->isTextPresent("$houseHold"), "Contact did not found in search result!");
-
+    $this->assertElementContainsText('css=div.crm-search-results', $houseHold, "Contact did not found in search result!");
+ 
     // select to export all the contasct from search result.
     $this->click("CIVICRM_QFID_ts_all_4");
 
@@ -342,7 +340,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The Group '$groupName' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
   }
 }
-

@@ -95,6 +95,10 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => FALSE,
           ),
+          'currency' => array(
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
           'amount' =>
           array('title' => ts('Pledge Amount'),
             'required' => TRUE,
@@ -137,6 +141,12 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
           array('title' => ts('Pledged Amount'),
             'operatorType' => CRM_Report_Form::OP_INT,
           ),
+          'currency' =>
+          array('title' => 'Currency',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'sid' =>
           array(
             'name' => 'status_id',
@@ -169,7 +179,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
           'total_paid' =>
             array(
               'title' => ts('Total Amount Paid'),
-              'type' => CRM_Utils_Type::T_MONEY,
+              'type' => CRM_Utils_Type::T_STRING,
               'dbAlias' => 'sum(pledge_payment_civireport.actual_amount)',
             ),
         ),
@@ -193,6 +203,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     ) + $this->addAddressFields();
 
     $this->_tagFilter = TRUE;
+    $this->_currencyColumn = 'civicrm_pledge_currency';
     parent::__construct();
   }
 
@@ -298,6 +309,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
             ";
 
       $sql = "{$select} {$this->_from} {$this->_where}";
+
       $dao = CRM_Core_DAO::executeQuery($sql);
 
       if ($dao->fetch()) {
@@ -381,7 +393,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     $entryFound   = FALSE;
     $checkList    = array();
     $display_flag = $prev_cid = $cid = 0;
-
+    crm_Core_error::Debug('$rows', $rows);
     foreach ($rows as $rowNum => $row) {
 
       // convert display name to links

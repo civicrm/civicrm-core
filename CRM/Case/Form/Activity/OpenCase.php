@@ -87,7 +87,7 @@ class CRM_Case_Form_Activity_OpenCase {
       return $defaults;
     }
 
-    list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults();
+    list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
 
     // set default case status, case type, encounter medium, location type and phone type defaults are set in DB
     $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, 'AND is_default = 1');

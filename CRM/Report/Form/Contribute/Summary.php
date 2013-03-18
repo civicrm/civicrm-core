@@ -107,13 +107,14 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
-                   'civicrm_financial_type' =>
-                   array( 'dao'           => 'CRM_Financial_DAO_FinancialType',
-        'fields' =>
-                          array( 'financial_type'   => null, ), 
+      'civicrm_financial_type' =>
+      array('dao' => 'CRM_Financial_DAO_FinancialType',
+        'fields' => array('financial_type' => null,), 
         'grouping' => 'contri-fields',
-        'group_bys' =>
-                          array( 'financial_type'   => array('title' => ts('Financial Type')), ), ),
+        'group_bys' => array( 
+          'financial_type' => array('title' => ts('Financial Type')), 
+        ), 
+      ),
       'civicrm_contribution' =>
       array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -145,10 +146,10 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'default' => array(1),
             'type' => CRM_Utils_Type::T_INT,
           ),
-                                'financial_type_id'   =>
-                                   array( 'title'        => ts( 'Financial Type' ), 
+          'financial_type_id' =>
+          array('title' => ts('Financial Type'), 
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-                                          'options'      => CRM_Contribute_PseudoConstant::financialType( ),
+            'options'  => CRM_Contribute_PseudoConstant::financialType(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'total_amount' =>
@@ -344,7 +345,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           foreach ($table['fields'] as $fieldName => $field) {
             if (CRM_Utils_Array::value($field['name'], $fields['fields']) &&
               $fields['fields'][$field['name']] &&
-                             in_array( $field['name'], array( 'sort_name', 'postal_greeting_display', 'contribution_source', 'financial_type' ) ) ) {
+                in_array( $field['name'], array('sort_name', 'postal_greeting_display', 'contribution_source', 'financial_type'))) {
               $grouping[] = $field['title'];
             }
           }

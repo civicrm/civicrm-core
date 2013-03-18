@@ -44,13 +44,10 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
     $firstName1 = 'Ma_' . substr(sha1(rand()), 0, 7);
     $lastName1 = 'An_' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName1, $lastName1, TRUE);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("$firstName1 $lastName1 has been created."));
+    $this->assertElementContainsText('crm-notification-container', "$firstName1 $lastName1 has been created.");
     $url = explode('&cid=', $this->getLocation());
     $cid = $url[1];
 
@@ -108,20 +105,18 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $memTypeId2     = $memTypeId2[1];
 
     // edit contribution page memberships tab to add two new membership types
-    $this->open($this->sboxPath . "civicrm/admin/contribute/membership?reset=1&action=update&id={$pageId}");
-    $this->waitForElementPresent('_qf_MembershipBlock_next-bottom');
+    $this->openCiviPage('admin/contribute/membership', "reset=1&action=update&id={$pageId}", "_qf_MembershipBlock_next-bottom");
     $this->click("membership_type_$memTypeId1");
     $this->click("membership_type_$memTypeId2");
     $this->click('_qf_MembershipBlock_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_MembershipBlock_next-bottom');
     $text = "'MembershipBlock' information has been saved.";
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+    $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
     $this->_testOnlineMembershipSignup($pageId, $memTypeTitle1, $cid);
 
     //Find Member
-    $this->open($this->sboxPath . "civicrm/member/search?reset=1");
-    $this->waitForElementPresent("member_end_date_high");
+    $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
     $this->type("sort_name", "$firstName1 $lastName1");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -136,11 +131,8 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
       'Status' => 'Pending',
       'Source' => 'Online Contribution:' . ' ' . $contributionTitle,
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+
+    $this->webtestVerifyTabularData($verifyData);
 
     // Click View action link on associated contribution record
     $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
@@ -152,11 +144,8 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
       'From' => $firstName1 . ' ' . $lastName1,
       'Total Amount' => '$ 100.00',
     );
-    foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='ContributionView']/div[2]/table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
-    }
+    $this->webtestVerifyTabularData($verifyData);
+
     $this->click("_qf_ContributionView_cancel-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
@@ -164,22 +153,19 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
   function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
     //Open Live Contribution Page
     if ($cid) {
-      $makeContribUrl = "{$this->sboxPath}civicrm/contribute/transact?reset=1&id=$pageId&cid=$cid";
+      $contribUrl = array('url' => "contribute/transact", 'args' => "reset=1&id=$pageId&cid=$cid");
     }
     else {
-      $makeContribUrl = "{$this->sboxPath}civicrm/contribute/transact?reset=1&id=$pageId";
+      $contribUrl = array('url' => "contribute/transact", 'args' => "reset=1&id=$pageId");
     }
-    $this->open($makeContribUrl);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage($contribUrl['url'], $contribUrl['args'], '_qf_Main_upload-bottom');
 
     // Select membership type 1
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$memTypeId')]");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 60);
     $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-

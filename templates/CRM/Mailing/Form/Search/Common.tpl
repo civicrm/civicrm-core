@@ -26,7 +26,7 @@
     <br />
   {$form.mailing_delivery_status.html}
     <span class="crm-clear-link">
-      (<a href="javascript:unselectRadio('mailing_delivery_status','{$form.formName}')">{ts}clear{/ts}</a>)
+      (<a href="#" onclick="unselectRadio('mailing_delivery_status','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
     </span>
   </td>
   <td>
@@ -34,7 +34,7 @@
     <br />
   {$form.mailing_open_status.html}
     <span class="crm-clear-link">
-      (<a href="javascript:unselectRadio('mailing_open_status','{$form.formName}')">{ts}clear{/ts}</a>)
+      (<a href="#" onclick="unselectRadio('mailing_open_status','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
     </span>
   </td>
 </tr>
@@ -44,7 +44,7 @@
     <br />
   {$form.mailing_click_status.html}
     <span class="crm-clear-link">
-      (<a href="javascript:unselectRadio('mailing_click_status','{$form.formName}')">{ts}clear{/ts}</a>)
+      (<a href="#" onclick="unselectRadio('mailing_click_status','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
     </span>
   </td>
   <td>
@@ -52,7 +52,7 @@
     <br />
   {$form.mailing_reply_status.html}
     <span class="crm-clear-link">
-      (<a href="javascript:unselectRadio('mailing_reply_status','{$form.formName}')">{ts}clear{/ts}</a>)
+      (<a href="#" onclick="unselectRadio('mailing_reply_status','{$form.formName}')">{ts}clear{/ts}</a>)
     </span>
   </td>
 </tr>

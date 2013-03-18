@@ -76,7 +76,8 @@ function civicrm_api3_note_create($params) {
   $result = civicrm_api3_create_success($note, $params);
   return civicrm_api3_create_success($note, $params);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  * 
  * The metadata is used for setting defaults, documentation & validation
@@ -121,7 +122,8 @@ function civicrm_api3_note_get($params) {
 
   return _civicrm_api3_basic_get('CRM_Core_BAO_Note', $params);
 }
-/*
+
+/**
  * Adjust Metadata for Get action
  * 
  * The metadata is used for setting defaults, documentation & validation

@@ -33,6 +33,9 @@ abstract class CRM_Utils_System_Base {
       if ($maintenance) {
         drupal_set_breadcrumb('');
         drupal_maintenance_theme();
+        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+          CRM_Utils_System::addHTMLHead($region->render(''));
+        }
         print theme('maintenance_page', array('content' => $content));
         exit();
       }
@@ -100,5 +103,26 @@ abstract class CRM_Utils_System_Base {
    */
   public abstract function getLoginURL($destination = '');
 
+  /**
+   * Set a init session with user object
+   *
+   * @param array $data  array with user specific data
+   *
+   * @access public
+   */
+  function setUserSession($data) {
+    list($userID, $ufID) = $data;
+    $session = CRM_Core_Session::singleton();
+    $session->set('ufID', $ufID);
+    $session->set('userID', $userID);
+  }
+
+  /**
+   * Reset any system caches that may be required for proper CiviCRM
+   * integration.
+   */
+  function flush() {
+    // nullop by default
+  }
 }
 

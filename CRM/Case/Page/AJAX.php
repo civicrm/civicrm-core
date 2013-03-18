@@ -157,6 +157,9 @@ class CRM_Case_Page_AJAX {
 
     CRM_Case_BAO_Case::addCaseToContact($params);
 
+    // add case relationships
+    CRM_Case_BAO_Case::addCaseRelationships($caseId, $contactId);
+
     $session = CRM_Core_Session::singleton();
 
     $activityParams = array();
@@ -177,6 +180,19 @@ class CRM_Case_Page_AJAX {
 
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
     echo json_encode(TRUE);
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Function to delete relationships specific to case and relationship type
+   */
+  static function deleteCaseRoles() {
+    $caseId  = CRM_Utils_Type::escape($_POST['case_id'], 'Integer');
+    $relType = CRM_Utils_Type::escape($_POST['rel_type'], 'Integer');
+
+    $sql = "DELETE FROM civicrm_relationship WHERE case_id={$caseId} AND relationship_type_id={$relType}";
+    CRM_Core_DAO::executeQuery($sql);
+
     CRM_Utils_System::civiExit();
   }
 }

@@ -1230,7 +1230,7 @@ WHERE  v.option_group_id = g.id
       }
     }
     // check if user has permission, CRM-12062
-    else if (CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
+    else if ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
       return $tempID;
     }
 

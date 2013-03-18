@@ -46,9 +46,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Go directly to the URL of the screen that you will be testing (New Custom Group).
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
     //fill custom group title
     $customGroupTitle = 'custom_' . substr(sha1(rand()), 0, 7);
@@ -63,7 +61,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     //add custom field - alphanumeric checkbox
     $checkboxFieldLabel = 'custom_field' . substr(sha1(rand()), 0, 4);
@@ -101,7 +99,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent("Your custom field '$checkboxFieldLabel' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Integer Radio
     $this->click("//a[@id='newCustomField']/span");
@@ -143,7 +141,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
 
     // Go to the URL to create an Individual contact.
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -178,9 +176,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go directly to the URL of the screen that you will be testing (New Custom Group).
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
     //fill custom group title
     $customGroupTitle = 'custom_' . substr(sha1(rand()), 0, 7);
@@ -196,7 +192,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     //add custom field - money text
     $moneyTextFieldLabel = 'money' . substr(sha1(rand()), 0, 4);
@@ -223,11 +219,10 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent("Your custom field '$moneyTextFieldLabel' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$moneyTextFieldLabel' has been saved.");
 
     //Get the customFieldsetID
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/custom/group', 'reset=1');
     $customFieldsetId = explode('&gid=', $this->getAttribute("xpath=//div[@id='custom_group']//table/tbody//tr/td/span[text()='$customGroupTitle']/../../td[7]/span/a@href"));
     $customFieldsetId =  $customFieldsetId[1];
 
@@ -272,19 +267,17 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     //enable logging
-    $this->open($this->sboxPath . "civicrm/admin/setting/misc?reset=1");
+    $this->openCiviPage('admin/setting/misc', 'reset=1');
     $this->click("CIVICRM_QFID_1_logging");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("_qf_Miscellaneous_next-top");
     // adding sleep here since enabling logging takes lot of time
     // increased the time since we now also add a lot of triggers and create tables
     // the first time around
-    sleep(60);
-    $this->waitForTextPresent("Your changes have been saved");
+    sleep(40);
+    $this->waitForTextPresent("Changes Saved");
 
     // Create new Custom Field Set
-    $this->open($this->sboxPath . 'civicrm/admin/custom/group?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/custom/group', 'reset=1');
     $this->click("css=#newCustomDataGroup > span");
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $customFieldSet = 'Fieldset' . rand();
@@ -293,7 +286,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("id=collapse_display");
     $this->click("id=_qf_Group_next-bottom");
     $this->waitForElementPresent('_qf_Field_next-bottom');
-    $this->assertTrue($this->isTextPresent("Your custom field set '$customFieldSet' has been added."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field set '$customFieldSet' has been added.");
 
     // Add field to fieldset
     $customField = 'CustomField' . rand();
@@ -301,10 +294,10 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->select("id=data_type_0", "value=0");
     $this->click("id=_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Your custom field '$customField' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "Your custom field '$customField' has been saved.");
 
     // Go directly to the URL of the screen that you will be testing (New Individual).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //contact details section
     //fill in first name
@@ -340,7 +333,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=1228");
 
-    if ($this->isTextPresent("Latitude")) {
+    if ($this->assertElementContainsText("address_1", "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -349,7 +342,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("{$firstName} {$lastName} has been created."));
+    $this->assertElementContainsText('crm-notification-container', "{$firstName} {$lastName} has been created.");
 
     //Update the custom field
     $this->click("css=a.edit.button");
@@ -370,11 +363,11 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='LoggingDetail']/div[2]/table/tbody/tr/td[3][contains(text(), '$value1')]"));
 
     //disable logging
-    $this->open($this->sboxPath . "civicrm/admin/setting/misc?reset=1");
+    $this->openCiviPage('admin/setting/misc', 'reset=1');
     $this->click("CIVICRM_QFID_0_logging");
     $this->click("_qf_Miscellaneous_next-top");
     //adding sleep here since disabling logging takes lot of time
-    sleep(40);
+    sleep(20);
     $this->waitForTextPresent("Changes Saved");
   }
 

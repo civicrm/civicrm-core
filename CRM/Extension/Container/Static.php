@@ -43,6 +43,13 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
   /**
    * {@inheritdoc}
    */
+  public function checkRequirements() {
+    return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getName() {
     return $this->name;
   }

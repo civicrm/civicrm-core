@@ -71,7 +71,8 @@ function civicrm_api3_group_nesting_create($params) {
   $result = array('is_error' => 0);
   return civicrm_api3_create_success($result, $params);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
  * 
  * The metadata is used for setting defaults, documentation & validation

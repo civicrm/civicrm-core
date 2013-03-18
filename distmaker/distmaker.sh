@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -v
 set -e
 
 # This is distmaker script for CiviCRM

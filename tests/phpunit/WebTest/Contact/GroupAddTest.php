@@ -66,10 +66,9 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The Group '{$params['name']}' has been saved."));
+    $this->assertElementContainsText('crm-notification-container', "The Group '{$params['name']}' has been saved.");
 
-    $this->open($this->sboxPath . "civicrm/group?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[3]/a");
@@ -78,9 +77,8 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table[2]/tbody/tr/td[2]/select");
 
     //assert created by in the edit page
-    $this->assertTrue($this->isElementPresent("xpath=//form[@id='Edit']/div[2]/div/table/tbody/tr[2]/td[1][text()='Created By']/following-sibling::td[text()='{$createdBy}']"));
-    $this->open($this->sboxPath . "civicrm/group?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->assertTrue($this->isElementPresent("xpath=//form[@id='Edit']/div[2]/div/table/tbody/tr[2]/td[contains(text(),'Created By')]/following-sibling::td[contains(text(),'{$createdBy}')]"));
+    $this->openCiviPage('group', 'reset=1');
 
     //search groups using created by
     $this->type('created_by', $createdBy);
@@ -93,7 +91,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $name = explode(',', $createdBy);
     $displayName = isset($name[1]) ? "{$name[1]} {$name[0]}" : "{$name[0]}";
-    $this->assertTrue($this->isTextPresent($displayName));
+    $this->assertElementContainsText("css=div.crm-summary-display_name",$displayName);
   }
 
   function testGroupReserved() {
@@ -158,7 +156,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->changePermissions($permissions);
     
     // Now logout as admin, login as regular user and verify that Group settings, delete and disable links are not available
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->waitForElementPresent('edit-submit');
     $this->type('edit-name', $user);
@@ -166,15 +164,15 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->click('edit-submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     
-    $this->open($this->sboxPath . "civicrm/group?&reset=1");
+    $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
     $this->waitForTextPresent("Adding new reserved group.");
     // Settings link should NOT be included in selector after search returns with only the reserved group.
-    $this->assertFalse($this->isTextPresent("Settings"));
+    $this->assertElementNotContainsText("css=td.crm-group-group_links", "Settings");
 
     //login as admin and delete the role
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
+    $this->openCiviPage('logout', 'reset=1', NULL);
     $this->open($this->sboxPath);
     $this->webtestLogin(TRUE);
     $this->open($this->sboxPath . "admin/people/permissions/roles");
