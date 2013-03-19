@@ -128,6 +128,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $this->preProcess();
 
     $newArgs = func_get_args();
+    // since we want only first function argument
+    $newArgs = $newArgs[0];
     if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
       $config = CRM_Core_Config::singleton();
       CRM_Mailing_BAO_Job::runJobs_pre($config->mailerJobSize);
