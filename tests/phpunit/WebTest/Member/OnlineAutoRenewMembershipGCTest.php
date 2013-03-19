@@ -64,7 +64,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     //configure membership signup page.
     $pageId = $this->_configureMembershipPage();
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -96,12 +95,11 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     static $pageId = NULL;
 
     if (!$pageId) {
-      $this->open($this->sboxPath);
       $this->webtestLogin();
 
       //add payment processor.
-      $hash          = substr(sha1(rand()), 0, 7);
-      $rand          = 2 * rand(2, 50);
+      $hash = substr(sha1(rand()), 0, 7);
+      $rand = 2 * rand(2, 50);
       $processorName = "Webtest Auto Renew Google Checkout" . $hash;
       $this->webtestAddPaymentProcessor($processorName, 'Google_Checkout');
 
@@ -135,21 +133,21 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $this->waitForPageToLoad($this->getTimeoutMsec());
 
       // create contribution page with randomized title and default params
-      $amountSection   = FALSE;
-      $payLater        = TRUE;
-      $onBehalf        = FALSE;
-      $pledges         = FALSE;
-      $recurring       = TRUE;
+      $amountSection = FALSE;
+      $payLater = TRUE;
+      $onBehalf = FALSE;
+      $pledges = FALSE;
+      $recurring = TRUE;
       $membershipTypes = array(array('id' => 1, 'auto_renew' => 1),
         array('id' => 2, 'auto_renew' => 1),
       );
       $memPriceSetId = NULL;
-      $friend        = TRUE;
-      $profilePreId  = NULL;
+      $friend = TRUE;
+      $profilePreId = NULL;
       $profilePostId = NULL;
-      $premiums      = TRUE;
-      $widget        = TRUE;
-      $pcp           = TRUE;
+      $premiums = TRUE;
+      $widget = TRUE;
+      $pcp = TRUE;
 
       $contributionTitle = "Title $hash";
       $pageId = $this->webtestAddContributionPage($hash,
@@ -172,15 +170,12 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
         FALSE
       );
 
-      // now logout and login with admin credentials
-      $this->openCiviPage('logout', 'reset=1', NULL);
-
       //make sure we do have required permissions.
       $permissions = array("edit-1-make-online-contributions");
       $this->changePermissions($permissions);
 
       // now logout and do membership test that way
-      $this->openCiviPage('logout', 'reset=1', NULL);
+      $this->webtestLogout();
     }
 
     return $pageId;

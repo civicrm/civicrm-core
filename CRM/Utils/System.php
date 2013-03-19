@@ -1195,10 +1195,10 @@ class CRM_Utils_System {
 
       // if db.ver > code.ver, sth really wrong
       if (version_compare($dbVersion, $codeVersion) > 0) {
-        $errorMessage = ts('Your database is marked with an unexpected version number: %1. The v%2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using until you resolve this problem.',
+        $errorMessage = '<p>' . ts('Your database is marked with an unexpected version number: %1. The v%2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using until you resolve this problem.',
           array(1 => $dbVersion, 2 => $codeVersion)
-        );
-        $errorMessage .= "<p>" . ts('OR if this is an svn install, you might want to fix civicrm-version.php file.') . "</p>";
+        ) . '</p>';
+        $errorMessage .= "<p>" . ts('OR if this is a manual install from git, you might want to fix civicrm-version.php file.') . "</p>";
         return FALSE;
       }
     }

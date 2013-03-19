@@ -33,7 +33,6 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
   }
 
   function testOfflineAutoRenewMembership() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // We need a payment processor
@@ -94,8 +93,7 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Use Find Members to make sure membership exists
-    $this->open($this->sboxPath . "civicrm/member/search?reset=1");
-    $this->waitForElementPresent("member_end_date_high");
+    $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
     $this->click("member_test");

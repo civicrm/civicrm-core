@@ -38,7 +38,6 @@ class WebTest_Release_InstallScript extends WebTest_Release_ReleaseTestCase {
   }
 
   function testInstall() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->open($this->settings->installURL);
 

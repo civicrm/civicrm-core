@@ -50,9 +50,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    //Offline Pay Later Contribution
    $this->_testOfflineContribution($firstName, $lastName, $email, $amount, "Pending");
 
-   $this->open($this->sboxPath . "civicrm/contribute/search?reset=1");
-
-   $this->waitForElementPresent("contribution_date_low");
+   $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
    $this->type("sort_name", "$lastName, $firstName");
    $this->click("_qf_Search_refresh");
@@ -521,14 +519,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
  function _testOfflineContribution($firstName, $lastName, $email, $amount, $status="Completed") {
-   // Go directly to the URL of the screen that you will be testing (New Contribution-standalone).
-   $this->open($this->sboxPath . "civicrm/contribute/add?reset=1&context=standalone");
 
-   // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-   // button at the end of this page to show up, to make sure it's fully loaded.
-   $this->waitForElementPresent("_qf_Contribution_upload");
-
-   // Let's start filling the form with values.
+   $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
    // create new contact using dialog
    $this->webtestNewDialogContact($firstName, $lastName, $email);

@@ -147,7 +147,6 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
    * Helper function to select Editor.
    */
   function _selectEditor($editor) {
-    // Go directly to the URL of Set Default Editor.
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
 
     // Select your Editor

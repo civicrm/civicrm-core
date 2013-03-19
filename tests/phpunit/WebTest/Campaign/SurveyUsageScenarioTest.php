@@ -33,7 +33,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
   }
 
   function testSurveyUsageScenario() {
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
@@ -69,13 +69,14 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
 
-    // add the required Drupal permission
+    // add the required permission
     $this->changePermissions(array('edit-2-administer-civicampaign'));
 
-    // Go directly to the URL of the screen that you will be testing
+    // Log in as normal user
+    $this->webtestLogin();
+
     $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
 
-    // Let's start filling the form with values.
     $this->type("title", "Campaign $title");
 
     // select the campaign type
@@ -308,6 +309,14 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
   }
 
   function testSurveyReportTest() {
+    $this->webtestLogin('admin');
+
+    // Enable CiviCampaign module if necessary
+    $this->enableComponents(array('CiviCampaign'));
+
+    // add the required permission
+    $this->changePermissions('edit-2-administer-civicampaign');
+
     $this->webtestLogin();
 
     // Create new group
@@ -419,13 +428,6 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->check('in_selector');
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Enable CiviCampaign module if necessary
-    $this->enableComponents(array('CiviCampaign'));
-
-    // add the required Drupal permission
-    $permissions = array('edit-2-administer-civicampaign');
-    $this->changePermissions($permissions);
 
     // Create a survey
     $this->openCiviPage("survey/add", "reset=1", "_qf_Main_upload-bottom");

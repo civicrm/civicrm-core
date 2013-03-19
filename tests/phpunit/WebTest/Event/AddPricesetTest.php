@@ -38,8 +38,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
-    $usedFor  = 'Event';
-    $setHelp  = 'Select your conference options.';
+    $usedFor = 'Event';
+    $setHelp = 'Select your conference options.';
     $this->_testAddSet($setTitle, $usedFor, $setHelp);
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
@@ -186,13 +186,12 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   }
 
   function testRegisterWithPriceSet() {
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
-    $usedFor  = 'Event';
-    $setHelp  = 'Select your conference options.';
+    $usedFor = 'Event';
+    $setHelp = 'Select your conference options.';
     $this->_testAddSet($setTitle, $usedFor, $setHelp);
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
@@ -217,14 +216,12 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
-    $eventTitle       = 'My Conference - ' . substr(sha1(rand()), 0, 7);
-    $email            = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
+    $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
+    $email = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
     $eventDescription = 'Here is a description for this conference.';
 
-    // Let's start filling the form with values.
     $this->select('event_type_id', 'value=1');
 
     // Attendee role s/b selected now.
@@ -289,7 +286,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $eventInfoUrl = $this->getLocation();
 
-    $this->openCiviPage('logout', 'reset=1', NULL);
+    $this->webtestLogout();
     $this->open($eventInfoUrl);
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');
@@ -357,8 +354,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
-    $usedFor  = 'Event';
-    $setHelp  = 'Select your conference options.';
+    $usedFor = 'Event';
+    $setHelp = 'Select your conference options.';
     $this->_testAddSet($setTitle, $usedFor, $setHelp);
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
@@ -383,14 +380,12 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
-    $eventTitle       = 'My Conference - ' . substr(sha1(rand()), 0, 7);
-    $email            = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
+    $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
+    $email = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
     $eventDescription = 'Here is a description for this conference.';
 
-    // Let's start filling the form with values.
     $this->select('event_type_id', 'value=1');
 
     // Attendee role s/b selected now.
@@ -460,10 +455,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $contactName = "Anderson, $firstName";
     $displayName = "$firstName Anderson";
 
-    // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
     $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom');
 
-    // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
     $this->webtestFillAutocomplete($firstName);
 
@@ -515,8 +508,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $displayName = "$firstName Anderson";
     
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
-    $usedFor  = 'Event';
-    $setHelp  = 'Select your conference options.';
+    $usedFor = 'Event';
+    $setHelp = 'Select your conference options.';
     $this->_testAddSet($setTitle, $usedFor, $setHelp);
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
@@ -535,15 +528,13 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
-    
-    // Go directly to the URL of the screen that you will be testing (New Event).
+
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
-    $eventTitle       = 'My Conference - ' . substr(sha1(rand()), 0, 7);
-    $email            = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
+    $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
+    $email = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
     $eventDescription = 'Here is a description for this conference.';
 
-    // Let's start filling the form with values.
     $this->select('event_type_id', 'value=1');
     
     // Attendee role s/b selected now.
@@ -578,10 +569,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->click('_qf_Fee_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
-    $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom'); 
+    $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom');
 
-    // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
     $this->webtestFillAutocomplete($firstName);
     $this->select('event_id', "label=regexp:$eventTitle");

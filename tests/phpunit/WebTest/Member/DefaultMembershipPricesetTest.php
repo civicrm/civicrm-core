@@ -33,11 +33,6 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
   }
 
   function testDefaultPricesetSelection() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -84,8 +79,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->assertType('numeric', $cid);
 
     //senario 1
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id={$membershipContributionPageId}&cid={$cid}");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
@@ -96,8 +90,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 2
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id={$membershipContributionPageId}&cid={$cid}");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
     // checking
     $this->checkOptions("National_Membership_{$title}-section", 2);
     // senario 1
@@ -111,8 +104,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 3
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id={$membershipContributionPageId}&cid={$cid}");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
     // checking
     $this->checkOptions("Second_Membership_{$title}-section", 2);
     // senario 2
@@ -126,8 +118,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 4
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id={$membershipContributionPageId}&cid={$cid}");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
     // checking senario 3
     $this->assertTrue($this->isTextPresent("You have a current Lifetime Membership which does not need to be renewed."));
 
@@ -166,9 +157,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
   }
 
   function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
-    $this->open($this->sboxPath . 'civicrm/admin/price?reset=1&action=add');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Set_next-bottom');
+    $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
     $this->type('title', $setTitle);
@@ -180,7 +169,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     }
     elseif ($usedFor == 'Membership') {
       $this->click('extends[3]');
-          $this->waitForElementPresent( 'financial_type_id' );
+      $this->waitForElementPresent( 'financial_type_id' );
       $this->select("css=select.form-select", "label={$contributionType}");
     }
 

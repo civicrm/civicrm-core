@@ -35,7 +35,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
   function testIndividualAdd() {
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->WebtestAddGroup();
 
     // go to display preferences to enable Open ID field
@@ -177,7 +176,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Display_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing (New Household).
     $this->openCiviPage('contact/add', "reset=1&ct=Household");
 
     //contact details section
@@ -283,7 +281,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->check("xpath=//ul[@id='contactEditBlocks']//li/span[2]/label[text()='Open ID']/../input");
     $this->click("_qf_Display_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    // Go directly to the URL of the screen that you will be testing (New Organization).
+
     $this->openCiviPage('contact/add', 'reset=1&ct=Organization');
 
     //contact details section
@@ -377,7 +375,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
   function testIndividualAddWithSharedAddress() {
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->openCiviPage('contact/add', "reset=1&ct=Individual");
 
     //contact details section

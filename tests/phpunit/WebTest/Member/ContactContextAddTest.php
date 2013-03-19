@@ -33,14 +33,12 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testContactMemberAdd() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)
     $memTypeParams = $this->webtestAddMembershipType();
     $lifeTimeMemTypeParams = $this->webtestAddMembershipType('rolling', 1, 'lifetime');
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -160,13 +158,11 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testMemberAddWithLifeTimeMembershipType() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)
     $lifeTimeMemTypeParams = $this->webtestAddMembershipType('rolling', 1, 'lifetime');
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);

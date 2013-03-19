@@ -33,17 +33,6 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   function testAdvanceSearch() {
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -143,7 +132,6 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
     //-------------- advance search --------------
 
-    // Go directly to the URL of the screen that you will be testing (Advance Search).
     $this->openCiviPage('contact/search/advanced', 'reset=1');
 
     //also create a dummy name to test false
@@ -203,7 +191,6 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
    * Check for CRM-9873
    */
   function testActivitySearchByTypeTest() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->click("activity");

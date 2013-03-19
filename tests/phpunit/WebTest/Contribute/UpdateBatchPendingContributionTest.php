@@ -33,24 +33,12 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
   }
 
   function testBatchUpdatePendingContribution() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $this->_testOfflineContribution();
     $this->_testOfflineContribution();
     $this->_testOfflineContribution();
 
-    $this->open($this->sboxPath . "civicrm/contribute/search?reset=1");
-
-    $this->waitForElementPresent("contribution_date_low");
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "Contributor");
     $this->click('contribution_status_id_2');
@@ -84,11 +72,6 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
   }
 
   function testParticipationAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -105,8 +88,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->_addParticipant($firstName2);
 
     // Search the participants
-    $this->open($this->sboxPath . 'civicrm/event/search?reset=1');
-    $this->waitForElementPresent('_qf_Search_refresh');
+    $this->openCiviPage("event/search", "reset=1", '_qf_Search_refresh');
 
     $eventName = 'Rain';
     $this->click("event_name");
@@ -117,8 +99,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->assertContains($eventName, $this->getValue("event_name"), "autocomplete expected $eventName but didn’t find it in " . $this->getValue("event_name"));
     $this->click('_qf_Search_refresh');
 
-    $this->open($this->sboxPath . "civicrm/contribute/search?reset=1");
-    $this->waitForElementPresent("contribution_date_low");
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "Anderson");
     $this->click('contribution_status_id_2');
@@ -152,14 +133,9 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
   }
 
   function _addParticipant($firstName) {
-    // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
-    $this->open($this->sboxPath . 'civicrm/participant/add?reset=1&action=add&context=standalone');
 
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent('_qf_Participant_upload-bottom');
+    $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');
 
-    // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
     $this->webtestFillAutocomplete($firstName);
 
@@ -219,14 +195,8 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $lastName  = 'Contributor';
     $email     = $firstName . "@example.com";
 
-    // Go directly to the URL of the screen that you will be testing (New Contribution-standalone).
-    $this->open($this->sboxPath . "civicrm/contribute/add?reset=1&context=standalone");
+    $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Contribution_upload");
-
-    // Let's start filling the form with values.
 
     // create new contact using dialog
     $this->webtestNewDialogContact($firstName, "Contributor", $email);

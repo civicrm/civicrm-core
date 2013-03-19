@@ -34,7 +34,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
 
   function testStandaloneCaseAdd() {
     // Log in as admin first to verify permissions for CiviCase
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
@@ -42,6 +42,9 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     // let's give full CiviCase permissions to demo user (registered user).
     $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
     $this->changePermissions($permission);
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     // Go to reserved New Individual Profile to set value for logged in user's contact name (we'll need that later)
     $this->openCiviPage('profile/edit', 'reset=1&gid=4', NULL);
@@ -57,7 +60,6 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->assertElementContainsText('crm-container', "Thank you. Your information has been saved.", "Save successful status message didn't show up after saving profile to update testUserName!");
 
-    // Go directly to the URL of the screen that you will be testing (New Case-standalone).
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Try submitting the form without creating or selecting a contact (test for CRM-7971)
@@ -78,10 +80,10 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
     // activity types we expect for this case type
-    $activityTypes   = array("ADC referral", "Follow up", "Medical evaluation", "Mental health evaluation");
-    $caseRoles       = array("Senior Services Coordinator", "Health Services Coordinator", "Benefits Specialist", "Client");
+    $activityTypes = array("ADC referral", "Follow up", "Medical evaluation", "Mental health evaluation");
+    $caseRoles = array("Senior Services Coordinator", "Health Services Coordinator", "Benefits Specialist", "Client");
     $caseStatusLabel = "Ongoing";
-    $subject         = "Safe daytime setting - senior female";
+    $subject = "Safe daytime setting - senior female";
     $this->select("medium_id", "value=1");
     $location = "Main offices";
     $this->type("activity_location", $location);

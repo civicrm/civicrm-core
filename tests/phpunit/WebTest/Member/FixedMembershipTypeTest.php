@@ -38,16 +38,10 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     // Join Date > Rollover Date and Join Date < Start Date
 
 
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Organization");
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization", '_qf_Contact_cancel');
 
     $title = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $title");
@@ -57,7 +51,6 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    // Go directly to the URL
     $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -89,7 +82,6 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -204,16 +196,10 @@ SELECT end_event_adjust_interval
     // Rollover Date < Join Date
 
 
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Organization");
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization", '_qf_Contact_cancel');
 
     $title = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $title");
@@ -223,7 +209,6 @@ SELECT end_event_adjust_interval
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    // Go directly to the URL
     $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -255,7 +240,6 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -372,16 +356,10 @@ SELECT end_event_adjust_interval
     // Join Date is later than Rollover Date
 
 
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Organization");
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization", '_qf_Contact_cancel');
 
     $title = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $title");
@@ -391,7 +369,6 @@ SELECT end_event_adjust_interval
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    // Go directly to the URL
     $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -421,7 +398,6 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -533,16 +509,10 @@ SELECT end_event_adjust_interval
     // Join Date is earlier than Rollover Date
 
 
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Organization");
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization", '_qf_Contact_cancel');
 
     $title = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $title");
@@ -552,7 +522,6 @@ SELECT end_event_adjust_interval
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    // Go directly to the URL
     $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -583,7 +552,6 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);

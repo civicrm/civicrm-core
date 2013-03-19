@@ -33,24 +33,18 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   }
 
   function testAddPriceSet() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Log in using webtestLogin() method
-    $this->webtestLogin();
-
-    // add the required Drupal permission
-
+    // add the required permission
     $permissions = array('edit-1-make-online-contributions');
     $this->changePermissions($permissions);
 
-    $title            = substr(sha1(rand()), 0, 7);
-    $setTitle         = "Membership Fees - $title";
-    $usedFor          = 'Membership';
+    // Log in as normal user
+    $this->webtestLogin();
+
+    $title = substr(sha1(rand()), 0, 7);
+    $setTitle = "Membership Fees - $title";
+    $usedFor = 'Membership';
     $contributionType = 'Donation';
-    $setHelp          = 'Select your membership options.';
+    $setHelp = 'Select your membership options.';
     $this->_testAddSet($setTitle, $usedFor, $contributionType, $setHelp);
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
@@ -80,8 +74,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
 
     $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName  = 'Anderson_' . substr(sha1(rand()), 0, 7);
-    $email     = "{$firstName}.{$lastName}@example.com";
+    $lastName = 'Anderson_' . substr(sha1(rand()), 0, 7);
+    $email = "{$firstName}.{$lastName}@example.com";
 
     $contactParams = array(
       'first_name' => $firstName,
@@ -95,28 +89,22 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   }
 
   function testAddPriceSetWithMultipleTerms() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-    
-    // Log in using webtestLogin() method
-    $this->webtestLogin();
-    
-    // add the required Drupal permission
-
+    // add the required permission
     $permissions = array('edit-1-make-online-contributions');
     $this->changePermissions($permissions);
 
-    $title            = substr(sha1(rand()), 0, 7);
-    $setTitle         = "Membership Fees - $title";
-    $usedFor          = 'Membership';
+    // Log in as normal user
+    $this->webtestLogin();
+
+    $title = substr(sha1(rand()), 0, 7);
+    $setTitle = "Membership Fees - $title";
+    $usedFor = 'Membership';
     $contributionType = 'Member Dues';
-    $setHelp          = 'Select your membership options.';
+    $setHelp = 'Select your membership options.';
     $memTypeParams1 = $this->webtestAddMembershipType();
-    $memTypeTitle1  = $memTypeParams1['membership_type'];
-    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
-    $memTypeId1     = $memTypeId1[1];
+    $memTypeTitle1 = $memTypeParams1['membership_type'];
+    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1 = $memTypeId1[1];
     $this->_testAddSet($setTitle, $usedFor, $contributionType, $setHelp);
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
@@ -183,8 +171,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
 
     $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName  = 'Anderson_' . substr(sha1(rand()), 0, 7);
-    $email     = "{$firstName}.{$lastName}@example.com";
+    $lastName = 'Anderson_' . substr(sha1(rand()), 0, 7);
+    $email = "{$firstName}.{$lastName}@example.com";
 
     $contactParams = array(
       'first_name' => $firstName,
@@ -227,14 +215,14 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
   function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
     $memTypeParams1 = $this->webtestAddMembershipType();
-    $memTypeTitle1  = $memTypeParams1['membership_type'];
-    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
-    $memTypeId1     = $memTypeId1[1];
+    $memTypeTitle1 = $memTypeParams1['membership_type'];
+    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1 = $memTypeId1[1];
 
     $memTypeParams2 = $this->webtestAddMembershipType();
-    $memTypeTitle2  = $memTypeParams2['membership_type'];
-    $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
-    $memTypeId2     = $memTypeId2[1];
+    $memTypeTitle2 = $memTypeParams2['membership_type'];
+    $memTypeId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
+    $memTypeId2 = $memTypeId2[1];
 
     $this->openCiviPage('admin/price/field', "reset=1&action=add&sid={$sid}");
 
@@ -308,14 +296,14 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->type('title', $contributionPageTitle);
     $this->click('_qf_SearchContribution_refresh');
     $this->waitForPageToLoad('50000');
-    $id          = $this->getAttribute("//div[@id='configure_contribution_page']//div[@class='dataTables_wrapper']/table/tbody/tr@id");
-    $id          = explode('_', $id);
+    $id = $this->getAttribute("//div[@id='configure_contribution_page']//div[@class='dataTables_wrapper']/table/tbody/tr@id");
+    $id = explode('_', $id);
     $registerUrl = array('url' => 'contribute/transact', 'args' => "reset=1&id=$id[1]");
     return $registerUrl;
   }
 
   function _testSignUpOrRenewMembership($registerUrl, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
-    $this->openCiviPage('logout', 'reset=1', NULL);
+    $this->webtestLogout();
 
     $this->openCiviPage($registerUrl['url'], $registerUrl['args'], '_qf_Main_upload-bottom');
 
@@ -323,14 +311,14 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
-    $previousDay  = date('d') - 1;
-    $endYear      = ($renew) ? $currentYear + 2 : $currentYear + 1;
-    $joinDate     = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
-    $startDate    = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
-    $endDate      = date('Y-m-d', mktime(0, 0, 0, $currentMonth, $previousDay, $endYear));
-    $configVars   = new CRM_Core_Config_Variables();
+    $previousDay = date('d') - 1;
+    $endYear = ($renew) ? $currentYear + 2 : $currentYear + 1;
+    $joinDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
+    $startDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
+    $endDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, $previousDay, $endYear));
+    $configVars = new CRM_Core_Config_Variables();
     foreach (array(
       'joinDate', 'startDate', 'endDate') as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
@@ -374,7 +362,6 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //login to check membership
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -438,7 +425,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       $prevYear = substr($year, 0, 4);
     }
     
-    $this->openCiviPage('logout', 'reset=1', NULL);
+    $this->webtestLogout();
 
     $this->openCiviPage($registerUrl['url'], $registerUrl['args'], '_qf_Main_upload-bottom');
 
@@ -446,20 +433,20 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
-    $previousDay  = date('d') - 1;
-    $endYear      = ($term == 3) ? $currentYear + 3 : (($term == 2) ? $currentYear + 2 : $currentYear + 1);
-    $endYear      = ($renew) ? $endYear + ($prevYear - $currentYear) : $endYear; 
-    $joinDate     = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
-    $startDate    = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
-    $endDate      = date('Y-m-d', mktime(0, 0, 0, $currentMonth, $previousDay, $endYear));
-    $configVars   = new CRM_Core_Config_Variables();
+    $previousDay = date('d') - 1;
+    $endYear = ($term == 3) ? $currentYear + 3 : (($term == 2) ? $currentYear + 2 : $currentYear + 1);
+    $endYear = ($renew) ? $endYear + ($prevYear - $currentYear) : $endYear; 
+    $joinDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
+    $startDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
+    $endDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, $previousDay, $endYear));
+    $configVars = new CRM_Core_Config_Variables();
     foreach (array(
       'joinDate', 'startDate', 'endDate') as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
-    $i      = ($term == 3) ? 3 : (($term == 2) ? 2 : 1 );
+    $i = ($term == 3) ? 3 : (($term == 2) ? 2 : 1 );
     $this->waitForElementPresent("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $this->click("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $amount = $this->getText("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/label/span[@class='crm-price-amount-amount']");
@@ -499,7 +486,6 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //login to check membership
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();

@@ -97,7 +97,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
   }
 
   function testGroupReserved() {
-    $this->webtestLogin(true);
+    $this->webtestLogin('admin');
 
     $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload-bottom');
 
@@ -158,13 +158,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->changePermissions($permissions);
 
     // Now logout as admin, login as regular user and verify that Group settings, delete and disable links are not available
-    $this->openCiviPage('logout', 'reset=1', NULL);
-    $this->open($this->sboxPath);
-    $this->waitForElementPresent('edit-submit');
-    $this->type('edit-name', $user);
-    $this->type('edit-pass', 'Test12345');
-    $this->click('edit-submit');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogin($user, 'Test12345');
 
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
@@ -174,16 +168,13 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->assertElementNotContainsText("css=td.crm-group-group_links", "Settings");
 
     //login as admin and delete the role
-    $this->openCiviPage('logout', 'reset=1', NULL);
-    $this->open($this->sboxPath);
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->_roleDelete($role);
 
   }
 
   function _testCreateUser($roleid) {
-    // Go directly to the URL of the screen that will Create User Authentically.
     $this->open($this->sboxPath . "admin/people/create");
 
     $this->waitForElementPresent("edit-submit");

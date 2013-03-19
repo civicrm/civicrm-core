@@ -33,7 +33,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
   }
 
   function testAddCase() {
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
@@ -64,6 +64,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
     $this->changePermissions($permission);
 
+    // Log in as normal user
+    $this->webtestLogin();
+
     // Go to reserved New Individual Profile to set value for logged in user's contact name (we'll need that later)
     $this->openCiviPage('profile/edit', 'reset=1&gid=4', '_qf_Edit_next');
     $testUserFirstName = "Testuserfirst";
@@ -74,7 +77,6 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("profilewrap4");
 
-    // Go directly to the URL of the screen that you will be testing (New Case-standalone).
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Try submitting the form without creating or selecting a contact (test for CRM-7971)

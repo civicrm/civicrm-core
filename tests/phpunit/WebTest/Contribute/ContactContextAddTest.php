@@ -32,12 +32,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactContextAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-    
+  function testContactContextAdd() {    
     // Log in using webtestLogin() method
     $this->webtestLogin();
     

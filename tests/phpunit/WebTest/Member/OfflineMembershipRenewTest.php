@@ -33,7 +33,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
   }
 
   function testOfflineMembershipRenew() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -120,7 +119,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
    }
 
   function testOfflineMemberRenewOverride() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // add membership type
@@ -229,7 +227,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
   }
 
   function testOfflineMembershipRenewChangeType() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -326,7 +323,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
   }
 
   function testOfflineMembershipRenewMultipleTerms() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,

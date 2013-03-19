@@ -33,16 +33,6 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
   }
 
   function testCustomDataImport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     $firstName1       = 'Ma_' . substr(sha1(rand()), 0, 7);
@@ -78,8 +68,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
 
     // Find the contact
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh');
+    $this->openCiviPage("contact/search", "reset=1", '_qf_Basic_refresh');
     $this->type('sort_name', $firstName1);
     $this->click('_qf_Basic_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -153,7 +142,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
   }
 
   function _addCustomData($customGroupTitle, $id1, $id2) {
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
+
     $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
 
     //add new custom data

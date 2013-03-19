@@ -33,7 +33,6 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
   }
 
   function testTagSetSearch() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
 

@@ -31,7 +31,6 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
   }
 
   function testEditMembershipActivityTypes() {
-    $this->open($this->sboxPath);
     // Log in using webtestLogin() method
     $this->webtestLogin();
     // create contact

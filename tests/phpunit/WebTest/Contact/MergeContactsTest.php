@@ -33,14 +33,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   }
 
   function testIndividualAdd() {
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of New Individual.
     $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -169,8 +163,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("{$fname2} {$lname2}"), "Redirect for Goto Next Pair after merge did not work.");
 
     // Ensure that the duplicate contact has been deleted
-    $this->open($this->sboxPath . 'civicrm/contact/search/advanced?reset=1');
-    $this->waitForElementPresent('_qf_Advanced_refresh');
+    $this->openCiviPage("contact/search/advanced", "reset=1", '_qf_Advanced_refresh');
     $this->type('sort_name', $firstName);
     $this->check('deleted_contacts');
     $this->click('_qf_Advanced_refresh');
@@ -178,8 +171,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('1 Contact'), "Deletion of duplicate contact during merge was not successful. Dupe contact not found when searching trash.");
 
     // Search for the main contact
-    $this->open($this->sboxPath . 'civicrm/contact/search/advanced?reset=1');
-    $this->waitForElementPresent('_qf_Advanced_refresh');
+    $this->openCiviPage("contact/search/advanced", "reset=1", '_qf_Advanced_refresh');
     $this->type('sort_name', $firstName);
     $this->click('_qf_Advanced_refresh');
     $this->waitForElementPresent("xpath=//form[@id='Advanced']/div[3]/div/div[2]/table/tbody/tr");
@@ -229,7 +221,6 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload");
 
-    // Let's start filling the form with values.
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertTrue($this->isTextPresent("Anderson, " . $withContact), "Contact not found in line " . __LINE__);
@@ -289,14 +280,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
 
   function testMergeTest() {
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of New Individual.
     $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -395,7 +380,6 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[4]/div[2][contains(text(), '9876543120')]"));
 
     //Merge with the feature of (add)
-    // Go directly to the URL of New Individual.
     $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -488,11 +472,6 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   }
 
   function testBatchMerge(){
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // add contact1 and its duplicate

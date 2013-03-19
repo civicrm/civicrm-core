@@ -39,10 +39,8 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
-    $this->webtestLogin(TRUE);
-    $this->open($this->sboxPath . 'civicrm/financial/batch?reset=1&action=add');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_FinancialBatch_next-botttom');
+    $this->webtestLogin('admin');
+    $this->openCiviPage("financial/batch", "reset=1&action=add", '_qf_FinancialBatch_next-botttom');
     $setTitle = 'Batch ' . substr(sha1(rand()), 0, 7) . date('Y-m-d');
     $setDescription  = 'Test Batch Creation';
     $setPaymentInstrument = 'Credit Card';

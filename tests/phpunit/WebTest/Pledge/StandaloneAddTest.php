@@ -33,14 +33,8 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
   }
 
   function testStandalonePledgeAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Pledge-standalone).
     $this->openCiviPage('pledge/add', 'reset=1&context=standalone', '_qf_Pledge_upload');
 
     // create new contact using dialog

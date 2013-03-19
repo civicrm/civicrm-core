@@ -33,10 +33,8 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
   }
 
   function testAddActivityToCase() {
-    $this->open($this->sboxPath);
-
     // Log in as admin first to verify permissions for CiviCase
-    $this->webtestLogin();
+    $this->webtestLogin('true');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
@@ -45,7 +43,9 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
     $this->changePermissions($permission);
 
-    // Go directly to the URL of the screen that you will be testing (New Case-standalone).
+    // Log in as normal user
+    $this->webtestLogin();
+
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
@@ -98,7 +98,6 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "Anderson", $firstName2 . "@anderson.name");
 
-    // Go directly to the URL of the screen that you will be testing (Activity Tab).
     $this->click("css=li#tab_activity a");
 
     // waiting for the activity dropdown to show up
@@ -111,7 +110,6 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload-bottom");
 
-    // Let's start filling the form with values.
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', 'Anderson, ' . $firstName2, "Contact not found in line " . __LINE__);
@@ -233,7 +231,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
   }
 
   function _addCustomData($customGroupTitle) {
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
+
     $this->openCiviPage('admin/custom/group', 'reset=1');
 
     //add new custom data

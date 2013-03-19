@@ -33,12 +33,10 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
   }
 
   function testSMSToContacts() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // ADD a New Group
-    $this->open($this->sboxPath . "civicrm/group/add?reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     $smsGroupName = 'group_' . substr(sha1(rand()), 0, 7);
 

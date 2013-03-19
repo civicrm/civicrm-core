@@ -43,7 +43,6 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $sortName = "Anderson, $firstName";
     $displayName = "$firstName Anderson";
 
-    // Go directly to the URL of the screen that you will be testing (Home dashboard).
     $this->open($this->sboxPath . "civicrm/dashboard?reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -72,7 +71,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($firstName, "Adams", "{$firstName}.adams@example.org");
 
     $sortName = "Adams, {$firstName}";
-    // Go directly to the URL of the screen that you will be testing (Home dashboard).
+
     $this->open($this->sboxPath . "civicrm/dashboard?reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

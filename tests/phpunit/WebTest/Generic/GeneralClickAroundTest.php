@@ -33,7 +33,6 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
   }
 
   function login() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("//a[contains(text(),'CiviCRM')]");

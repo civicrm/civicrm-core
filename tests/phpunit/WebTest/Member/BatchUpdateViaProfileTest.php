@@ -33,11 +33,6 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
   }
 
   function testMemberAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -189,7 +184,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
   }
 
   function _addProfile($profileTitle, $customDataParams) {
-    // Go directly to the URL of the screen that you will be testing (New Profile).
+
     $this->openCiviPage("admin/uf/group", "reset=1");
 
     $this->click('link=Add Profile');
@@ -224,7 +219,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
   function _addCustomData() {
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
+
     $this->openCiviPage('admin/custom/group', 'reset=1');
     
     //add new custom data

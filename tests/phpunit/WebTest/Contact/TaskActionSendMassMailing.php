@@ -33,12 +33,9 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
   }
 
   function testSelectedContacts() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Group).
-    $this->open($this->sboxPath . "civicrm/group/add&reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage('group/add', 'reset=1', "_qf_Edit_upload");
 
     // make group name
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);

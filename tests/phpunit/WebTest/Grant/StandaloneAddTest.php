@@ -38,7 +38,7 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
 
   function testStandaloneGrantAdd() {
     // Log in as admin first to verify permissions for CiviGrant
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviGrant module if necessary
     $this->enableComponents("CiviGrant");
@@ -47,10 +47,10 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     $permission = array('edit-2-access-civigrant', 'edit-2-edit-grants', 'edit-2-delete-in-civigrant');
     $this->changePermissions($permission);
 
-    // Go directly to the URL of the screen that you will be testing (New Contribution-standalone).
-    $this->openCiviPage('grant/add', 'reset=1&context=standalone', '_qf_Grant_upload');
+    // Log in as normal user
+    $this->webtestLogin();
 
-    // Let's start filling the form with values.
+    $this->openCiviPage('grant/add', 'reset=1&context=standalone', '_qf_Grant_upload');
 
     // create new contact using dialog
     $firstName = substr(sha1(rand()), 0, 7);

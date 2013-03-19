@@ -7,13 +7,8 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
   }
 
   function testEventListing() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     //Closed Event
     $eventTitle1 = 'My Conference - ' . substr(sha1(rand()), 0, 7);
@@ -84,8 +79,8 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
 
     //go to block listing to enable Upcomming Events Block
     // you need to be admin user for below operation
-    $this->openCiviPage("logout", "reset=1", NULL);
-    $this->webtestLogin(TRUE);
+    $this->webtestLogout();
+    $this->webtestLogin('admin');
 
     $this->open($this->sboxPath . 'admin/structure/block/manage/civicrm/6/configure');
     $this->waitForElementPresent('edit-submit');
@@ -115,17 +110,13 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
   }
 
   function _testCreateEvent($eventTitle, $startdate, $enddate) {
-    // Go directly to the URL of the screen that you will be testing (New Event).
+
     $this->openCiviPage("event/add", "reset=1&action=add");
 
     // $eventTitle = 'My Conference - '.substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
-    // Let's start filling the form with values.
     $this->select("event_type_id", "value=1");
 
     // Attendee role s/b selected now.

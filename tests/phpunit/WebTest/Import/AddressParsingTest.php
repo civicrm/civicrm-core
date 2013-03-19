@@ -37,11 +37,6 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
      */
   function testValidStreetAddressParsing() {
 
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Logging in.
     $this->webtestLogin();
 
@@ -99,7 +94,6 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
      *  Function to check for Invalid Street Address
      */
   function testInvalidStreetAddressParsing() {
-    $this->open($this->sboxPath);
 
     // Logging in.
     $this->webtestLogin();
@@ -160,7 +154,6 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
      *  Function to check Street Address when Address Parsing is Disabled
      */
   function testStreetAddress() {
-    $this->open($this->sboxPath);
 
     // Logging in.
     $this->webtestLogin();

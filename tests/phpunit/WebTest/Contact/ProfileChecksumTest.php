@@ -33,17 +33,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
   }
 
   function testProfileChecksum() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Profile fields.
     $fields = array(
@@ -116,12 +106,10 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->changePermissions($permission);
 
     // Get checksum of the newly created contact.
-    require_once 'CRM/Contact/BAO/Contact/Utils.php';
     $cs = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactId);
 
-    // Logout.
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // logout.
+    $this->webtestLogout();
 
     // Go to edit profile page of the created contact.
     $this->open($this->sboxPath . "civicrm/profile/edit?id={$contactId}&gid={$profileId}&reset=1&cs={$cs}");
@@ -154,8 +142,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
   }
 
   function _testCreateContactProfile($fields, $profileName) {
-    // Go directly to the URL of the screen that you will be
-    // testing (Add new profile ).
+    // Add new profile.
     $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
     $this->click('newCiviCRMProfile-top');

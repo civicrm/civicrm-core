@@ -33,10 +33,6 @@ class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
   }
 
   function testDefaultCountryIsEnabled() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->open($this->sboxPath . "civicrm/admin/setting/localization?reset=1");
 

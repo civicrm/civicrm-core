@@ -33,19 +33,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
   function testCustomDataAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
     //fill custom group title
@@ -167,15 +156,9 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
   function testCustomDataMoneyAdd() {
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
     //fill custom group title
@@ -257,13 +240,6 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
      // This is the path where our testing install resides.
     // The rest of URL is defined in CiviSeleniumTestCase base class, in
     // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     //enable logging
@@ -296,7 +272,6 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('crm-notification-container', "Your custom field '$customField' has been saved.");
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //contact details section

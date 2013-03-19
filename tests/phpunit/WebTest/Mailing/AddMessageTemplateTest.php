@@ -35,7 +35,6 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
   function testTemplateAdd($useTokens = FALSE, $msgTitle = NULL) {
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (Add Message Template).
     $this->openCiviPage("admin/messageTemplates/add", "action=add&reset=1");
 
     // Fill message title.
@@ -120,7 +119,6 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->click('_qf_MailSettings_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to Schedule and Send Mailing form
     $this->openCiviPage("mailing/send", "reset=1", "_qf_Group_cancel");
 
     // fill mailing name

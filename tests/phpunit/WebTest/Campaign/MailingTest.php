@@ -34,7 +34,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
 
   function testCreateCampaign() {
     // Log in as admin first to verify permissions for CiviCampaign
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
@@ -42,6 +42,9 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     // add the required Drupal permission
     $permissions = array('edit-2-administer-civicampaign');
     $this->changePermissions($permissions);
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
@@ -62,10 +65,8 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
-    // Let's start filling the form with values.
 
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);
@@ -119,7 +120,6 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->click('_qf_MailSettings_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to Schedule and Send Mailing form
     $this->openCiviPage('mailing/send', 'reset=1', '_qf_Group_cancel');
 
     //-------select recipients----------

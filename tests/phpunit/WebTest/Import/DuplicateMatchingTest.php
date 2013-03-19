@@ -36,21 +36,9 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
    *  Test contact import for Individuals Duplicate Matching.
    */
   function testIndividualDuplicateMatchingImport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of New Individual.
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Individual');
-    $this->waitForElementPresent('first_name');
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual", 'first_name');
 
     $email = substr(sha1(rand()), 0, 7) . '@example.com';
 
@@ -150,21 +138,10 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
    *  Test contact import for Organization Duplicate Matching.
    */
   function testOrganizationDuplicateMatchingImport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     //create oranization
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Organization');
-    $this->waitForElementPresent('organization_name');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization", 'organization_name');
 
     // get value for organization contact
     $organizationName = 'org_' . substr(sha1(rand()), 0, 7);
@@ -258,21 +235,10 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
    *  Test contact import for Household Duplicate Matching.
    */
   function testHouseholdDuplicateMatchingImport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // create household
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Household');
-    $this->waitForElementPresent('household_name');
+    $this->openCiviPage("contact/add", "reset=1&ct=Household", 'household_name');
 
     // get values for household contact
     $householdName = 'household_' . substr(sha1(rand()), 0, 7);

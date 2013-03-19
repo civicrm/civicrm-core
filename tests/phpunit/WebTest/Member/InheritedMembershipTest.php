@@ -31,11 +31,6 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
   }
 
   function testInheritedMembership() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -48,7 +43,6 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('crm-notification-container', "Organization {$title} has been created.");
 
-    // Go directly to the URL
     $this->openCiviPage('admin/member/membershipType', 'reset=1&action=browse');
 
     $this->click('link=Add Membership Type');

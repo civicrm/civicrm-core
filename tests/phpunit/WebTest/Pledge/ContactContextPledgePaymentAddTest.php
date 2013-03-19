@@ -33,16 +33,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
   }
 
   function testAddPledgePaymentWithAdjustPledgePaymentSchedule() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $this->openCiviPage('admin/setting/localization', 'reset=1');
     $this->select("currencyLimit-f","value=FJD");
@@ -75,7 +65,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     // check contact name on pledge form
     $this->assertElementContainsText('css=tr.crm-pledge-form-block-displayName', "$firstName $lastName");
 
-    // Let's start filling the form with values.
     $this->select("currency","value=FJD");
     $this->type("amount", "30");
     $this->type("installments", "3");
@@ -231,16 +220,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
   }
 
   function testAddPledgePaymentWithAdjustTotalPledgeAmount() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // create unique name
@@ -268,7 +247,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     // check contact name on pledge form
     $this->assertElementContainsText('css=tr.crm-pledge-form-block-displayName', "$firstName $lastName");
 
-    // Let's start filling the form with values.
     $this->type("amount", "30");
     $this->type("installments", "3");
     $this->select("frequency_unit", "value=week");
@@ -406,16 +384,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
   }
 
   function testAddPledgePayment() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // create unique name
@@ -443,7 +411,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     // check contact name on pledge form
     $this->assertElementContainsText('css=tr.crm-pledge-form-block-displayName', "$firstName $lastName");
 
-    // Let's start filling the form with values.
     $this->type("amount", "30");
     $this->type("installments", "3");
     $this->select("frequency_unit", "value=week");

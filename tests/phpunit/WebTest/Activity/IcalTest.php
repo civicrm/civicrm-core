@@ -41,8 +41,6 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
     }
 
     function testStandaloneActivityAdd() {
-
-        $this->open($this->sboxPath);
         $this->webtestLogin();
 
         $this->openCivipage("admin/setting/preferences/display", "reset=1", "name=activity_assignee_notification_ics");
@@ -53,7 +51,7 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
         $this->waitForPageToLoad($this->getTimeoutMsec());
 
         // Start spooling emails
-        $mailer = new CiviMailUtils( $this, true );
+        $mailer = new CiviMailUtils($this, true);
         self::$foundIt = false;
 
         $firstName1 = substr(sha1(rand()), 0, 7);
@@ -63,8 +61,10 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
 
         $this->select("activity_type_id", "value=1");
 
-        $this->click("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id");
-        $this->typeKeys("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", "$firstName1");
+        $this->click("token-input-assignee_contact_id");
+        sleep(1);
+        $this->type("token-input-assignee_contact_id", "$firstName1");
+        $this->typeKeys("token-input-assignee_contact_id", "$firstName1");
 
         $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
         $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");

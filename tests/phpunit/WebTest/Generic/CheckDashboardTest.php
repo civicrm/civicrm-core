@@ -34,7 +34,6 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
   }
 
   function testCheckDashboardElements() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 

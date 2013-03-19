@@ -33,7 +33,6 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
   }
 
   function testOfflineRecurContribution() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // We need a payment processor
@@ -85,8 +84,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Use Find Contributions to make sure test recurring contribution exists
-    $this->open($this->sboxPath . 'civicrm/contribute/search?reset=1');
-    $this->waitForElementPresent('contribution_currency_type');
+    $this->openCiviPage("contribute/search", "reset=1", 'contribution_currency_type');
 
     $this->type('sort_name', "$lastName, $firstName");
     $this->click('contribution_test');
