@@ -174,6 +174,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           array('title' => 'Currency',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+            'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
 
