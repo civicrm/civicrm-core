@@ -246,11 +246,11 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     $permission = array('edit-1-access-civimail-subscribeunsubscribe-pages');
     $this->changePermissions($permission);
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
+    $this->openCiviPage('logout', 'reset=1', NULL);
 
     // build forward url
     $forwardUrl = array("mailing/forward", "reset=1&jid={$eventQueue->job_id}&qid={$eventQueue->id}&h={$eventQueue->hash}");
-    $this->openCiviPage($forwardUrl[0], $forwardUrl[1]);
+    $this->openCiviPage($forwardUrl[0], $forwardUrl[1], NULL);
 
     $this->type("email_0", substr(sha1(rand()), 0, 7) . '@example.com');
     $this->type("email_1", substr(sha1(rand()), 0, 7) . '@example.com');
@@ -367,8 +367,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go directly to Schedule and Send Mailing form
-    $this->open($this->sboxPath . "civicrm/mailing/send?reset=1");
-    $this->waitForElementPresent("_qf_Group_cancel");
+    $this->openCiviPage('mailing/send', 'reset=1', '_qf_Group_cancel');
 
     //-------select recipients----------
 
