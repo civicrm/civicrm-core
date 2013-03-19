@@ -41,7 +41,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     parent::__construct();
   }
   /*
-   * Create email address - note that the create function calls 'add' but
+   * Create option value - note that the create function calls 'add' but
   * has more business logic
   * Note that this is the right place to add pre & post hooks if we want them
   * ? any reason not to?
