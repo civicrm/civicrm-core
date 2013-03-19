@@ -91,7 +91,7 @@ class CRM_Export_BAO_Export {
       NULL,
       NULL,
       TRUE,
-      'label',
+      'name',
       FALSE
     );
     $queryMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
@@ -227,12 +227,12 @@ class CRM_Export_BAO_Export {
             $returnProperties['event_title'] = 1;
           }
           else if (
-            $exportMode == CRM_Export_Form_Select::EVENT_EXPORT && 
+            $exportMode == CRM_Export_Form_Select::EVENT_EXPORT &&
             array_key_exists( $fieldName, self::componentPaymentFields())
-          ) { 
+          ) {
               $selectedPaymentFields = true;
               $paymentTableId = 'participant_id';
-              $returnProperties[$fieldName] = 1;  
+              $returnProperties[$fieldName] = 1;
           }
           else {
             $returnProperties[$fieldName] = 1;
@@ -1005,7 +1005,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $setHeader = FALSE;
 
         // If specific payment fields have been selected for export, payment
-        // data will already be in $row. Otherwise, add payment related 
+        // data will already be in $row. Otherwise, add payment related
         // information, if appropriate.
         if (!$selectedPaymentFields) {
           if ($paymentFields) {
