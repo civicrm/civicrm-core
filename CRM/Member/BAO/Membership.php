@@ -2555,6 +2555,18 @@ WHERE      civicrm_membership.is_test = 0";
           $memParams['createActivity'] = TRUE;
           $memParams['version'] = 3;
 
+          // Unset columns which should remain unchanged from their current saved
+          // values. This avoids race condition in which these values may have
+          // been changed by other processes.
+          unset(
+            $memParams['contact_id'],
+            $memParams['membership_type_id'],
+            $memParams['membership_type'],
+            $memParams['join_date'],
+            $memParams['start_date'],
+            $memParams['end_date'],
+            $memParams['source']
+          );
           //since there is change in status.
           $statusChange = array('status_id' => $statusId);
           $smarty->append_by_ref('memberParams', $statusChange, TRUE);
