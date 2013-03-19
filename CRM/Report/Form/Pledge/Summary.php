@@ -145,6 +145,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
           array('title' => 'Currency',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+            'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
           'sid' =>
