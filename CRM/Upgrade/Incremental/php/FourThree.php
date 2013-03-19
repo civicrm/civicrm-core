@@ -203,7 +203,11 @@ WHERE    entity_value = '' OR entity_value IS NULL
     $query = "SELECT * FROM civicrm_saved_search WHERE form_values LIKE '%contribution_type%'";
     $this->addTask('Replace contribution_type to financial_type in table civicrm_saved_search', 'replaceContributionTypeId', $query, 'savedSearch');
   }
-  
+
+  function upgrade_4_3_beta4($rev) {
+    $this->addTask(ts('Upgrade DB to 4.3.beta4: SQL'), 'task_4_3_x_runSql', $rev);
+  }
+
   //CRM-11636
   function assignFinancialTypeToPriceRecords() {
     $upgrade = new CRM_Upgrade_Form();
@@ -732,12 +736,12 @@ AND TABLE_SCHEMA = '{$dbUf['database']}'";
         $saveDao = new CRM_Contact_DAO_SavedSearch();
       }
       else {
-        $saveDao = new CRM_Report_DAO_Instance();        
+        $saveDao = new CRM_Report_DAO_Instance();
       }
       $saveDao->id = $dao->id;
 
       if ($table == 'savedSearch') {
-        if (array_key_exists('mapper', $formValues)) { 
+        if (array_key_exists('mapper', $formValues)) {
           foreach ($formValues['mapper'] as $key => $values) {
             foreach ($values as $k => $v) {
               if (preg_grep('/contribution_/', $v)) {
@@ -758,7 +762,7 @@ AND TABLE_SCHEMA = '{$dbUf['database']}'";
         }
         if (preg_match('/contribution_type/', $dao->where_clause)) {
           $saveDao->where_clause = preg_replace('/contribution_type/', 'financial_type', $dao->where_clause);
-        }        
+        }
       }
       $saveDao->form_values = serialize($formValues);
 
