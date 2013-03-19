@@ -235,6 +235,10 @@ class CRM_Extension_Mapper {
    */
   public function keyToUrl($key) {
     if ($key == 'civicrm') {
+      if (empty($this->civicrmUrl)) {
+        $config = CRM_Core_Config::singleton();
+        return rtrim($config->resourceBase, '/');
+      }
       return $this->civicrmUrl;
     }
 
