@@ -112,8 +112,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     // Go to edit profile page of the created contact.
-    $this->open($this->sboxPath . "civicrm/profile/edit?id={$contactId}&gid={$profileId}&reset=1&cs={$cs}");
-    $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
+    $this->openCiviPage("profile/edit", "id={$contactId}&gid={$profileId}&reset=1&cs={$cs}");
     $this->assertStringsPresent(array($profileName));
 
     // Check all profile fields, update their values.
@@ -143,8 +142,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
 
   function _testCreateContactProfile($fields, $profileName) {
     // Add new profile.
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
-    $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
+    $this->openCiviPage("admin/uf/group", "reset=1");
     $this->click('newCiviCRMProfile-top');
     $this->waitForElementPresent('_qf_Group_next-top');
 
@@ -157,8 +155,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
 
     // Add field to the profile.
     foreach ($fields as $key => $values) {
-      $this->open($this->sboxPath . 'civicrm/admin/uf/group/field/add?reset=1&action=add&gid=' . $profileId);
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("admin/uf/group/field/add", "reset=1&action=add&gid=$profileId");
 
       $this->select("field_name[0]", "value={$values['type']}");
       sleep(1);

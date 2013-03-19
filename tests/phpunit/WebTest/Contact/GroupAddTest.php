@@ -157,21 +157,22 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     );
     $this->changePermissions($permissions);
 
-    // Now logout as admin, login as regular user and verify that Group settings, delete and disable links are not available
+    // Now logout as admin, login as regular user and verify that Group settings,
+    // delete and disable links are not available
     $this->webtestLogin($user, 'Test12345');
 
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
     $this->waitForTextPresent("Adding new reserved group.");
-    // Settings link should NOT be included in selector after search returns with only the reserved group.
+    // Settings link should NOT be included in selector
+    // after search returns with only the reserved group.
     $this->assertElementNotContainsText("css=td.crm-group-group_links", "Settings");
 
     //login as admin and delete the role
     $this->webtestLogin('admin');
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->_roleDelete($role);
-
   }
 
   function _testCreateUser($roleid) {

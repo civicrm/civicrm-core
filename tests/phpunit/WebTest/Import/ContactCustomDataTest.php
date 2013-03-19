@@ -41,8 +41,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
 
     // Add New Strict Rule
     $newRuleTitle = 'IndividualStrict_' . substr(sha1(rand()), 0, 7);
-    $this->open($this->sboxPath . "civicrm/contact/deduperules?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/deduperules", "reset=1");
 
     $this->click("xpath=//div[@id='browseValues_Individual']/div[2]/a/span");
     $this->waitForElementPresent('_qf_DedupeRules_next-bottom');
@@ -131,7 +130,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
 
   function _addCustomData() {
 
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
+    $this->openCiviPage("admin/custom/group", "reset=1");
 
     //add new custom data
     $this->click("//a[@id='newCustomDataGroup']/span");

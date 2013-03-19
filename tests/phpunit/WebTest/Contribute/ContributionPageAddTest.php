@@ -38,8 +38,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     // create contribution page with randomized title and default params
     $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy'), TRUE, TRUE, 'required');
 
-    $this->open($this->sboxPath . 'civicrm/admin/contribute?reset=1');
-    $this->waitForPageToLoad();
+    $this->openCiviPage("admin/contribute", "reset=1");
 
     // search for the new contrib page and go to its test version
     $this->type('title', $pageTitle);
@@ -48,8 +47,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // select testdrive mode
     $this->isTextPresent($pageTitle);
-    $this->open($this->sboxPath . 'civicrm/contribute/transact?reset=1&action=preview&id=' . $pageId);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
+
     // verify whatever’s possible to verify
     // FIXME: ideally should be expanded
     $texts = array(
@@ -90,8 +89,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       1, 7, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE
     );
 
-    $this->open($this->sboxPath . 'civicrm/admin/contribute?reset=1');
-    $this->waitForPageToLoad();
+    $this->openCiviPage("admin/contribute", "reset=1");
 
     // search for the new contrib page and go to its test version
     $this->type('title', $pageTitle);
@@ -100,9 +98,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // select testdrive mode
     $this->isTextPresent($pageTitle);
-    $this->open($this->sboxPath . 'civicrm/contribute/transact?reset=1&action=preview&id=' . $pageId);
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $texts = array(
       "Title - New Membership $hash",
       "This is introductory message for $pageTitle",
@@ -140,8 +137,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       1, 0, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE
     );
 
-    $this->open($this->sboxPath . 'civicrm/admin/contribute?reset=1');
-    $this->waitForPageToLoad();
+    $this->openCiviPage("admin/contribute", "reset=1");
 
     // search for the new contrib page and go to its test version
     $this->type('title', $pageTitle);

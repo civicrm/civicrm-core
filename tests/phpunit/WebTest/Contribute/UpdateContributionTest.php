@@ -33,15 +33,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
   }
 
  function testChangeContributionAmount() {
-   // This is the path where our testing install resides.
-   // The rest of URL is defined in CiviSeleniumTestCase base class, in
-   // class attributes.
-   $this->open($this->sboxPath);
-   // Logging in. Remember to wait for page to load. In most cases,
-   // you can rely on 30000 as the value that allows your test to pass, however,
-   // sometimes your test might fail because of this. In such cases, it's better to pick one element
-   // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-   // page contents loaded and you can continue your test execution.
    $this->webtestLogin();
    $firstName = substr(sha1(rand()), 0, 7);
    $lastName  = 'Contributor';
@@ -94,15 +85,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
  function testPayLater() {
-   // This is the path where our testing install resides.
-   // The rest of URL is defined in CiviSeleniumTestCase base class, in
-   // class attributes.
-   $this->open($this->sboxPath);
-   // Logging in. Remember to wait for page to load. In most cases,
-   // you can rely on 30000 as the value that allows your test to pass, however,
-   // sometimes your test might fail because of this. In such cases, it's better to pick one element
-   // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-   // page contents loaded and you can continue your test execution.
    $this->webtestLogin();
    $firstName = substr(sha1(rand()), 0, 7);
    $lastName  = 'Contributor';
@@ -132,15 +114,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
  function testChangePremium() {
-   // This is the path where our testing install resides.
-   // The rest of URL is defined in CiviSeleniumTestCase base class, in
-   // class attributes.
-   $this->open($this->sboxPath);
-   // Logging in. Remember to wait for page to load. In most cases,
-   // you can rely on 30000 as the value that allows your test to pass, however,
-   // sometimes your test might fail because of this. In such cases, it's better to pick one element
-   // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-   // page contents loaded and you can continue your test execution.
    $this->webtestLogin();
    $firstName = substr(sha1(rand()), 0, 7);
    $lastName  = 'Contributor';
@@ -165,7 +138,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $sku = 'SKU';
    $price = 300;
    $cost = 3.00;
-   $this->open($this->sboxPath . "civicrm/admin/contribute/managePremiums?action=add&reset=1");
+   $this->openCiviPage("admin/contribute/managePremiums", "action=add&reset=1");
    // add premium
    $this->addPremium($premiumName, $sku, $amount, $price, $cost, $financialType['name']);
 
@@ -175,12 +148,11 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $sku2 = 'SKU';
    $price2 = 200;
    $cost2 = 2.00;
-   $this->open($this->sboxPath . "civicrm/admin/contribute/managePremiums?action=add&reset=1");
+   $this->openCiviPage("admin/contribute/managePremiums", "action=add&reset=1");
    $this->addPremium($premiumName2, $sku2, $amount2, $price2, $cost2, $financialType['name']);
 
    // add contribution with premium
-   $this->open($this->sboxPath . "civicrm/contribute/add?reset=1&action=add&context=standalone");
-   $this->waitForPageToLoad($this->getTimeoutMsec());
+   $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone");
 
    // create new contact using dialog
    $this->webtestNewDialogContact($firstName, $lastName, $email);
@@ -219,15 +191,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
  function testDeletePremium() {
-   // This is the path where our testing install resides.
-   // The rest of URL is defined in CiviSeleniumTestCase base class, in
-   // class attributes.
-   $this->open($this->sboxPath);
-   // Logging in. Remember to wait for page to load. In most cases,
-   // you can rely on 30000 as the value that allows your test to pass, however,
-   // sometimes your test might fail because of this. In such cases, it's better to pick one element
-   // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-   // page contents loaded and you can continue your test execution.
    $this->webtestLogin();
    $firstName = substr(sha1(rand()), 0, 7);
    $lastName  = 'Contributor';
@@ -252,18 +215,17 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $sku = 'SKU';
    $price = 300;
    $cost = 3.00;
-   $this->open($this->sboxPath . "civicrm/admin/contribute/managePremiums?action=add&reset=1");
+   $this->openCiviPage("admin/contribute/managePremiums", "action=add&reset=1");
    // add premium
    $this->addPremium($premiumName, $sku, $amount, $price, $cost, $financialType['name']);
 
    // add contribution with premium
-   $this->open($this->sboxPath . "civicrm/contribute/add?reset=1&action=add&context=standalone");
-   $this->waitForPageToLoad($this->getTimeoutMsec());
+   $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone");
 
    // create new contact using dialog
    $this->webtestNewDialogContact($firstName, $lastName, $email);
    // select financial type
-   $this->select( "financial_type_id", "value=1" );
+   $this->select("financial_type_id", "value=1");
    // total amount
    $this->type("total_amount", "100");
    // fill Premium information
@@ -294,15 +256,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
  function testChangePaymentInstrument() {
-   // This is the path where our testing install resides.
-   // The rest of URL is defined in CiviSeleniumTestCase base class, in
-   // class attributes.
-   $this->open($this->sboxPath);
-   // Logging in. Remember to wait for page to load. In most cases,
-   // you can rely on 30000 as the value that allows your test to pass, however,
-   // sometimes your test might fail because of this. In such cases, it's better to pick one element
-   // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-   // page contents loaded and you can continue your test execution.
    $this->webtestLogin();
    $firstName = substr(sha1(rand()), 0, 7);
    $lastName  = 'Contributor';
@@ -328,15 +281,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
  function testRefundContribution() {
-   // This is the path where our testing install resides.
-   // The rest of URL is defined in CiviSeleniumTestCase base class, in
-   // class attributes.
-   $this->open($this->sboxPath);
-   // Logging in. Remember to wait for page to load. In most cases,
-   // you can rely on 30000 as the value that allows your test to pass, however,
-   // sometimes your test might fail because of this. In such cases, it's better to pick one element
-   // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-   // page contents loaded and you can continue your test execution.
    $this->webtestLogin();
    $firstName = substr(sha1(rand()), 0, 7);
    $lastName  = 'Contributor';
@@ -366,15 +310,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
  function testCancelPayLater() {
-   // This is the path where our testing install resides.
-   // The rest of URL is defined in CiviSeleniumTestCase base class, in
-   // class attributes.
-   $this->open($this->sboxPath);
-   // Logging in. Remember to wait for page to load. In most cases,
-   // you can rely on 30000 as the value that allows your test to pass, however,
-   // sometimes your test might fail because of this. In such cases, it's better to pick one element
-   // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-   // page contents loaded and you can continue your test execution.
    $this->webtestLogin();
    $firstName = substr(sha1(rand()), 0, 7);
    $lastName  = 'Contributor';
@@ -410,15 +345,6 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
  }
 
  function testChangeFinancialType() {
-   // This is the path where our testing install resides.
-   // The rest of URL is defined in CiviSeleniumTestCase base class, in
-   // class attributes.
-   $this->open($this->sboxPath);
-   // Logging in. Remember to wait for page to load. In most cases,
-   // you can rely on 30000 as the value that allows your test to pass, however,
-   // sometimes your test might fail because of this. In such cases, it's better to pick one element
-   // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-   // page contents loaded and you can continue your test execution.
    $this->webtestLogin();
    $firstName = substr(sha1(rand()), 0, 7);
    $lastName  = 'Contributor';

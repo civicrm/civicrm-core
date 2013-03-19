@@ -98,10 +98,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
 
     ////////////// Create petition using New Individual profile //////////////////////
 
-    $this->open($this->sboxPath . "civicrm/petition/add?reset=1");
-
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Petition_next-bottom");
+    $this->openCiviPage("petition/add", "reset=1", "_qf_Petition_next-bottom");
 
     // fill petition tile.
     $title = substr(sha1(rand()), 0, 7);
@@ -188,10 +185,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     }
     
     // ONCE MORE, NO EMAIL VERIFICATION AND CUSTOM THANK-YOU
-    $this->open($this->sboxPath . "civicrm/petition/add?reset=1");
-
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Petition_next-bottom");
+    $this->openCiviPage("petition/add", "reset=1", "_qf_Petition_next-bottom");
 
     // fill petition tile.
     $title = substr(sha1(rand()), 0, 7);

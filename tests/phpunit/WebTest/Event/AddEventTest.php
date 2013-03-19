@@ -40,7 +40,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -78,7 +78,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -117,7 +117,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -150,8 +150,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     sleep(3);
     
     //Assert quick config change and discount deletion
-    $this->open($this->sboxPath . "civicrm/admin/price?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/price", "reset=1");
     $this->assertStringsPresent($discount);
   }
 
@@ -164,7 +163,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -199,11 +198,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->type("discounted_value_1_2", "");
     $this->type("discounted_value_2_2", "");
     $this->click("_qf_Fee_upload-bottom");
-    sleep(3);
+    $this->waitForPageToLoad();
     //Assertions
-    $this->open($this->sboxPath . "civicrm/admin/price?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    sleep(3);
+    $this->openCiviPage("admin/price", "reset=1");
     $this->assertStringsPresent($discount[1]);
   }
 
@@ -216,7 +213,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -247,7 +244,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
    
     $eventTitle = 'My Free Meeting - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this free meeting.";
@@ -283,7 +280,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
     $this->_testAddEventInfo($eventTitle, $eventDescription);
@@ -477,7 +474,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage("event/manage", "reset=1");
     $this->click("link=$eventTitle");
 
     // Look for Register button

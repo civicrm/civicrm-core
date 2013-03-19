@@ -174,9 +174,8 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Confirm_next-bottom");
 
     $this->waitForElementPresent("thankyou_footer");
-    //login to check contribution
 
-    // Log in using webtestLogin() method
+    //login to check contribution
     $this->webtestLogin();
 
     //Find Contribution

@@ -43,8 +43,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $sortName = "Anderson, $firstName";
     $displayName = "$firstName Anderson";
 
-    $this->open($this->sboxPath . "civicrm/dashboard?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("dashboard", "reset=1");
 
     // type sortname in autocomplete
     $this->click("css=input#sort_name_navigation");
@@ -72,8 +71,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
 
     $sortName = "Adams, {$firstName}";
 
-    $this->open($this->sboxPath . "civicrm/dashboard?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("dashboard", "reset=1");
 
     // type partial sortname in autocomplete
     $this->click("css=input#sort_name_navigation");
@@ -132,8 +130,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=.success");
 
     // visit contact search page
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search", "reset=1");
 
     // fill name as first_name
     $this->type("css=.crm-basic-criteria-form-block input#sort_name", $firstName);
@@ -231,11 +228,8 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-
     // visit contact search page
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->openCiviPage("contact/search", "reset=1");
 
     // select contact type as Indiividual
     $this->select("contact_type", "value=Individual");

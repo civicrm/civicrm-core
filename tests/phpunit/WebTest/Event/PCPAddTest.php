@@ -114,7 +114,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
   function _testAddEventForPCP($processorName, $campaignType, $contributionPageId = NULL, $firstName, $lastName, $middleName, $email) {
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -426,8 +426,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
   function _testParticipantSearchEventName($eventName, $lastNameDonar, $firstNameDonar, $firstNameCreator, $lastNameCreator, $amount) {
     $sortName = $lastNameDonar . ', ' . $firstNameDonar;
-    $this->open($this->sboxPath . "civicrm/event/search?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("event/search", "reset=1");
 
     $this->type("event_name", $eventName);
     $this->click("event_name");
@@ -459,8 +458,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $displayName = "$firstName $lastName";
 
     // visit contact search page
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search", "reset=1");
 
     // fill name as first_name
     $this->type("css=.crm-basic-criteria-form-block input#sort_name", $pcpCreatorFirstName);

@@ -77,8 +77,8 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->webtestLogin();
 
     $this->openCiviPage("campaign", "reset=1", "link=Add Campaign");
-    if ($this->isTextPresent('No campaigns found.')) {
 
+    if ($this->isTextPresent('No campaigns found.')) {
       $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
       $this->assertTrue($this->isTextPresent('There are currently no active Campaigns.'));
     }
@@ -120,7 +120,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
 
   function offlineParticipantAddTest($campaignTitle, $id) {
     // connect campaign with event
-    $this->open($this->sboxPath . "civicrm/event/manage&reset=1");
+    $this->openCiviPage("event/manage", "reset=1");
     $eventId = $this->registerUrl();
 
     $this->openCiviPage('event/manage/settings', "reset=1&action=update&id=$eventId", "_qf_EventInfo_cancel-bottom");
@@ -216,8 +216,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
   }
 
   function registerUrl() {
-    $this->open($this->sboxPath . 'civicrm/event/manage?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("event/manage", "reset=1");
     $eventId = explode('_', $this->getAttribute("//div[@id='event_status_id']//table/tbody/tr@id"));
     return $eventId[1];
   }

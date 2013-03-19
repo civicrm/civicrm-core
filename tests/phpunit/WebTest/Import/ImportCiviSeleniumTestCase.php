@@ -194,10 +194,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     ), $other = array(), $type = 'csv') {
 
     // Go to contact import page.
-    $this->open($this->sboxPath . "civicrm/import/contact?reset=1");
-
-    // check for upload field.
-    $this->waitForElementPresent("uploadFile");
+    $this->openCiviPage("import/contact", "reset=1", "uploadFile");
 
     $originalHeaders = $headers;
     $originalRows = $rows;
@@ -543,9 +540,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
         $searchName = $row['household_name'];
       }
 
-      $this->open($this->sboxPath . "civicrm/dashboard?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-
+      $this->openCiviPage("dashboard", "reset=1");
 
       // Type search name in autocomplete.
       $this->click("css=input#sort_name_navigation");

@@ -80,9 +80,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id=" . $pageId);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
-
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);

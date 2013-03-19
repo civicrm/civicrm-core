@@ -75,8 +75,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
     // Visit contacts to check updated data.
     foreach ($updateRows as $updatedRow) {
-      $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid={$updatedRow['contact_id']}");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/view", "reset=1&cid={$updatedRow['contact_id']}");
       $displayName = "{$updatedRow['first_name']} {$updatedRow['last_name']}";
       $this->assertTrue($this->isTextPresent("$displayName"), "Contact did not update!");
     }
@@ -106,8 +105,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
     // Visit contacts to check filled data.
     foreach ($fillRows as $cid => $fillRow) {
-      $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid={$fillRow['contact_id']}");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/view", "reset=1&cid={$fillRow['contact_id']}");
 
       // Check old display name.
       $displayName = "{$updateRows[$cid]['first_name']} {$updateRows[$cid]['last_name']}";
@@ -159,8 +157,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     // Visit contacts to check updated data.
     foreach ($updateRows as $updatedRow) {
       $organizationName = $updatedRow['organization_name'];
-      $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid={$updatedRow['contact_id']}");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/view", "reset=1&cid={$updatedRow['contact_id']}");
 
       $this->assertTrue($this->isTextPresent("$organizationName"), "Contact did not update!");
     }
@@ -186,8 +183,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
     // Visit contacts to check filled data.
     foreach ($fillRows as $cid => $fillRow) {
-      $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid={$fillRow['contact_id']}");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/view", "reset=1&cid={$fillRow['contact_id']}");
 
       // Check old Organization name.
       $organizationName = $updateRows[$cid]['organization_name'];
@@ -241,8 +237,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     // Visit contacts to check updated data.
     foreach ($updateRows as $updatedRow) {
       $householdName = $updatedRow['household_name'];
-      $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid={$updatedRow['contact_id']}");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/view", "reset=1&cid={$updatedRow['contact_id']}");
 
       $this->assertTrue($this->isTextPresent("$householdName"), "Contact did not update!");
     }
@@ -268,8 +263,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
     // Visit contacts to check filled data.
     foreach ($fillRows as $cid => $fillRow) {
-      $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid={$fillRow['contact_id']}");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/view", "reset=1&cid={$fillRow['contact_id']}");
 
       // Check old Household name.
       $householdName = $updateRows[$cid]['household_name'];
@@ -287,7 +281,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   function _createHouseholdSubtype() {
 
     // Visit to create contact subtype
-    $this->open($this->sboxPath . "civicrm/admin/options/subtype?action=add&reset=1");
+    $this->openCiviPage("admin/options/subtype", "action=add&reset=1");
 
     // Create Household subtype
     $householdSubtype = substr(sha1(rand()), 0, 7);

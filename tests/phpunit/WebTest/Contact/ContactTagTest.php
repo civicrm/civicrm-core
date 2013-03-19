@@ -79,7 +79,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
   function testTagSetContact() {
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/admin/tag?action=add&reset=1&tagset=1");
+    $this->openCiviPage("admin/tag", "action=add&reset=1&tagset=1");
 
     // take a tagset name
     $tagSetName = 'tagset_' . substr(sha1(rand()), 0, 7);

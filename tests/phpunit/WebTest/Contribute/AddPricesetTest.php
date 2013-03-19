@@ -224,8 +224,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
-    $this->open($this->sboxPath . 'civicrm/admin/price?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/price", "reset=1");
 
     // Use the price set id ($sid) to pick the correct row
     $this->click("css=tr#row_{$sid} a[title='View and Edit Price Fields']");
@@ -386,7 +385,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    $this->open($this->sboxPath . 'civicrm/admin/contribute/add?reset=1&action=add');
+    $this->openCiviPage("admin/contribute/add", "reset=1&action=add");
 
     $contributionTitle = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
@@ -519,7 +518,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    $this->open($this->sboxPath . 'civicrm/admin/contribute/add?reset=1&action=add');
+    $this->openCiviPage("admin/contribute/add", "reset=1&action=add");
 
     $contributionTitle = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);

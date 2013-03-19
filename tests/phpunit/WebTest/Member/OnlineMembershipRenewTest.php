@@ -401,8 +401,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    $this->open($this->sboxPath . 'civicrm/admin/member/membershipType?reset=1&action=browse');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click('link=Add Membership Type');
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -476,7 +475,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     );
 
     $hash = substr(sha1(rand()), 0, 7);
-    $this->open($this->sboxPath . "civicrm/admin/contribute/settings?reset=1&action=update&id=$pageId");
+    $this->openCiviPage("admin/contribute/settings", "reset=1&action=update&id=$pageId");
 
     $this->click('link=Title');
     $this->waitForElementPresent('_qf_Settings_cancel-bottom');
@@ -500,8 +499,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     //get Url for Live Contribution Page
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id=" . $pageId);
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", '_qf_Main_upload-bottom');
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$membershipTypeTitle')]");
     $firstName = 'Eia' . substr(sha1(rand()), 0, 4);
     $lastName = 'Ande' . substr(sha1(rand()), 0, 4);
@@ -603,7 +601,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     //logout
     $this->webtestLogout();
 
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id=" . $pageId);
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId");
 
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$membershipTypeTitle')]");
     $this->type("email-5", $email);

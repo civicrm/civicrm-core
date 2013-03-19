@@ -36,7 +36,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin('admin');
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";

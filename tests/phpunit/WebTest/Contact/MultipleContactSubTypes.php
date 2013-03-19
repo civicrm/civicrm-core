@@ -44,7 +44,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     list($groupTitleForParent, $customGroupIdForParent) = $this->_addCustomData($selection2);
     list($groupTitleForStaff, $customGroupIdForStaff) = $this->_addCustomData($selection3);
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //contact details section
     //select prefix
@@ -271,7 +271,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
 
   function _addCustomData($contactSubType) {
 
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
+    $this->openCiviPage("admin/custom/group", "reset=1");
 
     //add new custom data
     $customGroupTitle = "Custom group For {$contactSubType}" . substr(sha1(rand()), 0, 4);

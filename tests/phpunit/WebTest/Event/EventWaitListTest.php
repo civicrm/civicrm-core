@@ -38,7 +38,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -153,7 +153,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings) {
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage("event/manage", "reset=1");
     $this->click("link=$eventTitle");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

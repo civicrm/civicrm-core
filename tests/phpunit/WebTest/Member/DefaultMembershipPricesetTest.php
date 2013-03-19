@@ -212,7 +212,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
       $memTypeId3     = $memTypeId3[1];
     }
 
-    $this->open($this->sboxPath . "civicrm/admin/price/field?reset=1&action=add&sid={$sid}");
+    $this->openCiviPage("admin/price/field", "reset=1&action=add&sid={$sid}");
 
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;

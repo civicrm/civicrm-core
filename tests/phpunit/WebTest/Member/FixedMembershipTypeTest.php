@@ -51,8 +51,7 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -82,7 +81,7 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 
@@ -209,8 +208,7 @@ SELECT end_event_adjust_interval
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -240,7 +238,7 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 
@@ -369,8 +367,7 @@ SELECT end_event_adjust_interval
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -398,7 +395,7 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 
@@ -522,8 +519,7 @@ SELECT end_event_adjust_interval
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -552,7 +548,7 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 

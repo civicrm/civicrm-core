@@ -33,11 +33,6 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
   }
 
   function testAddFinancialBatch() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin('admin');
     $this->openCiviPage("financial/batch", "reset=1&action=add", '_qf_FinancialBatch_next-botttom');
@@ -99,8 +94,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
   }
 
   function _testExportBatch($setTitle, $batchId, $exportFormat) {
-    $this->open($this->sboxPath . "civicrm/financial/batch?reset=1&action=export&id=$batchId");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("financial/batch", "reset=1&action=export&id=$batchId");
     if ($exportFormat == 'CSV') {
       $this->click("xpath=//form[@id='FinancialBatch']/div[2]/table[@class='form-layout']/tbody/tr/td/input[2]");
       $this->click('_qf_FinancialBatch_next-botttom');
@@ -111,7 +105,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
       $this->click('_qf_FinancialBatch_next-botttom');
       sleep(5);
     }
-    $this->open($this->sboxPath . "civicrm?reset=1");
+    $this->openCiviPage("dashboard", "reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("xpath=//div[@id='recently-viewed']/ul/li[1]/a");

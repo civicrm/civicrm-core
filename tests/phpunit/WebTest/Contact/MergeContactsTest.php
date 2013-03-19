@@ -35,8 +35,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   function testIndividualAdd() {
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     // add contact1
     //select prefix
@@ -88,7 +87,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->addActivity($firstName, $lastName, $subject);
 
     // contact2: duplicate of contact1.
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //fill in first name
     $this->type("first_name", $firstName);
@@ -115,8 +114,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($fname2, $lname2, $email2);
 
     // Can not use helper for 2nd contact since it is a dupe
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $this->type("first_name", $fname2);
     $this->type("last_name", $lname2);
     $this->type("email_1_email", $email2);
@@ -128,12 +126,10 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Contact Saved");
 
     // Find and Merge Contacts with Supervised Rule
-    $this->open($this->sboxPath . 'civicrm/contact/dedupefind?reset=1&rgid=1&action=renew');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew");
 
     // reload the page
-    $this->open($this->sboxPath . 'civicrm/contact/dedupefind?reset=1&rgid=1&action=update');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=update");
 
     // Select the contacts to be merged
     $this->select("name=option51_length", "value=100");
@@ -282,8 +278,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   function testMergeTest() {
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     // add contact1
     //fill in first name
@@ -318,7 +313,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Contact Saved");
 
     // contact2: duplicate of contact1.
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //fill in first name
     $this->type("first_name", $firstName);
@@ -342,8 +337,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Contact Saved");
 
     // Find and Merge Contacts with Supervised Rule
-    $this->open($this->sboxPath . 'civicrm/contact/dedupefind?reset=1&rgid=1&action=renew');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew");
 
     // Select the contacts to be merged
     $this->select("name=option51_length", "value=100");
@@ -380,8 +374,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[4]/div[2][contains(text(), '9876543120')]"));
 
     //Merge with the feature of (add)
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     // add contact1
     //fill in first name
@@ -411,7 +404,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Contact Saved");
 
     // contact2: duplicate of contact1.
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //fill in first name
     $this->type("first_name", $firstName1);
@@ -435,8 +428,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Contact Saved");
 
     // Find and Merge Contacts with Supervised Rule
-    $this->open($this->sboxPath . 'civicrm/contact/dedupefind?reset=1&rgid=1&action=renew');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew");
 
     // Select the contacts to be merged
     $this->select("name=option51_length", "value=100");
@@ -483,8 +475,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     //add contact2 and its duplicate
     //These are the contacts with conflicts in communication preference.these contacts will be skipped during merge.
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //fill in first name
     $firstName1 = "Kurt".substr(sha1(rand()), 0, 7);
@@ -521,7 +512,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Contact Saved");
 
     //duplicate of contact2.
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //fill in first name
     $this->type("first_name", $firstName1);
@@ -562,9 +553,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->_createContacts($firstName3,$lastName3);
 
     // Find and Merge Contacts with Supervised Rule
-    $this->open($this->sboxPath . 'civicrm/contact/dedupefind?reset=1&rgid=1&action=renew');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    sleep(3);
+    $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew", "css=#DedupeFind table.pagerDisplay tbody tr");
 
     $this->select("name=option51_length", "value=100");
     $totalContacts = $this->getXpathCount("//table[@class='pagerDisplay']/tbody/tr");
@@ -609,7 +598,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
    */
   function _createContacts($firstName,$lastName){
     // add contact
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     //fill in first name
     $this->type('first_name', $firstName);
 
@@ -631,7 +620,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Contact Saved");
 
     //duplicate of above contact.
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //fill in first name
     $this->type("first_name", $firstName);

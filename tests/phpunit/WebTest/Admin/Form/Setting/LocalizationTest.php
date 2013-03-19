@@ -34,9 +34,7 @@ class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
 
   function testDefaultCountryIsEnabled() {
     $this->webtestLogin();
-    $this->open($this->sboxPath . "civicrm/admin/setting/localization?reset=1");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/setting/localization", "reset=1");
     $this->addSelection("countryLimit-t", "label=United States");
     $this->click("//select[@id='countryLimit-t']/option");
     $this->click("//input[@name='remove' and @value='<< Remove' and @type='button' and @onclick=\"QFAMS.moveSelection('countryLimit', this.form.elements['countryLimit-f[]'], this.form.elements['countryLimit-t[]'], this.form.elements['countryLimit[]'], 'remove', 'none'); return false;\"]");

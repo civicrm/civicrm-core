@@ -53,7 +53,7 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
 
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
 
-    $this->open($this->sboxPath . 'civicrm/contact/search?reset=1');
+    $this->openCiviPage("contact/search", "reset=1");
     $this->select('tag', "label={$tagName}");
     // click to search
     $this->click('_qf_Basic_refresh');
@@ -73,8 +73,7 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
 
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
 
-    $this->open($this->sboxPath . 'civicrm/contact/search?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search", "reset=1");
 
     $this->select('tag', "label={$tagName}");
     // click to search

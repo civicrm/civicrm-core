@@ -37,8 +37,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->webtestLogin();
     
     //Enable shopping cart style
-    $this->open($this->sboxPath . "civicrm/admin/setting/preferences/event?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/setting/preferences/event", "reset=1");
     $this->check("enable_cart");
     $this->click("_qf_Event_next-top");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -49,7 +48,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     
     //event 1
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle1 = 'My Conference1 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription1 = "Here is a description for this conference 1.";
@@ -70,7 +69,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     
     //event 2
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle2 = 'My Conference2 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription2 = "Here is a description for this conference 2.";
@@ -91,7 +90,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     
     //event 3
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle3 = 'My Conference3 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription3 = "Here is a description for this conference 3.";
@@ -136,7 +135,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     
     //event 1
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle1 = 'My Conference1 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription1 = "Here is a description for this conference 1.";
@@ -157,7 +156,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
 
     //event 2
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle2 = 'My Conference2 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription2 = "Here is a description for this conference 2.";
@@ -178,7 +177,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
 
     //event 3
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle3 = 'My Conference3 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription3 = "Here is a description for this conference 3.";
@@ -198,8 +197,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $registerUrl3 = $this->_testVerifyEventInfo($eventTitle3, $eventInfoStrings3);
 
     //Enable shopping cart style
-    $this->open($this->sboxPath . "civicrm/admin/setting/preferences/event?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/setting/preferences/event", "reset=1");
     $this->check("enable_cart");
     $this->click("_qf_Event_next-top");
 
@@ -213,8 +211,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath."civicrm/dashboard");    
-    
+    $this->openCiviPage("dashboard", "reset=1");
+
     //three event names
     $events = array( 1 => $eventTitle1,
                      2 => $eventTitle2,
@@ -334,7 +332,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
   function _AddEventToCart($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage("event/manage", "reset=1");
     $this->click("link=$eventTitle");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     
@@ -348,7 +346,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage("event/manage", "reset=1");
     $this->click("link=$eventTitle");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     
@@ -458,8 +456,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     }
     
     //Disable shopping cart style
-    $this->open($this->sboxPath . "civicrm/admin/setting/preferences/event?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/setting/preferences/event", "reset=1");
     $this->click("enable_cart");
     $this->click("_qf_Event_next-top");
   }

@@ -91,8 +91,7 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
       );
 
       // enable verify ssl
-      $this->open($this->sboxPath . "civicrm/admin/setting/url?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("admin/setting/url", "reset=1");
       $this->click("id=CIVICRM_QFID_1_verifySSL");
       $this->click("id=_qf_Url_next-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());

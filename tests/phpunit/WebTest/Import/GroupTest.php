@@ -59,7 +59,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     $count = count($rows);
 
     // Direct URL To Search
-    $this->open($this->sboxPath . "/civicrm/contact/search?reset=1");
+    $this->openCiviPage("contact/search", "reset=1");
 
     // Select GroupName
     $this->select("group", "label={$groupName}");
@@ -81,7 +81,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     $count += count($rows);
 
     // Direct URL To Search
-    $this->open($this->sboxPath . "/civicrm/contact/search?reset=1");
+    $this->openCiviPage("contact/search", "reset=1");
 
     // Select GroupName
     $this->select("group", "label={$groupName}");

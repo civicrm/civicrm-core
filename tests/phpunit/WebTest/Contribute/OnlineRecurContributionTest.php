@@ -90,8 +90,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     // logout
     $this->webtestLogout();
 
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&action=preview&id=" . $pageId);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", "_qf_Main_upload-bottom");
 
     // helper AddContributionPage sets Minimum Other Amout = $rand / 2 so must contribute more than that
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");

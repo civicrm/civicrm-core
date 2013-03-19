@@ -120,8 +120,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($fillHeaders, $fillRows, 'Individual', 'Fill');
 
     foreach ($importedContactIds as $cid) {
-      $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid={$cid}");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/view", "reset=1&cid={$cid}");
 
       // Check old display name.
       $displayName = "{$updateRows[$cid]['first_name']} {$updateRows[$cid]['last_name']}";
@@ -218,8 +217,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($fillHeaders, $fillRows, 'Organization', 'Fill');
 
     foreach ($importedContactIds as $cid) {
-      $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid={$cid}");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/view", "reset=1&cid={$cid}");
 
       // Check old Organization name.
       $organizationName = $updateRows[$cid]['organization_name'];
@@ -315,8 +313,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($fillHeaders, $fillRows, 'Household', 'Fill');
 
     foreach ($importedContactIds as $cid) {
-      $this->open($this->sboxPath . "civicrm/contact/view?reset=1&cid={$cid}");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/view", "reset=1&cid={$cid}");
 
       // Check old Household name.
       $householdName = $updateRows[$cid]['household_name'];

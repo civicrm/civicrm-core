@@ -52,7 +52,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $cfId = $this->_addEmailField();
     
     // create custom group1
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
+    $this->openCiviPage("admin/custom/group", "reset=1");
     $this->click("newCustomDataGroup");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->type("title", $customGrp1);
@@ -68,7 +68,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     $profileId = $this->_testGetProfileId($customId);
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -87,7 +87,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Find Main Participant
-    $this->open($this->sboxPath . "civicrm/event/search?reset=1");
+    $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $firstName);
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -104,7 +104,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[6]/td[2]", preg_quote($status));
 
     // Find additional  Participant
-    $this->open($this->sboxPath . "civicrm/event/search?reset=1");
+    $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname);
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -124,24 +124,12 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     if (isset($cfId)) {
       $this->_removeEmailField($cfId);
     }
-    
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field?action=delete&reset=1&gid=" . $customGrpId1 . "&id=" . $customId[0]);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("_qf_DeleteField_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field?action=delete&reset=1&gid=" . $customGrpId1 . "&id=" . $customId[1]);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("_qf_DeleteField_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field?action=delete&reset=1&gid=" . $customGrpId1 . "&id=" . $customId[2]);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("_qf_DeleteField_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=delete&reset=1&id=" . $customGrpId1);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    foreach ($customId as $cid) {
+      $this->openCiviPage("admin/custom/group/field", "action=delete&reset=1&gid={$customGrpId1}&id=$cid");
+      $this->click("_qf_DeleteField_next-bottom");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+    }
+    $this->openCiviPage("admin/custom/group", "action=delete&reset=1&id=$customGrpId1");
     $this->click("_qf_DeleteGroup_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
@@ -173,7 +161,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $cfId = $this->_addEmailField( );
     
     // create custom group1
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
+    $this->openCiviPage("admin/custom/group", "reset=1");
     $this->click("newCustomDataGroup");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->type("title", $customGrp1);
@@ -211,7 +199,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Find Main Participant
-    $this->open($this->sboxPath . "civicrm/event/search?reset=1");
+    $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $firstName);
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -228,7 +216,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[6]/td[2]", preg_quote($status));
 
     // Find additional  Participant
-    $this->open($this->sboxPath . "civicrm/event/search?reset=1");
+    $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname);
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -274,7 +262,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[6]/td[2]", preg_quote($status));
 
     // Find additional  Participant
-    $this->open($this->sboxPath . "civicrm/event/search?reset=1");
+    $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname2);
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -294,24 +282,12 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     if (isset($cfId)) {  
       $this->_removeEmailField($cfId);
     }
-    
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field?action=delete&reset=1&gid=" . $customGrpId1 . "&id=" . $customId[0]);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("_qf_DeleteField_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field?action=delete&reset=1&gid=" . $customGrpId1 . "&id=" . $customId[1]);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("_qf_DeleteField_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field?action=delete&reset=1&gid=" . $customGrpId1 . "&id=" . $customId[2]);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("_qf_DeleteField_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=delete&reset=1&id=" . $customGrpId1);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    foreach ($customId as $cid) {
+      $this->openCiviPage("admin/custom/group/field", "action=delete&reset=1&gid={$customGrpId1}&id=$cid");
+      $this->click("_qf_DeleteField_next-bottom");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+    }
+    $this->openCiviPage("admin/custom/group", "action=delete&reset=1&id=$customGrpId1");
     $this->click("_qf_DeleteGroup_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
@@ -326,8 +302,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $field3 = "Lname" . substr(sha1(rand()), 0, 7);
 
     // add custom fields for group 1
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field/add?reset=1&action=add&gid=" . $customGrpId1);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/custom/group/field/add", "reset=1&action=add&gid=$customGrpId1");
     $this->type("label", $field1);
     $this->check("is_searchable");
     $this->click("_qf_Field_next_new-bottom");
@@ -344,7 +319,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get id of custom fields
-    $this->open($this->sboxPath . "civicrm/admin/custom/group/field?reset=1&action=browse&gid=" . $customGrpId1);
+    $this->openCiviPage("admin/custom/group/field", "reset=1&action=browse&gid=$customGrpId1");
     $custom1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[1]/td[8]/span/a[text()='Edit Field']/@href"));
     $custom1 = $custom1[1];
     array_push($customId, $custom1);
@@ -359,7 +334,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   function _testRemoveProfile($eventPageId) {
-    $this->open($this->sboxPath . "civicrm/event/manage/settings?reset=1&action=update&id=" . $eventPageId);
+    $this->openCiviPage("event/manage/settings", "reset=1&action=update&id=$eventPageId");
 
     // Go to Online Contribution tab
     $this->click("link=Online Registration");
@@ -458,8 +433,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     // Add new profile.
     $profilename = "Profile_" . substr(sha1(rand()), 0, 7);
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/uf/group", "reset=1");
     $this->click('newCiviCRMProfile-top');
     $this->waitForElementPresent('_qf_Group_next-top');
 
@@ -472,7 +446,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     //Add field to profile_testCreateProfile
     foreach ($profilefield as $key => $value) {
-      $this->open($this->sboxPath . 'civicrm/admin/uf/group/field/add?reset=1&action=add&gid=' . $profileId);
+      $this->openCiviPage("admin/uf/group/field/add", "reset=1&action=add&gid=$profileId");
       $this->waitForPageToLoad($this->getTimeoutMsec());
       if (in_array($value, $locationfields)) {
         $this->select("field_name[0]", "value={$type}");
@@ -807,8 +781,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
   
   function _removeEmailField($cfId) {    
-    $this->open($this->sboxPath . "civicrm/admin/uf/group/field?action=delete&id={$cfId}");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/uf/group/field", "action=delete&id={$cfId}");
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }

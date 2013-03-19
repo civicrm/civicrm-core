@@ -222,8 +222,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
       "Status message didn't show up after saving!"
     );
 
-    $this->open($this->sboxPath . 'civicrm/admin/reltype?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/reltype", "reset=1");
 
     //validate data on selector.
     $data = $params;

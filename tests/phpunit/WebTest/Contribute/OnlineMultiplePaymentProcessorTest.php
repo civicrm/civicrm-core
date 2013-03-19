@@ -63,8 +63,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
       $allowOtherAmmount = TRUE
     );
 
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&action=preview&id=$pageId");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
     $this->assertTrue($this->isTextPresent($donationPageTitle));
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
@@ -152,10 +151,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
       $allowOtherAmmount = TRUE
     );
 
-
-
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&action=preview&id=$pageId");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
     $this->assertTrue($this->isTextPresent($donationPageTitle));
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);

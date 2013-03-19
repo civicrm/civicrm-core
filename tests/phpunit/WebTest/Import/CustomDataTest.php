@@ -143,7 +143,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
   function _addCustomData($customGroupTitle, $id1, $id2) {
 
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
+    $this->openCiviPage("admin/custom/group", "reset=1");
 
     //add new custom data
     $this->click("//a[@id='newCustomDataGroup']/span");

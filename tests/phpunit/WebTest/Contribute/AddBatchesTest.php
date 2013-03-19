@@ -39,7 +39,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $contact = array();
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . "civicrm/batch?reset=1");
+    $this->openCiviPage("batch", "reset=1");
     $this->click("xpath=//div[@class='crm-submit-buttons']/a");
     $this->waitForElementPresent("_qf_Batch_next");
     $this->type("item_count", $itemCount);
@@ -70,7 +70,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $batchTitle = 'Batch-'.substr(sha1(rand()), 0, 7);
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . "civicrm/batch?reset=1");
+    $this->openCiviPage("batch", "reset=1");
     $this->click("xpath=//div[@class='crm-submit-buttons']/a");
     $this->waitForElementPresent("_qf_Batch_next");
     $this->click("title");

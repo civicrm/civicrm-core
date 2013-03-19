@@ -106,8 +106,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go to advance search, check for 'Exclude' option.
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search/advanced", "reset=1");
 
     $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[2]/td[2]//select[1]", "label={$groupName}");
     $this->waitForTextPresent($groupName);
@@ -124,8 +123,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("No matches found"));
 
     // Go to advance search, check for 'Include' + 'OR' options.
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search/advanced", "reset=1");
 
     $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[2]/td[2]//select[1]", "label={$groupName}");
     $this->waitForTextPresent($groupName);
@@ -145,8 +143,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$lname2, $fname2"));
 
     // Go to advance search, check for 'Include' + 'AND' options.
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search/advanced", "reset=1");
 
     $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[2]/td[2]//select[1]", "label={$groupName}");
     $this->waitForTextPresent($groupName);
