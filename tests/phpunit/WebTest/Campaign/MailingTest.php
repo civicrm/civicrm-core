@@ -37,11 +37,12 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->webtestLogin('admin');
 
     // Enable CiviCampaign module if necessary
-    $this->enableComponents(array('CiviCampaign'));
+    $this->enableComponents(array('CiviMail', 'CiviCampaign'));
 
-    // add the required Drupal permission
-    $permissions = array('edit-2-administer-civicampaign');
-    $this->changePermissions($permissions);
+    $this->setupDefaultMailbox();
+
+    // add the required permission
+    $this->changePermissions('edit-2-administer-civicampaign');
 
     // Log in as normal user
     $this->webtestLogin();
@@ -111,14 +112,6 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
     $this->click("_qf_GroupContact_next");
-
-    // configure default mail-box
-    $this->openCiviPage('admin/mailSettings', 'action=update&id=1&reset=1', '_qf_MailSettings_cancel-bottom');
-    $this->type('name', 'Test Domain');
-    $this->type('domain', 'example.com');
-    $this->select('protocol', 'value=1');
-    $this->click('_qf_MailSettings_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->openCiviPage('mailing/send', 'reset=1', '_qf_Group_cancel');
 

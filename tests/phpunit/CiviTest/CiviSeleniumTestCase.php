@@ -1775,6 +1775,22 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * Ensure we have a default mailbox set up for CiviMail
+   */
+  function setupDefaultMailbox() {
+    $this->openCiviPage('admin/mailSettings', 'action=update&id=1&reset=1');
+    // Check if it hasn't already been set up
+    if (!$this->getSelectedValue('protocol')) {
+      $this->type('name', 'Test Domain');
+      $this->select('protocol', "IMAP");
+      $this->type('server', 'localhost');
+      $this->type('domain', 'example.com');
+      $this->click('_qf_MailSettings_next-top');
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+    }
+  }
+
+  /**
    * Determine the default time-out in milliseconds.
    *
    * @return string, timeout expressed in milliseconds

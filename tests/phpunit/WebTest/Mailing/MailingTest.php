@@ -79,12 +79,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_GroupContact_next");
 
     // configure default mail-box
-    $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
-    $this->type('name', 'Test Domain');
-    $this->type('domain', 'example.com');
-    $this->select('protocol', 'value=1');
-    $this->click('_qf_MailSettings_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->setupDefaultMailbox();
 
     $this->openCiviPage("mailing/send", "reset=1", "_qf_Group_cancel");
 
