@@ -287,14 +287,8 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("xpath=id('mark_x_$id[1]')");
 
     $this->waitForElementPresent("Go");
-    $this->click("Go");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("_qf_Release_done-bottom");
-    $this->click("_qf_Release_done-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    // wait for Access Keys div to appear at bottom of page - since this page may take a while
-    $this->waitForElementPresent('access');
+    $this->clickLink("Go", "_qf_Release_done-bottom");
+    $this->clickLink("_qf_Release_done-bottom", 'access');
     $this->assertElementContainsText("crm-notification-container", "released");
 
     // check whether contact is available for reserving again
@@ -415,9 +409,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('visibility', "value=Public Pages and Listings");
     $this->check('is_searchable');
     $this->check('in_selector');
-    $this->click('_qf_Field_next_new-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_cancel-bottom');
     
     // Custom Data Fields
     $this->select('field_name[0]', "value=Contact");
@@ -497,10 +489,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("Go");
     $this->waitForElementPresent('_qf_Reserve_done_reserve-bottom');
 
-    $this->click('_qf_Reserve_done_reserve-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    // wait for Access Keys div to appear at bottom of page - since this page may take a while
-    $this->waitForElementPresent('access');
+    $this->clickLink('_qf_Reserve_done_reserve-bottom', 'access');
     $this->assertElementContainsText("crm-notification-container", "2");
 
     $this->openCiviPage("report/survey/detail", "reset=1", '_qf_SurveyDetails_submit');

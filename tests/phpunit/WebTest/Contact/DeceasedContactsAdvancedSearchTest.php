@@ -62,11 +62,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->click('demographics');
     $this->waitForElementPresent('CIVICRM_QFID_1_is_deceased');
     $this->click('CIVICRM_QFID_1_is_deceased');
-    $this->click('_qf_Advanced_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Remove contacts from group
-    $this->waitForElementPresent('Go');
+    $this->clickLink('_qf_Advanced_refresh', 'Go');
     $this->assertElementContainsText('search-status', '2 Contacts');
     $this->click("toggleSelect");
     $this->waitForTextPresent('2 Selected records only');

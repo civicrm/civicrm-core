@@ -68,9 +68,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
         
-    $this->click("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_FinancialAccount_cancel-botttom');
+    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom');
         
     //Varify Data after Adding new Financial Account
     $verifyData = array( 
@@ -146,9 +144,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $this->click('_qf_FinancialTypeAccount_next');
     $this->waitForElementPresent("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='Accounts Receivable']/../td[7]/span/a[text()='Edit']");
     $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='Accounts Receivable']/../td[2]", preg_quote('Accounts Receivable Account is'));
-    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='Accounts Receivable']/../td[7]/span/a[text()='Delete']"); 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_FinancialTypeAccount_next-botttom');
+    $this->clickLink("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='Accounts Receivable']/../td[7]/span/a[text()='Delete']", '_qf_FinancialTypeAccount_next-botttom');
     $this->click('_qf_FinancialTypeAccount_next-botttom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('crm-notification-container', 'Selected financial type account has been deleted.', 'Missing text: ' . 'Selected financial type account has been deleted.');

@@ -386,9 +386,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
       $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
       $this->select('financial_type_id', $financialType);
       $this->type('total_amount', 100 * $i);
-      $this->click('_qf_Contribution_upload_new');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_Contribution_upload_new');
+      $this->clickLink('_qf_Contribution_upload_new', '_qf_Contribution_upload_new');
     }
     $this->openCiviPage("contact/search/builder", "reset=1", "_qf_Builder_refresh");
       

@@ -952,9 +952,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
           $this->click('is_separate_payment');
         }
       }
-      $this->click('_qf_MembershipBlock_next');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_MembershipBlock_next-bottom');
+      $this->clickLink('_qf_MembershipBlock_next', '_qf_MembershipBlock_next-bottom');
       $text = "'MembershipBlock' information has been saved.";
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     }
@@ -1228,8 +1226,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     // Clicking save.
-    $this->click('_qf_Edit_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Edit_upload-bottom');
 
     // Is status message correct?
     $this->assertElementContainsText('crm-notification-container', "$groupName");
@@ -1511,10 +1508,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$editfinancialAccount}']/../td[9]/span/a[text()='Edit']");
-    $this->click("xpath=//table/tbody//tr/td[1][text()='{$editfinancialAccount}']/../td[9]/span/a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('_qf_FinancialAccount_cancel-botttom');
+    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$editfinancialAccount}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom');
 
     // Change Financial Account Name
     if ($financialAccountTitle) {

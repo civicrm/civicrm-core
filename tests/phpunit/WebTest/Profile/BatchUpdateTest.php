@@ -397,9 +397,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('sort_name');
     $this->type('sort_name', $lastName);
     $this->waitForElementPresent('_qf_Search_refresh');
-    $this->click('_qf_Search_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('Go');
+    $this->clickLink('_qf_Search_refresh', 'Go');
     $this->click('CIVICRM_QFID_ts_all_4');
     $this->click('Go');
     $this->waitForElementPresent('_qf_Reserve_next_reserveToInterview-top');

@@ -1020,10 +1020,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type('help_pre', 'This is test priceset.');
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
   function _testAddPriceFields($fields) {

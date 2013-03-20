@@ -134,13 +134,8 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     if ($type == "Contribution") {
       $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
       $this->type("sort_name", "{$data['first_name']} {$data['last_name']}");
-      $this->click("_qf_Search_refresh");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-
-      $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-      $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+      $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+      $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
       $expected = array(
         'From'                => "{$data['first_name']} {$data['last_name']}",
         'Financial Type'      => $data['financial_type'],
@@ -154,11 +149,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       
       // select contact
       $this->type("sort_name", "{$data['first_name']} {$data['last_name']}");
-      $this->click("_qf_Search_refresh");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      
-      //View Membership
-      $this->waitForElementPresent("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+      $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
       $this->click("xpath=//div[@id='memberSearch']//table/tbody/tr[1]/td[11]/span/a[text()='View']");
       $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
       $expected = array(
@@ -184,9 +175,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
   
   function _verifyData($data, $type) {
     $this->waitForElementPresent("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']");
-    $this->click("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Entry_upload");
+    $this->clickLink("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']", "_qf_Entry_upload");
     $this->click("_qf_Entry_upload");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     foreach ($data as $value) {

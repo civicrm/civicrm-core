@@ -118,9 +118,7 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
     }
 
     // submit contribution
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     // confirm contribution
     $this->click("_qf_Confirm_next-bottom");

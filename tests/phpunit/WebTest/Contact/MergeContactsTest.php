@@ -138,9 +138,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->click("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
 
-    $this->click("css=div.crm-contact-merge-form-block div.action-link a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Merge_cancel-bottom');
+    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", '_qf_Merge_cancel-bottom');
 
     // Move the activities, groups, etc to the main contact and merge using Merge and Goto Next Pair
     $this->check('move_prefix_id');
@@ -148,9 +146,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->check('move_rel_table_activities');
     $this->check('move_rel_table_groups');
     $this->check('move_rel_table_tags');
-    $this->click('_qf_Merge_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Merge_cancel-bottom');
+    $this->clickLink('_qf_Merge_next-bottom', '_qf_Merge_cancel-bottom');
     $this->assertTrue($this->isTextPresent('Contacts Merged'), "Contacts Merged text was not found after merge.");
 
     // Check that we are viewing the next Merge Pair (our 2nd contact, since the merge list is ordered by contact_id)
@@ -342,9 +338,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']");
     $this->click("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
-    $this->click("css=div.crm-contact-merge-form-block div.action-link a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[2]/td[4]/span[text()='(overwrite)']");
+    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[2]/td[4]/span[text()='(overwrite)']");
     $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(add)']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
 
@@ -433,9 +427,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@class='pagerDisplay']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']");
     $this->click("xpath=//table[@class='pagerDisplay']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
-    $this->click("css=div.crm-contact-merge-form-block div.action-link a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[2]/td[4]/span[text()='(overwrite)']");
+    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[2]/td[4]/span[text()='(overwrite)']");
     $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(add)']");
     $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(overwrite)']");
     $this->select('location_email_1_locTypeId', 'value=3');
@@ -594,9 +586,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
       $this->waitForElementPresent("css=div.ac_results-inner li");
 
       // Visit contact summary page.
-      $this->click("css=div.ac_results-inner li");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('civicrm-footer');
+      $this->clickLink("css=div.ac_results-inner li", 'civicrm-footer');
     }
   }
 

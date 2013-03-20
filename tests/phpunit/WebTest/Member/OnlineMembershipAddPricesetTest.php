@@ -205,10 +205,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
     $this->assertElementContainsText('crm-notification-container', "Your Set '{$setTitle}' has been added. You can add fields to this set now.");
   }
 
@@ -266,9 +263,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
           break;
       }
       $this->select("financial_type_id", "label={$contributionType}");
-      $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
       $this->assertElementContainsText('crm-notification-container', "Price Field '{$label}' has been saved.");
     }
     return array($memTypeTitle1, $memTypeTitle2);
@@ -280,11 +275,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->openCiviPage('admin/price', 'reset=1');
 
     // Use the price set id ($sid) to pick the correct row
-    $this->click("css=tr#row_{$sid} a[title='Preview Price Set']");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    // Look for Register button
-    $this->waitForElementPresent('_qf_Preview_cancel-bottom');
+    $this->clickLink("css=tr#row_{$sid} a[title='Preview Price Set']", '_qf_Preview_cancel-bottom');
 
     // Check for expected price set field strings
     $this->assertStringsPresent($validateStrings);
@@ -338,10 +329,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->select("billing_country_id-5", "value=1228");
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -400,9 +388,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     if($renew){
       $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
       $this->type("sort_name", "{$contactParams['first_name']} {$contactParams['last_name']}");
-      $this->click("_qf_Search_refresh");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent("xpath=//div[@id='memberSearch']/table/tbody/tr");
+      $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
       $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[4][text()='{$memTypeTitle1}']/../td[11]/span/a[text()='View']");
       $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
       $year = CRM_Utils_Date::processDate($this->getText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='End date']/following-sibling::td"));
@@ -458,10 +444,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->select("billing_country_id-5", "value=1228");
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());

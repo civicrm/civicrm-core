@@ -157,9 +157,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('first_name', $firstName);
     $this->type('last_name', $lastName);
 
-    $this->click('_qf_Main_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Confirm_next-bottom');
+    $this->clickLink('_qf_Main_upload-bottom', '_qf_Confirm_next-bottom');
 
     $this->click('_qf_Confirm_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -172,15 +170,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     $this->type('sort_name', "$firstName $lastName");
     $this->select('financial_type_id',"label=Member Dues");
-    $this->click('_qf_Search_refresh');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    //View Contribution for membership fee
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom');
     $expected = array(
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Member Dues',
@@ -196,14 +187,9 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->click("xpath=id('Search')/x:div[2]/x:div/x:div[1]");
     $this->waitForElementPresent("financial_type_id");
     $this->select('financial_type_id',"label=Donation");
-    $this->click('_qf_Search_refresh');
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom');
     $expected = array(
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
@@ -216,14 +202,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     //Find Member
     $this->openCiviPage("member/search", "reset=1", 'member_source');
     $this->type('sort_name', "$firstName $lastName");
-    $this->click('_qf_Search_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    //visit the Member View link
-    $this->waitForElementPresent("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_MembershipView_cancel-bottom');
 
     //View Membership Record
     $expected = array(

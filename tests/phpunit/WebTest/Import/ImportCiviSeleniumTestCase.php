@@ -142,11 +142,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     $this->_checkImportMapperData($headers, $rows, $existingMapping, isset($other['checkMapperHeaders']) ? $other['checkMapperHeaders'] : array());
 
     // Submit form.
-    $this->click('_qf_Preview_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Visit summary page.
-    $this->waitForElementPresent("_qf_Summary_next");
+    $this->clickLink('_qf_Preview_next-bottom', "_qf_Summary_next");
 
     // Check success message.
     $this->assertTrue($this->isTextPresent("Import has completed successfully. The information below summarizes the results."));

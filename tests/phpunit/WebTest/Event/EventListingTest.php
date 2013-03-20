@@ -145,11 +145,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
 
     $this->type("max_participants", "6");
     $this->click("is_public");
-    $this->click("_qf_EventInfo_upload-bottom");
-
-    // Wait for Location tab form to load
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Location_upload_done-bottom");
+    $this->clickLink("_qf_EventInfo_upload-bottom", "_qf_Location_upload_done-bottom");
 
     $this->click("_qf_Location_upload_done-bottom");
 

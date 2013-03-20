@@ -184,9 +184,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
       else {
         $this->_testAddMultipleChoiceOptions($field['options']);
       }
-      $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
     }
 
     // create event.
@@ -303,10 +301,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->type('help_pre', 'This is test priceset.');
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
   function _testAddMultipleChoiceOptions($options) {
@@ -411,9 +406,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->select('billing_state_province_id-5', 'value=1004');
     $this->type('billing_postal_code-5', '94129');
 
-    $this->click('_qf_Register_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Confirm_next-bottom');
+    $this->clickLink('_qf_Register_upload-bottom', '_qf_Confirm_next-bottom');
     $confirmStrings = array('Event Fee(s)', 'Billing Name and Address', 'Credit Card Information');
     $this->assertStringsPresent($confirmStrings);
     $this->click('_qf_Confirm_next-bottom');

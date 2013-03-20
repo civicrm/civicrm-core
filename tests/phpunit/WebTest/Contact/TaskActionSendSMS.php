@@ -97,25 +97,16 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
 
     // Do an advanced search
     $this->click("css=ul#civicrm-menu li.crm-Search");
-    $this->click("css=ul#civicrm-menu li.crm-Advanced_Search a");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("email");
+    $this->clickLink("css=ul#civicrm-menu li.crm-Advanced_Search a", "email");
 
     $this->select("crmasmSelect1", "label=$smsGroupName");
 
-    $this->click("_qf_Advanced_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('CIVICRM_QFID_ts_all_12');
+    $this->clickLink("_qf_Advanced_refresh", 'CIVICRM_QFID_ts_all_12');
     $this->click('CIVICRM_QFID_ts_all_12');
 
     // Perform a task action
     $this->select("task", "label=Send SMS to Contacts");
-    $this->click("Go");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('activity_subject');
+    $this->clickLink("Go", 'activity_subject');
     $this->type('activity_subject', "Send SMS to Contacts of {$smsGroupName}");
     $this->type('text_message', "Test SMS to Contacts of {$smsGroupName}");
     $this->click("_qf_SMS_upload-bottom");

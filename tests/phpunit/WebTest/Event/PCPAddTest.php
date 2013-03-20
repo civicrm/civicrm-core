@@ -436,10 +436,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//table[@class='selector']/tbody/tr/td[8]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']", "xpath=//table[@class='selector']/tbody/tr/td[8]/span/a[text()='View']");
     $this->click("xpath=//table[@class='selector']/tbody/tr/td[8]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

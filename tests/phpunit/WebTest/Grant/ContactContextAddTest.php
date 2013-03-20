@@ -109,17 +109,10 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->type('note', "Grant Note for $firstName");
 
     // Clicking save.
-    $this->click('_qf_Grant_upload');
-
-    // wait for page to load
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // verify if grant is created with presence of view link
-    $this->waitForElementPresent("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink('_qf_Grant_upload', "xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     // click through to the Grant view screen
-    $this->click("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_GrantView_cancel-bottom');
+    $this->clickLink("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_GrantView_cancel-bottom');
 
     $gDate = date('F jS, Y', strtotime('now'));
 

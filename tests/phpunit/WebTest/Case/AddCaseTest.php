@@ -54,18 +54,14 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Edit_next");
     $this->type("first_name", $testUserFirstName);
     $this->type("last_name", $testUserLastName);
-    $this->click("_qf_Edit_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("profilewrap4");
+    $this->clickLink("_qf_Edit_next", "profilewrap4");
     // Is status message correct?
     $this->assertElementContainsText('crm-container', "Thank you. Your information has been saved.", "Save successful status message didn't show up after saving profile to update testUserName!");
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Try submitting the form without creating or selecting a contact (test for CRM-7971)
-    $this->click("_qf_Case_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("css=span.crm-error");
+    $this->clickLink("_qf_Case_upload-bottom", "css=span.crm-error");
     $this->assertElementContainsText('Case', "Please select a contact or create new contact", "Expected form rule error for submit without selecting contact did not show up after clicking Save.");
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
@@ -100,11 +96,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $today = date('F jS, Y', strtotime('now'));
     // echo 'Today is ' . $today;
     $this->type("duration", "20");
-    $this->click("_qf_Case_upload-bottom");
-
-    // We should be at manage case screen
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_CaseView_cancel-bottom");
+    $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom");
 
     // Is status message correct?
     $this->assertElementContainsText('crm-notification-container', "Case opened successfully.", "Save successful status message didn't show up after saving!");

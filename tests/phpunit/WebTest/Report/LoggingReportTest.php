@@ -59,10 +59,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     // Justification for this instance: FIXME
     sleep(3);
     $this->select("group_id", "label=Case Resources");
-    $this->click("_qf_GroupContact_next");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td[4]/a");
+    $this->clickLink("_qf_GroupContact_next", "xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td[4]/a");
     $this->click("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td[4]/a");
 
     // Check confirmation alert.
@@ -130,9 +127,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->select("relationship_type_id", "label=Employee of");
     $this->webtestFillAutocomplete("Default Organization");
     $this->waitForElementPresent("quick-save");
-    $this->click("quick-save");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//a[text()='Disable']");
+    $this->clickLink("quick-save", "xpath=//div[@id='current-relationships']//a[text()='Disable']");
     $this->click("xpath=//div[@id='current-relationships']//a[text()='Disable']");
     $this->assertTrue((bool)preg_match("/^Are you sure you want to disable this relationship/",
       $this->getConfirmation()

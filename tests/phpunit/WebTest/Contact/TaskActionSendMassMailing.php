@@ -35,36 +35,16 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
   function testSelectedContacts() {
     $this->webtestLogin();
 
-    $this->openCiviPage('group/add', 'reset=1', "_qf_Edit_upload");
-
-    // make group name
+    // make group
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
-
-    // fill group name
-    $this->type("title", $groupName);
-
-    // fill description
-    $this->type("description", "New mailing group for Webtest");
-
-    // enable Mailing List
-    $this->click("group_type[2]");
-
-    // select Visibility as Public Pages
-    $this->select("visibility", "value=Public Pages");
-
-    // Clicking save.
-    $this->click("_qf_Edit_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->WebtestAddGroup($groupName);
 
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Search");
-    $this->click("css=ul#civicrm-menu li.crm-Advanced_Search a");
+    $this->clickLink("css=ul#civicrm-menu li.crm-Advanced_Search a", "email");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("email");
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     // Click "check all" box and act on "Add to group" action
     $this->click("//form[@id='Advanced']/div[3]/div/div[2]/table/thead/tr/th[1]/input");

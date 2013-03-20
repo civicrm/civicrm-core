@@ -422,9 +422,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $this->type("discount_name_1", $discount1);
       $this->webtestFillDate("discount_start_date_1", "-3 week");
       $this->webtestFillDate("discount_end_date_1", "-2 week");
-      $this->click("_qf_Fee_submit");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent("discounted_value_1_1");      
+      $this->clickLink("_qf_Fee_submit", "discounted_value_1_1");      
       $this->type("discounted_value_1_1","225.00");
       $this->type("discounted_value_2_1","300.00");
 
@@ -436,9 +434,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
         $this->type("discount_name_2", $discount2);
         $this->webtestFillDate("discount_start_date_2", "-1 week");
         $this->webtestFillDate("discount_end_date_2", "+1 week");
-        $this->click("_qf_Fee_submit");
-        $this->waitForPageToLoad($this->getTimeoutMsec());
-        $this->waitForElementPresent("discounted_value_2_1");
+        $this->clickLink("_qf_Fee_submit", "discounted_value_2_1");
         $this->type("discounted_value_1_2","225.00");
         $this->type("discounted_value_2_2","300.00");
     }

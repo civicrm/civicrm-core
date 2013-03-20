@@ -79,10 +79,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
   function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
@@ -163,9 +160,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         default:
           break;
       }
-      $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
     }
   }
 
@@ -175,11 +170,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/price', 'reset=1');
 
     // Use the price set id ($sid) to pick the correct row
-    $this->click("css=tr#row_{$sid} a[title='Preview Price Set']");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    // Look for Register button
-    $this->waitForElementPresent('_qf_Preview_cancel-bottom');
+    $this->clickLink("css=tr#row_{$sid} a[title='Preview Price Set']", '_qf_Preview_cancel-bottom');
 
     // Check for expected price set field strings
     $this->assertStringsPresent($validateStrings);
@@ -310,9 +301,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('billing_state_province_id-5', 'value=1004');
     $this->type('billing_postal_code-5', '94129');
 
-    $this->click('_qf_Register_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Confirm_next-bottom');
+    $this->clickLink('_qf_Register_upload-bottom', '_qf_Confirm_next-bottom');
     $confirmStrings = array('Event Fee(s)', 'Billing Name and Address', 'Credit Card Information');
     $this->assertStringsPresent($confirmStrings);
     $this->click('_qf_Confirm_next-bottom');
@@ -327,11 +316,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage('event/search', 'reset=1', '_qf_Search_refresh');
 
     $this->type('sort_name', "$email");
-    $this->click('_qf_Search_refresh');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=id('participantSearch')/table/tbody/tr/td[11]/span/a[text()='View']");
+    $this->clickLink('_qf_Search_refresh', "xpath=id('participantSearch')/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->click("xpath=id('participantSearch')/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 

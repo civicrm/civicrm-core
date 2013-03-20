@@ -290,9 +290,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
       $this->type("discount_name_1", "Early-bird" . substr(sha1(rand()), 0, 7));
       $this->webtestFillDate("discount_start_date_1", "-1 week");
       $this->webtestFillDate("discount_end_date_1", "+2 week");
-      $this->click("_qf_Fee_submit");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent("discounted_value_2_1");
+      $this->clickLink("_qf_Fee_submit", "discounted_value_2_1");
       $this->type("discounted_value_1_1","225.00");
       $this->type("discounted_value_2_1","300.00");
       $this->click("xpath=//fieldset[@id='discount']/fieldset/table/tbody/tr[2]/td[3]/input");
@@ -333,11 +331,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     // verify event input on info page
     // start at Manage Events listing
     $this->openCiviPage("event/manage", "reset=1");
-    $this->click("link=$eventTitle");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    
-    // Look for Add to Cart button
-    $this->waitForElementPresent("link=Add to Cart");
+    $this->clickLink("link=$eventTitle", "link=Add to Cart");
     $this->click("link=Add to Cart");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent("$eventTitle has been added to your cart"));

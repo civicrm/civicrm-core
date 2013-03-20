@@ -145,9 +145,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('fulfilled_date');
 
     // Clicking save.
-    $this->click("_qf_Contribution_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('civicrm-footer');
+    $this->clickLink("_qf_Contribution_upload-bottom", 'civicrm-footer');
     // Is status message correct?
     $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved");
     

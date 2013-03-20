@@ -120,10 +120,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
 
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -134,10 +131,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -183,10 +177,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
 
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -195,10 +186,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -298,10 +286,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
 
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -310,10 +295,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -345,10 +327,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->type("cvv2", "000");
     $this->select("credit_card_exp_date[M]", "value=1");
     $this->select("credit_card_exp_date[Y]", "value=2020");
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -356,10 +335,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -542,9 +518,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->select("billing_country_id-5", "value=1228");
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -558,10 +532,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$organisationName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -582,10 +553,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName, $firstName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -640,10 +608,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
 
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -656,10 +621,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$organisationName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -679,10 +641,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName, $firstName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 

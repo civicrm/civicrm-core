@@ -46,9 +46,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
     $this->type('email-5', "{$lastName}@example.com");
 
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next_checkout");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next_checkout");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
     $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
@@ -80,9 +78,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
     $this->type('email-5', "{$lastName}@example.com");
 
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next_checkout");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next_checkout");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
     $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);

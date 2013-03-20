@@ -65,9 +65,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
         
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
         
-    $this->click("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_FinancialAccount_cancel-botttom');
+    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom');
     //Varify Data after Adding new Financial Account
     $verifyData = array('name' => $financialAccountTitle,
       'description' => $financialAccountDescription,
@@ -111,9 +109,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       $orgName = $orgNameEdit;
     }
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-    $this->click("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_FinancialAccount_cancel-botttom');
+    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom');
        
     $verifyData = array( 'name' => $financialAccountTitle,
       'description' => $financialAccountDescription,

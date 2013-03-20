@@ -84,10 +84,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
   function _testAddPriceFields(&$fields, &$validateString, $financialType, $dateSpecificFields = FALSE) {
@@ -163,9 +160,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
         break;
       }
       $this->select('financial_type_id', "label={$financialType}");
-      $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
     }
   }
   
@@ -230,11 +225,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("admin/price", "reset=1");
 
     // Use the price set id ($sid) to pick the correct row
-    $this->click("css=tr#row_{$sid} a[title='View and Edit Price Fields']");
-    
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    // Look for Register button
-    $this->waitForElementPresent('Link=Add Price Field');
+    $this->clickLink("css=tr#row_{$sid} a[title='View and Edit Price Fields']", 'Link=Add Price Field');
     // Check for expected price set field strings
     $this->assertStringsPresent($validateStrings);
   }
@@ -438,10 +429,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('billing_country_id-5', 'value=1228');
     $this->select('billing_state_province_id-5', 'value=1004');
     $this->type('billing_postal_code-5', '94129');
-    $this->click('_qf_Main_upload-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Confirm_next-bottom');
+    $this->clickLink('_qf_Main_upload-bottom', '_qf_Confirm_next-bottom');
 
     $this->click('_qf_Confirm_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -455,14 +443,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
     $this->type('sort_name', "$firstName $lastName");
-    $this->click('_qf_Search_refresh');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     // View Contribution Record and test for expected values
     $expected = array(
@@ -566,10 +548,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('billing_country_id-5', 'value=1228');
     $this->select('billing_state_province_id-5', 'value=1004');
     $this->type('billing_postal_code-5', '94129');
-    $this->click('_qf_Main_upload-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Confirm_next-bottom');
+    $this->clickLink('_qf_Main_upload-bottom', '_qf_Confirm_next-bottom');
 
     $this->click('_qf_Confirm_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -581,14 +560,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
     $this->type('sort_name', "$firstName $lastName");
-    $this->click('_qf_Search_refresh');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom');
 
     // View Contribution Record and test for expected values
     $expected = array(
@@ -677,11 +650,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('thankyou_date');
 
     // Clicking save.
-    $this->click('_qf_Contribution_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Is status message correct?
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink('_qf_Contribution_upload', "xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->assertTrue($this->isTextPresent('The contribution record has been saved.'), "Status message didn't show up after saving!");
 
     //click through to the Contribution view screen

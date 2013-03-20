@@ -74,11 +74,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $today = date('F jS, Y', strtotime('now'));
     // echo 'Today is ' . $today;
     $this->type('duration', "20");
-    $this->click('_qf_Case_upload-bottom');
-
-    // We should be at manage case screen
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
+    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom');
 
     // Is status message correct?
     $this->assertElementContainsText('crm-notification-container', "Case opened successfully.", "Save successful status message didn't show up after saving!");

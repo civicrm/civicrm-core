@@ -98,10 +98,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
         'Send additional reminders' => '4 days after the last one sent',
       )
     );
-    $this->click('_qf_PledgeView_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
   }

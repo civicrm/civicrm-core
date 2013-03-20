@@ -128,10 +128,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
       'Source' => $sourceText,
     );
     $this->webtestVerifyTabularData($verifyData);
-    $this->click("_qf_MembershipView_cancel-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[7]");
+    $this->clickLink("_qf_MembershipView_cancel-bottom", "xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[7]");
     $this->click("xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[9]/span/a[2][text()='Edit']");
     $this->waitForElementPresent("_qf_Membership_cancel-bottom");
 

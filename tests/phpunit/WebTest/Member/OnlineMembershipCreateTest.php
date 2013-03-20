@@ -104,9 +104,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->openCiviPage("admin/contribute/membership", "reset=1&action=update&id={$pageId}", '_qf_MembershipBlock_next-bottom');
     $this->click("membership_type_$memTypeId1");
     $this->click("membership_type_$memTypeId2");
-    $this->click('_qf_MembershipBlock_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_MembershipBlock_next-bottom');
+    $this->clickLink('_qf_MembershipBlock_next', '_qf_MembershipBlock_next-bottom');
     $text = "'MembershipBlock' information has been saved.";
     $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
     
@@ -126,11 +124,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='memberSearch']/table/tbody/tr");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -308,13 +302,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search","reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     //View Contribution Record and verify data
     $expected = array(

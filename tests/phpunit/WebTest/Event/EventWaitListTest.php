@@ -154,11 +154,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     // verify event input on info page
     // start at Manage Events listing
     $this->openCiviPage("event/manage", "reset=1");
-    $this->click("link=$eventTitle");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Look for Register button
-    $this->waitForElementPresent("link=Register Now");
+    $this->clickLink("link=$eventTitle", "link=Register Now");
 
     // Check for correct event info strings
     $this->assertStringsPresent($eventInfoStrings);

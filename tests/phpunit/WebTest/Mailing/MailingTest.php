@@ -74,9 +74,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("css=li#tab_group a");
     $this->waitForElementPresent("_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
-    $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_GroupContact_next");
+    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next");
 
     // configure default mail-box
     $this->setupDefaultMailbox();
@@ -341,9 +339,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("css=li#tab_group a");
     $this->waitForElementPresent("_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
-    $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_GroupContact_next");
+    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next");
 
     // configure default mail-box
     $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');

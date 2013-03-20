@@ -284,10 +284,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->select("billing_country_id-5", "value=1228");
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->clickLink("_qf_Confirm_next-bottom", NULL);
 

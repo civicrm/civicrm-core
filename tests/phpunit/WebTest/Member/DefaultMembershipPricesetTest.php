@@ -83,9 +83,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -97,9 +95,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 4);
     $this->_testDefaultSenarios("Second_Membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -111,9 +107,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 3);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -124,9 +118,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 1);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Main_upload-bottom");
     $this->assertTrue($this->isTextPresent("You already have a lifetime membership and cannot select a membership with a shorter term."));
   }
 
@@ -176,10 +168,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
     $this->assertTrue($this->isTextPresent("Your Set '{$setTitle}' has been added. You can add fields to this set now."));
   }
 
@@ -265,9 +254,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
           break;
       }
       $this->select("financial_type_id", "label={$contributionType}");
-      $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
       $this->assertTrue($this->isTextPresent("Price Field '{$label}' has been saved."));
     }
     return array($memTypeTitle1, $memTypeTitle2, $memTypeTitle3);

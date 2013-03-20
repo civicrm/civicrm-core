@@ -104,11 +104,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->select("billing_country_id-5", "value=1228");
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -176,10 +172,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $xpath = "xpath=//label[text() = '{$payLaterText}']/preceding-sibling::input[1]";
     $this->click($xpath);
 
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     
     $payLaterInstructionsText = "Pay later instructions $hash";
     $this->assertTrue($this->isTextPresent($payLaterInstructionsText));
@@ -194,14 +187,8 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
 
     $this->type('sort_name', "$firstName $lastName");
     $this->check('contribution_test');
-    $this->click('_qf_Search_refresh');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom');
     $expected = array(
       'From'            => "{$firstName} {$lastName}",
       'Financial Type'  => 'Donation',

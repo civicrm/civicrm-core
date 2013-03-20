@@ -71,10 +71,7 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
         'Pledge Status' => 'Pending',
       )
     );
-    $this->click('_qf_PledgeView_next-bottom');
-    $this->waitForPageToLoad("30000");
-
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
     $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a");
