@@ -1369,7 +1369,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Selected Profile Field has been deleted.");
+    $this->waitForText('crm-notification-container', "Selected Profile Field has been deleted.");
   }
 
   function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {

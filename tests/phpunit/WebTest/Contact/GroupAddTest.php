@@ -65,7 +65,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '{$params['name']}' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '{$params['name']}' has been saved.");
 
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);

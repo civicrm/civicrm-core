@@ -58,7 +58,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
 
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
@@ -323,7 +323,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
 
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);

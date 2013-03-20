@@ -63,7 +63,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     // Go for Ckeck Your Editor, Click on Send Mail
     $this->click("//a[@id='crm-contact-actions-link']/span");
@@ -119,7 +119,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText("crm-notification-container", "{$name} has been updated.");
+    $this->waitForText('crm-notification-container', "{$name} has been updated.");
 
     // Go for Ckeck Your Editor, Click on Send Mail
     $this->click("//a[@id='crm-contact-actions-link']/span");

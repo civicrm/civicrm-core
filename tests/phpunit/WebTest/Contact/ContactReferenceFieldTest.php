@@ -63,7 +63,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_GroupContact_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Added to Group");
+    $this->waitForText('crm-notification-container', "Added to Group");
 
     // Individual 1
     $contact2 = substr(sha1(rand()), 0, 7);
@@ -92,7 +92,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     $matches = array();
     preg_match('/gid=([0-9]+)/', $this->getLocation(), $matches);
@@ -112,7 +112,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$contactRefFieldLabel1' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$contactRefFieldLabel1' has been saved.");
 
     //add custom field - alphanumeric checkbox
     $contactRefFieldLabel2 = 'contact_ref_' . substr(sha1(rand()), 0, 4);
@@ -131,7 +131,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$contactRefFieldLabel2' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$contactRefFieldLabel2' has been saved.");
 
     $this->openCiviPage('admin/custom/group/field', "reset=1&action=browse&gid={$customGroupId}");
 

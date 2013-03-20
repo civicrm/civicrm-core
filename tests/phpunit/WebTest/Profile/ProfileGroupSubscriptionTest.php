@@ -68,7 +68,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     //Add email field to profile
     $this->click('field_name[0]');
@@ -133,7 +133,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('newCiviCRMProfile-bottom');
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
   }
 }
 

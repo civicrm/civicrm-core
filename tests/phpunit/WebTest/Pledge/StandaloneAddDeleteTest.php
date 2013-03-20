@@ -50,7 +50,7 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click('_qf_Pledge_upload-bottom');
     $this->waitForPageToLoad("30000");
 
-    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
+    $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     // verify if Pledge is created
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
@@ -80,7 +80,7 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click('_qf_Contribution_upload-bottom');
 
     $this->waitForPageToLoad("30000");
-    $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved.");
+    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
@@ -91,7 +91,7 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->type('total_amount', '250.00');
     $this->click('_qf_Contribution_upload-bottom');
     $this->waitForPageToLoad("30000");
-    $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved.");
+    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
@@ -103,7 +103,7 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->type('total_amount', '170.00');
     $this->click('_qf_Contribution_upload-bottom');
     $this->waitForPageToLoad("30000");
-    $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved.");
+    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     // delete the contribution associated with the 2nd payment
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");

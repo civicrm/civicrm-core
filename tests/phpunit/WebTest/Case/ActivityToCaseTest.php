@@ -76,7 +76,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom');
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "Case opened successfully.", "Save successful status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "Case opened successfully.");
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 7);
 
     $this->_testAddNewActivity($firstName, $subject, $customGroupTitle, $contactName);
@@ -167,9 +167,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "Activity '$subject' has been saved.",
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', $subject);
 
     // click through to the Activity view screen
     $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[9]");
@@ -244,7 +242,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     // create a custom field - Integer Radio
     $this->click("data_type[0]");
@@ -280,7 +278,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
 
     // create another custom field - text field
     $this->click("//a[@id='newCustomField']/span");
@@ -303,7 +301,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$textFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$textFieldLabel' has been saved.");
     $textFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$textFieldLabel']/../../td[8]/span/a[text()='Edit Field']/@href"));
     $textFieldId = $textFieldId[1];
 

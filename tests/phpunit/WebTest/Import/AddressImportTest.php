@@ -118,7 +118,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
     $url = explode('gid=', $this->getLocation());
     $gid = $url[1];
 
@@ -130,7 +130,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_next-bottom');
     $this->waitForElementPresent('newCustomField');
 
-    $this->assertElementContainsText('crm-notification-container',"Your custom field '{$customField}' has been saved.");
+    $this->waitForText('crm-notification-container',"Your custom field '{$customField}' has been saved.");
     $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
 
@@ -144,7 +144,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     // clicking save
     $this->click('_qf_Field_next-bottom');
     $this->waitForElementPresent('newCustomField');
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '{$customField1}' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '{$customField1}' has been saved.");
     $customFieldId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField1']/../../td[8]/span/a@href"));
     $customFieldId1 = $customFieldId1[1];
 
@@ -158,7 +158,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     // clicking save
     $this->click('_qf_Field_next-bottom');
     $this->waitForElementPresent('newCustomField');
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '{$customField2}' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '{$customField2}' has been saved.");
     $customFieldId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField2']/../../td[8]/span/a@href"));
     $customFieldId2 = $customFieldId2[1];
 
@@ -208,7 +208,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     // clicking save
     $this->click('_qf_Field_next-bottom');
     $this->waitForElementPresent('newCustomField');
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '{$customField9}' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '{$customField9}' has been saved.");
     $customFieldId9 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField9']/../../td[8]/span/a@href"));
     $customFieldId9 = $customFieldId9[1];
 
@@ -223,7 +223,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     // clicking save
     $this->click('_qf_Field_next-bottom');
     $this->waitForElementPresent('newCustomField');
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '{$customField10}' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '{$customField10}' has been saved.");
     $customFieldId10 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField10']/../../td[8]/span/a@href"));
     $customFieldId10 = $customFieldId10[1];
 
@@ -283,7 +283,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     // clicking save
     $this->click('_qf_Field_next-bottom');
     $this->waitForElementPresent('newCustomField');
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '{$customFieldName}' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '{$customFieldName}' has been saved.");
     $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customFieldName']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
     return $customFieldId;

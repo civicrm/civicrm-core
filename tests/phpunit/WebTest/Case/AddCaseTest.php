@@ -98,7 +98,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom");
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "Case opened successfully.", "Save successful status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "Case opened successfully.");
 
     $summaryStrings = array(
       "Case Summary",

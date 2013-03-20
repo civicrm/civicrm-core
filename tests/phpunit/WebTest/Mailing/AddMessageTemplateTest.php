@@ -83,7 +83,7 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct
-    $this->assertElementContainsText('crm-notification-container', "The Message Template '$msgTitle' has been saved.");
+    $this->waitForText('crm-notification-container', "The Message Template '$msgTitle' has been saved.");
 
     // Verify text.
     $this->assertTrue($this->isElementPresent("xpath=id('user')/div[2]/div/table/tbody//tr/td[1][contains(text(), '$msgTitle')]"),

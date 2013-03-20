@@ -57,7 +57,7 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $individualName = $this->getText("xpath=//div[@class='crm-summary-display_name']");
-    $this->assertElementContainsText('crm-notification-container', "$individualName has been created.");
+    $this->waitForText('crm-notification-container', "$individualName has been created.");
 
     // submit dupe using profile/create as anonymous
     $this->openCiviPage('profile/create', 'gid=4&reset=1', '_qf_Edit_next');

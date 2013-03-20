@@ -49,7 +49,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     //add custom field - alphanumeric checkbox
     $checkboxFieldLabel = 'custom_field' . substr(sha1(rand()), 0, 4);
@@ -86,7 +86,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Integer Radio
     $this->click("//a[@id='newCustomField']/span");
@@ -128,7 +128,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
 
     // Go to the URL to create an Individual contact.
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -173,7 +173,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     //add custom field - money text
     $moneyTextFieldLabel = 'money' . substr(sha1(rand()), 0, 4);
@@ -200,7 +200,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$moneyTextFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$moneyTextFieldLabel' has been saved.");
 
     //Get the customFieldsetID
     $this->openCiviPage('admin/custom/group', 'reset=1');
@@ -256,7 +256,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("id=collapse_display");
     $this->click("id=_qf_Group_next-bottom");
     $this->waitForElementPresent('_qf_Field_next-bottom');
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '$customFieldSet' has been added.");
+    $this->waitForText('crm-notification-container', "Your custom field set '$customFieldSet' has been added.");
 
     // Add field to fieldset
     $customField = 'CustomField' . rand();
@@ -264,7 +264,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->select("id=data_type_0", "value=0");
     $this->click("id=_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$customField' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$customField' has been saved.");
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
@@ -311,7 +311,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "{$firstName} {$lastName} has been created.");
+    $this->waitForText('crm-notification-container', "{$firstName} {$lastName} has been created.");
 
     //Update the custom field
     $this->click("css=a.edit.button");

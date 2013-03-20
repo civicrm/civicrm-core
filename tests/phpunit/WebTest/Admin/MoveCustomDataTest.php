@@ -123,7 +123,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //assert that the success text is present
-    $this->assertElementContainsText('crm-notification-container', "has been moved", "Move field success message not displayed");
+    $this->waitForText('crm-notification-container', "has been moved");
 
     //assert that the custom field not on old data set page
 
@@ -210,7 +210,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.", "Group title missing");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     $url = $this->parseURL();
     $group_id = $url['queryString']['gid'];
@@ -343,7 +343,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$fieldLabel' has been saved.", "Field was not created successfully");
+    $this->waitForText('crm-notification-container', "Your custom field '$fieldLabel' has been saved.");
 
     //get the custom id of the custom field that was just created
     $results = $this->webtest_civicrm_api("CustomField", "get", array('label' => $fieldLabel, 'custom_group_id' => $group_id));
@@ -417,7 +417,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //assert success
-    $this->assertElementContainsText('crm-notification-container', "has been updated", "Contact Record could not be saved");
+    $this->waitForText('crm-notification-container', "has been updated");
   }
 }
 

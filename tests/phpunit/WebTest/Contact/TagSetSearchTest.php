@@ -154,7 +154,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The tag '$tagSetName' has been saved.");
+    $this->waitForText('crm-notification-container', "The tag '$tagSetName' has been saved.");
 
     // sort by ID desc
     $this->click("xpath=//table//tr/th[text()=\"ID\"]");

@@ -164,7 +164,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
   function testHouseholdAdd() {
@@ -268,7 +268,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
   function testOrganizationAdd() {
@@ -367,7 +367,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
   function testIndividualAddWithSharedAddress() {
@@ -428,9 +428,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Edit_next");
 
     // Is new contact created?
-    $this->assertElementContainsText('crm-notification-container', "$currentEmployer has been created.",
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', "$currentEmployer has been created.");
 
     //make sure shared address is selected
     $this->waitForElementPresent('selected_shared_address-1');
@@ -460,9 +458,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Edit_next");
 
     // Is new contact created?
-    $this->assertElementContainsText('crm-notification-container', "$sharedHousehold has been created.",
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', "$sharedHousehold has been created.");
 
     //make sure shared address is selected
     $this->waitForElementPresent('selected_shared_address-2');
@@ -471,7 +467,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $name = $this->getText("xpath=//div[@class='crm-summary-display_name']");
-    $this->assertElementContainsText('crm-notification-container',  "$name has been created.");
+    $this->waitForText('crm-notification-container',  "$name has been created.");
 
     //make sure current employer is set
     $this->verifyText("xpath=id('contactinfo-block')/div/div/div[2]/div", 'Employer');

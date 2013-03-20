@@ -74,9 +74,7 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
-      "Status message didn't show up after saving campaign!"
-    );
+    $this->waitForText('crm-notification-container', "Campaign $title");
 
     //Opening Edit Page of the created Campaign
     $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");

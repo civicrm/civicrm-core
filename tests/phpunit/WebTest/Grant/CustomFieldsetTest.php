@@ -56,7 +56,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->type('id=label', $grantType);
     $this->click('id=_qf_Options_next-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "The Grant Type '$grantType' has been saved.");
+    $this->waitForText('crm-notification-container', "The Grant Type '$grantType' has been saved.");
 
     // Create new Custom Field Set that extends the grant type
     $this->openCiviPage('admin/custom/group', 'reset=1');
@@ -69,7 +69,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->click('id=collapse_display');
     $this->click('id=_qf_Group_next-bottom');
     $this->waitForElementPresent('_qf_Field_next-bottom');
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '$grantFieldSet' has been added.");
+    $this->waitForText('crm-notification-container', "Your custom field set '$grantFieldSet' has been added.");
 
     // Add field to fieldset
     $grantField = 'GrantField' . $rand;
@@ -77,7 +77,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->select('id=data_type_0', 'label=Money');
     $this->click('id=_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$grantField' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$grantField' has been saved.");
 
     // Create new Grant
     $this->openCiviPage('grant/add', 'reset=1&action=add&context=standalone', '_qf_Grant_upload-bottom');
