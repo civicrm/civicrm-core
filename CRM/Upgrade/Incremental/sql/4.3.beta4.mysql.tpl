@@ -5,6 +5,9 @@
  option in premiums block (e.g. No thank you)';
 {/if}
 
+-- Also need to populate default text for premiums_nothankyou_label
+UPDATE `civicrm_premiums` SET {localize field='premiums_nothankyou_label'}premiums_nothankyou_label{/localize} = {localize}'{ts escape="sql"}No thank-you{/ts}'{/localize};
+
 -- CRM-12151
 ALTER TABLE civicrm_option_value
   DROP INDEX index_option_group_id_value,
