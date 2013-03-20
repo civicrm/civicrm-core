@@ -464,7 +464,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('autoRenewOption', CRM_Price_BAO_Set::checkAutoRenewForPriceSet($this->_priceSetId));
 
       $this->assign('optionsMembershipTypes', $optionsMembershipTypes);
-            $this->assign( 'contributionType', CRM_Utils_Array::value('financial_type_id', $this->_priceSet) );
+      $this->assign('contributionType', CRM_Utils_Array::value('financial_type_id', $this->_priceSet));
 
       // get only price set form elements.
       if ($getOnlyPriceSetElements) {
@@ -684,10 +684,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $this->addElement('checkbox', 'record_contribution', ts('Record Membership Payment?'));
 
-            $this->add('select', 'financial_type_id',
-                       ts( 'Financial Type' ),
-                       array(''=>ts( '- select -' )) + CRM_Contribute_PseudoConstant::financialType( ) );
-
       $this->add('text', 'total_amount', ts('Amount'));
       $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
 
@@ -729,6 +725,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       //add field for amount to allow an amount to be entered that differs from minimum
       $this->add('text', 'total_amount', ts('Amount'));
     }
+    $this->add('select', 'financial_type_id',
+      ts('Financial Type'),
+      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
+    );
     if ($this->_context != 'standalone') {
       //CRM-10223 - allow contribution to be recorded against different contact
       // causes a conflict in standalone mode so skip in standalone for now
@@ -888,6 +888,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if ($priceSetId && !$self->_mode && !CRM_Utils_Array::value('record_contribution', $params)) {
       $errors['record_contribution'] = ts('Record Membership Payment is required when you using price set.');
     }
+    
+    if (!$priceSetId && $self->_mode && !CRM_Utils_Array::value('financial_type_id', $params)) {
+      $errors['financial_type_id'] = ts('Please enter the financial Type.');
+    }
 
     if (CRM_Utils_Array::value('payment_processor_id', $params)) {
       // make sure that credit card number and cvv are valid
@@ -1001,8 +1005,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     //total amount condition arise when membership type having no
     //minimum fee
     if (isset($params['record_contribution'])) {
-            if ( ! $params['financial_type_id'] ) {
-                $errors['financial_type_id'] = ts('Please enter the financial Type.');
+      if (!$params['financial_type_id']) {
+        $errors['financial_type_id'] = ts('Please enter the financial Type.');
       }
       if (CRM_Utils_System::isNull($params['total_amount'])) {
         $errors['total_amount'] = ts('Please enter the contribution.');
@@ -1094,7 +1098,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $this->_params, $lineItem[$priceSetId]);
       $params['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
       $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
-      $isPaymentRecorded = CRM_Utils_Array::value('record_contribution', $formValues);
       if (!empty($lineItem[$priceSetId])) {
         foreach ($lineItem[$priceSetId] as &$li) {
           if (CRM_Utils_Array::value('membership_type_id', $li)) {
@@ -1106,7 +1109,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           ///CRM-11529 for quick config backoffice transactions
           //when financial_type_id is passed in form, update the
           //lineitems with the financial type selected in form
-          if ($isPaymentRecorded && $isQuickConfig && $submittedFinancialType) {
+          if ($isQuickConfig && $submittedFinancialType) {
             $li['financial_type_id'] = $submittedFinancialType;
           }
         }
@@ -1282,18 +1285,15 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       else {
         $params['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues, 0);
       }
-
-      if ($priceSetId) {
+        
+      if ($priceSetId && !$isQuickConfig) {
         $params['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_Set',
           $priceSetId,
           'financial_type_id'
         );
       }
       else {
-        $params['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Member_DAO_MembershipType',
-          end($this->_memTypeSelected),
-          'financial_type_id'
-        );
+        $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $formValues);
       }
 
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($formValues['payment_processor_id'],

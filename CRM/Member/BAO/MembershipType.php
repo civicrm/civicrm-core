@@ -118,8 +118,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
     self::createMembershipPriceField($params, $ids, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
-    if (CRM_Utils_Array::value('membershipType', $ids) && CRM_Utils_Array::value('financial_type_id', $params)) {
-      self::updateAllPriceFieldValue($ids['membershipType'], $params['financial_type_id']);
+    if (CRM_Utils_Array::value('membershipType', $ids)) {
+      self::updateAllPriceFieldValue($ids['membershipType'], $params);
     }
 
     return $membershipType;
@@ -684,6 +684,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $fieldParams['is_display_amounts'] = $fieldParams['is_required'] = 0;
       $fieldParams['weight'] = $fieldParams['option_weight'][1] = 1;
       $fieldParams['option_label'][1] = $params['name'];
+      $fieldParams['option_description'][1] = $params['description'];
+      
       $fieldParams['membership_type_id'][1] = $membershipTypeId;
       $fieldParams['option_amount'][1] = empty($params['minimum_fee']) ? 0 : $params['minimum_fee'];
       $fieldParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
@@ -725,6 +727,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         }
       }
       $results['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
+      $results['description'] = $params['description'];
       CRM_Price_BAO_FieldValue::add($results, $optionsIds);
     }
   }
@@ -736,15 +739,28 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    *  @param  integer      financial type id 
    */
-  static function updateAllPriceFieldValue($membershipTypeId, $financialTypeId) {
+  static function updateAllPriceFieldValue($membershipTypeId, $params) {
+    if (CRM_Utils_Array::value('minimum_fee', $params)){
+      $amount = $params['minimum_fee'];
+    }
+    else {
+      $amount = 0;
+    }
     $query = "UPDATE `civicrm_price_field_value` cpfv
 INNER JOIN civicrm_price_field cpf on cpf.id = cpfv.price_field_id 
 INNER JOIN civicrm_price_set cps on cps.id = cpf.price_set_id
-SET cpfv.financial_type_id = %2
-WHERE cpfv.membership_type_id = %1 AND cps.is_quick_config = 1";
+SET cpfv.financial_type_id = %2,
+cpfv.label = %3,
+cpfv.amount = %4,
+cpfv.description = %5
+WHERE cpfv.membership_type_id = %1 AND cps.is_quick_config = 1 AND cps.name != 'default_membership_type_amount'";
     $params = array(1 => array($membershipTypeId, 'Integer'),
-      2 => array($financialTypeId, 'Integer'));
-      CRM_Core_DAO::executeQuery($query, $params);
+      2 => array($params['financial_type_id'], 'Integer'),
+      3 => array($params['name'], 'String'),
+      4 => array($amount, 'Float'),
+      5 => array($params['description'], 'String'),
+    );
+    CRM_Core_DAO::executeQuery($query, $params);
   } 
 }
 

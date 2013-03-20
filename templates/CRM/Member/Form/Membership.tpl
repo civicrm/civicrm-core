@@ -164,6 +164,11 @@
             <span class="description">{ts}If <strong>Status Override</strong> is checked, the selected status will remain in force (it will NOT be modified by the automated status update script).{/ts}</span></td></tr>
 
           {elseif $membershipMode}
+          <tr class="crm-membership-form-block-financial_type_id-mode">
+            <td class="label">{$form.financial_type_id.label}</td>
+            <td>{$form.financial_type_id.html}<br />
+              <span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
+          </tr>
           <tr class="crm-membership-form-block-total_amount">
             <td class="label">{$form.total_amount.label}</td>
             <td>{$form.total_amount.html}<br />
@@ -437,11 +442,10 @@
             }
           }
         {/literal}{/if}{literal}
-
-        // skip this for test and live modes because financial type is set automatically
-        cj("#financial_type_id").val( allMemberships[memType]['financial_type_id'] );
       }
 
+      // skip this for test and live modes because financial type is set automatically
+      cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
       var term = cj('#num_terms').val();
       if ( term ) {
         var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
@@ -608,6 +612,7 @@
     cj( "#mem_type_id" ).hide( );
     cj('#total_amount').attr("readonly", true);
     cj( "#num_terms_row" ).hide( );
+    cj(".crm-membership-form-block-financial_type_id-mode").hide();
     {/literal}{/if}{literal}
 
     function buildAmount( priceSetId ) {
@@ -627,6 +632,7 @@
         cj( "#totalAmountORPriceSet" ).show( );
         cj('#total_amount').removeAttr("readonly");
         cj( "#num_terms_row").show( );
+        cj(".crm-membership-form-block-financial_type_id-mode").show();
 
         {/literal}{if $allowAutoRenew}{literal}
         cj('#autoRenew').hide();
@@ -653,6 +659,7 @@
       cj( "#totalAmountORPriceSet" ).hide( );
       cj( "#mem_type_id" ).hide( );
       cj( "#num_terms_row" ).hide( );
+      cj(".crm-membership-form-block-financial_type_id-mode").hide();
     }
 
     buildMaxRelated(cj('#membership_type_id_1', false).val());
