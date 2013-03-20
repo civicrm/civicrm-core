@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
 
@@ -249,6 +248,4 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     return array($customGroupTitle, $gid);
   }
 }
-
-
 

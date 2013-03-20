@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
 
@@ -37,7 +36,7 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
 
     // now create new donar detail report instance
     $this->openCiviPage('report/contribute/detail', 'reset=1', '_qf_Detail_submit');
-    
+
     // preview result
     $this->click("_qf_Detail_submit");
     $this->waitForPageToLoad($this->getTimeoutMsec());

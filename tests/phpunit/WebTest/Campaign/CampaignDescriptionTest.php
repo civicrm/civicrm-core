@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
 
@@ -37,7 +36,6 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-
 
     $this->webtestLogin();
 
@@ -82,14 +80,9 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
 
     //Opening Edit Page of the created Campaign
     $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");
-    $this->click("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    //Checking for Proper description present
-    $this->waitForElementPresent("//textarea[@id='description']");
+    $this->clickLink("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']", "//textarea[@id='description']");
     $fetchedVaue = $this->getValue('description');
     $this->assertEquals($campaignDescription, $fetchedVaue);
   }
 }
-
 

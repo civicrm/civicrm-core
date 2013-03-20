@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
@@ -231,7 +230,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->assertTrue($this->isTextPresent("Changes Saved."));
 
-      $this->openCiviPage('contribute/search', 'reset=1', '_qf_Search_refresh');      
+      $this->openCiviPage('contribute/search', 'reset=1', '_qf_Search_refresh');
 
       $this->type('sort_name', $firstName);
       $this->click("_qf_Search_refresh");

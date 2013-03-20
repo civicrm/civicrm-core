@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
 
@@ -112,8 +111,8 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     // Go to edit profile page of the created contact.
-    $this->openCiviPage("profile/edit", "id={$contactId}&gid={$profileId}&reset=1&cs={$cs}");
-    $this->assertStringsPresent(array($profileName));
+    $this->openCiviPage("profile/edit", "id={$contactId}&gid={$profileId}&reset=1&cs={$cs}", NULL);
+    $this->waitForTextPresent($profileName);
 
     // Check all profile fields, update their values.
     foreach ($fields as $field) {
@@ -130,7 +129,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
     // Check profile view page.
-    $this->assertStringsPresent(array($profileName));
+    $this->waitForTextPresent($profileName);
 
     // Check updated values of all fields.
     $checkFieldValues = array();

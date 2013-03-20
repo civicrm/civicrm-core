@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
@@ -95,11 +94,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText($grantFieldSet, $grantField);
     $this->type('id=amount_total', '100.00');
     $this->type("css=div#$grantFieldSet input.form-text", '99.99');
-    $this->click('id=_qf_Grant_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Verify grant is created with presence of view link
-    $this->waitForElementPresent("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink('id=_qf_Grant_upload-bottom', "xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     // Click through to the Grant view screen
     $this->click("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");

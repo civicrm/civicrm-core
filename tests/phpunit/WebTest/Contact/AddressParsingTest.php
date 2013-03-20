@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
 
@@ -160,5 +159,4 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
     }
   }
 }
-
 

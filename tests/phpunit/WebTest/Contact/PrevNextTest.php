@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
 
@@ -34,7 +33,6 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
 
   function testPrevNext() {
     $this->webtestLogin();
-
 
     /* add new group */
 

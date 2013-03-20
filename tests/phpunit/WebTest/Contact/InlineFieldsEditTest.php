@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
 
@@ -142,9 +141,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
     $this->type('organization_name', $orgName);
     $this->type('street_address-1', 'Test Org Street');
     $this->type('city-1', 'Test Org City');
-    $this->click('_qf_Edit_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('selected_shared_address-2');
+    $this->clickLink('_qf_Edit_next', 'selected_shared_address-2');
     $this->waitForTextPresent('Test Org Street');
     $this->inlineEdit('address-block-2', array(
       'address_2_location_type_id' => array('Work'),

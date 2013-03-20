@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
 
@@ -34,7 +33,6 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
 
   function testContactReferenceField() {
     $this->webtestLogin();
-
 
     /* add new group */
 
@@ -144,7 +142,6 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     preg_match('/&id=([0-9]+)/', $this->getLocation(), $matches);
     $contactRefFieldID1 = $matches[1];
 
-
     $this->openCiviPage('admin/custom/group/field', "reset=1&action=browse&gid={$customGroupId}");
 
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/span[1]/a[text()='Edit Field']");
@@ -163,7 +160,6 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=div.ac_results-inner li");
     $this->assertElementContainsText("css=div.ac_results-inner li", "{$contact1}@example.com");
     $this->assertElementNotContainsText("css=div.ac_results-inner ul li", "{$contact2}@example.com");
-
 
     $this->openCiviPage('admin/custom/group', "action=preview&reset=1&id={$customGroupId}");
 

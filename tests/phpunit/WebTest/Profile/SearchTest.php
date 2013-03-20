@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
@@ -37,7 +36,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // Add new profile.
     $this->openCiviPage('admin/uf/group', 'reset=1');
-    
+
     $this->click('newCiviCRMProfile-bottom');
 
     $this->waitForElementPresent('_qf_Group_next-bottom');
@@ -89,7 +88,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
     $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
-    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.'); 
+    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.');
 
     // Add Sample Custom Field.
     $this->click('field_name[0]');
@@ -102,11 +101,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
     $this->click('in_selector');
     // click on save
-    $this->click('_qf_Field_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Add Individual Contact.
-    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
+    $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
     $this->click("xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
 
     $this->waitForElementPresent('_qf_Edit_next');
@@ -148,11 +143,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // Edit first profile field
     $this->waitForElementPresent("xpath=//table/tbody/tr[1]/td[9]");
-    $this->click("xpath=//table/tbody/tr[1]/td[9]/span[1]/a[1]");
-
-    // Verify that visibility field is present in edit form
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink("xpath=//table/tbody/tr[1]/td[9]/span[1]/a[1]", '_qf_Field_next-bottom');
 
     // sleep 5 to make sure jQuery is not hiding field after page load
     // Because it tends to cause problems, all uses of sleep() must be justified in comments

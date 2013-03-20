@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
 
@@ -55,7 +54,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
       // check the opened panes.
       $this->_checkOpenedPanes(array($pane));
     }
-    
+
   }
 
   function testIndividualSearchPage(){
@@ -71,7 +70,8 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     $this->select("contribution_date_relative","value=earlier.quarter");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("contribution_date_relative","value=ending.year"); 
+    $this->select("contribution_date_relative","value=ending.year");
+
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
@@ -279,7 +279,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
             ),
           ),
         ),
-         
+
         'contribution' =>
         array(
           'headerLocator' => 'div#CiviContribute',
@@ -323,7 +323,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
                       'locator' => 'member_join_date_relative',
                       'values' => array('Previous Year'),
             ),
-         
+
           ),
         ),
         'event' =>
@@ -341,8 +341,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
             ),
                 ),
               ),
-      
-    
+
                                      );
     }
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Generic_CheckFindTest extends CiviSeleniumTestCase {
 
@@ -41,5 +40,4 @@ class WebTest_Generic_CheckFindTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("search-status"));
   }
 }
-
 

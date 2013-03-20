@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
@@ -118,7 +117,6 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'No Duplicate Checking', array(), $other);
   }
 
-
   /*
    *  Test contact import for Organization Subtype.
    */
@@ -194,7 +192,6 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     // Recreate same conacts using 'No Duplicate Checking' with contact type Team.
     $this->importContacts($headers, $rows, 'Organization', 'No Duplicate Checking', array(), $other);
   }
-
 
   /*
    *  Test contact import for Household Subtype.

@@ -111,9 +111,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->openCiviPage("dashboard", "reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->click("xpath=//div[@id='recently-viewed']/ul/li[1]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Activity_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='recently-viewed']/ul/li[1]/a", "_qf_Activity_cancel-bottom");
     $this->webtestVerifyTabularData(
       array(
         'Current Attachment(s)' => 'Financial_Transactions_'

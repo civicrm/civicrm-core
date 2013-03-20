@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
 
@@ -41,7 +40,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
 
     // Get sample import data.
     list($headers, $rows) = $this->_participantIndividualCSVData();
-   
+
     // Create and import csv from provided data and check imported data.
     $fieldMapper = array(
       'mapper[0][0]' => 'email',

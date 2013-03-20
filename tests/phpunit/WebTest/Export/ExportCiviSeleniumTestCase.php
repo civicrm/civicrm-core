@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 

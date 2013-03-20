@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
 
@@ -78,14 +77,10 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->type("css=input#sort_name_navigation", 'ada');
     $this->typeKeys("css=input#sort_name_navigation", 'ada');
 
-    $this->click("_qf_Basic_refresh");
+    $this->clickLink("_qf_Basic_refresh");
 
-    // wait for result list
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     // make sure we're on search results page
     $this->waitForElementPresent("alpha-filter");
-    // wait for bottom of page to load (access is in footer)
-    $this->waitForElementPresent("access");
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=.crm-search-results > table.row-highlight', $sortName);
@@ -191,7 +186,6 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // Create new group and select the previously selected group as parent group for this new group.
     $childGroupName = 'Childgroup_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($childGroupName, $parentGroupName);
-
 
     // Adding Parent group contact
     $firstName = substr(sha1(rand()), 0, 7);

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
 
@@ -61,5 +60,4 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.msg-text', "Your information has been saved.");
   }
 }
-
 

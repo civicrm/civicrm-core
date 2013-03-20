@@ -66,15 +66,18 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    //For LineItem
    $lineItemSearchParams = array('entity_id' => $contriIDOff);
    $lineItemCompareParams = array('line_total' => '90.00');
-   
+
+
    $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $searchParams, $compareParams);
    $this->assertDBCompareValues('CRM_Price_DAO_LineItem', $lineItemSearchParams, $lineItemCompareParams);
-   
+
+
    $total = $this->_getTotalContributedAmount($contriIDOff);
    $compare = array('total_amount' => $total);
    $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $searchParams, $compare);
 
-   
+
+
    $amount = $this->_getFinancialItemAmount($contriIDOff);
    $compare = array('total_amount' => $amount);
    $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $searchParams, $compare);
@@ -110,7 +113,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertDBCompareValues("CRM_Financial_DAO_FinancialItem", $search, $compare);
 
    $status = $this->_getPremiumActualCost($contId, 'Accounts Receivable', 'Payment Processor Account', NULL, "'civicrm_contribution'",  "ft.status_id as status");
-   $this->assertEquals($status, '1', "Verify Completed Status"); 
+   $this->assertEquals($status, '1', "Verify Completed Status");
+
  }
 
  function testChangePremium() {
@@ -462,9 +466,11 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
    // select payment instrument type
    $this->select("payment_instrument_id", "label=Credit Card");
-   
+
+
    $this->type("trxn_id", "P20901X1" . rand(100, 10000));
-  
+
+
    //Custom Data
    //$this->click('CIVICRM_QFID_3_6');
 

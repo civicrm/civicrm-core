@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
 
@@ -152,5 +151,4 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("tagset1, tagset2"));
   }
 }
-
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_UpdateProfileTest extends CiviSeleniumTestCase {
 
@@ -75,5 +74,4 @@ class WebTest_Contact_UpdateProfileTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("//div[@id='profilewrap1']/div[@id='crm-container']/div[7]/div[2][contains(text(), 'AR')]"));
   }
 }
-
 

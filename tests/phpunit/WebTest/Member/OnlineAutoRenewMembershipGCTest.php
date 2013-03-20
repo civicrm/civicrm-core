@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCase {
 
@@ -46,9 +45,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
     $this->type('email-5', "{$lastName}@example.com");
 
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next_checkout");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next_checkout");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
     $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
@@ -59,7 +56,8 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     // Justification for this instance: FIXME
     sleep(5);
 
-    // FIXME: By this time pending records has already been created. Formatting for external page (google checkout in this case) 
+    // FIXME: By this time pending records has already been created. Formatting for external page (google checkout in this case)
+
     // has changed a bit. No point in adding test for external page as we 'll test with fake transactions.
   }
 
@@ -80,9 +78,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
     $this->type('email-5', "{$lastName}@example.com");
 
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next_checkout");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next_checkout");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
     $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
@@ -93,7 +89,8 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     // Justification for this instance: FIXME
     sleep(5);
 
-    // FIXME: By this time pending records has already been created. Formatting for external page (google checkout in this case) 
+    // FIXME: By this time pending records has already been created. Formatting for external page (google checkout in this case)
+
     // has changed a bit. No point in adding test for external page as we 'll test with fake transactions.
   }
 
@@ -110,22 +107,22 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $this->webtestAddPaymentProcessor($processorName, 'Google_Checkout');
 
       // -- start updating membership types
-      $this->openCiviPage('admin/member/membershipType/add', 'action=update&id=1&reset=1'); 
-      
+      $this->openCiviPage('admin/member/membershipType/add', 'action=update&id=1&reset=1');
+
       $this->waitForElementPresent("xpath=//div[@id='membership_type_form']//table/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'Give option, but not required')]");
       $this->click("xpath=//div[@id='membership_type_form']//table/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'Give option, but not required')]");
-      
+
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
       //wait for the auto-complete member_of_contact to populate
       $this->waitForValue('member_of_contact', '::');
-      
+
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
 
-      $this->openCiviPage('admin/member/membershipType/add', 'action=update&id=2&reset=1'); 
-      
+      $this->openCiviPage('admin/member/membershipType/add', 'action=update&id=2&reset=1');
+
       $this->waitForElementPresent("xpath=//div[@id='membership_type_form']//table/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'Give option, but not required')]");
       $this->click("xpath=//div[@id='membership_type_form']//table/tbody/tr[6]/td/label[contains(text(), 'Auto-renew Option')]/../../td[2]/label[contains(text(), 'Give option, but not required')]");
 

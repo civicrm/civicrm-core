@@ -24,7 +24,6 @@
   +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
@@ -155,7 +154,6 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $eventTypeName = 'Fundraiser';
     $this->type("event_type", $eventTypeName);
     $this->type("event_type_id", 3);
-
 
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());

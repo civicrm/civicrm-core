@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
 
@@ -113,7 +112,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
   function memberAddTest($campaignTitle, $id) {
     //Add new memebershipType
     $memTypeParams = $this->webtestAddMembershipType();
-   
+
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
@@ -142,7 +141,6 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     // select campaign
     $this->click("campaign_id");
     $this->select("campaign_id", "value=$id");
-
 
     // Let Join Date stay default
     // fill in Start Date

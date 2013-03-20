@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
   protected $captureScreenshotOnFailure = TRUE;

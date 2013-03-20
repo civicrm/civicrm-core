@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
@@ -76,16 +75,12 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $testUserLastName = "Testuserlast";
     $this->type("first_name", $testUserFirstName);
     $this->type("last_name", $testUserLastName);
-    $this->click("_qf_Edit_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("profilewrap4");
+    $this->clickLink("_qf_Edit_next", "profilewrap4");
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Try submitting the form without creating or selecting a contact (test for CRM-7971)
-    $this->click("_qf_Case_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("css=span.crm-error");
+    $this->clickLink("_qf_Case_upload-bottom", "css=span.crm-error");
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
@@ -126,16 +121,11 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('start_date', 'now');
     $today = date('F jS, Y', strtotime('now'));
 
-    // echo 'Today is ' . $today;
     $this->type("duration", "20");
     $this->type("{$cusId_1}", $custFname);
     $this->type("{$cusId_2}", $custMname);
     $this->type("{$cusId_3}", $custLname);
-    $this->click("_qf_Case_upload-bottom");
-
-    // We should be at manage case screen
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_CaseView_cancel-bottom");
+    $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom");
 
     // Is status message correct?
     $this->assertTextPresent("Case opened successfully.", "Save successful status message didn't show up after saving!");
