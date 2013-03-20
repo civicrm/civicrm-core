@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
 
@@ -102,7 +101,6 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent('This is a test field'));
   }
-
 
   /*
      *  Helper function to provide data for custom data import.

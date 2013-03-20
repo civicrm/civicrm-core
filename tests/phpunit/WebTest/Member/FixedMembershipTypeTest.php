@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
@@ -36,7 +35,6 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     // Scenario 1
     // Rollover Date < Start Date
     // Join Date > Rollover Date and Join Date < Start Date
-
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -144,8 +142,10 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     }
 
     $query = "
-SELECT end_event_adjust_interval 
-  FROM civicrm_membership_status 
+SELECT end_event_adjust_interval
+
+  FROM civicrm_membership_status
+
  WHERE start_event = 'join_date'
    AND name = 'New'";
     $endInterval = CRM_Core_DAO::singleValueQuery($query);
@@ -193,7 +193,6 @@ SELECT end_event_adjust_interval
   function testMembershipTypeScenario2() {
     // Scenario 2
     // Rollover Date < Join Date
-
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -302,8 +301,10 @@ SELECT end_event_adjust_interval
     }
 
     $query = "
-SELECT end_event_adjust_interval 
-  FROM civicrm_membership_status 
+SELECT end_event_adjust_interval
+
+  FROM civicrm_membership_status
+
  WHERE start_event = 'join_date'
    AND name = 'New'";
     $endInterval = CRM_Core_DAO::singleValueQuery($query);
@@ -352,7 +353,6 @@ SELECT end_event_adjust_interval
     // Scenario 3
     // Standard Fixed scenario - Jan 1 Fixed Period Start and October 31 rollover
     // Join Date is later than Rollover Date
-
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -430,7 +430,6 @@ SELECT end_event_adjust_interval
     $this->waitForTextPresent("Membership Type {$title}");
     $this->select('membership_type_id[1]', "label=Membership Type {$title}");
 
-
     $sourceText = "Membership ContactAddTest with Fixed Membership Type Scenario 3";
     // fill in Source
     $this->type('source', $sourceText);
@@ -454,8 +453,10 @@ SELECT end_event_adjust_interval
     }
 
     $query = "
-SELECT end_event_adjust_interval 
-  FROM civicrm_membership_status 
+SELECT end_event_adjust_interval
+
+  FROM civicrm_membership_status
+
  WHERE start_event = 'join_date'
    AND name = 'New'";
     $endInterval = CRM_Core_DAO::singleValueQuery($query);
@@ -505,7 +506,6 @@ SELECT end_event_adjust_interval
     // Standard Fixed scenario - Jan 1 Fixed Period Start and October 31 rollover
     // Join Date is earlier than Rollover Date
 
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -529,7 +529,7 @@ SELECT end_event_adjust_interval
     $this->click('member_of_contact');
     $this->waitForElementPresent("css=div.ac_results-inner li");
     $this->click("css=div.ac_results-inner li");
-    
+
     $this->type('minimum_fee', '100');
     $this->select( 'financial_type_id', 'value=2' );
     $this->type('duration_interval', 1);
@@ -607,8 +607,10 @@ SELECT end_event_adjust_interval
     }
 
     $query = "
-SELECT end_event_adjust_interval 
-  FROM civicrm_membership_status 
+SELECT end_event_adjust_interval
+
+  FROM civicrm_membership_status
+
  WHERE start_event = 'join_date'
    AND name = 'New'";
     $endInterval = CRM_Core_DAO::singleValueQuery($query);

@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   protected $pageno = '';
@@ -123,9 +122,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Edit_next");
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
-    $this->click("_qf_Edit_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("profilewrap4");
+    $this->clickLink("_qf_Edit_next", "profilewrap4");
 
     // Is status message correct?
     $this->assertTextPresent("Thank you. Your information has been saved.", "Save successful status message didn't show up after saving profile to update testUserName!");
@@ -293,7 +290,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Membership_cancel-bottom');
     $this->click('_qf_Membership_upload-bottom');
 
-
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("css=li#tab_rel a");
 
@@ -454,9 +450,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Edit_next");
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
-    $this->click("_qf_Edit_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("profilewrap4");
+    $this->clickLink("_qf_Edit_next", "profilewrap4");
 
     $urlElements = $this->parseURL();
     print_r($urlElements);
@@ -464,7 +458,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->assertType('numeric', $cid);
     // Is status message correct?
     $this->assertTextPresent("Thank you. Your information has been saved.", "Save successful status message didn't show up after saving profile to update testUserName!");
-
 
     //add org fields to profile
     $this->openCiviPage("admin/uf/group", "reset=1");
@@ -487,7 +480,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click('field_name[1]');
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     //create organisation
     $orgName = "Org WebAccess ". substr(sha1(rand()), 0, 7);
@@ -568,7 +560,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
      $this->_testOrganization($pageId, $cid, $pageTitle);
   }
 
-
   function _testOrganization($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
@@ -588,11 +579,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select("onbehalf_state_province-3", "label=Alabama");
 
     $this->waitForElementPresent("_qf_Main_upload-bottom");
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -627,7 +614,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
 
-
     // Credit Card Info
     $this->select("credit_card_type", "value=Visa");
     $this->type("credit_card_number", "4111111111111111");
@@ -643,10 +629,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select("billing_country_id-5", "value=1228");
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -659,14 +642,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1");
     $this->type("sort_name", $orgName);
-    $this->click("_qf_Search_refresh");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     // verify contrb created
     $expected = array(
@@ -879,21 +856,15 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
 
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1");
     $this->type("sort_name", $orgName1);
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     // verify contrb created
     $expected = array(
@@ -905,7 +876,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     foreach ($expected as $value => $label) {
       $this->verifyText("xpath=id( 'ContributionView' )/div[2]/table[1]/tbody/tr[$value]/td[2]", preg_quote($label));
     }
-
 
     $this->openCiviPage("admin/uf/group", "reset=1");
     $this->click("link=Reserved Profiles");
@@ -1042,9 +1012,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select('field_name[0]', 'value=Membership');
     $this->select('field_name[1]', 'label=Campaign');
     $this->click('field_name[1]');
-    $this->click('_qf_Field_next_new-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_cancel-bottom');
 
     $this->select('field_name[0]', 'value=Membership');
     $this->select('field_name[1]', "label=$fieldTitle :: $groupTitle");
@@ -1120,7 +1088,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     // Save the Organization
     $this->click("_qf_Contact_upload_view-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     // create Membership type
     $title1 = "Membership Type" . substr(sha1(rand()), 0, 7);
@@ -1206,8 +1173,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Open Live Membership Page
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id=" . $pageId . "&cid=" . $cid);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId&cid=$cid", "_qf_Main_upload-bottom");
     $this->click('CIVICRM_QFID_amount_other_radio_4');
     $this->type('amount_other', 60);
     $this->click('onbehalf_organization_name');
@@ -1233,21 +1199,15 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select("credit_card_exp_date[M]", "value=1");
     $this->select("credit_card_exp_date[Y]", "value=2020");
 
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Find Membership for organization
     $this->openCiviPage("member/search", "reset=1");
     $this->type("sort_name", $orgName1);
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_MembershipView_cancel-bottom");
 
     //verify contrb created
     $expected = array(
@@ -1315,7 +1275,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     );
   }
 
-
   function testOnBehalfOfOrganizationWithImage() {
     $this->webtestLogin();
 
@@ -1327,9 +1286,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Edit_next");
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
-    $this->click("_qf_Edit_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("profilewrap4");
+    $this->clickLink("_qf_Edit_next", "profilewrap4");
 
     $urlElements = $this->parseURL();
     $cid = $urlElements['queryString']['id'];
@@ -1417,7 +1374,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
   function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -1466,10 +1423,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select("billing_country_id-5", "value=1228");
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());

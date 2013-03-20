@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
 
@@ -80,5 +79,4 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
   }
 }
-
 

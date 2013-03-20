@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
@@ -224,7 +223,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
 
     $this->openCiviPage('admin/custom/group', 'reset=1');
-    
+
     //add new custom data
     $this->click("//a[@id='newCustomDataGroup']/span");
     $this->waitForPageToLoad($this->getTimeoutMsec());

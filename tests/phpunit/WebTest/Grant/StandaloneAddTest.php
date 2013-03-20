@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
 
@@ -90,11 +89,7 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("note", "Grant Note");
 
     // Clicking save.
-    $this->click("_qf_Grant_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // verify if Grant is created
-    $this->waitForElementPresent("xpath=//div[@id='Grants']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink("_qf_Grant_upload", "xpath=//div[@id='Grants']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the Grant view screen
     $this->click("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");

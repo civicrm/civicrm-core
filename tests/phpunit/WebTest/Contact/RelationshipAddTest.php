@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
@@ -354,5 +353,4 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent($params['label_a_b']));
   }
 }
-
 

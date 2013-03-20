@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
@@ -392,7 +391,6 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate("member_end_date_low", "-1 year");
     $this->webtestFillDate("member_end_date_high", "+2 year");
   }
-
 
   // function to fill member search details
   function addPledgeSearchDetail($firstName) {

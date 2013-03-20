@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
 
@@ -69,7 +68,6 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
 
     //contact details section
 
-
     //fill in first name
     $this->type("first_name", "$firstName");
 
@@ -86,5 +84,4 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("css=.notify-content", "Please correct the following errors in the form fields below: One matching contact was found. You can View or Edit the existing contact.");
   }
 }
-
 

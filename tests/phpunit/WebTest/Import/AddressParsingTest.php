@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
 
@@ -274,5 +273,4 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-
 

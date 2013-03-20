@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
@@ -88,7 +87,6 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       FALSE
     );
 
-
     // create two new membership types
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1 = $memTypeParams1['membership_type'];
@@ -104,12 +102,10 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->openCiviPage("admin/contribute/membership", "reset=1&action=update&id={$pageId}", '_qf_MembershipBlock_next-bottom');
     $this->click("membership_type_$memTypeId1");
     $this->click("membership_type_$memTypeId2");
-    $this->click('_qf_MembershipBlock_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_MembershipBlock_next-bottom');
+    $this->clickLink('_qf_MembershipBlock_next', '_qf_MembershipBlock_next-bottom');
     $text = "'MembershipBlock' information has been saved.";
     $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
-    
+
     //logout
     $this->webtestLogout();
 
@@ -126,11 +122,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='memberSearch']/table/tbody/tr");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -143,7 +135,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     if ($payLater) {
       $verifyData['Status'] = 'Pending';
     }
-    else { 
+    else {
+
       $verifyData['Status'] = 'New';
     }
     $this->webtestVerifyTabularData($verifyData);
@@ -191,9 +184,11 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label");
     if ($memTypeId != 'No thank you') {
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$memTypeId')]");
-    } 
+    }
+
     else {
-      $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label[contains(text(),'$memTypeId')]"); 
+      $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label[contains(text(),'$memTypeId')]");
+
     }
     if (!$otherAmount) {
       $this->click("xpath=//div[@class='crm-section contribution_amount-section']/div[2]//span/label[text()='No thank you']");
@@ -238,7 +233,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
-  
+
   function testOnlineMembershipCreateWithContribution() {
     //login with admin credentials & make sure we do have required permissions.
     $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");
@@ -308,13 +303,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search","reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     //View Contribution Record and verify data
     $expected = array(

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
 
@@ -53,15 +52,17 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'first_name' => 'Ma'.substr(sha1(rand()), 0, 7),
         'last_name' => 'An'.substr(sha1(rand()), 0, 7),
         'financial_type' => 'Donation',
-        'amount' => 100,           
+        'amount' => 100,
+
       );
       $this->_fillData($data[$i], $i, "Contribution");
-    } 
+    }
+
     $this->click("_qf_Entry_cancel");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->_verifyData($data, "Contribution");
   }
-  
+
   function testBatchAddMembership() {
     $this->webtestLogin();
     $itemCount = 5;
@@ -80,7 +81,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $this->type("total", 500);
     $this->click("_qf_Batch_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     // Add Contact Details
     $data = array();
     for ($i=1; $i<=$itemCount; $i++ ) {
@@ -88,22 +89,22 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'first_name' => 'Ma'.substr(sha1(rand()), 0, 7),
         'last_name' => 'An'.substr(sha1(rand()), 0, 7),
         'membership_type' => 'Default Organization',
-        'amount' => 100,  
+        'amount' => 100,
+
         'financial_type' => 'Member Dues',
       );
       $this->_fillData($data[$i], $i, "Membership");
     }
     $this->click("_qf_Entry_cancel");
-    $this->waitForPageToLoad($this->getTimeoutMsec()); 
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
     $this->_verifyData($data, "Membership");
   }
-  
 
-  
   function _fillData($data, $row, $type) {
     $email = $data['first_name'] . '@example.com';
     $this->webtestNewDialogContact($data['first_name'], $data['last_name'], $email, 4, "primary_profiles_{$row}", "primary_{$row}");
-    
+
     if ($type == "Contribution") {
       $this->select("field_{$row}_financial_type", $data['financial_type']);
       $this->type("field_{$row}_total_amount", $data['amount']);
@@ -114,7 +115,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->click("field[{$row}][send_receipt]");
       $this->click("field_{$row}_invoice_id");
       $this->type("field_{$row}_invoice_id", substr(sha1(rand()), 0, 10));
-      
+
     } elseif ($type == "Membership") {
       $this->select("field[{$row}][membership_type][0]", $data['membership_type']);
       $this->webtestFillDate("field_{$row}_join_date", "now");
@@ -122,7 +123,8 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->webtestFillDate("field_{$row}_membership_end_date", "+1 month");
       $this->type("field_{$row}_membership_source", substr(sha1(rand()), 0, 10));
       $this->click("field[{$row}][send_receipt]");
-      $this->select("field_{$row}_financial_type", $data['financial_type']); 
+      $this->select("field_{$row}_financial_type", $data['financial_type']);
+
       $this->webtestFillDateTime("field_{$row}_receive_date", "+1 week");
       $this->select("field_{$row}_payment_instrument", "Check");
       $this->type("field_{$row}_check_number", rand());
@@ -134,31 +136,23 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     if ($type == "Contribution") {
       $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
       $this->type("sort_name", "{$data['first_name']} {$data['last_name']}");
-      $this->click("_qf_Search_refresh");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-
-      $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-      $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+      $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+      $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
       $expected = array(
         'From'                => "{$data['first_name']} {$data['last_name']}",
         'Financial Type'      => $data['financial_type'],
         'Total Amount'        => $data['amount'],
         'Contribution Status' => 'Completed',
-      );   
+      );
+
       $this->webtestVerifyTabularData($expected);
     }
     elseif ($type == "Membership") {
       $this->openCiviPage("member/search", "reset=1", "member_join_date_low");
-      
+
       // select contact
       $this->type("sort_name", "{$data['first_name']} {$data['last_name']}");
-      $this->click("_qf_Search_refresh");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      
-      //View Membership
-      $this->waitForElementPresent("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+      $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
       $this->click("xpath=//div[@id='memberSearch']//table/tbody/tr[1]/td[11]/span/a[text()='View']");
       $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
       $expected = array(
@@ -177,16 +171,15 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'Financial Type'      => $data['financial_type'],
         'Total Amount'        => $data['amount'],
         'Contribution Status' => 'Completed',
-      );   
+      );
+
       $this->webtestVerifyTabularData($expected);
     }
   }
-  
+
   function _verifyData($data, $type) {
     $this->waitForElementPresent("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']");
-    $this->click("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Entry_upload");
+    $this->clickLink("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']", "_qf_Entry_upload");
     $this->click("_qf_Entry_upload");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     foreach ($data as $value) {
@@ -208,11 +201,11 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         $this->type('first_name', $fname);
         $this->type('last_name', $lname);
         break;
-        
+
       case 5:
         $this->type('organization_name', $fname);
         break;
-        
+
       case 6:
         $this->type('household_name', $fname);
         break;

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'ReleaseTestCase.php';
 
 // name of the class doesn't end with Test on purpose - this way this

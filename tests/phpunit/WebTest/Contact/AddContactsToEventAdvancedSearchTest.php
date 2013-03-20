@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumTestCase {
 
@@ -35,7 +34,6 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
   function testAddContactsToEventAdvanceSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     // Advanced Search
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
@@ -61,7 +59,6 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
     $this->type('source', 'Event StandaloneAddTest Webtest');
 
     $this->assertElementContainsText('css=tr.crm-participant-form-block-source span.description', 'Source for this registration (if applicable).');
-
 
     // Clicking save.
     $this->click('_qf_Participant_upload-bottom');

@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
@@ -50,7 +49,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     //add email to name and address profile
     $cfId = $this->_addEmailField();
-    
+
     // create custom group1
     $this->openCiviPage("admin/custom/group", "reset=1");
     $this->click("newCustomDataGroup");
@@ -89,12 +88,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find Main Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $firstName);
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
 
     $name = $firstName . " " . $lastName;
     $status = 'Registered';
@@ -106,12 +101,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find additional  Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname);
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
 
     $name = $participantfname . " " . $participantlname;
     $status = 'Registered';
@@ -159,7 +150,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     //add email field to name and address profile
     $cfId = $this->_addEmailField( );
-    
+
     // create custom group1
     $this->openCiviPage("admin/custom/group", "reset=1");
     $this->click("newCustomDataGroup");
@@ -201,12 +192,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find Main Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $firstName);
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
 
     $name = $firstName . " " . $lastName;
     $status = 'Registered';
@@ -218,12 +205,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find additional  Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname);
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
 
     $name = $participantfname . " " . $participantlname;
     $status = 'Registered';
@@ -247,12 +230,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find Main Participant
     $this->openCiviPage('event/search', "reset=1");
     $this->type("sort_name", $firstName2);
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
 
     $name = $firstName2 . " " . $lastName2;
     $status = 'Registered';
@@ -264,12 +243,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find additional  Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname2);
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
 
     $name = $participantfname2 . " " . $participantlname2;
     $status = 'Registered';
@@ -279,7 +254,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[6]/td[2]", preg_quote($status));
 
     // delete all custom data
-    if (isset($cfId)) {  
+    if (isset($cfId)) {
+
       $this->_removeEmailField($cfId);
     }
     foreach ($customId as $cid) {
@@ -687,9 +663,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("nick_name", "Nick1");
     $this->type("url-1", "http://www.part.com");
 
-    $this->click("_qf_Participant_1_next-Array");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Participant_1_next-Array", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
@@ -755,12 +729,10 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("current_employer", "ABCD");
     $this->type("job_title", "BATCHER");
 
-    $this->click("_qf_Participant_1_next-Array");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Participant_1_next-Array", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
   }
-  
+
   function _addEmailField( ){
     //add email field in name and address profile
     $this->openCiviPage('admin/uf/group/field/add', 'reset=1&action=add&gid=1', "_qf_Field_next-bottom");
@@ -769,7 +741,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->select("field_name[2]", "value=0");
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $cfId = "";
     //check wheather webtest has created the field
     if (!$this->isTextPresent("The selected field was not added. It already exists in this profile")) {
@@ -779,8 +751,9 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     }
     return $cfId;
   }
-  
-  function _removeEmailField($cfId) {    
+
+  function _removeEmailField($cfId) {
+
     $this->openCiviPage("admin/uf/group/field", "action=delete&id={$cfId}");
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
@@ -68,9 +67,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
     // Go for Ckeck Your Editor, Click on Send Mail
     $this->click("//a[@id='crm-contact-actions-link']/span");
-    $this->click('link=Send an Email');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('subject');
+    $this->clickLink('link=Send an Email', 'subject');
 
     $this->click('subject');
     $subject = 'Subject_' . substr(sha1(rand()), 0, 8);
@@ -126,9 +123,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
     // Go for Ckeck Your Editor, Click on Send Mail
     $this->click("//a[@id='crm-contact-actions-link']/span");
-    $this->click('link=Send an Email');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('subject');
+    $this->clickLink('link=Send an Email', 'subject');
 
     $this->click('subject');
     $subject = 'Subject_' . substr(sha1(rand()), 0, 7);
@@ -183,14 +178,10 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
     $this->type('activity_subject', $subject);
 
-    $this->click('_qf_Search_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('Search');
+    $this->clickLink('_qf_Search_refresh', 'Search');
 
     // View your Activity
-    $this->click("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[2]/td[9]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_ActivityView_next-bottom');
+    $this->clickLink("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[2]/td[9]/span/a[text()='View']", '_qf_ActivityView_next-bottom');
 
     // Is signature correct? in Activity
     $this->assertTextPresent($signature);

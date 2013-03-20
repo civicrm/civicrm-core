@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSeleniumTestCase {
 
@@ -67,7 +66,8 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $expected = array(
       'Received Into' => "Deposit Bank Account",
       'Contribution Status' => "Completed",
-    );   
+    );
+
     $this->webtestVerifyTabularData($expected);
   }
 
@@ -128,7 +128,8 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $expected = array(
       'Received Into'        => "Deposit Bank Account",
       'Contribution Status' => "Completed",
-    );   
+    );
+
     $this->webtestVerifyTabularData($expected);
   }
 
@@ -144,7 +145,6 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
 
     // Select role
     $this->click('role_id[2]');
-
 
     // Select participant status
     $this->select('status_id', 'value=1');
@@ -196,7 +196,6 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $email     = $firstName . "@example.com";
 
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
-
 
     // create new contact using dialog
     $this->webtestNewDialogContact($firstName, "Contributor", $email);

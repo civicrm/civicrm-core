@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
@@ -69,7 +68,6 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $checkboxOptionLabel3 = 'optionLabel_' . substr(sha1(rand()), 0, 5);
     $this->type("option_label_3", $checkboxOptionLabel3);
     $this->type("option_value_3", "3");
-
 
     //enter options per line
     $this->type("options_per_line", "2");
@@ -344,5 +342,4 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
 }
-
 

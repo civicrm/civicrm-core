@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
 // name of the class doesn't end with Test on purpose - this way this
@@ -54,7 +53,6 @@ class WebTest_Release_ReleaseTestCase extends CiviSeleniumTestCase {
     require_once 'CiviTest/ReleaseTestSettings.php';
     $this->settings = new ReleaseTestSettings();
   }
-
 
   protected function setUp() {
     parent::setUp();

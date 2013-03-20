@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
 
@@ -156,5 +155,4 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->_testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector);
   }
 }
-
 

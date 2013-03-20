@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
 
@@ -34,7 +33,6 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
 
   function testTagSetSearch() {
     $this->webtestLogin();
-
 
     $tagSet1 = $this->_testAddTagSet();
     $tagSet2 = $this->_testAddTagSet();
@@ -70,7 +68,6 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
     $this->waitForTextPresent($tag2);
 
-
     // Individual 2
     $contact2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($contact2, "Anderson", "{$contact2}@example.com");
@@ -88,7 +85,6 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
     $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
     $this->waitForTextPresent($tag1);
-
 
     // Go to Advance search.
     $this->openCiviPage('contact/search/advanced', 'reset=1');

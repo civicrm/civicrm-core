@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase {
 
@@ -100,10 +99,7 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
 
     $this->type("sort_name", "$firstName $lastName");
     $this->click("member_test");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    
-    $this->waitForElementPresent("xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 

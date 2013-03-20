@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
 
@@ -103,7 +102,8 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.", 
+    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
+
       "Status message didn't show up after saving campaign!"
     );
 
@@ -131,7 +131,6 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // waitForPageToLoad is not always reliable. Below, we're waiting for the submit
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload");
-
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook','Anderson, ' . $firstName2, 'Contact not found in line ' . __LINE__);
@@ -207,7 +206,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // click through to the Activity view screen
     $this->click("xpath=//div[@id='Activities']//table/tbody//tr/td[2][text()='This is subject of test activity being added through activity tab of contact summary screen.']/../td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
-   
+
     // verify Activity created
     $this->verifyText("xpath=id( 'Activity' )/div[2]/table[1]/tbody/tr[5]/td[2]", preg_quote($campaignTitle));
   }

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase {
 
@@ -37,7 +36,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
 
     // Add new profile.
     $this->openCiviPage('admin/uf/group', 'reset=1');
-    
+
     $this->click('newCiviCRMProfile-top');
 
     $this->waitForElementPresent('_qf_Group_next-bottom');
@@ -111,7 +110,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
 
     // check advisory group ( may be we should create a separate group to test this)
     $this->click("group_3");
-    
+
     $this->click('_qf_Edit_next');
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -137,5 +136,4 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
   }
 }
-
 

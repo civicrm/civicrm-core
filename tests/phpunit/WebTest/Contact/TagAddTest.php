@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
 
@@ -108,5 +107,4 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']");
   }
 }
-
 

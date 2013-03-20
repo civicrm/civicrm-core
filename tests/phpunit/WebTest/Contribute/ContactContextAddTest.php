@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
 
@@ -32,15 +31,16 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactContextAdd() {    
+  function testContactContextAdd() {
+
     // Log in using webtestLogin() method
     $this->webtestLogin();
-    
+
     // Create a contact to be used as soft creditor
     $softCreditFname = substr(sha1(rand()), 0, 7);
     $softCreditLname = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
-    
+
     // Adding contact with randomized first name (so we can then select that contact when creating contribution.)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
@@ -55,7 +55,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $isTax = TRUE;
     $taxRate = 9.99999999;
     $isDefault = FALSE;
-    
+
     //Add new organisation
     if($orgName) {
       $this->webtestAddOrganization($orgName);
@@ -73,39 +73,39 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     );
 
     $this->webtestAddContact( $firstName, "Anderson", true );
-    
+
     // Get the contact id of the new contact
     $contactUrl = $this->parseURL();
     $cid = $contactUrl['queryString']['cid'];
     $this->assertType('numeric', $cid);
-      
+
     // go to contribution tab and add contribution.
     $this->click("css=li#tab_contribute a");
-      
+
     // wait for Record Contribution elenment.
     $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
     $this->click("link=Record Contribution (Check, Cash, EFT ...)");
-      
+
     $this->waitForElementPresent("_qf_Contribution_cancel-bottom");
     // fill financial type.
     $this->select("financial_type_id", "Donation");
-      
+
     // fill in Received Date
     $this->webtestFillDate('receive_date');
-      
+
     // source
     $this->type("source", "Mailer 1");
-      
+
     // total amount
     $this->type("total_amount", "100");
-      
+
     // select payment instrument type = Check and enter chk number
     $this->select("payment_instrument_id", "value=4");
     $this->waitForElementPresent("check_number");
     $this->type("check_number", "check #1041");
-    
+
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
-    
+
     // soft credit
     $this->click("soft_credit_to");
     $this->type("soft_credit_to", $softCreditFname);
@@ -120,7 +120,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     //Additional Detail section
     $this->click("AdditionalDetail");
     $this->waitForElementPresent("thankyou_date");
-    
+
     $this->type("note", "Test note for {$firstName}.");
     $this->type("fee_amount", "0");
     $this->type("net_amount", "0");
@@ -145,14 +145,12 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('fulfilled_date');
 
     // Clicking save.
-    $this->click("_qf_Contribution_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('civicrm-footer');
+    $this->clickLink("_qf_Contribution_upload-bottom", 'civicrm-footer');
     // Is status message correct?
     $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved");
-    
+
     $this->waitForElementPresent("xpath=//div[@id='Contributions']//table/tbody/tr/td[8]/span/a[text()='View']");
-    
+
     // click through to the Contribution view screen
     $this->click("xpath=//div[@id='Contributions']//table/tbody/tr/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
@@ -177,7 +175,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $viewUrl = $this->parseURL();
     $id = $viewUrl['queryString']['id'];
     $this->assertType('numeric', $id);
-    
+
     $searchParams = array('id' => $id);
     $compareParams = array(
       'contact_id' => $cid,

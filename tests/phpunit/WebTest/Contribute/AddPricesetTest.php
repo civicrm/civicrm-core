@@ -24,20 +24,19 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
-  
+
   function testAddPriceSet() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
     //add financial type of account type expense
-    
+
     $financialType = $this->_testAddFinancialType();
 
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
@@ -84,17 +83,14 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
   function _testAddPriceFields(&$fields, &$validateString, $financialType, $dateSpecificFields = FALSE) {
     $validateStrings[] = $financialType;
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
-      
+
       $this->type('label', $label);
       $this->select('html_type', "value={$type}");
 
@@ -109,7 +105,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
           $this->check('is_required');
         }
         break;
-        
+
       case 'Select':
         $options = array(
           1 => array('label' => 'Chicken',
@@ -125,7 +121,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
           $this->webtestFillDateTime('expire_on', '-1 week');
         }
         break;
-        
+
       case 'Radio':
         $options = array(
           1 => array('label' => 'Yes',
@@ -142,7 +138,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
           $this->webtestFillDateTime('active_on', '-1 week');
         }
         break;
-        
+
       case 'CheckBox':
         $options = array(
           1 => array('label' => 'First Night',
@@ -158,17 +154,15 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
           $this->webtestFillDateTime('expire_on', '+1 week');
         }
         break;
-        
+
       default:
         break;
       }
       $this->select('financial_type_id', "label={$financialType}");
-      $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
     }
   }
-  
+
   function _testAddFinancialType() {
     // Add new Financial Account
     $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
@@ -181,12 +175,12 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $isTax = TRUE;
     $taxRate = 9;
     $isDefault = FALSE;
-        
+
     //Add new organisation
     if($orgName) {
       $this->webtestAddOrganization($orgName);
     }
-        
+
     $this->_testAddFinancialAccount($financialAccountTitle,
       $financialAccountDescription,
       $accountingCode,
@@ -199,7 +193,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       $isDefault
     );
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-      
+
     //Add new Financial Type
     $financialType['name'] = 'FinancialType '.substr(sha1(rand()), 0, 4);
     $financialType['is_deductible'] = TRUE;
@@ -207,7 +201,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->addeditFinancialType($financialType);
 
     $accountRelationship = "Income Account is";
-    $expected[] = array('financial_account' => $financialAccountTitle, 
+    $expected[] = array('financial_account' => $financialAccountTitle,
+
       'account_relationship' => $accountRelationship
     );
 
@@ -223,18 +218,14 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     return $financialType['name'];
   }
-  
+
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
     $this->openCiviPage("admin/price", "reset=1");
 
     // Use the price set id ($sid) to pick the correct row
-    $this->click("css=tr#row_{$sid} a[title='View and Edit Price Fields']");
-    
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    // Look for Register button
-    $this->waitForElementPresent('Link=Add Price Field');
+    $this->clickLink("css=tr#row_{$sid} a[title='View and Edit Price Fields']", 'Link=Add Price Field');
     // Check for expected price set field strings
     $this->assertStringsPresent($validateStrings);
   }
@@ -245,12 +236,12 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     //add financial type of account type expense
     $financialType = $this->_testAddFinancialType();
-    
+
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
     $usedFor = 'Contribution';
     $setHelp = 'Select your conference options.';
     $this->_testAddSet($setTitle, $usedFor, $setHelp, $financialType);
-    
+
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
     $elements = $this->parseURL();
@@ -270,7 +261,6 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->_testVerifyPriceSet($validateStrings, $sid);
     $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone", '_qf_Contribution_upload');
 
-    
     // create new contact using dialog
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
@@ -343,17 +333,6 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     }
   }
 
-  function _testVerifyRegisterPage($contributionPageTitle) {
-    $this->openCiviPage("admin/contribute", "reset=1", '_qf_SearchContribution_refresh');
-    $this->type('title', $contributionPageTitle);
-    $this->click('_qf_SearchContribution_refresh');
-    $this->waitForPageToLoad('50000');
-    $id = $this->getAttribute("//div[@id='configure_contribution_page']//div[@class='dataTables_wrapper']/table/tbody/tr@id");
-    $id = explode('_', $id);
-    $registerUrl = "civicrm/contribute/transact?reset=1&id=$id[1]";
-    return $registerUrl;
-  }
-
   function testContributeOnlineWithPriceSet() {
     $this->webtestLogin();
 
@@ -378,9 +357,9 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'Pre-conference Meetup?' => 'Radio',
       'Evening Sessions' => 'CheckBox',
     );
-    
+
     $this->_testAddPriceFields($fields, $validateStrings, $financialType);
-      
+
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
@@ -400,26 +379,24 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->fillRichTextField('footer_text', 'This is Test Footer Message', 'CKEditor');
 
     $this->select('financial_type_id', "label={$financialType}");
-    // go to step 2
-    $this->click('_qf_Settings_next');
-    $this->waitForElementPresent('_qf_Amount_next-bottom');
+
+    // Submit form
+    $this->clickLink('_qf_Settings_next', "_qf_Amount_next-bottom");
+
+    // Get contribution page id
+    $pageId = $this->urlArg('id');
 
     //this contribution page for online contribution
-    //$this->select( 'payment_processor_id', 'label=' . $processorName );
     $this->click("xpath=//tr[@class='crm-contribution-contributionpage-amount-form-block-payment_processor']/td/label[text()='$processorName']");
     $this->select('price_set_id', 'label=' . $setTitle);
     $this->click('_qf_Amount_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //get Url for Live Contribution Page
-    $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
-
     //logout
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . $registerUrl);
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -451,10 +428,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('billing_country_id-5', 'value=1228');
     $this->select('billing_state_province_id-5', 'value=1004');
     $this->type('billing_postal_code-5', '94129');
-    $this->click('_qf_Main_upload-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Confirm_next-bottom');
+    $this->clickLink('_qf_Main_upload-bottom', '_qf_Confirm_next-bottom');
 
     $this->click('_qf_Confirm_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -468,14 +442,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
     $this->type('sort_name', "$firstName $lastName");
-    $this->click('_qf_Search_refresh');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     // View Contribution Record and test for expected values
     $expected = array(
@@ -493,7 +461,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     //add financial type of account type expense
     $financialType= $this->_testAddFinancialType();
-    
+
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
     $usedFor = 'Contribution';
     $setHelp = 'Select your conference options.';
@@ -533,26 +501,22 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->fillRichTextField('intro_text', 'This is Test Introductory Message', 'CKEditor');
     $this->fillRichTextField('footer_text', 'This is Test Footer Message', 'CKEditor');
 
-    // go to step 2
-    $this->click('_qf_Settings_next');
-    $this->waitForElementPresent('_qf_Amount_next-bottom');
+    // Submit form
+    $this->clickLink('_qf_Settings_next', "_qf_Amount_next-bottom");
+
+    // Get contribution page id
+    $pageId = $this->urlArg('id');
 
     //this contribution page for online contribution
-    //$this->select( 'payment_processor_id', 'label=' . $processorName );
     $this->click("xpath=//tr[@class='crm-contribution-contributionpage-amount-form-block-payment_processor']/td/label[text()='$processorName']");
     $this->select('price_set_id', 'label=' . $setTitle);
-    $this->click('_qf_Amount_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    //get Url for Live Contribution Page
-    $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
+    $this->clickLink('_qf_Amount_next-bottom');
 
     //logout
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . $registerUrl);
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -583,31 +547,20 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('billing_country_id-5', 'value=1228');
     $this->select('billing_state_province_id-5', 'value=1004');
     $this->type('billing_postal_code-5', '94129');
-    $this->click('_qf_Main_upload-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Confirm_next-bottom');
+    $this->clickLink('_qf_Main_upload-bottom', '_qf_Confirm_next-bottom');
 
     $this->click('_qf_Confirm_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //login to check contribution
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
     $this->type('sort_name', "$firstName $lastName");
-    $this->click('_qf_Search_refresh');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom');
 
     // View Contribution Record and test for expected values
     $expected = array(
@@ -622,7 +575,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
   function testContributeOfflineforSoftcreditwithApi() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
-    
+
     //create a contact and return the contact id
     $firstNameSoft = "John_".substr(sha1(rand()), 0, 5);
     $lastNameSoft = "Doe_".substr(sha1(rand()), 0, 5);
@@ -630,7 +583,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $url = $this->parseURL();
     $cid = $url['queryString']['cid'];
     $this->assertType('numeric', $cid);
-    
+
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
     $usedFor = 'Contribution';
     $setHelp = 'Select your conference options.';
@@ -657,7 +610,6 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone", '_qf_Contribution_upload');
 
-
     // create new contact using dialog
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
@@ -682,7 +634,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('check_number', '1041');
 
     $this->type('trxn_id', 'P20901X1' . rand(100, 10000));
-   
+
     $this->type('soft_credit_to', "$lastNameSoft, $firstNameSoft");
     $this->click('soft_credit_to');
     $this->waitForElementPresent("css=div.ac_results-inner li");
@@ -696,11 +648,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('thankyou_date');
 
     // Clicking save.
-    $this->click('_qf_Contribution_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Is status message correct?
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink('_qf_Contribution_upload', "xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->assertTrue($this->isTextPresent('The contribution record has been saved.'), "Status message didn't show up after saving!");
 
     //click through to the Contribution view screen
@@ -718,7 +666,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'Soft Credit To' => "$firstNameSoft $lastNameSoft",
     );
     $this->webtestVerifyTabularData($expected);
-    
+
     $exp = array(
       2 => '$ 525.00',
       3 => '$ 50.00',
@@ -737,28 +685,28 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->typeKeys("css=input#sort_name_navigation", "$lastNameSoft, $firstNameSoft");
     // wait for result list
     $this->waitForElementPresent("css=div.ac_results-inner li");
-    
+
     // visit contact summary page
     $this->click("css=div.ac_results-inner li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click( 'css=li#tab_contribute a' );
     $this->waitForElementPresent('link=Record Contribution (Check, Cash, EFT ...)');
-   
+
     $id = explode('id=', $this->getAttribute("xpath=id('rowid')/td[7]/a[text()='View']@href"));
     $id = substr($id[1], 0, strpos($id[1], '&'));
     $this->click("xpath=id('rowid')/td[7]/a");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
-    
+
     $this->webtestVerifyTabularData($expected);
-    
+
     $params = array('contribution_id' => $id,
       'version' => 3,
     );
-    
+
     // Retrieve contribution from the DB via api and verify DB values against view contribution page
     require_once 'api/api.php';
     $fields = $this->webtest_civicrm_api('contribution','get',$params );
-    
+
     $params['id'] = $params['contact_id'] = $fields['values'][$fields['id']]['soft_credit_to'];
     $softCreditContact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, TRUE);
 

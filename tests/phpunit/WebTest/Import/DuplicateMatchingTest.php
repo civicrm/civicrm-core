@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
 
@@ -175,7 +174,6 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
 
     // Get imported contact Ids
     $importedContactIds = $this->_getImportedContactIds($rows, 'Organization');
-
 
     // Build update mode import headers
     $updateHeaders = array(

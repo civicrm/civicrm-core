@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
@@ -639,7 +638,6 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     $this->_checkConfirmationAndRegister();
 
-
     // 2'st registration
     // Register Participant 1
     // visit event info page
@@ -930,7 +928,6 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     $this->_checkConfirmationAndRegister();
 
-
     // 2'st registration
     // Register Participant 1
     // visit event info page
@@ -1020,10 +1017,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type('help_pre', 'This is test priceset.');
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
   function _testAddPriceFields($fields) {
@@ -1054,7 +1048,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
         if (isset($field['financial_type_id'])) {
           $this->waitForElementPresent('financial_type_id');
           $this->select('financial_type_id', "value={$field['financial_type_id']}");
-        }        
+        }
+
       }
       else {
         $this->_testAddMultipleChoiceOptions($field['options'], $field['type']);
@@ -1090,11 +1085,11 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
         $this->waitForElementPresent("option_max_value_{$oIndex}");
         $this->type("option_max_value_{$oIndex}", $oValue['max_count']);
       }
-      
+
       if (!empty($oValue['financial_type_id'])) {
         $this->select( "option_financial_type_id_{$oIndex}", "value={$oValue['financial_type_id']}" );
       }
-      
+
       $this->click('link=another choice');
     }
 
@@ -1139,7 +1134,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $processorName = $params['payment_processor'];
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
     $this->select('financial_type_id', 'value=4');
-    
+
     if (array_key_exists('price_set', $params)) {
       $this->select('price_set_id', 'label=' . $params['price_set']);
     }

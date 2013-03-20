@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
@@ -202,7 +201,6 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->click("css=ul#civicrm-menu li.crm-Mailings");
     $this->click("css=ul#civicrm-menu li.crm-New_Mailing a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     $this->assertTextPresent("New Mailing");
     $this->assertElementPresent("name");

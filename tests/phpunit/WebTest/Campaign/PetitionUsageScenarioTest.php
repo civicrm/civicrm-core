@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
 
@@ -183,7 +182,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     foreach ($expected as $column => $value) {
       $this->verifyText("xpath=//table[@class='selector']/tbody/tr[2]/td[$column]", preg_quote($value));
     }
-    
+
     // ONCE MORE, NO EMAIL VERIFICATION AND CUSTOM THANK-YOU
     $this->openCiviPage("petition/add", "reset=1", "_qf_Petition_next-bottom");
 
@@ -246,7 +245,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     // click Sign the petition.
     $this->click("_qf_Signature_next-bottom");
     $this->waitForElementPresent("thankyou_text");
-    
+
     // check that thank-you page has appropriate title and message
     $this->assertTrue($this->isTextPresent("Awesome $title donation"));
     $this->assertTrue($this->isTextPresent("Thank you for your kind contribution to support $title"));

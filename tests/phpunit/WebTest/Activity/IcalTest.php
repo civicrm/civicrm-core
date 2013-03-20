@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CiviTest/CiviMailUtils.php';
 require_once 'ezc/Base/src/ezc_bootstrap.php';
@@ -34,7 +33,6 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
 
     // This variable is a bit awkward, but the ezc callback function needed to walk through the email parts needs to be static, so use this variable to "report back" on whether we found what we're looking for or not.
     private static $foundIt = false;
-
 
     protected function setUp() {
         parent::setUp();
@@ -89,28 +87,27 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
         $this->assertElementContainsText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving!");
 
         // check the resulting email
-        $mail = $mailer->getMostRecentEmail( 'ezc' );
-        $this->assertNotNull( $mail, ts('Assignee email not generated or problem locating it.') );
-        $this->assertEquals( $mail->subject, "$subject" );
-        $context = new ezcMailPartWalkContext( array( get_class($this), 'mailWalkCallback' ) );
-        $mail->walkParts( $context, $mail );
+        $mail = $mailer->getMostRecentEmail('ezc');
+        $this->assertNotNull($mail, ts('Assignee email not generated or problem locating it.'));
+        $this->assertEquals($mail->subject, "$subject");
+        $context = new ezcMailPartWalkContext(array(get_class($this), 'mailWalkCallback'));
+        $mail->walkParts($context, $mail);
 
         $mailer->stop();
 
-        $this->assertTrue( self::$foundIt, ts('Generated email does not contain an ical attachment.') );
+        $this->assertTrue(self::$foundIt, ts('Generated email does not contain an ical attachment.'));
     }
 
-    public static function mailWalkCallback( $context, $mailPart ) {
-        // echo "Class: " . get_class($mailPart) . "\n";
+    public static function mailWalkCallback($context, $mailPart) {
+
         $disp = $mailPart->contentDisposition;
-        if ( $disp ) {
-            if ( $disp->disposition == 'attachment' ) {
-                if ( $mailPart instanceof ezcMailText ) {
-                    if ( $mailPart->subType == 'calendar' ) {
+        if ($disp) {
+            if ($disp->disposition == 'attachment') {
+                if ($mailPart instanceof ezcMailText) {
+                    if ($mailPart->subType == 'calendar') {
                         // For now we just check for existence.
                         self::$foundIt = true;
 
-                        // echo $mailPart->generateBody() . "\n";
                     }
                 }
             }

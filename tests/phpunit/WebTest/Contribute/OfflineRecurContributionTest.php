@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCase {
 
@@ -102,7 +101,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
       'Contribution Status' => 'Pending : Incomplete Transaction',
       'Paid By' => 'Credit Card',
     );
-    
+
     foreach ($verifyData as $label => $value) {
       $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
         preg_quote($value)

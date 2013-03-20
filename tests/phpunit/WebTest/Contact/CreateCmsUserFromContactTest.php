@@ -24,9 +24,7 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
-
 
 //Tests for the ability to add a CMS user from a contact's record
 //See http://issues.civicrm.org/jira/browse/CRM-8723
@@ -35,8 +33,6 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
   protected function setUp() {
     parent::setUp();
   }
-
-
 
   //Test that option to create a cms user is present on a contact who does not
   //have a cms account already( in this case, a new contact )
@@ -102,7 +98,6 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->assertElementContainsText("msgbox", "This username is currently available", "Available username is indicated as being taken");
   }
 
-
   //Test form submission when the username is taken
   function testTakenUsernameSubmission() {
 
@@ -112,7 +107,6 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     //create a New Contact
     list($cid, $firstName, $lastName, $email) = $this->_createUserAndGotoForm();
     $password = 'abc123';
-
 
     //submit the form with the bad username
     $username = $this->settings->adminUsername;
@@ -138,7 +132,6 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     list($cid, $firstName, $lastName, $email) = $this->_createUserAndGotoForm();
     $password = 'abc123';
 
-
     //submit with mismatch passwords
     $username = $this->settings->adminUsername;
     $this->_fillCMSUserForm($username, $password, $password . "mismatch");
@@ -162,7 +155,6 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     list($cid, $firstName, $lastName, $email) = $this->_createUserAndGotoForm();
     $password = 'abc123';
 
-
     //submit with mismatch passwords
     $username = $this->settings->adminUsername;
     $this->click("_qf_Useradd_next-bottom");
@@ -176,7 +168,6 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
 
     //the civicrm message should say password is required
     $this->assertElementContainsText("css=#crm-notification-container", "Password is required", "The CiviCRM messae does not indicate that the password is required");
-
 
     //check that no user was created;
     $results = $this->webtest_civicrm_api("UFMatch", "get", array('contact_id' => $cid));
@@ -192,7 +183,6 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     //create a New Contact
     list($cid, $firstName, $lastName, $email) = $this->_createUserAndGotoForm();
     $password = 'abc123';
-
 
     //submit with matching passwords
     $this->_fillCMSUserForm($firstName, $password, $password);

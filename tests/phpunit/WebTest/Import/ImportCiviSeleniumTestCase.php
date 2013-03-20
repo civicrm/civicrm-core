@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CRM/Utils/Array.php';
 class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
@@ -39,7 +38,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * @params string $mode        import mode
      * @params array  $fieldMapper select mapper fields while import
      * @params array  $other       other parameters
-     *                             useMappingName     : to reuse mapping 
+     *                             useMappingName     : to reuse mapping
+
      *                             dateFormat         : date format of data
      *                             checkMapperHeaders : to override default check mapper headers
      *                             saveMapping        : save current mapping?
@@ -142,11 +142,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     $this->_checkImportMapperData($headers, $rows, $existingMapping, isset($other['checkMapperHeaders']) ? $other['checkMapperHeaders'] : array());
 
     // Submit form.
-    $this->click('_qf_Preview_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Visit summary page.
-    $this->waitForElementPresent("_qf_Summary_next");
+    $this->clickLink('_qf_Preview_next-bottom', "_qf_Summary_next");
 
     // Check success message.
     $this->assertTrue($this->isTextPresent("Import has completed successfully. The information below summarizes the results."));
@@ -172,7 +168,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * @params string $mode        import mode
      * @params array  $fieldMapper select mapper fields while import
      * @params array  $other       other parameters
-     *                             contactSubtype     : import for selected Contact Subtype           
+     *                             contactSubtype     : import for selected Contact Subtype
+
      *                             useMappingName     : to reuse mapping
      *                             dateFormat         : date format of data
      *                             checkMapperHeaders : to override default check mapper headers
@@ -187,7 +184,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      *                             callbackImportSummary : function to override default import summary assertions
      *
      * @params string $type        import type (csv/sql)
-     *                             @todo:currently only supports csv, need to work on sql import 
+     *                             @todo:currently only supports csv, need to work on sql import
+
      */
   function importContacts($headers, $rows, $contactType = 'Individual', $mode = 'Skip', $fieldMapper = array(
     ), $other = array(), $type = 'csv') {
@@ -433,7 +431,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      *
      * @params string $component component name
      *
-     * @return string import url 
+     * @return string import url
+
      */
   function _getImportComponentUrl($component) {
 
@@ -452,7 +451,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      *
      * @params string $component component name
      *
-     * @return string import url 
+     * @return string import url
+
      */
   function _getImportComponentContactType($component, $contactType) {
     $importComponentMode = array(
@@ -520,7 +520,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * Helper function to get imported contact ids.
      *
      * @params array  $rows        fields rows
-     * @params string $contactType contact type 
+     * @params string $contactType contact type
+
      *
      * @return array  $contactIds  imported contact ids
      */

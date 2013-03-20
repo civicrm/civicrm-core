@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
@@ -101,7 +100,8 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if($this->assertElementContainsText('address_1', "Latitude")) {    
+    if($this->assertElementContainsText('address_1', "Latitude")) {
+
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -196,7 +196,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->type("phone_1_phone", "444-4444");
     $this->select("phone_1_phone_type_id", "value=" . $this->webtestGetFirstValueForOptionGroup('phone_type'));
 
-
     //fill in IM
     $this->assertElementContainsText('im_1_provider_id', "Yahoo MSN AIM GTalk Jabber Skype");
     $this->type("im_1_name", "testSkype");
@@ -254,7 +253,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     //select preferred language
     $this->waitForElementPresent("preferred_language");
     $this->select("preferred_language", "value=fr_FR");
-
 
     //Notes section
     $this->click("notesBlock");
@@ -490,5 +488,4 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('option11', 'Household Member of');
   }
 }
-
 

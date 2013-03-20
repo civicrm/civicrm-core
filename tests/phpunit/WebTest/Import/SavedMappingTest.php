@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
 
@@ -136,5 +135,4 @@ class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-
 

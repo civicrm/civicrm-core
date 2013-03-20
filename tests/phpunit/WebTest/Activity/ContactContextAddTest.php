@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
@@ -54,7 +53,6 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     // waitForPageToLoad is not always reliable. Below, we're waiting for the submit
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload");
-
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', 'Anderson, ' . $firstName2, 'Contact not found in line ' . __LINE__);
