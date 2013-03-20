@@ -52,7 +52,7 @@
           {foreach from=$customOption item=row key=id}
             <tr id="OptionValue-{$id}"class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-custom_option {if NOT $row.is_active} disabled{/if}">
               <td><span class="crm-custom_option-label crm-editable crmf-label">{$row.label}</span></td>
-              <td><span class="crm-custom_option-value crm-editable crmf-value">{$row.value}</span></td>
+              <td><span class="crm-custom_option-value disabled-crm-editable" data-field="value" data-action="update">{$row.value}</span></td>
               <td class="crm-custom_option-default_value crmf-value">{$row.default_value}</td>
               <td class="nowrap crm-custom_option-weight crmf-weight">{$row.weight}</td>
               <td id="row_{$id}_status" class="crm-custom_option-is_active crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
