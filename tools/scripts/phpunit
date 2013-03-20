@@ -68,6 +68,7 @@ define('PHPUnit_MAIN_METHOD', 'PHPUnit_TextUI_Command::main');
 // splice --tap as the second last argument
 // do this only if we have 2 or more arguments from command line
 // (the first argument is always the name of the script)
+// currently no way to turn it off
 // CRM-12158
 if (
     isset($_SERVER['argv']) &&
