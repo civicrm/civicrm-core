@@ -66,12 +66,13 @@ require 'PHPUnit/TextUI/Command.php';
 define('PHPUnit_MAIN_METHOD', 'PHPUnit_TextUI_Command::main');
 
 // splice --tap as the second last argument
-// do this only if we have 1 or more arguments from command line
+// do this only if we have 2 or more arguments from command line
+// (the first argument is always the name of the script)
 // CRM-12158
 if (
     isset($_SERVER['argv']) &&
     is_array($_SERVER['argv']) &&
-    count($_SERVER['argv']) > 0
+    count($_SERVER['argv']) > 1
     ) {
   array_splice($_SERVER['argv'], -1, 0, array('--tap'));
 }
