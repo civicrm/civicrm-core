@@ -371,7 +371,7 @@ function civicrm_wp_frontend($shortcode = FALSE) {
     return;
   }
 
-  require_once 'wp-includes/pluggable.php';
+  require_once ABSPATH . WPINC . 'wp-includes/pluggable.php';
 
   // if snippet is set, which means ajax call, we just
   // output civicrm html and skip the header
