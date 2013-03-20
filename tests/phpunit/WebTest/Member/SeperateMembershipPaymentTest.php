@@ -147,20 +147,16 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
 
   function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
     //Open Live Contribution Page
+    $args = array('reset' => 1, 'id' => $pageId);
     if ($cid) {
-      $contribUrl = array('url' => "contribute/transact", 'args' => "reset=1&id=$pageId&cid=$cid");
+      $args['cid'] = $cid;
     }
-    else {
-      $contribUrl = array('url' => "contribute/transact", 'args' => "reset=1&id=$pageId");
-    }
-    $this->openCiviPage($contribUrl['url'], $contribUrl['args'], '_qf_Main_upload-bottom');
+    $this->openCiviPage("contribute/transact", $args, '_qf_Main_upload-bottom');
 
     // Select membership type 1
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$memTypeId')]");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 60);
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
-    $this->click("_qf_Confirm_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Confirm_next-bottom", NULL);
   }
 }

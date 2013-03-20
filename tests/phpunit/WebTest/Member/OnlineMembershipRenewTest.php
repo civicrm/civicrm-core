@@ -32,6 +32,9 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
+  /**
+   * FIXME: This test tries to update a contribution page (id=2) that may not exist :(
+   */
   function testOnlineMembershipRenew() {
     // a random 7-char string and an even number to make this pass unique
     $hash = substr(sha1(rand()), 0, 7);
@@ -53,8 +56,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // save
     $this->waitForElementPresent("_qf_Amount_next");
-    $this->click('_qf_Amount_next');
-    $this->waitForPageToLoad();
+    $this->clickLink('_qf_Amount_next');
 
     // go to Membership block
     $this->click('css=#tab_membership a');
@@ -214,6 +216,9 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * FIXME: This test tries to update a contribution page (id=2) that may not exist :(
+   */
   function testOnlineMembershipRenewChangeType() {
     // a random 7-char string and an even number to make this pass unique
     $hash = substr(sha1(rand()), 0, 7);
@@ -601,7 +606,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     //logout
     $this->webtestLogout();
 
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$membershipTypeTitle')]");
     $this->type("email-5", $email);

@@ -1206,8 +1206,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Open Live Membership Page
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id=" . $pageId . "&cid=" . $cid);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId&cid=$cid", "_qf_Main_upload-bottom");
     $this->click('CIVICRM_QFID_amount_other_radio_4');
     $this->type('amount_other', 60);
     $this->click('onbehalf_organization_name');
@@ -1417,7 +1416,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
   function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);

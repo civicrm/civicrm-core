@@ -138,9 +138,11 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->fillRichTextField('intro_text', 'This is Test Introductory Message', 'CKEditor');
     $this->fillRichTextField('footer_text', 'This is Test Footer Message', 'CKEditor');
 
-    // go to step 2
-    $this->click('_qf_Settings_next');
-    $this->waitForElementPresent("_qf_Amount_next-bottom");
+    // Submit form
+    $this->clickLink('_qf_Settings_next', "_qf_Amount_next-bottom");
+
+    // Get contribution page id
+    $pageId = $this->urlArg('id');
 
     //this contribution page for online contribution
     $this->check("payment_processor[{$paymentProcessorId}]");
@@ -240,21 +242,25 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->click('_qf_Contribute_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //get Url for Live Contribution Page
-    $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
+    // Make sure our page shows up in search results
+    $this->openCiviPage("admin/contribute", "reset=1", "_qf_SearchContribution_refresh");
+    $this->type('title', $contributionPageTitle);
+    $this->click("_qf_SearchContribution_refresh");
+    $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
+    $url = $this->assertElementContainsText("//div[@id='configure_contribution_page']//table/tbody", $contributionPageTitle);
 
     //logout
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->openCiviPage($registerUrl['url'], $registerUrl['args'], NULL);
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
+
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
-
-    $this->type("email-5", $firstName . "@example.com");
-
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
+
+    $this->type("email-5", $firstName . "@example.com");
 
     $streetAddress = "100 Main Street";
     $this->type("street_address-1", $streetAddress);
@@ -283,39 +289,20 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
 
-    $this->click("_qf_Confirm_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Confirm_next-bottom", NULL);
 
     //login to check contribution
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     //View Contribution Record
     $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[10]/td[2]", preg_quote($campaignTitle));
   }
 
-  function _testVerifyRegisterPage($contributionPageTitle) {
-    $this->openCiviPage("admin/contribute", "reset=1", "_qf_SearchContribution_refresh");
-    $this->type('title', $contributionPageTitle);
-    $this->click("_qf_SearchContribution_refresh");
-    $this->waitForPageToLoad('50000');
-    $id = $this->getAttribute("//div[@id='configure_contribution_page']//table/tbody/tr/td/strong[text()='$contributionPageTitle']/../../td[5]/div/span/ul/li/a[text()='Title and Settings']@href");
-    $id = explode('id=', $id);
-    $registerUrl = array('url' => 'contribute/transact', 'args' => "reset=1&id=$id[1]");
-    return $registerUrl;
-  }
 }

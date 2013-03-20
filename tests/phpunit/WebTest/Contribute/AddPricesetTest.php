@@ -343,17 +343,6 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     }
   }
 
-  function _testVerifyRegisterPage($contributionPageTitle) {
-    $this->openCiviPage("admin/contribute", "reset=1", '_qf_SearchContribution_refresh');
-    $this->type('title', $contributionPageTitle);
-    $this->click('_qf_SearchContribution_refresh');
-    $this->waitForPageToLoad('50000');
-    $id = $this->getAttribute("//div[@id='configure_contribution_page']//div[@class='dataTables_wrapper']/table/tbody/tr@id");
-    $id = explode('_', $id);
-    $registerUrl = "civicrm/contribute/transact?reset=1&id=$id[1]";
-    return $registerUrl;
-  }
-
   function testContributeOnlineWithPriceSet() {
     $this->webtestLogin();
 
@@ -400,26 +389,24 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->fillRichTextField('footer_text', 'This is Test Footer Message', 'CKEditor');
 
     $this->select('financial_type_id', "label={$financialType}");
-    // go to step 2
-    $this->click('_qf_Settings_next');
-    $this->waitForElementPresent('_qf_Amount_next-bottom');
+
+    // Submit form
+    $this->clickLink('_qf_Settings_next', "_qf_Amount_next-bottom");
+
+    // Get contribution page id
+    $pageId = $this->urlArg('id');
 
     //this contribution page for online contribution
-    //$this->select( 'payment_processor_id', 'label=' . $processorName );
     $this->click("xpath=//tr[@class='crm-contribution-contributionpage-amount-form-block-payment_processor']/td/label[text()='$processorName']");
     $this->select('price_set_id', 'label=' . $setTitle);
     $this->click('_qf_Amount_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //get Url for Live Contribution Page
-    $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
-
     //logout
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . $registerUrl);
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -533,26 +520,22 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->fillRichTextField('intro_text', 'This is Test Introductory Message', 'CKEditor');
     $this->fillRichTextField('footer_text', 'This is Test Footer Message', 'CKEditor');
 
-    // go to step 2
-    $this->click('_qf_Settings_next');
-    $this->waitForElementPresent('_qf_Amount_next-bottom');
+    // Submit form
+    $this->clickLink('_qf_Settings_next', "_qf_Amount_next-bottom");
+
+    // Get contribution page id
+    $pageId = $this->urlArg('id');
 
     //this contribution page for online contribution
-    //$this->select( 'payment_processor_id', 'label=' . $processorName );
     $this->click("xpath=//tr[@class='crm-contribution-contributionpage-amount-form-block-payment_processor']/td/label[text()='$processorName']");
     $this->select('price_set_id', 'label=' . $setTitle);
-    $this->click('_qf_Amount_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    //get Url for Live Contribution Page
-    $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
+    $this->clickLink('_qf_Amount_next-bottom');
 
     //logout
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . $registerUrl);
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -592,8 +575,6 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //login to check contribution
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
     //Find Contribution

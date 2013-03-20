@@ -162,6 +162,19 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * Click on a link or button
+   * Wait for the page to load
+   * Wait for an element to be present
+   */
+  function clickLink($element, $waitFor = 'civicrm-footer') {
+    $this->click($element);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    if ($waitFor) {
+      $this->waitForElementPresent($waitFor);
+    }
+  }
+
+  /**
    * Call the API on the local server
    * (kind of defeats the point of a webtest - see CRM-11889)
    */
@@ -293,7 +306,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   function webtestAddHousehold($householdName = "Smith's Home", $email = NULL) {
 
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Household');
+    $this->openCiviPage("contact/add", "reset=1&ct=Household");
     $this->click('household_name');
     $this->type('household_name', $householdName);
 
@@ -311,7 +324,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   function webtestAddOrganization($organizationName = "Organization XYZ", $email = NULL) {
 
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Organization');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization");
     $this->click('organization_name');
     $this->type('organization_name', $organizationName);
 
@@ -702,7 +715,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @return an array of saved params values.
    */
   function webtestAddRelationshipType($params = array()) {
-    $this->open($this->sboxPath . 'civicrm/admin/reltype?reset=1&action=add');
+    $this->openCiviPage("admin/reltype", "reset=1&action=add");
 
     //build the params if not passed.
     if (!is_array($params) || empty($params)) {
@@ -735,8 +748,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       "Status message didn't show up after saving!"
     );
 
-    $this->open($this->sboxPath . 'civicrm/admin/reltype?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/reltype", "reset=1");
 
     //validate data on selector.
     $data = $params;
@@ -750,6 +762,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Create new online contribution page w/ user specified params or defaults.
+   * FIXME: this function take an absurd number of params - very unwieldy :(
    *
    * @param User can define pageTitle, hash and rand values for later data verification
    *
@@ -801,8 +814,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     // go to the New Contribution Page page
-    $this->open($this->sboxPath . 'civicrm/admin/contribute?action=add&reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/contribute', 'action=add&reset=1');
 
     // fill in step 1 (Title and Settings)
     $this->type('title', $pageTitle);
@@ -840,9 +852,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->click("id=is_confirm_enabled");
     }
 
-    // go to step 2
-    $this->click('_qf_Settings_next');
-    $this->waitForElementPresent('_qf_Amount_next-bottom');
+    // Submit form
+    $this->clickLink('_qf_Settings_next', "_qf_Amount_next-bottom");
+
+    // Get contribution page id
+    $pageId = $this->urlArg('id');
 
     // fill in step 2 (Processor, Pay Later, Amounts)
     if (!empty($processor)) {
@@ -1063,9 +1077,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     }
 
-    // parse URL to grab the contribution page id
-    // pass $pageId back to any other tests that call this class
-    return $this->urlArg('id');
+    return $pageId;
   }
 
   /**
@@ -1102,9 +1114,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       }
     }
 
-    $this->open($this->sboxPath . 'civicrm/contact/deduperules?action=update&id=' . $strictRuleId);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_DedupeRules_next-bottom');
+    $this->openCiviPage('contact/deduperules', "action=update&id=$strictRuleId", '_qf_DedupeRules_next-bottom');
 
     $count = 0;
     foreach ($fields as $field => $weight) {
@@ -1415,8 +1425,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
                                     $isDefault = FALSE
   ) {
 
-    $this->open($this->sboxPath . "civicrm/admin/financial/financialAccount?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/financial/financialAccount", "reset=1");
 
     $this->click("link=Add Financial Account");
     $this->waitForElementPresent('_qf_FinancialAccount_cancel-botttom');
@@ -1498,8 +1507,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
                                      $isDefault = FALSE
   ) {
     if ($firstName) {
-      $this->open($this->sboxPath . "civicrm/admin/financial/financialAccount?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("admin/financial/financialAccount", "reset=1");
     }
 
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$editfinancialAccount}']/../td[9]/span/a[text()='Edit']");
@@ -1609,7 +1617,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   function addeditFinancialType($financialType, $option = 'new') {
-    $this->open($this->sboxPath . 'civicrm/admin/financial/financialType?reset=1');
+    $this->openCiviPage("admin/financial/financialType", "reset=1");
 
     if ($option == 'Delete') {
       $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span[2]");
@@ -1660,7 +1668,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Give the specified permissions
-   * Note: this function logs in as 'admin'
+   * Note: this function logs in as 'admin' (logging out if necessary)
    */
   function changePermissions($permission) {
     $this->webtestLogin('admin');

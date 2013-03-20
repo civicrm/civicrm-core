@@ -47,7 +47,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // select testdrive mode
     $this->isTextPresent($pageTitle);
-    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", '_qf_Main_upload-bottom');
 
     // verify whatever’s possible to verify
     // FIXME: ideally should be expanded
@@ -71,9 +71,9 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     }
   }
 
-  /*
-     * check CRM-7943
-     */
+  /**
+   * check CRM-7943
+   */
   function testContributionPageSeparatePayment() {
     // open browser, login
     $this->webtestLogin();
@@ -98,7 +98,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // select testdrive mode
     $this->isTextPresent($pageTitle);
-    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", '_qf_Main_upload-bottom');
 
     $texts = array(
       "Title - New Membership $hash",
@@ -119,9 +119,9 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     }
   }
 
-  /*
-     * check CRM-7949
-     */
+  /**
+   * check CRM-7949
+   */
   function testContributionPageSeparatePaymentPayLater() {
     // open browser, login
     $this->webtestLogin();
@@ -144,14 +144,11 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_SearchContribution_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //get Url for Live Contribution Page
-    $registerUrl = "civicrm/contribute/transact?reset=1&id=$pageId";
     //logout
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . $registerUrl);
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
     $firstName = 'Ya' . substr(sha1(rand()), 0, 4);
     $lastName = 'Cha' . substr(sha1(rand()), 0, 7);
@@ -159,8 +156,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('email-5', $firstName . '@example.com');
     $this->type('first_name', $firstName);
     $this->type('last_name', $lastName);
-    //$this->click( "xpath=id('Main')/x:div[2]/x:div[3]/x:div[2]/x:label[2]" );
-    $this->waitForElementPresent('_qf_Main_upload-bottom');
+
     $this->click('_qf_Main_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_Confirm_next-bottom');

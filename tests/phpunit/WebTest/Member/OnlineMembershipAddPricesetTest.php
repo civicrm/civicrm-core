@@ -66,13 +66,11 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
     $contributionPageTitle = "Contribution Page $title";
     $paymentProcessor = "Webtest Dummy $title";
-    $this->webtestAddContributionPage(NULL, NULL, $contributionPageTitle, array($paymentProcessor => 'Dummy'),
+    $pageId = $this->webtestAddContributionPage(NULL, NULL, $contributionPageTitle, array($paymentProcessor => 'Dummy'),
       TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, $sid, FALSE, 1, NULL
     );
 
     // Sign up for membership
-    $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
-
     $firstName = 'John_' . substr(sha1(rand()), 0, 7);
     $lastName = 'Anderson_' . substr(sha1(rand()), 0, 7);
     $email = "{$firstName}.{$lastName}@example.com";
@@ -82,10 +80,10 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       'last_name' => $lastName,
       'email-5' => $email,
     );
-    $this->_testSignUpOrRenewMembership($registerUrl, $contactParams, $memTypeTitle1, $memTypeTitle2);
+    $this->_testSignUpOrRenewMembership($pageId, $contactParams, $memTypeTitle1, $memTypeTitle2);
 
     // Renew this membership
-    $this->_testSignUpOrRenewMembership($registerUrl, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = TRUE);
+    $this->_testSignUpOrRenewMembership($pageId, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = TRUE);
   }
 
   function testAddPriceSetWithMultipleTerms() {
@@ -166,13 +164,11 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
     $contributionPageTitle = "Contribution Page $title";
     $paymentProcessor = "Webtest Dummy $title";
-    $this->webtestAddContributionPage(NULL, NULL, $contributionPageTitle, array($paymentProcessor => 'Dummy'),
+    $pageId = $this->webtestAddContributionPage(NULL, NULL, $contributionPageTitle, array($paymentProcessor => 'Dummy'),
       TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, $sid, FALSE, 1, NULL
     );
 
     // Sign up for membership
-    $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
-
     $firstName = 'John_' . substr(sha1(rand()), 0, 7);
     $lastName = 'Anderson_' . substr(sha1(rand()), 0, 7);
     $email = "{$firstName}.{$lastName}@example.com";
@@ -183,9 +179,9 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       'email-5' => $email,
     );
     //membership with number of terms as 2
-    $this->_testMultilpeTermsMembershipRegistration($registerUrl, $contactParams, $memTypeTitle1, 2);
+    $this->_testMultilpeTermsMembershipRegistration($pageId, $contactParams, $memTypeTitle1, 2);
     //membership with number of terms as 3 which will renew the above membership
-    $this->_testMultilpeTermsMembershipRegistration($registerUrl, $contactParams, $memTypeTitle1, 3, TRUE);
+    $this->_testMultilpeTermsMembershipRegistration($pageId, $contactParams, $memTypeTitle1, 3, TRUE);
 
   }
 
@@ -294,26 +290,12 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->assertStringsPresent($validateStrings);
   }
 
-  function _testVerifyRegisterPage($contributionPageTitle) {
-    $this->openCiviPage('admin/contribute', 'reset=1', '_qf_SearchContribution_refresh');
-    $this->type('title', $contributionPageTitle);
-    $this->click('_qf_SearchContribution_refresh');
-    $this->waitForPageToLoad('50000');
-    $id = $this->getAttribute("//div[@id='configure_contribution_page']//div[@class='dataTables_wrapper']/table/tbody/tr@id");
-    $id = explode('_', $id);
-    $registerUrl = array('url' => 'contribute/transact', 'args' => "reset=1&id=$id[1]");
-    return $registerUrl;
-  }
-
-  function _testSignUpOrRenewMembership($registerUrl, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
+  function _testSignUpOrRenewMembership($pageId, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
     $this->webtestLogout();
 
-    $this->openCiviPage($registerUrl['url'], $registerUrl['args'], '_qf_Main_upload-bottom');
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
     //build the membership dates.
-    require_once 'CRM/Core/Config.php';
-    require_once 'CRM/Utils/Array.php';
-    require_once 'CRM/Utils/Date.php';
     $currentYear = date('Y');
     $currentMonth = date('m');
     $previousDay = date('d') - 1;
@@ -395,8 +377,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       );
     }
 
-    $this->click('_qf_MembershipView_cancel-bottom');
-    $this->waitForElementPresent("xpath=//div[@id='memberSearch']/table/tbody/tr[2]");
+    $this->clickLink('_qf_MembershipView_cancel-bottom', "xpath=//div[@id='memberSearch']/table/tbody/tr[2]");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[4][text()='{$memTypeTitle2}']/../td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
@@ -415,7 +396,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     }
   }
   
-  function _testMultilpeTermsMembershipRegistration($registerUrl, $contactParams, $memTypeTitle1, $term, $renew = FALSE){
+  function _testMultilpeTermsMembershipRegistration($pageId, $contactParams, $memTypeTitle1, $term, $renew = FALSE){
     if($renew){
       $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
       $this->type("sort_name", "{$contactParams['first_name']} {$contactParams['last_name']}");
@@ -430,12 +411,9 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     
     $this->webtestLogout();
 
-    $this->openCiviPage($registerUrl['url'], $registerUrl['args'], '_qf_Main_upload-bottom');
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
     //build the membership dates.
-    require_once 'CRM/Core/Config.php';
-    require_once 'CRM/Utils/Array.php';
-    require_once 'CRM/Utils/Date.php';
     $currentYear = date('Y');
     $currentMonth = date('m');
     $previousDay = date('d') - 1;
