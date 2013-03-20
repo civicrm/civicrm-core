@@ -1,5 +1,5 @@
 -- CRM-10969
-SELECT @mailingsID := MAX(id) FROM civicrm_navigation WHERE name = 'Mailings';
+SELECT @mailingsID := MAX(id) FROM civicrm_navigation WHERE name = 'Mailings' AND domain_id = {$domainID};
 SELECT @navWeight := MAX(id) FROM civicrm_navigation WHERE name = 'New SMS' AND parent_id = @mailingsID;
 
 UPDATE civicrm_navigation SET has_separator = NULL
@@ -14,17 +14,17 @@ VALUES
 SELECT @optionID := max(id) FROM civicrm_option_value WHERE name = 'BULK SMS';
 {if $multilingual}
     {foreach from=$locales item=locale}
-  	UPDATE `civicrm_option_value` SET label_{$locale} = '{ts escape="sql"}Mass SMS{/ts}',name = 'Mass SMS',description_{$locale} = '{ts escape="sql"}Mass SMS{/ts}' WHERE id = @optionID; 
+  	UPDATE `civicrm_option_value` SET label_{$locale} = '{ts escape="sql"}Mass SMS{/ts}',name = 'Mass SMS',description_{$locale} = '{ts escape="sql"}Mass SMS{/ts}' WHERE id = @optionID;
     	ALTER TABLE `civicrm_price_field_value` CHANGE name name VARCHAR(255) NULL DEFAULT NULL, CHANGE label_{$locale} label_{$locale} VARCHAR(255)  NULL DEFAULT NULL;
     {/foreach}
 {else}
-	UPDATE `civicrm_option_value` SET label = '{ts escape="sql"}Mass SMS{/ts}',name = 'Mass SMS',description = '{ts escape="sql"}Mass SMS{/ts}' WHERE name = 'BULK SMS'; 
+	UPDATE `civicrm_option_value` SET label = '{ts escape="sql"}Mass SMS{/ts}',name = 'Mass SMS',description = '{ts escape="sql"}Mass SMS{/ts}' WHERE name = 'BULK SMS';
 	ALTER TABLE `civicrm_price_field_value` CHANGE `name` `name` VARCHAR(255) NULL DEFAULT NULL, CHANGE `label` `label` VARCHAR(255)  NULL DEFAULT NULL;
 {/if}
 
 -- CRM-11014
   ALTER TABLE `civicrm_line_item` CHANGE `label` `label` VARCHAR(255) NULL DEFAULT NULL;
-	
+
 -- CRM-10986: Rename Batches UI elements to Bulk Data Entry
 -- update reserved profile titles
 {if $multilingual}
