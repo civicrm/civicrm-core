@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
 
@@ -84,7 +83,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     $firstName2 = substr(sha1(rand()), 0, 7);
     $email2 = 'mail_' . substr(sha1(rand()), 0, 7) . '@example.com';
     $this->webtestAddContact($firstName2, 'Anderson', $email2);
-    
+
     $headers = array(
       'email' => 'Email',
       'fee_amount' => 'Fee Amount',

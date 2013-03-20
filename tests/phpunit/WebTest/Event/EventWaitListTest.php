@@ -22,7 +22,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
 

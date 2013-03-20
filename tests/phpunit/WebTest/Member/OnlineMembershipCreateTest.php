@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
@@ -88,7 +87,6 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       FALSE
     );
 
-
     // create two new membership types
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1 = $memTypeParams1['membership_type'];
@@ -107,7 +105,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_MembershipBlock_next', '_qf_MembershipBlock_next-bottom');
     $text = "'MembershipBlock' information has been saved.";
     $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
-    
+
     //logout
     $this->webtestLogout();
 
@@ -137,7 +135,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     if ($payLater) {
       $verifyData['Status'] = 'Pending';
     }
-    else { 
+    else {
+
       $verifyData['Status'] = 'New';
     }
     $this->webtestVerifyTabularData($verifyData);
@@ -185,9 +184,11 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label");
     if ($memTypeId != 'No thank you') {
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$memTypeId')]");
-    } 
+    }
+
     else {
-      $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label[contains(text(),'$memTypeId')]"); 
+      $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label[contains(text(),'$memTypeId')]");
+
     }
     if (!$otherAmount) {
       $this->click("xpath=//div[@class='crm-section contribution_amount-section']/div[2]//span/label[text()='No thank you']");
@@ -232,7 +233,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
-  
+
   function testOnlineMembershipCreateWithContribution() {
     //login with admin credentials & make sure we do have required permissions.
     $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");

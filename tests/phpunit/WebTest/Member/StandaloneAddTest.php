@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
 
@@ -163,5 +162,4 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 }
-
 

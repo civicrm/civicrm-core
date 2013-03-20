@@ -124,8 +124,10 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", $email);
     if ($this->isElementPresent("cms_pass")) {
       $pass = 'myBigPassword';
-      $this->type("cms_pass", $pass);      
-      $this->type("cms_confirm_pass", $pass);      
+      $this->type("cms_pass", $pass);
+
+      $this->type("cms_confirm_pass", $pass);
+
     }
     $this->click("_qf_PCPAccount_next-bottom");
 

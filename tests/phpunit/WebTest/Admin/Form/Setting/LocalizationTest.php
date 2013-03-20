@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
 
@@ -56,5 +55,4 @@ class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
     }
   }
 }
-
 

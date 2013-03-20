@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
@@ -37,7 +36,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // Add new profile.
     $this->openCiviPage('admin/uf/group', 'reset=1');
-    
+
     $this->click('newCiviCRMProfile-bottom');
 
     $this->waitForElementPresent('_qf_Group_next-bottom');
@@ -89,7 +88,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
     $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
-    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.'); 
+    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.');
 
     // Add Sample Custom Field.
     $this->click('field_name[0]');

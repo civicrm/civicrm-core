@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
 
@@ -187,7 +186,6 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // Create new group and select the previously selected group as parent group for this new group.
     $childGroupName = 'Childgroup_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($childGroupName, $parentGroupName);
-
 
     // Adding Parent group contact
     $firstName = substr(sha1(rand()), 0, 7);

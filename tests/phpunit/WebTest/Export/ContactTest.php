@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Export/ExportCiviSeleniumTestCase.php';
 class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
@@ -97,10 +96,10 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $sortName, "Contact did not found in search result!");
-       
+
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $childSortName, "Contact did not found in search result!");
-    
+
     // select to export all the contasct from search result.
     $this->click("CIVICRM_QFID_ts_all_4");
 
@@ -248,13 +247,13 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $sortName1, "Contact did not found in search result!");
-   
+
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $sortName2, "Contact did not found in search result!");
- 
+
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $houseHold, "Contact did not found in search result!");
- 
+
     // select to export all the contasct from search result.
     $this->click("CIVICRM_QFID_ts_all_4");
 

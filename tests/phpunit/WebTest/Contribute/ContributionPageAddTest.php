@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   function testContributionPageAdd() {
@@ -197,7 +196,6 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     );
     $this->webtestVerifyTabularData($expected);
     $this->click('_qf_ContributionView_cancel-bottom');
-
 
     //Find Member
     $this->openCiviPage("member/search", "reset=1", 'member_source');

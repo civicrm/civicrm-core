@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTestCase {
 
@@ -39,7 +38,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->click("add");
     $this->click("_qf_Localization_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     // create unique name
     $name      = substr(sha1(rand()), 0, 7);
     $firstName = 'Adam' . $name;

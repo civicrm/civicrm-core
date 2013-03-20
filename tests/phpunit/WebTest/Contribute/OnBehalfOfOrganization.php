@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   protected $pageno = '';
@@ -291,7 +290,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Membership_cancel-bottom');
     $this->click('_qf_Membership_upload-bottom');
 
-
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("css=li#tab_rel a");
 
@@ -461,7 +459,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->assertTextPresent("Thank you. Your information has been saved.", "Save successful status message didn't show up after saving profile to update testUserName!");
 
-
     //add org fields to profile
     $this->openCiviPage("admin/uf/group", "reset=1");
     $this->click("link=Reserved Profiles");
@@ -483,7 +480,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click('field_name[1]');
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     //create organisation
     $orgName = "Org WebAccess ". substr(sha1(rand()), 0, 7);
@@ -564,7 +560,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
      $this->_testOrganization($pageId, $cid, $pageTitle);
   }
 
-
   function _testOrganization($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
@@ -618,7 +613,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select("onbehalf_country-3", "label=United States");
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
-
 
     // Credit Card Info
     $this->select("credit_card_type", "value=Visa");
@@ -883,7 +877,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
       $this->verifyText("xpath=id( 'ContributionView' )/div[2]/table[1]/tbody/tr[$value]/td[2]", preg_quote($label));
     }
 
-
     $this->openCiviPage("admin/uf/group", "reset=1");
     $this->click("link=Reserved Profiles");
 
@@ -1096,7 +1089,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-
     // create Membership type
     $title1 = "Membership Type" . substr(sha1(rand()), 0, 7);
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
@@ -1282,7 +1274,6 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
       "Status message didn't show up after saving!"
     );
   }
-
 
   function testOnBehalfOfOrganizationWithImage() {
     $this->webtestLogin();

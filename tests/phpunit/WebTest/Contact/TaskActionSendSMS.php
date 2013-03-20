@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
 
@@ -115,5 +114,4 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('Your message has been sent.'), "Test SMS could not be sent!");
   }
 }
-
 

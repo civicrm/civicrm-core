@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase {
 
@@ -38,7 +37,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
 
     //now do the test membership signup.
     $this->openCiviPage('contribute/transact', "reset=1&action=preview&id={$pageId}", "_qf_Main_upload-bottom");
-   
+
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'Student')]");
 
     $this->click("auto_renew");
@@ -70,7 +69,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
 
     //now do the test membership signup.
     $this->openCiviPage('contribute/transact', "reset=1&action=preview&id={$pageId}", "_qf_Main_upload-bottom");
- 
+
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'Student')]");
 
     $this->click("auto_renew");
@@ -100,7 +99,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
 
     //now do the test membership signup.
     $this->openCiviPage('contribute/transact', "reset=1&action=preview&id={$pageId}", "_qf_Main_upload-bottom");
-   
+
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'Student')]");
 
     $this->click("auto_renew");
@@ -141,7 +140,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
 
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
-      
+
       // wait for the auto-complete member_of_contact to populate
       $this->waitForValue('member_of_contact', '::');
 

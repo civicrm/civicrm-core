@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
@@ -72,7 +71,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     // Using helper webtestFillDate function.
     $this->webtestFillDate('start_date', 'now');
     $today = date('F jS, Y', strtotime('now'));
-    // echo 'Today is ' . $today;
+
     $this->type('duration', "20");
     $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom');
 
@@ -105,7 +104,6 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     // waitForPageToLoad is not always reliable. Below, we're waiting for the submit
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload-bottom");
-
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', 'Anderson, ' . $firstName2, "Contact not found in line " . __LINE__);

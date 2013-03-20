@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCase {
 
@@ -113,7 +112,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
     $fields = array("National Membership $title", "Radio");
     $this->openCiviPage('admin/price/field', "reset=1&action=add&sid={$sid}");
-    
+
     $validateStrings[] = $fields[0];
     $this->type('label', $fields[0]);
     $this->select('html_type', "value={$fields[1]}");
@@ -135,7 +134,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
               'amount' => 120.00,
               'membership_num_terms' => 3,
             ),
-       
+
           );
     $i = 2;
     foreach($options as $index => $values){
@@ -148,7 +147,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input",$values['label']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[6]/input",$values['amount']);
       if($i > 3){
-        $this->click('link=another choice'); 
+        $this->click('link=another choice');
+
       }
       $i++;
     }
@@ -158,7 +158,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('crm-notification-container', "Price Field '{$fields[0]}' has been saved.");
- 
+
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
 
@@ -383,7 +383,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       );
     }
   }
-  
+
   function _testMultilpeTermsMembershipRegistration($pageId, $contactParams, $memTypeTitle1, $term, $renew = FALSE){
     if($renew){
       $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
@@ -394,7 +394,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       $year = CRM_Utils_Date::processDate($this->getText("xpath=//form[@id='MembershipView']//table/tbody/tr/td[text()='End date']/following-sibling::td"));
       $prevYear = substr($year, 0, 4);
     }
-    
+
     $this->webtestLogout();
 
     $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
@@ -404,7 +404,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $currentMonth = date('m');
     $previousDay = date('d') - 1;
     $endYear = ($term == 3) ? $currentYear + 3 : (($term == 2) ? $currentYear + 2 : $currentYear + 1);
-    $endYear = ($renew) ? $endYear + ($prevYear - $currentYear) : $endYear; 
+    $endYear = ($renew) ? $endYear + ($prevYear - $currentYear) : $endYear;
+
     $joinDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
     $startDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, date('d'), $currentYear));
     $endDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, $previousDay, $endYear));

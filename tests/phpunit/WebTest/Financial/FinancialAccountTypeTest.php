@@ -30,12 +30,13 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
 
   function testFinancialAccount() {
-    // To Add Financial Account 
+    // To Add Financial Account
+
     // class attributes.
-    
+
     // Log in using webtestLogin() method
     $this->webtestLogin();
-    
+
     // Add new Financial Account
     $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
     $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
@@ -47,13 +48,14 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $isTax = TRUE;
     $taxRate = 5.20;
     $isDefault = FALSE;
-        
+
     //Add new organisation
     if ($orgName) {
       $this->webtestAddOrganization($orgName);
     }
-        
-    $this->_testAddFinancialAccount( 
+
+    $this->_testAddFinancialAccount(
+
       $financialAccountTitle,
       $financialAccountDescription,
       $accountingCode,
@@ -65,13 +67,14 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
       $taxRate,
       $isDefault
     );
-    
+
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-        
+
     $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom');
-        
+
     //Varify Data after Adding new Financial Account
-    $verifyData = array( 
+    $verifyData = array(
+
       'name' => $financialAccountTitle,
       'description' => $financialAccountDescription,
       'accounting_code' => $accountingCode,
@@ -81,7 +84,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
       'is_deductible' => 'off',
       'is_default' => 'off',
     );
-    
+
     $this->_assertFinancialAccount($verifyData);
     $verifySelectFieldData = array(
       'financial_account_type_id' => $financialAccountType,
@@ -96,11 +99,14 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $financialType['is_reserved'] = false;
     $this->addeditFinancialType($financialType);
     $accountRelationship = "Income Account is";
-    $expected[] = array( 
-      'financial_account' => $financialAccountTitle, 
-      'account_relationship' => $accountRelationship 
+    $expected[] = array(
+
+      'financial_account' => $financialAccountTitle,
+
+      'account_relationship' => $accountRelationship
+
     );
-        
+
     $this->select('account_relationship', "label={$accountRelationship}");
     $this->select('financial_account_id', "label={$financialAccountTitle}");
     $this->click('_qf_FinancialTypeAccount_next_new');
@@ -112,9 +118,12 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
     $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     $accountRelationship = 'Expense Account is';
-    $expected[] = array( 
-      'financial_account' => 'Banking Fees', 
-      'account_relationship' => $accountRelationship 
+    $expected[] = array(
+
+      'financial_account' => 'Banking Fees',
+
+      'account_relationship' => $accountRelationship
+
     );
 
     $this->select('account_relationship', "label={$accountRelationship}");
@@ -124,7 +133,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $text = 'The financial type Account has been saved.';
     $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
     $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
-        
+
     foreach ($expected as  $value => $label) {
       $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$label[financial_account]']/../td[2]", preg_quote($label['account_relationship']));
     }
@@ -148,7 +157,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $this->click('_qf_FinancialTypeAccount_next-botttom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('crm-notification-container', 'Selected financial type account has been deleted.', 'Missing text: ' . 'Selected financial type account has been deleted.');
-        
+
     //edit financial type
     $financialType['oldname'] = $financialType['name'];
     $financialType['name'] = 'Edited FinancialType '.substr(sha1(rand()), 0, 4);

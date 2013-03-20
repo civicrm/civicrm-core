@@ -350,7 +350,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $firstNameDonar = 'Andrew' . substr(sha1(rand()), 0, 7);
     $lastNameDonar = 'Roger' . substr(sha1(rand()), 0, 7);
     $middleNameDonar = 'Nicholas' . substr(sha1(rand()), 0, 7);
-    
+
     $this->type("{$emailElement}", $firstNameDonar . "@example.com");
     $this->webtestAddCreditCardDetails();
     $this->webtestAddBillingDetails($firstNameDonar, $middleNameDonar, $lastNameDonar);

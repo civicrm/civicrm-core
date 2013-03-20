@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
@@ -180,11 +179,12 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $this->click("_qf_Main_upload-bottom");
     $this->waitForElementPresent("_qf_Questions_upload_next-bottom");
-    
+
     // Select the profile for the survey
     $this->select("//form[@id='Questions']/div[2]/table/tbody/tr[1]/td[2]/div/div/span/select", "label=New Individual");
 
-    // select the question created for the survey 
+    // select the question created for the survey
+
     $this->select("//form[@id='Questions']/div[2]/table/tbody/tr[2]/td[2]/div/div/span/select", "label=Profile $title");
     $this->click("_qf_Questions_upload_next-bottom");
 
@@ -410,7 +410,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->check('is_searchable');
     $this->check('in_selector');
     $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_cancel-bottom');
-    
+
     // Custom Data Fields
     $this->select('field_name[0]', "value=Contact");
     $this->select('field_name[1]', "label=$field1 :: $customGroup");
@@ -445,11 +445,12 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $this->click("_qf_Main_upload-bottom");
     $this->waitForElementPresent("_qf_Questions_upload_next-bottom");
-    
+
     //Select the profile for the survey
     $this->select("//form[@id='Questions']/div[2]/table/tbody/tr[1]/td[2]/div/div/span/select", "label=New Individual");
 
-    // select the question created for the survey 
+    // select the question created for the survey
+
     $this->select("//form[@id='Questions']/div[2]/table/tbody/tr[2]/td[2]/div/div/span/select", "label=$surveyProfile");
     $this->click("_qf_Questions_upload_next-bottom");
 
@@ -504,7 +505,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Is equal to Reserved"));
 
     // commenting out the print assertion as print dialog which appears breaks the webtest
-    // as it is OS-related and cannot be handled through webtest 
+    // as it is OS-related and cannot be handled through webtest
 
     // $this->click('_qf_SurveyDetails_submit_print');
     // $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -557,7 +558,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Is equal to Interviewed"));
 
     // commenting out the print assertion as print dialog which appears breaks the webtest
-    // as it is OS-related and cannot be handled through webtest 
+    // as it is OS-related and cannot be handled through webtest
 
     // $this->click('_qf_SurveyDetails_submit_print');
     // $this->waitForPageToLoad($this->getTimeoutMsec());

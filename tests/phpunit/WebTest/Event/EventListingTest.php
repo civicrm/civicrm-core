@@ -155,4 +155,3 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
   }
 }
 
-

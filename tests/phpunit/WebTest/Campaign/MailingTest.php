@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
 
@@ -67,7 +66,6 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
-
 
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);

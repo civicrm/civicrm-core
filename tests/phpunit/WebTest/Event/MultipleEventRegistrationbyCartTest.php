@@ -24,175 +24,176 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTestCase {
-  
+
   protected function setUp() {
     parent::setUp();
   }
-  
-  function testAuthenticatedMultipleEvent(){    
+
+  function testAuthenticatedMultipleEvent(){
+
     // Log in using webtestLogin() method
     $this->webtestLogin();
-    
+
     //Enable shopping cart style
     $this->openCiviPage("admin/setting/preferences/event", "reset=1");
     $this->check("enable_cart");
     $this->click("_qf_Event_next-top");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     // We need a payment processor
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
-    
+
     //event 1
 
     $this->openCiviPage("event/add", "reset=1&action=add");
-    
+
     $eventTitle1 = 'My Conference1 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription1 = "Here is a description for this conference 1.";
     $this->_testAddEventInfo($eventTitle1, $eventDescription1);
-    
+
     $streetAddress1 = "100 Main Street";
     $this->_testAddLocation($streetAddress1);
-    
+
     $this->_testAddFees(FALSE, FALSE, $processorName);
-    
+
     // intro text for registration page
     $registerIntro = "Fill in all the fields below and click Continue.";
     $multipleRegistrations = TRUE;
     $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
-    
+
     $eventInfoStrings1 = array($eventTitle1, $eventDescription1, $streetAddress1);
     $this->_AddEventToCart($eventTitle1, $eventInfoStrings1);
-    
+
     //event 2
 
     $this->openCiviPage("event/add", "reset=1&action=add");
-    
+
     $eventTitle2 = 'My Conference2 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription2 = "Here is a description for this conference 2.";
     $this->_testAddEventInfo($eventTitle2, $eventDescription2);
-    
+
     $streetAddress2 = "101 Main Street";
     $this->_testAddLocation($streetAddress2);
-    
+
     $this->_testAddFees(FALSE, FALSE, $processorName);
-    
+
     // intro text for registration page
     $registerIntro = "Fill in all the fields below and click Continue.";
     $multipleRegistrations = TRUE;
     $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
-    
+
     $eventInfoStrings2 = array($eventTitle2, $eventDescription2, $streetAddress2);
     $this->_AddEventToCart($eventTitle2, $eventInfoStrings2);
-    
+
     //event 3
 
     $this->openCiviPage("event/add", "reset=1&action=add");
-    
+
     $eventTitle3 = 'My Conference3 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription3 = "Here is a description for this conference 3.";
     $this->_testAddEventInfo($eventTitle3, $eventDescription3);
-    
+
     $streetAddress3 = "102 Main Street";
     $this->_testAddLocation($streetAddress3);
-    
+
     $this->_testAddFees(FALSE, FALSE, $processorName);
-    
+
     // intro text for registration page
     $registerIntro = "Fill in all the fields below and click Continue.";
     $multipleRegistrations = TRUE;
     $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
-    
+
     $eventInfoStrings3 = array($eventTitle3, $eventDescription3, $streetAddress3);
     $this->_AddEventToCart($eventTitle3, $eventInfoStrings3);
-    
+
     //Checkout
     $value = $this->_testCheckOut();
-    
+
     //three event names
     $events = array( 1 => $eventTitle1,
                      2 => $eventTitle2,
                      3 => $eventTitle3,
                      );
-    //check the existence of the contacts who were registered and the one who did the contribution 
+    //check the existence of the contacts who were registered and the one who did the contribution
+
     $this->_checkContributionsandEventRegistration($value[0],$value[1],$events);
   }
-  
+
   function testAnonymousMultipleEvent(){
       // This is the path where our testing install resides.
     // The rest of URL is defined in CiviSeleniumTestCase base class, in
     // class attributes.
-    
+
     // Log in using webtestLogin() method
     $this->webtestLogin();
- 
+
     // We need a payment processor
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
-    
+
     //event 1
 
     $this->openCiviPage("event/add", "reset=1&action=add");
-    
+
     $eventTitle1 = 'My Conference1 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription1 = "Here is a description for this conference 1.";
     $this->_testAddEventInfo($eventTitle1, $eventDescription1);
-    
+
     $streetAddress1 = "100 Main Street";
     $this->_testAddLocation($streetAddress1);
-    
+
     $this->_testAddFees(FALSE, FALSE, $processorName);
-    
+
     // intro text for registration page
     $registerIntro = "Fill in all the fields below and click Continue.";
     $multipleRegistrations = TRUE;
     $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
-   
+
     $eventInfoStrings1 = array($eventTitle1, $eventDescription1, $streetAddress1);
     $registerUrl1 = $this->_testVerifyEventInfo($eventTitle1, $eventInfoStrings1);
 
     //event 2
 
     $this->openCiviPage("event/add", "reset=1&action=add");
-    
+
     $eventTitle2 = 'My Conference2 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription2 = "Here is a description for this conference 2.";
     $this->_testAddEventInfo($eventTitle2, $eventDescription2);
-    
+
     $streetAddress2 = "101 Main Street";
     $this->_testAddLocation($streetAddress2);
-    
+
     $this->_testAddFees(FALSE, FALSE, $processorName);
-    
+
     // intro text for registration page
     $registerIntro = "Fill in all the fields below and click Continue.";
     $multipleRegistrations = TRUE;
     $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
-    
+
     $eventInfoStrings2 = array($eventTitle2, $eventDescription2, $streetAddress2);
     $registerUrl2 = $this->_testVerifyEventInfo($eventTitle2, $eventInfoStrings2);
 
     //event 3
 
     $this->openCiviPage("event/add", "reset=1&action=add");
-    
+
     $eventTitle3 = 'My Conference3 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription3 = "Here is a description for this conference 3.";
     $this->_testAddEventInfo($eventTitle3, $eventDescription3);
-    
+
     $streetAddress3 = "102 Main Street";
     $this->_testAddLocation($streetAddress3);
-    
+
     $this->_testAddFees(FALSE, FALSE, $processorName);
-    
+
     // intro text for registration page
     $registerIntro = "Fill in all the fields below and click Continue.";
     $multipleRegistrations = TRUE;
     $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
-    
+
     $eventInfoStrings3 = array($eventTitle3, $eventDescription3, $streetAddress3);
     $registerUrl3 = $this->_testVerifyEventInfo($eventTitle3, $eventInfoStrings3);
 
@@ -218,10 +219,11 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
                      2 => $eventTitle2,
                      3 => $eventTitle3,
                      );
-    //check the existence of the contacts who were registered and the one who did the contribution 
+    //check the existence of the contacts who were registered and the one who did the contribution
+
     $this->_checkContributionsandEventRegistration($value[0],$value[1],$events);
   }
-  
+
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -251,7 +253,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Location_upload-bottom");
-    
+
     $this->type("address_1_street_address", $streetAddress);
     $this->type("address_1_city", "San Francisco");
     $this->type("address_1_postal_code", "94117");
@@ -336,20 +338,21 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent("$eventTitle has been added to your cart"));
   }
-  
+
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
     $this->openCiviPage("event/manage", "reset=1");
     $this->click("link=$eventTitle");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     // Check for correct event info strings
     $this->assertStringsPresent($eventInfoStrings);
-    
+
     // Optionally verify event fees (especially for discounts)
     if ($eventFees) {
-      $this->assertStringsPresent($eventFees);      
+      $this->assertStringsPresent($eventFees);
+
     }
     return $this->getLocation();
   }
@@ -368,12 +371,12 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
   function _testCheckOut(){
     //View the Cart
     $this->click("xpath=//div[@id='messages']/div/div/a[text()='View your cart.']");
-    
+
     //Click on Checkout
     $this->waitForElementPresent("xpath=//a[@class='button crm-check-out-button']/span");
     $this->click("xpath=//a[@class='button crm-check-out-button']/span");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $firstName = "AB".substr(sha1(rand()), 0, 7);
     $lastName = "XY".substr(sha1(rand()), 0, 7);
     for( $i = 1; $i <= 3; $i++ ){
@@ -396,10 +399,10 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
     $this->type("billing_contact_email", "{$firstName}.{$lastName}@example.com");
-    
+
     $this->click("_qf_Payment_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->assertTrue($this->isTextPresent("This is your receipt of payment made for the following event registration."));
     return array($firstName, $lastName);
   }
@@ -409,14 +412,14 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->click('sort_name_navigation');
     $this->type('css=input#sort_name_navigation',"{$firstName}.{$lastName}@home.com" );
     $this->typeKeys('css=input#sort_name_navigation', "{$firstName}.{$lastName}@home.com");
-    
+
     // Wait for result list.
     $this->waitForElementPresent("css=div.ac_results-inner li");
-    
+
     // Visit contact summary page.
     $this->click("css=div.ac_results-inner li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     //click on Events Tab
     $this->click("xpath=//li[@id='tab_participant']/a");
     //check if the participant is registered for all the three events
@@ -428,19 +431,19 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
       $this->waitForElementPresent("xpath=//table[@class='selector']/tbody/tr[$i]/td[6][text()='Registered']");
       $this->assertTrue($this->isElementPresent("xpath=//table[@class='selector']/tbody/tr[$i]/td[6][text()='Registered']"));
     }
-    
+
     //Type the billing email in autocomplete.
     $this->click('sort_name_navigation');
     $this->type('css=input#sort_name_navigation',"{$firstName}.{$lastName}@example.com" );
     $this->typeKeys('css=input#sort_name_navigation', "{$firstName}.{$lastName}@example.com");
-    
+
     // Wait for result list.
     $this->waitForElementPresent("css=div.ac_results-inner li");
-    
+
     // Visit contact summary page.
     $this->click("css=div.ac_results-inner li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     //click on Contributions Tab
     $this->click("xpath=//li[@id='tab_contribute']/a");
     //check for the three contributions
@@ -448,7 +451,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
       $this->waitForElementPresent("xpath=//table[@class='selector']/tbody/tr/td[3][contains(text(),'$value')]");
       $this->assertTrue($this->isElementPresent("xpath=//table[@class='selector']/tbody/tr/td[3][contains(text(),'$value')]"));
     }
-    
+
     //Disable shopping cart style
     $this->openCiviPage("admin/setting/preferences/event", "reset=1");
     $this->click("enable_cart");

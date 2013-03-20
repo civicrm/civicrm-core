@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTestCase {
 
@@ -234,7 +233,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->select('relationship_type_id', "label={$relType}");
 
     //fill in the individual
-    $this->webtestFillAutocomplete($relatedName);    
+    $this->webtestFillAutocomplete($relatedName);
 
     $this->waitForElementPresent("quick-save");
 
@@ -282,8 +281,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
 
  function testAdvanceSearchForLog() {
     $this->webtestLogin();
-    
-    
+
     $Pdate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1,   date( 'Y' )) );
     $Ndate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) + 1,   date( 'Y' )) );
 
@@ -294,7 +292,6 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $url = $this->parseURL( );
     $cid = $url['queryString']['cid'];
     $this->assertType('numeric', $cid);
-    
 
     //advance search for created contacts
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
@@ -309,10 +306,8 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->assertTrue(True, 'greater than or equal to "{$Pdate}" AND less than or equal to "{$Ndate}"');
     $value = "$lastNameSoft, $firstNameSoft";
     $this->verifyText("xpath= id('rowid{$cid}')/td[3]/a", preg_quote($value));
-   
+
 }
-
-
 
 }
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
@@ -122,7 +121,6 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('start_date', 'now');
     $today = date('F jS, Y', strtotime('now'));
 
-    // echo 'Today is ' . $today;
     $this->type("duration", "20");
     $this->type("{$cusId_1}", $custFname);
     $this->type("{$cusId_2}", $custMname);

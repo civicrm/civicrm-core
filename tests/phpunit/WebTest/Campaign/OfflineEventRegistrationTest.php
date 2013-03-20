@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase {
 
@@ -167,7 +166,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     // Select an event fee
     $this->waitForElementPresent('priceset');
     $this->click("xpath=//div[@id='priceset']//input[1][@class='form-radio']");
-    
+
     // Select 'Record Payment'
     $this->click("record_contribution");
 

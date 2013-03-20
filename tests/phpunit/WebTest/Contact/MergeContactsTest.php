@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
@@ -211,7 +210,6 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload");
 
-
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertTrue($this->isTextPresent("Anderson, " . $withContact), "Contact not found in line " . __LINE__);
 
@@ -267,7 +265,6 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->assertTrue($this->isTextPresent("Activity '$subject' has been saved."), "Status message didn't show up after saving!");
   }
-
 
   function testMergeTest() {
     $this->webtestLogin();

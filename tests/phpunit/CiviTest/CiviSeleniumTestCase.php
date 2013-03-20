@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
 /**
@@ -359,7 +358,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->click("css=div.ac_results-inner li");
     //$this->assertContains($sortName, $this->getValue('contact_1'), "autocomplete expected $sortName but didn’t find it in " . $this->getValue('contact_1'));
   }
-
 
   /*
      * 1. By default, when no strtotime arg is specified, sets date to "now + 1 month"
@@ -1035,7 +1033,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     }
 
-
     if ($widget) {
       // fill in step 8 (Widget Settings)
       $this->click('link=Widgets');
@@ -1311,7 +1308,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // click through to the Activity view screen
     $this->click("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
-    
+
     // parse URL to grab the activity id
     // pass id back to any other tests that call this class
     return $this->urlArg('id');
@@ -1487,7 +1484,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-
   /**
    * Edit Financial Account
    */
@@ -1524,7 +1520,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($accountingCode) {
       $this->type('accounting_code', $accountingCode);
     }
-
 
     // Autofill Edit Organization
     if ($firstName) {
@@ -1575,7 +1570,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->click('_qf_FinancialAccount_next-botttom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
-
 
   /**
    * Delete Financial Account

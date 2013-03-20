@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
 
@@ -37,7 +36,6 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-
 
     $this->webtestLogin();
 
@@ -87,5 +85,4 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $this->assertEquals($campaignDescription, $fetchedVaue);
   }
 }
-
 

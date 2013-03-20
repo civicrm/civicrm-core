@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
 
@@ -94,7 +93,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     // Using helper webtestFillDate function.
     $this->webtestFillDate('start_date', 'now');
     $today = date('F jS, Y', strtotime('now'));
-    // echo 'Today is ' . $today;
+
     $this->type("duration", "20");
     $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom");
 
@@ -128,14 +127,14 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     );
 
     $this->_testVerifyOpenCaseActivity($subject, $openCaseData);
-    
+
     //change the case status to Resolved to get the end date
     $this->click("xpath=//form[@id='CaseView']/div[2]/table/tbody/tr/td[4]/a");
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
     $this->select("case_status_id","value=2");
     $this->click("_qf_Activity_upload-top");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->_testSearchbyDate($firstName, $lastName, "this.quarter");
     $this->_testSearchbyDate($firstName, $lastName, "0");
     $this->_testSearchbyDate($firstName, $lastName, "this.year");
@@ -206,7 +205,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->assertElementContainsText('Search', "$lastName, $firstName");
     }
-    
+
     //Advanced Search
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
     $this->click("CiviCase");

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCase {
 
@@ -165,7 +164,6 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->_testMultilpeTermsMembershipRegistration($sid, $contactParams, $memTypeTitle1, 2);
 
   }
-
 
   function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');

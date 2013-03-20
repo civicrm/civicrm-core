@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
 
@@ -130,5 +129,4 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-
 

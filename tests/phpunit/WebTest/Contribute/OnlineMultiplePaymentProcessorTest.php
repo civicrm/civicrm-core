@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSeleniumTestCase {
   protected function setUp() {
@@ -108,16 +107,15 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     //login to check contribution
-    
+
   }
 
   function testOnlineMultiplePaymentProcessorWithPayLater() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
-
 
     $proProcessorName = "Pro " . substr(sha1(rand()), 0, 7);
     $standardProcessorName = "Standard " . substr(sha1(rand()), 0, 7);
@@ -152,7 +150,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
-    
+
     $this->type("email-5", $firstName . "@example.com");
 
     $this->type("first_name", $firstName);
@@ -173,7 +171,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->click($xpath);
 
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
-    
+
     $payLaterInstructionsText = "Pay later instructions $hash";
     $this->assertTrue($this->isTextPresent($payLaterInstructionsText));
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
 

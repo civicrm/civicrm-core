@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
 
@@ -60,7 +59,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->type('last_name', $lname1);
     $email1 = $fname1 . '@example.org';
     $this->type('email_1_email', $email1);
-    
+
     //click 'Communication Preferences' Panel
     $this->click("commPrefs");
     $this->waitForElementPresent("preferred_mail_format");

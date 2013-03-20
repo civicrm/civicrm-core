@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
 
@@ -70,7 +69,6 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // check contact name on Grant form
     $this->assertElementContainsText('page-title', "$firstName $lastName");
-
 
     // select grant Status
     $this->select('status_id', 'value=1');

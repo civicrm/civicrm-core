@@ -24,14 +24,12 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
-
 
   function testSearchBuilderOptions() {
     $this->webtestLogin();
@@ -248,10 +246,12 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
       $this->waitForElementPresent("css=#crm_search_value_{$set}_{$row} select option + option");
       foreach ($value as $val) {
         if ($op != 'IN') {
-          $select = 'select'; 
+          $select = 'select';
+
         }
         else {
-          $select = 'addSelection';           
+          $select = 'addSelection';
+
         }
         $this->$select("css=#crm_search_value_{$set}_{$row} select", "label=$val");
       }
@@ -352,7 +352,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
     // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
-    
+
     // add financial type
     $financialTypeName1 = 'Financial Type' . substr(sha1(rand()), 0, 5);;
     $financialTypeName2 = 'Financial Type' . substr(sha1(rand()), 0, 5);;
@@ -389,19 +389,19 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
       $this->clickLink('_qf_Contribution_upload_new', '_qf_Contribution_upload_new');
     }
     $this->openCiviPage("contact/search/builder", "reset=1", "_qf_Builder_refresh");
-      
+
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, '=', array($financialTypeName1));
     $this->click('_qf_Builder_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->assertTrue($this->isTextPresent('3 Contacts'), 'Missing text: ' . '3 Contacts');
-      
+
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, '=', array($financialTypeName2));
     $this->click('_qf_Builder_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent('3 Contacts'), 'Missing text: ' . '3 Contacts');
-      
+
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, 'IN', array($financialTypeName1, $financialTypeName2));
     $this->click('_qf_Builder_refresh');

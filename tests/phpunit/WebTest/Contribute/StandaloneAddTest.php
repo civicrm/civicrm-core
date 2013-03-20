@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
 
@@ -51,12 +50,12 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $isTax = TRUE;
     $taxRate = 9.9999999;
     $isDefault = FALSE;
-    
+
     //Add new organisation
     if($orgName) {
       $this->webtestAddOrganization($orgName);
     }
-    
+
     $this->_testAddFinancialAccount($financialAccountTitle,
       $financialAccountDescription,
       $accountingCode,
@@ -71,14 +70,13 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
-
     // create new contact using dialog
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestNewDialogContact($firstName, "Contributor", $firstName . "@example.com");
-    
+
     // select financial type
     $this->select("financial_type_id", "value=1");
-    
+
     // fill in Received Date
     $this->webtestFillDate('receive_date');
 
@@ -92,7 +90,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->select("payment_instrument_id", "value=4");
     $this->waitForElementPresent("check_number");
     $this->type("check_number", "check #1041");
-    
+
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
@@ -162,7 +160,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
 
     // go to soft creditor contact view page
     $this->click("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='Soft Credit To']/../td[2]/a[text()='{$softCreditFname} {$softCreditLname}']");
-    
+
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");

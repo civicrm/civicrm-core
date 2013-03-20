@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
 
@@ -316,7 +315,8 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
               'locator' => 'contribution_amount_high',
               'values' => array('1000'),
             ),
-                                   'Financial Type'   => 
+                                   'Financial Type'   =>
+
             array(
               'type' => 'select',
                                           'locator' => 'financial_type_id',

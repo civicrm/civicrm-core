@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
@@ -297,7 +296,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     // //------ end unsubscribe -------
   }
-  
+
   function testAdvanceSearchAndReportCheck() {
 
     $this->webtestLogin();
@@ -381,7 +380,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     // fill subject for mailing
     $this->type("subject", "Test subject {$mailingName} for Webtest");
-    
+
     // check for default option enabled
     $this->assertChecked("CIVICRM_QFID_1_upload_type");
 
@@ -444,7 +443,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//table//tr[td/a[text()='Successful Deliveries']]/descendant::td[2]", preg_quote("1 (100.00%)"));
 
     $summaryInfoLinks = array('Intended Recipients', 'Successful Deliveries', 'Tracked Opens', 'Click-throughs', 'Forwards', 'Replies', 'Bounces', 'Unsubscribe Requests','Opt-out Requests');
-    
+
     //check for report and adv search links
     foreach($summaryInfoLinks as $value) {
       $this->assertTrue($this->isElementPresent("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$value}']]/descendant::td[3]/span/a[1][text()='Report']"), "Report link missing for {$value}");

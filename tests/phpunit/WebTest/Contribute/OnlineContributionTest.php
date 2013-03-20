@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
@@ -88,7 +87,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $honorLastName = 'Hon' . substr(sha1(rand()), 0, 7);
     $honorEmail = $honorFirstName . "@example.com";
     $honorSortName = $honorLastName . ', ' . $honorFirstName;
-    $honorDisplayName = 'Ms. ' . $honorFirstName . ' ' . $honorLastName; 
+    $honorDisplayName = 'Ms. ' . $honorFirstName . ' ' . $honorLastName;
 
     $this->type("email-5", $firstName . "@example.com");
 
@@ -113,7 +112,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->type("honor_first_name", $honorFirstName);
     $this->type("honor_last_name", $honorLastName);
     $this->type("honor_email", $honorEmail);
-    
+
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");
     $this->type("credit_card_number", "4111111111111111");
@@ -170,7 +169,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     // Is contact present?
     $this->assertTrue($this->isTextPresent("$honorDisplayName"), "Honoree contact not found.");
-    
+
     }
   }
 

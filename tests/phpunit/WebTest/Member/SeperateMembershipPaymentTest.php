@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase {
 
@@ -86,7 +85,6 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
       $isSeparatePayment,
       FALSE
     );
-
 
     // create new membership types
     $memTypeParams1 = $this->webtestAddMembershipType();

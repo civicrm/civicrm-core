@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
 
@@ -236,5 +235,4 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-
 

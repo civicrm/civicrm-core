@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestCase {
 
@@ -80,7 +79,6 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
 
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
-
 
     // create new contact using dialog
     $this->webtestNewDialogContact($firstName, "Contributor", $email);
@@ -241,7 +239,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
-    
+
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 100);
     $this->click("xpath=//div[@class='crm-section payment_processor-section']/div[2]//label[text()='Pay later label {$hash}']");
