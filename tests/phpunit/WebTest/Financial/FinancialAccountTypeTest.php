@@ -137,6 +137,9 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='Banking Fees']/../td[7]/span/a[text()='Edit']");
     $this->waitForElementPresent('_qf_FinancialTypeAccount_next');
     $this->select('account_relationship', "value=select");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(1);
     $this->select('account_relationship', "label=Accounts Receivable Account is");
     $this->select('financial_account_id', "label=Accounts Receivable");

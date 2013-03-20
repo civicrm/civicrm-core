@@ -63,6 +63,9 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
 
     // Custom data
     $this->click('css=div.crm-custom-set-block-1 .collapsible-title');
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // NOTE: Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: opening an accordion is predictable
     sleep(1);
     $this->openInlineForm('custom-set-content-1');
     $dateFieldId = $this->getAttribute("xpath=//div[@id='constituent_information']/table/tbody/tr[3]/td[@class='html-adjust']/input@id");
@@ -140,7 +143,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
     $this->type('street_address-1', 'Test Org Street');
     $this->type('city-1', 'Test Org City');
     $this->click('_qf_Edit_next');
-    sleep(2);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('selected_shared_address-2');
     $this->waitForTextPresent('Test Org Street');
     $this->inlineEdit('address-block-2', array(

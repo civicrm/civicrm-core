@@ -315,7 +315,9 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("relationship_type_id");
     $this->select('relationship_type_id', "label={$params['label_a_b']}");
 
-    //wait untill new contact dialog select is built
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: wait until new contact dialog select is built
     sleep(2);
 
     // create a new organization

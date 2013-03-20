@@ -396,6 +396,9 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select('custom_pre_id', "label={$profileTitle}");
     $this->click('_qf_Custom_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->assertTrue($this->isTextPresent('You should move the membership related fields in the "On Behalf" profile for this Contribution Page'), "Form rule didn't showed up while incorrectly configuring membership fields profile for 'on behalf of' contribution page");
 
@@ -403,6 +406,9 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->select('custom_post_id', "label={$profileTitle}");
     $this->click('_qf_Custom_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->assertTrue($this->isTextPresent('You should move the membership related fields in the "On Behalf" profile for this Contribution Page'), "Form rule didn't showed up while incorrectly configuring membership fields profile for 'on behalf of' contribution page");
 
@@ -427,6 +433,9 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->check('is_organization');
     $this->click('_qf_Settings_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->assertTrue($this->isTextPresent("You should move the membership related fields configured in 'Includes Profile (top of page)' to the 'On Behalf' profile for this Contribution Page"), "Form rule 'You should move the membership related fields configured in 'Includes Profile (top of page)' to the 'On Behalf' profile for this Contribution Page' didn't showed up");
 
@@ -1207,6 +1216,9 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click("onbehalf_organization_name");
     $this->waitForElementPresent("css=div.ac_results-inner li");
     $this->click("css=div.ac_results-inner li");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     $this->click('onbehalf_member_campaign_id');
     $this->select('onbehalf_member_campaign_id', "label={$title}");

@@ -144,8 +144,8 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
       
-      //wait for the auto-complete member_of_contact to populate
-      sleep(2);
+      // wait for the auto-complete member_of_contact to populate
+      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -158,11 +158,10 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       $this->select("duration_unit", "label=year");
 
       //wait for the auto-complete member_of_contact to populate
-      sleep(2);
+      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
       // create contribution page with randomized title and default params
       $amountSection = FALSE;

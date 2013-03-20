@@ -155,6 +155,9 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_next-bottom');
 
     // sleep 5 to make sure jQuery is not hiding field after page load
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     $this->assertTrue($this->isElementPresent("visibility"), 'Visibility field not present when editing existing profile field.');
     $this->click("xpath=//tr[@id='profile_visibility']/td[1]/a");

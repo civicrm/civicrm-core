@@ -143,8 +143,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
     // Submit form.
     $this->click('_qf_Preview_next-bottom');
-
-    sleep(10);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Visit summary page.
     $this->waitForElementPresent("_qf_Summary_next");
@@ -233,7 +232,10 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     // Select contact subtype
     if (isset($other['contactSubtype'])) {
       if ($contactType != 'Individual') {
-        // wait for contact subtypes to repopulate.
+        // Because it tends to cause problems, all uses of sleep() must be justified in comments
+        // Sleep should never be used for wait for anything to load from the server
+        // FIXME: this is bad, using sleep to wait for AJAX
+        // Need to use a better way to wait for contact subtypes to repopulate
         sleep(5);
       }
       $this->waitForElementPresent("subType");
@@ -358,13 +360,12 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
     // Submit form.
     $this->click('_qf_Preview_next');
-    sleep(2);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check confirmation alert.
     $this->assertTrue((bool)preg_match("/^Are you sure you want to Import now[\s\S]$/", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
-
-    sleep(10);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Visit summary page.
     $this->waitForElementPresent("_qf_Summary_next");

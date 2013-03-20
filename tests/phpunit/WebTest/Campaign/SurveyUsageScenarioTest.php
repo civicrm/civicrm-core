@@ -551,6 +551,9 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("//table[@id='voterRecords']/tbody//tr[@id='row_{$id1}']/td[5]/input[6]/../label[text()='$label2']");
     $this->select("field_{$id1}_result", $optionLabel1);
     $this->click("interview_voter_button_{$id1}");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     // Survey Report
     $this->openCiviPage("report/survey/detail", "reset=1", '_qf_SurveyDetails_submit');

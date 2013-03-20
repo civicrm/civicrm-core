@@ -103,9 +103,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->click('_qf_Form_submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //to wait for thank you message to appear
-    sleep(5);
-    $this->assertTrue($this->isTextPresent($thankYouMsg));
+    $this->waitForTextPresent($thankYouMsg);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();

@@ -32,8 +32,8 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
-   *  Test Signature in TinyMC.
+  /**
+   * Test Signature in TinyMC.
    */
   function testTinyMCE() {
     $this->webtestLogin();
@@ -44,14 +44,12 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $name = $this->getText("xpath=//div[@class='crm-summary-display_name']");
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // Select Your Editor
     $this->_selectEditor('TinyMCE');
 
-    $this->openCiviPage("contact/add", "reset=1&action=update&cid={$contactId}");
+    $this->openCiviPage("contact/add", "reset=1&action=update&cid=$contactId");
 
     $this->click("//tr[@id='Email_Block_1']/td[1]/div[2]/div[1]");
     // HTML format message
@@ -72,10 +70,10 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->click("//a[@id='crm-contact-actions-link']/span");
     $this->click('link=Send an Email');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    sleep(10);
+    $this->waitForElementPresent('subject');
 
     $this->click('subject');
-    $subject = 'Subject_' . substr(sha1(rand()), 0, 7);
+    $subject = 'Subject_' . substr(sha1(rand()), 0, 8);
     $this->type('subject', $subject);
 
     // Is signature correct? in Editor
@@ -86,9 +84,12 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
     // Go for Activity Search
     $this->_checkActivity($subject, $signature);
+
+    // Set Editor back to default so we don't break other tests
+    $this->_selectEditor('CKEditor');
   }
 
-  /*
+  /**
    *  Test Signature in CKEditor.
    */
   function testCKEditor() {
@@ -109,7 +110,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("contact/add", "reset=1&action=update&cid={$contactId}");
     $this->click("//tr[@id='Email_Block_1']/td[1]/div[2]/div[1]");
-    
+
     // HTML format message
     $signature = 'Contact Signature in html';
     $this->fireEvent('email_1_signature_html', 'focus');
@@ -127,7 +128,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->click("//a[@id='crm-contact-actions-link']/span");
     $this->click('link=Send an Email');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    sleep(10);
+    $this->waitForElementPresent('subject');
 
     $this->click('subject');
     $subject = 'Subject_' . substr(sha1(rand()), 0, 7);
@@ -143,19 +144,22 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->_checkActivity($subject, $signature);
   }
 
-  /*
+  /**
    * Helper function to select Editor.
    */
   function _selectEditor($editor) {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
 
-    // Select your Editor
-    $this->click('editor_id');
-    $this->select('editor_id', "label=$editor");
-    $this->click('_qf_Display_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // Change editor if not already selected
+    if ($this->getSelectedLabel('editor_id') != $editor) {
+      $this->click('editor_id');
+      $this->select('editor_id', "label=$editor");
+      $this->click('_qf_Display_next-bottom');
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+    }
   }
-  /*
+
+  /**
    * Helper function for Check Signature in Editor.
    */
   function _checkSignature($fieldName, $signature, $editor) {
@@ -170,7 +174,8 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->verifyText('//html/body', preg_quote("{$signature}"));
     $this->selectFrame('relative=top');
   }
-  /*
+
+  /**
    * Helper function for Check Signature in Activity.
    */
   function _checkActivity($subject, $signature) {
@@ -188,7 +193,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_ActivityView_next-bottom');
 
     // Is signature correct? in Activity
-    $this->assertTrue($this->isTextPresent($signature));
+    $this->assertTextPresent($signature);
   }
 }
 

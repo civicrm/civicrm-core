@@ -49,6 +49,10 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     // Download file.
     // File will automatically download without confirmation.
     $this->click($selector);
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // FIXME: consider doing the following assertion in a while loop
+    // with a more reasonable sleep time of 2 seconds per loop iteration
     sleep(20);
 
     // File was downloaded?

@@ -212,6 +212,9 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     );
 
     $this->select('account_relationship', "label={$accountRelationship}");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(2);
     $this->select('financial_account_id', "label={$financialAccountTitle}");
     $this->click('_qf_FinancialTypeAccount_next');

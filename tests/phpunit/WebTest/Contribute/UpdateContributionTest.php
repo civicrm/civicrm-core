@@ -492,6 +492,9 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    }
    $this->click("_qf_ContributionView_cancel-top");
    $this->waitForPageToLoad($this->getTimeoutMsec());
+   // Because it tends to cause problems, all uses of sleep() must be justified in comments
+   // Sleep should never be used for wait for anything to load from the server
+   // Justification for this instance: FIXME
    sleep(4);
  }
 }

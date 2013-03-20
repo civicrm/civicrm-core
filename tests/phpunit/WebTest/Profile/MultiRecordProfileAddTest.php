@@ -226,6 +226,9 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->verifyElementNotPresent("//div[@id='crm-profile-block']/a/span");
 
     //Check for edit functionality
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='Edit']");
     $this->waitForElementPresent("//html/body/div[5]");
@@ -238,11 +241,17 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     // Check the delete functionality
     $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='Delete']");
     $this->waitForElementPresent("//html/body/div[5]");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->assertElementContainsText('profile-dialog', 'Are you sure you want to delete this record?');
     $this->click('_qf_Edit_upload_delete');
 
     // Check the view functionality
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='View']");
     $this->waitForElementPresent("//html/body/div[5]");

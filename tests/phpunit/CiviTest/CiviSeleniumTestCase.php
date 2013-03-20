@@ -539,6 +539,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * Returns a single argument from the url query
+   */
+   function urlArg($arg, $url = NULL) {
+     $elements = $this->parseURL($url);
+     return isset($elements['queryString'][$arg]) ? $elements['queryString'][$arg] : NULL;
+   }
+
+  /**
    * Define a payment processor for use by a webtest. Default is to create Dummy processor
    * which is useful for testing online public forms (online contribution pages and event registration)
    *
@@ -1056,11 +1064,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     // parse URL to grab the contribution page id
-    $elements = $this->parseURL();
-    $pageId = $elements['queryString']['id'];
-
     // pass $pageId back to any other tests that call this class
-    return $pageId;
+    return $this->urlArg('id');
   }
 
   /**
@@ -1299,9 +1304,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // click through to the Activity view screen
     $this->click("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
-    $elements = $this->parseURL();
-    $activityID = $elements['queryString']['id'];
-    return $activityID;
+    
+    // parse URL to grab the activity id
+    // pass id back to any other tests that call this class
+    return $this->urlArg('id');
   }
 
   static
@@ -1742,6 +1748,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     );
 
     $this->select('account_relationship', "label={$accountRelationship}");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(2);
     $this->select('financial_account_id', "label={$financialAccountTitle}");
     $this->click('_qf_FinancialTypeAccount_next');

@@ -158,9 +158,15 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
       $this->openCiviPage("admin/uf/group/field/add", "reset=1&action=add&gid=$profileId");
 
       $this->select("field_name[0]", "value={$values['type']}");
+      // Because it tends to cause problems, all uses of sleep() must be justified in comments
+      // Sleep should never be used for wait for anything to load from the server
+      // Justification for this instance: FIXME
       sleep(1);
       $this->select("field_name[1]", "value={$key}");
       if (isset($values['location'])) {
+        // Because it tends to cause problems, all uses of sleep() must be justified in comments
+        // Sleep should never be used for wait for anything to load from the server
+        // Justification for this instance: FIXME
         sleep(1);
         $this->select("field_name[2]", "value={$values['location']}");
       }

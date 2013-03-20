@@ -133,10 +133,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Select the contacts to be merged
     $this->select("name=option51_length", "value=100");
-    $this->waitForTextPresent("$firstName $lastName");
 
-    // sleep seems to work here, not sure why
-    sleep(3);
+    $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
     $this->click("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
 
@@ -566,11 +564,20 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
                                        ));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    sleep(5);
-
-    $unMergedContacts = $this->getXpathCount("//table[@class='pagerDisplay']/tbody/tr");
-    $mergedContacts = $totalContacts - $unMergedContacts;
+    $this->waitForElementPresent('civicrm-footer');
     $this->assertElementContainsText('crm-notification-container', "safe mode");
+
+    // If we are still on the dedupe table page, count unmerged contacts
+    if ($this->isElementPresent("//table[@class='pagerDisplay']")) {
+      // Wait for datatable to load
+      $this->waitForElementPresent("//table[@class='pagerDisplay']/tbody/tr");
+      $unMergedContacts = $this->getXpathCount("//table[@class='pagerDisplay']/tbody/tr");
+    }
+    else {
+      $unMergedContacts = 0;
+    }
+
+    $mergedContacts = $totalContacts - $unMergedContacts;
 
     //check the existence of merged contacts
     $contactEmails = array(
@@ -579,7 +586,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
       3 => "{$firstName3}.{$lastName3}@example.com"
     );
 
-    foreach( $contactEmails as $key => $value ) {
+    foreach($contactEmails as $key => $value) {
       $this->click('sort_name_navigation');
       $this->type('css=input#sort_name_navigation', $value);
       $this->typeKeys('css=input#sort_name_navigation', $value);
@@ -589,7 +596,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
       // Visit contact summary page.
       $this->click("css=div.ac_results-inner li");
       $this->waitForPageToLoad($this->getTimeoutMsec());
-      sleep(2);
+      $this->waitForElementPresent('civicrm-footer');
     }
   }
 

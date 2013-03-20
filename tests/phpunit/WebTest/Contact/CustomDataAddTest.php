@@ -237,19 +237,15 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
   function testCustomDataChangeLog(){
-     // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
     $this->webtestLogin();
 
     //enable logging
     $this->openCiviPage('admin/setting/misc', 'reset=1');
     $this->click("CIVICRM_QFID_1_logging");
     $this->click("_qf_Miscellaneous_next-top");
-    // adding sleep here since enabling logging takes lot of time
-    // increased the time since we now also add a lot of triggers and create tables
-    // the first time around
-    sleep(40);
+
+    // Increase timeout by quadruple since enabling logging takes a long time
+    $this->waitForPageToLoad($this->getTimeoutMsec() * 4);
     $this->waitForTextPresent("Changes Saved");
 
     // Create new Custom Field Set
@@ -341,8 +337,9 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/setting/misc', 'reset=1');
     $this->click("CIVICRM_QFID_0_logging");
     $this->click("_qf_Miscellaneous_next-top");
-    //adding sleep here since disabling logging takes lot of time
-    sleep(20);
+
+    // Increase timeout by triple since disabling logging takes a long time
+    $this->waitForPageToLoad($this->getTimeoutMsec() * 3);
     $this->waitForTextPresent("Changes Saved");
   }
 

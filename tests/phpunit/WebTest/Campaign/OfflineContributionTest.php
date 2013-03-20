@@ -151,6 +151,9 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
     if ($past) {
       $this->click("include-past-campaigns");
+      // Because it tends to cause problems, all uses of sleep() must be justified in comments
+      // Sleep should never be used for wait for anything to load from the server
+      // FIXME: Use a better method for waiting for this AJAX call - sleep is not going to work!
       sleep(2);
     }
 

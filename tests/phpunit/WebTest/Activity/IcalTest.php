@@ -62,6 +62,9 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
         $this->select("activity_type_id", "value=1");
 
         $this->click("token-input-assignee_contact_id");
+        // Because it tends to cause problems, all uses of sleep() must be justified in comments
+        // Sleep should never be used for wait for anything to load from the server
+        // Justification for this instance: tokeninput has a slight delay
         sleep(1);
         $this->type("token-input-assignee_contact_id", "$firstName1");
         $this->typeKeys("token-input-assignee_contact_id", "$firstName1");

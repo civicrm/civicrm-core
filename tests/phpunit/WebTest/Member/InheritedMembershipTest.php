@@ -240,6 +240,9 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
         $this->getConfirmation()
       ));
     $this->chooseOkOnNextConfirmation();
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(10);
 
     //verify inherited membership has been removed
@@ -257,7 +260,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
         $this->getConfirmation()
       ));
     $this->chooseOkOnNextConfirmation();
-    sleep(10);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //verify membership
     $this->click('css=li#tab_member a');

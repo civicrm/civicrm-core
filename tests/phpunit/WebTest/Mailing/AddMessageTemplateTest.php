@@ -138,6 +138,9 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
 
     $this->click("template");
     $this->select("template", "label=$msgTitle");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     $this->click("xpath=id('Upload')/div[2]/fieldset[@id='compose_id']/div[2]/div[1]");
     $this->click('subject');

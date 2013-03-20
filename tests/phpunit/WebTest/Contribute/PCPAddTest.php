@@ -129,7 +129,6 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
       $this->type("cms_pass", $pass);      
       $this->type("cms_confirm_pass", $pass);      
     }
-//    sleep(20);
     $this->click("_qf_PCPAccount_next-bottom");
 
     $this->waitForElementPresent("_qf_Campaign_upload-bottom");

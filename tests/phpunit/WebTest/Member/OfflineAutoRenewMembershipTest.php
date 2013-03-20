@@ -85,6 +85,9 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     // since country is not pre-selected for offline mode
     $this->select("billing_country_id-5", "label=United States");
     //wait for states to populate the select box
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(2);
     $this->click('billing_state_province_id-5');
     $this->webtestAddBillingDetails($firstName, NULL, $lastName);

@@ -86,11 +86,14 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
 
   function _testAssignBatch($numberOfTrxn) {
     $this->select( "xpath=//div[@id='crm-transaction-selector-assign_length']/label/select[@name='crm-transaction-selector-assign_length']", "value=$numberOfTrxn" );
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     $this->click('toggleSelect');
     $this->select('trans_assign', 'value=Assign');
     $this->click('Go');
-    sleep(5);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
   function _testExportBatch($setTitle, $batchId, $exportFormat) {
@@ -98,12 +101,12 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     if ($exportFormat == 'CSV') {
       $this->click("xpath=//form[@id='FinancialBatch']/div[2]/table[@class='form-layout']/tbody/tr/td/input[2]");
       $this->click('_qf_FinancialBatch_next-botttom');
-      sleep(5);
+      $this->waitForPageToLoad($this->getTimeoutMsec());
     }
     else {
       $this->click("xpath=//form[@id='FinancialBatch']/div[2]/table[@class='form-layout']/tbody/tr/td/input[1]");
       $this->click('_qf_FinancialBatch_next-botttom');
-      sleep(5);
+      $this->waitForPageToLoad($this->getTimeoutMsec());
     }
     $this->openCiviPage("dashboard", "reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
