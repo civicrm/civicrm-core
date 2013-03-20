@@ -111,8 +111,8 @@ cj("#mergeTagDialog").hide( );
 cj( function() {
     cj('.merge_tag').click(function(){
         var row_id = cj(this).closest('tr').attr('id');
-        var tagId = row_id.split('_');
-        mergeTag( tagId[2] );
+        var tagId = row_id.split('-');
+        mergeTag(tagId[1]);
     });
 });
 
@@ -168,7 +168,7 @@ function mergeTag( fromId ) {
 
                 /* send synchronous request so that disabling any actions for slow servers*/
         var postUrl = {/literal}"{crmURL p='civicrm/ajax/mergeTags' h=0 }"{literal};
-        var data    = '{fromId:'+ fromId + ',toId:'+ toId + ",key:{/literal}{crmKey name='civicrm/ajax/mergeTags'}{literal}}";
+        var data    = {fromId: fromId, toId: toId, key:{/literal}"{crmKey name='civicrm/ajax/mergeTags'}"{literal}};
                 cj.ajax({ type     : "POST",
             url      : postUrl,
             data     : data,
