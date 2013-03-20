@@ -38,6 +38,9 @@ function civicrm_api3_report_template_create($params) {
   $params['option_group_id'] = CRM_Core_DAO::getFieldValue(
     'CRM_Core_DAO_OptionGroup', 'report_template', 'id', 'name'
   );
+  if (!empty($params['component_id']) && !is_numeric($params['component_id'])) {
+    $params['component_id'] = array_search($params['component_id'], CRM_Core_PseudoConstant::component());
+  }
   return civicrm_api3_option_value_create($params);
 }
 
@@ -50,9 +53,11 @@ function civicrm_api3_report_template_create($params) {
 function _civicrm_api3_report_template_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';
   _civicrm_api3_option_value_create_spec($params);
-  $params['weight']['api.default'] = 'next';
   $params['value']['api.aliases'] = array('report_url');
   $params['name']['api.aliases'] = array('class_name');
+  $params['option_group_id']['api.default'] = CRM_Core_DAO::getFieldValue(
+    'CRM_Core_DAO_OptionGroup', 'report_template', 'id', 'name'
+  );
   // $params['component']['api.required'] = TRUE;
 }
 

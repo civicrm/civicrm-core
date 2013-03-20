@@ -54,7 +54,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'report_url' => 'example/path',
       'component' => 'CiviCase',
     ));
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $entityId = $result['id'];
     $this->assertTrue(is_numeric($entityId), 'In line ' . __LINE__);
@@ -71,7 +71,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'id' => $entityId,
       'component' => '',
     ));
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
@@ -86,7 +86,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'id' => $entityId,
       'is_active' => 0,
     ));
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
@@ -100,7 +100,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'id' => $entityId,
       'is_active' => 1,
     ));
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
@@ -112,7 +112,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
       'id' => $entityId,
     ));
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
