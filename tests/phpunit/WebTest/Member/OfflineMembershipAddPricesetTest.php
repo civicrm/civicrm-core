@@ -33,11 +33,6 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
   }
 
   function testAddPriceSet() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -84,11 +79,6 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
   }
 
    function testAddPriceSetWithMultipleTerms() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -137,6 +127,9 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $i = 2;
     foreach($options as $index => $values){
       $this->select("membership_type_id_{$index}", "value={$values['membership_type_id']}");
+      // Because it tends to cause problems, all uses of sleep() must be justified in comments
+      // Sleep should never be used for wait for anything to load from the server
+      // Justification for this instance: FIXME
       sleep(1);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input",$values['membership_num_terms']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input",$values['label']);
@@ -294,7 +287,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     }
 
     if (!$renew) {
-      // Go directly to the URL of the screen that you will be testing (Activity Tab).
+
       $this->click('css=li#tab_member a');
       $this->waitForElementPresent('link=Add Membership');
 
@@ -371,7 +364,6 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
 
-    // Go directly to the URL of the screen that you will be testing (Activity Tab).
     $this->click('css=li#tab_member a');
     $this->waitForElementPresent('link=Add Membership');
 

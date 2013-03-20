@@ -33,24 +33,9 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
   }
 
   function testAddTag() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Tag).
-    $this->open($this->sboxPath . "civicrm/admin/tag?action=add&reset=1");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Tag_next");
+    $this->openCiviPage("admin/tag", "action=add&reset=1", "_qf_Tag_next");
 
     // take a tag name
     $tagName = 'tag_' . substr(sha1(rand()), 0, 7);
@@ -86,11 +71,9 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
   }
 
   function testAddTagSet() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Tag).
-    $this->open($this->sboxPath . "civicrm/admin/tag?action=add&reset=1&tagset=1");
+    $this->openCiviPage("admin/tag", "action=add&reset=1&tagset=1");
 
     // take a tagset name
     $tagSetName = 'tagset_' . substr(sha1(rand()), 0, 7);

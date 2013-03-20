@@ -33,17 +33,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
@@ -80,7 +70,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
 
-    // add the required Drupal permission
+    // add the required permission
     $permissions = array(
       'edit-2-administer-civicampaign',
       'edit-1-make-online-contributions',
@@ -88,10 +78,10 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     );
     $this->changePermissions($permissions);
 
-    // Go directly to the URL of the screen that you will be testing
+    // Log in as normal user
+    $this->webtestLogin();
     $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
 
-    // Let's start filling the form with values.
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);
 
@@ -254,7 +244,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
 
     //logout
-    $this->openCiviPage("logout", "reset=1", NULL);
+    $this->webtestLogout();
 
     //Open Live Contribution Page
     $this->openCiviPage($registerUrl['url'], $registerUrl['args'], NULL);
@@ -297,7 +287,6 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //login to check contribution
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -324,8 +313,8 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->type('title', $contributionPageTitle);
     $this->click("_qf_SearchContribution_refresh");
     $this->waitForPageToLoad('50000');
-    $id          = $this->getAttribute("//div[@id='configure_contribution_page']//table/tbody/tr/td/strong[text()='$contributionPageTitle']/../../td[5]/div/span/ul/li/a[text()='Title and Settings']@href");
-    $id          = explode('id=', $id);
+    $id = $this->getAttribute("//div[@id='configure_contribution_page']//table/tbody/tr/td/strong[text()='$contributionPageTitle']/../../td[5]/div/span/ul/li/a[text()='Title and Settings']@href");
+    $id = explode('id=', $id);
     $registerUrl = array('url' => 'contribute/transact', 'args' => "reset=1&id=$id[1]");
     return $registerUrl;
   }

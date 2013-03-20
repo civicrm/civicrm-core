@@ -33,7 +33,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
   }
 
   function testOfflineMembershipRenew() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -66,7 +65,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('join_date', '-2 year');
 
     // Let Start Date and End Date be auto computed
-    // added sleep to make sure jscript onchange for total_amount has a chance to fire
+
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: make sure onchange for total_amount has a chance to fire
     sleep(2);
 
     // Clicking save.
@@ -120,7 +122,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
    }
 
   function testOfflineMemberRenewOverride() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // add membership type
@@ -229,7 +230,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
   }
 
   function testOfflineMembershipRenewChangeType() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -262,7 +262,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('join_date', '-2 year');
 
     // Let Start Date and End Date be auto computed
-    // added sleep to make sure jscript onchange for total_amount has a chance to fire
+
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: make sure onchange for total_amount has a chance to fire
     sleep(2);
 
     // Clicking save.
@@ -291,6 +294,9 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->select('membership_type_id[1]', "label={$newMembershipType['membership_type']}");
 
     $this->click('membership_type_id[0]');
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: wait for onchange handler
     sleep(2);
 
     // save the renewed membership
@@ -326,7 +332,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
   }
 
   function testOfflineMembershipRenewMultipleTerms() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -369,7 +374,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->type('check_number', '1023');
     $this->select('contribution_status_id', "label=Completed");
     $this->click('send_receipt');
-    // added sleep to make sure jscript onchange for total_amount has a chance to fire
+
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: make sure onchange for total_amount has a chance to fire
     sleep(2);
 
     // Clicking save.
@@ -400,7 +408,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('num_terms');
     $this->type('num_terms', '');
     $this->type('num_terms', '2');
-    // added sleep to make sure jscript onchange for total_amount has a chance to fire
+
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: make sure onchange for total_amount has a chance to fire
     sleep(2);
     $this->click('total_amount');
     $this->verifyValue('total_amount', "200.00");

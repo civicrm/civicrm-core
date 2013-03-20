@@ -33,25 +33,14 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
   }
 
   function testAddReport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // create contact
-    $firstName   = 'reportuser_' . substr(sha1(rand()), 0, 7);
+    $firstName = 'reportuser_' . substr(sha1(rand()), 0, 7);
     $displayName = "Anderson, $firstName";
-    $emailId     = "$firstName.anderson@example.org";
+    $emailId = "$firstName.anderson@example.org";
     $this->webtestAddContact($firstName, "Anderson", $emailId);
 
-    // Go directly to the URL of the screen that you will be testing (New Tag).
     $this->openCiviPage('report/contact/summary', 'reset=1', '_qf_Summary_submit' );
 
     // enable email field
@@ -94,10 +83,10 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->click("css=div.crm-report_setting-accordion div.crm-accordion-header");
     $this->waitForElementPresent("title");
 
-    $reportName        = 'ContactSummary_' . substr(sha1(rand()), 0, 7);
+    $reportName = 'ContactSummary_' . substr(sha1(rand()), 0, 7);
     $reportDescription = "New Contact Summary Report";
-    $emaiSubject       = "Contact Summary Report";
-    $emailCC           = "tesmail@example.org";
+    $emaiSubject = "Contact Summary Report";
+    $emailCC = "tesmail@example.org";
 
     // Fill Report Title
     $this->type("title", $reportName);

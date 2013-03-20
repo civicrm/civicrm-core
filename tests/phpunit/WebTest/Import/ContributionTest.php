@@ -33,7 +33,6 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
   }
 
   function testContributionImportIndividual() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 
@@ -50,7 +49,6 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
   }
 
   function testContributionImportOrganization() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 
@@ -65,7 +63,6 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
   }
 
   function testContributionImportHousehold() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 

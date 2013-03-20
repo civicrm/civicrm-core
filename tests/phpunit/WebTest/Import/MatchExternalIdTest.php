@@ -36,11 +36,6 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
      *  Test participant import for Individuals matching on external identifier.
      */
   function testContributionImport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     $this->webtestLogin();
 
     // Get sample import data.
@@ -54,11 +49,6 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
      *  Test membership import for Individuals matching on external identifier.
      */
   function testMemberImportIndividual() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     $this->webtestLogin();
 
     // Get membership import data for Individuals.
@@ -72,11 +62,6 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
      *  Test participant import for Individuals matching on external identifier.
      */
   function testParticipantImportIndividual() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -296,7 +281,6 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
 
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
-    // Let's start filling the form with values.
     $this->select("event_type_id", "value={$params['event_type_id']}");
 
     // Attendee role s/b selected now.

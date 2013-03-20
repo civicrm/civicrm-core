@@ -34,7 +34,6 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
   function testRelationshipTypeAdd() {
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -80,7 +79,6 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
   function testRelationshipTypeAddValidateFormRules() {
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

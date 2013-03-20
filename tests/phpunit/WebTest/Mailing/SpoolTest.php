@@ -37,7 +37,6 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
 
   function testSpooledMailing() {
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Start spooling mail

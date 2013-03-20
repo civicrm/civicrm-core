@@ -37,11 +37,6 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
   }
 
   function testBatchUpdateWithContactSubtypes() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -101,6 +96,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent('_qf_Batch_next');
     $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[2]/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     //$this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_Batch_next');
@@ -131,11 +129,6 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
   }
 
   function testBatchUpdate() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -193,6 +186,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     // if other check Profile Field check box are affected
 
     $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[2]/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     if ($this->isChecked("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[3]/input[2]") &&
       !$this->isChecked("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[3]/input[4]") &&
@@ -213,6 +209,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->assertTrue($assertCheck, 'copy rows for field one failed');
 
     $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[3]/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     if ($this->isChecked("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[3]/input[2]") &&
       !$this->isChecked("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[3]/input[4]") &&
@@ -237,6 +236,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->webtestFillDateTime($dateElementIdFirstRow, "+1 week");
     $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[4]/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
 
     if ($this->getValue("{$dateElementIdFirstRow}_time") == $this->getValue("{$dateElementIdSecondRow}_time") && $this->getValue("{$dateElementIdFirstRow}_display") == $this->getValue("{$dateElementIdSecondRow}_display")) {
@@ -251,6 +253,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->fillRichTextField($richTextAreaIdOne, 'This is Test Introductory Message', 'CKEditor');
     $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[5]/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
 
     if ($this->getValue($richTextAreaIdOne) == $this->getValue($richTextAreaIdTwo)) {
@@ -268,6 +273,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     // if other radio Profile Field radio buttons are affected
 
     $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[6]/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     if ($this->isChecked("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[7]/input") &&
       !$this->isChecked("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[7]/input[2]") &&
@@ -288,6 +296,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->assertTrue($assertCheck, 'copy rows for field one failed[radio button]');
 
     $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[7]/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     if ($this->isChecked("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[7]/input") &&
       !$this->isChecked("xpath=//form[@id='Batch']/div[2]/table/tbody/tr/td[7]/input[2]") &&
@@ -343,6 +354,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->selectFrame('relative=top');
 
     $this->click("xpath=//table[@class='crm-copy-fields']/thead/tr/td[5]/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
 
     if ($this->getValue($richTextAreaIdOne) == $this->getValue($richTextAreaIdTwo)) {
@@ -404,6 +418,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     // if other check Profile Field check box are affected
 
     $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[3]/div/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     if ($this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[2]") &&
       !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[4]") &&
@@ -424,6 +441,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->assertTrue($assertCheck, 'copy rows for field one failed for inteview (campaign)');
 
     $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[4]/div/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     if ($this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[2]") &&
       !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[4]/input[4]") &&
@@ -448,6 +468,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->webtestFillDateTime($dateElementIdFirstRow, "+1 week");
     $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[5]/div/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
 
     if ($this->getValue("{$dateElementIdFirstRow}_time") == $this->getValue("{$dateElementIdSecondRow}_time") && $this->getValue("{$dateElementIdFirstRow}_display") == $this->getValue("{$dateElementIdSecondRow}_display")) {
@@ -459,6 +482,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     $this->type("xpath=//table[@id='voterRecords']/tbody/tr/td[@class='note']/input", 'This is Test Introductory Message');
     $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[8]/div/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
 
     if ($this->getValue("xpath=//table[@id='voterRecords']/tbody/tr/td[@class='note']/input") == $this->getValue("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[@class='note']/input")) {
@@ -475,6 +501,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     // if other radio Profile Field radio buttons are affected
 
     $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[6]/div/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     if ($this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input") &&
       !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input[2]") &&
@@ -495,6 +524,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->assertTrue($assertCheck, 'copy rows for field one failed for inteview (campaign)[radio button]');
 
     $this->click("xpath=//table[@id='voterRecords']/thead/tr/th[7]/div/img");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     if ($this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input") &&
       !$this->isChecked("xpath=//table[@id='voterRecords']/tbody/tr/td[7]/input[2]") &&
@@ -522,7 +554,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
   }
 
   function _addProfile($profileTitle, $customDataArr, $profileFor) {
-    // Go directly to the URL of the screen that you will be testing (New Profile).
+
     $this->openCiviPage('admin/uf/group', 'reset=1');
 
     $this->click('link=Add Profile');
@@ -551,7 +583,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
   function _addCustomData($profileFor) {
     $returnArray = array();
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
+
     $this->openCiviPage('admin/custom/group', 'reset=1');
 
     //add new custom data

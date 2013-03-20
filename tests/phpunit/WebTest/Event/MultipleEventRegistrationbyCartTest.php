@@ -32,18 +32,12 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     parent::setUp();
   }
   
-  function testAuthenticatedMultipleEvent(){
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-    
+  function testAuthenticatedMultipleEvent(){    
     // Log in using webtestLogin() method
     $this->webtestLogin();
     
     //Enable shopping cart style
-    $this->open($this->sboxPath . "civicrm/admin/setting/preferences/event?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/setting/preferences/event", "reset=1");
     $this->check("enable_cart");
     $this->click("_qf_Event_next-top");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -53,8 +47,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->webtestAddPaymentProcessor($processorName);
     
     //event 1
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle1 = 'My Conference1 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription1 = "Here is a description for this conference 1.";
@@ -74,8 +68,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->_AddEventToCart($eventTitle1, $eventInfoStrings1);
     
     //event 2
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle2 = 'My Conference2 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription2 = "Here is a description for this conference 2.";
@@ -95,8 +89,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->_AddEventToCart($eventTitle2, $eventInfoStrings2);
     
     //event 3
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle3 = 'My Conference3 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription3 = "Here is a description for this conference 3.";
@@ -131,7 +125,6 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
       // This is the path where our testing install resides.
     // The rest of URL is defined in CiviSeleniumTestCase base class, in
     // class attributes.
-    $this->open($this->sboxPath);
     
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -141,8 +134,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->webtestAddPaymentProcessor($processorName);
     
     //event 1
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle1 = 'My Conference1 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription1 = "Here is a description for this conference 1.";
@@ -162,8 +155,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $registerUrl1 = $this->_testVerifyEventInfo($eventTitle1, $eventInfoStrings1);
 
     //event 2
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle2 = 'My Conference2 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription2 = "Here is a description for this conference 2.";
@@ -183,8 +176,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $registerUrl2 = $this->_testVerifyEventInfo($eventTitle2, $eventInfoStrings2);
 
     //event 3
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+
+    $this->openCiviPage("event/add", "reset=1&action=add");
     
     $eventTitle3 = 'My Conference3 - ' . substr(sha1(rand()), 0, 7);
     $eventDescription3 = "Here is a description for this conference 3.";
@@ -204,8 +197,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $registerUrl3 = $this->_testVerifyEventInfo($eventTitle3, $eventInfoStrings3);
 
     //Enable shopping cart style
-    $this->open($this->sboxPath . "civicrm/admin/setting/preferences/event?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/setting/preferences/event", "reset=1");
     $this->check("enable_cart");
     $this->click("_qf_Event_next-top");
 
@@ -219,8 +211,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath."civicrm/dashboard");    
-    
+    $this->openCiviPage("dashboard", "reset=1");
+
     //three event names
     $events = array( 1 => $eventTitle1,
                      2 => $eventTitle2,
@@ -231,11 +223,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
   }
   
   function _testAddEventInfo($eventTitle, $eventDescription) {
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
-    // Let's start filling the form with values.
     $this->select("event_type_id", "value=1");
 
     // Attendee role s/b selected now.
@@ -343,7 +332,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
   function _AddEventToCart($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage("event/manage", "reset=1");
     $this->click("link=$eventTitle");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     
@@ -357,7 +346,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage("event/manage", "reset=1");
     $this->click("link=$eventTitle");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     
@@ -370,19 +359,18 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     }
     return $this->getLocation();
   }
-  
+
   function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
-      $this->open($this->sboxPath . "civicrm/logout?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->webtestLogout();
     }
     $this->open($registerUrl);
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("link=Add to Cart");
     $this->click("link=Add to Cart");
-    $this->waitForPageToLoad($this->getTimeoutMsec());  
+    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
-  
+
   function _testCheckOut(){
     //View the Cart
     $this->click("xpath=//div[@id='messages']/div/div/a[text()='View your cart.']");
@@ -419,7 +407,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForPageToLoad($this->getTimeoutMsec());
     
     $this->assertTrue($this->isTextPresent("This is your receipt of payment made for the following event registration."));
-    return array($firstName,$lastName);
+    return array($firstName, $lastName);
   }
 
   function _checkContributionsandEventRegistration($firstName,$lastName,$events){
@@ -468,8 +456,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     }
     
     //Disable shopping cart style
-    $this->open($this->sboxPath . "civicrm/admin/setting/preferences/event?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/setting/preferences/event", "reset=1");
     $this->click("enable_cart");
     $this->click("_qf_Event_next-top");
   }

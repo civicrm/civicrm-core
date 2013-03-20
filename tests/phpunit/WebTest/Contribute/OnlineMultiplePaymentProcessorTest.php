@@ -32,7 +32,6 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
   }
 
   function testOnlineMultpiplePaymentProcessor() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -64,8 +63,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
       $allowOtherAmmount = TRUE
     );
 
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&action=preview&id=$pageId");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
     $this->assertTrue($this->isTextPresent($donationPageTitle));
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
@@ -116,12 +114,10 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->waitForPageToLoad($this->getTimeoutMsec());
     
     //login to check contribution
-    $this->open($this->sboxPath);
     
   }
 
   function testOnlineMultiplePaymentProcessorWithPayLater() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -155,10 +151,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
       $allowOtherAmmount = TRUE
     );
 
-
-
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&action=preview&id=$pageId");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
     $this->assertTrue($this->isTextPresent($donationPageTitle));
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
@@ -197,9 +190,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->assertTrue($this->isTextPresent($payLaterInstructionsText));
 
     //login to check contribution
-    $this->open($this->sboxPath . 'civicrm/contribute/search?reset=1');
-
-    $this->waitForElementPresent('contribution_date_low');
+    $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
     $this->type('sort_name', "$firstName $lastName");
     $this->check('contribution_test');

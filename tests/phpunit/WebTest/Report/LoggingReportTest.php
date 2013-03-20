@@ -54,6 +54,9 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     //add contact to group
     $this->waitForElementPresent("xpath=//li[@id='tab_group']/a");
     $this->click("xpath=//li[@id='tab_group']/a");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->select("group_id", "label=Case Resources");
     $this->click("_qf_GroupContact_next");
@@ -72,6 +75,9 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     //tag addition
     $this->waitForElementPresent("xpath=//li[@id='tab_tag']/a");
     $this->click("xpath=//li[@id='tab_tag']/a");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->click("xpath=//div[@id='tagtree']/ul//li/label[text()='Company']/../input");
     $this->waitForTextPresent("Saved");
@@ -83,6 +89,9 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     //add new note
     $this->waitForElementPresent("xpath=//li[@id='tab_note']/a");
     $this->click("xpath=//li[@id='tab_note']/a");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->click("xpath=//div[@id='Notes']//div[@class='action-link']/a");
 
@@ -112,6 +121,9 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     //add new relationship , disable it , delete it
     $this->waitForElementPresent("xpath=//li[@id='tab_rel']/a");
     $this->click("xpath=//li[@id='tab_rel']/a");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->click("xpath=//div[@id='Relationships']//div[@class='action-link']/a");
     $this->waitForElementPresent("_qf_Relationship_refresh");

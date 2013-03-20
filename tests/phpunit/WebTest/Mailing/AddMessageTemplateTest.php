@@ -35,7 +35,6 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
   function testTemplateAdd($useTokens = FALSE, $msgTitle = NULL) {
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (Add Message Template).
     $this->openCiviPage("admin/messageTemplates/add", "action=add&reset=1");
 
     // Fill message title.
@@ -113,14 +112,8 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
 
     // configure default mail-box
-    $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
-    $this->type('name', 'Test Domain');
-    $this->type('domain', 'example.com');
-    $this->select('protocol', 'value=1');
-    $this->click('_qf_MailSettings_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->setupDefaultMailbox();
 
-    // Go directly to Schedule and Send Mailing form
     $this->openCiviPage("mailing/send", "reset=1", "_qf_Group_cancel");
 
     // fill mailing name
@@ -145,6 +138,9 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
 
     $this->click("template");
     $this->select("template", "label=$msgTitle");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     $this->click("xpath=id('Upload')/div[2]/fieldset[@id='compose_id']/div[2]/div[1]");
     $this->click('subject');

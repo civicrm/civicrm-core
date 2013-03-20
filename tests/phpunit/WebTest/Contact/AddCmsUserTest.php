@@ -33,13 +33,10 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
   }
 
   function testAuthenticAddUser() {
-    $this->open($this->sboxPath);
 
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
-    // Go directly to the URL of the screen that will Create User Authentically.
     $this->open($this->sboxPath . "admin/people/create");
-
 
     $this->waitForElementPresent("edit-submit");
 
@@ -71,7 +68,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
   function testAnonymousAddUser() {
     // Make sure Drupal account settings allow visitors to register for account w/o admin approval
     // login as admin
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
     $this->open($this->sboxPath . "admin/config/people/accounts");
     $this->waitForElementPresent("edit-submit");
 
@@ -80,9 +77,8 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->click('edit-submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     // logout
-    $this->openCiviPage('logout', 'reset=1', NULL);
+    $this->webtestLogout();
 
-    // Go directly to the URL of the screen that will Create User Anonymously.
     $this->open($this->sboxPath . "user/register");
 
     $this->waitForElementPresent("edit-submit");
@@ -108,7 +104,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // In case the site is set up to login immediately upon registration
-    $this->open($this->sboxPath . "user/logout");
+    $this->webtestLogout();
 
     $this->webtestLogin();
 

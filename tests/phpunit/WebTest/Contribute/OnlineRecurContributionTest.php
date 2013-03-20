@@ -36,27 +36,26 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     require_once 'ContributionPageAddTest.php';
 
     // a random 7-char string and an even number to make this pass unique
-    $hash          = substr(sha1(rand()), 0, 7);
-    $rand          = $contributionAmount = 2 * rand(2, 50);
-    $pageTitle     = 'Donate Online Recurring ' . $hash;
+    $hash = substr(sha1(rand()), 0, 7);
+    $rand = $contributionAmount = 2 * rand(2, 50);
+    $pageTitle = 'Donate Online Recurring ' . $hash;
     $processorType = 'AuthNet';
     $processorName = "Webtest AuthNet " . substr(sha1(rand()), 0, 7);
     $amountSection = TRUE;
-    $payLater      = FALSE;
-    $onBehalf      = FALSE;
-    $pledges       = FALSE;
-    $recurring     = TRUE;
-    $memberships   = FALSE;
+    $payLater = FALSE;
+    $onBehalf = FALSE;
+    $pledges = FALSE;
+    $recurring = TRUE;
+    $memberships = FALSE;
     $memPriceSetId = NULL;
-    $friend        = TRUE;
-    $profilePreId  = NULL;
+    $friend = TRUE;
+    $profilePreId = NULL;
     $profilePostId = NULL;
-    $premiums      = FALSE;
-    $widget        = FALSE;
-    $pcp           = FALSE;
+    $premiums = FALSE;
+    $widget = FALSE;
+    $pcp = FALSE;
 
     // open browser, login
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // create a new online contribution page with recurring enabled (using a newly created AuthNet processor)
@@ -81,20 +80,17 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     );
 
     //now do the test online recurring contribution as an anonymous user.
-    $anonymous   = TRUE;
-    $firstName   = 'Jane' . substr(sha1(rand()), 0, 7);
-    $middleName  = 'Middle';
-    $lastName    = 'Recuron_' . substr(sha1(rand()), 0, 7);
-    $email       = $firstName . '@example.com';
+    $anonymous = TRUE;
+    $firstName = 'Jane' . substr(sha1(rand()), 0, 7);
+    $middleName = 'Middle';
+    $lastName = 'Recuron_' . substr(sha1(rand()), 0, 7);
+    $email = $firstName . '@example.com';
     $contactName = "$firstName $lastName";
 
     // logout
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    // Wait for Login button to indicate we've logged out.
-    $this->waitForElementPresent("edit-submit");
+    $this->webtestLogout();
 
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&action=preview&id=" . $pageId);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", "_qf_Main_upload-bottom");
 
     // helper AddContributionPage sets Minimum Other Amout = $rand / 2 so must contribute more than that
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
@@ -127,10 +123,8 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     $this->assertTrue($this->isTextPresent($contributionAmount), 'Missing contribution amount (thank-you): ' . $contributionAmount);
 
     // Log back in and verify that test contribution has been recorded
-    $this->open($this->sboxPath);
     $this->webtestLogin();
-    $this->open($this->sboxPath . "civicrm/contribute/search?reset=1");
-    $this->waitForElementPresent("contribution_currency_type");
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_currency_type");
 
     $this->type("sort_name", "{$lastName}, {$firstName}");
     $this->click("contribution_test");
@@ -143,7 +137,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     // View Recurring Contribution Record
     $verifyData = array(
       'From' => "$contactName",
-                          'Financial Type'        => 'Donation (test)',
+                          'Financial Type' => 'Donation (test)',
       'Total Amount' => 'Installments: 12, Interval: 1 month(s)',
       'Contribution Status' => 'Pending : Incomplete Transaction',
       'Paid By' => 'Credit Card',

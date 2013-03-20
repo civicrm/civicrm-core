@@ -33,10 +33,9 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
   }
 
   function testAssignUsersToRoles() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
-    // Go directly to the URL of the screen that will create new group.
+
     $this->openCiviPage("group/add", "reset=1");
     $groupTitle = "testGroup" . substr(sha1(rand()), 0, 4);
     $this->type("title", $groupTitle);
@@ -46,7 +45,6 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
 
     $this->assertElementContainsText('crm-notification-container', "The Group '{$groupTitle}' has been saved.");
 
-    // Go directly to the URL that will create a new ACL role
     $this->openCiviPage("admin/options/acl_role", "group=acl_role&action=add&reset=1", "_qf_Options_cancel-bottom");
 
     $label = "TestAclRole" . substr(sha1(rand()), 0, 4);
@@ -55,8 +53,6 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('crm-notification-container', "The Acl Role '{$label}' has been saved");
 
-
-    // Go directly to the URL of the screen that will assign users to role.
     $this->openCiviPage("acl/entityrole", "action=add&reset=1");
 
     $this->select("acl_role_id", "label=" . $label);
@@ -65,8 +61,6 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->click("_qf_EntityRole_next-botttom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-
-    // Go directly to the URL of the screen that will manage ACLs
     $this->openCiviPage("acl", "action=add&reset=1");
     $this->click("group_id");
     $this->select("group_id", "label={$groupTitle}");

@@ -33,16 +33,6 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
   }
 
   function testStandaloneContributeAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Create a contact to be used as soft creditor
@@ -79,14 +69,8 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    // Go directly to the URL of the screen that you will be testing (New Contribution-standalone).
-    $this->open($this->sboxPath . "civicrm/contribute/add?reset=1&context=standalone");
+    $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Contribution_upload");
-
-    // Let's start filling the form with values.
 
     // create new contact using dialog
     $firstName = substr(sha1(rand()), 0, 7);

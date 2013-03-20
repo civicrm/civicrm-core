@@ -34,7 +34,7 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
 
   function testContactContextAddTest() {
     // Log in as admin first to verify permissions for CiviGrant
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviGrant module if necessary
     $this->enableComponents("CiviGrant");
@@ -43,10 +43,13 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     $permission = array('edit-2-access-civigrant', 'edit-2-edit-grants', 'edit-2-delete-in-civigrant');
     $this->changePermissions($permission);
 
+    // Log in as normal user
+    $this->webtestLogin();
+
     // create unique name
-    $name      = substr(sha1(rand()), 0, 7);
+    $name = substr(sha1(rand()), 0, 7);
     $firstName = 'Grant' . $name;
-    $lastName  = 'L' . $name;
+    $lastName = 'L' . $name;
 
     // create new contact
     $this->webtestAddContact($firstName, $lastName);
@@ -68,7 +71,6 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     // check contact name on Grant form
     $this->assertElementContainsText('page-title', "$firstName $lastName");
 
-    // Let's start filling the form with values.
 
     // select grant Status
     $this->select('status_id', 'value=1');

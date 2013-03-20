@@ -38,7 +38,6 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
 
   function testCreateCampaign() {
 
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 
@@ -52,7 +51,6 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     //Creating a new Campaign
     $this->openCivipage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
-    // Let's start filling the form with values.
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);
 

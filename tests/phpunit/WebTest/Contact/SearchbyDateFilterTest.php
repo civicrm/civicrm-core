@@ -36,16 +36,6 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
    * Function to test individual pane seperatly.
    */
   function testAdvancedSearch() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Get all default advance search panes.
@@ -54,8 +44,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     // Test Individual panes.
     foreach (array_keys($allpanes) as $pane) {
       // Go to the Advance Search
-      $this->open($this->sboxPath . 'civicrm/contact/search/advanced?reset=1');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("contact/search/advanced", "reset=1");
 
       // Select some fields from pane.
       $this->_selectPaneFields($pane);
@@ -70,19 +59,9 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
   }
 
   function testIndividualSearchPage(){
-     // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . 'civicrm/contribute/search?reset=1');
+    $this->openCiviPage("contribute/search", "reset=1");
     $this->select("contribution_date_relative","value=previous_before.quarter");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
@@ -95,7 +74,8 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     $this->select("contribution_date_relative","value=ending.year"); 
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->open($this->sboxPath . 'civicrm/member/search?reset=1');
+
+    $this->openCiviPage("member/search", "reset=1");
     $this->select("member_end_date_relative","value=previous_before.month");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
@@ -108,7 +88,8 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     $this->select("member_end_date_relative","value=ending.month");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->open($this->sboxPath . 'civicrm/event/search?reset=1');
+
+    $this->openCiviPage("event/search", "reset=1");
     $this->select("event_relative","value=previous_before.week");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
@@ -121,7 +102,8 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     $this->select("event_relative","value=ending.week");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->open($this->sboxPath . 'civicrm/activity/search?reset=1');
+
+    $this->openCiviPage("activity/search", "reset=1");
     $this->select("activity_date_relative","value=previous_before.day");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
@@ -134,7 +116,8 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     $this->select("activity_date_relative","value=ending.quarter");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->open($this->sboxPath . 'civicrm/pledge/search?reset=1');
+
+    $this->openCiviPage("pledge/search", "reset=1");
     $this->select("pledge_payment_date_relative","value=greater.week");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
@@ -150,7 +133,8 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     $this->select("pledge_payment_date_relative","value=greater.month");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->open($this->sboxPath . 'civicrm/mailing?reset=1');
+
+    $this->openCiviPage("mailing", "reset=1");
     $this->select("mailing_relative","value=previous_before.year");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());

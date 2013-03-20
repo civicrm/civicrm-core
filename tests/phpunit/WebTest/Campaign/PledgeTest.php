@@ -33,13 +33,8 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in as admin first to verify permissions for CiviGrant
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviCampaign module and CiviPledge module if necessary
     $this->enableComponents(array("CiviCampaign", "CiviPledge"));
@@ -51,11 +46,7 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     );
     $this->changePermissions($permissions);
 
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
     // Log in as demo user
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Create new group
@@ -90,14 +81,8 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing
-    $this->open($this->sboxPath . "civicrm/campaign/add?reset=1");
+    $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
 
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Campaign_upload-bottom");
-
-    // Let's start filling the form with values.
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);
 
@@ -133,9 +118,9 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
 
   function pledgeAddTest($campaignTitle, $id) {
     // create unique name
-    $name      = substr(sha1(rand()), 0, 7);
+    $name = substr(sha1(rand()), 0, 7);
     $firstName = 'Adam' . $name;
-    $lastName  = 'Jones' . $name;
+    $lastName = 'Jones' . $name;
 
     // create new contact
     $this->webtestAddContact($firstName, $lastName, $firstName . "@example.com");
@@ -157,7 +142,6 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     // check contact name on pledge form
     $this->assertTrue($this->isTextPresent("$firstName $lastName"));
 
-    // Let's start filling the form with values.
     $this->type("amount", "100");
     $this->type("installments", "10");
     $this->select("frequency_unit", "value=week");

@@ -51,7 +51,7 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
     }
 
     if (!CRM_Utils_System::isDBVersionValid($errorMessage)) {
-      CRM_Core_Session::setStatus($errorMessage, ts('Warning'), "alert");
+      CRM_Core_Session::setStatus($errorMessage, ts('Warning'), "alert", array('expires' => 0));
     }
 
     $groups = array('Customize Data and Screens' => ts('Customize Data and Screens'),

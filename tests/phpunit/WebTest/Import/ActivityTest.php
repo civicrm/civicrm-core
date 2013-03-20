@@ -33,7 +33,6 @@ class WebTest_Import_ActivityTest extends ImportCiviSeleniumTestCase {
   }
 
   function testActivityImport() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 

@@ -47,7 +47,8 @@ require_once CIVICRM_SETTINGS_PATH;
  */
 class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
-  //    protected $coverageScriptUrl = 'http://tests.dev.civicrm.org/drupal/phpunit_coverage.php';
+  // Current logged-in user
+  protected $loggedInAs = NULL;
 
   /**
    *  Constructor
@@ -65,6 +66,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    */
   function __construct($name = NULL, array$data = array(), $dataName = '', array$browser = array()) {
     parent::__construct($name, $data, $dataName, $browser);
+    $this->loggedInAs = NULL;
 
     require_once 'CiviSeleniumSettings.php';
     $this->settings = new CiviSeleniumSettings();
@@ -74,6 +76,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     CRM_Core_ClassLoader::singleton()->register();
 
     // also initialize a connection to the db
+    // FIXME: not necessary for most tests, consider moving into functions that need this
     $config = CRM_Core_Config::singleton();
   }
 
@@ -85,23 +88,44 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   protected function tearDown() {
-    //        $this->open( $this->settings->sandboxPATH . "logout?reset=1");
   }
 
   /**
    * Authenticate as drupal user
-   * @param $admin: (bool) use admin user/pass instead of normal user
+   * @param $user: (str) the key 'user' or 'admin', or a literal username
+   * @param $pass: (str) if $user is a literal username and not 'user' or 'admin', supply the password
    */
-  function webtestLogin($admin = FALSE) {
+  function webtestLogin($user = 'user', $pass = NULL) {
+    // If already logged in as correct user, do nothing
+    if ($this->loggedInAs === $user) {
+      return;
+    }
+    // If we are logged in as a different user, log out first
+    if ($this->loggedInAs) {
+      $this->webtestLogout();
+    }
     $this->open("{$this->sboxPath}user");
-    $password = $admin ? $this->settings->adminPassword : $this->settings->password;
-    $username = $admin ? $this->settings->adminUsername : $this->settings->username;
+    // Lookup username & password if not supplied
+    $username = $user;
+    if ($pass === NULL) {
+      $pass = $user == 'admin' ? $this->settings->adminPassword : $this->settings->password;
+      $username = $user == 'admin' ? $this->settings->adminUsername : $this->settings->username;
+    }
     // Make sure login form is available
     $this->waitForElementPresent('edit-submit');
     $this->type('edit-name', $username);
-    $this->type('edit-pass', $password);
+    $this->type('edit-pass', $pass);
     $this->click('edit-submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->loggedInAs = $user;
+  }
+
+  function webtestLogout() {
+    if ($this->loggedInAs) {
+      $this->open($this->sboxPath . "user/logout");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+    }
+    $this->loggedInAs = NULL;
   }
 
   /**
@@ -131,7 +155,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       }
     }
     $this->open("{$this->sboxPath}civicrm/$url");
-    $this->waitForPageToLoad();
+    $this->waitForPageToLoad($this->getTimeoutMsec());
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
     }
@@ -515,6 +539,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * Returns a single argument from the url query
+   */
+   function urlArg($arg, $url = NULL) {
+     $elements = $this->parseURL($url);
+     return isset($elements['queryString'][$arg]) ? $elements['queryString'][$arg] : NULL;
+   }
+
+  /**
    * Define a payment processor for use by a webtest. Default is to create Dummy processor
    * which is useful for testing online public forms (online contribution pages and event registration)
    *
@@ -770,7 +802,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     // go to the New Contribution Page page
     $this->open($this->sboxPath . 'civicrm/admin/contribute?action=add&reset=1');
-    $this->waitForPageToLoad();
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // fill in step 1 (Title and Settings)
     $this->type('title', $pageTitle);
@@ -1032,11 +1064,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     // parse URL to grab the contribution page id
-    $elements = $this->parseURL();
-    $pageId = $elements['queryString']['id'];
-
     // pass $pageId back to any other tests that call this class
-    return $pageId;
+    return $this->urlArg('id');
   }
 
   /**
@@ -1119,8 +1148,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       'period_type' => $period_type,
     );
 
-    $this->open($this->sboxPath . 'civicrm/admin/member/membershipType/add?action=add&reset=1');
-    $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
+    $this->openCiviPage("admin/member/membershipType/add", "action=add&reset=1", '_qf_MembershipType_cancel-bottom');
 
     $this->type('name', $memTypeParams['membership_type']);
 
@@ -1206,7 +1234,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "Anderson", $firstName2 . "@anderson.name");
 
-    // Go directly to the URL of the screen that you will be testing (Activity Tab).
     $this->click("css=li#tab_activity a");
 
     // waiting for the activity dropdown to show up
@@ -1277,9 +1304,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // click through to the Activity view screen
     $this->click("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
-    $elements = $this->parseURL();
-    $activityID = $elements['queryString']['id'];
-    return $activityID;
+    
+    // parse URL to grab the activity id
+    // pass id back to any other tests that call this class
+    return $this->urlArg('id');
   }
 
   static
@@ -1372,21 +1400,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $this->assertInternalType($expected, $actual, $message);
   }
 
-  function changeAdminLinks() {
-    $version = 7;
-    if ($version == 7) {
-      $this->open("{$this->sboxPath}admin/people/permissions");
-    }
-    else {
-      $this->open("{$this->sboxPath}admin/user/permissions");
-    }
-  }
-
-
   /**
    * Add new Financial Account
    */
-
   function _testAddFinancialAccount($financialAccountTitle,
                                     $financialAccountDescription = FALSE,
                                     $accountingCode = FALSE,
@@ -1399,7 +1415,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
                                     $isDefault = FALSE
   ) {
 
-    // Go directly to the URL
     $this->open($this->sboxPath . "civicrm/admin/financial/financialAccount?reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -1643,29 +1658,25 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
   }
 
-
+  /**
+   * Give the specified permissions
+   * Note: this function logs in as 'admin'
+   */
   function changePermissions($permission) {
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->webtestLogin(TRUE);
-    $this->changeAdminLinks();
+    $this->webtestLogin('admin');
+    $this->open("{$this->sboxPath}admin/people/permissions");
     $this->waitForElementPresent('edit-submit');
-    foreach ((array) $permission as $key => $value) {
-      $this->check($value);
+    foreach ((array) $permission as $perm) {
+      $this->check($perm);
     }
     $this->click('edit-submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent('The changes have been saved.'));
-    $this->open($this->sboxPath . "user/logout");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->webtestLogin();
   }
 
   function addProfile($profileTitle, $profileFields) {
-    // Go directly to the URL of the screen that you will be testing (New Profile).
-    $this->open($this->sboxPath . "civicrm/admin/uf/group?reset=1");
+    $this->openCiviPage('admin/uf/group', "reset=1");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('link=Add Profile');
 
     // Add membership custom data field to profile
@@ -1737,6 +1748,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     );
 
     $this->select('account_relationship', "label={$accountRelationship}");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(2);
     $this->select('financial_account_id', "label={$financialAccountTitle}");
     $this->click('_qf_FinancialTypeAccount_next');
@@ -1762,12 +1776,27 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   function addPaymentInstrument($label, $financialAccount) {
-    $this->open($this->sboxPath . "civicrm/admin/options/payment_instrument?group=payment_instrument&action=add&reset=1");
-    $this->waitForElementPresent("_qf_Options_next-bottom");
+    $this->openCiviPage('admin/options/payment_instrument?group=payment_instrument&action=add', 'reset=1', "_qf_Options_next-bottom");
     $this->type("label", $label);
     $this->select("financial_account_id", "value=$financialAccount");
     $this->click("_qf_Options_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
+  }
+
+  /**
+   * Ensure we have a default mailbox set up for CiviMail
+   */
+  function setupDefaultMailbox() {
+    $this->openCiviPage('admin/mailSettings', 'action=update&id=1&reset=1');
+    // Check if it hasn't already been set up
+    if (!$this->getSelectedValue('protocol')) {
+      $this->type('name', 'Test Domain');
+      $this->select('protocol', "IMAP");
+      $this->type('server', 'localhost');
+      $this->type('domain', 'example.com');
+      $this->click('_qf_MailSettings_next-top');
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+    }
   }
 
   /**

@@ -33,11 +33,8 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
   }
 
   function testAllOrMyCases() {
-
-    $this->open($this->sboxPath);
-
     // Log in as admin first to verify permissions for CiviCase
-    $this->webtestLogin();
+    $this->webtestLogin('true');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
@@ -46,8 +43,10 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
     $this->changePermissions($permission);
 
-    // Go directly to the URL of the screen that you will be testing (Dashboard).
-    $this->openCiviPage('case', 'reset=1', 'css=a.button');
+    // Log in as normal user
+    $this->webtestLogin();
+
+    $this->openCiviPage('case', 'reset=1');
 
     // Should default to My Cases
     $this->assertTrue($this->isChecked("name=allupcoming value=0"), 'Case dashboard should default to My Cases.');
