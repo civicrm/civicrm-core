@@ -32,14 +32,13 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // a random 7-char string and an even number to make this pass unique
-    $hash      = substr(sha1(rand()), 0, 7);
-    $rand      = 2 * rand(2, 50);
+    $hash = substr(sha1(rand()), 0, 7);
+    $rand = 2 * rand(2, 50);
     $pageTitle = 'Donate Online ' . $hash;
     // create contribution page with randomized title and default params
     $pageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array("Webtest Dummy" . substr(sha1(rand()), 0, 7) => 'Dummy'), TRUE, TRUE, 'required');
 
-    $this->open($this->sboxPath . 'civicrm/admin/contribute?reset=1');
-    $this->waitForPageToLoad();
+    $this->openCiviPage("admin/contribute", "reset=1");
 
     // search for the new contrib page and go to its test version
     $this->type('title', $pageTitle);
@@ -48,8 +47,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // select testdrive mode
     $this->isTextPresent($pageTitle);
-    $this->open($this->sboxPath . 'civicrm/contribute/transact?reset=1&action=preview&id=' . $pageId);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
+
     // verify whatever’s possible to verify
     // FIXME: ideally should be expanded
     $texts = array(
@@ -80,8 +79,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // a random 7-char string and an even number to make this pass unique
-    $hash      = substr(sha1(rand()), 0, 7);
-    $rand      = 2 * rand(2, 50);
+    $hash = substr(sha1(rand()), 0, 7);
+    $rand = 2 * rand(2, 50);
     $pageTitle = 'Donate Online ' . $hash;
 
     // create contribution page with randomized title, default params and separate payment for Membership and Contribution
@@ -90,8 +89,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       1, 7, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE
     );
 
-    $this->open($this->sboxPath . 'civicrm/admin/contribute?reset=1');
-    $this->waitForPageToLoad();
+    $this->openCiviPage("admin/contribute", "reset=1");
 
     // search for the new contrib page and go to its test version
     $this->type('title', $pageTitle);
@@ -100,9 +98,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // select testdrive mode
     $this->isTextPresent($pageTitle);
-    $this->open($this->sboxPath . 'civicrm/contribute/transact?reset=1&action=preview&id=' . $pageId);
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $texts = array(
       "Title - New Membership $hash",
       "This is introductory message for $pageTitle",
@@ -130,8 +127,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // a random 7-char string and an even number to make this pass unique
-    $hash      = substr(sha1(rand()), 0, 7);
-    $rand      = 2 * rand(2, 50);
+    $hash = substr(sha1(rand()), 0, 7);
+    $rand = 2 * rand(2, 50);
     $pageTitle = 'Donate Online ' . $hash;
 
     // create contribution page with randomized title, default params and separate payment for Membership and Contribution
@@ -140,8 +137,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       1, 0, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE
     );
 
-    $this->open($this->sboxPath . 'civicrm/admin/contribute?reset=1');
-    $this->waitForPageToLoad();
+    $this->openCiviPage("admin/contribute", "reset=1");
 
     // search for the new contrib page and go to its test version
     $this->type('title', $pageTitle);
@@ -151,8 +147,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     //get Url for Live Contribution Page
     $registerUrl = "civicrm/contribute/transact?reset=1&id=$pageId";
     //logout
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogout();
 
     //Open Live Contribution Page
     $this->open($this->sboxPath . $registerUrl);
@@ -174,15 +169,10 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //login to check contribution
-    $this->open($this->sboxPath);
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
     //Find Contribution
-    $this->open($this->sboxPath . 'civicrm/contribute/search?reset=1');
-
-    $this->waitForElementPresent('contribution_date_low');
+    $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
     $this->type('sort_name', "$firstName $lastName");
     $this->select('financial_type_id',"label=Member Dues");
@@ -196,8 +186,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
     $expected = array(
-      'From'                => "{$firstName} {$lastName}",
-      'Financial Type'      => 'Member Dues',
+      'From' => "{$firstName} {$lastName}",
+      'Financial Type' => 'Member Dues',
       'Total Amount' => '$ 50.00',
       'Contribution Status' => 'Pending : Pay Later',
     );
@@ -219,8 +209,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
     $expected = array(
-      'From'                => "{$firstName} {$lastName}",
-      'Financial Type'      => 'Donation',
+      'From' => "{$firstName} {$lastName}",
+      'Financial Type' => 'Donation',
       'Contribution Status' => 'Pending : Pay Later',
     );
     $this->webtestVerifyTabularData($expected);
@@ -228,8 +218,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
 
     //Find Member
-    $this->open($this->sboxPath . 'civicrm/member/search?reset=1');
-    $this->waitForElementPresent('member_source');
+    $this->openCiviPage("member/search", "reset=1", 'member_source');
     $this->type('sort_name', "$firstName $lastName");
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());

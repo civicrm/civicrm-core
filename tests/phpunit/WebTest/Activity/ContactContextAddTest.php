@@ -33,13 +33,6 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testContactContextActivityAdd() {
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
@@ -49,7 +42,6 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "Anderson", $firstName2 . "@anderson.name");
 
-    // Go directly to the URL of the screen that you will be testing (Activity Tab).
     $this->click("css=li#tab_activity a");
 
     // waiting for the activity dropdown to show up
@@ -57,12 +49,12 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // Select the activity type from the activity dropdown
     $this->select("other_activity", "label=Meeting");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // waitForPageToLoad is not always reliable. Below, we're waiting for the submit
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload");
 
-    // Let's start filling the form with values.
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', 'Anderson, ' . $firstName2, 'Contact not found in line ' . __LINE__);

@@ -33,14 +33,12 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testContactMemberAdd() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)
     $memTypeParams = $this->webtestAddMembershipType();
     $lifeTimeMemTypeParams = $this->webtestAddMembershipType('rolling', 1, 'lifetime');
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -73,6 +71,9 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->select("membership_type_id[0]", "label={$memTypeParams['member_of_contact']}");
     // Wait for membership type select to reload
     $this->waitForTextPresent($memTypeParams['membership_type']);
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->select("membership_type_id[1]", "label={$memTypeParams['membership_type']}");
 
@@ -160,13 +161,11 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testMemberAddWithLifeTimeMembershipType() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)
     $lifeTimeMemTypeParams = $this->webtestAddMembershipType('rolling', 1, 'lifetime');
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -200,6 +199,9 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // Wait for membership type select to reload
     $this->waitForTextPresent($lifeTimeMemTypeParams['membership_type']);
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->select("membership_type_id[1]", "label={$lifeTimeMemTypeParams['membership_type']}");
 

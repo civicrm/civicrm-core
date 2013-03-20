@@ -33,11 +33,6 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
   }
 
   function testEventParticipationAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -48,10 +43,8 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $contactName = "Anderson, $firstName";
     $displayName = "$firstName Anderson";
 
-    // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
-    // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
     $this->webtestFillAutocomplete($firstName);
 
@@ -132,11 +125,6 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
   }
 
   function testEventParticipationAddWithMultipleRoles() {
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -251,10 +239,8 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
-    // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
     $this->webtestFillAutocomplete($firstName);
 
@@ -341,12 +327,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     );
   }
 
-  function testEventAddMultipleParticipants() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-    
+  function testEventAddMultipleParticipants() {    
     // Log in using webtestLogin() method
     $this->webtestLogin();
     
@@ -356,8 +337,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $lastName = 'Last' . $rand;
     $rand = substr(sha1(rand()), 0, 7);
     $lastName2 = 'Last' . $rand;
-    
-    // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
+
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone&mode=test&eid=3");
     
     $this->assertTrue($this->isTextPresent("Register New Participant"), "Page title 'Register New Participant' missing");

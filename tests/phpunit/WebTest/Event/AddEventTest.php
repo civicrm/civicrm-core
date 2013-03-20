@@ -33,11 +33,6 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   function testAddPaidEventNoTemplate() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -45,8 +40,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -76,7 +70,6 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   function testAddPaidEventDiscount() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -85,8 +78,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -117,7 +109,6 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   function testDeletePriceSetDiscount() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -126,8 +117,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -152,22 +142,25 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $registerUrl = $this->_testVerifyRegisterPage($registerStrings);
 
     //Add Price Set now
-    $this->open($this->sboxPath . "civicrm/event/manage/fee?reset=1&action=update&id=$id");
-    $this->waitForElementPresent("_qf_Fee_upload-bottom");
+    $this->openCiviPage("event/manage/fee", "reset=1&action=update&id=$id", "_qf_Fee_upload-bottom");
     $this->click("xpath=//a[@id='quickconfig']");
     $this->waitForElementPresent('popupContainer');
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     
     //Assert quick config change and discount deletion
-    $this->open($this->sboxPath . "civicrm/admin/price?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/price", "reset=1");
     $this->assertStringsPresent($discount);
   }
 
   function testAddDeleteEventDiscount() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -176,8 +169,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -205,24 +197,20 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   function _deleteDiscount($id, $eventTitle, $discount) {
-    $this->open($this->sboxPath . "civicrm/event/manage/fee?reset=1&action=update&id=$id");
-    $this->waitForElementPresent("_qf_Fee_upload-bottom");
+    $this->openCiviPage("event/manage/fee", "reset=1&action=update&id=$id", "_qf_Fee_upload-bottom");
     $this->type("discount_name_2", "");
     $this->click("xpath=//tr[@id='discount_2']/td[3]/span/a");
     $this->click("xpath=//tr[@id='discount_2']/td[4]/span/a");
     $this->type("discounted_value_1_2", "");
     $this->type("discounted_value_2_2", "");
     $this->click("_qf_Fee_upload-bottom");
-    sleep(3);
+    $this->waitForPageToLoad();
     //Assertions
-    $this->open($this->sboxPath . "civicrm/admin/price?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    sleep(3);
+    $this->openCiviPage("admin/price", "reset=1");
     $this->assertStringsPresent($discount[1]);
   }
 
   function testAddPaidEventWithTemplate() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -231,8 +219,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -259,13 +246,11 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   function testAddFreeEventWithTemplate() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
-   
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+
+    $this->openCiviPage("event/add", "reset=1&action=add");
    
     $eventTitle = 'My Free Meeting - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this free meeting.";
@@ -297,13 +282,11 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   function testUnpaidPaid() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
     $this->_testAddEventInfo($eventTitle, $eventDescription);
@@ -320,17 +303,13 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     //check if pay later option is disabled
     $this->click('CIVICRM_QFID_1_is_monetary');
-    sleep(3);
     $this->waitForElementPresent('is_pay_later');
     $this->assertNotChecked('is_pay_later');
   }
 
   function _testAddEventInfo($eventTitle, $eventDescription) {
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
-    // Let's start filling the form with values.
     $this->select("event_type_id", "value=1");
 
     // Attendee role s/b selected now.
@@ -356,11 +335,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   function _testAddEventInfoFromTemplate($eventTitle, $eventDescription, $templateID, $eventTypeID) {
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
-    
-    // Let's start filling the form with values.
+
     // Select event template. Use option value, not label - since labels can be translated and test would fail
     $this->select("template_id", "value={$templateID}"); 
 
@@ -503,7 +479,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage("event/manage", "reset=1");
     $this->click("link=$eventTitle");
 
     // Look for Register button
@@ -530,8 +506,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
   function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
-      $this->open($this->sboxPath . "civicrm/logout?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->webtestLogout();
     }
     $this->open($registerUrl);
 

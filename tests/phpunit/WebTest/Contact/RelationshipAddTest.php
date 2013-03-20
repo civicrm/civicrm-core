@@ -33,11 +33,6 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
   }
 
   function testRelationshipAddTest() {
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     //create a relationship type between different contact types
@@ -56,8 +51,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($firstName, "Anderson", "$firstName@anderson.name");
     $sortName = "Anderson, $firstName";
 
-    // Go directly to the URL of the screen that you will be testing (New Household).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Household");
+    $this->openCiviPage("contact/add", "reset=1&ct=Household");
 
     //fill in Household name
     $this->click("household_name");
@@ -113,8 +107,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent($params['label_b_a']));
 
     //create a New Individual subtype
-    $this->open($this->sboxPath . "civicrm/admin/options/subtype?action=add&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('admin/options/subtype', "action=add&reset=1");
     $label = "IndividualSubtype" . substr(sha1(rand()), 0, 4);
     $this->type("label", $label);
     $this->type("description", "here is individual subtype");
@@ -122,8 +115,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //create a new contact of individual subtype
-    $this->open($this->sboxPath . "civicrm/contact/add?ct=Individual&cst={$label}&reset=1");
-    $this->waitForElementPresent('_qf_Contact_upload_view');
+    $this->openCiviPage('contact/add', "ct=Individual&cst={$label}&reset=1", '_qf_Contact_upload_view');
     $firstName = substr(sha1(rand()), 0, 7);
     $lastName = 'And' . substr(sha1(rand()), 0, 7);
     $this->click("first_name");
@@ -137,8 +129,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=.crm-contact-tabs-list");
 
     //create a New household subtype
-    $this->open($this->sboxPath . "civicrm/admin/options/subtype?action=add&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/options/subtype", "action=add&reset=1");
 
     $label = "HouseholdSubtype" . substr(sha1(rand()), 0, 4);
     $householdSubtypeName = $label;
@@ -150,8 +141,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //create a new contact of household subtype
-    $this->open($this->sboxPath . "civicrm/contact/add?ct=Household&cst={$label}&reset=1");
-    $this->waitForElementPresent('_qf_Contact_upload_view');
+    $this->openCiviPage('contact/add', "ct=Household&cst={$label}&reset=1", '_qf_Contact_upload_view');
 
     //fill in Household name
     $householdName = substr(sha1(rand()), 0, 4) . 'home';
@@ -214,7 +204,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     );
 
     //create relationship type
-    $this->open($this->sboxPath . 'civicrm/admin/reltype?reset=1&action=add');
+    $this->openCiviPage('admin/reltype', 'reset=1&action=add');
     $this->type('label_a_b', $params['label_a_b']);
     $this->type('label_b_a', $params['label_b_a']);
     $this->select('contact_types_a', "value={$params['contact_type_a']}");
@@ -232,8 +222,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
       "Status message didn't show up after saving!"
     );
 
-    $this->open($this->sboxPath . 'civicrm/admin/reltype?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/reltype", "reset=1");
 
     //validate data on selector.
     $data = $params;
@@ -248,8 +237,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $sortName = "Anderson, $firstName";
 
     //create a new contact of household subtype
-    $this->open($this->sboxPath . "civicrm/contact/add?ct=Household&cst=" . $householdSubtypeName . "&reset=1");
-    $this->waitForElementPresent('_qf_Contact_upload_view');
+    $this->openCiviPage('contact/add', "ct=Household&cst={$householdSubtypeName}&reset=1", '_qf_Contact_upload_view');
 
     //fill in Household name
     $householdName = substr(sha1(rand()), 0, 4) . 'home';
@@ -327,7 +315,9 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("relationship_type_id");
     $this->select('relationship_type_id', "label={$params['label_a_b']}");
 
-    //wait untill new contact dialog select is built
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: wait until new contact dialog select is built
     sleep(2);
 
     // create a new organization

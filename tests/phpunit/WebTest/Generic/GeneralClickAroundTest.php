@@ -33,7 +33,6 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
   }
 
   function login() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("//a[contains(text(),'CiviCRM')]");
@@ -196,12 +195,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviMail");
 
     // configure default mail-box
-    $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", "_qf_MailSettings_cancel-bottom");
-    $this->type('name', 'Test Domain');
-    $this->type('domain', 'example.com');
-    $this->select('protocol', 'value=1');
-    $this->click('_qf_MailSettings_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->setupDefaultMailbox();
 
     // New Mailing Form
     // Use class names for menu items since li array can change based on which components are enabled

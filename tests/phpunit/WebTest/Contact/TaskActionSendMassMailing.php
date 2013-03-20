@@ -33,12 +33,9 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
   }
 
   function testSelectedContacts() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Group).
-    $this->open($this->sboxPath . "civicrm/group/add&reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage('group/add', 'reset=1', "_qf_Edit_upload");
 
     // make group name
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
@@ -146,8 +143,7 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently."));
 
     // directly send schedule mailing -- not working right now
-    $this->open($this->sboxPath . "civicrm/mailing/queue&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
     $this->click("xpath=//table//tbody/tr[td[1]/text()='$mailingName']/descendant::a[text()='Report']");

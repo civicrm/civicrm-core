@@ -33,17 +33,15 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
 
   function testPCPAdd() {
     // open browser, login
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // set pcp supporter name and email
-    $firstName  = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName   = 'An' . substr(sha1(rand()), 0, 7);
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
     $middleName = 'Mid' . substr(sha1(rand()), 0, 7);
-    $email      = substr(sha1(rand()), 0, 7) . '@example.org';
+    $email = substr(sha1(rand()), 0, 7) . '@example.org';
 
-    $this->open($this->sboxPath . 'civicrm/admin/domain?action=update&reset=1');
-    $this->waitForElementPresent('_qf_Domain_cancel-bottom');
+    $this->openCiviPage("admin/domain", "action=update&reset=1", '_qf_Domain_cancel-bottom');
     $this->type('name', 'DefaultDomain');
     $this->type('email_name', $firstName);
     $this->type('email_address', $email);
@@ -57,24 +55,24 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     require_once 'ContributionPageAddTest.php';
 
     // a random 7-char string and an even number to make this pass unique
-    $hash            = substr(sha1(rand()), 0, 7);
-    $rand            = $contributionAmount = 2 * rand(2, 50);
-    $pageTitle       = 'PCP Contribution' . $hash;
-    $processorType   = 'Dummy';
-    $processorName   = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
-    $amountSection   = TRUE;
-    $payLater        = TRUE;
-    $onBehalf        = FALSE;
-    $pledges         = FALSE;
-    $recurring       = FALSE;
-    $memberships     = FALSE;
-    $memPriceSetId   = NULL;
-    $friend          = FALSE;
-    $profilePreId    = NULL;
-    $profilePostId   = NULL;
-    $premiums        = FALSE;
-    $widget          = FALSE;
-    $pcp             = TRUE;
+    $hash = substr(sha1(rand()), 0, 7);
+    $rand = $contributionAmount = 2 * rand(2, 50);
+    $pageTitle = 'PCP Contribution' . $hash;
+    $processorType = 'Dummy';
+    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    $amountSection = TRUE;
+    $payLater = TRUE;
+    $onBehalf = FALSE;
+    $pledges = FALSE;
+    $recurring = FALSE;
+    $memberships = FALSE;
+    $memPriceSetId = NULL;
+    $friend = FALSE;
+    $profilePreId = NULL;
+    $profilePostId = NULL;
+    $premiums = FALSE;
+    $widget = FALSE;
+    $pcp = TRUE;
     $isAprovalNeeded = TRUE;
 
     // create a new online contribution page with pcp enabled
@@ -101,12 +99,9 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     );
 
     // logout
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    // Wait for Login button to indicate we've logged out.
-    $this->waitForElementPresent("edit-submit");
+    $this->webtestLogout();
 
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id=" . $pageId);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", $contributionAmount);
@@ -121,8 +116,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Confirm_next-bottom");
 
     $this->waitForElementPresent("thankyou_footer");
-    $this->open($this->sboxPath . "civicrm/contribute/campaign?action=add&reset=1&pageId=" . $pageId . "&component=contribute");
-    $this->waitForElementPresent("_qf_PCPAccount_next-bottom");
+    $this->openCiviPage("contribute/campaign", "action=add&reset=1&pageId={$pageId}&component=contribute", "_qf_PCPAccount_next-bottom");
 
     $cmsUserName = 'CmsUser' . substr(sha1(rand()), 0, 7);
     $this->type("cms_name", $cmsUserName);
@@ -135,7 +129,6 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
       $this->type("cms_pass", $pass);      
       $this->type("cms_confirm_pass", $pass);      
     }
-//    sleep(20);
     $this->click("_qf_PCPAccount_next-bottom");
 
     $this->waitForElementPresent("_qf_Campaign_upload-bottom");
@@ -146,10 +139,8 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->type("goal_amount", $contributionAmount);
     $this->click("_qf_Campaign_upload-bottom");
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
-    $this->open($this->sboxPath . "civicrm/admin/pcp?reset=1");
-    $this->waitForElementPresent("_qf_PCP_refresh");
+    $this->openCiviPage("admin/pcp", "reset=1", "_qf_PCP_refresh");
     $this->select('status_id', 'value=1');
     $this->click("_qf_PCP_refresh");
     $this->waitForElementPresent("_qf_PCP_refresh");
@@ -159,21 +150,17 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("xpath=//td[@id=$pcpId]/span[1]/a[2]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     // logout
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    // Wait for Login button to indicate we've logged out.
-    $this->waitForElementPresent('edit-submit');
+    $this->webtestLogout();
 
     // Set pcp contributor name
-    $donorFirstName  = 'Donor' . substr(sha1(rand()), 0, 4);
-    $donorLastName   = 'Person' . substr(sha1(rand()), 0, 7);
+    $donorFirstName = 'Donor' . substr(sha1(rand()), 0, 4);
+    $donorLastName = 'Person' . substr(sha1(rand()), 0, 7);
     $middleName = 'Mid' . substr(sha1(rand()), 0, 7);
 
     $this->open($this->sboxPath . $pcpUrl);
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id=$pageId&pcpId=$id[1]");
-
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&pcpId=$id[1]", "_qf_Main_upload-bottom");
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", $contributionAmount);
     $this->type("email-5", $donorFirstName . "@example.com");
@@ -186,16 +173,12 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Confirm_next-bottom");
 
     $this->waitForElementPresent("thankyou_footer");
-    //login to check contribution
-    $this->open($this->sboxPath);
 
-    // Log in using webtestLogin() method
+    //login to check contribution
     $this->webtestLogin();
 
     //Find Contribution
-    $this->open($this->sboxPath . "civicrm/contribute/search?reset=1");
-
-    $this->waitForElementPresent("contribution_date_low");
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->select('contribution_pcp_made_through_id', "label={$pcpTitle}");
 
@@ -210,9 +193,9 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
 
     // View Contribution Record and test for expected values
     $expected = array(
-      'From'             => "{$donorFirstName} {$donorLastName}",
-      'Financial Type'   => 'Donation',
-      'Total Amount'     => $contributionAmount,
+      'From' => "{$donorFirstName} {$donorLastName}",
+      'Financial Type' => 'Donation',
+      'Total Amount' => $contributionAmount,
       'Contribution Status' => 'Completed',
     );
     $this->webtestVerifyTabularData($expected);

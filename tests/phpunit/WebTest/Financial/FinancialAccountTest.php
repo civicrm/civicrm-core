@@ -28,12 +28,10 @@
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
 
+  /**
+   * Test To Add Financial Account class attributes.
+   */
   function testFinancialAccount() {
-    // To Add Financial Account 
-    // class attributes.
-    $this->open( $this->sboxPath );
-    
-    // Log in using webtestLogin() method
     $this->webtestLogin();
     
     // Add new Financial Account

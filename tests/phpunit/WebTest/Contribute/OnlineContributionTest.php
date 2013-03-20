@@ -33,36 +33,26 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
   }
 
   function testOnlineContributionAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // We need a payment processor
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $processorType = 'Dummy';
-    $pageTitle     = substr(sha1(rand()), 0, 7);
-    $rand          = 2 * rand(10, 50);
-    $hash          = substr(sha1(rand()), 0, 7);
+    $pageTitle = substr(sha1(rand()), 0, 7);
+    $rand = 2 * rand(10, 50);
+    $hash = substr(sha1(rand()), 0, 7);
     $amountSection = TRUE;
-    $payLater      = FALSE;
-    $onBehalf      = FALSE;
-    $pledges       = FALSE;
-    $recurring     = FALSE;
-    $memberships   = FALSE;
-    $friend        = TRUE;
-    $profilePreId  = 1;
+    $payLater = FALSE;
+    $onBehalf = FALSE;
+    $pledges = FALSE;
+    $recurring = FALSE;
+    $memberships = FALSE;
+    $friend = TRUE;
+    $profilePreId = 1;
     $profilePostId = NULL;
-    $premiums      = FALSE;
-    $widget        = FALSE;
-    $pcp           = FALSE;
+    $premiums = FALSE;
+    $widget = FALSE;
+    $pcp = FALSE;
     $memPriceSetId = NULL;
 
     // create a new online contribution page
@@ -87,13 +77,10 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     );
 
     //logout
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id=" . $pageId);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
-
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -151,15 +138,12 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //login to check contribution
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
     //Find Contribution
-    $this->open($this->sboxPath . "civicrm/contribute/search?reset=1");
-
-    $this->waitForElementPresent("contribution_date_low");
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$firstName $lastName");
     $this->click("_qf_Search_refresh");
@@ -173,11 +157,11 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     //View Contribution Record and verify data
     $expected = array(
-      'From'                => "{$firstName} {$lastName}",
-      'Financial Type'   => 'Donation',
-      'Total Amount'        => '100.00',
+      'From' => "{$firstName} {$lastName}",
+      'Financial Type' => 'Donation',
+      'Total Amount' => '100.00',
       'Contribution Status' => 'Completed',
-      'In Honor of'         => $honorDisplayName
+      'In Honor of' => $honorDisplayName
     );
     $this->webtestVerifyTabularData($expected);
 

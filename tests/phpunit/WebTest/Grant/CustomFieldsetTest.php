@@ -34,7 +34,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
   function testCustomFieldsetTest() {
     // Log in as admin first to verify permissions for CiviGrant
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviGrant module if necessary
     $this->enableComponents("CiviGrant");
@@ -42,6 +42,9 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     // let's give full CiviGrant permissions to demo user (registered user).
     $permission = array('edit-2-access-civigrant', 'edit-2-edit-grants', 'edit-2-delete-in-civigrant');
     $this->changePermissions($permission);
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     // Create unique identifier for names
     $rand = substr(sha1(rand()), 0, 7);

@@ -70,6 +70,9 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     // Click "check all" box and act on "Add to group" action
     $this->click('toggleSelect');
     $this->select("task", "label=Add Contacts to Group");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(1);
     $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());

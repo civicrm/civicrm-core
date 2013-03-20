@@ -40,16 +40,6 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
    *  Test contact import for yyyy_mm_dd date format.
    */
   function testDateFormat_yyyy_mm_dd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Get sample import data.
@@ -65,16 +55,6 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
    *  Test contact import for mm_dd_yy date format.
    */
   function testDateFormat_mm_dd_yy() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Get sample import data.
@@ -91,11 +71,6 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
    *  Test contact import for mm_dd_yyyy date format.
    */
   function testDateFormat_mm_dd_yyyy() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -117,11 +92,6 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
    *  Test contact import for Month_dd_yyyy date format.
    */
   function testDateFormat_Month_dd_yyyy() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -143,11 +113,6 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
    *  Test contact import for dd_mon_yy date format.
    */
   function testDateFormat_dd_mon_yy() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -169,11 +134,6 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
    *  Test contact import for dd_mm_yyyy date format.
    */
   function testDateFormat_dd_mm_yyyy() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element

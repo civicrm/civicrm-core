@@ -33,12 +33,10 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
   }
 
   function testSMSToContacts() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // ADD a New Group
-    $this->open($this->sboxPath . "civicrm/group/add?reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     $smsGroupName = 'group_' . substr(sha1(rand()), 0, 7);
 
@@ -50,8 +48,7 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // ADD contact1
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $firstName = substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName);
 
@@ -75,8 +72,7 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-notification-container', "Added to Group");
 
     // ADD contact2
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $firstName = substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName);
 

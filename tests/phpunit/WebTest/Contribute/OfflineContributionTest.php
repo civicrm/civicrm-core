@@ -40,16 +40,6 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
   }
   
   function testStandaloneContributeAdd() {
-    // This is the path where our testing install resides. 
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open( $this->sboxPath );
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Create a contact to be used as soft creditor
@@ -58,8 +48,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->webtestAddContact( $softCreditFname, $softCreditLname, false );
  
     //financial account for check
-    $this->open($this->sboxPath . 'civicrm/admin/options/payment_instrument?group=payment_instrument&reset=1');
-    $this->waitForPageToLoad();
+    $this->openCiviPage("admin/options/payment_instrument", "group=payment_instrument&reset=1");
     $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/div[2]/table/tbody//tr/td[1][text()='Check']/../td[3]");
     
     // Add new Financial Account
@@ -205,23 +194,13 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
   }
   
   function testDeductibleAmount() {
-    // This is the path where our testing install resides. 
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open( $this->sboxPath );
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     //add authorize .net payment processor
     $processorName = 'Webtest AuthNet' . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName, 'AuthNet');
       
-    $this->open($this->sboxPath . "civicrm/admin/contribute/managePremiums?action=add&reset=1");
+    $this->openCiviPage("admin/contribute/managePremiums", "action=add&reset=1");
     $premiumName = 'test Premium' . substr(sha1(rand()), 0, 7);
     $this->addPremium($premiumName, 'SKU', 3, 12, NULL, NULL);
     

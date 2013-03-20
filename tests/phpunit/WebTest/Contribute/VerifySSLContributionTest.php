@@ -49,8 +49,7 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
   function _initialize() {
     if (!$this->initialized) {
       // log in
-      $this->open($this->sboxPath);
-      $this->webtestLogin();
+        $this->webtestLogin();
 
       // build names
       $hash = substr(sha1(rand()), 0, 7);
@@ -92,8 +91,7 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
       );
 
       // enable verify ssl
-      $this->open($this->sboxPath . "civicrm/admin/setting/url?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("admin/setting/url", "reset=1");
       $this->click("id=CIVICRM_QFID_1_verifySSL");
       $this->click("id=_qf_Url_next-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -104,9 +102,7 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
 
   function _tryPaymentProcessor($name) {
     // load contribution page
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&action=preview&id={$this->pageId}");
-    $this->waitForPageToLoad("3000");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id={$this->pageId}", "_qf_Main_upload-bottom");
 
     // fill out info
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", "30");

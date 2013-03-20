@@ -33,7 +33,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
@@ -41,6 +41,9 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // add the required Drupal permission
     $permissions = array('edit-2-administer-civicampaign');
     $this->changePermissions($permissions);
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
@@ -74,10 +77,8 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
-    // Let's start filling the form with values.
     $campaignTitle = "Campaign " . $title;
     $this->type("title", $campaignTitle);
 
@@ -119,7 +120,6 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "Anderson", $firstName2 . "@anderson.name");
 
-    // Go directly to the URL of the screen that you will be testing (Activity Tab).
     $this->click("css=li#tab_activity a");
 
     // waiting for the activity dropdown to show up
@@ -132,7 +132,6 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload");
 
-    // Let's start filling the form with values.
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook','Anderson, ' . $firstName2, 'Contact not found in line ' . __LINE__);

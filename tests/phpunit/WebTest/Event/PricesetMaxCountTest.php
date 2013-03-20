@@ -33,8 +33,6 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   }
 
   function testWithoutFieldCount() {
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -160,8 +158,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $infoEvent = $this->_testAddEvent($paramsEvent);
 
     // logout to register for event.
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogout();
 
     // Register Participant 1
     // visit event info page
@@ -231,8 +228,6 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   }
 
   function testWithFieldCount() {
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -365,8 +360,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $infoEvent = $this->_testAddEvent($paramsEvent);
 
     // logout to register for event.
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogout();
 
     // Register Participant 1
     // visit event info page
@@ -437,8 +431,6 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   }
 
   function testAdditionalParticipantWithoutFieldCount() {
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -565,9 +557,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $infoEvent = $this->_testAddEvent($paramsEvent);
 
     // logout to register for event.
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->webtestLogout();
 
     // 1'st registration
     // Register Participant 1
@@ -725,8 +715,6 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   }
 
   function testAdditionalParticipantWithFieldCount() {
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -860,9 +848,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $infoEvent = $this->_testAddEvent($paramsEvent);
 
     // logout to register for event.
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->webtestLogout();
 
     // 1'st registration
     // Register Participant 1
@@ -1020,9 +1006,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   }
 
   function _testAddSet($setTitle, $financialType = NULL) {
-    $this->open($this->sboxPath . 'civicrm/admin/price?reset=1&action=add');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Set_next-bottom');
+    $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
     $this->type('title', $setTitle);
@@ -1124,11 +1108,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   }
 
   function _testAddEvent($params) {
-    $this->open($this->sboxPath . 'civicrm/event/add?reset=1&action=add');
+    $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
-    $this->waitForElementPresent('_qf_EventInfo_upload-bottom');
-
-    // Let's start filling the form with values.
     $this->select('event_type_id', "value={$params['event_type_id']}");
 
     // Attendee role s/b selected now.
@@ -1198,7 +1179,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . 'civicrm/event/manage?reset=1');
+    $this->openCiviPage('event/manage', 'reset=1');
     $this->click('link=' . $params['title']);
 
     $this->waitForPageToLoad($this->getTimeoutMsec());

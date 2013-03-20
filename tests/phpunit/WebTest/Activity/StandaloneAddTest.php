@@ -33,17 +33,6 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
   }
 
   function testStandaloneActivityAdd() {
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Adding Anderson, Anthony and Summerson, Samuel for testStandaloneActivityAdd test
@@ -53,10 +42,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact("$firstName2", "Summerson", $firstName2 . "@summerson.com");
 
-    // Go directly to the URL of the screen that you will be testing (New Activity-standalone).
     $this->openCiviPage("activity", "reset=1&action=add&context=standalone", "_qf_Activity_upload");
-
-    // Let's start filling the form with values.
 
     // Select one of the options in Activity Type selector. Use option value, not label - since labels can be translated and test would fail
     $this->select("activity_type_id", "value=1");

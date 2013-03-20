@@ -33,12 +33,10 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
   }
 
   function testAddMailing() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     //----do create test mailing group
 
-    // Go directly to the URL of the screen that you will be testing (New Group).
     $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     // make group name
@@ -81,14 +79,8 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_GroupContact_next");
 
     // configure default mail-box
-    $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
-    $this->type('name', 'Test Domain');
-    $this->type('domain', 'example.com');
-    $this->select('protocol', 'value=1');
-    $this->click('_qf_MailSettings_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->setupDefaultMailbox();
 
-    // Go directly to Schedule and Send Mailing form
     $this->openCiviPage("mailing/send", "reset=1", "_qf_Group_cancel");
 
     //-------select recipients----------
@@ -239,14 +231,13 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // verify email
     $this->verifyText("xpath=//table[@id='mailing_event']/tbody//tr/td[2]", preg_quote("mailino$firstName@mailson.co.in"));
 
-    require_once 'CRM/Mailing/Event/DAO/Queue.php';
     $eventQueue = new CRM_Mailing_Event_DAO_Queue();
     $eventQueue->contact_id = $contactId;
     $eventQueue->find(TRUE);
 
     $permission = array('edit-1-access-civimail-subscribeunsubscribe-pages');
     $this->changePermissions($permission);
-    $this->openCiviPage('logout', 'reset=1', NULL);
+    $this->webtestLogout();
 
     // build forward url
     $forwardUrl = array("mailing/forward", "reset=1&jid={$eventQueue->job_id}&qid={$eventQueue->id}&h={$eventQueue->hash}");
@@ -262,7 +253,6 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('css=div.messages', 'Mailing is forwarded successfully to 2 email addresses');
 
-    $this->open($this->sboxPath);
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->webtestLogin();
 
@@ -290,8 +280,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // $unsubscribeUrl = "civicrm/mailing/optout?reset=1&jid={$eventQueue->job_id}&qid={$eventQueue->id}&h={$eventQueue->hash}&confirm=1";
 
     // // logout to unsubscribe
-    // $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    // $this->waitForPageToLoad($this->getTimeoutMsec());
+    // $this->webtestLogout();
 
     // // click(visit) unsubscribe path
     // $this->open($this->sboxPath . $unsubscribeUrl);
@@ -313,10 +302,8 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
   
   function testAdvanceSearchAndReportCheck() {
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Group).
     $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     // make group name
@@ -366,7 +353,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click('_qf_MailSettings_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to Schedule and Send Mailing form
+    // Go to Schedule and Send Mailing form
     $this->openCiviPage('mailing/send', 'reset=1', '_qf_Group_cancel');
 
     //-------select recipients----------

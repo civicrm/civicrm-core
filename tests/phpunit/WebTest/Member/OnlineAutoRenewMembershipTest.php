@@ -67,7 +67,6 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     //configure membership signup page.
     $pageId = $this->_configureMembershipPage();
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -129,12 +128,11 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     static $pageId = NULL;
 
     if (!$pageId) {
-      $this->open($this->sboxPath);
-      $this->webtestLogin();
+        $this->webtestLogin();
 
       //add payment processor.
-      $hash          = substr(sha1(rand()), 0, 7);
-      $rand          = 2 * rand(2, 50);
+      $hash = substr(sha1(rand()), 0, 7);
+      $rand = 2 * rand(2, 50);
       $processorName = "Webtest Auto Renew AuthNet" . $hash;
       $this->webtestAddPaymentProcessor($processorName, 'AuthNet');
 
@@ -146,8 +144,8 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
       
-      //wait for the auto-complete member_of_contact to populate
-      sleep(2);
+      // wait for the auto-complete member_of_contact to populate
+      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -160,28 +158,27 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       $this->select("duration_unit", "label=year");
 
       //wait for the auto-complete member_of_contact to populate
-      sleep(2);
+      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
 
-
       // create contribution page with randomized title and default params
-      $amountSection   = FALSE;
-      $payLater        = TRUE;
-      $onBehalf        = FALSE;
-      $pledges         = FALSE;
-      $recurring       = TRUE;
+      $amountSection = FALSE;
+      $payLater = TRUE;
+      $onBehalf = FALSE;
+      $pledges = FALSE;
+      $recurring = TRUE;
       $membershipTypes = array(array('id' => 1, 'auto_renew' => 1),
         array('id' => 2, 'auto_renew' => 1),
       );
       $memPriceSetId = NULL;
-      $friend        = TRUE;
-      $profilePreId  = NULL;
+      $friend = TRUE;
+      $profilePreId = NULL;
       $profilePostId = NULL;
-      $premiums      = TRUE;
-      $widget        = TRUE;
-      $pcp           = TRUE;
+      $premiums = TRUE;
+      $widget = TRUE;
+      $pcp = TRUE;
 
       $contributionTitle = "Title $hash";
       $pageId = $this->webtestAddContributionPage($hash,
@@ -209,7 +206,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       $this->changePermissions($permissions);
 
       // now logout and do membership test that way
-      $this->openCiviPage('logout', 'reset=1', NULL);
+      $this->webtestLogout();
     }
 
     return $pageId;
