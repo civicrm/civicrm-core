@@ -474,7 +474,7 @@ class CRM_Utils_Date {
    * @param string $dateParam  index of params
    * @static
    */
-  function convertToDefaultDate(&$params, $dateType, $dateParam) {
+  static function convertToDefaultDate(&$params, $dateType, $dateParam) {
     $now     = getDate();
     $cen     = substr($now['year'], 0, 2);
     $prevCen = $cen - 1;
