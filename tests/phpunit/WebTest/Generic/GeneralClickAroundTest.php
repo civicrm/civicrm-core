@@ -57,7 +57,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Advanced Search by Tag
     $this->click("css=ul#civicrm-menu li.crm-Search");
     $this->click("css=ul#civicrm-menu li.crm-Advanced_Search a");
-    $this->waitForElementPresent('_qf_Advanced_refresh');
+    $this->waitForElementPresent('css=select#crmasmSelect3');
     $this->click('crmasmSelect3');
     $this->select('crmasmSelect3', 'label=Major Donor');
     $this->waitForElementPresent("//ul[@id='crmasmList3']/li/span");
