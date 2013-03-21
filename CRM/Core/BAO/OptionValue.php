@@ -71,18 +71,17 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $params
    */
   static function setDefaults(&$params){
-    if(empty($params['label'])){
+    if(CRM_Utils_Array::value('label', $params, NULL) === NULL){
       $params['label'] = $params['name'];
     }
-    if(empty($params['name'])){
+    if(CRM_Utils_Array::value('name', $params, NULL) === NULL){
       $params['name'] = $params['label'];
     }
-    if(empty($params['weight'])){
-      $params['weight'] = (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
-          array('option_group_id' => $params['option_group_id']));
+    if(CRM_Utils_Array::value('weight', $params, NULL) === NULL){
+      $params['weight'] = self::getDefaultValue($params);
     }
-    if(empty($params['value'])){
-      $params['value'] = self::getNextValue($params);
+    if (CRM_Utils_Array::value('value', $params, NULL) === NULL){
+      $params['value'] = self::getDefaultValue($params);
     }
   }
   /**
@@ -92,7 +91,19 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * more complex decision making
    * @param array $params
    */
-  static function getNextValue($params){
+  static function getDefaultWeight($params){
+    return (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
+          array('option_group_id' => $params['option_group_id']));
+  }
+
+  /**
+   * Get next available value
+   * We will take the highest numeric value (or 0 if no numeric values exist)
+   * and add one. The calling function is responsible for any
+   * more complex decision making
+   * @param array $params
+   */
+  static function getDefaultValue($params){
      $bao = new CRM_Core_BAO_OptionValue();
      $bao->option_group_id = $params['option_group_id'];
      if(isset($params['domain_id'])){
