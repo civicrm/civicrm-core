@@ -416,12 +416,10 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Event_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $text = "'Event' information has been saved.";
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+    $this->waitForText('crm-notification-container', $text);
 
     // parse URL to grab the contribution page id
-    $elements = $this->parseURL();
-    $pageId = $elements['queryString']['id'];
-    return $pageId;
+    return $this->urlArg('id');
   }
 
   function _testParticipantSearchEventName($eventName, $lastNameDonar, $firstNameDonar, $firstNameCreator, $lastNameCreator, $amount) {

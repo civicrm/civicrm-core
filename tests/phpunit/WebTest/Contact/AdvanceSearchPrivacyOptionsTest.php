@@ -199,7 +199,7 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "{$firstName} {$lastName} has been created.");
+    $this->waitForText('crm-notification-container', "{$firstName} {$lastName} has been created.");
 
   }
 }

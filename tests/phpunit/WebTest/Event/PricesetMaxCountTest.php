@@ -111,9 +111,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // get text field Id.
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/fid=([0-9]+)/', $this->getLocation(), $matches);
-    $textFieldId = $matches[1];
+    $textFieldId = $this->urlArg('fid');
 
     $this->open($pricesetLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -122,17 +120,13 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $selectFieldLoc = $this->getLocation();
-    $matches = array();
-    preg_match('/fid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldId = $matches[1];
+    $selectFieldId = $this->urlArg('fid');
 
     // get select field ids
     // get select field option1
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/oid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldOp1 = $matches[1];
+    $selectFieldOp1 = $this->urlArg('oid');
 
     $this->open($selectFieldLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -140,9 +134,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // get select field option2
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/oid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldOp2 = $matches[1];
+    $selectFieldOp2 = $this->urlArg('oid');
 
     // create event.
     $eventTitle = 'Meeting - ' . substr(sha1(rand()), 0, 7);
@@ -311,11 +303,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $pricesetLoc = $this->getLocation();
 
     // get text field Id.
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/fid=([0-9]+)/', $this->getLocation(), $matches);
-    $textFieldId = $matches[1];
+    $this->clickLink("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
+    $textFieldId = $this->urlArg('fid');
 
     $this->open($pricesetLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -324,17 +313,13 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $selectFieldLoc = $this->getLocation();
-    $matches = array();
-    preg_match('/fid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldId = $matches[1];
+    $selectFieldId = $this->urlArg('fid');
 
     // get select field ids
     // get select field option1
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/oid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldOp1 = $matches[1];
+    $selectFieldOp1 = $this->urlArg('oid');
 
     $this->open($selectFieldLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -342,9 +327,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // get select field option2
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/oid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldOp2 = $matches[1];
+    $selectFieldOp2 = $this->urlArg('oid');
 
     // create event.
     $eventTitle = 'Meeting - ' . substr(sha1(rand()), 0, 7);
@@ -507,11 +490,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $pricesetLoc = $this->getLocation();
 
     // get text field Id.
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/fid=([0-9]+)/', $this->getLocation(), $matches);
-    $textFieldId = $matches[1];
+    $this->clickLink("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
+    $textFieldId = $this->urlArg('fid');
 
     $this->open($pricesetLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -520,17 +500,13 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $selectFieldLoc = $this->getLocation();
-    $matches = array();
-    preg_match('/fid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldId = $matches[1];
+    $selectFieldId = $this->urlArg('fid');
 
     // get select field ids
     // get select field option1
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/oid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldOp1 = $matches[1];
+    $selectFieldOp1 = $this->urlArg('oid');
 
     $this->open($selectFieldLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -538,9 +514,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // get select field option2
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/oid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldOp2 = $matches[1];
+    $selectFieldOp2 = $this->urlArg('oid');
 
     // create event.
     $eventTitle = 'Meeting - ' . substr(sha1(rand()), 0, 7);
@@ -799,9 +773,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // get text field Id.
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[9]/span[1]/a[2]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/fid=([0-9]+)/', $this->getLocation(), $matches);
-    $textFieldId = $matches[1];
+    $textFieldId = $this->urlArg('fid');
 
     $this->open($pricesetLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -810,17 +782,13 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $selectFieldLoc = $this->getLocation();
-    $matches = array();
-    preg_match('/fid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldId = $matches[1];
+    $selectFieldId = $this->urlArg('fid');
 
     // get select field ids
     // get select field option1
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/oid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldOp1 = $matches[1];
+    $selectFieldOp1 = $this->urlArg('oid');
 
     $this->open($selectFieldLoc);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -828,9 +796,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // get select field option2
     $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[7]/span[1]/a[1]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $matches = array();
-    preg_match('/oid=([0-9]+)/', $this->getLocation(), $matches);
-    $selectFieldOp2 = $matches[1];
+    $selectFieldOp2 = $this->urlArg('oid');
 
     // create event.
     $eventTitle = 'Meeting - ' . substr(sha1(rand()), 0, 7);

@@ -41,8 +41,7 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
     //check the street address parsing is already enabled
     if (!$this->isChecked("address_options[13]")) {
       $this->click("address_options[13]");
-      $this->click("_qf_Address_next");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->clickLink("_qf_Address_next");
     }
 
     // Go to the URL to create an Individual contact.
@@ -52,10 +51,8 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
     $firstName = "John" . substr(sha1(rand()), 0, 7);
     $lastName = "Smith" . substr(sha1(rand()), 0, 7);
 
-    //fill in first name
+    //fill in name
     $this->type("first_name", $firstName);
-
-    //fill in last name
     $this->type("last_name", $lastName);
 
     //address section
@@ -103,31 +100,27 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
       $location[$this->getSelectedLabel("address_{$i}_location_type_id")] = $i;
     }
 
-    // Clicking save.
-    $this->click("_qf_Contact_upload_view");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("{$firstName} {$lastName} has been created."));
+    // Submit form
+    $this->clickLink("_qf_Contact_upload_view");
+    $this->waitForText('crm-notification-container', "{$firstName} {$lastName}");
 
-    //Get the is of newly created contact
-    $matches = array();
-    preg_match('/id=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    //Get the ids of newly created contact
+    $contactId = $this->urlArg('cid');
 
     //Go to the url of edit contact
     $this->openCiviPage('contact/add', array('reset' => 1, 'action' => 'update', 'cid' => $contactId), 'addressBlock');
     $this->click("addressBlock");
     $this->click("//div[@id='addressBlockId']/div[1]");
-    $this->waitForElementPresent("address_1_street_address");
-    $this->waitForElementPresent("address_4_street_address");
 
     // Match addresses by location type since the order may have changed
     for ($i = 1; $i <= 4; ++$i) {
+      $this->waitForElementPresent("address_{$i}_street_address");
       $address[$i] = $location[$this->getSelectedLabel("address_{$i}_location_type_id")];
       // Open "Edit Address Elements"
-      $this->click("//table[@id='address_{$i}']//a[@href='#']");
+      $this->click("//table[@id='address_{$i}']//a[text()='Edit Address Elements']");
     }
 
-    //verify all the address fields whether parsed correctly
+    //verify all the address fields were parsed correctly
     $verifyData = array(
       1 => array(
         'street_number' => '121A',
@@ -153,8 +146,7 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
     foreach ($verifyData as $loc => $values) {
       $num = $address[$loc];
       foreach ($values as $key => $expectedvalue) {
-        $actualvalue = $this->getValue("address_{$num}_$key");
-        $this->assertEquals($expectedvalue, $actualvalue);
+        $this->waitForValue("address_{$num}_$key", $expectedvalue);
       }
     }
   }

@@ -562,7 +562,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->click('_qf_Group_next-bottom');
 
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     foreach ($customDataArr as $key => $customDataParams) {
       $this->select('field_name[0]', "label={$profileFor}");
@@ -573,7 +573,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
       // Clicking save and new
       $this->click('_qf_Field_next_new-bottom');
       $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field '{$customDataParams[1]}' has been saved to '{$profileTitle}'.");
+      $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field '{$customDataParams[1]}' has been saved to '{$profileTitle}'.");
     }
   }
 
@@ -602,7 +602,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     //for checkbox 1
     $checkLabel1 = 'Custom Check One Text_' . substr(sha1(rand()), 0, 4);
@@ -631,7 +631,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$checkLabel1' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$checkLabel1' has been saved.");
     $returnArray[1] = array($customGroupTitle, $checkLabel1);
 
     // create another custom field - Integer Radio
@@ -662,7 +662,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$checkLabel2' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$checkLabel2' has been saved.");
     $returnArray[2] = array($customGroupTitle, $checkLabel2);
 
     // create another custom field - Integer Radio
@@ -691,7 +691,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$dateFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$dateFieldLabel' has been saved.");
     $returnArray[3] = array($customGroupTitle, $dateFieldLabel);
 
     // create another custom field - Integer Radio
@@ -710,7 +710,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$richTextField' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$richTextField' has been saved.");
     $returnArray[4] = array($customGroupTitle, $richTextField);
 
     // create another custom field - Integer Radio
@@ -773,7 +773,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$radioLabel2' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$radioLabel2' has been saved.");
     $returnArray[6] = array($customGroupTitle, $radioLabel2);
 
     return $returnArray;

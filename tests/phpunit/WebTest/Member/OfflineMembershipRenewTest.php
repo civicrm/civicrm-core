@@ -78,9 +78,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.",
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
     $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
@@ -185,9 +183,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.",
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
     $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
@@ -275,9 +271,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.",
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
     $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[7]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
@@ -387,12 +381,8 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.",
-      "Status message didn't show up after saving!"
-    );
-    $this->assertElementContainsText('crm-notification-container', "A membership confirmation and receipt has been sent to {$firstName}@memberson.com.",
-      "Email sent to member message didn't show up after saving membership!"
-    );
+    $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
+    $this->waitForText('crm-notification-container', "A membership confirmation and receipt has been sent to {$firstName}@memberson.com.");
 
     $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 

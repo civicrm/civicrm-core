@@ -58,16 +58,14 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
 
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // go to group tab and add to mailing group
     $this->click("css=li#tab_group a");
@@ -323,16 +321,14 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
 
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // go to group tab and add to mailing group
     $this->click("css=li#tab_group a");

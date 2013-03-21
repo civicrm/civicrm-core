@@ -47,9 +47,7 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
     $email = $this->webtestAddContact($fname, $lname, TRUE);
 
     // Get the contact id of the newly added contact
-    $urlElements = $this->parseURL();
-    $cid = $urlElements['queryString']['cid'];
-    $this->assertNotEmpty($cid, 'Could not find cid after adding contact');
+    $cid = $this->urlArg('cid');
 
     // Send an email to the added contact
     $this->openCiviPage("activity/email/add", "action=add&reset=1&cid={$cid}&selectedChild=activity&atype=3");

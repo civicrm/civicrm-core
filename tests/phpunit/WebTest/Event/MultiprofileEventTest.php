@@ -60,8 +60,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get custom group id
-    $elements = $this->parseURL();
-    $customGrpId1 = $elements['queryString']['gid'];
+    $customGrpId1 = $this->urlArg('gid');
 
     $customId = $this->_testGetCustomFieldId($customGrpId1);
 
@@ -161,8 +160,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get custom group id
-    $elements = $this->parseURL();
-    $customGrpId1 = $elements['queryString']['gid'];
+    $customGrpId1 = $this->urlArg('gid');
 
     $customId = $this->_testGetCustomFieldId($customGrpId1);
 
@@ -417,8 +415,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type('title', $profilename);
     $this->click('_qf_Group_next-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $elements = $this->parseURL();
-    $profileId = $elements['queryString']['gid'];
+    $profileId = $this->urlArg('gid');
 
     //Add field to profile_testCreateProfile
     foreach ($profilefield as $key => $value) {
@@ -581,12 +578,9 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $elements = $this->parseURL();
-    $eventPageId = $elements['queryString']['id'];
+    $this->waitForText('crm-notification-container', "'Registration' information has been saved.");
 
-    $this->waitForTextPresent("'Registration' information has been saved.");
-
-    return $eventPageId;
+    return $this->urlArg('id');
   }
 
   function _testEventRegistration($eventPageId, $customId, $firstName, $lastName,

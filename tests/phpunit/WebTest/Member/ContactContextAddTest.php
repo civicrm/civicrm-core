@@ -56,7 +56,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "$firstName $lastName has been created.");
+    $this->waitForText('crm-notification-container', "$firstName $lastName");
 
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
@@ -93,8 +93,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "membership for $firstName $lastName has been added.",
-      "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "membership for $firstName $lastName has been added.");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -180,7 +179,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "$firstName $lastName has been created.");
+    $this->waitForText('crm-notification-container', "$firstName $lastName has been created.");
 
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
@@ -218,8 +217,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "membership for $firstName $lastName has been added.",
-      "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "membership for $firstName $lastName has been added.");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");

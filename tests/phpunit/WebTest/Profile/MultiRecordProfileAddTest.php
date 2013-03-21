@@ -101,7 +101,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     //Add field to profile
     $this->waitForElementPresent('field_name[0]');
@@ -181,8 +181,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->click('link=Use (create mode)');
     $recordNew = $this->_addRecords('Create');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $elements = $this->parseURL( );
-
+    $elements = $this->parseURL();
     $gid = $elements['queryString']['gid'];
     $id = $elements['queryString']['id'];
 

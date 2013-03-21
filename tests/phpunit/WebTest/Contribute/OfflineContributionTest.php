@@ -301,6 +301,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $url = $this->getLocation();
     $url = str_replace('mode=live', 'mode=test', $url);
     $this->open($url);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // start filling out contribution form
     $this->waitForElementPresent('payment_processor_id');

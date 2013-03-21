@@ -60,9 +60,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //does data saved.
-    $this->assertElementContainsText('crm-notification-container', 'The Relationship Type has been saved.',
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', 'The Relationship Type has been saved.');
 
     //validate data.
     $data = array(
@@ -98,9 +96,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_RelationshipType_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', 'Relationship Label-A to B is a required field.',
-      'Required form rule for Label A - B seems to be broken.'
-    );
+    $this->waitForText('crm-notification-container', 'Relationship Label-A to B is a required field.');
 
     //enter the relationship type values.
     $labelAB = 'Test Relationship Type A - B - DUPLICATE TO BE' . rand();
@@ -122,9 +118,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_RelationshipType_next-bottom');
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', 'Label already exists in Database.',
-      'Unique relationship type label form rule seems to be broken.'
-    );
+    $this->waitForText('crm-notification-container', 'Label already exists in Database.');
   }
 }
 

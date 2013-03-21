@@ -301,9 +301,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
-    $matches = array();
-    preg_match('/id=([0-9]+)/', $this->getLocation(), $matches);
-    $membershipCreatedId = $matches[1];
+    $membershipCreatedId = $this->urlArg('id');
 
     $memberSince = date('F jS, Y');
 
@@ -341,9 +339,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
-    $matches = array();
-    preg_match('/id=([0-9]+)/', $this->getLocation(), $matches);
-    $membershipRenewedId = $matches[1];
+    $membershipRenewedId = $this->urlArg('id');
 
     //View Membership Record
     $verifyMembershipData = array(

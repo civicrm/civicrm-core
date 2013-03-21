@@ -154,7 +154,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The tag '$tagSetName' has been saved.");
+    $this->waitForText('crm-notification-container', "The tag '$tagSetName' has been saved.");
 
     // sort by ID desc
     $this->click("xpath=//table//tr/th[text()=\"ID\"]");
@@ -163,15 +163,9 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     // verify text
     $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']");
 
-    $this->click("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']");
+    $this->clickLink("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Get contact id from url.
-    $matches = array();
-    preg_match('/id=([0-9]+)/', $this->getLocation(), $matches);
-
-    return $matches[1];
+    return $this->urlArg('id');
   }
 }
 

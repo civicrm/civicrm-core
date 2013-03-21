@@ -212,9 +212,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $email = $this->webtestAddContact($firstName, $lastName, TRUE);
 
     // Get the contact id of the new contact
-    $contactUrl = $this->parseURL();
-    $cid = $contactUrl['queryString']['cid'];
-    $this->assertType('numeric', $cid);
+    $cid = $this->urlArg('cid');
 
     //got to the new cms user form
     $this->openCiviPage('contact/view/useradd', "reset=1&action=add&cid={$cid}");

@@ -50,11 +50,10 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     // Get profile id (gid) from URL
-    $elements = $this->parseURL();
-    $profileId = $elements['queryString']['gid'];
+    $profileId = $this->urlArg('gid');
 
     // Add Last Name field.
     $this->click('field_name[0]');
@@ -70,8 +69,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Last Name' has been saved to '$profileTitle'.");
-    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.');
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Last Name' has been saved to '$profileTitle'.");
+    $this->waitForText('crm-notification-container', 'You can add another profile field.');
 
     // Add Email field.
     $this->click('field_name[0]');
@@ -87,8 +86,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
-    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.');
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
+    $this->waitForText('crm-notification-container', 'You can add another profile field.');
 
     // Add Sample Custom Field.
     $this->click('field_name[0]');
@@ -153,7 +152,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("visibility"), 'Visibility field not present when editing existing profile field.');
     $this->click("xpath=//tr[@id='profile_visibility']/td[1]/a");
     $this->waitForElementPresent("xpath=//div[@id='crm-notification-container']/div/div[2]/p[2]");
-    $this->assertElementContainsText('crm-notification-container', 'Is this field hidden from other users');
+    $this->waitForText('crm-notification-container', 'Is this field hidden from other users');
     $this->select('visibility', 'value=Public Pages and Listings');
   }
 }

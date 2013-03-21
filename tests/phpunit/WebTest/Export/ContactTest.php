@@ -325,6 +325,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
   }
 }

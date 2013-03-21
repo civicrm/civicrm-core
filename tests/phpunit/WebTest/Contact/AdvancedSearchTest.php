@@ -66,7 +66,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
     // is status message correct?
     $this->waitForTextPresent("Saved");
-    $this->assertElementContainsText('crm-notification-container', "Saved");
+    $this->waitForText('crm-notification-container', "Saved");
 
     // go to event tab and register for event ( auto add activity and contribution )
     $this->click("css=li#tab_participant a");
@@ -84,7 +84,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "trid$firstName");
     $this->click("_qf_Participant_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Event registration for $firstName adv$firstName has been added");
+    $this->waitForText('crm-notification-container', "Event registration for $firstName adv$firstName has been added");
 
     // go to pledge tab and add pledge
     $this->click("css=li#tab_pledge a");
@@ -98,7 +98,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->click("_qf_Pledge_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
+    $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     // go to Membership tab and add membership
     $this->click("css=li#tab_member a");
@@ -113,7 +113,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->click("_qf_Membership_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Student membership for $firstName adv$firstName has been added");
+    $this->waitForText('crm-notification-container', "Student membership for $firstName adv$firstName has been added");
 
     // go to relationship tab and add relationship
     $this->click("css=li#tab_rel a");
@@ -127,7 +127,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate("end_date", "+1 day");
     $this->click("details-save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "New relationship created.");
+    $this->waitForText('crm-notification-container', "New relationship created.");
 
     //-------------- advance search --------------
 

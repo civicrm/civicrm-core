@@ -451,7 +451,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText("crm-notification-container", "'Fee' information has been saved");
+    $this->waitForText('crm-notification-container', "'Fee' information has been saved");
     return array($discount1, $discount2);
   }
 
@@ -497,8 +497,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $this->assertStringsPresent($eventFees);
 
     }
-    $elements = $this->parseURL();
-    return $elements['queryString']['id'];
+    return $this->urlArg('id');
   }
 
   function _testVerifyRegisterPage($registerStrings) {

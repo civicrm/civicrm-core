@@ -62,7 +62,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     // Add Contact to a group
     $group = 'Newsletter Subscribers';
@@ -71,7 +71,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->select('group_id', "label=$group");
     $this->click('_qf_GroupContact_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Added to Group");
+    $this->waitForText('crm-notification-container', "Added to Group");
 
     // Add Tags to the contact
     $tag = 'Government Entity';
@@ -104,7 +104,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     // Add second pair of dupes so we can test Merge and Goto Next Pair
     $fname2 = 'Janet';
@@ -122,7 +122,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     // Find and Merge Contacts with Supervised Rule
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew");
@@ -301,7 +301,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     // contact2: duplicate of contact1.
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -325,7 +325,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     // Find and Merge Contacts with Supervised Rule
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew");
@@ -390,7 +390,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     // contact2: duplicate of contact1.
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -414,7 +414,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     // Find and Merge Contacts with Supervised Rule
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew");
@@ -496,7 +496,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     //Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     //duplicate of contact2.
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -523,7 +523,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     // add contact3 and its duplicate
     //fill in first name
@@ -554,7 +554,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('civicrm-footer');
-    $this->assertElementContainsText('crm-notification-container', "safe mode");
+    $this->waitForText('crm-notification-container', "safe mode");
 
     // If we are still on the dedupe table page, count unmerged contacts
     if ($this->isElementPresent("//table[@class='pagerDisplay']")) {
@@ -611,7 +611,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     //duplicate of above contact.
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -632,7 +632,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
   }
 }
 

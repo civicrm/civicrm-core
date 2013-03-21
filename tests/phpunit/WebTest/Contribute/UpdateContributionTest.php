@@ -97,8 +97,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->_testOfflineContribution($firstName, $lastName, $email, $amount, "Pending");
    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']");
    $this->waitForPageToLoad($this->getTimeoutMsec());
-   $elements = $this->parseURL();
-   $contId = $elements['queryString']['id'];
+   $contId = $this->urlArg('id');
    $this->select("contribution_status_id", "label=Completed");
    $this->click("_qf_Contribution_upload");
    $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -178,8 +177,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    //click through to the Contribution edit screen
    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']");
    $this->waitForElementPresent("_qf_Contribution_upload-bottom");
-   $elements = $this->parseURL();
-   $contId = $elements['queryString']['id'];
+   $contId = $this->urlArg('id');
    $this->waitForElementPresent("product_name_0");
    $this->select('product_name_0', "label=$premiumName2 ( $sku2 )");
    // Clicking save.
@@ -246,8 +244,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    //click through to the Contribution edit screen
    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']");
    $this->waitForElementPresent("_qf_Contribution_upload-bottom");
-   $elements = $this->parseURL();
-   $contId = $elements['queryString']['id'];
+   $contId = $this->urlArg('id');
    $this->waitForElementPresent("product_name_0");
    $this->select('product_name_0', "value=0");
    // Clicking save.
@@ -273,8 +270,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->_testOfflineContribution($firstName, $lastName, $email, $amount);
    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='Edit']");
    $this->waitForPageToLoad($this->getTimeoutMsec());
-   $elements = $this->parseURL();
-   $contId = $elements['queryString']['id'];
+   $contId = $this->urlArg('id');
    //change payment processor to newly created value
    $this->select("payment_instrument_id", "label=$label");
    $this->click("_qf_Contribution_upload");
@@ -296,8 +292,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->waitForPageToLoad($this->getTimeoutMsec());
    //Contribution status
    $this->select("contribution_status_id", "label=Refunded");
-   $elements = $this->parseURL();
-   $contId = $elements['queryString']['id'];
+   $contId = $this->urlArg('id');
    $this->click("_qf_Contribution_upload");
    $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -325,8 +320,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->waitForPageToLoad($this->getTimeoutMsec());
    //Contribution status
    $this->select("contribution_status_id", "label=Cancelled");
-   $elements = $this->parseURL();
-   $contId = $elements['queryString']['id'];
+   $contId = $this->urlArg('id');
    $this->click("_qf_Contribution_upload");
    $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -360,8 +354,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->waitForPageToLoad($this->getTimeoutMsec());
    //Contribution status
    $this->select("financial_type_id", "value=3");
-   $elements = $this->parseURL();
-   $contId = $elements['queryString']['id'];
+   $contId = $this->urlArg('id');
    $this->click("_qf_Contribution_upload");
    $this->waitForPageToLoad($this->getTimeoutMsec());
 

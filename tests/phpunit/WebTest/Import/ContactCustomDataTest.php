@@ -147,9 +147,8 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now."));
-    $url = explode('gid=', $this->getLocation());
-    $gid = $url[1];
+    $this->waitForText('crm-notification-container', $customGroupTitle);
+    $gid = $this->urlArg('gid');
 
     // create another custom field - Date
     $customField = 'Custom field ' . substr(sha1(rand()), 0, 4);

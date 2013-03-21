@@ -62,7 +62,7 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->assertElementContainsText('crm-notification-container', "The mailing component '$componentName' has been saved.");
+    $this->waitForText('crm-notification-container', "The mailing component '$componentName' has been saved.");
 
     // Verify text.
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Header']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
@@ -99,7 +99,7 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->assertElementContainsText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
+    $this->waitForText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
 
     // Verify text.
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Footer']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
@@ -136,7 +136,7 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->assertElementContainsText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
+    $this->waitForText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
 
     // Verify text
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Reply']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");

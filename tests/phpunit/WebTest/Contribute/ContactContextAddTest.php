@@ -72,7 +72,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    $this->webtestAddContact( $firstName, "Anderson", true );
+    $this->webtestAddContact($firstName, "Anderson", true);
 
     // Get the contact id of the new contact
     $contactUrl = $this->parseURL();
@@ -147,7 +147,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->clickLink("_qf_Contribution_upload-bottom", 'civicrm-footer');
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved");
+    $this->waitForText('crm-notification-container', "The contribution record has been saved");
 
     $this->waitForElementPresent("xpath=//div[@id='Contributions']//table/tbody/tr/td[8]/span/a[text()='View']");
 

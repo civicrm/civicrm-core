@@ -73,7 +73,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_RemoveFromGroup_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "2 contacts removed from '{$groupName}'");
+    $this->waitForText('crm-notification-container', "2 contacts removed from '{$groupName}'");
 
     // Search for the contacts who are not deceased
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');

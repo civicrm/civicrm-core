@@ -55,7 +55,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     // Clicking save.
     $this->click('_qf_Contact_upload_view');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     $existingContact = array(
       'first_name' => $firstName,
