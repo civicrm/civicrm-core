@@ -141,7 +141,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
     $this->type('organization_name', $orgName);
     $this->type('street_address-1', 'Test Org Street');
     $this->type('city-1', 'Test Org City');
-    $this->clickLink('_qf_Edit_next', 'selected_shared_address-2');
+    $this->clickLink('_qf_Edit_next', 'selected_shared_address-2', FALSE);
     $this->waitForTextPresent('Test Org Street');
     $this->inlineEdit('address-block-2', array(
       'address_2_location_type_id' => array('Work'),
