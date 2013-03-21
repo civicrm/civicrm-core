@@ -2454,7 +2454,7 @@ WHERE      civicrm_membership.is_test = 0";
     $params = array();
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $today         = date("Y-m-d");
+    $today         = date('Y-m-d');
     $processCount  = 0;
     $updateCount   = 0;
 
@@ -2514,6 +2514,15 @@ WHERE      civicrm_membership.is_test = 0";
           //since there is change in status.
           $statusChange = array('status_id' => $deceaseStatusId);
           $smarty->append_by_ref('memberParams', $statusChange, TRUE);
+          unset(
+            $deceasedMembership['contact_id'],
+            $deceasedMembership['membership_type_id'],
+            $deceasedMembership['membership_type'],
+            $deceasedMembership['join_date'],
+            $deceasedMembership['start_date'],
+            $deceasedMembership['end_date'],
+            $deceasedMembership['source']
+          );
 
           //process membership record.
           civicrm_api('membership', 'create', $deceasedMembership);
