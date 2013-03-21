@@ -139,6 +139,9 @@ WHERE    entity_value = '' OR entity_value IS NULL
   function upgrade_4_3_alpha1($rev) {
     self::task_4_3_alpha1_checkDBConstraints();
 
+    // add indexes for civicrm_entity_financial_trxn
+    // CRM-12141
+    $this->addTask(ts('Check/Add indexes for civicrm_entity_financial_trxn'), 'task_4_3_x_checkIndexes', $rev);
     // task to process sql
     $this->addTask(ts('Upgrade DB to 4.3.alpha1: SQL'), 'task_4_3_x_runSql', $rev);
 
@@ -206,6 +209,9 @@ WHERE    entity_value = '' OR entity_value IS NULL
 
   function upgrade_4_3_beta4($rev) {
     $this->addTask(ts('Upgrade DB to 4.3.beta4: SQL'), 'task_4_3_x_runSql', $rev);
+    // add indexes for civicrm_entity_financial_trxn
+    // CRM-12141
+    $this->addTask(ts('Check/Add indexes for civicrm_entity_financial_trxn'), 'task_4_3_x_checkIndexes', $rev);
   }
 
   //CRM-11636
@@ -348,6 +354,9 @@ FROM civicrm_entity_financial_account ceft
      INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
 WHERE cog.name = 'payment_instrument'";
     CRM_Core_DAO::executeQuery($sql);
+    //CRM-12141
+    $sql = "ALTER TABLE {$tempTableName1} ADD INDEX index_instrument_id (instrument_id);";
+    CRM_Core_DAO::executeQuery($sql);
 
     //create temp table to process completed / cancelled contribution
     $tempTableName2 = CRM_Core_DAO::createTempTableName();
@@ -378,6 +387,9 @@ FROM   civicrm_contribution con
        LEFT JOIN {$tempTableName1} tpi
               ON con.payment_instrument_id = tpi.instrument_id
 WHERE con.contribution_status_id IN ({$completedStatus}, {$cancelledStatus})";
+    CRM_Core_DAO::executeQuery($sql);
+    // CRM-12141
+    $sql = "ALTER TABLE {$tempTableName2} ADD INDEX index_action (action);";
     CRM_Core_DAO::executeQuery($sql);
 
     //handling for completed contribution and cancelled contribution
@@ -767,6 +779,23 @@ AND TABLE_SCHEMA = '{$dbUf['database']}'";
       $saveDao->form_values = serialize($formValues);
 
       $saveDao->save();
+    }
+    return TRUE;
+  }
+
+  /**
+   * Check/Add INDEX CRM-12141
+   *
+   * @return bool TRUE for success
+   */
+  function task_4_3_x_checkIndexes(CRM_Queue_TaskContext $ctx) {
+    $query = "SHOW KEYS FROM  `civicrm_entity_financial_trxn` 
+WHERE key_name IN ('UI_entity_financial_trxn_entity_table', 'UI_entity_financial_trxn_entity_id');";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    if (!$dao->N) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_entity_financial_trxn
+ADD INDEX UI_entity_financial_trxn_entity_table (entity_table),
+ADD INDEX UI_entity_financial_trxn_entity_id (entity_id);");
     }
     return TRUE;
   }
