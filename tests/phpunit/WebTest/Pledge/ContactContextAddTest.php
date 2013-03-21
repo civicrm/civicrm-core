@@ -91,7 +91,7 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Pledge_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
+    $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']");
     //click through to the Pledge view screen

@@ -61,14 +61,14 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
 
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     $this->click('css=li#tab_group a');
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label=$smsGroupName");
     $this->click('_qf_GroupContact_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Added to Group");
+    $this->waitForText('crm-notification-container', "Added to Group");
 
     // ADD contact2
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -85,14 +85,14 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
 
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     $this->click('css=li#tab_group a');
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label=$smsGroupName");
     $this->click('_qf_GroupContact_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Added to Group");
+    $this->waitForText('crm-notification-container', "Added to Group");
 
     // Do an advanced search
     $this->click("css=ul#civicrm-menu li.crm-Search");

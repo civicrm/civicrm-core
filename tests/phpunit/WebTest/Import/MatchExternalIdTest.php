@@ -244,7 +244,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     return $externalId;
   }
@@ -335,7 +335,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
 
     $this->click("_qf_Registration_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Saved");
+    $this->waitForText('crm-notification-container', "Saved");
 
     // verify event input on info page
     // start at Manage Events listing
@@ -343,13 +343,9 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input",$params['title']);
     $this->click("_qf_SearchEvent_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("link=" . $params['title']);
+    $this->clickLink("link=" . $params['title']);
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $matches = array();
-    preg_match('/id=([0-9]+)/', $this->getLocation(), $matches);
-    $params['event_id'] = $matches[1];
+    $params['event_id'] = $this->urlArg('id');
 
     return $params;
   }

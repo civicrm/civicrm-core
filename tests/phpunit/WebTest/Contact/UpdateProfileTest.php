@@ -40,6 +40,7 @@ class WebTest_Contact_UpdateProfileTest extends CiviSeleniumTestCase {
     $locationUrl = $this->getLocation();
     $editUrl = str_replace('/view?', '/edit?', $locationUrl);
     $this->open($editUrl);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Modify profile field values
     // contact details section

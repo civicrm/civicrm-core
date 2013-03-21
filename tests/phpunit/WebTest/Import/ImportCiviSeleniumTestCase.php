@@ -553,13 +553,10 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
       $this->waitForElementPresent("css=div.ac_results-inner li");
 
       // Visit contact summary page.
-      $this->click("css=div.ac_results-inner li");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->clickLink("css=div.ac_results-inner li");
 
       // Get contact id from url.
-      $matches = array();
-      preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-      $contactIds[] = $matches[1];
+      $contactIds[] = $this->urlArg('cid');
     }
 
     return $contactIds;

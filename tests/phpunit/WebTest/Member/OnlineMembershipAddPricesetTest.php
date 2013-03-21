@@ -48,8 +48,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $fields = array(
@@ -106,8 +105,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $fields = array("National Membership $title", "Radio");
@@ -157,7 +155,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Price Field '{$fields[0]}' has been saved.");
+    $this->waitForText('crm-notification-container', "Price Field '{$fields[0]}' has been saved.");
 
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
@@ -206,7 +204,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
     $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
-    $this->assertElementContainsText('crm-notification-container', "Your Set '{$setTitle}' has been added. You can add fields to this set now.");
+    $this->waitForText('crm-notification-container', "Your Set '{$setTitle}' has been added. You can add fields to this set now.");
   }
 
   function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
@@ -264,7 +262,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       }
       $this->select("financial_type_id", "label={$contributionType}");
       $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
-      $this->assertElementContainsText('crm-notification-container', "Price Field '{$label}' has been saved.");
+      $this->waitForText('crm-notification-container', "Price Field '{$label}' has been saved.");
     }
     return array($memTypeTitle1, $memTypeTitle2);
   }

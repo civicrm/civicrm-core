@@ -89,7 +89,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText("crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "Event registration for $displayName has been added");
 
     $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
@@ -158,7 +158,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom group created?
-    $this->assertElementContainsText("crm-notification-container", "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
 
     //add custom field - alphanumeric checkbox
     $checkboxFieldLabel = 'custom_field' . substr(sha1(rand()), 0, 4);
@@ -195,7 +195,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText("crm-notification-container", "Your custom field '$checkboxFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Integer Radio
     $this->click("//a[@id='newCustomField']/span");
@@ -286,7 +286,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText("crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "Event registration for $displayName has been added");
 
     $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen

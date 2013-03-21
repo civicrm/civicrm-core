@@ -104,7 +104,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->click("membership_type_$memTypeId2");
     $this->clickLink('_qf_MembershipBlock_next', '_qf_MembershipBlock_next-bottom');
     $text = "'MembershipBlock' information has been saved.";
-    $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
+    $this->waitForText('crm-notification-container', $text);
 
     //logout
     $this->webtestLogout();

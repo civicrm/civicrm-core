@@ -41,9 +41,8 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $firstName1 = 'Ma_' . substr(sha1(rand()), 0, 7);
     $lastName1 = 'An_' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName1, $lastName1, TRUE);
-    $this->assertElementContainsText('crm-notification-container', "$firstName1 $lastName1 has been created.");
-    $url = explode('&cid=', $this->getLocation());
-    $cid = $url[1];
+    $this->waitForText('crm-notification-container', "$firstName1 $lastName1 has been created.");
+    $cid = $this->urlArg('cid');
 
     // create contribution page with randomized title and default params
     $amountSection = TRUE;
@@ -103,7 +102,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $this->click("membership_type_$memTypeId2");
     $this->clickLink('_qf_MembershipBlock_next', '_qf_MembershipBlock_next-bottom');
     $text = "'MembershipBlock' information has been saved.";
-    $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
+    $this->waitForText('crm-notification-container', $text);
     $this->_testOnlineMembershipSignup($pageId, $memTypeTitle1, $cid);
 
     //Find Member

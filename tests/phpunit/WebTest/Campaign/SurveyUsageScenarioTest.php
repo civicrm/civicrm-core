@@ -99,7 +99,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText("crm-notification-container", "$title");
+    $this->waitForText('crm-notification-container', "$title");
 
     // create a custom data set for activities -> survey
     $this->openCiviPage('admin/custom/group', "action=add&reset=1", "_qf_Group_next-bottom");
@@ -133,7 +133,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("_qf_Field_next-bottom");
 
     $this->waitForElementPresent("newCustomField");
-    $this->assertElementContainsText("crm-notification-container", "$title");
+    $this->waitForText('crm-notification-container', "$title");
 
     // create a profile for campaign
     $this->openCiviPage("admin/uf/group/add", "action=add&reset=1", "_qf_Group_next-bottom");
@@ -145,7 +145,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click("_qf_Group_next-bottom");
 
     $this->waitForElementPresent("_qf_Field_next-bottom");
-    $this->assertElementContainsText("crm-notification-container", "$title");
+    $this->waitForText('crm-notification-container', "$title");
 
     // add a profile field for activity
     $this->select("field_name[0]", "value=Activity");
@@ -154,7 +154,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText("crm-notification-container", "$title");
+    $this->waitForText('crm-notification-container', "$title");
 
     // create a survey
     $this->openCiviPage("survey/add", "reset=1", "_qf_Main_upload-bottom");
@@ -197,7 +197,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->type("//input[@id='option_value_2']", "2");
     $this->click('_qf_Results_upload_done-bottom');
     $this->waitForElementPresent("//div[@id='search_form_survey']");
-    $this->assertElementContainsText("crm-notification-container", "Results");
+    $this->waitForText('crm-notification-container', "Results");
 
     // Reserve Respondents
     $this->openCiviPage("survey/search", "reset=1&op=reserve", "_qf_Search_refresh");
@@ -214,7 +214,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Reserve_done_reserve-bottom");
     $this->click("_qf_Reserve_done_reserve-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText("crm-notification-container", "2");
+    $this->waitForText('crm-notification-container', "2");
 
     // Interview Respondents
     $this->openCiviPage("survey/search", "reset=1&op=interview", "_qf_Search_refresh");
@@ -244,8 +244,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add a contact to the group to test release respondents
     $firstName3 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName3, "James", "$firstName3.james@example.org");
-    $url       = $this->getLocation();
-    $id        = explode('cid=', $url);
+    $id = $this->urlArg('cid');
     $sortName3 = "James, $firstName3";
 
     // add contact to group
@@ -273,7 +272,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Reserve_done_reserve-bottom");
     $this->click("_qf_Reserve_done_reserve-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText("crm-notification-container", "Contact(s) have been reserved");
+    $this->waitForText('crm-notification-container', "Contact(s) have been reserved");
 
     // Release Respondents
     $this->openCiviPage("survey/search", "reset=1&op=release", "_qf_Search_refresh");
@@ -289,7 +288,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("Go");
     $this->clickLink("Go", "_qf_Release_done-bottom");
     $this->clickLink("_qf_Release_done-bottom", 'access');
-    $this->assertElementContainsText("crm-notification-container", "released");
+    $this->waitForText('crm-notification-container', "released");
 
     // check whether contact is available for reserving again
     $this->openCiviPage("survey/search", "reset=1&op=reserve", "_qf_Search_refresh");
@@ -320,8 +319,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // Adding contact
     $firstName1 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName1, "Smith", "$firstName1.smith@example.org");
-    $url1 = explode('cid=', $this->getLocation());
-    $id1 = $url1[1];
+    $id1 = $this->urlArg('cid');
 
     // add contact to group
     // visit group tab
@@ -335,8 +333,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "John", "$firstName2.john@example.org");
-    $url2 = explode('cid=', $this->getLocation());
-    $id2 = $url2[1];
+    $id2 = $this->urlArg('cid');
 
     // add contact to group
     // visit group tab
@@ -359,7 +356,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('extends[0]', "value=Contact");
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
-    $this->assertElementContainsText("crm-notification-container", $customGroup);
+    $this->waitForText('crm-notification-container', $customGroup);
 
     // Add custom fields
     $field1 = "Checkbox $title";
@@ -387,7 +384,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText("crm-notification-container", $field1);
+    $this->waitForText('crm-notification-container', $field1);
 
     // Create a profile for survey
     $this->openCiviPage("admin/uf/group", "reset=1");
@@ -399,7 +396,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->type('title', $surveyProfile);
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
-    $this->assertElementContainsText("crm-notification-container", $surveyProfile);
+    $this->waitForText('crm-notification-container', $surveyProfile);
 
     // Add fields to the profile
     // Phone ( Primary )
@@ -491,7 +488,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Reserve_done_reserve-bottom');
 
     $this->clickLink('_qf_Reserve_done_reserve-bottom', 'access');
-    $this->assertElementContainsText("crm-notification-container", "2");
+    $this->waitForText('crm-notification-container', "2");
 
     $this->openCiviPage("report/survey/detail", "reset=1", '_qf_SurveyDetails_submit');
 

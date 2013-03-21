@@ -49,7 +49,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
     //add custom field - alphanumeric text
     $textFieldLabel = 'test_text_field' . substr(sha1(rand()), 0, 3);
     $this->click("header");
@@ -97,7 +97,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Number Radio
     $this->click("data_type[0]");
@@ -133,7 +133,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
 
     //On New Individual contact form
     $this->openCiviPage("contact/add", "ct=Individual&reset=1");

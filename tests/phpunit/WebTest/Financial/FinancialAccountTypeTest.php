@@ -112,27 +112,21 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $this->click('_qf_FinancialTypeAccount_next_new');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $text = 'The financial type Account has been saved.';
-    $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+    $this->waitForText('crm-notification-container', $text);
     $text = 'You can add another Financial Account Type.';
-    $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+    $this->waitForText('crm-notification-container', $text);
     $accountRelationship = 'Expense Account is';
     $expected[] = array(
-
       'financial_account' => 'Banking Fees',
-
       'account_relationship' => $accountRelationship
-
     );
 
     $this->select('account_relationship', "label={$accountRelationship}");
     $this->select('financial_account_id', "label=Banking Fees");
     $this->click('_qf_FinancialTypeAccount_next');
-    $this->waitForElementPresent( 'newfinancialTypeAccount');
+    $this->waitForElementPresent('newfinancialTypeAccount');
     $text = 'The financial type Account has been saved.';
-    $this->assertElementContainsText('crm-notification-container', $text, 'Missing text: ' . $text);
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+    $this->waitForText('crm-notification-container', $text);
 
     foreach ($expected as  $value => $label) {
       $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$label[financial_account]']/../td[2]", preg_quote($label['account_relationship']));
@@ -156,7 +150,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='Accounts Receivable']/../td[7]/span/a[text()='Delete']", '_qf_FinancialTypeAccount_next-botttom');
     $this->click('_qf_FinancialTypeAccount_next-botttom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', 'Selected financial type account has been deleted.', 'Missing text: ' . 'Selected financial type account has been deleted.');
+    $this->waitForText('crm-notification-container', 'Selected financial type account has been deleted.');
 
     //edit financial type
     $financialType['oldname'] = $financialType['name'];

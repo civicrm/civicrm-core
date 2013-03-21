@@ -54,8 +54,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get custom group id
-    $elements = $this->parseURL();
-    $customGrpId1 = $elements['queryString']['gid'];
+    $customGrpId1 = $this->urlArg('gid');
 
     $customId = $this->_testGetCustomFieldId($customGrpId1);
     $cusId_1 = 'custom_' . $customId[0] . '_-1';

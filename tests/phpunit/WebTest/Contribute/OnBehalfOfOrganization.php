@@ -47,10 +47,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     //adding contact for membership sign up
     $this->webtestAddContact($firstName, $lastName, $email);
-    $urlElements = $this->parseURL();
-    print_r($urlElements);
-    $cid = $urlElements['queryString']['cid'];
-    $this->assertType('numeric', $cid);
+    $cid = $this->urlArg('cid');
 
     // We need a payment processor
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
@@ -452,10 +449,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("last_name", $lastName);
     $this->clickLink("_qf_Edit_next", "profilewrap4");
 
-    $urlElements = $this->parseURL();
-    print_r($urlElements);
-    $cid = $urlElements['queryString']['id'];
-    $this->assertType('numeric', $cid);
+    $cid = $this->urlArg('id');
     // Is status message correct?
     $this->assertTextPresent("Thank you. Your information has been saved.", "Save successful status message didn't show up after saving profile to update testUserName!");
 
@@ -715,8 +709,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent("Your custom field '$fieldTitle' has been saved."));
-    $url = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody//tr/td[1][text()='$fieldTitle']/../td[8]/span/a@href"));
-    $fieldId = $url[1];
+    $fieldId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody//tr/td[1][text()='$fieldTitle']/../td[8]/span/a@href"));
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents("CiviCampaign");
@@ -961,8 +954,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent("Your custom field '$fieldTitle' has been saved."));
-    $url = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody//tr/td[1]/span[text()='$fieldTitle']/../td[8]/span/a@href"));
-    $fieldId = $url[1];
+    $fieldId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody//tr/td[1]/span[text()='$fieldTitle']/../td[8]/span/a@href"));
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents("CiviCampaign");
@@ -1119,8 +1111,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type '$title1' has been saved."));
-    $typeUrl = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[1][text()='{$title1}']/../td[10]/span/a[3]@href"));
-    $typeId = $typeUrl[1];
+    $typeId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[1][text()='{$title1}']/../td[10]/span/a[3]@href"));
 
     // open contact
     $this->openCiviPage("contact/view/rel", "cid={$cid}&action=add&reset=1");
@@ -1288,8 +1279,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("last_name", $lastName);
     $this->clickLink("_qf_Edit_next", "profilewrap4");
 
-    $urlElements = $this->parseURL();
-    $cid = $urlElements['queryString']['id'];
+    $cid = $this->urlArg('id');
     $this->assertType('numeric', $cid);
     // Is status message correct?
     $this->assertTextPresent("Thank you. Your information has been saved.", "Save successful status message didn't show up after saving profile to update testUserName!");
@@ -1369,7 +1359,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Selected Profile Field has been deleted.");
+    $this->waitForText('crm-notification-container', "Selected Profile Field has been deleted.");
   }
 
   function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {

@@ -45,8 +45,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
       $this->webtestAddContact();
 
       // get cid of new contact
-      $queryParams = $this->parseURL();
-      $cids[] = $queryParams['queryString']['cid'];
+      $cids[] = $this->urlArg('cid');
 
       // update email of new contact
       $this->click("//ul[@id='actions']/li/a/span[text()='Edit']");
@@ -83,8 +82,8 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check status messages are as expected
-    $this->assertElementContainsText('crm-notification-container', "Added Contacts to {$newGroupName}");
-    $this->assertElementContainsText('crm-notification-container', "2 contacts added to group");
+    $this->waitForText('crm-notification-container', "Added Contacts to {$newGroupName}");
+    $this->waitForText('crm-notification-container', "2 contacts added to group");
 
     // Search by group membership in newly created group
     $this->openCiviPage('contact/search/advanced', 'reset=1');
@@ -130,8 +129,8 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check status messages are as expected
-    $this->assertElementContainsText('crm-notification-container', "Added Contacts to {$newGroupName}");
-    $this->assertElementContainsText('crm-notification-container', "50 contacts added to group");
+    $this->waitForText('crm-notification-container', "Added Contacts to {$newGroupName}");
+    $this->waitForText('crm-notification-container', "50 contacts added to group");
 
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->select("crmasmSelect1", "label=" . $newGroupName);

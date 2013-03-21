@@ -51,14 +51,12 @@ class WebTest_Import_ActivityTest extends ImportCiviSeleniumTestCase {
     $firstName1 = substr(sha1(rand()), 0, 7);
     $email1 = 'mail_' . substr(sha1(rand()), 0, 7) . '@example.com';
     $this->webtestAddContact($firstName1, 'Anderson', $email1);
-    $url = explode('&cid=', $this->getLocation());
-    $id1 = $url[1];
+    $id1 = $this->urlArg('cid');
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $email2 = 'mail_' . substr(sha1(rand()), 0, 7) . '@example.com';
     $this->webtestAddContact($firstName2, 'Anderson', $email2);
-    $url = explode('&cid=', $this->getLocation());
-    $id2 = $url[1];
+    $id2 = $this->urlArg('cid');
 
     $headers = array(
       'target_contact_id' => 'Contact ID',

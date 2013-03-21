@@ -48,7 +48,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $lastName  = 'Anderson' . substr(sha1(rand()), 0, 7);
 
     $this->webtestAddContact($firstName, $lastName);
-    $cid = explode('&cid=', $this->getLocation());
+    $cid = $this->urlArg('cid');
 
     //add contact to group
     $this->waitForElementPresent("xpath=//li[@id='tab_group']/a");

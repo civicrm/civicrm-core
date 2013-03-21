@@ -84,7 +84,7 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
         $this->click("_qf_Activity_upload");
         $this->waitForPageToLoad($this->getTimeoutMsec());
 
-        $this->assertElementContainsText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving!");
+        $this->waitForText('crm-notification-container', $subject);
 
         // check the resulting email
         $mail = $mailer->getMostRecentEmail('ezc');

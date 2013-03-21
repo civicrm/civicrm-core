@@ -167,7 +167,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //checking the contact sub-type of newly created individual
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
     $this->assertElementContainsText('css=.crm-contact_type_label', "Student");
     $this->assertElementContainsText('css=.crm-contact_type_label', "Parent");
 
@@ -202,7 +202,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Verify contact types
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
     $this->assertElementNotContainsText('css=.crm-contact_type_label', "Student");
     $this->assertElementContainsText('css=.crm-contact_type_label', "Staff");
     $this->assertElementContainsText('css=.crm-contact_type_label', "Parent");
@@ -237,8 +237,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
 
     //Is custom group created?
     $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added."));
-    $url = explode('gid=', $this->getLocation());
-    $gid = $url[1];
+    $gid = $this->urlArg('gid');
 
     $fieldLabel = "custom_field_for_{$contactSubType}" . substr(sha1(rand()), 0, 4);
     $this->type('label', $fieldLabel);

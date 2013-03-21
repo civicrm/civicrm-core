@@ -131,8 +131,8 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->click("_qf_AddToGroup_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Added Contacts to ".$groupName);
-    $this->assertElementContainsText('crm-notification-container', '2 contacts added to group');
+    $this->waitForText('crm-notification-container', "Added Contacts to ".$groupName);
+    $this->waitForText('crm-notification-container', '2 contacts added to group');
     $this->_testSearchResult($relType);
   }
 
@@ -178,7 +178,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
 
     // Wait for "saved" status msg
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "'Location' information has been saved.");
+    $this->waitForText('crm-notification-container', "'Location' information has been saved.");
   }
 
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
@@ -250,7 +250,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->waitForElementPresent("current-relationships");
 
     //check the status message
-    $this->assertElementContainsText('crm-notification-container', "New relationship created.");
+    $this->waitForText('crm-notification-container', "New relationship created.");
 
     $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
     $this->click("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
@@ -289,9 +289,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $firstNameSoft = "John_".substr(sha1(rand()), 0, 5);
     $lastNameSoft  = "Doe_".substr(sha1(rand()), 0, 5);
     $this->webtestAddContact( $firstNameSoft, $lastNameSoft );
-    $url = $this->parseURL( );
-    $cid = $url['queryString']['cid'];
-    $this->assertType('numeric', $cid);
+    $cid = $this->urlArg('cid');
 
     //advance search for created contacts
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');

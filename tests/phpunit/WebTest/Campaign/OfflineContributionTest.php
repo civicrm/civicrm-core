@@ -107,9 +107,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Campaign $campaignTitle has been saved.",
-      "Status message didn't show up after saving campaign!"
-    );
+    $this->waitForText('crm-notification-container', "Campaign $title");
 
     $this->waitForElementPresent("xpath=//div[@id='campaignList']/div[@id='campaigns_wrapper']/table[@id='campaigns']/tbody//tr/td[text()='$campaignTitle']");
     $url = explode('id=', $this->getAttribute("xpath=//div[@id='campaignList']/div[@id='campaigns_wrapper']/table[@id='campaigns']/tbody//tr/td[text()='$campaignTitle']/../td[13]/span/a[text()='Edit']@href"));
@@ -209,7 +207,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The contribution record has been saved");
+    $this->waitForText('crm-notification-container', "The contribution record has been saved");
 
     $this->waitForElementPresent("xpath=//div[@id='Contributions']//table/tbody/tr/td[8]/span/a[text()='View']");
 

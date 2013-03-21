@@ -268,7 +268,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if ($added) {
       $this->click("_qf_Component_next-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertElementContainsText("crm-notification-container", "Saved");
+      $this->waitForText('crm-notification-container', "Saved");
     }
   }
 
@@ -1226,7 +1226,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->clickLink('_qf_Edit_upload-bottom');
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "$groupName");
+    $this->waitForText('crm-notification-container', "$groupName");
     return $groupName;
   }
 
