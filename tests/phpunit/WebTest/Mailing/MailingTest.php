@@ -248,7 +248,6 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('css=div.messages', 'Mailing is forwarded successfully to 2 email addresses');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->webtestLogin();
 
     $this->openCiviPage("mailing/browse/scheduled", "reset=1&scheduled=true");
