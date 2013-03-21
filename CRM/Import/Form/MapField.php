@@ -94,7 +94,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
    * @var array
    * @access protected
    */
-  protected static $_formattedFieldNames;
+  protected $_formattedFieldNames;
 
   /**
    * on duplicate
