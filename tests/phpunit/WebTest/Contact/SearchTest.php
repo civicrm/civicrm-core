@@ -77,7 +77,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->type("css=input#sort_name_navigation", 'ada');
     $this->typeKeys("css=input#sort_name_navigation", 'ada');
 
-    $this->clickLink("_qf_Basic_refresh");
+    $this->clickLink("_qf_Advanced_refresh");
 
     // make sure we're on search results page
     $this->waitForElementPresent("alpha-filter");
