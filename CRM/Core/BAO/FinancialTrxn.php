@@ -270,6 +270,11 @@ WHERE lt.entity_id = %1 ";
       // delete financial transaction
       $query = 'DELETE FROM civicrm_financial_trxn WHERE id = %1';
       CRM_Core_DAO::executeQuery($query, array(1 => array($fids['financialTrxnId'], 'Integer')));
+
+      // delete financial item record
+      $query = 'DELETE FROM civicrm_financial_item WHERE entity_table="civicrm_financial_trxn" AND entity_id = %1';
+      CRM_Core_DAO::executeQuery($query, array(1 => array($fids['financialTrxnId'], 'Integer')));
+
       return TRUE;
     }
     else {
