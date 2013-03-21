@@ -242,18 +242,34 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @static
    */
   public static function deleteLineItems($entityId, $entityTable) {
-    $result = FALSE;
     if (!$entityId || !$entityTable) {
-      return $result;
+      return FALSE;
     }
 
     if ($entityId && !is_array($entityId)) {
       $entityId = array($entityId);
     }
 
-    $query = "DELETE FROM civicrm_line_item where entity_id IN ('" . implode("','", $entityId) . "') AND entity_table = '$entityTable'";
+    // we need to fetch the line item ids that needs to be deleted.
+    $query = "SELECT id FROM civicrm_line_item WHERE entity_id IN ('" . implode("','", $entityId) . "') AND entity_table = '$entityTable'";
     $dao = CRM_Core_DAO::executeQuery($query);
-    return $result;
+
+    $lineItemIds = array();
+    while($dao->fetch()) {
+      $lineItemIds[$dao->id] = $dao->id;
+    }
+
+    // delete line item records from financial item
+    if (!empty($lineItemIds)) {
+      $query = "DELETE FROM civicrm_financial_item WHERE entity_id IN ('" . implode("','", $lineItemIds) . "') AND entity_table = 'civicrm_line_item'";
+      CRM_Core_DAO::executeQuery($query);
+    }
+
+    // delete records from line item
+    $query = "DELETE FROM civicrm_line_item WHERE entity_id IN ('" . implode("','", $entityId) . "') AND entity_table = '$entityTable'";
+    CRM_Core_DAO::executeQuery($query);
+
+    return TRUE;
   }
 
   /**
