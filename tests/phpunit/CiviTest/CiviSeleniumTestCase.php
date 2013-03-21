@@ -165,9 +165,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Wait for the page to load
    * Wait for an element to be present
    */
-  function clickLink($element, $waitFor = 'civicrm-footer') {
+  function clickLink($element, $waitFor = 'civicrm-footer', $waitForPageLoad = TRUE) {
     $this->click($element);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // conditional wait for page load e.g for ajax form save
+    if ($waitForPageLoad) {
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+    }
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
     }
