@@ -148,7 +148,11 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     //Relationship importables
-    $this->_relationships = $relations = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $this->_contactType, FALSE, 'label', TRUE, $this->_contactSubType);
+    $this->_relationships = $relations =
+      CRM_Contact_BAO_Relationship::getContactRelationshipType(
+        NULL, NULL, NULL, $this->_contactType,
+        FALSE, 'label', TRUE, $this->_contactSubType
+      );
     asort($relations);
 
     foreach ($relations as $key => $var) {
@@ -395,8 +399,15 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
 
     $errorMessage = NULL;
 
+    //CRM-5125
+    //add custom fields for contact sub type
+    $csType = NULL;
+    if (!empty($this->_contactSubType)) {
+      $csType = $this->_contactSubType;
+    }
+
     //checking error in custom data
-    $this->isErrorInCustomData($params, $errorMessage);
+    $this->isErrorInCustomData($params, $errorMessage, $csType, $this->_relationships);
 
     //checking error in core data
     $this->isErrorInCoreData($params, $errorMessage);
@@ -798,7 +809,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
                 $relatedCsType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params[$key]['id'], 'contact_sub_type');
               }
 
-              if (!empty($relatedCsType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params[$key]['id'], $relatedCsType) && 
+              if (!empty($relatedCsType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params[$key]['id'], $relatedCsType) &&
                 $relatedCsType != CRM_Utils_Array::value('contact_sub_type', $formatting))) {
                 $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact ID: %1", array(1 => $params[$key]['id']));
                 array_unshift($values, $errorMessage);
@@ -1107,20 +1118,14 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @access public
    */
-  function isErrorInCustomData($params, &$errorMessage) {
+  static function isErrorInCustomData($params, &$errorMessage, $csType = NULL, $relationships = NULL) {
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get("dateTypes");
-
-    //CRM-5125
-    //add custom fields for contact sub type
-    $csType = NULL;
-    if (!empty($this->_contactSubType)) {
-      $csType = $this->_contactSubType;
-    }
 
     if (CRM_Utils_Array::value('contact_sub_type', $params)) {
       $csType = CRM_Utils_Array::value('contact_sub_type', $params);
     }
+
     if (!CRM_Utils_Array::value('contact_type', $params)) {
       $params['contact_type'] = 'Individual';
     }
@@ -1256,11 +1261,14 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
       elseif (is_array($params[$key]) && isset($params[$key]["contact_type"])) {
         //CRM-5125
         //supporting custom data of related contact subtypes
-        if (array_key_exists($key, $this->_relationships)) {
-          $relation = $key;
-        }
-        elseif (CRM_Utils_Array::key($key, $this->_relationships)) {
-          $relation = CRM_Utils_Array::key($key, $this->_relationships);
+        $relation = NULL;
+        if ($relationships) {
+          if (array_key_exists($key, $relationships)) {
+            $relation = $key;
+          }
+          elseif (CRM_Utils_Array::key($key, $relationships)) {
+            $relation = CRM_Utils_Array::key($key, $relationships);
+          }
         }
         if (!empty($relation)) {
           list($id, $first, $second) = CRM_Utils_System::explode('_', $relation, 3);
@@ -1275,7 +1283,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
           $relationshipType->free();
         }
 
-        self::isErrorInCustomData($params[$key], $errorMessage);
+        self::isErrorInCustomData($params[$key], $errorMessage, $csType, $relationships);
       }
     }
   }
@@ -1393,7 +1401,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
             if (!empty($value)) {
               foreach ($value as $stateValue) {
                 if ($stateValue['state_province']) {
-                  if (self::in_value($stateValue['state_province'], CRM_Core_PseudoConstant::stateProvinceAbbreviation()) || 
+                  if (self::in_value($stateValue['state_province'], CRM_Core_PseudoConstant::stateProvinceAbbreviation()) ||
                       self::in_value($stateValue['state_province'], CRM_Core_PseudoConstant::stateProvince())) {
                     continue;
                   }

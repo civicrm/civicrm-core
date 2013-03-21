@@ -39,7 +39,11 @@
  */
 class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
   public function buildQuickForm() {
-    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    self::commonBuildQuickForm($this);
+  }
+
+  static function commonBuildQuickForm($self) {
+    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $self);
     if (!$contactId) {
       $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, $_REQUEST);
     }
@@ -60,7 +64,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
       'Text Message (SMS)',
       'label'
     );
-   
+
     if (CRM_Utils_Mail::validOutBoundMail() && $contactId) {
       list($name, $email, $doNotEmail, $onHold, $isDeseased) = CRM_Contact_BAO_Contact::getContactDetails($contactId);
       if (!$doNotEmail && $email && !$isDeseased) {
@@ -72,7 +76,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
       // Check for existence of a mobile phone and ! do not SMS privacy setting
       $mobileTypeID = CRM_Core_OptionGroup::getValue('phone_type', 'Mobile', 'name');
       list($name, $phone, $doNotSMS) = CRM_Contact_BAO_Contact_Location::getPhoneDetails($contactId, $mobileTypeID);
-      
+
       if (!$doNotSMS && $phone) {
         $sendSMS = array($SMSId  => ts('Send SMS'));
         $activityTypes += $sendSMS;
@@ -106,10 +110,10 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
       }
     }
 
-    $this->assign('activityTypes', $activityTypes);
-    $this->assign('urls', $urls);
+    $self->assign('activityTypes', $activityTypes);
+    $self->assign('urls', $urls);
 
-    $this->assign('suppressForm', TRUE);
+    $self->assign('suppressForm', TRUE);
   }
 }
 

@@ -419,7 +419,17 @@ class CRM_Core_PseudoConstant {
    * @access public
    * @static
    */
-  public static function populate(&$var, $name, $all = FALSE, $retrieve = 'name', $filter = 'is_active', $condition = NULL, $orderby = NULL, $key = 'id', $force = NULL) {
+  public static function populate(
+    &$var,
+    $name,
+    $all = FALSE,
+    $retrieve = 'name',
+    $filter = 'is_active',
+    $condition = NULL,
+    $orderby = NULL,
+    $key = 'id',
+    $force = NULL
+  ) {
     $cacheKey = "CRM_PC_{$name}_{$all}_{$key}_{$retrieve}_{$filter}_{$condition}_{$orderby}";
     $cache    = CRM_Utils_Cache::singleton();
     $var      = $cache->get($cacheKey);
@@ -1105,10 +1115,9 @@ WHERE  id = %1";
   public static function &groupIterator($styledLabels = FALSE) {
     if (!self::$groupIterator) {
       /*
-             When used as an object, GroupNesting implements Iterator
-             and iterates nested groups in a logical manner for us
-            */
-
+        When used as an object, GroupNesting implements Iterator
+        and iterates nested groups in a logical manner for us
+      */
       self::$groupIterator = new CRM_Contact_BAO_GroupNesting($styledLabels);
     }
     return self::$groupIterator;
