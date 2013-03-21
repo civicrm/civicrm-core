@@ -54,7 +54,6 @@ function civicrm_api3_custom_search_create($params) {
 function _civicrm_api3_custom_search_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';
   _civicrm_api3_option_value_create_spec($params);
-  $params['weight']['api.default'] = 'next';
   $params['name']['api.aliases'] = array('class_name');
 }
 
