@@ -212,11 +212,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
-    $url = $this->parseURL();
-    $group_id = $url['queryString']['gid'];
-    $this->assertType('numeric', $group_id);
-
-    return $group_id;
+    return $this->urlArg('gid');
   }
 
   //Adds a new custom field to a specfied custom field group, using the given

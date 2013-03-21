@@ -289,9 +289,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $firstNameSoft = "John_".substr(sha1(rand()), 0, 5);
     $lastNameSoft  = "Doe_".substr(sha1(rand()), 0, 5);
     $this->webtestAddContact( $firstNameSoft, $lastNameSoft );
-    $url = $this->parseURL( );
-    $cid = $url['queryString']['cid'];
-    $this->assertType('numeric', $cid);
+    $cid = $this->urlArg('cid');
 
     //advance search for created contacts
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');

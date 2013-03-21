@@ -181,8 +181,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->click('link=Use (create mode)');
     $recordNew = $this->_addRecords('Create');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $elements = $this->parseURL( );
-
+    $elements = $this->parseURL();
     $gid = $elements['queryString']['gid'];
     $id = $elements['queryString']['id'];
 

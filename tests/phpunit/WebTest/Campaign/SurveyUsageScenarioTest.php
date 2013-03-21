@@ -244,8 +244,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add a contact to the group to test release respondents
     $firstName3 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName3, "James", "$firstName3.james@example.org");
-    $url       = $this->getLocation();
-    $id        = explode('cid=', $url);
+    $id = $this->urlArg('cid');
     $sortName3 = "James, $firstName3";
 
     // add contact to group
@@ -320,8 +319,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // Adding contact
     $firstName1 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName1, "Smith", "$firstName1.smith@example.org");
-    $url1 = explode('cid=', $this->getLocation());
-    $id1 = $url1[1];
+    $id1 = $this->urlArg('cid');
 
     // add contact to group
     // visit group tab
@@ -335,8 +333,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "John", "$firstName2.john@example.org");
-    $url2 = explode('cid=', $this->getLocation());
-    $id2 = $url2[1];
+    $id2 = $this->urlArg('cid');
 
     // add contact to group
     // visit group tab

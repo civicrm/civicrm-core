@@ -237,8 +237,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
 
     //Is custom group created?
     $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added."));
-    $url = explode('gid=', $this->getLocation());
-    $gid = $url[1];
+    $gid = $this->urlArg('gid');
 
     $fieldLabel = "custom_field_for_{$contactSubType}" . substr(sha1(rand()), 0, 4);
     $this->type('label', $fieldLabel);

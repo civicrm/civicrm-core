@@ -92,9 +92,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($fields['first_name']['default_value'], $fields['last_name']['default_value'], $fields['email']['default_value']);
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // Create profile for contact
     $profileName = "Profile_" . substr(sha1(rand()), 0, 7);
@@ -149,8 +147,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->type('title', $profileName);
     $this->click('_qf_Group_next-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $elements = $this->parseURL();
-    $profileId = $elements['queryString']['gid'];
+    $profileId = $this->urlArg('gid');
 
     // Add field to the profile.
     foreach ($fields as $key => $values) {

@@ -119,8 +119,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
-    $url = explode('gid=', $this->getLocation());
-    $gid = $url[1];
+    $gid = $this->urlArg('gid');
 
     // create custom field "alphanumeric text"
     $customField = 'Custom field ' . substr(sha1(rand()), 0, 4);

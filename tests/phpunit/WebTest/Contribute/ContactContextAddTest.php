@@ -72,7 +72,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    $this->webtestAddContact( $firstName, "Anderson", true );
+    $this->webtestAddContact($firstName, "Anderson", true);
 
     // Get the contact id of the new contact
     $contactUrl = $this->parseURL();

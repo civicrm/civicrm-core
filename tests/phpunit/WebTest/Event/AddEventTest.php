@@ -497,8 +497,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $this->assertStringsPresent($eventFees);
 
     }
-    $elements = $this->parseURL();
-    return $elements['queryString']['id'];
+    return $this->urlArg('id');
   }
 
   function _testVerifyRegisterPage($registerStrings) {

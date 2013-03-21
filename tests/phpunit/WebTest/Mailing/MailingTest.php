@@ -65,9 +65,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // go to group tab and add to mailing group
     $this->click("css=li#tab_group a");
@@ -330,9 +328,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // go to group tab and add to mailing group
     $this->click("css=li#tab_group a");

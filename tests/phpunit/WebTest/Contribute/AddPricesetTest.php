@@ -46,8 +46,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $validStrings = array();
@@ -244,8 +243,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $validStrings = array();
@@ -346,8 +344,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $validStrings = array();
@@ -469,8 +466,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $validStrings = array();
@@ -592,8 +588,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $validStrings = array();

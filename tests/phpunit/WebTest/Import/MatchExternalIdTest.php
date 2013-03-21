@@ -343,13 +343,9 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input",$params['title']);
     $this->click("_qf_SearchEvent_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("link=" . $params['title']);
+    $this->clickLink("link=" . $params['title']);
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $matches = array();
-    preg_match('/id=([0-9]+)/', $this->getLocation(), $matches);
-    $params['event_id'] = $matches[1];
+    $params['event_id'] = $this->urlArg('id');
 
     return $params;
   }

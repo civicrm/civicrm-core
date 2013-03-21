@@ -79,8 +79,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // parse URL to grab the batch ID
-    $elements = $this->parseURL();
-    $batchId = $elements['queryString']['bid'];
+    $batchId = $this->urlArg('bid');
     return $batchId;
   }
 

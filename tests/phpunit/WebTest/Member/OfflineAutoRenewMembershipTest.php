@@ -62,6 +62,7 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $url = $this->getLocation();
     $url = str_replace('mode=live', 'mode=test', $url);
     $this->open($url);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // start filling membership form
     $this->waitForElementPresent('payment_processor_id');

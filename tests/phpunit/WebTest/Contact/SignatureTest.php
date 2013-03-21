@@ -98,9 +98,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $name = $this->getText("xpath=//div[@class='crm-summary-display_name']");
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // Select Your Editor
     $this->_selectEditor('CKEditor');

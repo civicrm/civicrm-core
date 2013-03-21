@@ -53,8 +53,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     // Get profile id (gid) from URL
-    $elements = $this->parseURL();
-    $profileId = $elements['queryString']['gid'];
+    $profileId = $this->urlArg('gid');
 
     // Add Last Name field.
     $this->click('field_name[0]');

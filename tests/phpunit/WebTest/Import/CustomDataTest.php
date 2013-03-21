@@ -41,16 +41,12 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     $firstName3 = 'Ma' . substr(sha1(rand()), 0, 4);
     $this->webtestAddContact($firstName3, "Anderson", TRUE);
     $sortName3 = "$firstName3 Anderson";
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $url1 = explode('&cid=', $this->getLocation());
-    $id1 = $url1[1];
+    $id1 = $this->urlArg('cid');
 
     $firstName4 = 'Ma' . substr(sha1(rand()), 0, 4);
     $this->webtestAddContact($firstName4, "Anderson", TRUE);
     $sortName4 = "$firstName4 Anderson";
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $url2 = explode('&cid=', $this->getLocation());
-    $id2 = $url2[1];
+    $id2 = $this->urlArg('cid');
 
     // Get sample import data.
     list($headers, $rows, $customDataVerify) = $this->_individualCustomCSVData($customGroupTitle, $firstName1, $firstName2,

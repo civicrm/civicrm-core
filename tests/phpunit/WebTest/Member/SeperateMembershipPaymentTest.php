@@ -42,8 +42,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $lastName1 = 'An_' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName1, $lastName1, TRUE);
     $this->waitForText('crm-notification-container', "$firstName1 $lastName1 has been created.");
-    $url = explode('&cid=', $this->getLocation());
-    $cid = $url[1];
+    $cid = $this->urlArg('cid');
 
     // create contribution page with randomized title and default params
     $amountSection = TRUE;
