@@ -321,7 +321,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     // verify event input on info page
     // start at Manage Events listing
     $this->openCiviPage('event/manage', 'reset=1');
-    $this->clickLink("link=" . $params['title']);
+    $this->clickLink("link=" . $params['title'], NULL);
 
     $params['event_id'] = $this->urlArg('id');;
 
