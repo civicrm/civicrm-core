@@ -190,11 +190,11 @@
         {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
       </td>
     </tr>
-    <tr>
+    <tr class="crm-case-activity-form-block-attachment">
       <td colspan="2">{include file="CRM/Form/attachment.tpl"}</td>
     </tr>
     {if $searchRows} {* We have got case role rows to display for "Send Copy To" feature *}
-      <tr>
+      <tr class="crm-case-activity-form-block-send_copy">
         <td colspan="2">
           <div id="sendcopy" class="crm-accordion-wrapper collapsed">
             <div class="crm-accordion-header">
@@ -226,7 +226,7 @@
         </td>
       </tr>
     {/if}
-  <tr>
+  <tr class="crm-case-activity-form-block-schedule_followup">
     <td colspan="2">
 
       <div id="follow-up" class="crm-accordion-wrapper collapsed">
