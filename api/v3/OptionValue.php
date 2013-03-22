@@ -40,47 +40,9 @@ function civicrm_api3_option_value_get($params) {
  */
 function civicrm_api3_option_value_create($params) {
 
-  // CRM-10921: do not fill-in defaults if this is an update
-  if (!CRM_Utils_Array::value('id', $params)) {
-    if (!CRM_Utils_Array::value('label', $params) && CRM_Utils_Array::value('name', $params)) {
-      // 'label' defaults to 'name'
-      $params['label'] = $params['name'];
-    }
-    if (!CRM_Utils_Array::value('value', $params) && CRM_Utils_Array::value('option_group_id', $params)) {
-      // 'value' defaults to next weight in option_group
-      $params['value'] = (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
-        array('option_group_id' => $params['option_group_id'])
-      );
-    }
-    if (!CRM_Utils_Array::value('weight', $params) && CRM_Utils_Array::value('value', $params)) {
-      // 'weight' defaults to 'value'
-      $params['weight'] = $params['value'];
-    } elseif (CRM_Utils_Array::value('weight', $params) && $params['weight'] == 'next' && CRM_Utils_Array::value('option_group_id', $params)) {
-      // weight is numeric, so it's safe-ish to treat symbol 'next' as magical value
-      $params['weight'] = (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
-        array('option_group_id' => $params['option_group_id'])
-      );
-    }
-  }
-
-  if (isset($params['component'])) {// allow a component to be reset to ''
-    // convert 'component' to 'component_id'
-    if (empty($params['component'])) {
-      $params['component_id'] = '';
-    } else {
-      $params['component_id'] = array_search($params['component'], CRM_Core_PseudoConstant::component());
-    }
-    unset($params['component']);
-  }
-
-  if (CRM_Utils_Array::value('id', $params)) {
-    $ids = array('optionValue' => $params['id']);
-  }
-  $optionValueBAO = CRM_Core_BAO_OptionValue::add($params, $ids);
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1, 'option_group_id' => $params['option_group_id']));
-  $values = array();
-  _civicrm_api3_object_to_array($optionValueBAO, $values[$optionValueBAO->id]);
-  return civicrm_api3_create_success($values, $params);
+  return $result;
 }
 
 /**
@@ -91,10 +53,10 @@ function civicrm_api3_option_value_create($params) {
  */
 function _civicrm_api3_option_value_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
-  $params['component']['type'] = CRM_Utils_Type::T_STRING;
-  $params['component']['options'] = array_values(CRM_Core_PseudoConstant::component());
+  //continue to support component
+  $params['component_id']['api.aliases'] = array('component');
   $params['name']['api.aliases'] = array('label');
-  // $params['component_id']['pseudoconstant'] = 'component';
+  $params['option_group_id']['api.required'] = TRUE;
 }
 
 /**

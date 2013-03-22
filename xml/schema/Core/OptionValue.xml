@@ -123,7 +123,13 @@
       <name>component_id</name>
       <type>int unsigned</type>
       <comment>Component that this option value belongs/caters to.</comment>
-       <add>2.0</add>
+      <add>2.0</add>
+      <pseudoconstant>
+        <name>component</name>
+        <table>civicrm_component</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
   </field>
   <foreignKey>
        <name>component_id</name>
