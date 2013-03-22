@@ -250,7 +250,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
     $temp = array();
     if (empty($form->_id)) {
       $query = "
-SELECT count(*) 
+SELECT count(*)
   FROM civicrm_option_value
  WHERE option_group_id = %1
    AND label = %2";
@@ -262,7 +262,7 @@ SELECT count(*)
       }
 
       $query = "
-SELECT count(*) 
+SELECT count(*)
   FROM civicrm_option_value
  WHERE option_group_id = %1
    AND value = %2";
@@ -279,7 +279,7 @@ SELECT count(*)
 
       //check label duplicates within a custom field
       $query = "
-SELECT count(*) 
+SELECT count(*)
   FROM civicrm_option_value
  WHERE option_group_id = %1
    AND id != %2
@@ -294,7 +294,7 @@ SELECT count(*)
 
       //check value duplicates within a custom field
       $query = "
-SELECT count(*) 
+SELECT count(*)
   FROM civicrm_option_value
  WHERE option_group_id = %1
    AND id != %2
@@ -309,7 +309,7 @@ SELECT count(*)
     }
 
     $query = "
-SELECT data_type 
+SELECT data_type
   FROM civicrm_custom_field
  WHERE id = %1";
     $params = array(1 => array($fieldId, 'Integer'));
@@ -363,7 +363,7 @@ SELECT data_type
           if (!empty($fields["value"])) {
             $params = array(1 => array($fields['value'], 'String'));
             $query = "
-SELECT count(*) 
+SELECT count(*)
   FROM civicrm_state_province
  WHERE name = %1
     OR abbreviation = %1";
@@ -414,19 +414,27 @@ SELECT count(*)
     }
 
     $fieldValues = array('option_group_id' => $this->_optionGroupID);
-    $customOption->weight = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, $params['weight'], $fieldValues);
+    $customOption->weight =
+      CRM_Utils_Weight::updateOtherWeights(
+        'CRM_Core_DAO_OptionValue',
+        $oldWeight,
+        $params['weight'],
+        $fieldValues);
 
     $customOption->option_group_id = $this->_optionGroupID;
 
     $customField = new CRM_Core_DAO_CustomField();
     $customField->id = $this->_fid;
-    if ($customField->find(TRUE) &&
-      ($customField->html_type == 'CheckBox' ||
+    if (
+      $customField->find(TRUE) &&
+      (
+        $customField->html_type == 'CheckBox' ||
         $customField->html_type == 'AdvMulti-Select' ||
         $customField->html_type == 'Multi-Select'
       )
     ) {
-      $defVal = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+      $defVal = explode(
+        CRM_Core_DAO::VALUE_SEPARATOR,
         substr($customField->default_value, 1, -1)
       );
       if (CRM_Utils_Array::value('default_value', $params)) {
@@ -437,7 +445,10 @@ SELECT count(*)
           else {
             $defVal[] = $customOption->value;
           }
-          $customField->default_value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $defVal) . CRM_Core_DAO::VALUE_SEPARATOR;
+          $customField->default_value =
+            CRM_Core_DAO::VALUE_SEPARATOR .
+            implode(CRM_Core_DAO::VALUE_SEPARATOR, $defVal) .
+            CRM_Core_DAO::VALUE_SEPARATOR;
           $customField->save();
         }
       }
@@ -449,7 +460,10 @@ SELECT count(*)
           }
         }
 
-        $customField->default_value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $tempVal) . CRM_Core_DAO::VALUE_SEPARATOR;
+        $customField->default_value =
+          CRM_Core_DAO::VALUE_SEPARATOR .
+          implode(CRM_Core_DAO::VALUE_SEPARATOR, $tempVal) .
+          CRM_Core_DAO::VALUE_SEPARATOR;
         $customField->save();
       }
     }
@@ -481,14 +495,18 @@ SELECT count(*)
 
     $customOption->save();
 
-    CRM_Core_Session::setStatus(ts('Your multiple choice option \'%1\' has been saved', array(1 => $customOption->label)), '', 'success');
+    $msg = ts('Your multiple choice option \'%1\' has been saved', array(1 => $customOption->label));
+    CRM_Core_Session::setStatus($msg, '', 'success');
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another option.'), '', 'info');
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/option',
+      CRM_Core_Session::setStatus(ts('You can add another option.'), '', 'info');
+      $session->replaceUserContext(
+        CRM_Utils_System::url(
+          'civicrm/admin/custom/group/field/option',
           'reset=1&action=add&fid=' . $this->_fid . '&gid=' . $this->_gid
-        ));
+        )
+      );
     }
   }
 }
