@@ -700,8 +700,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
     // cleanup line items.
     $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $id, 'participant_id', 'contribution_id');
 
-    // delete any related entity_financial_trxn and financial_trxn records.
-    CRM_Core_BAO_FinancialTrxn::deleteFinancialTrxn($id, 'civicrm_contribution');
+    // delete any related entity_financial_trxn, financial_trxn and financial_item records.
+    CRM_Core_BAO_FinancialTrxn::deleteFinancialTrxn($id);
 
     if ($participantId) {
       CRM_Price_BAO_LineItem::deleteLineItems($participantId, 'civicrm_participant');
