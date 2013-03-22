@@ -183,7 +183,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // determine if express + recurring and direct accordingly
         if ($paymentParams['is_recur'] == 1) {
           if (is_object($payment)) {
-            $result = &$payment->createRecurringPayments($paymentParams);
+            $result = $payment->createRecurringPayments($paymentParams);
           }
           else {
             CRM_Core_Error::fatal($paymentObjError);
@@ -191,7 +191,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
         else {
           if (is_object($payment)) {
-            $result = &$payment->doExpressCheckout($paymentParams);
+            $result = $payment->doExpressCheckout($paymentParams);
           }
           else {
             CRM_Core_Error::fatal($paymentObjError);
@@ -227,7 +227,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
       }
       if (is_object($payment)) {
-        $result = &$payment->doDirectPayment($paymentParams);
+        $result = $payment->doDirectPayment($paymentParams);
       }
       else {
         CRM_Core_Error::fatal($paymentObjError);
