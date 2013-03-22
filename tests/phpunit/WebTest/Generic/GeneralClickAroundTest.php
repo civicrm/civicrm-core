@@ -33,7 +33,6 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
   function login() {
     $this->webtestLogin();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("//a[contains(text(),'CiviCRM')]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
@@ -99,7 +98,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertElementPresent("title");
     $this->assertTextPresent("Access Control");
     $this->waitForElementPresent('link=Settings');
-    $this->assertTextPresent("Newsletter Subscribers");
+    $this->assertTextPresent("Administrators");
     $this->assertTextPresent("Add Group");
   }
 

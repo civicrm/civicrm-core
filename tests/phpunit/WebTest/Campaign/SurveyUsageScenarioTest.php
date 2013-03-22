@@ -45,7 +45,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add contact to group
     // visit group tab
     $this->click("css=li#tab_group a");
-    $this->waitForElementPresent("group_id");
+    $this->waitForElementPresent("css=#group_id option");
 
     // add to group
     $this->select("group_id", "label=$groupName");
@@ -58,7 +58,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add contact to group
     // visit group tab
     $this->click("css=li#tab_group a");
-    $this->waitForElementPresent("group_id");
+    $this->waitForElementPresent("css=#group_id option");
 
     // add to group
     $this->select("group_id", "label=$groupName");
@@ -250,7 +250,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add contact to group
     // visit group tab
     $this->click("css=li#tab_group a");
-    $this->waitForElementPresent("group_id");
+    $this->waitForElementPresent("css=#group_id option");
 
     // add to group
     $this->select("group_id", "label=$groupName");
@@ -324,7 +324,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add contact to group
     // visit group tab
     $this->click("css=li#tab_group a");
-    $this->waitForElementPresent('group_id');
+    $this->waitForElementPresent('css=#group_id option');
 
     // add to group
     $this->select("group_id", "label=$groupName");
@@ -338,7 +338,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add contact to group
     // visit group tab
     $this->click("css=li#tab_group a");
-    $this->waitForElementPresent('group_id');
+    $this->waitForElementPresent('css=#group_id option');
 
     // add to group
     $this->select("group_id", "label=$groupName");
