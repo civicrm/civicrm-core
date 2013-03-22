@@ -67,7 +67,8 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
     // Go for Ckeck Your Editor, Click on Send Mail
     $this->click("//a[@id='crm-contact-actions-link']/span");
-    $this->clickLink('link=Send an Email', 'subject');
+    //after clicking on 'Send an Email', wait for the text in tinymce editor to load
+    $this->clickLink('link=Send an Email', "xpath=//body[@id='tinymce']/p[2]");
 
     $this->click('subject');
     $subject = 'Subject_' . substr(sha1(rand()), 0, 8);
