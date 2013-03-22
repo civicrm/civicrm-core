@@ -133,7 +133,7 @@
               </td>
            {else}
               {foreach from=$row item=value key=key}
-                {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "contact_sub_type") and ($key neq "status") and ($key neq "sort_name") and ($key neq "contact_id")}
+                {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "contact_sub_type") and ($key neq "status") and ($key neq "sort_name") and ($key neq "contact_id") and ($key neq "contact_type_orig")}
                  <td>{$value}&nbsp;</td>
                 {/if}
               {/foreach}
