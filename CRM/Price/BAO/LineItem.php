@@ -241,7 +241,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @access public
    * @static
    */
-  public static function deleteLineItems($entityId, $entityTable) {
+  public static function deleteLineItems($entityId, $entityTable) { 
     if (!$entityId || !$entityTable) {
       return FALSE;
     }
@@ -250,25 +250,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       $entityId = array($entityId);
     }
 
-    // we need to fetch the line item ids that needs to be deleted.
-    $query = "SELECT id FROM civicrm_line_item WHERE entity_id IN ('" . implode("','", $entityId) . "') AND entity_table = '$entityTable'";
+    $query = "DELETE FROM civicrm_line_item where entity_id IN ('" . implode("','", $entityId) . "') AND entity_table = '$entityTable'";
     $dao = CRM_Core_DAO::executeQuery($query);
-
-    $lineItemIds = array();
-    while($dao->fetch()) {
-      $lineItemIds[$dao->id] = $dao->id;
-    }
-
-    // delete line item records from financial item
-    if (!empty($lineItemIds)) {
-      $query = "DELETE FROM civicrm_financial_item WHERE entity_id IN ('" . implode("','", $lineItemIds) . "') AND entity_table = 'civicrm_line_item'";
-      CRM_Core_DAO::executeQuery($query);
-    }
-
-    // delete records from line item
-    $query = "DELETE FROM civicrm_line_item WHERE entity_id IN ('" . implode("','", $entityId) . "') AND entity_table = '$entityTable'";
-    CRM_Core_DAO::executeQuery($query);
-
     return TRUE;
   }
 
