@@ -28,6 +28,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
           'initialProfileList' => civicrm_api('UFGroup', 'get', array(
             'version' => 3,
             'sequential' => 1,
+            'is_active' => 1,
             'rowCount' => 1000, // FIXME
           )),
           'profilePreviewKey' => CRM_Core_Key::get('CRM_UF_Form_Inline_Preview', TRUE),
