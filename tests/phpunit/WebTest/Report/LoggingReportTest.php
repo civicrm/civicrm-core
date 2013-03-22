@@ -38,7 +38,8 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/setting/misc', 'reset=1');
     $this->click("xpath=//tr[@class='crm-miscellaneous-form-block-logging']/td[2]/label[text()='Yes']");
     $this->click("_qf_Miscellaneous_next-top");
-    $this->waitForTextPresent("Changes Saved");
+    $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
+    // FIXME: good to do waitForText here but enabling log is time consuming and status may fade out by the time we do the check.
 
     //enable CiviCase component
     $this->enableComponents("CiviCase");
@@ -113,18 +114,16 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       ));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText('crm-notification-container', "Your Note has been saved.");
 
     //add new relationship , disable it , delete it
     $this->waitForElementPresent("xpath=//li[@id='tab_rel']/a");
-    $this->click("xpath=//li[@id='tab_rel']/a");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(3);
-    $this->click("xpath=//div[@id='Relationships']//div[@class='action-link']/a");
-    $this->waitForElementPresent("_qf_Relationship_refresh");
+    $this->click("css=li#tab_rel a");
+    $this->waitForElementPresent("link=Add Relationship");
+    $this->click("link=Add Relationship");
+    $this->waitForElementPresent("_qf_Relationship_cancel");
     $this->select("relationship_type_id", "label=Employee of");
-    $this->webtestFillAutocomplete("Default Organization");
+    $this->webtestFillAutocomplete("Default");
     $this->waitForElementPresent("quick-save");
     $this->clickLink("quick-save", "xpath=//div[@id='current-relationships']//a[text()='Disable']");
     $this->click("xpath=//div[@id='current-relationships']//a[text()='Disable']");
@@ -255,7 +254,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->detailReportCheck($dataForReportDetail, $filters);
 
     //delete contact check
-    $this->openCiviPage('contact/view/delete', "reset=1&delete=1&cid={$cid[1]}");
+    $this->openCiviPage('contact/view/delete', "reset=1&delete=1&cid=$cid");
     $this->click("_qf_Delete_done");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
