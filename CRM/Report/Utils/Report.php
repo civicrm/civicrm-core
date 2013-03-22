@@ -63,7 +63,7 @@ class CRM_Report_Utils_Report {
 
     if ($optionVal) {
       $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value');
-      return array($templateInfo['id'], $optionVal);
+      return array(CRM_Utils_Array::value('id', $templateInfo), $optionVal);
     }
 
     return FALSE;
