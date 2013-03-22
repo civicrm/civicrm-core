@@ -420,7 +420,7 @@
    */
   CRM.UF.UFGroupModel = CRM.Backbone.Model.extend({
     defaults: {
-      title: ts('Unnamed Form'),
+      title: ts('Unnamed Profile'),
       is_active: 1
     },
     schema: {
