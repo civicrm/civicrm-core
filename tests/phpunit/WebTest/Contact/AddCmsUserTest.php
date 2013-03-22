@@ -89,6 +89,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     //Add profile Details
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $this->waitForElementPresent('first_name');
     $this->type('first_name', $firstName);
     $this->type('last_name', $lastName);
 
