@@ -103,15 +103,13 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // go to Membership tab and add membership
     $this->click("css=li#tab_member a");
     $this->waitForElementPresent("link=Add Membership");
-    $this->click("link=Add Membership");
-    $this->waitForElementPresent("send_receipt");
+    $this->clickLink("link=Add Membership");
     //let the organisation be default (Default Organization)
-    $this->select("membership_type_id[0]", "label=Default Organization");
+    $this->select("membership_type_id[0]", "value=1");
     $this->click("membership_type_id[1]");
     $this->select("membership_type_id[1]", "Student");
     $this->type("source", "membership source$firstName");
-    $this->click("_qf_Membership_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Membership_upload-bottom");
 
     $this->waitForText('crm-notification-container', "Student membership for $firstName adv$firstName has been added");
 
@@ -125,8 +123,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("details-save");
     $this->webtestFillDate("start_date", "-1 day");
     $this->webtestFillDate("end_date", "+1 day");
-    $this->click("details-save");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("details-save");
     $this->waitForText('crm-notification-container', "New relationship created.");
 
     //-------------- advance search --------------
@@ -175,15 +172,13 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
           $this->$blockValues[1]($firstName);
           break;
       }
-
       $this->submitSearch($firstName);
     }
 
     //--  search with non existing value ( sort name )
     $this->type("sort_name", "$dummyName");
-    $this->click("_qf_Advanced_refresh");
-    $this->waitForElementPresent("css=div.messages");
-    $this->assertElementContainsText('css=div.messages', "No matches found for");
+    $this->clickLink("_qf_Advanced_refresh");
+    $this->waitForText('css=div.messages', "No matches found for");
   }
 
   /*
@@ -233,11 +228,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
   //function to check match for sumbit Advance Search
   function submitSearch($firstName) {
-
-    $this->click("_qf_Advanced_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Advanced_refresh");
     // verify unique name
-    $this->verifyText("xpath=//div[@class='crm-search-results']/table/tbody/tr/td[3]/a", preg_quote("adv$firstName, $firstName"));
+    $this->waitForText("xpath=//div[@class='crm-search-results']/table/tbody", preg_quote("adv$firstName, $firstName"));
     // should give 1 result only as we are searching with unique name
     $this->waitForText("xpath=//div[@id='search-status']/table/tbody/tr/td", preg_quote("1 Contact"));
     // click to edit search
