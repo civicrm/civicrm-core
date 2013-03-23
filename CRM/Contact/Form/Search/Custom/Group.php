@@ -120,7 +120,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
       '1' => ts('Show contacts that meet the Groups criteria AND the Tags criteria'),
       '0' => ts('Show contacts that meet the Groups criteria OR  the Tags criteria'),
     );
-    $form->addRadio('andOr', ts('AND/OR'), $andOr, TRUE, '<br />', TRUE);
+    $form->addRadio('andOr', ts('AND/OR'), $andOr, NULL, '<br />', TRUE);
 
     $int = &$form->addElement('advmultiselect', 'includeTags',
       ts('Include Tag(s)') . ' ', $tags,
@@ -163,8 +163,16 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
    * Set search form field defaults here.
    */
   function setDefaultValues() {
-    return
-      array( 'andOr' => '1' );
+    $defaults = array( 'andOr' => '1' );
+
+    if (!empty($this->_formValues)) {
+      $defaults['andOr'] = CRM_Utils_Array::value('andOr', $this->_formValues, '1');
+
+      $defaults['includeGroups'] = CRM_Utils_Array::value('includeGroups', $this->_formValues);
+      $defaults['excludeGroups'] = CRM_Utils_Array::value('excludeGroups', $this->_formValues);
+    }
+
+    return $defaults;
   }
 
   function all(
