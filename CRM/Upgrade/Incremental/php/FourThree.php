@@ -189,6 +189,7 @@ WHERE    entity_value = '' OR entity_value IS NULL
 
   function upgrade_4_3_beta2($rev) {
     $this->addTask(ts('Upgrade DB to 4.3.beta2: SQL'), 'task_4_3_x_runSql', $rev);
+
     // CRM-12002
     if (
       CRM_Core_DAO::checkTableExists('log_civicrm_line_item') &&
@@ -212,6 +213,17 @@ WHERE    entity_value = '' OR entity_value IS NULL
     // add indexes for civicrm_entity_financial_trxn
     // CRM-12141
     $this->addTask(ts('Check/Add indexes for civicrm_entity_financial_trxn'), 'task_4_3_x_checkIndexes', $rev);
+  }
+
+  function upgrade_4_3_beta5($rev) {
+    $this->addTask(ts('Upgrade DB to 4.3.beta5: SQL'), 'task_4_3_x_runSql', $rev);
+    // CRM-12205
+    if (
+      CRM_Core_DAO::checkTableExists('log_civicrm_financial_trxn') &&
+      CRM_Core_DAO::checkFieldExists('log_civicrm_financial_trxn', 'trxn_id')
+    ) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE `log_civicrm_financial_trxn` CHANGE `trxn_id` `trxn_id` VARCHAR(255) NULL DEFAULT NULL');
+    }
   }
 
   //CRM-11636
@@ -789,7 +801,7 @@ AND TABLE_SCHEMA = '{$dbUf['database']}'";
    * @return bool TRUE for success
    */
   function task_4_3_x_checkIndexes(CRM_Queue_TaskContext $ctx) {
-    $query = "SHOW KEYS FROM  `civicrm_entity_financial_trxn` 
+    $query = "SHOW KEYS FROM  `civicrm_entity_financial_trxn`
 WHERE key_name IN ('UI_entity_financial_trxn_entity_table', 'UI_entity_financial_trxn_entity_id');";
     $dao = CRM_Core_DAO::executeQuery($query);
     if (!$dao->N) {
