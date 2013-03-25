@@ -131,8 +131,8 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
     $defaults = array();
     $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::retrieve($financialParams, $defaults);
-    $this->assertEquals( $financialAccountType->entity_id, $financialType->id, 'Verify Entity Id.');
-    $this->assertEquals( $financialAccountType->financial_account_id, $financialAccount->id, 'Verify Financial Account Id.');
+    $this->assertEquals( $financialAccountType['entity_id'], $financialType->id, 'Verify Entity Id.');
+    $this->assertEquals( $financialAccountType['financial_account_id'], $financialAccount->id, 'Verify Financial Account Id.');
   }
 
   /**
