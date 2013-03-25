@@ -99,6 +99,8 @@
             });
           }
           designerDialog.undoState = false;
+          // CRM-12188
+          CRM.designerApp.DetachedProfiles = [];
         },
         close: function() {
           window.onbeforeunload = designerDialog.oldOnBeforeUnload;
@@ -113,6 +115,8 @@
               return false;
             });
           }
+          // CRM-12188
+          CRM.designerApp.restorePreviewArea();
         },
         resize: function() {
           CRM.designerApp.vent.trigger('resize');
@@ -252,6 +256,8 @@
       }
       var $dialog = this.$el.closest('.crm-designer-dialog'); // FIXME use events
       $dialog.block({message: 'Loading...', theme: true});
+      // CRM-12188
+      CRM.designerApp.clearPreviewArea();
       $.ajax({
         url: CRM.url("civicrm/ajax/inline"),
         type: 'POST',
