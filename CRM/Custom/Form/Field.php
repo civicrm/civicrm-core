@@ -549,10 +549,12 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     //validate field label as well as name.
     $title  = $fields['label'];
     $name   = CRM_Utils_String::munge($title, '_', 64);
-    $query  = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3';
+    $gId    = $self->_gid;  // CRM-7564
+    $query  = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3 and custom_group_id = %4';    
     $fldCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
         2 => array($title, 'String'),
         3 => array((int)$self->_id, 'Integer'),
+        4 => array($gId, 'Integer'),
       ));
     if ($fldCnt) {
       $errors['label'] = ts('Custom field \'%1\' already exists in Database.', array(1 => $title));
