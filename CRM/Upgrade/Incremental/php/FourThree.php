@@ -73,6 +73,48 @@ class CRM_Upgrade_Incremental_php_FourThree {
         CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
       }
     }
+    // CRM-12155
+    if ($rev == '4.3.beta5') {
+      $query = "SELECT ceft.id FROM `civicrm_financial_trxn` cft
+LEFT JOIN civicrm_entity_financial_trxn ceft 
+ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
+LEFT JOIN civicrm_contribution cc ON cc.id = ceft.entity_id AND ceft.entity_table = 'civicrm_contribution'
+WHERE cc.id IS NULL";
+
+      $dao = CRM_Core_DAO::executeQuery($query);
+      $isOrphanData = TRUE;
+      if (!$dao->N) {
+        $query = "SELECT cli.id FROM civicrm_line_item cli 
+LEFT JOIN civicrm_contribution cc ON cli.entity_id = cc.id AND cli.entity_table = 'civicrm_contribution'
+LEFT JOIN civicrm_participant cp ON cli.entity_id = cp.id AND cli.entity_table = 'civicrm_participant'
+WHERE CASE WHEN cli.entity_table = 'civicrm_contribution'
+THEN cc.id IS NULL 
+ELSE  cp.id IS NULL
+END";
+        $dao = CRM_Core_DAO::executeQuery($query);
+        if (!$dao->N) {          
+          $revPattern = '/^((\d{1,2})\.\d{1,2})\.(\d{1,2}|\w{4,7})?$/i';
+          preg_match($revPattern, $currentVer, $version);
+          if ($version[1] >= 4.3) {
+            $query = "SELECT cfi.id FROM civicrm_financial_item cfi 
+LEFT JOIN civicrm_entity_financial_trxn ceft ON ceft.entity_table = 'civicrm_financial_item' and cfi.id = ceft.entity_id
+WHERE ceft.entity_id IS NULL;";
+            $dao = CRM_Core_DAO::executeQuery($query);
+            if (!$dao->N) { 
+              $isOrphanData = FALSE;
+            }
+          }
+          else {
+            $isOrphanData = FALSE;            
+          }
+        }
+      }
+
+      if ($isOrphanData) {
+        $preUpgradeMessage = "</br> <strong>" . ts('Your database contains orphaned financial records related to deleted contributions. Refer to <a href="%1">this wiki page for instructions on repairing your database</a> so that you can run the upgrade successfully.
+        ', array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC43/Database+repair+for+4.3+upgrades')) . "</strong>";
+      }
+    }
   }
 
   /**
