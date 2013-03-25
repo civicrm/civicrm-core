@@ -2963,4 +2963,23 @@ WHERE  contribution_id = %1 ";
       $errors['contribution_status_id'] = ts("Cannot change contribution status from %1 to %2.", array(1 => $contributionStatuses[$values['contribution_status_id']], 2 => $contributionStatuses[$fields['contribution_status_id']]));
     }
   }
+
+  /**
+   * Function to delete contribution of contact
+   *
+   * CRM-12155
+   *
+   * @param integer $contactId contact id 
+   *
+   * @access public
+   * @static
+   */
+  static function deleteContactContribution($contactId) {
+    $contribution = new CRM_Contribute_DAO_Contribution();
+    $contribution->contact_id = $contactId;
+    $contribution->find();
+    while ($contribution->fetch()) {
+      self::deleteContribution($contribution->id);
+    }
+  }
 }
