@@ -293,8 +293,9 @@ function registerInterview( voterId ) {
   }
 
   //carry contact related profile field data.
-  fieldName = 'field_' + voterId;
-  cj('[id^="'+ fieldName +'"]').each(function( ) {
+  var fieldName = 'field_' + voterId;
+  var checkBoxFieldName = 'field[' + voterId + ']';
+  cj('[id^="'+ fieldName +'"], [id^="'+ checkBoxFieldName +'"]').each(function( ) { 
     fldId = cj(this).attr('id');
     if (fldId.indexOf('_custom_') == -1 &&
       fldId.indexOf('_result') == -1  &&

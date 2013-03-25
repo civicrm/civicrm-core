@@ -537,14 +537,8 @@ WHERE {$clause}
     $activity->activity_date_time = date('YmdHis');
     $activity->status_id = $statusId;
 
-    if (CRM_Utils_Array::value('details', $params)) {
-      $activity->details = $params['details'];
-    }
-    if ($result = CRM_Utils_Array::value('result', $params)) {
-      $activity->result = $result;
-    }
-    if (CRM_Utils_Array::value('activity_engagement_level', $params)) {
-      $activity->engagement_level = $params['activity_engagement_level'];
+    if (CRM_Utils_Array::value('activity_date_time', $params)) {
+      $activity->activity_date_time = CRM_Utils_Date::processDate($params['activity_date_time'], $params['activity_date_time_time']);
     }
 
     $subject = '';
@@ -556,6 +550,23 @@ WHERE {$clause}
     $subject .= ts('Respondent Interview');
 
     $activity->subject = $subject;
+    $activityParams = array(
+      'details' => 'details',
+      'result' => 'result',
+      'engagement_level' => 'activity_engagement_level', 
+      'subject' => 'activity_subject',
+      'status_id' => 'activity_status_id',
+      'source_contact_id' => 'source_contact', 
+      'location' => 'activity_location', 
+      'campaign_id' => 'activity_campaign_id',
+      'duration' => 'activity_duration'
+    );
+    foreach ($activityParams as $key => $field) {
+      if (CRM_Utils_Array::value($field, $params)) {
+        $activity->$key = $params[$field];
+      }
+    }
+  
     $activity->save();
     //really this should use Activity BAO& not be here but refactoring will have to be later
     //actually the whole ajax call could be done as an api ajax call & post hook would be sorted
