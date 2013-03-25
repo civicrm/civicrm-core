@@ -141,7 +141,7 @@
           return;
         }
 
-        if (this.nodeName = 'A') {
+        if (this.nodeName == 'A') {
           if (this.className.indexOf('crmf-') == -1) { // it isn't a jeditable field
             var formSettings= $.extend({}, editableSettings.form ,
               {source: $i.attr('href')
@@ -242,10 +242,12 @@
           }
 
           if ($i.data('action')) {
-            params[params['field']]=value;//format for create at least
-            action=$i.data('action');
+            var fieldName = params['field'];
             delete params['field'];
             delete params['value'];
+
+            params[fieldName]=value;//format for create at least
+            action=$i.data('action');
           } else {
             action="setvalue";
           }
