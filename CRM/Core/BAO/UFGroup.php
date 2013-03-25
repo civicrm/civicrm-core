@@ -447,6 +447,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $formattedField = array(
       'name' => $name,
       'groupTitle' => $group->title,
+      'groupName'  => $group->name,
       'groupHelpPre' => empty($group->help_pre) ? '' : $group->help_pre,
       'groupHelpPost' => empty($group->help_post) ? '' : $group->help_post,
       'title' => $title,
