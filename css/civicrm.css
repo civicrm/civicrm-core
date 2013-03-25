@@ -1880,6 +1880,7 @@ div.grippie {
 #crm-container div.crm-inline-edit.form {
   cursor: default;
   border: 2px dashed #6665BF;
+  overflow: auto;
 }
 
 #crm-container .crm-inline-edit.add-new {
