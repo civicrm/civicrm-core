@@ -9,4 +9,23 @@ cj(document).ready(function($) {
    */
   CRM.designerApp = new Backbone.Marionette.Application();
 
+  /**
+   * FIXME: Workaround for problem that having more than one instance
+   * of a profile on the page will result in duplicate DOM ids.
+   * @see CRM-12188
+   */
+  CRM.designerApp.clearPreviewArea = function() {
+    $('.crm-profile-selector-preview-pane > .crm-form-block').each(function() {
+      var parent = $(this).parent();
+      CRM.designerApp.DetachedProfiles.push({
+        parent: parent,
+        item: $(this).detach()
+      });
+    });
+  };
+  CRM.designerApp.restorePreviewArea = function() {
+    $.each(CRM.designerApp.DetachedProfiles, function() {
+      $(this.parent).append(this.item);
+    });
+  };
 });
