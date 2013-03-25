@@ -145,9 +145,12 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       $financialType[$dao->id] = array();
       CRM_Core_DAO::storeValues( $dao, $financialType[$dao->id]);
       $defaults = $financialAccountId = array();
-      $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount( );
-      $financialAccountIds = CRM_Core_DAO::commonRetrieveAll( 'CRM_Financial_DAO_EntityFinancialAccount',
-        'entity_id', $dao->id, $defaults, array('financial_account_id'));
+      $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
+      $financialAccountIds = array();
+     
+      $params['entity_id'] = $dao->id;
+      $params['entity_table'] = 'civicrm_financial_type';
+      CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, CRM_Core_DAO::$_nullArray, $financialAccountIds);
 
       foreach( $financialAccountIds as $key => $values){
         if (CRM_Utils_Array::value($values['financial_account_id'], $financialAccounts)) {
