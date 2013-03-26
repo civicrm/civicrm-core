@@ -750,7 +750,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // this option should be available only during add mode
     if ($this->_action != CRM_Core_Action::UPDATE) {
-      $this->add('advcheckbox', 'is_multi_activity', ts('Create a separate activity for each of the above selected contact.'));
+      $this->add('advcheckbox', 'is_multi_activity', ts('Create a separate activity for each contact.'));
     }
 
     $this->addRule('duration',
