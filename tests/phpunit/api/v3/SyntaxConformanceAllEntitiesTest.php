@@ -143,6 +143,20 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     }
     return $entities;
   }
+
+  public static function toBeSkipped_automock($sequential = FALSE) {
+    $entitiesWithoutGet = array('Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
+    if ($sequential === TRUE) {
+      return $entitiesWithoutGet;
+    }
+    $entities = array();
+    foreach ($entitiesWithoutGet as $e) {
+      $entities[] = array($e);
+    }
+    return $entities;
+  }
+
+
   /*
   * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
   */
@@ -404,7 +418,8 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
    * Currency - only seems to support US
    */
   public function testByID_get($entityName) {
-    if (in_array($entityName, $this->toBeImplemented['create'])) {
+    printf("consider %s\n", $entityName);
+    if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
       return;
     }
