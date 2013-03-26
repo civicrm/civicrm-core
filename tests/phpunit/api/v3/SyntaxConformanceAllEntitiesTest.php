@@ -339,7 +339,6 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
    */
   public function testSimple_get($Entity) {
     // $this->markTestSkipped("test gives core error on test server (but not on our locals). Skip until we can get server to pass");
-    return;
     if (in_array($Entity, $this->toBeImplemented['get'])) {
       return;
     }
