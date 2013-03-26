@@ -50,7 +50,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     // this contribution page for membership signup
     // select newly created processor
     $xpath = "xpath=//label[text() = '{$processorName}']/preceding-sibling::input[1]";
-    $this->assertTrue($this->isTextPresent($processorName));
+    $this->waitForText('css=.crm-contribution-contributionpage-amount-form-block-payment_processor', $processorName);
     $this->check($xpath);
 
     // save
@@ -224,7 +224,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     //this contribution page for membership signup
     $xpath = "xpath=//label[text() = '{$processorName}']/preceding-sibling::input[1]";
-    $this->assertTrue($this->isTextPresent($processorName));
+    $this->waitForText('css=.crm-contribution-contributionpage-amount-form-block-payment_processor', $processorName);
     $this->check($xpath);
 
     // save
@@ -378,7 +378,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->click('_qf_Contact_upload_view');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Organization $title has been created."));
+    $this->waitForText('crm-notification-container', "Organization $title has been created.");
 
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
@@ -404,7 +404,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
+    $this->waitForText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
 
     $url = $this->getAttribute("xpath=//div[@id='membership_type']//div[@class='dataTables_wrapper']//table/tbody//tr/td[1][text()='{$membershipTypeTitle}']/../td[12]/span/a[3][text()='Delete']/@href");
 

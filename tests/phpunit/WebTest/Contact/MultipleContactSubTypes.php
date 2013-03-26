@@ -77,9 +77,6 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     //fill in IM
     $this->type("im_1_name", "testYahoo");
 
-    //fill in openID
-    $this->type("openid_1_openid", "http://" . substr(sha1(rand()), 0, 7) . "openid.com");
-
     //fill in website
     $this->type("website_1_url", "http://www.john.com");
 
@@ -172,8 +169,8 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.crm-contact_type_label', "Parent");
 
     //custom data check
-    $this->assertTrue($this->isTextPresent("dummy text for customData{$customGroupIdForParent}"));
-    $this->assertTrue($this->isTextPresent("dummy text for customData{$customGroupIdForStudent}"));
+    $this->waitForText("custom-set-content-{$customGroupIdForParent}", "dummy text for customData{$customGroupIdForParent}");
+    $this->waitForText("custom-set-content-{$customGroupIdForStudent}", "dummy text for customData{$customGroupIdForStudent}");
 
     // Get contact id
     $cid = $this->urlArg('cid');
@@ -208,8 +205,8 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.crm-contact_type_label', "Parent");
 
     //custom data check
-    $this->assertTrue($this->isTextPresent("dummy text for customData{$customGroupIdForParent}"));
-    $this->assertTrue($this->isTextPresent("dummy text for customData{$customGroupIdForStaff}"));
+    $this->waitForText("custom-set-content-{$customGroupIdForParent}", "dummy text for customData{$customGroupIdForParent}");
+    $this->waitForText("custom-set-content-{$customGroupIdForStaff}", "dummy text for customData{$customGroupIdForStaff}");
   }
 
   /**
@@ -236,7 +233,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added."));
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
     $gid = $this->urlArg('gid');
 
     $fieldLabel = "custom_field_for_{$contactSubType}" . substr(sha1(rand()), 0, 4);

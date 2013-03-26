@@ -44,15 +44,15 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input",$eventTitle3);
     $this->click("_qf_SearchEvent_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("{$eventTitle3}"));
+    $this->waitForText("SearchEvent", "{$eventTitle3}");
     $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input",$eventTitle4);
     $this->click("_qf_SearchEvent_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("{$eventTitle4}"));
+    $this->waitForText("SearchEvent", "{$eventTitle4}");
     $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input",$eventTitle5);
     $this->click("_qf_SearchEvent_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("{$eventTitle5}"));
+    $this->waitForText("SearchEvent", "{$eventTitle5}");
     $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input","");
 
     //check if closed Event is present
@@ -63,8 +63,8 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->click('_qf_SearchEvent_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("{$eventTitle1}"));
-    $this->assertTrue($this->isTextPresent("{$eventTitle2}"));
+    $this->waitForText("option11", "{$eventTitle1}");
+    $this->waitForText("option11", "{$eventTitle2}");
     $this->assertFalse($this->isTextPresent("{$eventTitle3}"));
     $this->assertFalse($this->isTextPresent("{$eventTitle4}"));
     $this->assertFalse($this->isTextPresent("{$eventTitle5}"));
@@ -73,9 +73,9 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/ical", "reset=1&page=1&html=1", NULL);
     $this->assertFalse($this->isTextPresent("{$eventTitle1}"));
     $this->assertFalse($this->isTextPresent("{$eventTitle2}"));
-    $this->assertTrue($this->isTextPresent("{$eventTitle3}"));
-    $this->assertTrue($this->isTextPresent("{$eventTitle4}"));
-    $this->assertTrue($this->isTextPresent("{$eventTitle5}"));
+    $this->waitForText("option11", "{$eventTitle3}");
+    $this->waitForText("option11", "{$eventTitle4}");
+    $this->waitForText("option11", "{$eventTitle5}");
 
     //go to block listing to enable Upcomming Events Block
     // you need to be admin user for below operation
@@ -98,8 +98,8 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isTextPresent("{$eventTitle1}"));
     $this->assertFalse($this->isTextPresent("{$eventTitle2}"));
     $this->assertFalse($this->isTextPresent("{$eventTitle3}"));
-    $this->assertTrue($this->isTextPresent("{$eventTitle4}"));
-    $this->assertTrue($this->isTextPresent("{$eventTitle5}"));
+    $this->waitForText("block-civicrm-6", "{$eventTitle4}");
+    $this->waitForText("block-civicrm-6", "{$eventTitle5}");
 
     //go to block listing to disable Upcomming Events Block
     $this->open($this->sboxPath . 'admin/structure/block');
