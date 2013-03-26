@@ -1226,4 +1226,14 @@ LIMIT {$offset}, {$rowCount}
     echo json_encode($addressVal);
     CRM_Utils_System::civiExit();
   }
+
+  /**
+   * Function to delete address via inline edit
+   */
+  static function deleteAddress() {
+    $addressId = CRM_Utils_Array::value('address_id', $_REQUEST);
+
+    CRM_Core_BAO_Block::blockDelete('Address', array('id' => $addressId));
+    CRM_Utils_System::civiExit();
+  }
 }

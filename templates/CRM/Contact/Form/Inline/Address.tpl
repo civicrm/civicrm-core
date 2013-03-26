@@ -38,6 +38,9 @@
            <span class="crm-address-element location_type_id-address-element">
             {$form.address.$blockId.location_type_id.label}&nbsp;{$form.address.$blockId.location_type_id.html}
             </span>
+            {if $addressId}
+            <a class="delete-address" address_id="{$addressId}" href="#">{ts}Delete this address{/ts}</a>
+            {/if}
         </td>
      </tr>
      <tr>
@@ -106,4 +109,25 @@
   {if $masterAddress.$blockId}
     CRM.alert('{ts escape="js" 1=$masterAddress.$blockId}This address is shared with %1 contact record(s). Modifying this address will automatically update the shared address for these contacts.{/ts}', '{ts escape="js"}Editing Master Address{/ts}', 'info', {ldelim}expires: 0{rdelim});
   {/if}
+  {literal}
+  cj('.delete-address').click(function(){
+    var addressId = cj(this).attr('address_id');
+
+    CRM.confirm(function() {
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/deladdress' h=0 }"{literal};
+      cj.post( postUrl, {
+        address_id: addressId, key: {/literal}"{crmKey name='civicrm/ajax/deladdress'}"{literal}},
+        function(data) {
+          
+        }
+      );
+    },
+      {
+        title: ts('Delete address'),
+        message: ts('Are you sure you want to delete this address.')
+      }
+    );
+    return false;
+  });
+  {/literal}
 </script>
