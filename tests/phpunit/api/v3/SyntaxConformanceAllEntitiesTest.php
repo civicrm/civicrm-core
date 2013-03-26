@@ -38,6 +38,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
   protected $_apiversion;
 
+  /**
+   * @var array e.g. $this->deletes['CRM_Contact_DAO_Contact'][] = $contactID;
+   */
+  protected $deletableTestObjects;
+
   /* This test case doesn't require DB reset */
 
 
@@ -58,9 +63,16 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     $this->toBeImplemented['delete'] = array('MembershipPayment', 'OptionGroup', 'SurveyRespondant', 'UFJoin', 'UFMatch', 'Extension', 'LocationType', 'System');
     $this->onlyIDNonZeroCount['get'] = array('ActivityType', 'Entity', 'Domain','Setting');
     $this->deprecatedAPI = array('Location', 'ActivityType', 'SurveyRespondant');
+    $this->deletableTestObjects = array();
   }
 
-  function tearDown() {}
+  function tearDown() {
+    foreach ($this->deletableTestObjects as $entityName => $entities) {
+      foreach ($entities as $entityID) {
+        CRM_Core_DAO::deleteTestObjects($entityName, array('id' => $entityID));
+      }
+    }
+  }
 
 
   public static function entities($skip = NULL) {
@@ -383,6 +395,56 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
   }
 
   /**
+   * Create two entities and make sure we can fetch them individually by ID
+   *
+   * @dataProvider entities_get
+   *
+   * limitations include the problem with avoiding loops when creating test objects -
+   * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
+   * Currency - only seems to support US
+   */
+  public function testByID_get($entityName) {
+    if (in_array($entityName, $this->toBeImplemented['create'])) {
+      // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
+      return;
+    }
+
+    $baoString = _civicrm_api3_get_DAO($entityName);
+    if (empty($baoString)) {
+      $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
+      return;
+    }
+
+    // create entities
+    $baoObj1 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
+    $this->assertTrue(is_integer($baoObj1->id), 'check first id');
+    $this->deletableTestObjects[$baoString][] = $baoObj1->id;
+    $baoObj2 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
+    $this->assertTrue(is_integer($baoObj2->id), 'check second id');
+    $this->deletableTestObjects[$baoString][] = $baoObj2->id;
+
+    // fetch first by ID
+    $result = civicrm_api($entityName, 'get', array(
+      'version' => 3,
+      'id' => $baoObj1->id,
+    ));
+    $this->assertAPISuccess($result);
+    $this->assertTrue(!empty($result['values'][$baoObj1->id]), 'Should find first object by id');
+    $this->assertEquals($baoObj1->id, $result['values'][$baoObj1->id]['id'], 'Should find id on first object');
+    $this->assertEquals(1, count($result['values']));
+
+    // fetch second by ID
+    $result = civicrm_api($entityName, 'get', array(
+      'version' => 3,
+      'id' => $baoObj2->id,
+    ));
+    $this->assertAPISuccess($result);
+    $this->assertTrue(!empty($result['values'][$baoObj2->id]), 'Should find second object by id');
+    $this->assertEquals($baoObj2->id, $result['values'][$baoObj2->id]['id'], 'Should find id on second object');
+    $this->assertEquals(1, count($result['values']));
+  }
+
+    /**
    * @dataProvider entities_get
    */
   public function testNonExistantID_get($Entity) {
@@ -597,7 +659,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       );
 
       $checkEntity = civicrm_api($entityName, 'getsingle', $checkParams);
-      $this->assertEquals($entity, $checkEntity, "changing field $fieldName" . print_r($entity,true) );//. print_r($checkEntity,true) .print_r($checkParams,true) . print_r($update,true) . print_r($updateParams, TRUE));
+      $this->assertEquals($entity, $checkEntity, "changing field $fieldName" . print_r($entity,TRUE) );//. print_r($checkEntity,true) .print_r($checkParams,true) . print_r($update,true) . print_r($updateParams, TRUE));
     }
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();
