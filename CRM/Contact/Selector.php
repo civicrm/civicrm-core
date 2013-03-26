@@ -794,10 +794,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       if ($sortByCharacter == 'all') {
         //delete the alphabet key corresponding records in prevnext_cache
         CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKeyCharacter, 'civicrm_contact');
+        $cacheKeyCharacter = NULL;
       }
-      else {
-        $this->fillupPrevNextCache($sort, $cacheKeyCharacter);
-      }
+      $this->fillupPrevNextCache($sort, $cacheKeyCharacter);
     }
   }
 
