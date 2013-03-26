@@ -112,11 +112,13 @@
   {literal}
   cj('.delete-address').on('click', function(){
     var addressId = cj(this).attr('address_id');
+    var contactId = {/literal}"{$contactId}"{literal};
 
     CRM.confirm(function() {
       var postUrl = {/literal}"{crmURL p='civicrm/ajax/deladdress' h=0 }"{literal};
       cj.post( postUrl, {
-        address_id: addressId, key: {/literal}"{crmKey name='civicrm/ajax/deladdress'}"{literal}},
+        address_id: addressId, contact_id: contactId,
+        key: {/literal}"{crmKey name='civicrm/ajax/deladdress'}"{literal}},
         function(data) {
           CRM.alert('', ts('Address has been deleted successfully.'), 'success');
           var blockId = {/literal}"{$blockId}"{literal};
