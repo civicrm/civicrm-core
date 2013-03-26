@@ -47,6 +47,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   public $_activityId;
 
   /**
+   * store activity ids when multiple activities are created
+   *
+   * @var int
+   */
+  public $_activityIds = array();
+
+  /**
    * The id of activity type
    *
    * @var int
@@ -733,6 +740,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
     $this->assign('surveyActivity', $this->_isSurveyActivity);
 
+    // this option should be available only during add mode
+    if ($this->_action != CRM_Core_Action::UPDATE) {
+      $this->add('advcheckbox', 'is_multi_activity', ts('Create a separate activity for each of the above selected contact.'));
+    }
+
     $this->addRule('duration',
       ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger'
     );
@@ -1017,6 +1029,32 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $params['target_contact_id'] = $this->_contactIds;
     }
 
+    $activity = array();
+    if (CRM_Utils_Array::value('is_multi_activity', $params) &&
+      !CRM_Utils_Array::crmIsEmptyArray($params['target_contact_id'])
+    ) {
+      $targetContacts = $params['target_contact_id'];
+      foreach($targetContacts as $targetContactId) {
+        $params['target_contact_id'] = array($targetContactId);
+        // save activity
+        $activity[] = $this->processActivity($params);
+      }
+    }
+    else {
+      // save activity
+      $activity = $this->processActivity($params);
+    }
+
+    return array('activity' => $activity);
+  }
+
+  /**
+   * Process activity creation
+   *
+   * @param array $params associated array of submitted values
+   * @access protected
+   */
+  protected function processActivity(&$params) {
     $activityAssigned = array();
     // format assignee params
     if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
@@ -1056,12 +1094,17 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->endPostProcess($params, $activity);
 
     // CRM-9590
-    $this->_activityId = $activity->id;
+    if (CRM_Utils_Array::value('is_multi_activity', $params)) {
+      $this->_activityIds[] = $activity->id;
+    }
+    else {
+      $this->_activityId = $activity->id;
+    }
 
     // create follow up activity if needed
     $followupStatus = '';
     if (CRM_Utils_Array::value('followup_activity_type_id', $params)) {
-      $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activity->id, $params);
+      CRM_Activity_BAO_Activity::createFollowupActivity($activity->id, $params);
       $followupStatus = ts('A followup activity has been scheduled.');
     }
 
@@ -1091,7 +1134,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $ics->addAttachment( $attachments, $mailToContacts );
 
         // CRM-8400 add param with _currentlyViewedContactId for URL link in mail
-        $result = CRM_Case_BAO_Case::sendActivityCopy(NULL, $activity->id, $mailToContacts, $attachments, NULL);
+        CRM_Case_BAO_Case::sendActivityCopy(NULL, $activity->id, $mailToContacts, $attachments, NULL);
 
         $ics->cleanup();
 
@@ -1100,19 +1143,20 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     // set status message
+    $subject = '';
     if (CRM_Utils_Array::value('subject', $params)) {
-      $params['subject'] = "'" . $params['subject'] . "'";
+      $subject = "'" . $params['subject'] . "'";
     }
 
     CRM_Core_Session::setStatus(ts('Activity %1 has been saved. %2. %3',
-        array(
-          1 => $params['subject'],
-          2 => $followupStatus,
-          3 => $mailStatus
-        )
-      ), ts('Saved'), 'success');
+      array(
+        1 => $subject,
+        2 => $followupStatus,
+        3 => $mailStatus
+      )
+    ), ts('Saved'), 'success');
 
-    return array('activity' => $activity);
+    return $activity;
   }
 
   /**
