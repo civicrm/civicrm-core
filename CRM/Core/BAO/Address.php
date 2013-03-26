@@ -471,7 +471,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       $address->$fieldName = CRM_Utils_Array::value($fieldName, $entityBlock);
     }
     else {
-      $addressIds = array();
       $addressIds = self::allEntityAddress($entityBlock);
 
       if (!empty($addressIds[1])) {

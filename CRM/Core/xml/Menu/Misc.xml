@@ -171,4 +171,9 @@
     <title>ProfileEditor</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/ajax/deladdress</path>
+    <page_callback>CRM_Contact_Page_AJAX::deleteAddress</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

@@ -1226,4 +1226,35 @@ LIMIT {$offset}, {$rowCount}
     echo json_encode($addressVal);
     CRM_Utils_System::civiExit();
   }
+
+  /**
+   * Function to delete address via inline edit
+   */
+  static function deleteAddress() {
+    $addressId = CRM_Utils_Array::value('address_id', $_POST);
+    $contactId = CRM_Utils_Array::value('contact_id', $_POST);
+
+    $params = array('contact_id' => $contactId);
+    // get all contact addresses and check if we are deleting primary address.
+    // in this case set the next address as primary after deleting this address.
+    $contactAddresses = CRM_Core_BAO_Address::getValues($params);
+
+    // first address is always primary, so check if we are deleting primary address
+    // also check if there is another address for this contact
+    $newPrimaryAddressId = null;
+    if ($contactAddresses[1]['id'] == $addressId AND isset($contactAddresses[2])) {
+      $newPrimaryAddressId = $contactAddresses[2]['id'];
+    }
+
+    // delete current address
+    CRM_Core_BAO_Block::blockDelete('Address', array('id' => $addressId));
+
+    // check new primary address is set and update that record.
+    if ($newPrimaryAddressId) {
+      $query = "UPDATE civicrm_address SET is_primary=1 WHERE id={$newPrimaryAddressId}";
+      CRM_Core_DAO::executeQuery($query);
+    }
+
+    CRM_Utils_System::civiExit();
+  }
 }
