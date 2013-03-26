@@ -127,11 +127,19 @@
   <tr class="crm-activity-form-block-target_contact_id">
     {if $single eq false}
       <td class="label">{ts}With Contact(s){/ts}</td>
-      <td class="view-value" style="white-space: normal">{$with|escape}</td>
+      <td class="view-value" style="white-space: normal">
+        {$with|escape}
+        <br/>
+        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label}
+      </td>
       {elseif $action neq 4}
       <td class="label">{ts}With Contact{/ts}</td>
       <td class="view-value">
         {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true multiClient=true}
+        {if $action eq 1}
+        <br/>
+        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label}
+        {/if}
       </td>
       {else}
       <td class="label">{ts}With Contact{/ts}</td>
