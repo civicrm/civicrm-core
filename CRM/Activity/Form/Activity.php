@@ -741,8 +741,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('surveyActivity', $this->_isSurveyActivity);
 
     // this option should be available only during add mode
-    if ($this->_action & CRM_Core_Action::ADD) {
-      $this->add('advcheckbox', 'is_multi_activity', ts('Create a separate activity for each selected contact?'));
+    if ($this->_action != CRM_Core_Action::UPDATE) {
+      $this->add('advcheckbox', 'is_multi_activity', ts('Create a separate activity for each of the above selected contact.'));
     }
 
     $this->addRule('duration',
@@ -1143,13 +1143,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     // set status message
+    $subject = '';
     if (CRM_Utils_Array::value('subject', $params)) {
-      $params['subject'] = "'" . $params['subject'] . "'";
+      $subject = "'" . $params['subject'] . "'";
     }
 
     CRM_Core_Session::setStatus(ts('Activity %1 has been saved. %2. %3',
       array(
-        1 => $params['subject'],
+        1 => $subject,
         2 => $followupStatus,
         3 => $mailStatus
       )
