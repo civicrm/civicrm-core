@@ -72,7 +72,7 @@
       // Delete an address
       if (o.hasClass('address') && !o.hasClass('add-new') && !response.addressId) {
         o.parent().remove();
-        CRM.alert('', ts('Removed'), 'success');
+        CRM.alert('', ts('Address Deleted'), 'success');
       }
       else {
         // Reload this block plus all dependent blocks
@@ -242,6 +242,24 @@
           $('[class$=is_primary] input:first', form).prop('checked', true );
         }
         $('.add-more-inline', form).show();
+      })
+      // Delete an address
+      .on('click', '.crm-inline-edit.address .delete-button', function() {
+         var $block = $(this).closest('.crm-inline-edit.address');
+         CRM.confirm(function() {
+            CRM.api('address', 'delete', {id: $block.data('edit-params').aid}, {success:
+              function(data) {
+                CRM.alert('', ts('Address Deleted.'), 'success');
+                $('.crm-inline-edit-container').addClass('crm-edit-ready');
+                $block.remove();
+              }
+            });
+          },
+          {
+          message: ts('Are you sure you want to delete this address?')
+          }
+        );
+        return false;
       })
       // add more and set focus to new row
       .on('click', '.add-more-inline', function() {
