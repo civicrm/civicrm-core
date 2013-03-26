@@ -418,7 +418,6 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
    * Currency - only seems to support US
    */
   public function testByID_get($entityName) {
-    printf("consider %s\n", $entityName);
     if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
       return;
