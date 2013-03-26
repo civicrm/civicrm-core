@@ -372,7 +372,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // set user context
     $urlParams = $urlString = NULL;
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
+    if (!$qfKey) {
+      $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+    }
 
     //validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
