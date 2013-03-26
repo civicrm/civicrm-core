@@ -43,10 +43,12 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
    */
   protected $deletableTestObjects;
 
-  /* This test case doesn't require DB reset */
+  /**
+   * @var array ($entityName => $fieldName) where $fieldName is expected as an alias for 'id'
+   */
+  protected $idAliasFields;
 
-
-
+  /** This test case doesn't require DB reset */
   public $DBResetRequired = FALSE;
 
   /* they are two types of missing APIs:
@@ -63,6 +65,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     $this->toBeImplemented['delete'] = array('MembershipPayment', 'OptionGroup', 'SurveyRespondant', 'UFJoin', 'UFMatch', 'Extension', 'LocationType', 'System');
     $this->onlyIDNonZeroCount['get'] = array('ActivityType', 'Entity', 'Domain','Setting');
     $this->deprecatedAPI = array('Location', 'ActivityType', 'SurveyRespondant');
+    $this->idAliasFields = array('Group' => 'group_id', 'Contact' => 'contact_id');
     $this->deletableTestObjects = array();
   }
 
@@ -458,7 +461,58 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     $this->assertEquals(1, count($result['values']));
   }
 
-    /**
+  /**
+   * Create two entities and make sure we can fetch them individually by ID (e.g. using "contact_id=>2"
+   * or "group_id=>4")
+   *
+   * @dataProvider entities_get
+   *
+   * limitations include the problem with avoiding loops when creating test objects -
+   * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
+   * Currency - only seems to support US
+   */
+  public function testByIDAlias_get($entityName) {
+    if (in_array($entityName, self::toBeSkipped_automock(TRUE)) || empty($this->idAliasFields[$entityName])) {
+      // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
+      return;
+    }
+
+    $baoString = _civicrm_api3_get_DAO($entityName);
+    if (empty($baoString)) {
+      $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
+      return;
+    }
+
+    // create entities
+    $baoObj1 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
+    $this->assertTrue(is_integer($baoObj1->id), 'check first id');
+    $this->deletableTestObjects[$baoString][] = $baoObj1->id;
+    $baoObj2 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
+    $this->assertTrue(is_integer($baoObj2->id), 'check second id');
+    $this->deletableTestObjects[$baoString][] = $baoObj2->id;
+
+    // fetch first by ID
+    $result = civicrm_api($entityName, 'get', array(
+      'version' => 3,
+      $this->idAliasFields[$entityName] => $baoObj1->id,
+    ));
+    $this->assertAPISuccess($result);
+    $this->assertTrue(!empty($result['values'][$baoObj1->id]), 'Should find first object by id');
+    $this->assertEquals($baoObj1->id, $result['values'][$baoObj1->id]['id'], 'Should find id on first object');
+    $this->assertEquals(1, count($result['values']));
+
+    // fetch second by ID
+    $result = civicrm_api($entityName, 'get', array(
+      'version' => 3,
+      $this->idAliasFields[$entityName] => $baoObj2->id,
+    ));
+    $this->assertAPISuccess($result);
+    $this->assertTrue(!empty($result['values'][$baoObj2->id]), 'Should find second object by id');
+    $this->assertEquals($baoObj2->id, $result['values'][$baoObj2->id]['id'], 'Should find id on second object');
+    $this->assertEquals(1, count($result['values']));
+  }
+
+  /**
    * @dataProvider entities_get
    */
   public function testNonExistantID_get($Entity) {
