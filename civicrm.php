@@ -79,12 +79,17 @@ function civicrm_wp_set_capabilities() {
 
   //Minimum capabilities (Civicrm permissions) arrays
   $min_capabilities =  array(
+    'access_civimail_subscribe_unsubscribe_pages' => 1,
+    'access_all_custom_data' => 1,
+    'access_uploaded_files' => 1,
     'make_online_contributions' => 1,
     'profile_create' => 1,
     'profile_edit' => 1,
     'profile_view' => 1,
     'register_for_events' => 1,
     'view_event_info' => 1,
+    'sign_civicrm_petition' => 1,
+    'view_public_civimail_content' => 1,
   );
 
   // Assign the Minimum capabilities (Civicrm permissions) to all WP roles
