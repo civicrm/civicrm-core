@@ -52,9 +52,9 @@
       // Clone the add-new link if replacing it, and queue the clone to be refreshed as a dependent block
       if (o.hasClass('add-new') && response.addressId) {
         data.aid = response.addressId;
-        var clone = o.parent().clone();
+        var clone = o.closest('.crm-summary-block').clone();
         o.data('edit-params', data);
-        $('.crm-container-snippet', clone).remove();
+        $('form', clone).remove();
         if (clone.hasClass('contactCardLeft')) {
           clone.removeClass('contactCardLeft').addClass('contactCardRight');
         }
@@ -65,7 +65,7 @@
         var clData = cl.data('edit-params');
         var locNo = clData.locno++;
         cl.attr('id', cl.attr('id').replace(locNo, clData.locno)).removeClass('form');
-        o.parent().after(clone);
+        o.closest('.crm-summary-block').after(clone);
         $.merge(dependent, $('.crm-inline-edit', clone));
       }
       $('a.ui-notify-close', '#crm-notification-container').click();
