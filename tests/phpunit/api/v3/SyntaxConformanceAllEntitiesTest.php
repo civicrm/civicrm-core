@@ -43,11 +43,6 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
    */
   protected $deletableTestObjects;
 
-  /**
-   * @var array ($entityName => $fieldName) where $fieldName is expected as an alias for 'id'
-   */
-  protected $idAliasFields;
-
   /** This test case doesn't require DB reset */
   public $DBResetRequired = FALSE;
 
@@ -65,7 +60,6 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     $this->toBeImplemented['delete'] = array('MembershipPayment', 'OptionGroup', 'SurveyRespondant', 'UFJoin', 'UFMatch', 'Extension', 'LocationType', 'System');
     $this->onlyIDNonZeroCount['get'] = array('ActivityType', 'Entity', 'Domain','Setting');
     $this->deprecatedAPI = array('Location', 'ActivityType', 'SurveyRespondant');
-    $this->idAliasFields = array('Group' => 'group_id', 'Contact' => 'contact_id');
     $this->deletableTestObjects = array();
   }
 
@@ -472,7 +466,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
    * Currency - only seems to support US
    */
   public function testByIDAlias_get($entityName) {
-    if (in_array($entityName, self::toBeSkipped_automock(TRUE)) || empty($this->idAliasFields[$entityName])) {
+    if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
       return;
     }
@@ -482,6 +476,8 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
       return;
     }
+
+    $idFieldName = _civicrm_api_get_entity_name_from_camel($entityName) . '_id';
 
     // create entities
     $baoObj1 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
@@ -494,7 +490,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     // fetch first by ID
     $result = civicrm_api($entityName, 'get', array(
       'version' => 3,
-      $this->idAliasFields[$entityName] => $baoObj1->id,
+      $idFieldName => $baoObj1->id,
     ));
     $this->assertAPISuccess($result);
     $this->assertTrue(!empty($result['values'][$baoObj1->id]), 'Should find first object by id');
@@ -504,7 +500,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     // fetch second by ID
     $result = civicrm_api($entityName, 'get', array(
       'version' => 3,
-      $this->idAliasFields[$entityName] => $baoObj2->id,
+      $idFieldName => $baoObj2->id,
     ));
     $this->assertAPISuccess($result);
     $this->assertTrue(!empty($result['values'][$baoObj2->id]), 'Should find second object by id');
