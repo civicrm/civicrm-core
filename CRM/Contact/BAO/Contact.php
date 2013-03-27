@@ -2974,4 +2974,46 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       return FALSE;
     }
   }
+
+  
+  /**
+   * Delete a contact-related object that has an 'is_primary' field
+   * Ensures that is_primary gets assigned to another object if available
+   * Also calls pre/post hooks
+   *
+   * @var $type: object type
+   * @var $id: object id
+   */
+  public static function deleteObjectWithPrimary($type, $id) {
+    if (!$id || !is_numeric($id)) {
+      return false;
+    }
+    $daoName = "CRM_Core_DAO_$type";
+    $obj = new $daoName();
+    $obj->id = $id;
+    $obj->find();
+    if ($obj->fetch()) {
+      CRM_Utils_Hook::pre('delete', $type, $id, CRM_Core_DAO::$_nullArray);
+      $contactId = $obj->contact_id;
+      $obj->delete();
+    }
+    else {
+      return false;
+    }
+    $dao = new $daoName();
+    $dao->contact_id = $contactId;
+    $dao->is_primary = 1;
+    // Pick another record to be primary (if one isn't already)
+    if (!$dao->find(TRUE)) {
+      $dao->is_primary = 0;
+      $dao->find();
+      if ($dao->fetch()) {
+        $dao->is_primary = 1;
+        $dao->save();
+      }
+    }
+    $dao->free();
+    CRM_Utils_Hook::post('delete', $type, $id, $obj);
+    $obj->free();
+  }
 }
