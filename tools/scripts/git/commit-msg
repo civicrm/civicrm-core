@@ -2,4 +2,18 @@
 
 # Note: This shell script should be designed and tested for cross-platform use
 
-# Reserved for future use
+set -e
+
+if [ "$GIT_CANONICAL_REPO_NAME" = "civicrm-core" ]; then
+  PACKAGES="$GIT_DIR/../packages"
+else
+  PACKAGES="$GIT_DIR/../../packages"
+fi
+
+if [ -f "$PACKAGES/git-footnote/bin/git-footnote" ]; then
+  FILE="$1"
+  TMPFILE="$1.jira"
+  cp -p "$FILE" "$TMPFILE"
+  $PACKAGES/git-footnote/bin/git-footnote CRM http://issues.civicrm.org/jira < "$TMPFILE" > "$FILE"
+  rm -f "$TMPFILE"
+fi
