@@ -31,7 +31,8 @@
         <div class="crm-submit-buttons"> 
           {include file="CRM/common/formButtons.tpl"}
           {if $addressId}
-            &nbsp;<a class="button delete-button" href="#"><div class="icon delete-icon"></div> {ts}Delete{/ts}</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a class="button delete-button" href="#" style="display:inline-block;float:none;"><div class="icon delete-icon"></div> {ts}Delete{/ts}</a>
           {/if}
         </div>
       </td>

@@ -249,7 +249,7 @@
          CRM.confirm(function() {
             CRM.api('address', 'delete', {id: $block.data('edit-params').aid}, {success:
               function(data) {
-                CRM.alert('', ts('Address Deleted.'), 'success');
+                CRM.alert('', ts('Address Deleted'), 'success');
                 $('.crm-inline-edit-container').addClass('crm-edit-ready');
                 $block.remove();
               }
