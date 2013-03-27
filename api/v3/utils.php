@@ -134,8 +134,7 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array(
  *
  * @return <type>
  */
-function civicrm_api3_create_error($msg, $data = array(
-  ), &$dao = NULL) {
+function civicrm_api3_create_error($msg, $data = array(), &$dao = NULL) {
   //fix me - $dao should be param 4 & 3 should be $apiRequest
   if (is_object($dao)) {
     $dao->free();
@@ -989,7 +988,10 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
   $args = array(&$params['id']);
   if (method_exists($bao_name, 'del')) {
     $bao = call_user_func_array(array($bao_name, 'del'), $args);
-    return civicrm_api3_create_success(TRUE);
+    if ($bao !== FALSE) {
+      return civicrm_api3_create_success(TRUE);
+    }
+    return civicrm_api3_create_error('Could not delete entity id ' . $params['id']);
   }
   elseif (method_exists($bao_name, 'delete')) {
     $dao = new $bao_name();

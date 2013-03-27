@@ -311,7 +311,7 @@ AND    reset_date IS NULL
    * Call common delete function
    */
   static function del($id) {
-    CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
+    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
   }
 }
 
