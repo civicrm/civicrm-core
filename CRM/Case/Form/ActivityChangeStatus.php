@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
@@ -22,37 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{strip}
-{if $rows}
-  <table class="nestedActivitySelector">
-    <tr class="columnheader">
-      <th>{ts}Date{/ts}</th>
-      <th>{ts}Subject{/ts}</th>
-      <th>{ts}Type{/ts}</th>
-      <th>{ts}With{/ts}</th>
-      <th>{ts}Reporter / Assignee{/ts}</th>
-      <th>{ts}Status{/ts}</th>
-      <th></th>
-    </tr>
+*/
 
-    {counter start=0 skip=1 print=false}
-    {foreach from=$rows item=row}
-    <tr class="{$row.class}">
-      <td class="crm-case-display_date">{$row.display_date}</td>
-      <td class="crm-case-subject">{$row.subject}</td>
-      <td class="crm-case-type">{$row.type}</td>
-      <td class="crm-case-with_contacts">{$row.with_contacts}</td>
-      <td class="crm-case-reporter">{$row.reporter}</td>
-      <td class="crm-case-status">{$row.status}</td>
-      <td style="white-space: nowrap;">{$row.links}</td>
-    </tr>
-    {/foreach}
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2013
+ * $Id$
+ *
+ */
 
-  </table>
-{else}
-    <strong>{ts}There are no activities defined for this case.{/ts}</strong>
-{/if}
-{/strip}
+/**
+ * This class generates form components for building changing activity status interface in a case
+ *
+ */
+class CRM_Case_Form_ActivityChangeStatus extends CRM_Core_Form {
 
-{include file="CRM/Case/Form/ActivityToCase.tpl"}
+  /**
+   * Function to build the form
+   *
+   * @return None
+   * @access public
+   */
+  public function buildQuickForm() {
+    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $this->add('select', 'activity_change_status', ts('New Status'), $activityStatus);
+  }
+}
+
