@@ -30,7 +30,7 @@ P=`dirname $0`
 ORIGPWD=`pwd`
 
 # List of files to exclude from all tarballs
-DM_EXCLUDES=".git .svn packages/_ORIGINAL_ packages/SeleniumRC packages/PHPUnit packages/PhpDocumentor packages/SymfonyComponents packages/amavisd-new"
+DM_EXCLUDES=".git .svn packages/_ORIGINAL_ packages/SeleniumRC packages/PHPUnit packages/PhpDocumentor packages/SymfonyComponents packages/amavisd-new packages/git-footnote"
 for DM_EXCLUDE in $DM_EXCLUDES ; do
   DM_EXCLUDES_RSYNC="--exclude=${DM_EXCLUDE} ${DM_EXCLUDES_RSYNC}"
 done
