@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
@@ -22,13 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{* CiviCase - change activity status inline *}
-<div class="crm-block crm-form-block crm-case-activitychangestatus-form-block">
-  <table class="form-layout">
-    <tr class="crm-case-activitychangestatus-form-block-status">
-      <td class="label">{$form.activity_change_status.label}</td>
-      <td>{$form.activity_change_status.html}</td>
-    </tr>
-  </table>
-</div>
+*/
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2013
+ * $Id$
+ *
+ */
+
+/**
+ * This class generates form components for building changing activity status interface in a case
+ *
+ */
+class CRM_Case_Form_ActivityChangeStatus extends CRM_Core_Form {
+
+  /**
+   * Function to build the form
+   *
+   * @return None
+   * @access public
+   */
+  public function buildQuickForm() {
+    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $this->add('select', 'activity_change_status', ts('New Status'), $activityStatus);
+  }
+}
+
