@@ -135,6 +135,9 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
   function preProcess() {
     $this->set('searchFormName', 'Search');
 
+    // js for changing activity status
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Case/Form/ActivityChangeStatus.js');
+
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
