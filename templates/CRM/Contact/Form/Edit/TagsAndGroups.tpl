@@ -56,7 +56,9 @@
         {/if}
       {/foreach}
     </tr>
-    <tr><td>{include file="CRM/common/Tag.tpl"}</td></tr>
+    {if !$type || $type eq 'tag'}
+      <tr><td>{include file="CRM/common/Tag.tpl"}</td></tr>
+    {/if}
   </table>
 {if $title}
   </div>
