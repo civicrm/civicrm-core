@@ -25,9 +25,9 @@
 *}
 <div id="menu-container" style="display:none;">
     <ul id="civicrm-menu">
-        {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
+      {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
         <li id="crm-qsearch" class="menumain crm-link-home">
-            <form action="{crmURL p='civicrm/contact/search/advanced' h=0 }" name="search_block" id="id_search_block" method="post" onsubmit="getSearchURLValue( );">
+            <form action="{crmURL p='civicrm/contact/search/advanced' h=0 }" name="search_block" id="id_search_block" method="post">
               <div id="quickSearch">
                 <input type="text" class="form-text" id="sort_name_navigation" placeholder="{ts}Find Contacts{/ts}" name="sort_name" style="width: 12em;" />
                 <input type="text" id="sort_contact_id" style="display: none" />
@@ -50,9 +50,8 @@
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="job_title" name="quickSearchField">{ts}Job Title{/ts}</label></li>
           </ul>
         </li>
-
-  {/if}
-        {$navigation}
+      {/if}
+      {$navigation}
     </ul>
 </div>
 
@@ -97,31 +96,30 @@ cj(function( ) {
     }
     cj('#sort_name_navigation').attr({name: value, placeholder: label}).flushCache().focus();
   });
+  // check if there is only one contact and redirect to view page
+  cj('#id_search_block').on('submit', function() {
+    var contactId, sortValue = cj('#sort_name_navigation').val();
+    if (sortValue && cj('#sort_name_navigation').attr('name') == 'sort_name') {
+      {/literal}{*
+      // FIXME: async:false == bad,
+      // we should just check the autocomplete results instead of firing a new request
+      // when we fix this, the civicrm/ajax/contact server-side callback can be removed as well
+      // also that would fix the fact that this only works with sort_name search
+      // (and we can remove the above conditional)
+      *}{literal}
+      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/contact' h=0 q='name='}"{literal} + sortValue;
+      contactId = cj.ajax({
+        url: dataUrl,
+        async: false
+      }).responseText;
+    }
+    if (contactId && !isNaN(parseInt(contactId))) {
+      var url = {/literal}"{crmURL p='civicrm/contact/view' h=0 q='reset=1&cid='}"{literal} + contactId;
+      this.action = url;
+    }
+  });
 });
-function getSearchURLValue( )
-{
-    var input = cj('#sort_name_navigation').val();
-    var contactId =  cj( '#sort_contact_id' ).val();
-    if ( ! contactId || isNaN( contactId ) ) {
-      var sortValue = cj( '#sort_name_navigation' ).val();
-      if ( sortValue ) {
-          //using xmlhttprequest check if there is only one contact and redirect to view page
-          var dataUrl = {/literal}"{crmURL p='civicrm/ajax/contact' h=0 q='name='}"{literal} + sortValue;
 
-          var response = cj.ajax({
-              url: dataUrl,
-              async: false
-              }).responseText;
-
-          contactId = response;
-      }
-    }
-
-    if ( contactId && !isNaN(parseInt(contactId)) ) {
-        var url = {/literal}"{crmURL p='civicrm/contact/view' h=0 q='reset=1&cid='}"{literal} + contactId;
-        document.getElementById('id_search_block').action = url;
-    }
-}
 {/literal}{if $config->userFramework neq 'Joomla'}{literal}
   cj('body').prepend( cj("#menu-container").html() );
 

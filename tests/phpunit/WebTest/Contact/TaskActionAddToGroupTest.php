@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
@@ -46,8 +45,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
       $this->webtestAddContact();
 
       // get cid of new contact
-      $queryParams = $this->parseURL();
-      $cids[] = $queryParams['queryString']['cid'];
+      $cids[] = $this->urlArg('cid');
 
       // update email of new contact
       $this->click("//ul[@id='actions']/li/a/span[text()='Edit']");
@@ -70,6 +68,9 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     // Click "check all" box and act on "Add to group" action
     $this->click('toggleSelect');
     $this->select("task", "label=Add Contacts to Group");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(1);
     $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -81,8 +82,8 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check status messages are as expected
-    $this->assertElementContainsText('crm-notification-container', "Added Contacts to {$newGroupName}");
-    $this->assertElementContainsText('crm-notification-container', "2 contacts added to group");
+    $this->waitForText('crm-notification-container', "Added Contacts to {$newGroupName}");
+    $this->waitForText('crm-notification-container', "2 contacts added to group");
 
     // Search by group membership in newly created group
     $this->openCiviPage('contact/search/advanced', 'reset=1');
@@ -128,8 +129,8 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check status messages are as expected
-    $this->assertElementContainsText('crm-notification-container', "Added Contacts to {$newGroupName}");
-    $this->assertElementContainsText('crm-notification-container', "50 contacts added to group");
+    $this->waitForText('crm-notification-container', "Added Contacts to {$newGroupName}");
+    $this->waitForText('crm-notification-container', "50 contacts added to group");
 
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->select("crmasmSelect1", "label=" . $newGroupName);
@@ -139,5 +140,4 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("50 Contacts"), 'Looking for 50 results belonging to group: ' . $newGroupName);
   }
 }
-
 

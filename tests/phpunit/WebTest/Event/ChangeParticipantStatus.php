@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
 
@@ -33,11 +32,6 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
   }
 
   function testParticipationAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -54,8 +48,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     $this->addParticipant($firstName2);
 
     // Search the participants
-    $this->open($this->sboxPath . 'civicrm/event/search?reset=1');
-    $this->waitForElementPresent('_qf_Search_refresh');
+    $this->openCiviPage("event/search", "reset=1", '_qf_Search_refresh');
 
     $eventName = 'Rain';
     $this->click("event_name");
@@ -88,8 +81,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     );
 
     // Verify the changed status
-    $this->open($this->sboxPath . 'civicrm/event/search?reset=1');
-    $this->waitForElementPresent('_qf_Search_refresh');
+    $this->openCiviPage("event/search", "reset=1", '_qf_Search_refresh');
     $this->type('sort_name', $firstName1);
     $this->click('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[text()='$sortName1']");
@@ -97,8 +89,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
     $this->webtestVerifyTabularData(array('Status' => 'Attended'));
 
-    $this->open($this->sboxPath . 'civicrm/event/search?reset=1');
-    $this->waitForElementPresent('_qf_Search_refresh');
+    $this->openCiviPage("event/search", "reset=1", '_qf_Search_refresh');
     $this->type('sort_name', $firstName2);
     $this->click('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[text()='$sortName2']");
@@ -108,14 +99,8 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
   }
 
   function addParticipant($firstName) {
-    // Go directly to the URL of the screen that you will be testing (Register Participant for Event-standalone).
-    $this->open($this->sboxPath . 'civicrm/participant/add?reset=1&action=add&context=standalone');
+    $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');
 
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent('_qf_Participant_upload-bottom');
-
-    // Let's start filling the form with values.
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
     $this->webtestFillAutocomplete($firstName);
 

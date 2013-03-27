@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
 
@@ -33,7 +32,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
@@ -41,6 +40,9 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // add the required Drupal permission
     $permissions = array('edit-2-administer-civicampaign');
     $this->changePermissions($permissions);
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
@@ -74,10 +76,8 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
-    // Let's start filling the form with values.
     $campaignTitle = "Campaign " . $title;
     $this->type("title", $campaignTitle);
 
@@ -102,9 +102,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.", 
-      "Status message didn't show up after saving campaign!"
-    );
+    $this->waitForText('crm-notification-container', "Campaign $title");
 
     $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
@@ -119,7 +117,6 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "Anderson", $firstName2 . "@anderson.name");
 
-    // Go directly to the URL of the screen that you will be testing (Activity Tab).
     $this->click("css=li#tab_activity a");
 
     // waiting for the activity dropdown to show up
@@ -131,8 +128,6 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // waitForPageToLoad is not always reliable. Below, we're waiting for the submit
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload");
-
-    // Let's start filling the form with values.
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook','Anderson, ' . $firstName2, 'Contact not found in line ' . __LINE__);
@@ -197,18 +192,17 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->type("followup_activity_subject", "This is subject of schedule follow-up activity");
 
     // Clicking save.
-    $this->click("_qf_Activity_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Activity_upload");
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', $subject);
 
     $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
 
     // click through to the Activity view screen
     $this->click("xpath=//div[@id='Activities']//table/tbody//tr/td[2][text()='This is subject of test activity being added through activity tab of contact summary screen.']/../td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
-   
+
     // verify Activity created
     $this->verifyText("xpath=id( 'Activity' )/div[2]/table[1]/tbody/tr[5]/td[2]", preg_quote($campaignTitle));
   }

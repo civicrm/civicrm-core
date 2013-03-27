@@ -31,11 +31,6 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
   }
 
   function testInheritedMembership() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -46,9 +41,8 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->type('email_1_email', "$title@org.com");
     $this->click('_qf_Contact_upload_view');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Organization {$title} has been created.");
+    $this->waitForText('crm-notification-container', "Organization {$title} has been created.");
 
-    // Go directly to the URL
     $this->openCiviPage('admin/member/membershipType', 'reset=1&action=browse');
 
     $this->click('link=Add Membership Type');
@@ -75,7 +69,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertElementContainsText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
+    $this->waitForText('crm-notification-container', "Membership Type $title");
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Organization', '_qf_Contact_cancel');
 
@@ -110,8 +104,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "Membership Type $title membership for Organization $title1 has been added.",
-      "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "Membership Type $title");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -162,7 +155,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('quick-save');
     $this->waitForElementPresent('current-relationships');
     //check the status message
-    $this->assertElementContainsText('crm-notification-container', 'New relationship created.');
+    $this->waitForText('crm-notification-container', 'New relationship created');
 
     $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
 
@@ -194,9 +187,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click("//li[@id='tab_rel']/a");
     $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='Edit']");
     $this->click("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='Edit']");
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $id = $matches[1];
+    $id = $this->urlArg('cid');
 
     $this->waitForElementPresent('is_active');
     //disable relationship
@@ -206,7 +197,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('_qf_Relationship_upload');
     $this->waitForElementPresent('inactive-relationships');
     //check the status message
-    $this->assertElementContainsText('crm-notification-container', 'Relationship record has been updated.');
+    $this->waitForText('crm-notification-container', 'Relationship record has been updated');
 
     // click through to the membership view screen
     $this->click('css=li#tab_member a');
@@ -229,7 +220,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('_qf_Relationship_upload');
     $this->waitForElementPresent('current-relationships');
     //check the status message
-    $this->assertElementContainsText('crm-notification-container', 'Relationship record has been updated.');
+    $this->waitForText('crm-notification-container', 'Relationship record has been updated.');
 
     //check for memberships
     $this->click('css=li#tab_member a');
@@ -246,6 +237,9 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
         $this->getConfirmation()
       ));
     $this->chooseOkOnNextConfirmation();
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(10);
 
     //verify inherited membership has been removed
@@ -263,7 +257,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
         $this->getConfirmation()
       ));
     $this->chooseOkOnNextConfirmation();
-    sleep(10);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //verify membership
     $this->click('css=li#tab_member a');

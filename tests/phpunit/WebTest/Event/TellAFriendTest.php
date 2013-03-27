@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
 
@@ -33,16 +32,10 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
   }
 
   function testAddEvent() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -74,8 +67,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->changePermissions($permission);
 
     // register as an anonymous user
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    $this->waitForElementPresent('edit-submit');
+    $this->webtestLogout();
     $this->open($registerUrl);
     $this->waitForElementPresent('_qf_Register_upload-bottom');
 
@@ -110,49 +102,41 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->click('_qf_Form_submit');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //to wait for thank you message to appear
-    sleep(5);
-    $this->assertTrue($this->isTextPresent($thankYouMsg));
+    $this->waitForTextPresent($thankYouMsg);
 
     // Log in using webtestLogin() method
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // get all friends contact id
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh ');
+    $this->openCiviPage("contact/search", "reset=1", '_qf_Basic_refresh');
     $this->type('sort_name', $firstName1);
     $this->click('_qf_Basic_refresh ');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh ');
+    $this->openCiviPage("contact/search", "reset=1", '_qf_Basic_refresh');
     $this->type('sort_name', $firstName2);
     $this->click('_qf_Basic_refresh ');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh ');
+    $this->openCiviPage("contact/search", "reset=1", '_qf_Basic_refresh');
     $this->type('sort_name', $firstName3);
     $this->click('_qf_Basic_refresh ');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent('_qf_Basic_refresh ');
+    $this->openCiviPage("contact/search", "reset=1", '_qf_Basic_refresh');
     $this->type('sort_name', $firstName);
     $this->click('_qf_Basic_refresh ');
     $this->waitForElementPresent('Print');
     $this->assertTrue($this->isTextPresent('1 Contact'));
 
     // Verify Activity created
-    $this->open($this->sboxPath . "civicrm/activity/search?reset=1");
-    $this->waitForElementPresent('_qf_Search_refresh');
+    $this->openCiviPage("activity/search", "reset=1", '_qf_Search_refresh');
     $this->type('sort_name', $firstName1);
     $this->click('_qf_Search_refresh');
     $this->waitForElementPresent("_qf_Search_next_print");
@@ -179,11 +163,8 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
   }
 
   function _testAddEventInfo($eventTitle, $eventDescription) {
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
-    // Let's start filling the form with values.
     $this->select("event_type_id", "value=1");
 
     // Attendee role s/b selected now.

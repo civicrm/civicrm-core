@@ -260,21 +260,16 @@ WHERE lt.entity_id = %1 ";
    * @static
    */
   static function deleteFinancialTrxn($entity_id) {
-    $fids = self::getFinancialTrxnId($entity_id);
-
-    if ($fids['financialTrxnId']) {
-      // delete enity financial transaction before financial transaction since financial_trxn_id will be set to null if financial transaction deleted first
-      $query = 'DELETE FROM civicrm_entity_financial_trxn  WHERE financial_trxn_id = %1';
-      CRM_Core_DAO::executeQuery($query, array(1 => array($fids['financialTrxnId'], 'Integer')));
-
-      // delete financial transaction
-      $query = 'DELETE FROM civicrm_financial_trxn WHERE id = %1';
-      CRM_Core_DAO::executeQuery($query, array(1 => array($fids['financialTrxnId'], 'Integer')));
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+    $query = "DELETE ceft1, cfi, ceft, cft FROM `civicrm_financial_trxn` cft
+LEFT JOIN civicrm_entity_financial_trxn ceft 
+  ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
+LEFT JOIN civicrm_entity_financial_trxn ceft1
+  ON ceft1.financial_trxn_id = cft.id AND ceft1.entity_table = 'civicrm_financial_item'
+LEFT JOIN civicrm_financial_item cfi 
+  ON ceft1.entity_table = 'civicrm_financial_item' and cfi.id = ceft1.entity_id
+WHERE ceft.entity_id = %1";
+    CRM_Core_DAO::executeQuery($query, array(1 => array($entity_id, 'Integer')));
+    return TRUE;
   }
 
   /**

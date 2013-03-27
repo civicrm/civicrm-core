@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
 
@@ -37,7 +36,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
   }
 
   function testPetitionUsageScenario() {
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents("CiviCampaign");
@@ -63,16 +62,13 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     );
     $this->changePermissions($permissions);
 
+    // Log in as normal user
+    $this->webtestLogin();
+
     /////////////// Create Campaign ///////////////////////////////
 
-    // Go directly to the URL of the screen that you will be add campaign
-    $this->open($this->sboxPath . "civicrm/campaign/add?reset=1");
+    $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
 
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Campaign_upload-bottom");
-
-    // Let's start filling the form with values.
     $title = substr(sha1(rand()), 0, 7);
     $this->type("title", "$title Campaign");
 
@@ -101,11 +97,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
 
     ////////////// Create petition using New Individual profile //////////////////////
 
-    // Go directly to the URL of the screen that you will be add petition
-    $this->open($this->sboxPath . "civicrm/petition/add?reset=1");
-
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Petition_next-bottom");
+    $this->openCiviPage("petition/add", "reset=1", "_qf_Petition_next-bottom");
 
     // fill petition tile.
     $title = substr(sha1(rand()), 0, 7);
@@ -140,8 +132,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     ////////////// Retrieve Sign Petition Url /////////////////////////
 
     // logout and sign as anonymous.
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    $this->waitForElementPresent("edit-submit");
+    $this->webtestLogout();
 
     // go to the link that you will be sign as anonymous
     $this->open($url);
@@ -165,12 +156,9 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Thank You"));
 
     // login
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/campaign?reset=1&subPage=petition");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("link=Add Petition");
+    $this->openCiviPage("campaign", "reset=1&subPage=petition", "link=Add Petition");
 
     // check for unconfirmed petition signature
     $this->waitForElementPresent("petitions");
@@ -194,14 +182,9 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     foreach ($expected as $column => $value) {
       $this->verifyText("xpath=//table[@class='selector']/tbody/tr[2]/td[$column]", preg_quote($value));
     }
-    
+
     // ONCE MORE, NO EMAIL VERIFICATION AND CUSTOM THANK-YOU
-
-    // Go directly to the URL of the screen that you will be add petition
-    $this->open($this->sboxPath . "civicrm/petition/add?reset=1");
-
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Petition_next-bottom");
+    $this->openCiviPage("petition/add", "reset=1", "_qf_Petition_next-bottom");
 
     // fill petition tile.
     $title = substr(sha1(rand()), 0, 7);
@@ -241,8 +224,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $url = $this->getAttribute("xpath=//div[@id='petitions_wrapper']/table[@id='petitions']/tbody/tr/td[10]/span[2][text()='more']/ul/li/a[text()='Sign']@href");
 
     // logout and sign as anonymous.
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    $this->waitForElementPresent("edit-submit");
+    $this->webtestLogout();
 
     // go to the link that you will be sign as anonymous
     $this->open($url);
@@ -263,18 +245,15 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     // click Sign the petition.
     $this->click("_qf_Signature_next-bottom");
     $this->waitForElementPresent("thankyou_text");
-    
+
     // check that thank-you page has appropriate title and message
     $this->assertTrue($this->isTextPresent("Awesome $title donation"));
     $this->assertTrue($this->isTextPresent("Thank you for your kind contribution to support $title"));
 
     // login
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/campaign?reset=1&subPage=petition");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("link=Add Petition");
+    $this->openCiviPage("campaign", "reset=1&subPage=petition", "link=Add Petition");
 
     // check for confirmed petition signature
     $this->waitForElementPresent("petitions");

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
@@ -33,22 +32,11 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
   }
 
   function testSearchProfile() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen where you will be
     // Add new profile.
     $this->openCiviPage('admin/uf/group', 'reset=1');
-    
+
     $this->click('newCiviCRMProfile-bottom');
 
     $this->waitForElementPresent('_qf_Group_next-bottom');
@@ -62,11 +50,10 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     // Get profile id (gid) from URL
-    $elements = $this->parseURL();
-    $profileId = $elements['queryString']['gid'];
+    $profileId = $this->urlArg('gid');
 
     // Add Last Name field.
     $this->click('field_name[0]');
@@ -82,8 +69,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Last Name' has been saved to '$profileTitle'.");
-    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.');
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Last Name' has been saved to '$profileTitle'.");
+    $this->waitForText('crm-notification-container', 'You can add another profile field.');
 
     // Add Email field.
     $this->click('field_name[0]');
@@ -99,8 +86,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
-    $this->assertElementContainsText('crm-notification-container', 'You can add another profile field.'); 
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
+    $this->waitForText('crm-notification-container', 'You can add another profile field.');
 
     // Add Sample Custom Field.
     $this->click('field_name[0]');
@@ -113,11 +100,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
     $this->click('in_selector');
     // click on save
-    $this->click('_qf_Field_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Add Individual Contact.
-    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
+    $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
     $this->click("xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
 
     $this->waitForElementPresent('_qf_Edit_next');
@@ -159,18 +142,17 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // Edit first profile field
     $this->waitForElementPresent("xpath=//table/tbody/tr[1]/td[9]");
-    $this->click("xpath=//table/tbody/tr[1]/td[9]/span[1]/a[1]");
-
-    // Verify that visibility field is present in edit form
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink("xpath=//table/tbody/tr[1]/td[9]/span[1]/a[1]", '_qf_Field_next-bottom');
 
     // sleep 5 to make sure jQuery is not hiding field after page load
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     $this->assertTrue($this->isElementPresent("visibility"), 'Visibility field not present when editing existing profile field.');
     $this->click("xpath=//tr[@id='profile_visibility']/td[1]/a");
     $this->waitForElementPresent("xpath=//div[@id='crm-notification-container']/div/div[2]/p[2]");
-    $this->assertElementContainsText('crm-notification-container', 'Is this field hidden from other users');
+    $this->waitForText('crm-notification-container', 'Is this field hidden from other users');
     $this->select('visibility', 'value=Public Pages and Listings');
   }
 }

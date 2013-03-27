@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
 
@@ -36,11 +35,6 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
      *  Test participant import for Individuals matching on external identifier.
      */
   function testContributionImport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     $this->webtestLogin();
 
     // Get sample import data.
@@ -54,11 +48,6 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
      *  Test membership import for Individuals matching on external identifier.
      */
   function testMemberImportIndividual() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     $this->webtestLogin();
 
     // Get membership import data for Individuals.
@@ -72,11 +61,6 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
      *  Test participant import for Individuals matching on external identifier.
      */
   function testParticipantImportIndividual() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -246,7 +230,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
      * @return int external id
      */
   function _addContact($firstName, $lastName, $externalId) {
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //fill in first name
     $this->type("first_name", $firstName);
@@ -260,7 +244,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     return $externalId;
   }
@@ -294,11 +278,8 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
       );
     }
 
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
-    $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
-
-    // Let's start filling the form with values.
     $this->select("event_type_id", "value={$params['event_type_id']}");
 
     // Attendee role s/b selected now.
@@ -354,21 +335,17 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
 
     $this->click("_qf_Registration_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Saved");
+    $this->waitForText('crm-notification-container', "Saved");
 
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
+    $this->openCiviPage('event/manage', 'reset=1');
     $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input",$params['title']);
     $this->click("_qf_SearchEvent_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("link=" . $params['title']);
+    $this->clickLink("link=" . $params['title'], NULL);
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $matches = array();
-    preg_match('/id=([0-9]+)/', $this->getLocation(), $matches);
-    $params['event_id'] = $matches[1];
+    $params['event_id'] = $this->urlArg('id');
 
     return $params;
   }

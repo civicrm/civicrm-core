@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
@@ -66,12 +65,12 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '{$params['name']}' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '{$params['name']}' has been saved.");
 
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[3]/a");
+    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(text(), '{$params['name']}')]");
     $createdBy = $this->getText("xpath=//table[@id='crm-group-selector']/tbody/tr/td[3]/a");
     $this->click("xpath=//table[@id='crm-group-selector']/tbody/tr/td[7]/span/a[2]");
     $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table[2]/tbody/tr/td[2]/select");
@@ -90,12 +89,14 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->click("xpath=//table[@id='crm-group-selector']/tbody//tr/td[1][text()='{$params['name']}']/following-sibling::td[2]/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $name = explode(',', $createdBy);
-    $displayName = isset($name[1]) ? "{$name[1]} {$name[0]}" : "{$name[0]}";
-    $this->assertElementContainsText("css=div.crm-summary-display_name",$displayName);
+    $name1 = trim($name[1]);
+    $name0 = trim($name[0]);
+    $displayName = isset($name1) ? "{$name1} {$name0}" : "{$name0}";
+    $this->assertElementContainsText("css=div.crm-summary-display_name", $displayName);
   }
 
   function testGroupReserved() {
-    $this->webtestLogin(true);
+    $this->webtestLogin('admin');
 
     $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload-bottom');
 
@@ -127,14 +128,14 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
     // Check Reserved box
     $this->click("is_reserved");
-    
+
     // Clicking save.
     $this->click("_qf_Edit_upload");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
     $this->assertTrue($this->isTextPresent("The Group '{$params['name']}' has been saved."));
-    
+
     // Create a new role w/o reserved group permissions
     $role = 'role' . substr(sha1(rand()), 0, 7);
     $this->open($this->sboxPath . "admin/people/permissions/roles");
@@ -143,7 +144,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->type("edit-name", $role);
     $this->click("edit-add");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role}']");
     $roleId = explode('/', $this->getAttribute("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role}']/../td[4]/a[text()='edit permissions']/@href"));
@@ -154,34 +155,26 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
       "edit-{$roleId}-access-civicrm",
     );
     $this->changePermissions($permissions);
-    
-    // Now logout as admin, login as regular user and verify that Group settings, delete and disable links are not available
-    $this->openCiviPage('logout', 'reset=1', NULL);
-    $this->open($this->sboxPath);
-    $this->waitForElementPresent('edit-submit');
-    $this->type('edit-name', $user);
-    $this->type('edit-pass', 'Test12345');
-    $this->click('edit-submit');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
+    // Now logout as admin, login as regular user and verify that Group settings,
+    // delete and disable links are not available
+    $this->webtestLogin($user, 'Test12345');
+
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
     $this->waitForTextPresent("Adding new reserved group.");
-    // Settings link should NOT be included in selector after search returns with only the reserved group.
+    // Settings link should NOT be included in selector
+    // after search returns with only the reserved group.
     $this->assertElementNotContainsText("css=td.crm-group-group_links", "Settings");
 
     //login as admin and delete the role
-    $this->openCiviPage('logout', 'reset=1', NULL);
-    $this->open($this->sboxPath);
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->_roleDelete($role);
-
   }
 
   function _testCreateUser($roleid) {
-    // Go directly to the URL of the screen that will Create User Authentically.
     $this->open($this->sboxPath . "admin/people/create");
 
     $this->waitForElementPresent("edit-submit");
@@ -213,7 +206,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     return $name;
   }
-  
+
   function _roleDelete($role) {
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->click("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
@@ -223,7 +216,4 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->click("edit-submit");
     $this->waitForTextPresent("The role has been deleted.");
   }
-  
 }
-
-

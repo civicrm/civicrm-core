@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
 
@@ -33,16 +32,6 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
   }
 
   function testCustomDataImport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     $firstName1 = 'Ma_' . substr(sha1(rand()), 0, 7);
@@ -51,8 +40,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
 
     // Add New Strict Rule
     $newRuleTitle = 'IndividualStrict_' . substr(sha1(rand()), 0, 7);
-    $this->open($this->sboxPath . "civicrm/contact/deduperules?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/deduperules", "reset=1");
 
     $this->click("xpath=//div[@id='browseValues_Individual']/div[2]/a/span");
     $this->waitForElementPresent('_qf_DedupeRules_next-bottom');
@@ -114,7 +102,6 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('This is a test field'));
   }
 
-
   /*
      *  Helper function to provide data for custom data import.
      */
@@ -140,8 +127,8 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
   }
 
   function _addCustomData() {
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
+
+    $this->openCiviPage("admin/custom/group", "reset=1");
 
     //add new custom data
     $this->click("//a[@id='newCustomDataGroup']/span");
@@ -160,9 +147,8 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now."));
-    $url = explode('gid=', $this->getLocation());
-    $gid = $url[1];
+    $this->waitForText('crm-notification-container', $customGroupTitle);
+    $gid = $this->urlArg('gid');
 
     // create another custom field - Date
     $customField = 'Custom field ' . substr(sha1(rand()), 0, 4);

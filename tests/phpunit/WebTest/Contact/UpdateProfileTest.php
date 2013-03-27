@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_UpdateProfileTest extends CiviSeleniumTestCase {
 
@@ -41,6 +40,7 @@ class WebTest_Contact_UpdateProfileTest extends CiviSeleniumTestCase {
     $locationUrl = $this->getLocation();
     $editUrl = str_replace('/view?', '/edit?', $locationUrl);
     $this->open($editUrl);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Modify profile field values
     // contact details section
@@ -75,5 +75,4 @@ class WebTest_Contact_UpdateProfileTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("//div[@id='profilewrap1']/div[@id='crm-container']/div[7]/div[2][contains(text(), 'AR')]"));
   }
 }
-
 

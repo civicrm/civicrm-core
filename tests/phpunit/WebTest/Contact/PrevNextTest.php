@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
 
@@ -33,18 +32,7 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
   }
 
   function testPrevNext() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
-
 
     /* add new group */
 
@@ -75,7 +63,7 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_GroupContact_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Added to Group");
+    $this->waitForText('crm-notification-container', "Added to Group");
 
     // Individual 2
     $contact2 = substr(sha1(rand()), 0, 7);
@@ -87,7 +75,7 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_GroupContact_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Added to Group");
+    $this->waitForText('crm-notification-container', "Added to Group");
 
     // Individual 3
     $contact3 = substr(sha1(rand()), 0, 7);
@@ -99,7 +87,7 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_GroupContact_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Added to Group");
+    $this->waitForText('crm-notification-container', "Added to Group");
 
     // Search contacts
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');

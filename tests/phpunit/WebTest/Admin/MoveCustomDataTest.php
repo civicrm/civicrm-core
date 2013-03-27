@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
 
@@ -33,16 +32,6 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCustomFields() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     $cid_all          = $this->_createContact("all_data", "move_custom_data");
@@ -67,7 +56,6 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $pre_move_values[$cid_to_missing]['source'] = $this->_loadDataFromApi($cid_to_missing, $from_group_id);
     $pre_move_values[$cid_to_missing]['destination'] = $this->_loadDataFromApi($cid_to_missing, $to_group_id);
 
-
     //ok, so after all that setup, we are now good to actually move a field
 
     //first, pick a random field from the source group to move
@@ -85,7 +73,6 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $post_move_values[$cid_from_missing]['destination'] = $this->_loadDataFromApi($cid_from_missing, $to_group_id);
     $post_move_values[$cid_to_missing]['source'] = $this->_loadDataFromApi($cid_to_missing, $from_group_id);
     $post_move_values[$cid_to_missing]['destination'] = $this->_loadDataFromApi($cid_to_missing, $to_group_id);
-
 
     //Make sure that only the appropriate values have changed
     foreach (array(
@@ -136,9 +123,10 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //assert that the success text is present
-    $this->assertElementContainsText('crm-notification-container', "has been moved", "Move field success message not displayed");
+    $this->waitForText('crm-notification-container', "has been moved");
 
-    //assert that the custom field not on old data set page 
+    //assert that the custom field not on old data set page
+
     $this->assertTrue(!$this->isElementPresent("CustomField-" . $field_to_move), "The moved custom field still displays on the old fieldset page");
 
     //go to the destination fieldset and make sure the field is present
@@ -175,7 +163,6 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
       }
     }
 
-
     $params = array('contact_id' => $contact_id);
     foreach ($field_ids[$group_id] as $id) {
       $params['return.custom_' . $id] = 1;
@@ -194,7 +181,6 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     return $results;
   }
 
-
   //creates a new custom group and fields in that group, and returns the group Id
   function _buildCustomFieldset($prefix) {
     $group_id    = $this->_createCustomGroup($prefix);
@@ -208,7 +194,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
 
   //Creates a custom field group for a specific entity type and returns the custom group Id
   function _createCustomGroup($prefix = "custom", $entity = "Contact") {
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
+
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
     //fill custom group title
@@ -224,13 +210,9 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.", "Group title missing");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
-    $url = $this->parseURL();
-    $group_id = $url['queryString']['gid'];
-    $this->assertType('numeric', $group_id);
-
-    return $group_id;
+    return $this->urlArg('gid');
   }
 
   //Adds a new custom field to a specfied custom field group, using the given
@@ -357,7 +339,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$fieldLabel' has been saved.", "Field was not created successfully");    
+    $this->waitForText('crm-notification-container', "Your custom field '$fieldLabel' has been saved.");
 
     //get the custom id of the custom field that was just created
     $results = $this->webtest_civicrm_api("CustomField", "get", array('label' => $fieldLabel, 'custom_group_id' => $group_id));
@@ -383,7 +365,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   //randomly generates data for a specific custom field
   function _fillCustomDataForContact($contact_id, $group_id) {
     //edit the given contact
-    $this->openCiviPage('contact/add', "reset=1&action=update&cid={$contact_id}");   
+    $this->openCiviPage('contact/add', "reset=1&action=update&cid={$contact_id}");
 
     $this->click("expand");
     $this->waitForElementPresent("address_1_street_address");
@@ -431,8 +413,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //assert success
-    $this->assertElementContainsText('crm-notification-container', "has been updated", "Contact Record could not be saved");
+    $this->waitForText('crm-notification-container', "has been updated");
   }
 }
-
 

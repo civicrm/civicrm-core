@@ -24,7 +24,6 @@
    +--------------------------------------------------------------------+
   */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
 
@@ -33,17 +32,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
   }
 
   function testRolePermissionReport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     //create new roles
     $role1 = 'role1' . substr(sha1(rand()), 0, 7);
@@ -71,8 +60,6 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
 
     $user1 = $this->_testCreateUser($roleId1);
     $user2 = $this->_testCreateUser($roleId2);
-    $this->open($this->sboxPath . "user/logout");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // let's give full CiviReport permissions.
     $permissions = array(
@@ -92,20 +79,13 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->click("add");
     $this->click("_qf_Summary_submit_save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->openCiviPage('logout','reset=1');
-    $this->open($this->sboxPath);
-    $this->waitForElementPresent('edit-submit');
-    $this->type('edit-name', $user2);
-    $this->type('edit-pass', 'Test12345');
-    $this->click('edit-submit');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogin($user2, 'Test12345');
     $this->openCiviPage('report/instance/1', 'reset=1');
     $this->assertElementContainsText('crm-container', 'You do not have permission to access this report.');
     $this->openCiviPage('report/list', 'reset=1');
-    $this->openCiviPage('logout', 'reset=1');
 
     //delete roles
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->_roleDelete($role1);
     $this->_roleDelete($role2);
@@ -115,17 +95,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
    *check for CRM-10148
    */
   function testReservedReportPermission() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     //create new role
     $role = 'role' . substr(sha1(rand()), 0, 7);
@@ -155,21 +125,12 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     );
     $this->changePermissions($permissions);
 
-    $this->openCiviPage('logout', 'reset=1');
-    $this->open($this->sboxPath);
-    $this->waitForElementPresent('edit-submit');
-    $this->type('edit-name', $user);
-    $this->type('edit-pass', 'Test12345');
-    $this->click('edit-submit');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogin($user, 'Test12345');
     $this->openCiviPage('report/instance/1', 'reset=1');
 
     //check if the reserved report field is frozen
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='instanceForm']//table[3]/tbody//tr/td[2]/tt[text()='[ ]']"));
 
-    $this->openCiviPage('logout', 'reset=1');
-    $this->open($this->sboxPath);
-    $this->webtestLogin(TRUE);
     // let's give full CiviReport permissions.
     $permissions = array(
       "edit-{$roleId}-access-civireport",
@@ -187,13 +148,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->click("_qf_Summary_submit_save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->openCiviPage('logout', 'reset=1');
-    $this->open($this->sboxPath);
-    $this->waitForElementPresent('edit-submit');
-    $this->type('edit-name', $user);
-    $this->type('edit-pass', 'Test12345');
-    $this->click('edit-submit');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogin($user, 'Test12345');
     $this->openCiviPage('report/instance/1', 'reset=1');
 
     //check if the report criteria and settings is accessible
@@ -201,9 +156,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']/table//input[@id='title']"));
 
     //login as admin and remove reserved permission
-    $this->openCiviPage('logout', 'reset=1');
-    $this->open($this->sboxPath);
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
     $this->open($this->sboxPath . "admin/people/permissions");
     $this->waitForElementPresent("edit-submit");
 
@@ -216,13 +169,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //login as user and check for absence of report criteria and settings
-    $this->openCiviPage('logout', 'reset=1');
-    $this->open($this->sboxPath);
-    $this->waitForElementPresent('edit-submit');
-    $this->type('edit-name', $user);
-    $this->type('edit-pass', 'Test12345');
-    $this->click('edit-submit');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogin($user, 'Test12345');
     $this->openCiviPage('report/instance/1', 'reset=1');
 
     if ($this->isElementPresent("xpath=//form[@id='Summary']/div[2]/div/div/div")) {
@@ -235,30 +182,20 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']//input[@id='title']"));
 
     //login as admin and turn the is_reserved flag off for the instance
-    $this->openCiviPage('logout', 'reset=1');
-    $this->open($this->sboxPath);
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
     $this->openCiviPage('report/instance/1', 'reset=1');
     $this->click("is_reserved");
     $this->click("_qf_Summary_submit_save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->openCiviPage('logout', 'reset=1');
-    $this->open($this->sboxPath);
-    $this->waitForElementPresent('edit-submit');
-    $this->type('edit-name', $user);
-    $this->type('edit-pass', 'Test12345');
-    $this->click('edit-submit');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogin($user, 'Test12345');
     $this->openCiviPage('report/instance/1', 'reset=1');
 
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='id_default']//input[@id='fields_email']"));
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']//input[@id='title']"));
 
     //login as admin and delete the role
-    $this->openCiviPage('logout', 'reset=1');
-    $this->open($this->sboxPath);
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->_roleDelete($role);
   }
@@ -275,7 +212,6 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
 
   function _testCreateUser($roleid) {
 
-    // Go directly to the URL of the screen that will Create User Authentically.
     $this->open($this->sboxPath . "admin/people/create");
 
     $this->waitForElementPresent("edit-submit");

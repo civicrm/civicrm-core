@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
 
@@ -33,19 +32,8 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
   }
 
   function testDuplicateContactAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of New Individual.
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     $firstName = substr(sha1(rand()), 0, 7);
@@ -74,13 +62,11 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
-    // Go directly to the URL of New Individual.
     $this->openCiviPage('contact/add' , 'reset=1&ct=Individual');
 
     //contact details section
-
 
     //fill in first name
     $this->type("first_name", "$firstName");
@@ -98,5 +84,4 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("css=.notify-content", "Please correct the following errors in the form fields below: One matching contact was found. You can View or Edit the existing contact.");
   }
 }
-
 

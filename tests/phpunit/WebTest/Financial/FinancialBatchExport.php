@@ -33,16 +33,9 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
   }
 
   function testAddFinancialBatch() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
-    $this->webtestLogin(TRUE);
-    $this->open($this->sboxPath . 'civicrm/financial/batch?reset=1&action=add');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_FinancialBatch_next-botttom');
+    $this->webtestLogin('admin');
+    $this->openCiviPage("financial/batch", "reset=1&action=add", '_qf_FinancialBatch_next-botttom');
     $setTitle = 'Batch ' . substr(sha1(rand()), 0, 7) . date('Y-m-d');
     $setDescription  = 'Test Batch Creation';
     $setPaymentInstrument = 'Credit Card';
@@ -86,39 +79,38 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // parse URL to grab the batch ID
-    $elements = $this->parseURL();
-    $batchId = $elements['queryString']['bid'];
+    $batchId = $this->urlArg('bid');
     return $batchId;
   }
 
   function _testAssignBatch($numberOfTrxn) {
     $this->select( "xpath=//div[@id='crm-transaction-selector-assign_length']/label/select[@name='crm-transaction-selector-assign_length']", "value=$numberOfTrxn" );
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     $this->click('toggleSelect');
     $this->select('trans_assign', 'value=Assign');
     $this->click('Go');
-    sleep(5);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
   function _testExportBatch($setTitle, $batchId, $exportFormat) {
-    $this->open($this->sboxPath . "civicrm/financial/batch?reset=1&action=export&id=$batchId");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("financial/batch", "reset=1&action=export&id=$batchId");
     if ($exportFormat == 'CSV') {
       $this->click("xpath=//form[@id='FinancialBatch']/div[2]/table[@class='form-layout']/tbody/tr/td/input[2]");
       $this->click('_qf_FinancialBatch_next-botttom');
-      sleep(5);
+      $this->waitForPageToLoad($this->getTimeoutMsec());
     }
     else {
       $this->click("xpath=//form[@id='FinancialBatch']/div[2]/table[@class='form-layout']/tbody/tr/td/input[1]");
       $this->click('_qf_FinancialBatch_next-botttom');
-      sleep(5);
+      $this->waitForPageToLoad($this->getTimeoutMsec());
     }
-    $this->open($this->sboxPath . "civicrm?reset=1");
+    $this->openCiviPage("dashboard", "reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->click("xpath=//div[@id='recently-viewed']/ul/li[1]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Activity_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='recently-viewed']/ul/li[1]/a", "_qf_Activity_cancel-bottom");
     $this->webtestVerifyTabularData(
       array(
         'Current Attachment(s)' => 'Financial_Transactions_'

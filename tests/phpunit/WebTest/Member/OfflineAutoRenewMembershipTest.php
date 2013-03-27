@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase {
 
@@ -33,7 +32,6 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
   }
 
   function testOfflineAutoRenewMembership() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // We need a payment processor
@@ -64,6 +62,7 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $url = $this->getLocation();
     $url = str_replace('mode=live', 'mode=test', $url);
     $this->open($url);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // start filling membership form
     $this->waitForElementPresent('payment_processor_id');
@@ -86,6 +85,9 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     // since country is not pre-selected for offline mode
     $this->select("billing_country_id-5", "label=United States");
     //wait for states to populate the select box
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(2);
     $this->click('billing_state_province_id-5');
     $this->webtestAddBillingDetails($firstName, NULL, $lastName);
@@ -94,15 +96,11 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Use Find Members to make sure membership exists
-    $this->open($this->sboxPath . "civicrm/member/search?reset=1");
-    $this->waitForElementPresent("member_end_date_high");
+    $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
     $this->click("member_test");
-    $this->click("_qf_Search_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    
-    $this->waitForElementPresent("xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 

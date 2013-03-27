@@ -47,7 +47,7 @@
         <td class="label">{$form.description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_type' field='description' id=$membershipTypeId}{/if}
         </td>
         <td>{$form.description.html}<br />
-          <span class="description">{ts}Description of this membership type for display on signup forms. May include eligibility, benefits, terms, etc.{/ts}</span>
+          <span class="description">{ts}Description of this membership type for internal use. May include eligibility, benefits, terms, etc.{/ts}</span>
         </td>
       </tr>
 

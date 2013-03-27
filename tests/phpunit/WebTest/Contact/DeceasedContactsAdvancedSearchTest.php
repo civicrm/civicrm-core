@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTestCase {
 
@@ -33,16 +32,6 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
   }
 
   function testDeceasedContactsAdvanceSearch() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -72,15 +61,11 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->click('demographics');
     $this->waitForElementPresent('CIVICRM_QFID_1_is_deceased');
     $this->click('CIVICRM_QFID_1_is_deceased');
-    $this->click('_qf_Advanced_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Remove contacts from group
-    $this->waitForElementPresent('Go');
+    $this->clickLink('_qf_Advanced_refresh', 'Go');
     $this->assertElementContainsText('search-status', '2 Contacts');
     $this->click("toggleSelect");
     $this->waitForTextPresent('2 Selected records only');
-    
+
     $this->select('task', 'label=Remove Contacts from Group');
     $this->click("xpath=//div[@id='search-status']/table/tbody/tr[3]/td/ul/input[2]");
     $this->waitForElementPresent('_qf_RemoveFromGroup_back-bottom');
@@ -88,7 +73,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_RemoveFromGroup_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "2 contacts removed from '{$groupName}'");
+    $this->waitForText('crm-notification-container', "2 contacts removed from '{$groupName}'");
 
     // Search for the contacts who are not deceased
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');

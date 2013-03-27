@@ -22,7 +22,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
 
@@ -31,11 +30,6 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
   }
 
   function testEventWaitList() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -43,17 +37,12 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $this->webtestAddPaymentProcessor($processorName);
 
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
-    // Let's start filling the form with values.
     $this->select("event_type_id", "value=1");
 
     // Attendee role s/b selected now.
@@ -163,12 +152,8 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings) {
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . "civicrm/event/manage?reset=1");
-    $this->click("link=$eventTitle");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Look for Register button
-    $this->waitForElementPresent("link=Register Now");
+    $this->openCiviPage("event/manage", "reset=1");
+    $this->clickLink("link=$eventTitle", "link=Register Now");
 
     // Check for correct event info strings
     $this->assertStringsPresent($eventInfoStrings);
@@ -184,8 +169,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
 
   function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
-      $this->open($this->sboxPath . "civicrm/logout?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->webtestLogout();
     }
     $this->open($registerUrl);
 
@@ -227,7 +211,6 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
 
     if ($anonymous) {
       // log back in so we're in the same state
-      $this->open($this->sboxPath);
       $this->webtestLogin();
     }
   }

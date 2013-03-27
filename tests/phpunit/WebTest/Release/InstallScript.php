@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'ReleaseTestCase.php';
 
 // name of the class doesn't end with Test on purpose - this way this
@@ -38,7 +37,6 @@ class WebTest_Release_InstallScript extends WebTest_Release_ReleaseTestCase {
   }
 
   function testInstall() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->open($this->settings->installURL);
 
@@ -59,7 +57,7 @@ class WebTest_Release_InstallScript extends WebTest_Release_ReleaseTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //      $this->assertTrue($this->isTextPresent("this will take a few minutes"));
     $this->waitForTextPresent("CiviCRM has been successfully installed");
-    $this->open($this->sboxPath . "civicrm/dashboard?reset=1");
+    $this->openCiviPage("dashboard", "reset=1");
     $this->assertTrue($this->isTextPresent("CiviCRM Home"));
   }
 }

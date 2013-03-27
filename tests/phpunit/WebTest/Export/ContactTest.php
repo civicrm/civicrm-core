@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Export/ExportCiviSeleniumTestCase.php';
 class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
@@ -36,13 +35,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
    *  Test Contact Export.
    */
   function testContactExport() {
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Create new  group
@@ -104,10 +96,10 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $sortName, "Contact did not found in search result!");
-       
+
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $childSortName, "Contact did not found in search result!");
-    
+
     // select to export all the contasct from search result.
     $this->click("CIVICRM_QFID_ts_all_4");
 
@@ -155,13 +147,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
   }
 
   function testMergeHousehold() {
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Create new  group
@@ -262,13 +247,13 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $sortName1, "Contact did not found in search result!");
-   
+
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $sortName2, "Contact did not found in search result!");
- 
+
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $houseHold, "Contact did not found in search result!");
- 
+
     // select to export all the contasct from search result.
     $this->click("CIVICRM_QFID_ts_all_4");
 
@@ -340,6 +325,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
   }
 }

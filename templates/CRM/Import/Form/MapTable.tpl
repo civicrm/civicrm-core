@@ -165,6 +165,24 @@
             cj('select[id^="mapper"][id$="[0]"]').addClass('huge');
             {/literal}
       {include file="CRM/common/highLightImport.tpl" relationship=true}
+
+      {* // Set default location type *}
+      {literal}
+      cj(function() {
+        var defaultLocationType = "{/literal}{$defaultLocationType}{literal}";
+        if (defaultLocationType.length) {
+          cj('#map-field').on('change', 'select[id^="mapper"][id$="_0"]', function() {
+            var select = cj(this).next();
+            cj('option', select).each(function() {
+              if (cj(this).attr('value') == defaultLocationType
+              && cj(this).text() == "{/literal}{$defaultLocationTypeLabel}{literal}") {
+                select.val(defaultLocationType);
+              }
+            });
+          });
+        }
+      });
+      {/literal}
   </script>
     </div>
     {/if}

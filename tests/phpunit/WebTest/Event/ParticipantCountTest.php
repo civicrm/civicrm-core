@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
@@ -33,7 +32,6 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   function testParticipantCountWithFeelevel() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -58,8 +56,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $infoEvent = $this->_testAddEvent($paramsEvent);
 
     // logout to register for event.
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogout();
 
     // Register Participant 1
     // visit event info page
@@ -93,12 +90,10 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->_testRegisterWithBillingInfo();
 
     // login to check participant count
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Find Participant
-    $this->open($this->sboxPath . 'civicrm/event/search?reset=1');
-    $this->waitForElementPresent('participant_fee_amount_low');
+    $this->openCiviPage("event/search", "reset=1", 'participant_fee_amount_low');
     $this->click("event_name");
     $this->type("event_name", $eventTitle);
     $this->typeKeys("event_name", $eventTitle);
@@ -112,7 +107,6 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   function testParticipantCountWithPriceset() {
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -189,9 +183,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
       else {
         $this->_testAddMultipleChoiceOptions($field['options']);
       }
-      $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
     }
 
     // create event.
@@ -207,8 +199,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $infoEvent = $this->_testAddEvent($paramsEvent);
 
     // logout to register for event.
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestLogout();
 
     $priceFieldOptionCounts = $participants = array();
 
@@ -279,12 +270,10 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     );
 
     // login to check participant count
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Find Participant
-    $this->open($this->sboxPath . 'civicrm/event/search?reset=1');
-    $this->waitForElementPresent('participant_fee_amount_low');
+    $this->openCiviPage('event/search', 'reset=1', 'participant_fee_amount_low');
     $this->click("event_name");
     $this->type("event_name", $eventTitle);
     $this->typeKeys("event_name", $eventTitle);
@@ -302,9 +291,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   function _testAddSet($setTitle, $financialType = 'Event Fee') {
-    $this->open($this->sboxPath . 'civicrm/admin/price?reset=1&action=add');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Set_next-bottom');
+    $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
     $this->type('title', $setTitle);
@@ -313,10 +300,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->type('help_pre', 'This is test priceset.');
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
   function _testAddMultipleChoiceOptions($options) {
@@ -333,11 +317,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   function _testAddEvent($params) {
-    $this->open($this->sboxPath . 'civicrm/event/add?reset=1&action=add');
+    $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
-    $this->waitForElementPresent('_qf_EventInfo_upload-bottom');
-
-    // Let's start filling the form with values.
     $this->select('event_type_id', "value={$params['event_type_id']}");
 
     // Attendee role s/b selected now.
@@ -401,7 +382,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     // verify event input on info page
     // start at Manage Events listing
-    $this->open($this->sboxPath . 'civicrm/event/manage?reset=1');
+    $this->openCiviPage('event/manage', 'reset=1');
     $this->click('link=' . $params['title']);
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -424,9 +405,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->select('billing_state_province_id-5', 'value=1004');
     $this->type('billing_postal_code-5', '94129');
 
-    $this->click('_qf_Register_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Confirm_next-bottom');
+    $this->clickLink('_qf_Register_upload-bottom', '_qf_Confirm_next-bottom');
     $confirmStrings = array('Event Fee(s)', 'Billing Name and Address', 'Credit Card Information');
     $this->assertStringsPresent($confirmStrings);
     $this->click('_qf_Confirm_next-bottom');
@@ -436,8 +415,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   function _testPricesetDetailsCustomSearch($eventParams, $participants, $priceFieldOptionCounts) {
-    $this->open($this->sboxPath . 'civicrm/contact/search/custom?csid=9&reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('contact/search/custom', 'csid=9&reset=1');
 
     $this->select('event_id', 'label=' . $eventParams['title']);
     $this->click('_qf_Custom_refresh-bottom');

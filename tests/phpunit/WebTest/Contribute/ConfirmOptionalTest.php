@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
   protected $pageId = 0;
@@ -59,7 +58,6 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
 
   protected function _addContributionPage($isConfirmEnabled) {
     // log in
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // create new contribution page
@@ -93,9 +91,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
 
   protected function _fillOutContributionPage() {
     // load contribution page
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id={$this->pageId}");
-    $this->waitForPageToLoad("3000");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$this->pageId}", "_qf_Main_upload-bottom");
 
     // fill out info
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", "30");

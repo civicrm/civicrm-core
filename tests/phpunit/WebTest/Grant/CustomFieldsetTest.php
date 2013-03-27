@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
@@ -34,7 +33,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
   function testCustomFieldsetTest() {
     // Log in as admin first to verify permissions for CiviGrant
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviGrant module if necessary
     $this->enableComponents("CiviGrant");
@@ -42,6 +41,9 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     // let's give full CiviGrant permissions to demo user (registered user).
     $permission = array('edit-2-access-civigrant', 'edit-2-edit-grants', 'edit-2-delete-in-civigrant');
     $this->changePermissions($permission);
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     // Create unique identifier for names
     $rand = substr(sha1(rand()), 0, 7);
@@ -54,7 +56,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->type('id=label', $grantType);
     $this->click('id=_qf_Options_next-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "The Grant Type '$grantType' has been saved.");
+    $this->waitForText('crm-notification-container', "The Grant Type '$grantType' has been saved.");
 
     // Create new Custom Field Set that extends the grant type
     $this->openCiviPage('admin/custom/group', 'reset=1');
@@ -67,7 +69,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->click('id=collapse_display');
     $this->click('id=_qf_Group_next-bottom');
     $this->waitForElementPresent('_qf_Field_next-bottom');
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '$grantFieldSet' has been added.");
+    $this->waitForText('crm-notification-container', "Your custom field set '$grantFieldSet' has been added.");
 
     // Add field to fieldset
     $grantField = 'GrantField' . $rand;
@@ -75,7 +77,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->select('id=data_type_0', 'label=Money');
     $this->click('id=_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$grantField' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$grantField' has been saved.");
 
     // Create new Grant
     $this->openCiviPage('grant/add', 'reset=1&action=add&context=standalone', '_qf_Grant_upload-bottom');
@@ -92,11 +94,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText($grantFieldSet, $grantField);
     $this->type('id=amount_total', '100.00');
     $this->type("css=div#$grantFieldSet input.form-text", '99.99');
-    $this->click('id=_qf_Grant_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Verify grant is created with presence of view link
-    $this->waitForElementPresent("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink('id=_qf_Grant_upload-bottom', "xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     // Click through to the Grant view screen
     $this->click("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");

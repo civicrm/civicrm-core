@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
 
@@ -33,19 +32,8 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
   }
 
   function testAddViaCreateProfile() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (Create Profile).
     $this->openCiviPage('profile/create', 'reset=1&gid=1', '_qf_Edit_cancel');
 
     $firstName = 'Jo' . substr(sha1(rand()), 0, 4);
@@ -72,5 +60,4 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.msg-text', "Your information has been saved.");
   }
 }
-
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
@@ -33,17 +32,6 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   function testAdvanceSearch() {
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -78,7 +66,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
     // is status message correct?
     $this->waitForTextPresent("Saved");
-    $this->assertElementContainsText('crm-notification-container', "Saved");
+    $this->waitForText('crm-notification-container', "Saved");
 
     // go to event tab and register for event ( auto add activity and contribution )
     $this->click("css=li#tab_participant a");
@@ -96,7 +84,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "trid$firstName");
     $this->click("_qf_Participant_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Event registration for $firstName adv$firstName has been added");
+    $this->waitForText('crm-notification-container', "Event registration for $firstName adv$firstName has been added");
 
     // go to pledge tab and add pledge
     $this->click("css=li#tab_pledge a");
@@ -110,22 +98,20 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->click("_qf_Pledge_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
+    $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     // go to Membership tab and add membership
     $this->click("css=li#tab_member a");
     $this->waitForElementPresent("link=Add Membership");
-    $this->click("link=Add Membership");
-    $this->waitForElementPresent("send_receipt");
+    $this->clickLink("link=Add Membership");
     //let the organisation be default (Default Organization)
-    $this->select("membership_type_id[0]", "label=Default Organization");
+    $this->select("membership_type_id[0]", "value=1");
     $this->click("membership_type_id[1]");
     $this->select("membership_type_id[1]", "Student");
     $this->type("source", "membership source$firstName");
-    $this->click("_qf_Membership_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Membership_upload-bottom");
 
-    $this->assertElementContainsText('crm-notification-container', "Student membership for $firstName adv$firstName has been added");
+    $this->waitForText('crm-notification-container', "Student membership for $firstName adv$firstName has been added");
 
     // go to relationship tab and add relationship
     $this->click("css=li#tab_rel a");
@@ -137,13 +123,11 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("details-save");
     $this->webtestFillDate("start_date", "-1 day");
     $this->webtestFillDate("end_date", "+1 day");
-    $this->click("details-save");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "New relationship created.");
+    $this->clickLink("details-save");
+    $this->waitForText('crm-notification-container', "New relationship created.");
 
     //-------------- advance search --------------
 
-    // Go directly to the URL of the screen that you will be testing (Advance Search).
     $this->openCiviPage('contact/search/advanced', 'reset=1');
 
     //also create a dummy name to test false
@@ -188,22 +172,19 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
           $this->$blockValues[1]($firstName);
           break;
       }
-
       $this->submitSearch($firstName);
     }
 
     //--  search with non existing value ( sort name )
     $this->type("sort_name", "$dummyName");
-    $this->click("_qf_Advanced_refresh");
-    $this->waitForElementPresent("css=div.messages");
-    $this->assertElementContainsText('css=div.messages', "No matches found for");
+    $this->clickLink("_qf_Advanced_refresh");
+    $this->waitForText('css=div.messages', "No matches found for");
   }
 
   /*
    * Check for CRM-9873
    */
   function testActivitySearchByTypeTest() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->click("activity");
@@ -247,11 +228,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
   //function to check match for sumbit Advance Search
   function submitSearch($firstName) {
-
-    $this->click("_qf_Advanced_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Advanced_refresh");
     // verify unique name
-    $this->verifyText("xpath=//div[@class='crm-search-results']/table/tbody/tr/td[3]/a", preg_quote("adv$firstName, $firstName"));
+    $this->waitForText("xpath=//div[@class='crm-search-results']/table/tbody", preg_quote("adv$firstName, $firstName"));
     // should give 1 result only as we are searching with unique name
     $this->waitForText("xpath=//div[@id='search-status']/table/tbody/tr/td", preg_quote("1 Contact"));
     // click to edit search
@@ -405,7 +384,6 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate("member_end_date_low", "-1 year");
     $this->webtestFillDate("member_end_date_high", "+2 year");
   }
-
 
   // function to fill member search details
   function addPledgeSearchDetail($firstName) {

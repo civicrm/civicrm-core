@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
 
@@ -33,11 +32,6 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
   }
 
   function testCheckDashboardElements() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -85,5 +79,4 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
   }
 }
-
 

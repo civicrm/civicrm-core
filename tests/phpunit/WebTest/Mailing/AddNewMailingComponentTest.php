@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
 
@@ -33,19 +32,8 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
   }
 
   function testHeaderAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (Add New Mailing Component).
     $this->openCiviPage("admin/component", "action=add&reset=1");
 
     // fill component name.
@@ -74,21 +62,15 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->assertElementContainsText('crm-notification-container', "The mailing component '$componentName' has been saved.");
+    $this->waitForText('crm-notification-container', "The mailing component '$componentName' has been saved.");
 
     // Verify text.
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Header']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
   }
 
   function testFooterAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (Add New Mailing Component).
     $this->openCiviPage("admin/component", "action=add&reset=1");
 
     // fill component name.
@@ -117,21 +99,15 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->assertElementContainsText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
+    $this->waitForText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
 
     // Verify text.
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Footer']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
   }
 
   function testAutomatedAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (Add New Mailing Component).
     $this->openCiviPage("admin/component", "action=add&reset=1");
 
     // fill component name.
@@ -160,7 +136,7 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->assertElementContainsText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
+    $this->waitForText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
 
     // Verify text
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Reply']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
 
@@ -33,17 +32,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
   }
 
   function testProfileChecksum() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Profile fields.
     $fields = array(
@@ -103,9 +92,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($fields['first_name']['default_value'], $fields['last_name']['default_value'], $fields['email']['default_value']);
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // Create profile for contact
     $profileName = "Profile_" . substr(sha1(rand()), 0, 7);
@@ -116,17 +103,14 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->changePermissions($permission);
 
     // Get checksum of the newly created contact.
-    require_once 'CRM/Contact/BAO/Contact/Utils.php';
     $cs = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactId);
 
-    // Logout.
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // logout.
+    $this->webtestLogout();
 
     // Go to edit profile page of the created contact.
-    $this->open($this->sboxPath . "civicrm/profile/edit?id={$contactId}&gid={$profileId}&reset=1&cs={$cs}");
-    $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->assertStringsPresent(array($profileName));
+    $this->openCiviPage("profile/edit", "id={$contactId}&gid={$profileId}&reset=1&cs={$cs}", NULL);
+    $this->waitForTextPresent($profileName);
 
     // Check all profile fields, update their values.
     foreach ($fields as $field) {
@@ -143,7 +127,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
     // Check profile view page.
-    $this->assertStringsPresent(array($profileName));
+    $this->waitForTextPresent($profileName);
 
     // Check updated values of all fields.
     $checkFieldValues = array();
@@ -154,10 +138,8 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
   }
 
   function _testCreateContactProfile($fields, $profileName) {
-    // Go directly to the URL of the screen that you will be
-    // testing (Add new profile ).
-    $this->open($this->sboxPath . 'civicrm/admin/uf/group?reset=1');
-    $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
+    // Add new profile.
+    $this->openCiviPage("admin/uf/group", "reset=1");
     $this->click('newCiviCRMProfile-top');
     $this->waitForElementPresent('_qf_Group_next-top');
 
@@ -165,18 +147,22 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->type('title', $profileName);
     $this->click('_qf_Group_next-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $elements = $this->parseURL();
-    $profileId = $elements['queryString']['gid'];
+    $profileId = $this->urlArg('gid');
 
     // Add field to the profile.
     foreach ($fields as $key => $values) {
-      $this->open($this->sboxPath . 'civicrm/admin/uf/group/field/add?reset=1&action=add&gid=' . $profileId);
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->openCiviPage("admin/uf/group/field/add", "reset=1&action=add&gid=$profileId");
 
       $this->select("field_name[0]", "value={$values['type']}");
+      // Because it tends to cause problems, all uses of sleep() must be justified in comments
+      // Sleep should never be used for wait for anything to load from the server
+      // Justification for this instance: FIXME
       sleep(1);
       $this->select("field_name[1]", "value={$key}");
       if (isset($values['location'])) {
+        // Because it tends to cause problems, all uses of sleep() must be justified in comments
+        // Sleep should never be used for wait for anything to load from the server
+        // Justification for this instance: FIXME
         sleep(1);
         $this->select("field_name[2]", "value={$values['location']}");
       }

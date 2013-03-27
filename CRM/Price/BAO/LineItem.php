@@ -241,10 +241,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @access public
    * @static
    */
-  public static function deleteLineItems($entityId, $entityTable) {
-    $result = FALSE;
+  public static function deleteLineItems($entityId, $entityTable) { 
     if (!$entityId || !$entityTable) {
-      return $result;
+      return FALSE;
     }
 
     if ($entityId && !is_array($entityId)) {
@@ -253,7 +252,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
 
     $query = "DELETE FROM civicrm_line_item where entity_id IN ('" . implode("','", $entityId) . "') AND entity_table = '$entityTable'";
     $dao = CRM_Core_DAO::executeQuery($query);
-    return $result;
+    return TRUE;
   }
 
   /**

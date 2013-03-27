@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
@@ -33,9 +32,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
   }
 
   function login() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("//a[contains(text(),'CiviCRM')]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
@@ -59,7 +56,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Advanced Search by Tag
     $this->click("css=ul#civicrm-menu li.crm-Search");
     $this->click("css=ul#civicrm-menu li.crm-Advanced_Search a");
-    $this->waitForElementPresent('_qf_Advanced_refresh');
+    $this->waitForElementPresent('css=select#crmasmSelect3');
     $this->click('crmasmSelect3');
     $this->select('crmasmSelect3', 'label=Major Donor');
     $this->waitForElementPresent("//ul[@id='crmasmList3']/li/span");
@@ -101,7 +98,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertElementPresent("title");
     $this->assertTextPresent("Access Control");
     $this->waitForElementPresent('link=Settings');
-    $this->assertTextPresent("Newsletter Subscribers");
+    $this->assertTextPresent("Administrators");
     $this->assertTextPresent("Add Group");
   }
 
@@ -196,19 +193,13 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviMail");
 
     // configure default mail-box
-    $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", "_qf_MailSettings_cancel-bottom");
-    $this->type('name', 'Test Domain');
-    $this->type('domain', 'example.com');
-    $this->select('protocol', 'value=1');
-    $this->click('_qf_MailSettings_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->setupDefaultMailbox();
 
     // New Mailing Form
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Mailings");
     $this->click("css=ul#civicrm-menu li.crm-New_Mailing a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     $this->assertTextPresent("New Mailing");
     $this->assertElementPresent("name");

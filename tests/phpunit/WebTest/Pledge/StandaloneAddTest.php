@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
 
@@ -33,14 +32,8 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
   }
 
   function testStandalonePledgeAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Pledge-standalone).
     $this->openCiviPage('pledge/add', 'reset=1&context=standalone', '_qf_Pledge_upload');
 
     // create new contact using dialog
@@ -80,7 +73,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_Pledge_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
+    $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     // verify if Pledge is created
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
@@ -104,10 +97,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
         'Send additional reminders' => '4 days after the last one sent',
       )
     );
-    $this->click('_qf_PledgeView_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
   }

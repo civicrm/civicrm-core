@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
@@ -33,19 +32,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
   function testCustomDataAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
     //fill custom group title
@@ -61,7 +49,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     //add custom field - alphanumeric checkbox
     $checkboxFieldLabel = 'custom_field' . substr(sha1(rand()), 0, 4);
@@ -81,7 +69,6 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->type("option_label_3", $checkboxOptionLabel3);
     $this->type("option_value_3", "3");
 
-
     //enter options per line
     $this->type("options_per_line", "2");
 
@@ -99,7 +86,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Integer Radio
     $this->click("//a[@id='newCustomField']/span");
@@ -141,7 +128,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
 
     // Go to the URL to create an Individual contact.
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -167,15 +154,9 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
   function testCustomDataMoneyAdd() {
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
     //fill custom group title
@@ -192,7 +173,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     //add custom field - money text
     $moneyTextFieldLabel = 'money' . substr(sha1(rand()), 0, 4);
@@ -219,7 +200,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$moneyTextFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$moneyTextFieldLabel' has been saved.");
 
     //Get the customFieldsetID
     $this->openCiviPage('admin/custom/group', 'reset=1');
@@ -254,26 +235,15 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
   function testCustomDataChangeLog(){
-     // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     //enable logging
     $this->openCiviPage('admin/setting/misc', 'reset=1');
     $this->click("CIVICRM_QFID_1_logging");
     $this->click("_qf_Miscellaneous_next-top");
-    // adding sleep here since enabling logging takes lot of time
-    // increased the time since we now also add a lot of triggers and create tables
-    // the first time around
-    sleep(40);
+
+    // Increase timeout by quadruple since enabling logging takes a long time
+    $this->waitForPageToLoad($this->getTimeoutMsec() * 4);
     $this->waitForTextPresent("Changes Saved");
 
     // Create new Custom Field Set
@@ -286,7 +256,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("id=collapse_display");
     $this->click("id=_qf_Group_next-bottom");
     $this->waitForElementPresent('_qf_Field_next-bottom');
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '$customFieldSet' has been added.");
+    $this->waitForText('crm-notification-container', "Your custom field set '$customFieldSet' has been added.");
 
     // Add field to fieldset
     $customField = 'CustomField' . rand();
@@ -294,9 +264,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->select("id=data_type_0", "value=0");
     $this->click("id=_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$customField' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$customField' has been saved.");
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //contact details section
@@ -342,7 +311,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "{$firstName} {$lastName} has been created.");
+    $this->waitForText('crm-notification-container', "{$firstName} {$lastName} has been created.");
 
     //Update the custom field
     $this->click("css=a.edit.button");
@@ -366,11 +335,11 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/setting/misc', 'reset=1');
     $this->click("CIVICRM_QFID_0_logging");
     $this->click("_qf_Miscellaneous_next-top");
-    //adding sleep here since disabling logging takes lot of time
-    sleep(20);
+
+    // Increase timeout by triple since disabling logging takes a long time
+    $this->waitForPageToLoad($this->getTimeoutMsec() * 3);
     $this->waitForTextPresent("Changes Saved");
   }
 
 }
-
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCase {
 
@@ -33,7 +32,6 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
   }
 
   function testOfflineRecurContribution() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // We need a payment processor
@@ -57,6 +55,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $url = $this->getLocation();
     $url = str_replace('mode=live', 'mode=test', $url);
     $this->open($url);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // start filling out contribution form
     $this->waitForElementPresent('payment_processor_id');
@@ -85,8 +84,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Use Find Contributions to make sure test recurring contribution exists
-    $this->open($this->sboxPath . 'civicrm/contribute/search?reset=1');
-    $this->waitForElementPresent('contribution_currency_type');
+    $this->openCiviPage("contribute/search", "reset=1", 'contribution_currency_type');
 
     $this->type('sort_name', "$lastName, $firstName");
     $this->click('contribution_test');
@@ -104,7 +102,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
       'Contribution Status' => 'Pending : Incomplete Transaction',
       'Paid By' => 'Credit Card',
     );
-    
+
     foreach ($verifyData as $label => $value) {
       $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
         preg_quote($value)

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
 
@@ -33,17 +32,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
@@ -81,13 +70,12 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->enableComponents(array('CiviCampaign'));
 
     // add the required Drupal permission
-    $permissions = array('edit-2-administer-civicampaign');
-    $this->changePermissions($permissions);
+    $this->changePermissions('edit-2-administer-civicampaign');
 
-    // Go directly to the URL of the screen that you will be testing
+    // Log in as normal user
+    $this->webtestLogin();
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
-    // Let's start filling the form with values.
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);
 
@@ -112,9 +100,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
-      "Status message didn't show up after saving campaign!"
-    );
+    $this->waitForText('crm-notification-container', "Campaign $title");
 
     $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
@@ -124,7 +110,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
   function memberAddTest($campaignTitle, $id) {
     //Add new memebershipType
     $memTypeParams = $this->webtestAddMembershipType();
-   
+
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
@@ -153,7 +139,6 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     // select campaign
     $this->click("campaign_id");
     $this->select("campaign_id", "value=$id");
-
 
     // Let Join Date stay default
     // fill in Start Date

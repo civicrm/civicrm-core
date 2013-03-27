@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CiviTest/CiviMailUtils.php';
 require_once 'ezc/Base/src/ezc_bootstrap.php';
@@ -37,11 +36,10 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
 
   function testSpooledMailing() {
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Start spooling mail
-    $mut = new CiviMailUtils( $this, true );
+    $mut = new CiviMailUtils($this, true);
 
     // Add a contact
     $fname = substr(sha1(rand()), 0, 6);
@@ -49,49 +47,45 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
     $email = $this->webtestAddContact($fname, $lname, TRUE);
 
     // Get the contact id of the newly added contact
-    $urlElements = $this->parseURL();
-    $cid = $urlElements['queryString']['cid'];
-    $this->assertNotEmpty( $cid, 'Could not find cid after adding contact' );
+    $cid = $this->urlArg('cid');
 
     // Send an email to the added contact
     $this->openCiviPage("activity/email/add", "action=add&reset=1&cid={$cid}&selectedChild=activity&atype=3");
-    $this->type( 'subject', 'test spool' );
-    $this->fillRichTextField( 'html_message', 'Unit tests keep children safe.' );
-    $this->click( "_qf_Email_upload" );
+    $this->type('subject', 'test spool');
+    $this->fillRichTextField('html_message', 'Unit tests keep children safe.');
+    $this->click("_qf_Email_upload");
 
     // Retrieve an ezc mail object version of the email
-    $msg = $mut->getMostRecentEmail( 'ezc' );
-    // print_r($msg);
+    $msg = $mut->getMostRecentEmail('ezc');
 
-    $this->assertNotEmpty( $msg, 'Mail message empty or not found.' );
-    $this->assertEquals( $msg->subject, 'test spool' );
-    $this->assertContains( $email, implode(';', $msg->to), 'Recipient incorrect.' ); // should really walk through the 'to' array, but this is legal according to the docs
+    $this->assertNotEmpty($msg, 'Mail message empty or not found.');
+    $this->assertEquals($msg->subject, 'test spool');
+    // should really walk through the 'to' array, but this is legal according to the docs
+    $this->assertContains($email, implode(';', $msg->to), 'Recipient incorrect.');
 
-    $context = new ezcMailPartWalkContext( array( get_class($this), 'mailWalkCallback' ) );
-    $msg->walkParts( $context, $msg );
+    $context = new ezcMailPartWalkContext(array(get_class($this), 'mailWalkCallback'));
+    $msg->walkParts($context, $msg);
 
     /*
      *  Now try a regular activity with cc to assignee
      */
     $this->WebtestAddActivity();
-    $msg = $mut->getMostRecentEmail( 'raw' );
-//    echo $msg;
-    $this->assertNotEmpty( $msg, 'Mail message empty or not found.' );
-    $this->assertContains( 'Subject: This is subject of test activity', $msg, 'Subject of email is wrong.' );
+    $msg = $mut->getMostRecentEmail('raw');
+    $this->assertNotEmpty($msg, 'Mail message empty or not found.');
+    $this->assertContains('Subject: This is subject of test activity', $msg, 'Subject of email is wrong.');
 
     $mut->stop();
   }
 
-  public static function mailWalkCallback( $context, $mailPart ) {
-//    print_r($mailPart);
-    if ( $mailPart instanceof ezcMailText ) {
-      self::assertEquals( $mailPart->subType, 'html' );
-      self::assertContains( 'Unit tests keep children safe', $mailPart->generateBody() );
+  public static function mailWalkCallback($context, $mailPart) {
+    if ($mailPart instanceof ezcMailText) {
+      self::assertEquals($mailPart->subType, 'html');
+      self::assertContains('Unit tests keep children safe', $mailPart->generateBody());
     }
 
     $disp = $mailPart->contentDisposition;
-    if ( $disp ) {
-//     print_r($disp);
+    if ($disp) {
+
     }
   }
 }

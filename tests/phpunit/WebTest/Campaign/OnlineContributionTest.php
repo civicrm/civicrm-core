@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
 
@@ -33,17 +32,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
   }
 
   function testCreateCampaign() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
@@ -80,7 +69,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
 
-    // add the required Drupal permission
+    // add the required permission
     $permissions = array(
       'edit-2-administer-civicampaign',
       'edit-1-make-online-contributions',
@@ -88,10 +77,10 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     );
     $this->changePermissions($permissions);
 
-    // Go directly to the URL of the screen that you will be testing
+    // Log in as normal user
+    $this->webtestLogin();
     $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
 
-    // Let's start filling the form with values.
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);
 
@@ -116,9 +105,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
-      "Status message didn't show up after saving campaign!"
-    );
+    $this->waitForText('crm-notification-container', "Campaign $title");
 
     $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
@@ -148,9 +135,11 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->fillRichTextField('intro_text', 'This is Test Introductory Message', 'CKEditor');
     $this->fillRichTextField('footer_text', 'This is Test Footer Message', 'CKEditor');
 
-    // go to step 2
-    $this->click('_qf_Settings_next');
-    $this->waitForElementPresent("_qf_Amount_next-bottom");
+    // Submit form
+    $this->clickLink('_qf_Settings_next', "_qf_Amount_next-bottom");
+
+    // Get contribution page id
+    $pageId = $this->urlArg('id');
 
     //this contribution page for online contribution
     $this->check("payment_processor[{$paymentProcessorId}]");
@@ -250,21 +239,25 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->click('_qf_Contribute_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //get Url for Live Contribution Page
-    $registerUrl = $this->_testVerifyRegisterPage($contributionPageTitle);
+    // Make sure our page shows up in search results
+    $this->openCiviPage("admin/contribute", "reset=1", "_qf_SearchContribution_refresh");
+    $this->type('title', $contributionPageTitle);
+    $this->click("_qf_SearchContribution_refresh");
+    $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
+    $url = $this->assertElementContainsText("//div[@id='configure_contribution_page']//table/tbody", $contributionPageTitle);
 
     //logout
-    $this->openCiviPage("logout", "reset=1", NULL);
+    $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->openCiviPage($registerUrl['url'], $registerUrl['args'], NULL);
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
+
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
-
-    $this->type("email-5", $firstName . "@example.com");
-
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
+
+    $this->type("email-5", $firstName . "@example.com");
 
     $streetAddress = "100 Main Street";
     $this->type("street_address-1", $streetAddress);
@@ -288,45 +281,22 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->select("billing_country_id-5", "value=1228");
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
-    $this->click("_qf_Main_upload-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
-
-    $this->click("_qf_Confirm_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Confirm_next-bottom", NULL);
 
     //login to check contribution
-    $this->open($this->sboxPath);
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->click("_qf_Search_refresh");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     //View Contribution Record
     $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[10]/td[2]", preg_quote($campaignTitle));
   }
 
-  function _testVerifyRegisterPage($contributionPageTitle) {
-    $this->openCiviPage("admin/contribute", "reset=1", "_qf_SearchContribution_refresh");
-    $this->type('title', $contributionPageTitle);
-    $this->click("_qf_SearchContribution_refresh");
-    $this->waitForPageToLoad('50000');
-    $id          = $this->getAttribute("//div[@id='configure_contribution_page']//table/tbody/tr/td/strong[text()='$contributionPageTitle']/../../td[5]/div/span/ul/li/a[text()='Title and Settings']@href");
-    $id          = explode('id=', $id);
-    $registerUrl = array('url' => 'contribute/transact', 'args' => "reset=1&id=$id[1]");
-    return $registerUrl;
-  }
 }

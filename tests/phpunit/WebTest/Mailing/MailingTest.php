@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
@@ -33,12 +32,9 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
   }
 
   function testAddMailing() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     //----do create test mailing group
-
-    // Go directly to the URL of the screen that you will be testing (New Group).
     $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     // make group name
@@ -57,38 +53,27 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->select("visibility", "value=Public Pages");
 
     // Clicking save.
-    $this->click("_qf_Edit_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Edit_upload");
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
 
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // go to group tab and add to mailing group
     $this->click("css=li#tab_group a");
     $this->waitForElementPresent("_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
-    $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_GroupContact_next");
+    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next");
 
     // configure default mail-box
-    $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
-    $this->type('name', 'Test Domain');
-    $this->type('domain', 'example.com');
-    $this->select('protocol', 'value=1');
-    $this->click('_qf_MailSettings_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->setupDefaultMailbox();
 
-    // Go directly to Schedule and Send Mailing form
     $this->openCiviPage("mailing/send", "reset=1", "_qf_Group_cancel");
 
     //-------select recipients----------
@@ -102,8 +87,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("add");
 
     // click next
-    $this->click("_qf_Group_next");
-    $this->waitForElementPresent("_qf_Settings_cancel");
+    $this->clickLink("_qf_Group_next", "_qf_Settings_cancel");
 
     //--------track and respond----------
 
@@ -117,8 +101,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // no need tracking for this test
 
     // click next with default settings
-    $this->click("_qf_Settings_next");
-    $this->waitForElementPresent("_qf_Upload_cancel");
+    $this->clickLink("_qf_Settings_next", "_qf_Upload_cancel");
 
     //--------Mailing content------------
     // let from email address be default
@@ -145,8 +128,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next with nominal content
-    $this->click("_qf_Upload_upload");
-    $this->waitForElementPresent("_qf_Test_cancel");
+    $this->clickLink("_qf_Upload_upload", "_qf_Test_cancel");
 
     //---------------Test------------------
 
@@ -169,8 +151,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next
-    $this->click("_qf_Test_next");
-    $this->waitForElementPresent("_qf_Schedule_cancel");
+    $this->clickLink("_qf_Test_next", "_qf_Schedule_cancel");
 
     //----------Schedule or Send------------
 
@@ -181,8 +162,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // finally schedule the mail by clicking submit
-    $this->click("_qf_Schedule_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Schedule_next");
 
     //----------end New Mailing-------------
 
@@ -194,8 +174,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // test undelivered report
 
     // click report link of created mailing
-    $this->click("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
 
     // verify undelivered status message
     $this->assertElementContainsText('css=.messages', "Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.");
@@ -207,8 +186,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
-    $this->click("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
 
     // do check again for recipient group
     $this->assertElementContainsText("xpath=//fieldset/legend[text()='Recipients']/../table/tbody//tr/td", "Members of $groupName");
@@ -230,8 +208,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     //---- check for delivery detail--
 
-    $this->click("link=Successful Deliveries");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("link=Successful Deliveries");
 
     // check for open page
     $this->assertElementContainsText( 'page-title', "Successful Deliveries");
@@ -239,18 +216,17 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // verify email
     $this->verifyText("xpath=//table[@id='mailing_event']/tbody//tr/td[2]", preg_quote("mailino$firstName@mailson.co.in"));
 
-    require_once 'CRM/Mailing/Event/DAO/Queue.php';
     $eventQueue = new CRM_Mailing_Event_DAO_Queue();
     $eventQueue->contact_id = $contactId;
     $eventQueue->find(TRUE);
 
     $permission = array('edit-1-access-civimail-subscribeunsubscribe-pages');
     $this->changePermissions($permission);
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
+    $this->webtestLogout();
 
     // build forward url
     $forwardUrl = array("mailing/forward", "reset=1&jid={$eventQueue->job_id}&qid={$eventQueue->id}&h={$eventQueue->hash}");
-    $this->openCiviPage($forwardUrl[0], $forwardUrl[1]);
+    $this->openCiviPage($forwardUrl[0], $forwardUrl[1], NULL);
 
     $this->type("email_0", substr(sha1(rand()), 0, 7) . '@example.com');
     $this->type("email_1", substr(sha1(rand()), 0, 7) . '@example.com');
@@ -262,15 +238,12 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('css=div.messages', 'Mailing is forwarded successfully to 2 email addresses');
 
-    $this->open($this->sboxPath);
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->webtestLogin();
 
     $this->openCiviPage("mailing/browse/scheduled", "reset=1&scheduled=true");
 
     //click report link of created mailing
-    $this->click("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
 
     // verify successful forwards
     $this->verifyText("xpath=//table//tr[td/a[text()='Forwards']]/descendant::td[2]", "2");
@@ -290,8 +263,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // $unsubscribeUrl = "civicrm/mailing/optout?reset=1&jid={$eventQueue->job_id}&qid={$eventQueue->id}&h={$eventQueue->hash}&confirm=1";
 
     // // logout to unsubscribe
-    // $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    // $this->waitForPageToLoad($this->getTimeoutMsec());
+    // $this->webtestLogout();
 
     // // click(visit) unsubscribe path
     // $this->open($this->sboxPath . $unsubscribeUrl);
@@ -310,13 +282,11 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     // //------ end unsubscribe -------
   }
-  
+
   function testAdvanceSearchAndReportCheck() {
 
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Group).
     $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     // make group name
@@ -335,40 +305,33 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->select("visibility", "value=Public Pages");
 
     // Clicking save.
-    $this->click("_qf_Edit_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Edit_upload");
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The Group '$groupName' has been saved.");
+    $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
 
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
     // Get contact id from url.
-    $matches = array();
-    preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-    $contactId = $matches[1];
+    $contactId = $this->urlArg('cid');
 
     // go to group tab and add to mailing group
     $this->click("css=li#tab_group a");
     $this->waitForElementPresent("_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
-    $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_GroupContact_next");
+    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next");
 
     // configure default mail-box
     $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
     $this->type('name', 'Test Domain');
     $this->type('domain', 'example.com');
     $this->select('protocol', 'value=1');
-    $this->click('_qf_MailSettings_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_MailSettings_next-bottom');
 
-    // Go directly to Schedule and Send Mailing form
-    $this->open($this->sboxPath . "civicrm/mailing/send?reset=1");
-    $this->waitForElementPresent("_qf_Group_cancel");
+    // Go to Schedule and Send Mailing form
+    $this->openCiviPage('mailing/send', 'reset=1', '_qf_Group_cancel');
 
     //-------select recipients----------
 
@@ -394,12 +357,11 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next with default settings
-    $this->click("_qf_Settings_next");
-    $this->waitForElementPresent("_qf_Upload_cancel");
+    $this->clickLink("_qf_Settings_next");
 
     // fill subject for mailing
     $this->type("subject", "Test subject {$mailingName} for Webtest");
-    
+
     // check for default option enabled
     $this->assertChecked("CIVICRM_QFID_1_upload_type");
 
@@ -419,15 +381,13 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next with nominal content
-    $this->click("_qf_Upload_upload");
-    $this->waitForElementPresent("_qf_Test_cancel");
+    $this->clickLink("_qf_Upload_upload", "_qf_Test_cancel");
 
     // do check count for Recipient
     $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next
-    $this->click("_qf_Test_next");
-    $this->waitForElementPresent("_qf_Schedule_cancel");
+    $this->clickLink("_qf_Test_next", "_qf_Schedule_cancel");
 
     //----------Schedule or Send------------
 
@@ -438,8 +398,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // finally schedule the mail by clicking submit
-    $this->click("_qf_Schedule_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Schedule_next");
 
     //----------end New Mailing-------------
 
@@ -451,8 +410,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
-    $this->click("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Mailing $mailingName Webtest']/descendant::a[text()='Report']");
 
     $mailingReportUrl = $this->getLocation();
     // do check again for recipient group
@@ -462,7 +420,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//table//tr[td/a[text()='Successful Deliveries']]/descendant::td[2]", preg_quote("1 (100.00%)"));
 
     $summaryInfoLinks = array('Intended Recipients', 'Successful Deliveries', 'Tracked Opens', 'Click-throughs', 'Forwards', 'Replies', 'Bounces', 'Unsubscribe Requests','Opt-out Requests');
-    
+
     //check for report and adv search links
     foreach($summaryInfoLinks as $value) {
       $this->assertTrue($this->isElementPresent("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$value}']]/descendant::td[3]/span/a[1][text()='Report']"), "Report link missing for {$value}");
@@ -536,11 +494,10 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
       foreach($infoFilter as $entity => $dataToCheck) {
         $this->open($mailingReportUrl);
         if ($entity == "report") {
-          $this->click("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[1][text()='Report']");
+          $this->clickLink("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[1][text()='Report']");
         } else {
-          $this->click("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[2][text()='Advanced Search']");
+          $this->clickLink("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[2][text()='Advanced Search']");
         }
-        $this->waitForPageToLoad($this->getTimeoutMsec());
         $this-> _verifyCriteria($key, $dataToCheck, $entity);
       }
     }

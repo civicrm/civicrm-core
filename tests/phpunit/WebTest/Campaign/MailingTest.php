@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
 
@@ -34,14 +33,18 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
 
   function testCreateCampaign() {
     // Log in as admin first to verify permissions for CiviCampaign
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviCampaign module if necessary
-    $this->enableComponents(array('CiviCampaign'));
+    $this->enableComponents(array('CiviMail', 'CiviCampaign'));
 
-    // add the required Drupal permission
-    $permissions = array('edit-2-administer-civicampaign');
-    $this->changePermissions($permissions);
+    $this->setupDefaultMailbox();
+
+    // add the required permission
+    $this->changePermissions('edit-2-administer-civicampaign');
+
+    // Log in as normal user
+    $this->webtestLogin();
 
     // Create new group
     $title = substr(sha1(rand()), 0, 7);
@@ -62,10 +65,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // Go directly to the URL of the screen that you will be testing
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
-
-    // Let's start filling the form with values.
 
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);
@@ -91,9 +91,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
-      "Status message didn't show up after saving campaign!"
-    );
+    $this->waitForText('crm-notification-container', "Campaign $title");
 
     $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
@@ -111,15 +109,6 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->select("group_id", "$groupName");
     $this->click("_qf_GroupContact_next");
 
-    // configure default mail-box
-    $this->openCiviPage('admin/mailSettings', 'action=update&id=1&reset=1', '_qf_MailSettings_cancel-bottom');
-    $this->type('name', 'Test Domain');
-    $this->type('domain', 'example.com');
-    $this->select('protocol', 'value=1');
-    $this->click('_qf_MailSettings_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Go directly to Schedule and Send Mailing form
     $this->openCiviPage('mailing/send', 'reset=1', '_qf_Group_cancel');
 
     //-------select recipients----------

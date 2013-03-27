@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
@@ -33,7 +32,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
   }
 
   function testOfflineMembershipRenew() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -66,7 +64,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('join_date', '-2 year');
 
     // Let Start Date and End Date be auto computed
-    // added sleep to make sure jscript onchange for total_amount has a chance to fire
+
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: make sure onchange for total_amount has a chance to fire
     sleep(2);
 
     // Clicking save.
@@ -77,9 +78,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.",
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
     $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
@@ -120,7 +119,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
    }
 
   function testOfflineMemberRenewOverride() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // add membership type
@@ -185,9 +183,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.",
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
     $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
@@ -229,7 +225,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
   }
 
   function testOfflineMembershipRenewChangeType() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -262,7 +257,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('join_date', '-2 year');
 
     // Let Start Date and End Date be auto computed
-    // added sleep to make sure jscript onchange for total_amount has a chance to fire
+
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: make sure onchange for total_amount has a chance to fire
     sleep(2);
 
     // Clicking save.
@@ -273,9 +271,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.",
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
     $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[7]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
@@ -291,6 +287,9 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->select('membership_type_id[1]', "label={$newMembershipType['membership_type']}");
 
     $this->click('membership_type_id[0]');
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: wait for onchange handler
     sleep(2);
 
     // save the renewed membership
@@ -326,7 +325,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
   }
 
   function testOfflineMembershipRenewMultipleTerms() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -369,7 +367,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->type('check_number', '1023');
     $this->select('contribution_status_id', "label=Completed");
     $this->click('send_receipt');
-    // added sleep to make sure jscript onchange for total_amount has a chance to fire
+
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: make sure onchange for total_amount has a chance to fire
     sleep(2);
 
     // Clicking save.
@@ -380,12 +381,8 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.",
-      "Status message didn't show up after saving!"
-    );
-    $this->assertElementContainsText('crm-notification-container', "A membership confirmation and receipt has been sent to {$firstName}@memberson.com.",
-      "Email sent to member message didn't show up after saving membership!"
-    );
+    $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
+    $this->waitForText('crm-notification-container', "A membership confirmation and receipt has been sent to {$firstName}@memberson.com.");
 
     $this->waitForElementPresent("xpath=//div[@id='Memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
 
@@ -400,7 +397,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('num_terms');
     $this->type('num_terms', '');
     $this->type('num_terms', '2');
-    // added sleep to make sure jscript onchange for total_amount has a chance to fire
+
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: make sure onchange for total_amount has a chance to fire
     sleep(2);
     $this->click('total_amount');
     $this->verifyValue('total_amount', "200.00");

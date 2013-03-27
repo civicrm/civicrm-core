@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
 
@@ -38,8 +37,6 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
 
   function testCreateCampaign() {
 
-    $this->open($this->sboxPath);
-
     $this->webtestLogin();
 
     // Create new group
@@ -52,7 +49,6 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     //Creating a new Campaign
     $this->openCivipage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
-    // Let's start filling the form with values.
     $campaignTitle = "Campaign $title";
     $this->type("title", $campaignTitle);
 
@@ -78,20 +74,13 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $this->click("_qf_Campaign_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Campaign Campaign $title has been saved.",
-      "Status message didn't show up after saving campaign!"
-    );
+    $this->waitForText('crm-notification-container', "Campaign $title");
 
     //Opening Edit Page of the created Campaign
     $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");
-    $this->click("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    //Checking for Proper description present
-    $this->waitForElementPresent("//textarea[@id='description']");
+    $this->clickLink("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']", "//textarea[@id='description']");
     $fetchedVaue = $this->getValue('description');
     $this->assertEquals($campaignDescription, $fetchedVaue);
   }
 }
-
 

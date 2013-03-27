@@ -94,7 +94,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
    * @var array
    * @access protected
    */
-  protected static $_formattedFieldNames;
+  protected $_formattedFieldNames;
 
   /**
    * on duplicate
@@ -339,19 +339,13 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
-    /* FIXME: dirty hack to make the default option show up first.  This
-     * avoids a mozilla browser bug with defaults on dynamically constructed
-     * selector widgets. */
-
+    // Pass default location to js
     if ($defaultLocationType) {
-      $defaultLocation = $this->_location_types[$defaultLocationType->id];
-      unset($this->_location_types[$defaultLocationType->id]);
-      $this->_location_types = array(
-        $defaultLocationType->id => $defaultLocation) + $this->_location_types;
+      $this->assign('defaultLocationType', $defaultLocationType->id);
+      $this->assign('defaultLocationTypeLabel', $this->_location_types[$defaultLocationType->id]);
     }
 
     /* Initialize all field usages to false */
-
     foreach ($mapperKeys as $key) {
       $this->_fieldUsed[$key] = FALSE;
     }

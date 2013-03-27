@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
 
@@ -33,22 +32,11 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
   }
 
   function testPrivacyOptionSearch() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Add new group.
-    $this->open($this->sboxPath . "civicrm/group/add?&reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage('group/add', 'reset=1', "_qf_Edit_upload");
 
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
     $this->type("title", $groupName);
@@ -66,13 +54,12 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     // Add Contact1.
     $fname1 = substr(sha1(rand()), 0, 7);
     $lname1 = substr(sha1(rand()), 0, 7);
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Individual');
-    $this->waitForElementPresent('_qf_Contact_upload_view-bottom');
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual", '_qf_Contact_upload_view-bottom');
     $this->type('first_name', $fname1);
     $this->type('last_name', $lname1);
     $email1 = $fname1 . '@example.org';
     $this->type('email_1_email', $email1);
-    
+
     //click 'Communication Preferences' Panel
     $this->click("commPrefs");
     $this->waitForElementPresent("preferred_mail_format");
@@ -94,8 +81,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     // Add Contact2.
     $fname2 = substr(sha1(rand()), 0, 7);
     $lname2 = substr(sha1(rand()), 0, 7);
-    $this->open($this->sboxPath . 'civicrm/contact/add?reset=1&ct=Individual');
-    $this->waitForElementPresent('_qf_Contact_upload_view-bottom');
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual", '_qf_Contact_upload_view-bottom');
     $this->type('first_name', $fname2);
     $this->type('last_name', $lname2);
     $email2 = $fname2 . '@example.org';
@@ -119,8 +105,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go to advance search, check for 'Exclude' option.
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search/advanced", "reset=1");
 
     $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[2]/td[2]//select[1]", "label={$groupName}");
     $this->waitForTextPresent($groupName);
@@ -137,8 +122,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("No matches found"));
 
     // Go to advance search, check for 'Include' + 'OR' options.
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search/advanced", "reset=1");
 
     $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[2]/td[2]//select[1]", "label={$groupName}");
     $this->waitForTextPresent($groupName);
@@ -158,8 +142,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$lname2, $fname2"));
 
     // Go to advance search, check for 'Include' + 'AND' options.
-    $this->open($this->sboxPath . "civicrm/contact/search/advanced?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search/advanced", "reset=1");
 
     $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[2]/td[2]//select[1]", "label={$groupName}");
     $this->waitForTextPresent($groupName);

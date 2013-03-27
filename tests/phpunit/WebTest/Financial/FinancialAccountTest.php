@@ -28,14 +28,12 @@
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
 
+  /**
+   * Test To Add Financial Account class attributes.
+   */
   function testFinancialAccount() {
-    // To Add Financial Account 
-    // class attributes.
-    $this->open( $this->sboxPath );
-    
-    // Log in using webtestLogin() method
     $this->webtestLogin();
-    
+
     // Add new Financial Account
     $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
     $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
@@ -47,12 +45,12 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $isTax = TRUE;
     $taxRate = 9.99999999;
     $isDefault = FALSE;
-        
+
     //Add new organisation
     if($orgName) {
       $this->webtestAddOrganization($orgName);
     }
-        
+
     $this->_testAddFinancialAccount($financialAccountTitle,
       $financialAccountDescription,
       $accountingCode,
@@ -64,12 +62,10 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       $taxRate,
       $isDefault
     );
-        
+
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-        
-    $this->click("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_FinancialAccount_cancel-botttom');
+
+    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom');
     //Varify Data after Adding new Financial Account
     $verifyData = array('name' => $financialAccountTitle,
       'description' => $financialAccountDescription,
@@ -80,23 +76,23 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       'is_deductible' => 'off',
       'is_default' => 'off'
     );
-      
+
     $this->_assertFinancialAccount($verifyData);
     $verifySelectFieldData = array('financial_account_type_id' => $financialAccountType);
     $this->_assertSelectVerify($verifySelectFieldData);
     $this->click('_qf_FinancialAccount_cancel-botttom');
-        
+
     //Edit Financial Account
     $editfinancialAccount = $financialAccountTitle;
     $financialAccountTitle .= ' Edited';
     $orgNameEdit = FALSE;
     $financialAccountType = 'Revenue';
-        
+
     if ($orgNameEdit) {
       $orgNameEdit = 'NGO '.substr(sha1(rand()), 0, 7);
       $this->webtestAddOrganization($orgNameEdit);
     }
-        
+
     $this->_testEditFinancialAccount($editfinancialAccount,
       $financialAccountTitle,
       $financialAccountDescription,
@@ -108,15 +104,14 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       $isTax,
       $taxRate,
       $isDefault
-    ); 
+    );
+
     if($orgNameEdit) {
       $orgName = $orgNameEdit;
     }
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-    $this->click("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_FinancialAccount_cancel-botttom');
-       
+    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom');
+
     $verifyData = array( 'name' => $financialAccountTitle,
       'description' => $financialAccountDescription,
       'accounting_code' => $accountingCode,
@@ -131,7 +126,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $this->_assertSelectVerify($verifySelectFieldData);
     $this->click('_qf_FinancialAccount_cancel-botttom');
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Delete']");
-        
+
     //Delete Financial Account
     $this->_testDeleteFinancialAccount($financialAccountTitle);
   }

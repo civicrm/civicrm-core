@@ -24,34 +24,43 @@
  +--------------------------------------------------------------------+
 */
 
+
 require_once 'CiviTest/CiviSeleniumTestCase.php';
-class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
+class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testCustomAdd() {
+  function testCustomSameFieldAdd() {
+    $this->open($this->sboxPath);
     $this->webtestLogin();
-
-    $this->openCiviPage("admin/custom/group", "action=add&reset=1");
+    
+    $this->_testCustomAdd();
+    $this->_testCustomAdd();
+  }
+  
+  function _testCustomAdd() {
+    //CRM-7564 : Different gropus can contain same custom fields
+    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");   
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //fill custom group title
     $customGroupTitle = 'custom_group' . substr(sha1(rand()), 0, 3);
     $this->click("title");
     $this->type("title", $customGroupTitle);
-
+    
     //custom group extends
     $this->click("extends[0]");
     $this->select("extends[0]", "label=Contacts");
     $this->click("//option[@value='Contact']");
     $this->click("//form[@id='Group']/div[2]/div[3]/span[1]/input");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    
     //Is custom group created?
-    $this->waitForText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
+    $this->assertTrue($this->isTextPresent("Your custom field set '$customGroupTitle' has been added. You can add custom fields now."));
     //add custom field - alphanumeric text
-    $textFieldLabel = 'test_text_field' . substr(sha1(rand()), 0, 3);
+    $textFieldLabel = 'test_text_field';
     $this->click("header");
     $this->type("label", $textFieldLabel);
     $this->click("_qf_Field_next_new-bottom");
@@ -62,43 +71,60 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->click("data_type[1]");
     $this->select("data_type[1]", "label=CheckBox");
     $this->click("//option[@value='CheckBox']");
-
-    $checkboxFieldLabel = 'test_checkbox' . substr(sha1(rand()), 0, 5);
+    
+    $checkboxFieldLabel = 'test_checkbox';
     $this->type("label", $checkboxFieldLabel);
-    $checkboxOptionLabel1 = 'check1' . substr(sha1(rand()), 0, 3);
+    $checkboxOptionLabel1 = 'check1';
     $this->type("option_label_1", $checkboxOptionLabel1);
     $this->type("option_value_1", "1");
-    $checkboxOptionLabel2 = 'check2' . substr(sha1(rand()), 0, 3);
+    $checkboxOptionLabel2 = 'check2';
     $this->type("option_label_2", $checkboxOptionLabel2);
     $this->type("option_value_2", "2");
     $this->click("link=another choice");
-    $checkboxOptionLabel3 = 'check3' . substr(sha1(rand()), 0, 3);
+    $checkboxOptionLabel3 = 'check3';
     $this->type("option_label_3", $checkboxOptionLabel3);
     $this->type("option_value_3", "3");
     $this->click("link=another choice");
-    $checkboxOptionLabel4 = 'check4' . substr(sha1(rand()), 0, 3);
+    $checkboxOptionLabel4 = 'check4';
     $this->type("option_label_4", $checkboxOptionLabel4);
     $this->type("option_value_4", "4");
-
+    
     //enter options per line
     $this->type("options_per_line", "2");
-
+    
     //enter pre help message
     $this->type("help_pre", "this is field pre help");
 
     //enter post help message
     $this->type("help_post", "this field post help");
-
+    
     //Is searchable?
     $this->click("is_searchable");
-
+    
     //clicking save
     $this->click("_qf_Field_next_new-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    
     //Is custom field created?
-    $this->waitForText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
-
+    $this->assertTrue($this->isTextPresent("Your custom field '$checkboxFieldLabel' has been saved."));
+    
+    //add custom field - alphanumeric text
+    $textFieldLabel = 'test_text_field';
+    $this->click("header");
+    $this->type("label", $textFieldLabel);
+    $this->click("_qf_Field_next_new-bottom");
+  
+    // Same group will not contain same custome fields so will show error for this field :
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("data_type[0]");
+    $this->select("data_type[0]", "value=0");
+    $this->click("//option[@value='0']");
+    $this->click("data_type[1]");
+    $this->select("data_type[1]", "label=CheckBox");
+    $this->click("//option[@value='CheckBox']");
+    //Is custom field created
+    $this->assertTrue($this->isTextPresent("Custom field '$textFieldLabel' already exists in Database."));
+    
     //create another custom field - Number Radio
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=2");
@@ -106,91 +132,35 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->click("data_type[1]");
     $this->select("data_type[1]", "value=Radio");
     $this->click("//option[@value='Radio']");
-
-    $radioFieldLabel = 'test_radio' . substr(sha1(rand()), 0, 5);
+    
+    $radioFieldLabel = 'test_radio';
     $this->type("label", $radioFieldLabel);
-    $radioOptionLabel1 = 'radio1' . substr(sha1(rand()), 0, 3);
+    $radioOptionLabel1 = 'radio1';
     $this->type("option_label_1", $radioOptionLabel1);
     $this->type("option_value_1", "1");
-    $radioOptionLabel2 = 'radio2' . substr(sha1(rand()), 0, 3);
+    $radioOptionLabel2 = 'radio2';
     $this->type("option_label_2", $radioOptionLabel2);
     $this->type("option_value_2", "2");
-
+    
     //select options per line
     $this->type("options_per_line", "3");
-
+    
     //enter pre help msg
     $this->type("help_pre", "this is field pre help");
-
+    
     //enter post help msg
     $this->type("help_post", "this is field post help");
-
+    
     //Is searchable?
     $this->click("is_searchable");
-
+    
     //clicking save
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
-
-    //On New Individual contact form
-    $this->openCiviPage("contact/add", "ct=Individual&reset=1");
-    $this->assertElementContainsText('page-title', "New Individual");
-
-    //expand all tabs
-    $this->click("expand");
-    $this->waitForElementPresent("address_1_street_address");
-
-    //verify custom group fields are present on new Individual Contact Form
-    $this->assertElementContainsText('customData', $textFieldLabel);
-    $this->assertElementContainsText('customData', $checkboxFieldLabel);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel1);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel2);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel3);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel4);
-    $this->assertElementContainsText('customData', $radioFieldLabel);
-    $this->assertElementContainsText('customData', $radioOptionLabel1);
-    $this->assertElementContainsText('customData', $radioOptionLabel2);
-
-    //On New Household contact form
-    $this->openCiviPage("contact/add", "ct=Household&reset=1");
-    $this->assertElementContainsText('page-title', "New Household");
-
-    //expand all tabs
-    $this->click("expand");
-    $this->waitForElementPresent("address_1_street_address");
-
-    //verify custom group fields are present on new household Contact Form
-    $this->assertElementContainsText('customData', $textFieldLabel);
-    $this->assertElementContainsText('customData', $checkboxFieldLabel);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel1);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel2);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel3);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel4);
-    $this->assertElementContainsText('customData', $radioFieldLabel);
-    $this->assertElementContainsText('customData', $radioOptionLabel1);
-    $this->assertElementContainsText('customData', $radioOptionLabel2);
-
-    //On New Organization contact form
-    $this->openCiviPage("contact/add", "ct=Organization&reset=1");
-    $this->assertElementContainsText('page-title', "New Organization");
-
-    //expand all tabs
-    $this->click("expand");
-    $this->waitForElementPresent("address_1_street_address");
-
-    //verify custom group fields are present on new Organization Contact Form
-    $this->assertElementContainsText('customData', $textFieldLabel);
-    $this->assertElementContainsText('customData', $checkboxFieldLabel);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel1);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel2);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel3);
-    $this->assertElementContainsText('customData', $checkboxOptionLabel4);
-    $this->assertElementContainsText('customData', $radioFieldLabel);
-    $this->assertElementContainsText('customData', $radioOptionLabel1);
-    $this->assertElementContainsText('customData', $radioOptionLabel2);
-  }
+    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved.")); 
+    
+  } 
 }
 

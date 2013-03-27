@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
 
@@ -40,11 +39,6 @@ class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
      * Function to test Saved Import Mapping for Individuals.
      */
   function testSaveIndividualMapping() {
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
 
     // Logging in.
     $this->webtestLogin();
@@ -141,5 +135,4 @@ class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-
 

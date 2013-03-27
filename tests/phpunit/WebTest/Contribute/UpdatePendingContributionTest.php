@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestCase {
 
@@ -33,29 +32,17 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
   }
 
   function testUpdatePendingContribution() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $firstName = substr(sha1(rand()), 0, 7);
-    $lastName  = 'Contributor';
-    $email     = $firstName . "@example.com";
+    $lastName = 'Contributor';
+    $email = $firstName . "@example.com";
 
     //Offline Pay Later Contribution
     $this->_testOfflineContribution($firstName, $lastName, $email);
 
     //Online Pay Later Contribution
     $this->_testOnlineContribution($firstName, $lastName, $email);
-    $this->open($this->sboxPath . "civicrm/contribute/search?reset=1");
-
-    $this->waitForElementPresent("contribution_date_low");
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$lastName, $firstName");
     $this->click("_qf_Search_refresh");
@@ -91,14 +78,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $softCreditLname = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
 
-    // Go directly to the URL of the screen that you will be testing (New Contribution-standalone).
-    $this->open($this->sboxPath . "civicrm/contribute/add?reset=1&context=standalone");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Contribution_upload");
-
-    // Let's start filling the form with values.
+    $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog
     $this->webtestNewDialogContact($firstName, "Contributor", $email);
@@ -213,21 +193,21 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     // We need a payment processor
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $processorType = 'Dummy';
-    $pageTitle     = substr(sha1(rand()), 0, 7);
-    $rand          = 2 * rand(2, 50);
-    $hash          = substr(sha1(rand()), 0, 7);
+    $pageTitle = substr(sha1(rand()), 0, 7);
+    $rand = 2 * rand(2, 50);
+    $hash = substr(sha1(rand()), 0, 7);
     $amountSection = TRUE;
-    $payLater      = TRUE;
-    $onBehalf      = FALSE;
-    $pledges       = FALSE;
-    $recurring     = FALSE;
-    $memberships   = FALSE;
-    $friend        = FALSE;
-    $profilePreId  = 1;
+    $payLater = TRUE;
+    $onBehalf = FALSE;
+    $pledges = FALSE;
+    $recurring = FALSE;
+    $memberships = FALSE;
+    $friend = FALSE;
+    $profilePreId = 1;
     $profilePostId = NULL;
-    $premiums      = FALSE;
-    $widget        = FALSE;
-    $pcp           = FALSE;
+    $premiums = FALSE;
+    $widget = FALSE;
+    $pcp = FALSE;
     $memPriceSetId = NULL;
 
     // create a new online contribution page
@@ -252,18 +232,14 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     );
 
     //logout
-    $this->open($this->sboxPath . "civicrm/logout?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id=" . $pageId);
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
-
-
+    $this->webtestLogout();
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
     $this->type("email-5", $email);
 
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
-    
+
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 100);
     $this->click("xpath=//div[@class='crm-section payment_processor-section']/div[2]//label[text()='Pay later label {$hash}']");
@@ -274,40 +250,25 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->select("country-1", "value=1228");
     $this->select("state_province-1", "value=1001");
 
-
-    $this->click("_qf_Main_upload-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-   //login to check contribution
-    $this->open($this->sboxPath);
-
-    // Log in using webtestLogin() method
+    //login to check contribution
     $this->webtestLogin();
 
     //Find Contribution
-    $this->open($this->sboxPath . "civicrm/contribute/search?reset=1");
-
-    $this->waitForElementPresent("contribution_date_low");
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$lastName, $firstName");
-    $this->click("_qf_Search_refresh");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
     // View Contribution Record and test for expected values
     $expected = array(
-      'From'             => "{$firstName} {$lastName}",
-      'Financial Type'   => 'Donation',
-      'Total Amount'     => '100.00',
+      'From' => "{$firstName} {$lastName}",
+      'Financial Type' => 'Donation',
+      'Total Amount' => '100.00',
       'Contribution Status' => 'Pending : Pay Later',
     );
     $this->webtestVerifyTabularData($expected);

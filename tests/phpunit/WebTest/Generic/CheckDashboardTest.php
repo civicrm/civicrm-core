@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
 
@@ -34,7 +33,6 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
   }
 
   function testCheckDashboardElements() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 
@@ -50,6 +48,9 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
 
   function _testAddDashboardElement($widgetConfigureID, $widgetEnabledSelector, $widgetTitle) {
     // Check if desired widget is already loaded on dashboard and remove it if it is so we can test adding it.
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(10);
     if ($this->isElementPresent($widgetEnabledSelector)) {
       $this->_testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector, $widgetTitle);
@@ -57,10 +58,19 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->click("link=Configure Your Dashboard");
     $this->waitForElementPresent("dashlets-header-col-0");
     $this->mouseDownAt($widgetConfigureID, "");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->mouseMoveAt("existing-dashlets-col-1", "");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->mouseUpAt("existing-dashlets-col-1", "");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->click("link=Done");
     $this->waitForElementPresent("link=Configure Your Dashboard");
@@ -71,6 +81,9 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->click("css=li#widget-2 a.fullscreen-icon");
     $this->waitForElementPresent("ui-id-1");
     $this->assertTrue($this->isTextPresent($widgetTitle));
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(5);
     $this->click("link=close");
   }
@@ -79,14 +92,26 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->click("link=Configure Your Dashboard");
     $this->waitForElementPresent("dashlets-header-col-0");
     $this->mouseDownAt("{$widgetConfigureID}", "");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(1);
     $this->mouseMoveAt("available-dashlets", "");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(1);
     $this->mouseUpAt("available-dashlets", "");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(1);
     $this->click("link=Done");
     $this->waitForElementPresent("link=Configure Your Dashboard");
     // giving time for activity widget to load (and make sure it did NOT)
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(10);
     $this->assertFalse($this->isElementPresent($widgetEnabledSelector));
   }
@@ -130,5 +155,4 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->_testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector);
   }
 }
-
 

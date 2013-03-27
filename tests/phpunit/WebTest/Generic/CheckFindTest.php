@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Generic_CheckFindTest extends CiviSeleniumTestCase {
 
@@ -33,16 +32,12 @@ class WebTest_Generic_CheckFindTest extends CiviSeleniumTestCase {
   }
 
   function testCheckDashboardElements() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing.
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForElementPresent("_qf_Basic_refresh");
+    $this->openCiviPage("contact/search", "reset=1", "_qf_Basic_refresh");
     $this->click("//input[@name='_qf_Basic_refresh' and @value='Search']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isElementPresent("search-status"));
   }
 }
-
 

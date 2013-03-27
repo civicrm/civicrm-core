@@ -144,7 +144,7 @@ function civicrm_api3_create_error($msg, $data = array(
   if (is_array($dao)) {
     if ($msg == 'DB Error: constraint violation' || substr($msg, 0,9)  == 'DB Error:' || $msg == 'DB Error: already exists') {
       try {
-        _civicrm_api3_validate_fields($dao['entity'], $dao['action'], $dao['params'], True);
+        _civicrm_api3_validate_fields($dao['entity'], $dao['action'], $dao['params'], TRUE);
       }
       catch(Exception $e) {
         $msg = $e->getMessage();
@@ -391,7 +391,7 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  * @param array $options array of options (so we can modify the filter)
  * @param bool $getCount are we just after the count
  */
-function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = null){
+function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL){
 
   // Convert id to e.g. contact_id
   if (empty($params[$entity . '_id']) && isset($params['id'])) {
@@ -410,7 +410,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     CRM_Utils_Array::value('return', $additional_options, array())
   );
   if(empty($returnProperties)){
-    $returnProperties = null;
+    $returnProperties = NULL;
   }
   if(!empty($params['check_permissions'])){
     // we will filter query object against getfields
@@ -608,7 +608,7 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  * for legacy report & return a unique fields array
  * @return array $options options extracted from params
  */
-function _civicrm_api3_get_options_from_params(&$params, $queryObject = false, $entity = '', $action = '') {
+function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
   $sort = CRM_Utils_Array::value('sort', $params, 0);
   $sort = CRM_Utils_Array::value('option.sort', $params, $sort);
   $sort = CRM_Utils_Array::value('option_sort', $params, $sort);
@@ -693,7 +693,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = false, $
  */
 function _civicrm_api3_apply_options_to_dao(&$params, &$dao, $entity) {
 
-  $options = _civicrm_api3_get_options_from_params($params,false,$entity);
+  $options = _civicrm_api3_get_options_from_params($params,FALSE,$entity);
   $dao->limit((int)$options['offset'], (int)$options['limit']);
   if (!empty($options['sort'])) {
     $dao->orderBy($options['sort']);
@@ -952,7 +952,7 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
  * @param array $params parameters passed into the api call
  * @param string $entity Entity - pass in if entity is non-standard & required $ids array
  */
-function _civicrm_api3_basic_create($bao_name, &$params, $entity = null) {
+function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
 
   $args = array(&$params);
   if(!empty($entity)){
@@ -975,7 +975,7 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = null) {
   else {
     $values = array();
     _civicrm_api3_object_to_array($bao, $values[$bao->id]);
-    return civicrm_api3_create_success($values, $params, null, 'create', $bao);
+    return civicrm_api3_create_success($values, $params, NULL, 'create', $bao);
   }
 }
 

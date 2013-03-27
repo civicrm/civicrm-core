@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
 
@@ -33,21 +32,18 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
   }
 
   function testProfileCreateDupeStrictDefault() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // lets give profile related permision to anonymous user.
     $permission = array('edit-1-profile-create', 'edit-1-profile-edit', 'edit-1-profile-listings', 'edit-1-profile-view');
     $this->changePermissions($permission);
 
-    // Go directly to the URL of the screen that you will beadding New Individual.
+    // Log in as normal user
+    $this->webtestLogin();
+
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     $firstName = "John" . substr(sha1(rand()), 0, 7);
-    $lastName  = "Smith" . substr(sha1(rand()), 0, 7);
-    $email     = $firstName . "@" . $lastName . ".com";
+    $lastName = "Smith" . substr(sha1(rand()), 0, 7);
+    $email = $firstName . "@" . $lastName . ".com";
     // fill in first name
     $this->type("first_name", $firstName);
 
@@ -61,7 +57,7 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $individualName = $this->getText("xpath=//div[@class='crm-summary-display_name']");
-    $this->assertElementContainsText('crm-notification-container', "$individualName has been created.");
+    $this->waitForText('crm-notification-container', "$individualName has been created.");
 
     // submit dupe using profile/create as anonymous
     $this->openCiviPage('profile/create', 'gid=4&reset=1', '_qf_Edit_next');

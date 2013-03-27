@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
 
@@ -36,7 +35,6 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
      *  Test participant import for Individuals.
      */
   function testMemberImportIndividual() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 
@@ -51,7 +49,6 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
      *  Test participant import for Households.
      */
   function testMemberImportHousehold() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 
@@ -66,7 +63,6 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
      *  Test participant import for Organizations.
      */
   function testMemberImportOrganization() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
 
@@ -33,9 +32,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
   }
 
   function testTagSetSearch() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
-
 
     $tagSet1 = $this->_testAddTagSet();
     $tagSet2 = $this->_testAddTagSet();
@@ -71,7 +68,6 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
     $this->waitForTextPresent($tag2);
 
-
     // Individual 2
     $contact2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($contact2, "Anderson", "{$contact2}@example.com");
@@ -89,7 +85,6 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
     $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
     $this->waitForTextPresent($tag1);
-
 
     // Go to Advance search.
     $this->openCiviPage('contact/search/advanced', 'reset=1');
@@ -159,7 +154,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "The tag '$tagSetName' has been saved.");
+    $this->waitForText('crm-notification-container', "The tag '$tagSetName' has been saved.");
 
     // sort by ID desc
     $this->click("xpath=//table//tr/th[text()=\"ID\"]");
@@ -168,15 +163,9 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     // verify text
     $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']");
 
-    $this->click("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']");
+    $this->clickLink("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Get contact id from url.
-    $matches = array();
-    preg_match('/id=([0-9]+)/', $this->getLocation(), $matches);
-
-    return $matches[1];
+    return $this->urlArg('id');
   }
 }
 

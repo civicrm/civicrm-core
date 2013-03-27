@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
 
@@ -34,7 +33,7 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
 
   function testContactContextAddTest() {
     // Log in as admin first to verify permissions for CiviGrant
-    $this->webtestLogin(TRUE);
+    $this->webtestLogin('admin');
 
     // Enable CiviGrant module if necessary
     $this->enableComponents("CiviGrant");
@@ -43,10 +42,13 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     $permission = array('edit-2-access-civigrant', 'edit-2-edit-grants', 'edit-2-delete-in-civigrant');
     $this->changePermissions($permission);
 
+    // Log in as normal user
+    $this->webtestLogin();
+
     // create unique name
-    $name      = substr(sha1(rand()), 0, 7);
+    $name = substr(sha1(rand()), 0, 7);
     $firstName = 'Grant' . $name;
-    $lastName  = 'L' . $name;
+    $lastName = 'L' . $name;
 
     // create new contact
     $this->webtestAddContact($firstName, $lastName);
@@ -67,8 +69,6 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // check contact name on Grant form
     $this->assertElementContainsText('page-title', "$firstName $lastName");
-
-    // Let's start filling the form with values.
 
     // select grant Status
     $this->select('status_id', 'value=1');
@@ -107,17 +107,10 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->type('note', "Grant Note for $firstName");
 
     // Clicking save.
-    $this->click('_qf_Grant_upload');
-
-    // wait for page to load
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // verify if grant is created with presence of view link
-    $this->waitForElementPresent("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink('_qf_Grant_upload', "xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     // click through to the Grant view screen
-    $this->click("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_GrantView_cancel-bottom');
+    $this->clickLink("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_GrantView_cancel-bottom');
 
     $gDate = date('F jS, Y', strtotime('now'));
 

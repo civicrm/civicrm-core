@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
@@ -32,55 +31,24 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
   function testAdminAddNewProfile() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile();
     $this->_deleteProfile($id, $profileTitle);
   }
 
   function testUserAddNewProfile() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile(TRUE, FALSE, TRUE);
     $this->_deleteProfile($id, $profileTitle);
   }
 
   function testAddNewNonMultiProfile() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile(FALSE);
     $this->_deleteProfile($id, $profileTitle);
   }
 
   function testNonSearchableMultiProfile() {
-    $this->open($this->sboxPath);
 
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile(TRUE, TRUE);
@@ -89,8 +57,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
   function _addNewProfile($checkMultiRecord = TRUE, $checkSearchable = FALSE, $userCheck = FALSE) {
     $params = $this->_testCustomAdd($checkSearchable);
-    // Go directly to the URL of the screen that you will be
-    // testing (Add new profile ).
+
     $this->openCiviPage('admin/uf/group', 'reset=1');
 
     $this->click('newCiviCRMProfile-top');
@@ -134,7 +101,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     //Add field to profile
     $this->waitForElementPresent('field_name[0]');
@@ -214,8 +181,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->click('link=Use (create mode)');
     $recordNew = $this->_addRecords('Create');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $elements = $this->parseURL( );
-
+    $elements = $this->parseURL();
     $gid = $elements['queryString']['gid'];
     $id = $elements['queryString']['id'];
 
@@ -227,8 +193,8 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->type('cms_confirm_pass', $recordNew['firstname']);
       $this->click('_qf_Useradd_next-bottom');
       $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->open($this->sboxPath . "user/logout");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->webtestLogout();
+
       $this->open("{$this->sboxPath}user");
       // Make sure login form is available
       $this->waitForElementPresent('edit-submit');
@@ -258,6 +224,9 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->verifyElementNotPresent("//div[@id='crm-profile-block']/a/span");
 
     //Check for edit functionality
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='Edit']");
     $this->waitForElementPresent("//html/body/div[5]");
@@ -270,11 +239,17 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     // Check the delete functionality
     $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='Delete']");
     $this->waitForElementPresent("//html/body/div[5]");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->assertElementContainsText('profile-dialog', 'Are you sure you want to delete this record?');
     $this->click('_qf_Edit_upload_delete');
 
     // Check the view functionality
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='View']");
     $this->waitForElementPresent("//html/body/div[5]");
@@ -310,10 +285,8 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
   }
 
   function _testCustomAdd($checkSearchable) {
-    // Go directly to the URL of the screen that you will be testing (Custom data for contacts).
+
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
 
     //fill custom group title
     $params['customGroupTitle'] = 'custom_group' . substr(sha1(rand()), 0, 3);

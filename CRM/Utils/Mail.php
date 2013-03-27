@@ -72,7 +72,8 @@ class CRM_Utils_Mail {
     CRM_Utils_Hook::alterMailParams($params);
 
     // check if any module has aborted mail sending
-    if (CRM_Utils_Array::value('abortMailSend', $params) ||
+    if (
+      CRM_Utils_Array::value('abortMailSend', $params) ||
       !CRM_Utils_Array::value('toEmail', $params)
     ) {
       return FALSE;
@@ -93,10 +94,12 @@ class CRM_Utils_Mail {
       $headers = array_merge($headers, $params['headers']);
     }
     $headers['From'] = $params['from'];
-    $headers['To']   = self::formatRFC822Email(CRM_Utils_Array::value('toName', $params),
-      CRM_Utils_Array::value('toEmail', $params),
-      FALSE
-    );
+    $headers['To']   =
+      self::formatRFC822Email(
+        CRM_Utils_Array::value('toName', $params),
+        CRM_Utils_Array::value('toEmail', $params),
+        FALSE
+      );
     $headers['Cc'] = CRM_Utils_Array::value('cc', $params);
     $headers['Bcc'] = CRM_Utils_Array::value('bcc', $params);
     $headers['Subject'] = CRM_Utils_Array::value('subject', $params);
@@ -104,8 +107,10 @@ class CRM_Utils_Mail {
     $headers['Content-Disposition'] = 'inline';
     $headers['Content-Transfer-Encoding'] = '8bit';
     $headers['Return-Path'] = CRM_Utils_Array::value('returnPath', $params);
+
     // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
     $replyTo = CRM_Utils_Array::value('replyTo', $params, $from);
+
     if (!empty($replyTo)) {
       $headers['Reply-To'] = $replyTo;
     }
@@ -171,15 +176,15 @@ class CRM_Utils_Mail {
 
     $result = NULL;
     $mailer = CRM_Core_Config::getMailer();
-    CRM_Core_Error::ignoreException();
     if (is_object($mailer)) {
+      CRM_Core_Error::ignoreException();
       $result = $mailer->send($to, $headers, $message);
       CRM_Core_Error::setCallback();
       if (is_a($result, 'PEAR_Error')) {
         $message = self::errorMessage($mailer, $result);
         // append error message in case multiple calls are being made to
         // this method in the course of sending a batch of messages.
-		CRM_Core_Session::setStatus(ts($message), ts('Mailing Error'), 'error');
+        CRM_Core_Session::setStatus($message, ts('Mailing Error'), 'error');
         return FALSE;
       }
       // CRM-10699

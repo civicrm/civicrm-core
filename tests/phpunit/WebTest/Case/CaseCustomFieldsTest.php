@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
@@ -33,7 +32,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
   }
 
   function testAddCase() {
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
@@ -46,14 +45,16 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->type("title", $customGrp1);
     $this->select("extends[0]", "value=Case");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(1);
     $this->select("extends_1", "value=2");
     $this->click("_qf_Group_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // get custom group id
-    $elements = $this->parseURL();
-    $customGrpId1 = $elements['queryString']['gid'];
+    $customGrpId1 = $this->urlArg('gid');
 
     $customId = $this->_testGetCustomFieldId($customGrpId1);
     $cusId_1 = 'custom_' . $customId[0] . '_-1';
@@ -64,23 +65,21 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
     $this->changePermissions($permission);
 
+    // Log in as normal user
+    $this->webtestLogin();
+
     // Go to reserved New Individual Profile to set value for logged in user's contact name (we'll need that later)
     $this->openCiviPage('profile/edit', 'reset=1&gid=4', '_qf_Edit_next');
     $testUserFirstName = "Testuserfirst";
     $testUserLastName = "Testuserlast";
     $this->type("first_name", $testUserFirstName);
     $this->type("last_name", $testUserLastName);
-    $this->click("_qf_Edit_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("profilewrap4");
+    $this->clickLink("_qf_Edit_next", "profilewrap4");
 
-    // Go directly to the URL of the screen that you will be testing (New Case-standalone).
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
     // Try submitting the form without creating or selecting a contact (test for CRM-7971)
-    $this->click("_qf_Case_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("css=span.crm-error");
+    $this->clickLink("_qf_Case_upload-bottom", "css=span.crm-error");
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
@@ -110,6 +109,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->type("activity_subject", $subject);
 
     $this->select("case_type_id", "label={$caseTypeLabel}");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->select("status_id", "label={$caseStatusLabel}");
 
@@ -118,16 +120,11 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('start_date', 'now');
     $today = date('F jS, Y', strtotime('now'));
 
-    // echo 'Today is ' . $today;
     $this->type("duration", "20");
     $this->type("{$cusId_1}", $custFname);
     $this->type("{$cusId_2}", $custMname);
     $this->type("{$cusId_3}", $custLname);
-    $this->click("_qf_Case_upload-bottom");
-
-    // We should be at manage case screen
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_CaseView_cancel-bottom");
+    $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom");
 
     // Is status message correct?
     $this->assertTextPresent("Case opened successfully.", "Save successful status message didn't show up after saving!");
@@ -136,6 +133,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->openCiviPage('case', 'reset=1', "xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Done']");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
 
     $openCaseData = array(
@@ -163,6 +163,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $cusId_2 = 'custom_' . $customId[1] . '_1';
     $cusId_3 = 'custom_' . $customId[2] . '_1';
     $this->click("css=#{$customGrp1} a.button");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(2);
     $this->waitForElementPresent("{$cusId_1}");
     $custFname = "Miky" . substr(sha1(rand()), 0, 7);
@@ -172,9 +175,15 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->type("{$cusId_2}", $custMname);
     $this->type("{$cusId_3}", $custLname);
     $this->click("_qf_CustomData_upload");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(2);
     $this->openCiviPage('case', 'reset=1');
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Change Custom Data']");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $openCaseChangeData = array(
       "Client" => $displayName,
@@ -188,6 +197,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     );
     $this->webtestVerifyTabularData($openCaseChangeData);
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Done']");
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(2);
     $this->_testAdvansearchCaseData($customId, $custFname, $custMname, $custLname);
     $this->_testDeleteCustomData($customGrpId1, $customId);

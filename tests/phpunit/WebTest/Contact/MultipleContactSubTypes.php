@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
 
@@ -33,16 +32,6 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
   }
 
   function testIndividualAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     $selection1 = 'Student';
@@ -54,8 +43,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     list($groupTitleForParent, $customGroupIdForParent) = $this->_addCustomData($selection2);
     list($groupTitleForStaff, $customGroupIdForStaff) = $this->_addCustomData($selection3);
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //contact details section
     //select prefix
@@ -89,9 +77,6 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     //fill in IM
     $this->type("im_1_name", "testYahoo");
 
-    //fill in openID
-    $this->type("openid_1_openid", "http://" . substr(sha1(rand()), 0, 7) . "openid.com");
-
     //fill in website
     $this->type("website_1_url", "http://www.john.com");
 
@@ -102,21 +87,14 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $indExternalId = substr(sha1(rand()), 0, 4);
     $this->type("external_identifier", $indExternalId);
 
-    //checking for presence of contact data specific custom data
-    if ($this->isElementPresent("xpath=//div[@id='customData{$customGroupIdForStudent}']") && $this->isElementPresent("xpath=//div[@id='customData{$customGroupIdForParent}']") && !$this->isElementPresent("xpath=//div[@id='customData{$customGroupIdForStaff}']")) {
-      $assertCheckForCustomGroup = TRUE;
-    }
-    else {
-      $assertCheckForCustomGroup = FALSE;
-    }
+    $this->waitForElementPresent("customData$customGroupIdForStudent");
+    $this->waitForElementPresent("customData$customGroupIdForParent");
 
-    $this->assertTrue($assertCheckForCustomGroup, "The Check for contact sub-type specific custom group failed");
+    // Make sure our staff custom set does NOT show up
+    $this->assertFalse($this->isElementPresent("customData$customGroupIdForStaff"), "A custom field showed up for the wrong subtype!");
 
-    if ($assertCheckForCustomGroup) {
-
-      $this->type("xpath=//div[@id='customData{$customGroupIdForStudent}']/table/tbody/tr//td/input", "dummy text for customData{$customGroupIdForStudent}");
-      $this->type("xpath=//div[@id='customData{$customGroupIdForParent}']/table/tbody/tr//td/input", "dummy text for customData{$customGroupIdForParent}");
-    }
+    $this->type("xpath=//div[@id='customData{$customGroupIdForStudent}']/table/tbody/tr//td/input", "dummy text for customData{$customGroupIdForStudent}");
+    $this->type("xpath=//div[@id='customData{$customGroupIdForParent}']/table/tbody/tr//td/input", "dummy text for customData{$customGroupIdForParent}");
 
     //address section
     $this->click("addressBlock");
@@ -129,7 +107,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->isTextPresent("Latitude")) {
+    if ($this->isElementPresent("address_1_geo_code_1")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -144,7 +122,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->click("address_2_country_id");
     $this->select("address_2_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->isTextPresent("Latitude")) {
+    if ($this->isElementPresent("address_2_geo_code_1")) {
       $this->type("address_2_geo_code_1", "1234");
       $this->type("address_2_geo_code_2", "5678");
     }
@@ -186,124 +164,77 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //checking the contact sub-type of newly created individual
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='contact-summary']/div[@id='contactTopBar']/table/tbody/tr/td[@class='crm-contact_type_label'][text()='{$selection1}, {$selection2}']"));
+    $this->waitForText('crm-notification-container', "Contact Saved");
+    $this->assertElementContainsText('css=.crm-contact_type_label', "Student");
+    $this->assertElementContainsText('css=.crm-contact_type_label', "Parent");
 
     //custom data check
-    if ($this->isElementPresent("{$groupTitleForStudent}_0")) {
-      $groupidSt = "{$groupTitleForStudent}_0";
-    }
-    else {
-      $groupidSt = "{$groupTitleForStudent}_1";
-    }
+    $this->waitForText("custom-set-content-{$customGroupIdForParent}", "dummy text for customData{$customGroupIdForParent}");
+    $this->waitForText("custom-set-content-{$customGroupIdForStudent}", "dummy text for customData{$customGroupIdForStudent}");
 
-    //custom data check
-    if ($this->isElementPresent("{$groupTitleForParent}_0")) {
-      $groupidPa = "{$groupTitleForParent}_0";
-    }
-    else {
-      $groupidPa = "{$groupTitleForParent}_1";
-    }
-
-    $this->click($groupidSt);
-    $this->click($groupidPa);
-
-    $this->assertTrue($this->isTextPresent("dummy text for customData{$customGroupIdForParent}"));
-    $this->assertTrue($this->isTextPresent("dummy text for customData{$customGroupIdForStudent}"));
+    // Get contact id
+    $cid = $this->urlArg('cid');
 
     //editing contact sub-type
-    $this->click("xpath=//ul[@id='actions']/li[2]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('_qf_Contact_upload_view-bottom');
-    $selectedValues = $this->getSelectedValues("contact_sub_type");
-    if (in_array($selection1, $selectedValues) && in_array($selection2, $selectedValues)) {
-      $checkSelection = TRUE;
-    }
-    else {
-      $checkSelection = FALSE;
-    }
-
-    $this->assertTrue($checkSelection, 'Assertion failed for multiple selection of contact sub-type');
+    $this->openCiviPage('contact/add', "reset=1&action=update&cid=$cid");
 
     //edit contact sub-type
     $this->removeSelection("contact_sub_type", "value={$selection1}");
     $this->addSelection('contact_sub_type', "value={$selection3}");
 
-    //checking for presence of contact data specific custom data
-    if (!$this->isElementPresent("xpath=//div[@id='customData{$customGroupIdForStudent}']") && $this->isElementPresent("xpath=//div[@id='customData{$customGroupIdForParent}']") && $this->isElementPresent("xpath=//div[@id='customData{$customGroupIdForStaff}']")) {
-      $assertCheckForCustomGroup = TRUE;
-    }
-    else {
-      $assertCheckForCustomGroup = FALSE;
-    }
+    $this->waitForElementPresent("customData$customGroupIdForStaff");
 
-    $this->assertTrue($assertCheckForCustomGroup, "The Check for contact sub-type specific custom group failed after de-selecting Student and selecting staff");
+    // Make sure our staff custom set does NOT show up
+    $this->assertFalse($this->isElementPresent("customData$customGroupIdForStudent"), "A custom field showed up for the wrong subtype!");
 
-    if ($assertCheckForCustomGroup) {
-
-      $this->type("xpath=//div[@id='customData{$customGroupIdForParent}']/table/tbody/tr//td/input", "dummy text for customData{$customGroupIdForParent}");
-      $this->type("xpath=//div[@id='customData{$customGroupIdForStaff}']/table/tbody/tr//td/input", "dummy text for customData{$customGroupIdForStaff}");
-    }
+    $this->type("xpath=//div[@id='customData{$customGroupIdForParent}']/table/tbody/tr//td/input", "dummy text for customData{$customGroupIdForParent}");
+    $this->type("xpath=//div[@id='customData{$customGroupIdForStaff}']/table/tbody/tr//td/input", "dummy text for customData{$customGroupIdForStaff}");
 
     $this->click("_qf_Contact_upload_view-bottom");
-    sleep(5);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check confirmation alert.
     $this->assertTrue((bool)preg_match("/One or more contact subtypes have been de-selected from the list for this contact. Any custom data associated with de-selected subtype will be removed. Click OK to proceed, or Cancel to review your changes before saving./", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
-    sleep(10);
-
-    $this->waitForElementPresent("xpath=//div[@id='contact-summary']/div[@id='contactTopBar']");
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='contact-summary']/div[@id='contactTopBar']/table/tbody/tr/td[@class='crm-contact_type_label'][text()='{$selection2}, {$selection3}']"));
-
-    //custom data check
-    if ($this->isElementPresent("{$groupTitleForParent}_0")) {
-      $groupidPa = "{$groupTitleForParent}_0";
-    }
-    else {
-      $groupidPa = "{$groupTitleForParent}_1";
-    }
-
-    //custom data check
-    if ($this->isElementPresent("{$groupTitleForStaff}_0")) {
-      $groupidSta = "{$groupTitleForStaff}_0";
-    }
-    else {
-      $groupidSta = "{$groupTitleForStaff}_1";
-    }
-
-    $this->click($groupidSta);
-    $this->click($groupidPa);
-
-    $this->assertTrue($this->isTextPresent("dummy text for customData{$customGroupIdForParent}"));
-    $this->assertTrue($this->isTextPresent("dummy text for customData{$customGroupIdForStaff}"));
-  }
-
-  function _addCustomData($contactSubType) {
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?reset=1");
-
-    //add new custom data
-    $customGroupTitle = "Custom group For {$contactSubType}" . substr(sha1(rand()), 0, 4);
-    $this->click("//a[@id='newCustomDataGroup']/span");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
+    // Verify contact types
+    $this->waitForText('crm-notification-container', "Contact Saved");
+    $this->assertElementNotContainsText('css=.crm-contact_type_label', "Student");
+    $this->assertElementContainsText('css=.crm-contact_type_label', "Staff");
+    $this->assertElementContainsText('css=.crm-contact_type_label', "Parent");
+
+    //custom data check
+    $this->waitForText("custom-set-content-{$customGroupIdForParent}", "dummy text for customData{$customGroupIdForParent}");
+    $this->waitForText("custom-set-content-{$customGroupIdForStaff}", "dummy text for customData{$customGroupIdForStaff}");
+  }
+
+  /**
+   * Add custom fields for a contact sub-type
+   */
+  function _addCustomData($contactSubType) {
+    $this->openCiviPage("admin/custom/group", "action=add&reset=1");
+
     //fill custom group title
+    $customGroupTitle = "Custom group For {$contactSubType}" . substr(sha1(rand()), 0, 4);
     $this->click("title");
     $this->type("title", $customGroupTitle);
 
     //custom group extends
-    $this->click("extends[0]");
-    $this->select("extends[0]", "value=Individual");
-    $this->addSelection("extends[1]", "label={$contactSubType}");
+    $this->click("extends_0");
+    $this->select("extends_0", "value=Individual");
+    $this->addSelection("extends_1", "label={$contactSubType}");
+
+    // Don't collapse
+    $this->uncheck('collapse_display');
+
+    // Save
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertTrue($this->isTextPresent("Your custom field set '{$customGroupTitle}' has been added."));
-    $url = explode('gid=', $this->getLocation());
-    $gid = $url[1];
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
+    $gid = $this->urlArg('gid');
 
     $fieldLabel = "custom_field_for_{$contactSubType}" . substr(sha1(rand()), 0, 4);
     $this->type('label', $fieldLabel);
@@ -313,6 +244,4 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     return array($customGroupTitle, $gid);
   }
 }
-
-
 

@@ -235,6 +235,12 @@ class CRM_Extension_Mapper {
    */
   public function keyToUrl($key) {
     if ($key == 'civicrm') {
+      // CRM-12130 Workaround: If the domain's config_backend is NULL at the start of the request,
+      // then the Mapper is wrongly constructed with an empty value for $this->civicrmUrl.
+      if (empty($this->civicrmUrl)) {
+        $config = CRM_Core_Config::singleton();
+        return rtrim($config->resourceBase, '/');
+      }
       return $this->civicrmUrl;
     }
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
 
@@ -33,12 +32,10 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
   }
 
   function testSMSToContacts() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // ADD a New Group
-    $this->open($this->sboxPath . "civicrm/group/add?reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
+    $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     $smsGroupName = 'group_' . substr(sha1(rand()), 0, 7);
 
@@ -50,8 +47,7 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // ADD contact1
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $firstName = substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName);
 
@@ -65,18 +61,17 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
 
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     $this->click('css=li#tab_group a');
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label=$smsGroupName");
     $this->click('_qf_GroupContact_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Added to Group");
+    $this->waitForText('crm-notification-container', "Added to Group");
 
     // ADD contact2
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $firstName = substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName);
 
@@ -90,36 +85,27 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
 
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Contact Saved");
+    $this->waitForText('crm-notification-container', "Contact Saved");
 
     $this->click('css=li#tab_group a');
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label=$smsGroupName");
     $this->click('_qf_GroupContact_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Added to Group");
+    $this->waitForText('crm-notification-container', "Added to Group");
 
     // Do an advanced search
     $this->click("css=ul#civicrm-menu li.crm-Search");
-    $this->click("css=ul#civicrm-menu li.crm-Advanced_Search a");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("email");
+    $this->clickLink("css=ul#civicrm-menu li.crm-Advanced_Search a", "email");
 
     $this->select("crmasmSelect1", "label=$smsGroupName");
 
-    $this->click("_qf_Advanced_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('CIVICRM_QFID_ts_all_12');
+    $this->clickLink("_qf_Advanced_refresh", 'CIVICRM_QFID_ts_all_12');
     $this->click('CIVICRM_QFID_ts_all_12');
 
     // Perform a task action
     $this->select("task", "label=Send SMS to Contacts");
-    $this->click("Go");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent('activity_subject');
+    $this->clickLink("Go", 'activity_subject');
     $this->type('activity_subject', "Send SMS to Contacts of {$smsGroupName}");
     $this->type('text_message', "Test SMS to Contacts of {$smsGroupName}");
     $this->click("_qf_SMS_upload-bottom");
@@ -128,5 +114,4 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('Your message has been sent.'), "Test SMS could not be sent!");
   }
 }
-
 

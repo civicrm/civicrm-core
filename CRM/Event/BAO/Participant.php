@@ -1759,5 +1759,24 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
     }
     return;
   }
+
+  /**
+   * Function to delete participants of contact
+   *
+   * CRM-12155
+   *
+   * @param integer $contactId contact id 
+   *
+   * @access public
+   * @static
+   */
+  static function deleteContactParticipant($contactId) {
+    $participant = new CRM_Event_DAO_Participant();
+    $participant->contact_id = $contactId;
+    $participant->find();
+    while ($participant->fetch()) {
+      self::deleteParticipant($participant->id);
+    }
+  }
 }
 

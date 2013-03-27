@@ -168,6 +168,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
           array('title' => 'Currency',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+            'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
           'contribution_status_id' =>

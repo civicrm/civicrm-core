@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
 
@@ -33,14 +32,12 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testContactMemberAdd() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)
     $memTypeParams = $this->webtestAddMembershipType();
     $lifeTimeMemTypeParams = $this->webtestAddMembershipType('rolling', 1, 'lifetime');
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -59,7 +56,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "$firstName $lastName has been created.");
+    $this->waitForText('crm-notification-container', "$firstName $lastName");
 
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
@@ -73,6 +70,9 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->select("membership_type_id[0]", "label={$memTypeParams['member_of_contact']}");
     // Wait for membership type select to reload
     $this->waitForTextPresent($memTypeParams['membership_type']);
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->select("membership_type_id[1]", "label={$memTypeParams['membership_type']}");
 
@@ -93,8 +93,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "membership for $firstName $lastName has been added.",
-      "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "membership for $firstName $lastName has been added.");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -127,10 +126,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
       'Source' => $sourceText,
     );
     $this->webtestVerifyTabularData($verifyData);
-    $this->click("_qf_MembershipView_cancel-bottom");
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[7]");
+    $this->clickLink("_qf_MembershipView_cancel-bottom", "xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[7]");
     $this->click("xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[9]/span/a[2][text()='Edit']");
     $this->waitForElementPresent("_qf_Membership_cancel-bottom");
 
@@ -160,13 +156,11 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testMemberAddWithLifeTimeMembershipType() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)
     $lifeTimeMemTypeParams = $this->webtestAddMembershipType('rolling', 1, 'lifetime');
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -185,7 +179,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "$firstName $lastName has been created.");
+    $this->waitForText('crm-notification-container', "$firstName $lastName has been created.");
 
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
@@ -200,6 +194,9 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // Wait for membership type select to reload
     $this->waitForTextPresent($lifeTimeMemTypeParams['membership_type']);
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->select("membership_type_id[1]", "label={$lifeTimeMemTypeParams['membership_type']}");
 
@@ -220,8 +217,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "membership for $firstName $lastName has been added.",
-      "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "membership for $firstName $lastName has been added.");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -237,5 +233,4 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-
 

@@ -353,10 +353,10 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         $this->_aclWhere = $this->_aclWhere ? "AND {$this->_aclWhere}" : '';
       }
       $query = "SELECT dedupe.id1, dedupe.id2, dedupe.weight
-                FROM dedupe JOIN civicrm_contact c1 ON dedupe.id1 = c1.id 
+                FROM dedupe JOIN civicrm_contact c1 ON dedupe.id1 = c1.id
                             JOIN civicrm_contact c2 ON dedupe.id2 = c2.id {$this->_aclFrom}
                        LEFT JOIN civicrm_dedupe_exception exc ON dedupe.id1 = exc.contact_id1 AND dedupe.id2 = exc.contact_id2
-                WHERE c1.contact_type = '{$this->contact_type}' AND 
+                WHERE c1.contact_type = '{$this->contact_type}' AND
                       c2.contact_type = '{$this->contact_type}' {$this->_aclWhere}
                       AND weight >= {$this->threshold} AND exc.contact_id1 IS NULL";
     }
@@ -373,7 +373,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * @return (rule field => weight) array and threshold associated to rule group
    * @access public
    */
-  function dedupeRuleFieldsWeight($params) {
+  static function dedupeRuleFieldsWeight($params) {
     $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->used         = $params['used'];
     $rgBao->contact_type = $params['contact_type'];

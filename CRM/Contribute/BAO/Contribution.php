@@ -700,8 +700,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
     // cleanup line items.
     $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $id, 'participant_id', 'contribution_id');
 
-    // delete any related entity_financial_trxn and financial_trxn records.
-    CRM_Core_BAO_FinancialTrxn::deleteFinancialTrxn($id, 'civicrm_contribution');
+    // delete any related entity_financial_trxn, financial_trxn and financial_item records.
+    CRM_Core_BAO_FinancialTrxn::deleteFinancialTrxn($id);
 
     if ($participantId) {
       CRM_Price_BAO_LineItem::deleteLineItems($participantId, 'civicrm_participant');
@@ -2961,6 +2961,25 @@ WHERE  contribution_id = %1 ";
 
     if (!in_array($contributionStatuses[$fields['contribution_status_id']], $checkStatus[$contributionStatuses[$values['contribution_status_id']]])) {
       $errors['contribution_status_id'] = ts("Cannot change contribution status from %1 to %2.", array(1 => $contributionStatuses[$values['contribution_status_id']], 2 => $contributionStatuses[$fields['contribution_status_id']]));
+    }
+  }
+
+  /**
+   * Function to delete contribution of contact
+   *
+   * CRM-12155
+   *
+   * @param integer $contactId contact id 
+   *
+   * @access public
+   * @static
+   */
+  static function deleteContactContribution($contactId) {
+    $contribution = new CRM_Contribute_DAO_Contribution();
+    $contribution->contact_id = $contactId;
+    $contribution->find();
+    while ($contribution->fetch()) {
+      self::deleteContribution($contribution->id);
     }
   }
 }

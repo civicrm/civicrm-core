@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
 
@@ -43,9 +42,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $sortName = "Anderson, $firstName";
     $displayName = "$firstName Anderson";
 
-    // Go directly to the URL of the screen that you will be testing (Home dashboard).
-    $this->open($this->sboxPath . "civicrm/dashboard?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("dashboard", "reset=1");
 
     // type sortname in autocomplete
     $this->click("css=input#sort_name_navigation");
@@ -72,23 +69,18 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($firstName, "Adams", "{$firstName}.adams@example.org");
 
     $sortName = "Adams, {$firstName}";
-    // Go directly to the URL of the screen that you will be testing (Home dashboard).
-    $this->open($this->sboxPath . "civicrm/dashboard?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->openCiviPage("dashboard", "reset=1");
 
     // type partial sortname in autocomplete
     $this->click("css=input#sort_name_navigation");
     $this->type("css=input#sort_name_navigation", 'ada');
     $this->typeKeys("css=input#sort_name_navigation", 'ada');
 
-    $this->click("_qf_Basic_refresh");
+    $this->clickLink("_qf_Advanced_refresh");
 
-    // wait for result list
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     // make sure we're on search results page
     $this->waitForElementPresent("alpha-filter");
-    // wait for bottom of page to load (access is in footer)
-    $this->waitForElementPresent("access");
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=.crm-search-results > table.row-highlight', $sortName);
@@ -133,8 +125,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=.success");
 
     // visit contact search page
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search", "reset=1");
 
     // fill name as first_name
     $this->type("css=.crm-basic-criteria-form-block input#sort_name", $firstName);
@@ -196,7 +187,6 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $childGroupName = 'Childgroup_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($childGroupName, $parentGroupName);
 
-
     // Adding Parent group contact
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, "Smith", "$firstName.smith@example.org");
@@ -232,11 +222,8 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->click("_qf_GroupContact_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-
     // visit contact search page
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->openCiviPage("contact/search", "reset=1");
 
     // select contact type as Indiividual
     $this->select("contact_type", "value=Individual");

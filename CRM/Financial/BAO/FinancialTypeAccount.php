@@ -64,14 +64,15 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @access public
    * @static
    */
-  static function retrieve( &$params, &$defaults ) {
-    $financialTypeAccount = new CRM_Financial_DAO_EntityFinancialAccount( );
-    $financialTypeAccount->copyValues( $params );
-    if ( $financialTypeAccount->find( true ) ) {
-      CRM_Core_DAO::storeValues( $financialTypeAccount, $defaults );
-      return $financialTypeAccount;
+  static function retrieve(&$params, &$defaults, &$allValues = array()) {
+    $financialTypeAccount = new CRM_Financial_DAO_EntityFinancialAccount();
+    $financialTypeAccount->copyValues($params);
+    $financialTypeAccount->find();
+    while ($financialTypeAccount->fetch()) {
+      CRM_Core_DAO::storeValues($financialTypeAccount, $defaults);
+      $allValues[] = $defaults;
     }
-    return null;
+    return $defaults;
   }
   
   /**

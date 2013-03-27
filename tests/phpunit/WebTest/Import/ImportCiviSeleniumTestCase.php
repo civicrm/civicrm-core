@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CRM/Utils/Array.php';
 class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
@@ -39,7 +38,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * @params string $mode        import mode
      * @params array  $fieldMapper select mapper fields while import
      * @params array  $other       other parameters
-     *                             useMappingName     : to reuse mapping 
+     *                             useMappingName     : to reuse mapping
+
      *                             dateFormat         : date format of data
      *                             checkMapperHeaders : to override default check mapper headers
      *                             saveMapping        : save current mapping?
@@ -142,12 +142,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     $this->_checkImportMapperData($headers, $rows, $existingMapping, isset($other['checkMapperHeaders']) ? $other['checkMapperHeaders'] : array());
 
     // Submit form.
-    $this->click('_qf_Preview_next-bottom');
-
-    sleep(10);
-
-    // Visit summary page.
-    $this->waitForElementPresent("_qf_Summary_next");
+    $this->clickLink('_qf_Preview_next-bottom', "_qf_Summary_next");
 
     // Check success message.
     $this->assertTrue($this->isTextPresent("Import has completed successfully. The information below summarizes the results."));
@@ -173,7 +168,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * @params string $mode        import mode
      * @params array  $fieldMapper select mapper fields while import
      * @params array  $other       other parameters
-     *                             contactSubtype     : import for selected Contact Subtype           
+     *                             contactSubtype     : import for selected Contact Subtype
+
      *                             useMappingName     : to reuse mapping
      *                             dateFormat         : date format of data
      *                             checkMapperHeaders : to override default check mapper headers
@@ -188,16 +184,14 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      *                             callbackImportSummary : function to override default import summary assertions
      *
      * @params string $type        import type (csv/sql)
-     *                             @todo:currently only supports csv, need to work on sql import 
+     *                             @todo:currently only supports csv, need to work on sql import
+
      */
   function importContacts($headers, $rows, $contactType = 'Individual', $mode = 'Skip', $fieldMapper = array(
     ), $other = array(), $type = 'csv') {
 
     // Go to contact import page.
-    $this->open($this->sboxPath . "civicrm/import/contact?reset=1");
-
-    // check for upload field.
-    $this->waitForElementPresent("uploadFile");
+    $this->openCiviPage("import/contact", "reset=1", "uploadFile");
 
     $originalHeaders = $headers;
     $originalRows = $rows;
@@ -236,7 +230,10 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     // Select contact subtype
     if (isset($other['contactSubtype'])) {
       if ($contactType != 'Individual') {
-        // wait for contact subtypes to repopulate.
+        // Because it tends to cause problems, all uses of sleep() must be justified in comments
+        // Sleep should never be used for wait for anything to load from the server
+        // FIXME: this is bad, using sleep to wait for AJAX
+        // Need to use a better way to wait for contact subtypes to repopulate
         sleep(5);
       }
       $this->waitForElementPresent("subType");
@@ -361,13 +358,12 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
     // Submit form.
     $this->click('_qf_Preview_next');
-    sleep(2);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check confirmation alert.
     $this->assertTrue((bool)preg_match("/^Are you sure you want to Import now[\s\S]$/", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
-
-    sleep(10);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Visit summary page.
     $this->waitForElementPresent("_qf_Summary_next");
@@ -435,7 +431,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      *
      * @params string $component component name
      *
-     * @return string import url 
+     * @return string import url
+
      */
   function _getImportComponentUrl($component) {
 
@@ -454,7 +451,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      *
      * @params string $component component name
      *
-     * @return string import url 
+     * @return string import url
+
      */
   function _getImportComponentContactType($component, $contactType) {
     $importComponentMode = array(
@@ -522,7 +520,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
      * Helper function to get imported contact ids.
      *
      * @params array  $rows        fields rows
-     * @params string $contactType contact type 
+     * @params string $contactType contact type
+
      *
      * @return array  $contactIds  imported contact ids
      */
@@ -543,9 +542,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
         $searchName = $row['household_name'];
       }
 
-      $this->open($this->sboxPath . "civicrm/dashboard?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-
+      $this->openCiviPage("dashboard", "reset=1");
 
       // Type search name in autocomplete.
       $this->click("css=input#sort_name_navigation");
@@ -556,13 +553,10 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
       $this->waitForElementPresent("css=div.ac_results-inner li");
 
       // Visit contact summary page.
-      $this->click("css=div.ac_results-inner li");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->clickLink("css=div.ac_results-inner li");
 
       // Get contact id from url.
-      $matches = array();
-      preg_match('/cid=([0-9]+)/', $this->getLocation(), $matches);
-      $contactIds[] = $matches[1];
+      $contactIds[] = $this->urlArg('cid');
     }
 
     return $contactIds;

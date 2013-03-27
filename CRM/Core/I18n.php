@@ -356,7 +356,7 @@ class CRM_Core_I18n {
         $array[$key] = $value;
       }
       elseif ((string ) $key == 'title') {
-        $array[$key] = ts($value);
+        $array[$key] = ts($value, array('context' => 'menu'));
       }
     }
   }

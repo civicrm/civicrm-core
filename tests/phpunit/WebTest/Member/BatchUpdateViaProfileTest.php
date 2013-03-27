@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
@@ -33,11 +32,6 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
   }
 
   function testMemberAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -56,8 +50,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     // Add membership for this individual
     $this->_addMembership($memTypeParams);
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "membership for $firstName1 $lastName has been added.",
-      "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "membership for $firstName1 $lastName has been added");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -81,8 +74,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->_addMembership($memTypeParams);
     // Is status message correct?
 
-    $this->assertElementContainsText('crm-notification-container', "membership for $firstName2 $lastName has been added.",
-      "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "membership for $firstName2 $lastName has been added.");
 
     // click through to the membership view screen
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -168,6 +160,9 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->select("membership_type_id[0]", "label={$memTypeParams['member_of_contact']}");
     // Wait for membership type select to reload
     $this->waitForTextPresent($memTypeParams['membership_type']);
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: FIXME
     sleep(3);
     $this->select("membership_type_id[1]", "label={$memTypeParams['membership_type']}");
 
@@ -189,7 +184,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
   }
 
   function _addProfile($profileTitle, $customDataParams) {
-    // Go directly to the URL of the screen that you will be testing (New Profile).
+
     $this->openCiviPage("admin/uf/group", "reset=1");
 
     $this->click('link=Add Profile');
@@ -199,7 +194,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->click('_qf_Group_next-bottom');
 
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     $this->select('field_name[0]', "value=Membership");
     $this->select('field_name[1]', "label={$customDataParams[0]} :: {$customDataParams[1]}");
@@ -209,7 +204,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     // Clicking save and new
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field '{$customDataParams[0]}' has been saved to '{$profileTitle}'.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field '{$customDataParams[0]}' has been saved to '{$profileTitle}'.");
 
     // Add membership status field to profile - CRM-8618
     $this->select('field_name[0]', "value=Membership");
@@ -219,14 +214,14 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     // Clicking save
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Your CiviCRM Profile Field 'Membership Status' has been saved to '{$profileTitle}'.");
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Membership Status' has been saved to '{$profileTitle}'.");
   }
 
   function _addCustomData() {
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
-    // Go directly to the URL of the screen that you will be testing (New Custom Group).
+
     $this->openCiviPage('admin/custom/group', 'reset=1');
-    
+
     //add new custom data
     $this->click("//a[@id='newCustomDataGroup']/span");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -243,7 +238,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //Is custom group created?
-    $this->assertElementContainsText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
 
     $textFieldLabel = 'Custom Field Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $textFieldLabel);
@@ -262,7 +257,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertElementContainsText('crm-notification-container', "Your custom field '$textFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Your custom field '$textFieldLabel' has been saved.");
 
     return array($textFieldLabel, $customGroupTitle);
   }

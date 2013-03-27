@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
 
@@ -33,16 +32,6 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
   }
 
   function testStandaloneContributeAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // Create a contact to be used as soft creditor
@@ -61,12 +50,12 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $isTax = TRUE;
     $taxRate = 9.9999999;
     $isDefault = FALSE;
-    
+
     //Add new organisation
     if($orgName) {
       $this->webtestAddOrganization($orgName);
     }
-    
+
     $this->_testAddFinancialAccount($financialAccountTitle,
       $financialAccountDescription,
       $accountingCode,
@@ -79,22 +68,15 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    // Go directly to the URL of the screen that you will be testing (New Contribution-standalone).
-    $this->open($this->sboxPath . "civicrm/contribute/add?reset=1&context=standalone");
-
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
-    $this->waitForElementPresent("_qf_Contribution_upload");
-
-    // Let's start filling the form with values.
+    $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestNewDialogContact($firstName, "Contributor", $firstName . "@example.com");
-    
+
     // select financial type
     $this->select("financial_type_id", "value=1");
-    
+
     // fill in Received Date
     $this->webtestFillDate('receive_date');
 
@@ -108,7 +90,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->select("payment_instrument_id", "value=4");
     $this->waitForElementPresent("check_number");
     $this->type("check_number", "check #1041");
-    
+
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
@@ -178,7 +160,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
 
     // go to soft creditor contact view page
     $this->click("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='Soft Credit To']/../td[2]/a[text()='{$softCreditFname} {$softCreditLname}']");
-    
+
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");

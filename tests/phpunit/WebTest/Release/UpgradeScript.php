@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'ReleaseTestCase.php';
 
 // name of the class doesn't end with Test on purpose - this way this
@@ -38,7 +37,6 @@ class WebTest_Release_UpgradeScript extends WebTest_Release_ReleaseTestCase {
   }
 
   function testUpgrade() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
     $this->open($this->settings->upgradeURL);
     $this->waitForTextPresent("Upgrade CiviCRM to Version");

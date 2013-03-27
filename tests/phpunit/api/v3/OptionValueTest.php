@@ -146,7 +146,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'name' => 'from_email_address',
       'sequential' => 1,
       'version' => $this->_apiversion,
-      'api.option_value.create' => array('domain_id' => 2, 'name' => 'my@y.com')
+      'api.option_value.create' => array('domain_id' => 2, 'name' => 'my@y.com'),
       ));
     $this->assertAPISuccess($result);
     $optionValueId = $result['values'][0]['api.option_value.create']['id'];
@@ -156,7 +156,99 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'return' => 'domain_id',
     ));
     $this->assertEquals(2, $domain_id);
+  }
+  /*
+   * Check that component_id is honoured
+  */
+  public function testCreateOptionSpecifyComponentID() {
+    $result = civicrm_api('option_group', 'get', array(
+      'name' => 'from_email_address',
+      'sequential' => 1,
+      'version' => $this->_apiversion,
+      'api.option_value.create' => array('component_id' => 2, 'name' => 'my@y.com'),
+    ));
+    $this->assertAPISuccess($result);
+    $optionValueId = $result['values'][0]['api.option_value.create']['id'];
+    $component_id = civicrm_api('option_value', 'getvalue', array(
+      'id' => $optionValueId,
+      'version' => $this->_apiversion,
+      'return' => 'component_id',
+    ));
+    $this->assertEquals(2, $component_id);
+  }
+  /*
+   * Check that component  continues to be honoured
+  */
+  public function testCreateOptionSpecifyComponent() {
+    $result = civicrm_api('option_group', 'get', array(
+      'name' => 'from_email_address',
+      'sequential' => 1,
+      'version' => $this->_apiversion,
+      'api.option_value.create' => array(
+        'component_id' => 'CiviContribute',
+        'name' => 'my@y.com'
+       ),
 
+    ));
+    $this->assertAPISuccess($result);
+    $optionValueId = $result['values'][0]['api.option_value.create']['id'];
+    $component_id = civicrm_api('option_value', 'getvalue', array(
+      'id' => $optionValueId,
+      'version' => $this->_apiversion,
+      'return' => 'component_id',
+    ));
+    $this->assertEquals(2, $component_id);
+  }
+  /*
+   * Check that component string is honoured
+  */
+  public function testCreateOptionSpecifyComponentString() {
+    $result = civicrm_api('option_group', 'get', array(
+      'name' => 'from_email_address',
+      'sequential' => 1,
+      'version' => $this->_apiversion,
+      'api.option_value.create' => array(
+        'component_id' => 'CiviContribute',
+        'name' => 'my@y.com'),
+
+    ));
+    $this->assertAPISuccess($result);
+    $optionValueId = $result['values'][0]['api.option_value.create']['id'];
+    $component_id = civicrm_api('option_value', 'getvalue', array(
+      'id' => $optionValueId,
+      'version' => $this->_apiversion,
+      'return' => 'component_id',
+    ));
+    $this->assertEquals(2, $component_id);
+  }
+  /*
+   * Check that domain_id is honoured
+  */
+  public function testCRM12133CreateOptionWeightNoValue() {
+    $optionGroup = civicrm_api(
+      'option_group', 'get', array(
+      'name' => 'gender',
+      'sequential' => 1,
+      'version' => $this->_apiversion,
+    ));
+    $this->assertAPISuccess($optionGroup);
+    $params = array(
+      'option_group_id' => $optionGroup['id'],
+      'label' => 'my@y.com',
+      'version' => $this->_apiversion,
+      'weight' => 3,
+    );
+    $optionValue = civicrm_api('option_value', 'create',  $params);
+    $this->assertAPISuccess($optionValue);
+    $params['weight'] = 4;
+    $optionValue2 = civicrm_api('option_value', 'create',  $params );
+    $this->assertAPISuccess($optionValue2);
+    $options = civicrm_api('option_value', 'get', array('version' => 3, 'option_group_id' => $optionGroup['id']));
+    $this->assertNotEquals($options['values'][$optionValue['id']]['value'], $options['values'][$optionValue2['id']]['value']);
+
+  //cleanup
+    civicrm_api('option_value', 'delete', array('version' => 3, 'id' => $optionValue['id']));
+    civicrm_api('option_value', 'delete', array('version' => 3, 'id' => $optionValue2['id']));
   }
 
   /*
@@ -206,6 +298,5 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     );
     $this->assertFalse(in_array('newest', $fields['values']));
   }
-
 }
 

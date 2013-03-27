@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase {
 
@@ -33,11 +32,6 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
   }
 
   function testDefaultPricesetSelection() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -50,8 +44,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $fields = array("National Membership $title" => 'Radio');
@@ -84,58 +77,46 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->assertType('numeric', $cid);
 
     //senario 1
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id={$membershipContributionPageId}&cid={$cid}");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 2
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id={$membershipContributionPageId}&cid={$cid}");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
     // checking
     $this->checkOptions("National_Membership_{$title}-section", 2);
     // senario 1
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 4);
     $this->_testDefaultSenarios("Second_Membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 3
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id={$membershipContributionPageId}&cid={$cid}");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
     // checking
     $this->checkOptions("Second_Membership_{$title}-section", 2);
     // senario 2
 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 3);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 4
-    $this->open($this->sboxPath . "civicrm/contribute/transact?reset=1&id={$membershipContributionPageId}&cid={$cid}");
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
     // checking senario 3
     $this->assertTrue($this->isTextPresent("You have a current Lifetime Membership which does not need to be renewed."));
 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 1);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->click("_qf_Main_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Main_upload-bottom");
     $this->assertTrue($this->isTextPresent("You already have a lifetime membership and cannot select a membership with a shorter term."));
   }
 
@@ -166,9 +147,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
   }
 
   function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
-    $this->open($this->sboxPath . 'civicrm/admin/price?reset=1&action=add');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Set_next-bottom');
+    $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
     $this->type('title', $setTitle);
@@ -180,17 +159,14 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     }
     elseif ($usedFor == 'Membership') {
       $this->click('extends[3]');
-          $this->waitForElementPresent( 'financial_type_id' );
+      $this->waitForElementPresent( 'financial_type_id' );
       $this->select("css=select.form-select", "label={$contributionType}");
     }
 
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->click('_qf_Set_next-bottom');
-
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
     $this->assertTrue($this->isTextPresent("Your Set '{$setTitle}' has been added. You can add fields to this set now."));
   }
 
@@ -223,7 +199,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
       $memTypeId3     = $memTypeId3[1];
     }
 
-    $this->open($this->sboxPath . "civicrm/admin/price/field?reset=1&action=add&sid={$sid}");
+    $this->openCiviPage("admin/price/field", "reset=1&action=add&sid={$sid}");
 
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
@@ -276,9 +252,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
           break;
       }
       $this->select("financial_type_id", "label={$contributionType}");
-      $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->waitForElementPresent('_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
       $this->assertTrue($this->isTextPresent("Price Field '{$label}' has been saved."));
     }
     return array($memTypeTitle1, $memTypeTitle2, $memTypeTitle3);

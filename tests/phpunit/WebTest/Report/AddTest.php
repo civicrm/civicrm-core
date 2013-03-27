@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Report_AddTest extends CiviSeleniumTestCase {
 
@@ -33,25 +32,14 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
   }
 
   function testAddReport() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // create contact
-    $firstName   = 'reportuser_' . substr(sha1(rand()), 0, 7);
+    $firstName = 'reportuser_' . substr(sha1(rand()), 0, 7);
     $displayName = "Anderson, $firstName";
-    $emailId     = "$firstName.anderson@example.org";
+    $emailId = "$firstName.anderson@example.org";
     $this->webtestAddContact($firstName, "Anderson", $emailId);
 
-    // Go directly to the URL of the screen that you will be testing (New Tag).
     $this->openCiviPage('report/contact/summary', 'reset=1', '_qf_Summary_submit' );
 
     // enable email field
@@ -70,13 +58,13 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
 
     // Is filter statistics present?
     $this->assertElementContainsText("xpath=//tr/th[@class='statistics'][text()='Contact Name']/../td", "Contains $firstName", "Statistics did not found!");
-    
+
     // Is Contact Name present in result?
     $this->assertElementContainsText('css=td.crm-report-civicrm_contact_sort_name', $displayName, "Contact Name did not found!");
 
     // Is email Id present on result?
     $this->assertElementContainsText('css=td.crm-report-civicrm_email_email', $emailId, "Email did not found!");
-  
+
     // check criteria
     $this->click("css=div.crm-report_criteria-accordion div.crm-accordion-header");
     $this->waitForElementPresent("sort_name_value");
@@ -94,10 +82,10 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->click("css=div.crm-report_setting-accordion div.crm-accordion-header");
     $this->waitForElementPresent("title");
 
-    $reportName        = 'ContactSummary_' . substr(sha1(rand()), 0, 7);
+    $reportName = 'ContactSummary_' . substr(sha1(rand()), 0, 7);
     $reportDescription = "New Contact Summary Report";
-    $emaiSubject       = "Contact Summary Report";
-    $emailCC           = "tesmail@example.org";
+    $emaiSubject = "Contact Summary Report";
+    $emailCC = "tesmail@example.org";
 
     // Fill Report Title
     $this->type("title", $reportName);
@@ -130,7 +118,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
 
     // Open report list
     $this->openCiviPage('report/list', 'reset=1');
-    
+
     // Is report is resent in list?
     $this->assertElementContainsText('css=table.report-layout', $reportName);
 
@@ -138,10 +126,9 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->click("link=$reportName");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-
    // Is filter statistics present?
     $this->assertElementContainsText("xpath=//tr/th[@class='statistics'][text()='Contact Name']/../td", "Contains $firstName", "Statistics did not found!");
-    
+
     // Is Contact Name present in result?
     $this->assertElementContainsText('css=td.crm-report-civicrm_contact_sort_name', $displayName, "Contact Name did not found!");
 
@@ -190,5 +177,4 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertSelectedLabel("permission", "access CiviCRM");
   }
 }
-
 

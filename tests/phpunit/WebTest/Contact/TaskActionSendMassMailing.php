@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
 
@@ -33,41 +32,18 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
   }
 
   function testSelectedContacts() {
-    $this->open($this->sboxPath);
     $this->webtestLogin();
 
-    // Go directly to the URL of the screen that you will be testing (New Group).
-    $this->open($this->sboxPath . "civicrm/group/add&reset=1");
-    $this->waitForElementPresent("_qf_Edit_upload");
-
-    // make group name
+    // make group
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
-
-    // fill group name
-    $this->type("title", $groupName);
-
-    // fill description
-    $this->type("description", "New mailing group for Webtest");
-
-    // enable Mailing List
-    $this->click("group_type[2]");
-
-    // select Visibility as Public Pages
-    $this->select("visibility", "value=Public Pages");
-
-    // Clicking save.
-    $this->click("_qf_Edit_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->WebtestAddGroup($groupName);
 
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Search");
-    $this->click("css=ul#civicrm-menu li.crm-Advanced_Search a");
+    $this->clickLink("css=ul#civicrm-menu li.crm-Advanced_Search a", "email");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("email");
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     // Click "check all" box and act on "Add to group" action
     $this->click("//form[@id='Advanced']/div[3]/div/div[2]/table/thead/tr/th[1]/input");
@@ -146,13 +122,11 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently."));
 
     // directly send schedule mailing -- not working right now
-    $this->open($this->sboxPath . "civicrm/mailing/queue&reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
     $this->click("xpath=//table//tbody/tr[td[1]/text()='$mailingName']/descendant::a[text()='Report']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-
 

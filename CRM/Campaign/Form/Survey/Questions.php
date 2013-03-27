@@ -57,8 +57,8 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
       'entity_id' => $this->_surveyId,
     );
 
-    list($defaults['contact_profile_id'],
-         $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+    list($defaults['contact_profile_id'], $second) =
+      CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
     $defaults['activity_profile_id'] = $second ? array_shift($second) : '';
 
     return $defaults;
@@ -77,11 +77,16 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
     if (!CRM_Core_BAO_CustomGroup::autoCreateByActivityType($subTypeId)) {
       $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, FALSE); // everything
       // FIXME: Displays weird "/\ Array" message; doesn't work with tabs
-      CRM_Core_Session::setStatus(ts('There are no custom data sets for activity type "%1". To create one, <a href="%2" target="%3">click here</a>.', array(
-        1 => $activityTypes[$subTypeId],
-        2 => CRM_Utils_System::url('civicrm/admin/custom/group', 'action=add&reset=1'),
-        3 => '_blank',
-      )));
+      CRM_Core_Session::setStatus(
+        ts(
+          'There are no custom data sets for activity type "%1". To create one, <a href="%2" target="%3">click here</a>.',
+          array(
+            1 => $activityTypes[$subTypeId],
+            2 => CRM_Utils_System::url('civicrm/admin/custom/group', 'action=add&reset=1'),
+            3 => '_blank',
+          )
+        )
+      );
     }
 
     $allowCoreTypes = CRM_Campaign_BAO_Survey::surveyProfileTypes();

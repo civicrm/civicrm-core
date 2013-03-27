@@ -89,7 +89,7 @@
         {/if}
       </td>
     {/if}
-    <td class="crm-case=caseview-case_subject label">
+    <td class="crm-case-caseview-case_subject label">
       <span class="crm-case-summary-label">{ts}Case Subject{/ts}:</span>&nbsp;{$caseDetails.case_subject}
     </td>
     <td class="crm-case-caseview-case_type label">

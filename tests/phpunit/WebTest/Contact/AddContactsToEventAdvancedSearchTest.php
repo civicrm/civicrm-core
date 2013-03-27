@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumTestCase {
 
@@ -33,19 +32,8 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
   }
 
   function testAddContactsToEventAdvanceSearch() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
 
     // Advanced Search
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
@@ -71,7 +59,6 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
     $this->type('source', 'Event StandaloneAddTest Webtest');
 
     $this->assertElementContainsText('css=tr.crm-participant-form-block-source span.description', 'Source for this registration (if applicable).');
-
 
     // Clicking save.
     $this->click('_qf_Participant_upload-bottom');

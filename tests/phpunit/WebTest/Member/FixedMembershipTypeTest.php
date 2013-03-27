@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
@@ -37,17 +36,10 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     // Rollover Date < Start Date
     // Join Date > Rollover Date and Join Date < Start Date
 
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Organization");
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization", '_qf_Contact_cancel');
 
     $title = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $title");
@@ -57,9 +49,7 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    // Go directly to the URL
-    $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -89,8 +79,7 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 
@@ -153,8 +142,10 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     }
 
     $query = "
-SELECT end_event_adjust_interval 
-  FROM civicrm_membership_status 
+SELECT end_event_adjust_interval
+
+  FROM civicrm_membership_status
+
  WHERE start_event = 'join_date'
    AND name = 'New'";
     $endInterval = CRM_Core_DAO::singleValueQuery($query);
@@ -203,17 +194,10 @@ SELECT end_event_adjust_interval
     // Scenario 2
     // Rollover Date < Join Date
 
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Organization");
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization", '_qf_Contact_cancel');
 
     $title = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $title");
@@ -223,9 +207,7 @@ SELECT end_event_adjust_interval
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    // Go directly to the URL
-    $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -255,8 +237,7 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 
@@ -320,8 +301,10 @@ SELECT end_event_adjust_interval
     }
 
     $query = "
-SELECT end_event_adjust_interval 
-  FROM civicrm_membership_status 
+SELECT end_event_adjust_interval
+
+  FROM civicrm_membership_status
+
  WHERE start_event = 'join_date'
    AND name = 'New'";
     $endInterval = CRM_Core_DAO::singleValueQuery($query);
@@ -371,17 +354,10 @@ SELECT end_event_adjust_interval
     // Standard Fixed scenario - Jan 1 Fixed Period Start and October 31 rollover
     // Join Date is later than Rollover Date
 
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Organization");
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization", '_qf_Contact_cancel');
 
     $title = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $title");
@@ -391,9 +367,7 @@ SELECT end_event_adjust_interval
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    // Go directly to the URL
-    $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -421,8 +395,7 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 
@@ -457,7 +430,6 @@ SELECT end_event_adjust_interval
     $this->waitForTextPresent("Membership Type {$title}");
     $this->select('membership_type_id[1]', "label=Membership Type {$title}");
 
-
     $sourceText = "Membership ContactAddTest with Fixed Membership Type Scenario 3";
     // fill in Source
     $this->type('source', $sourceText);
@@ -481,8 +453,10 @@ SELECT end_event_adjust_interval
     }
 
     $query = "
-SELECT end_event_adjust_interval 
-  FROM civicrm_membership_status 
+SELECT end_event_adjust_interval
+
+  FROM civicrm_membership_status
+
  WHERE start_event = 'join_date'
    AND name = 'New'";
     $endInterval = CRM_Core_DAO::singleValueQuery($query);
@@ -532,17 +506,10 @@ SELECT end_event_adjust_interval
     // Standard Fixed scenario - Jan 1 Fixed Period Start and October 31 rollover
     // Join Date is earlier than Rollover Date
 
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Organization");
-    $this->waitForElementPresent('_qf_Contact_cancel');
+    $this->openCiviPage("contact/add", "reset=1&ct=Organization", '_qf_Contact_cancel');
 
     $title = substr(sha1(rand()), 0, 7);
     $this->type('organization_name', "Organization $title");
@@ -552,9 +519,7 @@ SELECT end_event_adjust_interval
 
     $this->assertTrue($this->isTextPresent("Organization $title has been created."));
 
-    // Go directly to the URL
-    $this->open($this->sboxPath . "civicrm/admin/member/membershipType?reset=1&action=browse");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -564,7 +529,7 @@ SELECT end_event_adjust_interval
     $this->click('member_of_contact');
     $this->waitForElementPresent("css=div.ac_results-inner li");
     $this->click("css=div.ac_results-inner li");
-    
+
     $this->type('minimum_fee', '100');
     $this->select( 'financial_type_id', 'value=2' );
     $this->type('duration_interval', 1);
@@ -583,8 +548,7 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('link=Add Membership Type');
     $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
-    // Go directly to the URL of the screen that you will be testing (New Individual).
-    $this->open($this->sboxPath . "civicrm/contact/add?reset=1&ct=Individual");
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
 
@@ -643,8 +607,10 @@ SELECT end_event_adjust_interval
     }
 
     $query = "
-SELECT end_event_adjust_interval 
-  FROM civicrm_membership_status 
+SELECT end_event_adjust_interval
+
+  FROM civicrm_membership_status
+
  WHERE start_event = 'join_date'
    AND name = 'New'";
     $endInterval = CRM_Core_DAO::singleValueQuery($query);

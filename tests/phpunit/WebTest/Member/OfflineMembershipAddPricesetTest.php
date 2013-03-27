@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCase {
 
@@ -33,11 +32,6 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
   }
 
   function testAddPriceSet() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -50,8 +44,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $fields = array(
@@ -84,11 +77,6 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
   }
 
    function testAddPriceSetWithMultipleTerms() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -105,8 +93,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
-    $elements = $this->parseURL();
-    $sid = $elements['queryString']['sid'];
+    $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
 
     $fields = array("National Membership $title", "Radio");
@@ -137,6 +124,9 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $i = 2;
     foreach($options as $index => $values){
       $this->select("membership_type_id_{$index}", "value={$values['membership_type_id']}");
+      // Because it tends to cause problems, all uses of sleep() must be justified in comments
+      // Sleep should never be used for wait for anything to load from the server
+      // Justification for this instance: FIXME
       sleep(1);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input",$values['membership_num_terms']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input",$values['label']);
@@ -151,7 +141,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertElementContainsText('crm-notification-container', "Price Field '{$fields[0]}' has been saved.");
+    $this->waitForText('crm-notification-container', "Price Field '{$fields[0]}' has been saved.");
 
     // load the Price Set Preview and check for expected values
     $this->_testVerifyPriceSet($validateStrings, $sid);
@@ -172,7 +162,6 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->_testMultilpeTermsMembershipRegistration($sid, $contactParams, $memTypeTitle1, 2);
 
   }
-
 
   function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
@@ -195,7 +184,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
 
     $this->click('_qf_Set_next-bottom');
     $this->waitForElementPresent('_qf_Field_next-bottom');
-    $this->assertElementContainsText('crm-notification-container', "Your Set '{$setTitle}' has been added. You can add fields to this set now.");
+    $this->waitForText('crm-notification-container', "Your Set '{$setTitle}' has been added. You can add fields to this set now.");
   }
 
   function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
@@ -255,7 +244,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       $this->select("financial_type_id", "label={$contributionType}");
       $this->click('_qf_Field_next_new-bottom');
       $this->waitForPageToLoad($this->getTimeoutMsec());
-      $this->assertElementContainsText('crm-notification-container', "Price Field '{$label}' has been saved.");
+      $this->waitForText('crm-notification-container', "Price Field '{$label}' has been saved.");
     }
     return array($memTypeTitle1, $memTypeTitle2);
   }
@@ -294,7 +283,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     }
 
     if (!$renew) {
-      // Go directly to the URL of the screen that you will be testing (Activity Tab).
+
       $this->click('css=li#tab_member a');
       $this->waitForElementPresent('link=Add Membership');
 
@@ -371,7 +360,6 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
 
-    // Go directly to the URL of the screen that you will be testing (Activity Tab).
     $this->click('css=li#tab_member a');
     $this->waitForElementPresent('link=Add Membership');
 

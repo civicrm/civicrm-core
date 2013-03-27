@@ -99,6 +99,8 @@
             });
           }
           designerDialog.undoState = false;
+          // CRM-12188
+          CRM.designerApp.DetachedProfiles = [];
         },
         close: function() {
           window.onbeforeunload = designerDialog.oldOnBeforeUnload;
@@ -113,6 +115,8 @@
               return false;
             });
           }
+          // CRM-12188
+          CRM.designerApp.restorePreviewArea();
         },
         resize: function() {
           CRM.designerApp.vent.trigger('resize');
@@ -188,8 +192,19 @@
       'click .crm-designer-preview': 'doPreview'
     },
     onRender: function() {
-      this.$('.crm-designer-save').button();
+      this.$('.crm-designer-save').button().attr({
+        disabled: 'disabled',
+        style: 'opacity:.5; box-shadow:none; cursor:default;'
+      });
       this.$('.crm-designer-preview').button();
+    },
+    initialize: function(options) {
+      CRM.designerApp.vent.on('ufUnsaved', this.onUfChanged, this);
+    },
+    onUfChanged: function(isUfUnsaved) {
+      if (isUfUnsaved) {
+        this.$('.crm-designer-save').removeAttr('style').removeAttr('disabled');
+      }
     },
     doSave: function(event) {
       var ufGroupModel = this.model;
@@ -241,6 +256,8 @@
       }
       var $dialog = this.$el.closest('.crm-designer-dialog'); // FIXME use events
       $dialog.block({message: 'Loading...', theme: true});
+      // CRM-12188
+      CRM.designerApp.clearPreviewArea();
       $.ajax({
         url: CRM.url("civicrm/ajax/inline"),
         type: 'POST',

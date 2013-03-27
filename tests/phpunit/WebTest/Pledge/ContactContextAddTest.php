@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
 
@@ -33,16 +32,6 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testContactContextAddTest() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
     $this->webtestLogin();
 
     // create unique name
@@ -70,7 +59,6 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     // check contact name on pledge form
     $this->assertElementContainsText('css=tr.crm-pledge-form-block-displayName', "$firstName $lastName");
 
-    // Let's start filling the form with values.
     $this->type("amount", "100");
     $this->type("installments", "10");
     $this->select("frequency_unit", "value=week");
@@ -103,7 +91,7 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Pledge_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
+    $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']");
     //click through to the Pledge view screen
@@ -129,10 +117,7 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
       $this->verifyText("xpath=//form[@id='PledgeView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td", preg_quote($value));
     }
 
-    $this->click("_qf_PledgeView_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']");
+    $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']");
     $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
   }

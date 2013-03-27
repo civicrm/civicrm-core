@@ -33,27 +33,20 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
   }
 
   function testPCPAdd() {
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Log in using webtestLogin() method
-    $this->webtestLogin();
-    // visit event search page
-
     //give permissions to anonymous user
     $permission = array('edit-1-profile-listings-and-forms', 'edit-1-access-all-custom-data', 'edit-1-register-for-events', 'edit-1-make-online-contributions');
     $this->changePermissions($permission);
 
+    // Log in as normal user
+    $this->webtestLogin();
+
     // set domain values
     $domainNameValue = 'civicrm organization ';
-    $firstName       = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName        = 'An' . substr(sha1(rand()), 0, 7);
-    $middleName      = 'Mid' . substr(sha1(rand()), 0, 7);
-    $email           = substr(sha1(rand()), 0, 7) . '@example.org';
-    $this->open($this->sboxPath . 'civicrm/admin/domain?action=update&reset=1');
-    $this->waitForElementPresent('_qf_Domain_cancel-bottom');
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $middleName = 'Mid' . substr(sha1(rand()), 0, 7);
+    $email = substr(sha1(rand()), 0, 7) . '@example.org';
+    $this->openCiviPage("admin/domain", "action=update&reset=1", '_qf_Domain_cancel-bottom');
     $this->type('name', $domainNameValue);
     $this->type('email_name', $firstName);
     $this->type('email_address', $email);
@@ -112,16 +105,16 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
     //event add for contribute campaign type
     $campaignType = 'event';
-    $firstName    = 'Pa' . substr(sha1(rand()), 0, 4);
-    $lastName     = 'Cn' . substr(sha1(rand()), 0, 7);
-    $middleName   = 'PCid' . substr(sha1(rand()), 0, 7);
-    $email        = substr(sha1(rand()), 0, 7) . '@example.org';
+    $firstName = 'Pa' . substr(sha1(rand()), 0, 4);
+    $lastName = 'Cn' . substr(sha1(rand()), 0, 7);
+    $middleName = 'PCid' . substr(sha1(rand()), 0, 7);
+    $email = substr(sha1(rand()), 0, 7) . '@example.org';
     $this->_testAddEventForPCP($processorName, $campaignType, NULL, $firstName, $lastName, $middleName, $email);
   }
 
   function _testAddEventForPCP($processorName, $campaignType, $contributionPageId = NULL, $firstName, $lastName, $middleName, $email) {
-    // Go directly to the URL of the screen that you will be testing (New Event).
-    $this->open($this->sboxPath . "civicrm/event/add?reset=1&action=add");
+
+    $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $eventDescription = "Here is a description for this conference.";
@@ -142,11 +135,8 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
   }
 
   function _testAddEventInfo($eventTitle, $eventDescription) {
-    // As mentioned before, waitForPageToLoad is not always reliable. Below, we're waiting for the submit
-    // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
-    // Let's start filling the form with values.
     $this->select("event_type_id", "value=1");
 
     // Attendee role s/b selected now.
@@ -250,8 +240,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
     // registering online
     if ($anonymous) {
-      $this->open($this->sboxPath . "civicrm/logout?reset=1");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->webtestLogout();
     }
 
     //participant registeration
@@ -299,8 +288,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($thankStrings);
 
     //pcp creation via different user
-    $this->open($this->sboxPath . "civicrm/contribute/campaign?action=add&reset=1&pageId=" . $pageId . "&component=event");
-    $this->waitForElementPresent("_qf_PCPAccount_next-bottom");
+    $this->openCiviPage('contribute/campaign', "action=add&reset=1&pageId={$pageId}&component=event", "_qf_PCPAccount_next-bottom");
 
     $cmsUserName = 'CmsUser' . substr(sha1(rand()), 0, 7);
 
@@ -322,13 +310,11 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
     //admin pcp approval
     //login to check contribution
-    $this->open($this->sboxPath);
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $this->open($this->sboxPath . "civicrm/admin/pcp?reset=1&page_type=event");
-    $this->waitForElementPresent("_qf_PCP_refresh");
+    $this->openCiviPage('admin/pcp', 'reset=1&page_type=event', "_qf_PCP_refresh");
     $this->select('status_id', 'value=1');
     $this->click("_qf_PCP_refresh");
     $this->waitForElementPresent("_qf_PCP_refresh");
@@ -338,9 +324,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->open($this->sboxPath . 'civicrm/logout?reset=1');
-    // Wait for Login button to indicate we've logged out.
-    $this->waitForElementPresent('edit-submit');
+    $this->webtestLogout();
 
     $this->open($this->sboxPath . $pcpUrl);
     $this->waitForElementPresent("xpath=//div[@class='pcp-donate']/a");
@@ -363,10 +347,10 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
       $contributionAmount = '250.00';
     }
 
-    $firstNameDonar  = 'Andrew' . substr(sha1(rand()), 0, 7);
-    $lastNameDonar   = 'Roger' . substr(sha1(rand()), 0, 7);
+    $firstNameDonar = 'Andrew' . substr(sha1(rand()), 0, 7);
+    $lastNameDonar = 'Roger' . substr(sha1(rand()), 0, 7);
     $middleNameDonar = 'Nicholas' . substr(sha1(rand()), 0, 7);
-    
+
     $this->type("{$emailElement}", $firstNameDonar . "@example.com");
     $this->webtestAddCreditCardDetails();
     $this->webtestAddBillingDetails($firstNameDonar, $middleNameDonar, $lastNameDonar);
@@ -390,9 +374,6 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     }
 
     //login to check contribution
-    $this->open($this->sboxPath);
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
     if ($campaignType == 'event') {
@@ -435,18 +416,15 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Event_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $text = "'Event' information has been saved.";
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+    $this->waitForText('crm-notification-container', $text);
 
     // parse URL to grab the contribution page id
-    $elements = $this->parseURL();
-    $pageId = $elements['queryString']['id'];
-    return $pageId;
+    return $this->urlArg('id');
   }
 
   function _testParticipantSearchEventName($eventName, $lastNameDonar, $firstNameDonar, $firstNameCreator, $lastNameCreator, $amount) {
     $sortName = $lastNameDonar . ', ' . $firstNameDonar;
-    $this->open($this->sboxPath . "civicrm/event/search?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("event/search", "reset=1");
 
     $this->type("event_name", $eventName);
     $this->click("event_name");
@@ -456,10 +434,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->waitForElementPresent("xpath=//table[@class='selector']/tbody/tr/td[8]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']", "xpath=//table[@class='selector']/tbody/tr/td[8]/span/a[text()='View']");
     $this->click("xpath=//table[@class='selector']/tbody/tr/td[8]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -478,8 +453,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $displayName = "$firstName $lastName";
 
     // visit contact search page
-    $this->open($this->sboxPath . "civicrm/contact/search?reset=1");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage("contact/search", "reset=1");
 
     // fill name as first_name
     $this->type("css=.crm-basic-criteria-form-block input#sort_name", $pcpCreatorFirstName);

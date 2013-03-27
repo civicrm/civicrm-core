@@ -1727,7 +1727,8 @@ SELECT contact_id
     $dao = CRM_Core_DAO::executeQuery("SHOW VARIABLES LIKE '$escapedName'");
     if ($dao->fetch()) {
       return $dao->Value;
-    } else {
+    }
+    else {
       return $default;
     }
   }

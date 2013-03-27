@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
@@ -33,13 +32,6 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
   }
 
   function testContactContextActivityAdd() {
-
-    // This is the path where our testing install resides.
-    // The rest of URL is defined in CiviSeleniumTestCase base class, in
-    // class attributes.
-    $this->open($this->sboxPath);
-
-    // Log in using webtestLogin() method
     $this->webtestLogin();
 
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
@@ -49,7 +41,6 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "Anderson", $firstName2 . "@anderson.name");
 
-    // Go directly to the URL of the screen that you will be testing (Activity Tab).
     $this->click("css=li#tab_activity a");
 
     // waiting for the activity dropdown to show up
@@ -57,12 +48,11 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // Select the activity type from the activity dropdown
     $this->select("other_activity", "label=Meeting");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // waitForPageToLoad is not always reliable. Below, we're waiting for the submit
     // button at the end of this page to show up, to make sure it's fully loaded.
     $this->waitForElementPresent("_qf_Activity_upload");
-
-    // Let's start filling the form with values.
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', 'Anderson, ' . $firstName2, 'Contact not found in line ' . __LINE__);
@@ -88,7 +78,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // Since we're here, let's check if screen help is being displayed properly
 
-    $this->assertElementContainsText('css=tr.crm-activity-form-block-assignee_contact_id td span.description', 'You can optionally assign this activity to someone', 'Help text is missing.');
+    $this->assertElementContainsText('css=tr.crm-activity-form-block-assignee_contact_id', 'You can optionally assign this activity to someone', 'Help text is missing.');
     // Putting the contents into subject field - assigning the text to variable, it'll come in handy later
     $subject = "This is subject of test activity being added through activity tab of contact summary screen.";
     // For simple input fields we can use field id as selector
@@ -127,7 +117,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertElementContainsText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving.");
+    $this->waitForText('crm-notification-container', $subject);
 
     $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[9]/span/a[text()='View']");
 

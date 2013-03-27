@@ -49,7 +49,7 @@
       <required>true</required>
       <comment>The actual value stored (as a foreign key) in the data record. Functions which need lookup option_value.title should use civicrm_option_value.option_group_id plus civicrm_option_value.value as the key.</comment>
        <add>1.5</add>
-       <change>3.3</change>      
+       <change>3.3</change>
   </field>
   <field>
        <name>name</name>
@@ -123,14 +123,20 @@
       <name>component_id</name>
       <type>int unsigned</type>
       <comment>Component that this option value belongs/caters to.</comment>
-       <add>2.0</add>
+      <add>2.0</add>
+      <pseudoconstant>
+        <name>component</name>
+        <table>civicrm_component</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
   </field>
   <foreignKey>
        <name>component_id</name>
        <table>civicrm_component</table>
        <key>id</key>
        <add>2.0</add>
-  </foreignKey>  
+  </foreignKey>
   <field>
       <name>domain_id</name>
       <type>int unsigned</type>
@@ -151,14 +157,14 @@
   </field>
   <index>
        <name>index_option_group_id_value</name>
-       <fieldName>value</fieldName>
+       <fieldName length="128">value</fieldName>
        <fieldName>option_group_id</fieldName>
        <add>1.5</add>
   </index>
   <index>
     <name>index_option_group_id_name</name>
+    <fieldName length="128">name</fieldName>
     <fieldName>option_group_id</fieldName>
-    <fieldName>name</fieldName>
     <add>2.2</add>
   </index>
 </table>
