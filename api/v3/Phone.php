@@ -80,21 +80,7 @@ function _civicrm_api3_phone_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_phone_delete($params) {
-
-  $phoneID = CRM_Utils_Array::value('id', $params);
-
-  require_once 'CRM/Core/DAO/Phone.php';
-  $phoneDAO = new CRM_Core_DAO_Phone();
-  $phoneDAO->id = $phoneID;
-  if ($phoneDAO->find()) {
-    while ($phoneDAO->fetch()) {
-      $phoneDAO->delete();
-      return civicrm_api3_create_success($phoneDAO->id, $params, $phoneDAO);
-    }
-  }
-  else {
-    return civicrm_api3_create_error('Could not delete phone with id ' . $phoneID);
-  }
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**

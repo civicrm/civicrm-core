@@ -2986,7 +2986,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    */
   public static function deleteObjectWithPrimary($type, $id) {
     if (!$id || !is_numeric($id)) {
-      return false;
+      return FALSE;
     }
     $daoName = "CRM_Core_DAO_$type";
     $obj = new $daoName();
@@ -2998,7 +2998,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       $obj->delete();
     }
     else {
-      return false;
+      return FALSE;
     }
     $dao = new $daoName();
     $dao->contact_id = $contactId;
@@ -3015,5 +3015,6 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     $dao->free();
     CRM_Utils_Hook::post('delete', $type, $id, $obj);
     $obj->free();
+    return TRUE;
   }
 }

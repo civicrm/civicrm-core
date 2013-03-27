@@ -145,7 +145,7 @@ ORDER BY
    * Call common delete function
    */
   static function del($id) {
-    CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);
+    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);
   }
 }
 
