@@ -1135,6 +1135,6 @@ SELECT is_primary,
    * Call common delete function
    */
   static function del($id) {
-    CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Address', $id);
+    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Address', $id);
   }
 }
