@@ -885,7 +885,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $priceFieldIds = $this->get('memberPriceFieldIDS');
 
       if (!empty($priceFieldIds)) {
-                $contributionTypeID = CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_Set', $priceFieldIds['id'], 'financial_type_id' );
+        $contributionTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $priceFieldIds['id'], 'financial_type_id');
         unset($priceFieldIds['id']);
         $membershipTypeIds = array();
         $membershipTypeTerms = array();
@@ -906,11 +906,23 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $membershipParams['types_terms'] = $membershipTypeTerms;
       }
       if (CRM_Utils_Array::value('selectMembership', $membershipParams)) {
+        // CRM-12233
+        if ($this->_separateMembershipPayment && $this->_values['amount_block_is_active']) {
+          foreach ($this->_values['fee'] as $key => $feeValues) {
+            if ($feeValues['name'] == 'membership_amount') {
+              $fieldId = $this->_params['price_' . $key];
+              $this->_memLineItem[$this->_priceSetId][$fieldId] = $this->_lineItem[$this->_priceSetId][$fieldId];
+              unset($this->_lineItem[$this->_priceSetId][$fieldId]);
+              break;
+            }
+          }
+        }
+        
         CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
           $this, $premiumParams, $customFieldsFormatted,
           $fieldTypes
         );
-    }
+      }
     }
     else {
       // at this point we've created a contact and stored its address etc
