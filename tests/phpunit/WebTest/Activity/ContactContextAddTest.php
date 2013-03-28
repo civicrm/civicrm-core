@@ -146,5 +146,94 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
       )
     );
   }
+
+  function testSeparateActivityForMultiTargetContacts() {
+    $this->webtestLogin();
+
+    //creating contacts
+    $firstName1 = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName1, "Summerson", $firstName1 . "@summerson.name");
+    $firstName2 = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName2, "Andersonnn", $firstName2 . "@anderson.name");
+    $firstName3 = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName3, "Anderson", $firstName3 . "@andersonnn.name");
+
+    $this->click("css=li#tab_activity a");
+
+    // waiting for the activity dropdown to show up
+    $this->waitForElementPresent("other_activity");
+
+    // Select the activity type from the activity dropdown
+    $this->select("other_activity", "label=Meeting");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // ...and verifying if the page contains properly formatted display name for chosen contact.
+    $this->waitForText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', 'Anderson, ' . $firstName3, 'Contact not found in line ' . __LINE__);
+
+    //filling the second target Contact
+    $this->click("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1");
+    $this->type("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1", $firstName1);
+    $this->typeKeys("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1", $firstName1);
+
+    // ...waiting for drop down with results to show up...
+    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
+    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
+
+    // ...need to use mouseDownAt on first result (which is a li element), click does not work
+    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
+
+    // ...again, waiting for the box with contact name to show up...
+    $this->waitForElementPresent("css=tr.crm-activity-form-block-target_contact_id td ul li span.token-input-delete-token-facebook");
+
+    // ...and verifying if the page contains properly formatted display name for chosen contact.
+    $this->waitForText('css=tr.crm-activity-form-block-target_contact_id td ul', 'Summerson, ' . $firstName1, 'Contact not found in line ' . __LINE__);
+
+    //filling the third target contact
+    $this->click("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1");
+    $this->type("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1", $firstName2);
+    $this->typeKeys("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1", $firstName2);
+
+    // ...waiting for drop down with results to show up...
+    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
+    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
+
+    // ...need to use mouseDownAt on first result (which is a li element), click does not work
+    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
+
+    // ...again, waiting for the box with contact name to show up...
+    $this->waitForElementPresent("css=tr.crm-activity-form-block-target_contact_id td ul li span.token-input-delete-token-facebook");
+
+    // ...and verifying if the page contains properly formatted display name for chosen contact.
+    $this->waitForText('css=tr.crm-activity-form-block-target_contact_id td ul', 'Andersonnn, ' . $firstName2, 'Contact not found in line ' . __LINE__);
+
+    //check the checkbox to create a separate activity for the selected target contacts
+    $this->check('is_multi_activity');
+
+    $subject = "This is subject of test activity for creating a separate activity for contacts {$firstName1},{$firstName2} and {$firstName3}.";
+    $this->type("subject", $subject);
+  
+    $this->webtestFillDateTime('activity_date_time', '+1 month 11:10PM');
+    $this->select("status_id", "value=1");
+
+    // Clicking save.
+    $this->clickLink('_qf_Activity_upload');
+
+    // Is status message correct?
+    $this->waitForText('crm-notification-container', $subject);
+
+    //activity search page
+    $this->openCiviPage('activity/search', 'reset=1');
+    
+    $this->type('activity_subject', $subject);
+    
+    $this->clickLink('_qf_Search_refresh');
+
+    $targetContacts = array("Summerson, ". $firstName1, "Andersonnn, ". $firstName2, "Anderson, ". $firstName3 );
+
+    //check whether separate activities are created for the target contacts
+    foreach ($targetContacts as $contact) {
+      $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody//tr/td[5]/a[text()='$contact']"));
+    }
+  }
 }
 
