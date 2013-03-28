@@ -261,7 +261,6 @@ WHERE ceft.entity_id IS NULL;";
   }
 
   function upgrade_4_3_beta5($rev) {
-    $this->addTask(ts('Upgrade DB to 4.3.beta5: SQL'), 'task_4_3_x_runSql', $rev);
     // CRM-12205
     if (
       CRM_Core_DAO::checkTableExists('log_civicrm_financial_trxn') &&
@@ -269,6 +268,13 @@ WHERE ceft.entity_id IS NULL;";
     ) {
       CRM_Core_DAO::executeQuery('ALTER TABLE `log_civicrm_financial_trxn` CHANGE `trxn_id` `trxn_id` VARCHAR(255) NULL DEFAULT NULL');
     }
+    // CRM-12142 - some sites didn't get this column added yet, and sites which installed 4.3 from scratch will already have it
+    if (
+      !CRM_Core_DAO::checkFieldExists('civicrm_premiums', 'premiums_nothankyou_label')
+    ) {
+       CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_premiums` ADD COLUMN premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT "Label displayed for No Thank-you option in premiums block (e.g. No thank you)"');
+    }    
+    $this->addTask(ts('Upgrade DB to 4.3.beta5: SQL'), 'task_4_3_x_runSql', $rev);
   }
 
   //CRM-11636
