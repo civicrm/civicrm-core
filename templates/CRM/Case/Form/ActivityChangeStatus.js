@@ -51,13 +51,18 @@ cj(function($) {
     };
 
     var data = 'snippet=1&reset=1';
-    $('<div>')
-      .load(CRM.url('civicrm/case/changeactivitystatus'), data, function() {
-        cj("#activity_change_status").val(current_status_id);
-      })
+
+    var o = $('<div class="crm-container crm-activity_change_status"></div>');
+    addCiviOverlay(o);
+
+    o.load(CRM.url('civicrm/case/changeactivitystatus'), data, function() {
+      removeCiviOverlay(o);
+      cj("#activity_change_status").val(current_status_id);
+    })
       .dialog({
         modal: true,
         title: ts('Change Activity Status'),
+        resizable: false,
         buttons: buttons,
         beforeClose: function() {
           $(this).dialog("destroy");
