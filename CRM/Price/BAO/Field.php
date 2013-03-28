@@ -259,7 +259,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
     $currencyName = $config->defaultCurrency;
 
     if (!isset($label)) {
-      $label = (property_exists($qf,'_membershipBlock') &&  CRM_Utils_Array::value('is_separate_payment', $qf->_membershipBlock) && $field->name == 'contribution_amount' && !CRM_Utils_Array::value('is_allow_other_amount', $otherAmount)) ? ts('Additional Contribution') : $field->label;
+      $label = (property_exists($qf,'_membershipBlock') && $field->name == 'contribution_amount') ? ts('Additional Contribution') : $field->label;
     }
 
     if ($field->name == 'contribution_amount') {
@@ -298,7 +298,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
         }
 
         // if seperate membership payment is used with quick config priceset then change the other amount label
-        if (property_exists($qf,'_membershipBlock') && CRM_Utils_Array::value('is_separate_payment', $qf->_membershipBlock) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf,'_contributionAmount')) {
+        if (property_exists($qf,'_membershipBlock') && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf,'_contributionAmount')) {
           $label = ts('Additional Contribution');
           $useRequired = 0;
         } 
@@ -405,7 +405,8 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
         $element = &$qf->addGroup($choice, $elementName, $label);
 
         // make contribution field required for quick config when membership block is enabled
-        if (($field->name == 'contribution_amount' || $field->name == 'membership_amount') && property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock) && !$field->is_required) {
+        if (($field->name == 'membership_amount' || ($field->name == 'contribution_amount' && CRM_Utils_Array::value('is_separate_payment', $qf->_membershipBlock))) 
+          && property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock) && !$field->is_required) {
           $useRequired = $field->is_required = TRUE;
         }
 

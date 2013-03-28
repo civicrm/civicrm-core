@@ -902,7 +902,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
         $membershipParams['selectMembership'] = $membershipTypeIds;
-                $membershipParams['financial_type_id'] = $contributionTypeID;
+        $membershipParams['financial_type_id'] = $contributionTypeID;
         $membershipParams['types_terms'] = $membershipTypeTerms;
       }
       if (CRM_Utils_Array::value('selectMembership', $membershipParams)) {
