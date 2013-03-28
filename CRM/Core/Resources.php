@@ -478,6 +478,13 @@ class CRM_Core_Resources {
   }
 
   /**
+   * Flushes cached translated strings
+   */
+  public function flushStrings() {
+    $this->cache->flush();
+  }
+
+  /**
    * Translate strings in a javascript file
    *
    * @param $ext string, extension name
