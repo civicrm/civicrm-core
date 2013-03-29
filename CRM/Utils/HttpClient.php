@@ -26,7 +26,12 @@
 */
 
 /**
- * This class handles downloads of remotely-provided extensions
+ * This class handles HTTP downloads
+ *
+ * FIXME: fetch() and get() report errors differently -- e.g.
+ * fetch() returns fatal and get() returns an error code. Should
+ * refactor both (or get a third-party HTTP library) but don't
+ * want to deal with that so late in the 4.3 dev cycle.
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
@@ -68,31 +73,15 @@ class CRM_Utils_HttpClient {
    * @return STATUS_OK|STATUS_WRITE_ERROR|STATUS_DL_ERROR
    */
   public function fetch($remoteFile, $localFile) {
-    require_once 'CA/Config/Curl.php';
-    $caConfig = CA_Config_Curl::probe(array(
-      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, TRUE)
-    ));
-
     // Download extension zip file ...
     if (!function_exists('curl_init')) {
       CRM_Core_Error::fatal('Cannot install this extension - curl is not installed!');
     }
+
+    list($ch, $caConfig) = $this->createCurl($remoteFile);
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
     }
-
-    //setting the curl parameters.
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $remoteFile);
-    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-    curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
-    curl_setopt($ch, CURLOPT_VERBOSE, 0);
-    if (preg_match('/^https:/', $remoteFile)) {
-      curl_setopt_array($ch, $caConfig->toCurlOptions());
-    }
-
-    //follow redirects
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 
     $fp = @fopen($localFile, "w");
     if (!$fp) {
@@ -124,75 +113,52 @@ class CRM_Utils_HttpClient {
    * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
   public function get($remoteFile) {
-    /* This untested implementation should work on more sites because it doesn't
-    use curl, but file_get_contents() seems to handle gzipped replies badly
-
-    require_once 'CA/Config/Stream.php';
-    $caConfig = CA_Config_Stream::probe(array(
-      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, TRUE)
-    ));
-
-    $ctxParams = array(); // HTTP stream context options
-
-    if (preg_match('/^https:/', $remoteFile)) {
-      if ($caConfig->isEnableSSL()) {
-        $ctxParams['ssl'] = $caConfig->toStreamOptions();
-      }
-      else {
-        return array(self::STATUS_DL_ERROR, NULL);
-      }
-    }
-
-    ini_set('default_socket_timeout', $this->timeout);
-    $ctx = stream_context_create($ctxParams);
-    $data = @file_get_contents($remoteFile, FALSE, $ctx);
-    ini_restore('default_socket_timeout');
-
-    $status = !empty($data) ? self::STATUS_OK : self::STATUS_DL_ERROR; // TODO something better
-    return array($status, $data);
-    */
-
-    require_once 'CA/Config/Curl.php';
-    $caConfig = CA_Config_Curl::probe(array(
-      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, TRUE)
-    ));
-
     // Download extension zip file ...
     if (!function_exists('curl_init')) {
       //CRM_Core_Error::fatal('Cannot install this extension - curl is not installed!');
       return array(self::STATUS_DL_ERROR, NULL);
     }
+
+    list($ch, $caConfig) = $this->createCurl($remoteFile);
+
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       //CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
       return array(self::STATUS_DL_ERROR, NULL);
     }
 
-    //setting the curl parameters.
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $remoteFile);
-    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-    curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
-    curl_setopt($ch, CURLOPT_VERBOSE, 0);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    if (preg_match('/^https:/', $remoteFile)) {
-      curl_setopt_array($ch, $caConfig->toCurlOptions());
-    }
-
-    //follow redirects
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      CRM_Core_Session::setStatus(ts('Unable to download extension from %1. Error Message: %2',
-        array(1 => $remoteFile, 2 => curl_error($ch))), ts('Download Error'), 'error');
-      return array(self::STATUS_DL_ERROR. $data);
+      return array(self::STATUS_DL_ERROR . $data);
     }
     else {
       curl_close($ch);
     }
 
     return array(self::STATUS_OK, $data);
+  }
 
+  /**
+   * @param string $remoteFile
+   * @return array (0 => resource, 1 => CA_Config_Curl)
+   */
+  protected function createCurl($remoteFile) {
+    require_once 'CA/Config/Curl.php';
+    $caConfig = CA_Config_Curl::probe(array(
+      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, TRUE)
+    ));
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $remoteFile);
+    curl_setopt($ch, CURLOPT_HEADER, FALSE);
+    curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
+    curl_setopt($ch, CURLOPT_VERBOSE, 0);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+    if (preg_match('/^https:/', $remoteFile) && $caConfig->isEnableSSL()) {
+      curl_setopt_array($ch, $caConfig->toCurlOptions());
+    }
+
+    return array($ch, $caConfig);
   }
 
 }
