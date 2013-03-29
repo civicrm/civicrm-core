@@ -14,6 +14,11 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
    */
   protected $tmpFile;
 
+  /**
+   * @var CRM_Utils_HttpClient
+   */
+  protected $client;
+
   public function setUp() {
     parent::setUp();
 
@@ -24,6 +29,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
       'verifySSL' => TRUE,
     ));
     $this->assertAPISuccess($result);
+    $this->client = new CRM_Utils_HttpClient();
   }
 
   public function tearDown() {
@@ -33,19 +39,19 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
   }
 
   function testFetchHttp() {
-    $result = CRM_Utils_HttpClient::fetch(self::VALID_HTTP_URL, $this->tmpFile);
+    $result = $this->client->fetch(self::VALID_HTTP_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
     $this->assertRegExp(self::VALID_HTTP_REGEX, file_get_contents($this->tmpFile));
   }
 
   function testFetchHttps_valid() {
-    $result = CRM_Utils_HttpClient::fetch(self::VALID_HTTPS_URL, $this->tmpFile);
+    $result = $this->client->fetch(self::VALID_HTTPS_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
     $this->assertRegExp(self::VALID_HTTPS_REGEX, file_get_contents($this->tmpFile));
   }
 
   function testFetchHttps_invalid_verify() {
-    $result = CRM_Utils_HttpClient::fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
+    $result = $this->client->fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_DL_ERROR, $result);
     $this->assertEquals('', file_get_contents($this->tmpFile));
   }
@@ -57,13 +63,13 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
     ));
     $this->assertAPISuccess($result);
 
-    $result = CRM_Utils_HttpClient::fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
+    $result = $this->client->fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
     $this->assertRegExp(self::SELF_SIGNED_HTTPS_REGEX, file_get_contents($this->tmpFile));
   }
 
   function testFetchHttp_badOutFile() {
-    $result = CRM_Utils_HttpClient::fetch(self::VALID_HTTP_URL, '/ba/d/path/too/utput');
+    $result = $this->client->fetch(self::VALID_HTTP_URL, '/ba/d/path/too/utput');
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_WRITE_ERROR, $result);
   }
 

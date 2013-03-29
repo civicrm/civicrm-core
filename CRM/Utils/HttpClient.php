@@ -40,13 +40,25 @@ class CRM_Utils_HttpClient {
   const STATUS_DL_ERROR = 'dl-error';
 
   /**
+   * @var CRM_Utils_HttpClient
+   */
+  protected static $singleton;
+
+  public static function singleton() {
+    if (!self::$singleton) {
+      self::$singleton = new CRM_Utils_HttpClient();
+    }
+    return self::$singleton;
+  }
+
+  /**
    * Download the remote zipfile.
    *
    * @param string $remoteFile URL of a .zip file
    * @param string $localFile path at which to store the .zip file
    * @return STATUS_OK|STATUS_WRITE_ERROR|STATUS_DL_ERROR
    */
-  public static function fetch($remoteFile, $localFile) {
+  public function fetch($remoteFile, $localFile) {
     require_once 'CA/Config/Curl.php';
     $caConfig = CA_Config_Curl::probe(array(
       'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, TRUE)
