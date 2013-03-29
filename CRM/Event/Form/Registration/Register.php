@@ -784,7 +784,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     self::checkProfileComplete($fields, $errors, $self->_eventId);
     //To check if the user is already registered for the event(CRM-2426)
     if (!$self->_skipDupeRegistrationCheck) {
-      $self->checkRegistration($fields, $self);
+      self::checkRegistration($fields, $self);
     }
     //check for availability of registrations.
     if (!$self->_allowConfirmation &&
@@ -992,6 +992,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->assign('pay_later_receipt', $this->_values['event']['pay_later_receipt']);
     }
 
+    if (!$this->_allowConfirmation) {
+      // check if the participant is already registered
+      if (!$this->_skipDupeRegistrationCheck) {
+        $params['contact_id'] = self::checkRegistration($params, $this, FALSE, TRUE, TRUE);
+      }
+    }
+
     if (CRM_Utils_Array::value('image_URL', $params)) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
@@ -1183,13 +1190,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   //end of function
 
   /*
-   *Function to process Registration of free event
+   * Function to process Registration of free event
    *
-   *@param  array $param Form valuess
-   *@param  int contactID
+   * @param  array $param Form valuess
+   * @param  int contactID
    *
-   *@return None
-   *access public
+   * @return None
+   * access public
    *
    */
   public function processRegistration($params, $contactID = NULL) {
@@ -1369,11 +1376,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @param array $fields  the input form values(anonymous user)
    * @param array $self    event data
+   * @param boolean $isAdditional treat isAdditional participants a bit differently
+   * @param boolean $returnContactId just find and return the contactID match to use
+   * @param boolean $useDedupeRules force usage of dedupe rules
    *
    * @return void
    * @access public
    */
-  function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE) {
+  function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
     // CRM-3907, skip check for preview registrations
     // CRM-4320 participant need to walk wizard
     if (!$returnContactId &&
