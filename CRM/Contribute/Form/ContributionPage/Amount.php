@@ -294,7 +294,7 @@ SELECT id
         }
       }
       $hasMembershipBlk = TRUE;
-      if ($membershipBlock->is_separate_payment && !$fields['amount_block_is_active']) {
+      if ($membershipBlock->is_separate_payment && !CRM_Utils_Array::value('amount_block_is_active', $fields)) {
         $errors['amount_block_is_active'] = ts('To disable Contribution Amounts section you need to first disable Separate Membership Payment option from Membership Settings.');
       }
     }

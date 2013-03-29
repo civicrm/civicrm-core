@@ -599,7 +599,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution_Main', 'formRule'), $this);
-
   }
 
   /**
@@ -812,6 +811,33 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
 
+      // CRM-12233
+      if ($membershipIsActive && !$self->_membershipBlock['is_required'] 
+        && $self->_values['amount_block_is_active']) {
+        $membershipFieldId = $contributionFieldId = $errorKey = $otherFieldId = NULL;
+        foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
+          if ($fieldValue['name'] == 'membership_amount' && CRM_Utils_Array::value('price_' . $fieldKey, $fields) == 0) {
+            $membershipFieldId = $fieldKey;
+          }
+          elseif ($membershipFieldId) {
+            if ($fieldValue['name'] == 'other_amount') {
+              $otherFieldId = $fieldKey;
+            }
+            elseif ($fieldValue['name'] == 'contribution_amount') {
+              $contributionFieldId = $fieldKey;
+            }
+          
+            if (!$errorKey || CRM_Utils_Array::value('price_' . $contributionFieldId, $fields) == '0') {
+              $errorKey = $fieldKey;
+            }
+          }
+        }
+
+        if ($membershipFieldId && (!CRM_Utils_Array::value('price_' . $contributionFieldId, $fields)
+          && !CRM_Utils_Array::value('price_' . $otherFieldId, $fields))) {
+          $errors["price_{$errorKey}"] = ts('Additional Amount is required.');
+        }
+      }
       if (empty($check)) {
         if ($self->_useForMember == 1 && $membershipIsActive) {
           $errors['_qf_default'] = ts('Select at least one option from Membership Type(s).');
@@ -882,39 +908,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
 
-      $fieldId = $memPresent = $membershipLabel = $fieldOption = $proceFieldAmount = NULL;
-      if ($self->_separateMembershipPayment == 0 && $self->_quickConfig) {
-        foreach ($self->_priceSet['fields'] as $fieldKey => $fieldVal) {
-          if ($fieldVal['name'] == 'membership_amount' && CRM_Utils_Array::value('price_' . $fieldId, $fields)) {
-            $fieldId     = $fieldVal['id'];
-            $fieldOption = $fields['price_' . $fieldId];
-            $memPresent  = TRUE;
-          }
-          else {
-            if (CRM_Utils_Array::value('price_' . $fieldKey, $fields) && $memPresent && ($fieldVal['name'] == 'other_amount' || $fieldVal['name'] == 'contribution_amount')) {
-              $fieldId = $fieldVal['id'];
-              if ($fieldVal['name'] == 'other_amount') {
-                $proceFieldAmount = $self->_submitValues['price_' . $fieldId];
-              }
-              else $proceFieldAmount = $fieldVal['options'][$self->_submitValues['price_' . $fieldId]]['amount'];
-              unset($fields['price_' . $fieldId]);
-              break;
-            }
-          }
-        }
-      }
-
       CRM_Price_BAO_Set::processAmount($self->_values['fee'],
         $fields, $lineItem
       );
-      if ($proceFieldAmount) {
-        if ($proceFieldAmount < $lineItem[$fieldOption]['line_total']) {
-          $errors["price_$fieldId"] = ts('The Membership you have selected requires a minimum contribution of %1',
-                                      array(1 => CRM_Utils_Money::format($lineItem[$fieldOption]['line_total']))
-          );
-        }
-        $fields['amount'] = $proceFieldAmount;
-      }
+      
       if ($fields['amount'] < 0) {
         $errors['_qf_default'] = ts('Contribution can not be less than zero. Please select the options accordingly');
       }
@@ -1227,24 +1224,26 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     //If the membership & contribution is used in contribution page & not seperate payment
-    $fieldId = $memPresent = $membershipLabel = $fieldOption = $proceFieldAmount = $is_quick_config = NULL;
+    $fieldId = $memPresent = $membershipLabel = $fieldOption = $is_quick_config = NULL;
+    $proceFieldAmount = 0;
     if ($this->_separateMembershipPayment == 0) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config');
       if ($is_quick_config) {
         foreach ($this->_priceSet['fields'] as $fieldKey => $fieldVal) {
-          if ($fieldVal['name'] == 'membership_amount' && CRM_Utils_Array::value('price_' . $fieldId, $params)) {
+          if ($fieldVal['name'] == 'membership_amount' && CRM_Utils_Array::value('price_' . $fieldKey , $params)) {
             $fieldId     = $fieldVal['id'];
             $fieldOption = $params['price_' . $fieldId];
+            $proceFieldAmount += $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
             $memPresent  = TRUE;
           }
           else {
             if (CRM_Utils_Array::value('price_' . $fieldKey, $params) && $memPresent && ($fieldVal['name'] == 'other_amount' || $fieldVal['name'] == 'contribution_amount')) {
               $fieldId = $fieldVal['id'];
               if ($fieldVal['name'] == 'other_amount') {
-                $proceFieldAmount = $this->_submitValues['price_' . $fieldId];
+                $proceFieldAmount += $this->_submitValues['price_' . $fieldId];
               }
               else {
-                $proceFieldAmount = $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
+                $proceFieldAmount += $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
               }
               unset($params['price_' . $fieldId]);
               break;
