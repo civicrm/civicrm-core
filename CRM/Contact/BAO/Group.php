@@ -782,6 +782,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     while ($object->fetch()) {
       $permission = CRM_Contact_BAO_Group::checkPermission($object->id, $object->title);
+      //@todo CRM-12209 introduced an ACL check in the whereClause function
+      // it may be that this checking is now obsolete - or that what remains
+      // should be removed to the whereClause (which is also accessed by getCount)
+
       if ($permission) {
         $newLinks = $links;
         $values[$object->id] = array();
@@ -1114,6 +1118,15 @@ WHERE {$whereClause}";
 
     if ($excludeHidden) {
       $clauses[] = 'groups.is_hidden = 0';
+    }
+    //CRM-12209
+    if (!CRM_Core_Permission::check('view all contacts')) {
+      //get the allowed groups for the current user
+      $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
+      if (!empty( $groups)) {
+        $groupList = implode( ', ', array_values( $groups ) );
+        $clauses[] = "groups.id IN ( $groupList ) ";
+      }
     }
 
     return implode(' AND ', $clauses);

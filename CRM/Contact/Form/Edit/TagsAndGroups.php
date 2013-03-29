@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Contact_Form_Edit_TagsandGroups {
+class CRM_Contact_Form_Edit_TagsAndGroups {
 
   /**
    * constant to determine which forms we are generating
@@ -57,13 +57,13 @@ class CRM_Contact_Form_Edit_TagsandGroups {
    * @access public
    */
   static function buildQuickForm(&$form,
-    $contactId  = 0,
-    $type       = CRM_Contact_Form_Edit_TagsandGroups::ALL,
+    $contactId = 0,
+    $type = self::ALL,
     $visibility = FALSE,
     $isRequired = NULL,
-    $groupName  = 'Group(s)',
-    $tagName    = 'Tag(s)',
-    $fieldName  = NULL
+    $groupName = 'Group(s)',
+    $tagName = 'Tag(s)',
+    $fieldName = NULL
   ) {
     if (!isset($form->_tagGroup)) {
       $form->_tagGroup = array();
@@ -74,8 +74,8 @@ class CRM_Contact_Form_Edit_TagsandGroups {
       $contactId = $form->_contactId;
     }
 
-    $type = (int ) $type;
-    if ($type & CRM_Contact_Form_Edit_TagsandGroups::GROUP) {
+    $type = (int) $type;
+    if ($type & self::GROUP) {
 
       $fName = 'group';
       if ($fieldName) {
@@ -122,7 +122,7 @@ class CRM_Contact_Form_Edit_TagsandGroups {
       }
     }
 
-    if ($type & CRM_Contact_Form_Edit_TagsandGroups::TAG) {
+    if ($type & self::TAG) {
       $fName = 'tag';
       if ($fieldName) {
         $fName = $fieldName;
@@ -163,7 +163,7 @@ class CRM_Contact_Form_Edit_TagsandGroups {
    * @access public
    * @static
    */
-  static function setDefaults($id, &$defaults, $type = CRM_Contact_Form_Edit_TagsandGroups::ALL, $fieldName = NULL) {
+  static function setDefaults($id, &$defaults, $type = self::ALL, $fieldName = NULL) {
     $type = (int ) $type;
     if ($type & self::GROUP) {
       $fName = 'group';

@@ -256,8 +256,10 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     $wordReplacementSettings = CRM_Core_BAO_Domain::edit($params, $id);
 
     if ($wordReplacementSettings) {
-      //reset navigation
+      // Reset navigation
       CRM_Core_BAO_Navigation::resetNavigation();
+      // Clear js string cache
+      CRM_Core_Resources::singleton()->flushStrings();
 
       CRM_Core_Session::setStatus("", ts("Settings Saved"), "success");
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/options/wordreplacements',

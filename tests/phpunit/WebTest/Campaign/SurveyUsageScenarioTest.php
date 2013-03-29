@@ -534,8 +534,8 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Interview_cancel_interview');
 
     $this->type("field_{$id1}_phone-Primary-1", 9876543210);
-    $this->click("//table[@id='voterRecords']/tbody//tr[@id='row_{$id1}']/td[5]/input[2]/../label[text()='$label1']");
-    $this->click("//table[@id='voterRecords']/tbody//tr[@id='row_{$id1}']/td[5]/input[6]/../label[text()='$label2']");
+    $this->click("//table[@id='voterRecords']/tbody//tr[@id='row_{$id1}']/td[7]/input[2]/../label[text()='$label1']");
+    $this->click("//table[@id='voterRecords']/tbody//tr[@id='row_{$id1}']/td[7]/input[6]/../label[text()='$label2']");
     $this->select("field_{$id1}_result", $optionLabel1);
     $this->click("interview_voter_button_{$id1}");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments

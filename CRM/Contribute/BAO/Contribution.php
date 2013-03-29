@@ -1719,7 +1719,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             //updating the membership log
             $membershipLog = array();
             $membershipLog = $formatedParams;
-            $logStartDate  = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
+            $logStartDate  = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('log_start_date', $dates), $format);
             $logStartDate  = ($logStartDate) ? CRM_Utils_Date::isoToMysql($logStartDate) : $formatedParams['start_date'];
 
             $membershipLog['start_date'] = $logStartDate;

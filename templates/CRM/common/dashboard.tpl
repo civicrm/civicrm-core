@@ -26,8 +26,7 @@
 {literal}
 <script type="text/javascript">
     
-// Create closure, so that we don't accidentally spoil the global/window namespace.
-cj(function() {
+cj(function($) {
   // The set of options we can use to initialize jQuery.dashboard().
   var options = {
     // Optional. Defaults to 3.  You'll need to change the width of columns in CSS too.
@@ -204,12 +203,10 @@ cj(function() {
     }
   };
 
-  // Initialize the dashboard using these options, and save to the global/window
-  // namesapace so that server-side executable js file callbacks can access
-  // window.dashboardDemo.widgets by ID.
-  window.dashboardDemo = cj('#civicrm-dashboard').dashboard(options);
+  // Initialize the dashboard using these options
+  $('#civicrm-dashboard').dashboard(options);
 
-}); // End closure.
+});
 
 </script>
 {/literal}

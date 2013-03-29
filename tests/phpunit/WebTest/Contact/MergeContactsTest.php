@@ -101,7 +101,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_refresh_dedupe");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
+    $this->waitForText('crm-notification-container', "One matching contact was found. You can View or Edit the existing contact.");
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Contact Saved");
@@ -119,7 +119,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->type("email_1_email", $email2);
     $this->click("_qf_Contact_refresh_dedupe");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
+    $this->waitForText('crm-notification-container', "One matching contact was found. You can View or Edit the existing contact.");
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Contact Saved");
@@ -263,7 +263,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Activity '$subject' has been saved."), "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving!");
   }
 
   function testMergeTest() {
@@ -322,7 +322,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_refresh_dedupe");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
+    $this->waitForText('crm-notification-container', "One matching contact was found. You can View or Edit the existing contact.");
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Contact Saved");
@@ -411,7 +411,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contact_refresh_dedupe");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
+    $this->waitForText('crm-notification-container', "One matching contact was found. You can View or Edit the existing contact.");
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Contact Saved");
@@ -520,7 +520,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_refresh_dedupe");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
+    $this->waitForText('crm-notification-container', "One matching contact was found. You can View or Edit the existing contact.");
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Contact Saved");
@@ -629,7 +629,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_refresh_dedupe");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("One matching contact was found. You can View or Edit the existing contact."));
+    $this->waitForText('crm-notification-container', "One matching contact was found. You can View or Edit the existing contact.");
     $this->click("_qf_Contact_upload_duplicate");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Contact Saved");

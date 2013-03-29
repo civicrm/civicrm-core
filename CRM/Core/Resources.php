@@ -131,7 +131,7 @@ class CRM_Core_Resources {
     if ($cacheCodeKey !== NULL) {
       $this->cacheCode = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, $cacheCodeKey);
     }
-    if (! $this->cacheCode) {
+    if (!$this->cacheCode) {
       $this->resetCacheCode();
     }
   }
@@ -475,6 +475,13 @@ class CRM_Core_Resources {
       }
     }
     return $this;
+  }
+
+  /**
+   * Flushes cached translated strings
+   */
+  public function flushStrings() {
+    $this->cache->flush();
   }
 
   /**
