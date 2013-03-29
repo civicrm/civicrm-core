@@ -113,7 +113,7 @@ class CRM_Core_Resources {
       self::$_singleton = new CRM_Core_Resources(
         $sys->getMapper(),
         $cache,
-        'resCacheCode'
+        CRM_Core_Config::isUpgradeMode() ? NULL : 'resCacheCode'
       );
     }
     return self::$_singleton;
