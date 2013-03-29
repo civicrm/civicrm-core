@@ -156,7 +156,7 @@
    /**
     * The $useWhere is used so that the signature matches the parent class
     */
-   public function delete($useWhere = false) {
+   public static function delete($useWhere = false) {
      list($fileID, $entityID, $fieldID) = func_get_args();
 
      $fileDAO = new CRM_Core_DAO_File();
