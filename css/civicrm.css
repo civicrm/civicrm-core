@@ -2297,7 +2297,7 @@ div.grippie {
 }
 
 #crm-container .crm-button {
-  padding: 0;
+  padding: 1px;
 }
 
 .crm-container input.form-submit,
