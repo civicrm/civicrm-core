@@ -166,5 +166,12 @@ ORDER BY cim.is_primary DESC, im_id ASC ";
     }
     return $ims;
   }
+
+  /**
+   * Call common delete function
+   */
+  static function del($id) {
+    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('IM', $id);
+  }
 }
 

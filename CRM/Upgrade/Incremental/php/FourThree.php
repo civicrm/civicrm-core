@@ -73,48 +73,6 @@ class CRM_Upgrade_Incremental_php_FourThree {
         CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
       }
     }
-    // CRM-12155
-    if ($rev == '4.3.beta5') {
-      $query = "SELECT ceft.id FROM `civicrm_financial_trxn` cft
-LEFT JOIN civicrm_entity_financial_trxn ceft 
-ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
-LEFT JOIN civicrm_contribution cc ON cc.id = ceft.entity_id AND ceft.entity_table = 'civicrm_contribution'
-WHERE cc.id IS NULL";
-
-      $dao = CRM_Core_DAO::executeQuery($query);
-      $isOrphanData = TRUE;
-      if (!$dao->N) {
-        $query = "SELECT cli.id FROM civicrm_line_item cli 
-LEFT JOIN civicrm_contribution cc ON cli.entity_id = cc.id AND cli.entity_table = 'civicrm_contribution'
-LEFT JOIN civicrm_participant cp ON cli.entity_id = cp.id AND cli.entity_table = 'civicrm_participant'
-WHERE CASE WHEN cli.entity_table = 'civicrm_contribution'
-THEN cc.id IS NULL 
-ELSE  cp.id IS NULL
-END";
-        $dao = CRM_Core_DAO::executeQuery($query);
-        if (!$dao->N) {          
-          $revPattern = '/^((\d{1,2})\.\d{1,2})\.(\d{1,2}|\w{4,7})?$/i';
-          preg_match($revPattern, $currentVer, $version);
-          if ($version[1] >= 4.3) {
-            $query = "SELECT cfi.id FROM civicrm_financial_item cfi 
-LEFT JOIN civicrm_entity_financial_trxn ceft ON ceft.entity_table = 'civicrm_financial_item' and cfi.id = ceft.entity_id
-WHERE ceft.entity_id IS NULL;";
-            $dao = CRM_Core_DAO::executeQuery($query);
-            if (!$dao->N) { 
-              $isOrphanData = FALSE;
-            }
-          }
-          else {
-            $isOrphanData = FALSE;            
-          }
-        }
-      }
-
-      if ($isOrphanData) {
-        $preUpgradeMessage = "</br> <strong>" . ts('Your database contains orphaned financial records related to deleted contributions. Refer to <a href="%1">this wiki page for instructions on repairing your database</a> so that you can run the upgrade successfully.
-        ', array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC43/Database+repair+for+4.3+upgrades')) . "</strong>";
-      }
-    }
   }
 
   /**
@@ -175,6 +133,51 @@ WHERE    entity_value = '' OR entity_value IS NULL
 
     if ($rev == '4.3.beta2') {
       $postUpgradeMessage .= '<br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li><li>Events - Registration Confirmation and Receipt (off-line)</li><li>Pledges - Acknowledgement</li><li>Pledges - Payment Reminder</li><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li><li>Memberships - Receipt (on-line)</li><li>Personal Campaign Pages - Admin Notification</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
+    }
+
+    if ($rev == '4.3.beta5') {
+      $postUpgradeMessage .= '<br />' . ts("If you are interested in trying out the new Accounting Integration features, please review user permissions and assign the new 'manual batch' permissions as appropriate.");
+
+      // CRM-12155
+      $query = "SELECT ceft.id FROM `civicrm_financial_trxn` cft
+LEFT JOIN civicrm_entity_financial_trxn ceft 
+ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
+LEFT JOIN civicrm_contribution cc ON cc.id = ceft.entity_id AND ceft.entity_table = 'civicrm_contribution'
+WHERE cc.id IS NULL";
+
+      $dao = CRM_Core_DAO::executeQuery($query);
+      $isOrphanData = TRUE;
+      if (!$dao->N) {
+        $query = "SELECT cli.id FROM civicrm_line_item cli 
+LEFT JOIN civicrm_contribution cc ON cli.entity_id = cc.id AND cli.entity_table = 'civicrm_contribution'
+LEFT JOIN civicrm_participant cp ON cli.entity_id = cp.id AND cli.entity_table = 'civicrm_participant'
+WHERE CASE WHEN cli.entity_table = 'civicrm_contribution'
+THEN cc.id IS NULL 
+ELSE  cp.id IS NULL
+END";
+        $dao = CRM_Core_DAO::executeQuery($query);
+        if (!$dao->N) {          
+          $revPattern = '/^((\d{1,2})\.\d{1,2})\.(\d{1,2}|\w{4,7})?$/i';
+          preg_match($revPattern, $currentVer, $version);
+          if ($version[1] >= 4.3) {
+            $query = "SELECT cfi.id FROM civicrm_financial_item cfi 
+LEFT JOIN civicrm_entity_financial_trxn ceft ON ceft.entity_table = 'civicrm_financial_item' and cfi.id = ceft.entity_id
+WHERE ceft.entity_id IS NULL;";
+            $dao = CRM_Core_DAO::executeQuery($query);
+            if (!$dao->N) { 
+              $isOrphanData = FALSE;
+            }
+          }
+          else {
+            $isOrphanData = FALSE;            
+          }
+        }
+      }
+
+      if ($isOrphanData) {
+        $postUpgradeMessage .= "</br> <strong>" . ts('Your database contains extraneous financial records related to deleted contacts and contributions. These records should not affect the site and will not appear in reports, search results or exports. However you may wish to clean them up. Refer to <a href="%1">this wiki page for details</a>.
+        ', array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Clean+up+extraneous+financial+data+-+4.3+upgrades')) . "</strong>";
+      }
     }
   }
 
@@ -258,7 +261,6 @@ WHERE    entity_value = '' OR entity_value IS NULL
   }
 
   function upgrade_4_3_beta5($rev) {
-    $this->addTask(ts('Upgrade DB to 4.3.beta5: SQL'), 'task_4_3_x_runSql', $rev);
     // CRM-12205
     if (
       CRM_Core_DAO::checkTableExists('log_civicrm_financial_trxn') &&
@@ -266,6 +268,13 @@ WHERE    entity_value = '' OR entity_value IS NULL
     ) {
       CRM_Core_DAO::executeQuery('ALTER TABLE `log_civicrm_financial_trxn` CHANGE `trxn_id` `trxn_id` VARCHAR(255) NULL DEFAULT NULL');
     }
+    // CRM-12142 - some sites didn't get this column added yet, and sites which installed 4.3 from scratch will already have it
+    if (
+      !CRM_Core_DAO::checkFieldExists('civicrm_premiums', 'premiums_nothankyou_label')
+    ) {
+       CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_premiums` ADD COLUMN premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT "Label displayed for No Thank-you option in premiums block (e.g. No thank you)"');
+    }    
+    $this->addTask(ts('Upgrade DB to 4.3.beta5: SQL'), 'task_4_3_x_runSql', $rev);
   }
 
   //CRM-11636

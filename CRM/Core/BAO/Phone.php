@@ -247,5 +247,12 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
       CRM_Core_DAO::executeQuery($query, $params);
     }
   }
+
+  /**
+   * Call common delete function
+   */
+  static function del($id) {
+    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Phone', $id);
+  }
 }
 

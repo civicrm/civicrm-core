@@ -1,18 +1,3 @@
--- CRM-12142
-{if !$multilingual}
-  ALTER TABLE `civicrm_premiums`
-    ADD COLUMN premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Label displayed for No Thank-you
- option in premiums block (e.g. No thank you)';
-
--- Also need to populate default text for premiums_nothankyou_label
-  UPDATE `civicrm_premiums` SET premiums_nothankyou_label = '{ts escape="sql"}No thank-you{/ts}';
-{else}
-  {foreach from=$locales item=locale}
-    UPDATE `civicrm_premiums` SET premiums_nothankyou_label_{$locale} = '{ts escape="sql"}No thank-you{/ts}';	   
-  {/foreach}
-{/if}
-
-
 -- CRM-12151
 ALTER TABLE civicrm_option_value
   DROP INDEX index_option_group_id_value,

@@ -49,13 +49,13 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    */
   static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'openId', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'OpenID', CRM_Utils_Array::value('id', $params), $params);
 
     $openId = new CRM_Core_DAO_OpenID();
     $openId->copyValues($params);
     $openId->save();
 
-    CRM_Utils_Hook::post($hook, 'openId', $openId->id, $openId);
+    CRM_Utils_Hook::post($hook, 'OpenID', $openId->id, $openId);
     return $openId;
   }
 
@@ -139,6 +139,13 @@ ORDER BY
       }
     }
     return $openids;
+  }
+
+  /**
+   * Call common delete function
+   */
+  static function del($id) {
+    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);
   }
 }
 

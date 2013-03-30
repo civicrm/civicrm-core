@@ -274,7 +274,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
    */
   function getPerPageLink($perPage) {
     if ($perPage != $this->_perPage) {
-      $href = CRM_Utils_System::makeURL(self::PAGE_ROWCOUNT) . $perPage;
+      $href = $this->makeURL(self::PAGE_ROWCOUNT, $perPage);
       $link = sprintf('<a href="%s" %s>%s</a>',
         $href,
         $this->_classString,
@@ -293,7 +293,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
       return '';
     }
 
-    $href = CRM_Utils_System::makeURL(self::PAGE_ID) . 1;
+    $href = $this->makeURL(self::PAGE_ID, 1);
     return sprintf('<a href="%s" title="%s">%s</a>',
       $href,
       str_replace('%d', 1, $this->_altFirst),
@@ -306,7 +306,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
       return '';
     }
 
-    $href = CRM_Utils_System::makeURL(self::PAGE_ID) . $this->_totalPages;
+    $href = $this->makeURL(self::PAGE_ID, $this->_totalPages);
     return sprintf('<a href="%s" title="%s">%s</a>',
       $href,
       str_replace('%d', $this->_totalPages, $this->_altLast),
@@ -316,7 +316,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
 
   function getBackPageLink() {
     if ($this->_currentPage > 1) {
-      $href = CRM_Utils_System::makeURL(self::PAGE_ID) . $this->getPreviousPageID();
+      $href = $this->makeURL(self::PAGE_ID, $this->getPreviousPageID());
       return sprintf('<a href="%s" title="%s">%s</a>',
         $href,
         $this->_altPrev, $this->_prevImg
@@ -327,13 +327,25 @@ class CRM_Utils_Pager extends Pager_Sliding {
 
   function getNextPageLink() {
     if ($this->_currentPage < $this->_totalPages) {
-      $href = CRM_Utils_System::makeURL(self::PAGE_ID) . $this->getNextPageID();
+      $href = $this->makeURL(self::PAGE_ID, $this->getNextPageID());
       return $this->_spacesAfter . sprintf('<a href="%s" title="%s">%s</a>',
         $href,
         $this->_altNext, $this->_nextImg
       ) . $this->_spacesBefore . $this->_spacesAfter;
     }
     return '';
+  }
+
+  /**
+   * Build a url for pager links
+   */
+  function makeURL($key, $value) {
+    $href = CRM_Utils_System::makeURL($key);
+    // CRM-12212 Remove alpha sort param
+    if (strpos($href, '&amp;sortByCharacter=')) {
+      $href = preg_replace('#(.*)\&amp;sortByCharacter=[^&]*(.*)#', '\1\2', $href);
+    }
+    return $href . $value;
   }
 }
 

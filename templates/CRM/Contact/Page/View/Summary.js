@@ -52,9 +52,9 @@
       // Clone the add-new link if replacing it, and queue the clone to be refreshed as a dependent block
       if (o.hasClass('add-new') && response.addressId) {
         data.aid = response.addressId;
-        var clone = o.parent().clone();
+        var clone = o.closest('.crm-summary-block').clone();
         o.data('edit-params', data);
-        $('.crm-container-snippet', clone).remove();
+        $('form', clone).remove();
         if (clone.hasClass('contactCardLeft')) {
           clone.removeClass('contactCardLeft').addClass('contactCardRight');
         }
@@ -65,14 +65,14 @@
         var clData = cl.data('edit-params');
         var locNo = clData.locno++;
         cl.attr('id', cl.attr('id').replace(locNo, clData.locno)).removeClass('form');
-        o.parent().after(clone);
+        o.closest('.crm-summary-block').after(clone);
         $.merge(dependent, $('.crm-inline-edit', clone));
       }
       $('a.ui-notify-close', '#crm-notification-container').click();
       // Delete an address
       if (o.hasClass('address') && !o.hasClass('add-new') && !response.addressId) {
         o.parent().remove();
-        CRM.alert('', ts('Removed'), 'success');
+        CRM.alert('', ts('Address Deleted'), 'success');
       }
       else {
         // Reload this block plus all dependent blocks
@@ -242,6 +242,24 @@
           $('[class$=is_primary] input:first', form).prop('checked', true );
         }
         $('.add-more-inline', form).show();
+      })
+      // Delete an address
+      .on('click', '.crm-inline-edit.address .delete-button', function() {
+         var $block = $(this).closest('.crm-inline-edit.address');
+         CRM.confirm(function() {
+            CRM.api('address', 'delete', {id: $block.data('edit-params').aid}, {success:
+              function(data) {
+                CRM.alert('', ts('Address Deleted'), 'success');
+                $('.crm-inline-edit-container').addClass('crm-edit-ready');
+                $block.remove();
+              }
+            });
+          },
+          {
+          message: ts('Are you sure you want to delete this address?')
+          }
+        );
+        return false;
       })
       // add more and set focus to new row
       .on('click', '.add-more-inline', function() {

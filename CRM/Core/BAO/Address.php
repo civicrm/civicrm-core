@@ -1130,4 +1130,11 @@ SELECT is_primary,
       );
     }
   }
+
+  /**
+   * Call common delete function
+   */
+  static function del($id) {
+    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Address', $id);
+  }
 }

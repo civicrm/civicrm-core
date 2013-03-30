@@ -206,7 +206,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     $this->click("xpath=//div[@id='activities']//table[@id='activities-selector']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/a[text()='Scheduled']");
 
-    $this->waitForElementPresent("css=div#changeStatusDialog");
+    $this->waitForElementPresent("xpath=//html/body/div[7]");
     $this->waitForElementPresent('activity_change_status');
 
     // change activity status

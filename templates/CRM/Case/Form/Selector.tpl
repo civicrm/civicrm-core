@@ -165,3 +165,4 @@ function buildCaseDetails( caseId, contactId )
 </script>
 
 {/literal}
+{include file="CRM/common/overlay.tpl"}

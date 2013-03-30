@@ -1287,7 +1287,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       }
 
       if ($allowEdit) {
-        $values[$dao->id]['status'] = '<a class="crm-activity-status crm-activity-status-' . $dao->id . ' ' . $values[$dao->id]['class'] . '" href="javascript:changeActivityStatus(' . $dao->id . ',' . $contactID . ',' . $dao->status . ');" title=\'' . $statusTitle . '\'>' . $values[$dao->id]['status'] . '</a>';
+        $values[$dao->id]['status'] = '<a class="crm-activity-status crm-activity-status-' . $dao->id . ' ' . $values[$dao->id]['class'] . ' crm-activity-change-status" activity_id='. $dao->id. ' current_status=' . $dao->status . ' case_id=' . $caseID . '" href="#" title=\'' . $statusTitle . '\'>' . $values[$dao->id]['status'] . '</a>';
       }
     }
     $dao->free();

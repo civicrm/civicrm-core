@@ -51,8 +51,10 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-    $this->_showRelatedCases = CRM_Utils_Array::value('relatedCases', $_GET);
+    // js for changing activity status
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Case/Form/ActivityChangeStatus.js');
 
+    $this->_showRelatedCases = CRM_Utils_Array::value('relatedCases', $_GET);
 
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
     $isMultiClient = $xmlProcessorProcess->getAllowMultipleCaseClients();
@@ -330,7 +332,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $this->add('select', 'status_id', ts('Status'), array("" => ts(' - any status - ')) + $activityStatus);
-    $this->add('select', 'activity_change_status', ts('New Status'), $activityStatus);
 
     // activity dates
     $this->addDate('activity_date_low', ts('Activity Dates - From'), FALSE, array('formatType' => 'searchDate'));

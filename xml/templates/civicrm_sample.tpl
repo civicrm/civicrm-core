@@ -158,7 +158,7 @@ VALUES ('member_signup_and_renewal', 'Member Signup and Renewal', 1, 3, @financi
 
 SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `is_quick_config` = 1 and name = 'member_signup_and_renewal';
 
-INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `visibility_id`) VALUES ( @priceSetId, 'membership_amount', 'Membership Amount', 'Radio', 0, 1, 1, 1, 1, 1, 1);
+INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `visibility_id`) VALUES ( @priceSetId, 'membership_amount', 'Membership', 'Radio', 0, 1, 1, 1, 1, 1, 1);
 
 INSERT INTO `civicrm_price_set_entity` (`entity_table`,`entity_id`,`price_set_id`) VALUES ('civicrm_contribution_page', 2, @priceSetId);
 
