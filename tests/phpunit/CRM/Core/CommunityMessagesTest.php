@@ -147,14 +147,21 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     return $result;
   }
 
-  public function testGetDocument_disabled() {
+  public function testIsEnabled() {
+    $communityMessages = new CRM_Core_CommunityMessages(
+      $this->cache,
+      $this->expectNoHttpRequest()
+    );
+    $this->assertTrue($communityMessages->isEnabled());
+  }
+
+  public function testIsEnabled_false() {
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectNoHttpRequest(),
       FALSE
     );
-    $doc = $communityMessages->getDocument();
-    $this->assertTrue(NULL === $doc);
+    $this->assertFalse($communityMessages->isEnabled());
   }
 
   /**

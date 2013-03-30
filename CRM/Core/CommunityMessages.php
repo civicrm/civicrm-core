@@ -54,6 +54,21 @@ class CRM_Core_CommunityMessages {
   protected $messagesUrl;
 
   /**
+   * Create default instance
+   *
+   * @return CRM_Core_CommunityMessages
+   */
+  public static function create() {
+    return new CRM_Core_CommunityMessages(
+      new CRM_Utils_Cache_SqlGroup(array(
+        'group' => 'community-messages',
+        'prefetch' => FALSE,
+      )),
+      CRM_Utils_HttpClient::singleton()
+    );
+  }
+
+  /**
    * @param CRM_Utils_Cache_Interface $cache
    * @param CRM_Utils_HttpClient $client
    */
@@ -61,10 +76,13 @@ class CRM_Core_CommunityMessages {
     $this->cache = $cache;
     $this->client = $client;
     if ($messagesUrl === NULL) {
-      $this->messagesUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'community_messages_url', NULL, self::DEFAULT_MESSAGES_URL);
+      $this->messagesUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'communityMessagesUrl', NULL, '*default*');
     }
     else {
       $this->messagesUrl = $messagesUrl;
+    }
+    if ($this->messagesUrl === '*default*') {
+      $this->messagesUrl = self::DEFAULT_MESSAGES_URL;
     }
   }
 
@@ -74,10 +92,6 @@ class CRM_Core_CommunityMessages {
    * @return NULL|array
    */
   public function getDocument() {
-    if ($this->messagesUrl === FALSE) {
-      return NULL;
-    }
-
     $isChanged = FALSE;
     $document = $this->cache->get('communityMessages');
 
@@ -92,7 +106,7 @@ class CRM_Core_CommunityMessages {
     }
 
     if ($document['expires'] <= CRM_Utils_Time::getTimeRaw()) {
-      $newDocument = $this->fetchDocument($this->messagesUrl);
+      $newDocument = $this->fetchDocument();
       if ($newDocument && $this->validateDocument($newDocument)) {
         $document = $newDocument;
         $document['expires'] = CRM_Utils_Time::getTimeRaw() + $document['ttl'];
@@ -114,11 +128,10 @@ class CRM_Core_CommunityMessages {
   /**
    * Download document from URL and parse as JSON
    *
-   * @param string $url
    * @return NULL|array parsed JSON
    */
-  public function fetchDocument($url) {
-    list($status, $json) = $this->client->get(CRM_Utils_System::evalUrl($url));
+  public function fetchDocument() {
+    list($status, $json) = $this->client->get($this->getRenderedUrl());
     if ($status != CRM_Utils_HttpClient::STATUS_OK || empty($json)) {
       return NULL;
     }
@@ -127,6 +140,22 @@ class CRM_Core_CommunityMessages {
       return NULL;
     }
     return $doc;
+  }
+
+  /**
+   * Get the final, usable URL string (after interpolating any variables)
+   *
+   * @return FALSE|string
+   */
+  public function getRenderedUrl() {
+    return CRM_Utils_System::evalUrl($this->messagesUrl);
+  }
+
+  /**
+   * @return bool
+   */
+  public function isEnabled() {
+    return $this->messagesUrl !== FALSE && $this->messagesUrl !== 'FALSE';
   }
 
   /**
@@ -180,8 +209,8 @@ class CRM_Core_CommunityMessages {
     );
     $vars = array();
     foreach ($vals as $k => $v) {
-      $vars['%%'.$k.'%%'] = $v;
-      $vars['{{'.$k.'}}'] = urlencode($v);
+      $vars['%%' . $k . '%%'] = $v;
+      $vars['{{' . $k . '}}'] = urlencode($v);
     }
     return strtr($markup, $vars);
   }
