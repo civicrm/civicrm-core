@@ -105,7 +105,7 @@
        list($sql, $params) = self::sql($entityTable, $entityID, $fileTypeID);
      }
      else {
-       list($sql, $params) = self::sql($entityTable, $entityID, NULL);
+       list($sql, $params) = self::sql($entityTable, $entityID, 0);
      }
 
      $dao = CRM_Core_DAO::executeQuery($sql, $params);
