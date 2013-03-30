@@ -7,7 +7,7 @@
   function showDelete( fileName, postURLData, fileID, divName, divFile ) {
     var confirmMsg = '{/literal}{ts escape="js"}Are you sure you want to delete attachment: {/ts}{literal}' + fileName + '&nbsp; <a href="#" onclick="deleteAttachment( \'' + postURLData + '\',' + fileID + ',\'' + divName + '\', \'' + divFile + '\' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}Yes{/ts}{literal}</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="hideStatus( divName ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}</a>';
     cj( divName ).show( ).html( confirmMsg );
-p  }
+  }
 
   function deleteAttachment( postURLData, fileID, divName, divFile ) {
     var postUrl = {/literal}"{crmURL p='civicrm/file/delete' h=0 }"{literal};
