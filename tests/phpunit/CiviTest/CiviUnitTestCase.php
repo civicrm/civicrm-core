@@ -552,6 +552,21 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->assertEquals($e, $a);
   }
 
+  /**
+   * Assert that two numbers are approximately equal
+   *
+   * @param int|float $expected
+   * @param int|float $actual
+   * @param int|float $tolerance
+   * @param string $message
+   */
+  function assertApproxEquals($expected, $actual, $tolerance, $message = NULL) {
+    if ($message === NULL) {
+      $message = sprintf("approx-equals: expected=[%.3f] actual=[%.3f] tolerance=[%.3f]", $expected, $actual, $tolerance);
+    }
+    $this->assertTrue(abs($actual - $expected) < $tolerance, $message);
+  }
+
   function assertAttributesEquals($expectedValues, $actualValues, $message = NULL) {
     foreach ($expectedValues as $paramName => $paramValue) {
       if (isset($actualValues[$paramName])) {

@@ -87,6 +87,40 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
             ),
           ))
         ),
+        'two-messages' => array(
+          CRM_Utils_HttpClient::STATUS_OK,
+          json_encode(array(
+            'ttl' => 600,
+            'retry' => 600,
+            'messages' => array(
+              array(
+                'markup' => '<h1>One</h1>',
+                'components' => array('CiviMail'),
+              ),
+              array(
+                'markup' => '<h1>Two</h1>',
+                'components' => array('CiviMail'),
+              ),
+            ),
+          ))
+        ),
+        'two-messages-halfbadcomp' => array(
+          CRM_Utils_HttpClient::STATUS_OK,
+          json_encode(array(
+            'ttl' => 600,
+            'retry' => 600,
+            'messages' => array(
+              array(
+                'markup' => '<h1>One</h1>',
+                'components' => array('NotARealComponent'),
+              ),
+              array(
+                'markup' => '<h1>Two</h1>',
+                'components' => array('CiviMail'),
+              ),
+            ),
+          ))
+        ),
       );
     }
     return self::$webResponses;
@@ -250,6 +284,56 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $doc4 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Second valid response</h1>', $doc4['messages'][0]['markup']);
     $this->assertEquals(strtotime('2013-03-01 12:20:02'), $doc4['expires']);
+  }
+
+  /**
+   * Randomly pick among two options
+   */
+  public function testPick_rand() {
+    $communityMessages = new CRM_Core_CommunityMessages(
+      $this->cache,
+      $this->expectOneHttpRequest(self::$webResponses['two-messages'])
+    );
+    $doc1 = $communityMessages->getDocument();
+    $this->assertEquals('<h1>One</h1>', $doc1['messages'][0]['markup']);
+    $this->assertEquals('<h1>Two</h1>', $doc1['messages'][1]['markup']);
+
+    // randomly pick many times
+    $trials = 40;
+    $freq = array(); // array($message => $count)
+    for ($i = 0; $i < $trials; $i++) {
+      $message = $communityMessages->pick();
+      $freq[$message['markup']]++;
+    }
+
+    // assert the probabilities
+    $this->assertApproxEquals(0.5, $freq['<h1>One</h1>'] / $trials, 0.2);
+    $this->assertApproxEquals(0.5, $freq['<h1>Two</h1>'] / $trials, 0.2);
+    $this->assertEquals($trials, $freq['<h1>One</h1>'] + $freq['<h1>Two</h1>']);
+  }
+
+  /**
+   * When presented with two options using component filters, always
+   * choose the one which references an active component.
+   */
+  public function testPick_componentFilter() {
+    $communityMessages = new CRM_Core_CommunityMessages(
+      $this->cache,
+      $this->expectOneHttpRequest(self::$webResponses['two-messages-halfbadcomp'])
+    );
+    $doc1 = $communityMessages->getDocument();
+    $this->assertEquals('<h1>One</h1>', $doc1['messages'][0]['markup']);
+    $this->assertEquals('<h1>Two</h1>', $doc1['messages'][1]['markup']);
+
+    // randomly pick many times
+    $trials = 10;
+    $freq = array(); // array($message => $count)
+    for ($i = 0; $i < $trials; $i++) {
+      $message = $communityMessages->pick();
+      $freq[$message['markup']]++;
+    }
+
+    $this->assertEquals($trials, $freq['<h1>Two</h1>']);
   }
 
   /**

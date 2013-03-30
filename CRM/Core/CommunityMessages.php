@@ -31,6 +31,7 @@
 class CRM_Core_CommunityMessages {
 
   const DEFAULT_MESSAGES_URL = 'http://alert.civicrm.org/alert?prot=1&ver={ver}&uf={uf}&sid={sid}';
+  const DEFAULT_PERMISSION = 'administer CiviCRM';
 
   /**
    * Default time to wait before retrying
@@ -134,8 +135,32 @@ class CRM_Core_CommunityMessages {
    * @param array $components
    * @return NULL|array
    */
-  public function pick($permChecker, $components) {
-    throw new Exception('not implemented');
+  public function pick() {
+    $document = $this->getDocument();
+    $messages = array();
+    foreach ($document['messages'] as $message) {
+      if (!isset($message['perms'])) {
+        $message['perms'] = array(self::DEFAULT_PERMISSION);
+      }
+      if (!CRM_Core_Permission::checkAnyPerm($message['perms'])) {
+        continue;
+      }
+
+      if (isset($message['components'])) {
+        $enabled = array_keys(CRM_Core_Component::getEnabledComponents());
+        if (count(array_intersect($enabled, $message['components'])) == 0) {
+          continue;
+        }
+      }
+
+      $messages[] = $message;
+    }
+    if (empty($messages)) {
+      return NULL;
+    }
+
+    $idx = rand(0, count($messages) - 1);
+    return $messages[$idx];
   }
 
   /**
