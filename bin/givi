@@ -192,6 +192,11 @@ class Givi {
   function doHelp() {
     $program = basename($this->program);
     echo "Givi - Coordinate git checkouts across CiviCRM repositories\n";
+    echo "Scenario:\n";
+    echo "  You have cloned and forked the CiviCRM repos. Each of the repos has two\n";
+    echo "  remotes (origin + upstream). When working on a new PR, you generally want\n";
+    echo "  to checkout official code (eg upstream/master) in all repos, but 1-2 repos\n";
+    echo "  should use a custom branch (which tracks upstream/master).\n";
     echo "Usage:\n";
     echo "  $program [options] checkout <branch>\n";
     echo "  $program [options] fetch\n";
