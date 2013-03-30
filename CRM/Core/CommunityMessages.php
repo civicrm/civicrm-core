@@ -92,7 +92,7 @@ class CRM_Core_CommunityMessages {
 
     if ($document['expires'] <= CRM_Utils_Time::getTimeRaw()) {
       $newDocument = $this->fetchDocument($this->messagesUrl);
-      if ($newDocument) {
+      if ($newDocument && $this->validateDocument($newDocument)) {
         $document = $newDocument;
         $document['expires'] = CRM_Utils_Time::getTimeRaw() + $document['ttl'];
       }
@@ -144,6 +144,29 @@ class CRM_Core_CommunityMessages {
    */
   public static function evalMarkup($markup) {
     throw new Exception('not implemented');
+  }
+
+  /**
+   * Ensure that a document is well-formed
+   *
+   * @param array $document
+   * @return bool
+   */
+  public function validateDocument($document) {
+    if (!isset($document['ttl']) || !is_integer($document['ttl'])) {
+      return FALSE;
+    }
+    if (!isset($document['retry']) || !is_integer($document['retry'])) {
+      return FALSE;
+    }
+    if (!isset($document['messages']) || !is_array($document['messages'])) {
+      return FALSE;
+    }
+    foreach ($document['messages'] as $message) {
+      // TODO validate $message['markup']
+    }
+
+    return TRUE;
   }
 
 }

@@ -54,6 +54,18 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
         CRM_Utils_HttpClient::STATUS_OK,
         '<html>this is not json!</html>'
       ),
+      'invalid-ttl-document' => array(
+        CRM_Utils_HttpClient::STATUS_OK,
+        json_encode(array(
+          'ttl' => 'z', // not an integer!
+          'retry' => 'z', // not an integer!
+          'messages' => array(
+            array(
+              'markup' => '<h1>Invalid document</h1>',
+            ),
+          ),
+        ))
+      ),
       'hello-world' => array(
         CRM_Utils_HttpClient::STATUS_OK,
         json_encode(array(
@@ -231,6 +243,28 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectOneHttpRequest($this->webResponses['bad-json'])
+    );
+    $doc2 = $communityMessages->getDocument();
+    $this->assertEquals('<h1>Hello world</h1>', $doc2['messages'][0]['markup']);
+    $this->assertEquals(strtotime('2013-03-01 12:10:02'), $doc2['expires']);
+  }
+
+  public function testGetDocument_NewOK_UpdateInvalidDoc() {
+    // first try, good response
+    CRM_Utils_Time::setTime('2013-03-01 10:00:00');
+    $communityMessages = new CRM_Core_CommunityMessages(
+      $this->cache,
+      $this->expectOneHttpRequest($this->webResponses['hello-world'])
+    );
+    $doc1 = $communityMessages->getDocument();
+    $this->assertEquals('<h1>Hello world</h1>', $doc1['messages'][0]['markup']);
+    $this->assertEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires']);
+
+    // second try, $doc1 has expired; bad response; keep old data
+    CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
+    $communityMessages = new CRM_Core_CommunityMessages(
+      $this->cache,
+      $this->expectOneHttpRequest($this->webResponses['invalid-ttl-document'])
     );
     $doc2 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Hello world</h1>', $doc2['messages'][0]['markup']);
