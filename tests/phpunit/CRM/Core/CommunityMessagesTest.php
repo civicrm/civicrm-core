@@ -86,10 +86,20 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::resetTime();
   }
 
+  public function testGetDocument_disabled() {
+    $communityMessages = new CRM_Core_CommunityMessages(
+      $this->cache,
+      $this->expectNoHttpRequest(),
+      FALSE
+    );
+    $doc = $communityMessages->getDocument();
+    $this->assertTrue(NULL === $doc);
+  }
+
   /**
    * Download a document; after the set expiration period, download again.
    */
-  public function testNewOK_CacheOK_UpdateOK() {
+  public function testGetDocument_NewOK_CacheOK_UpdateOK() {
     // first try, good response
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
@@ -125,7 +135,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * First download attempt fails. Store the NACK and retry after
    * the default time period (DEFAULT_RETRY).
    */
-  public function testNewFailure_CacheOK_UpdateOK() {
+  public function testGetDocument_NewFailure_CacheOK_UpdateOK() {
     // first try, bad response
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
@@ -163,7 +173,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * The failure cached.
    * The failure eventually expires and new update succeeds.
    */
-  public function testNewOK_UpdateFailure_CacheOK_UpdateOK() {
+  public function testGetDocument_NewOK_UpdateFailure_CacheOK_UpdateOK() {
     // first try, good response
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
@@ -205,7 +215,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertEquals(strtotime('2013-03-01 12:20:02'), $doc4['expires']);
   }
 
-  public function testNewOK_UpdateParseError() {
+  public function testGetDocument_NewOK_UpdateParseError() {
     // first try, good response
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(

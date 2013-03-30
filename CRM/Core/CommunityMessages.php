@@ -30,6 +30,8 @@
  */
 class CRM_Core_CommunityMessages {
 
+  const DEFAULT_MESSAGES_URL = 'http://alert.civicrm.org/alert?prot=1&ver={ver}&uf={uf}&sid={sid}';
+
   /**
    * Default time to wait before retrying
    */
@@ -46,12 +48,23 @@ class CRM_Core_CommunityMessages {
   protected $cache;
 
   /**
+   * @var FALSE|string
+   */
+  protected $messagesUrl;
+
+  /**
    * @param CRM_Utils_Cache_Interface $cache
    * @param CRM_Utils_HttpClient $client
    */
-  public function __construct($cache, $client) {
+  public function __construct($cache, $client, $messagesUrl = NULL) {
     $this->cache = $cache;
     $this->client = $client;
+    if ($messagesUrl === NULL) {
+      $this->messagesUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'community_messages_url', NULL, self::DEFAULT_MESSAGES_URL);
+    }
+    else {
+      $this->messagesUrl = $messagesUrl;
+    }
   }
 
   /**
@@ -60,9 +73,7 @@ class CRM_Core_CommunityMessages {
    * @return NULL|array
    */
   public function getDocument() {
-    // FIXME register in settings
-    $url = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'communityMessagesUrl', NULL, TRUE);
-    if (empty($url)) {
+    if ($this->messagesUrl === FALSE) {
       return NULL;
     }
 
@@ -80,11 +91,12 @@ class CRM_Core_CommunityMessages {
     }
 
     if ($document['expires'] <= CRM_Utils_Time::getTimeRaw()) {
-      $newDocument = $this->fetchDocument($url);
+      $newDocument = $this->fetchDocument($this->messagesUrl);
       if ($newDocument) {
         $document = $newDocument;
         $document['expires'] = CRM_Utils_Time::getTimeRaw() + $document['ttl'];
-      } else {
+      }
+      else {
         $document['expires'] = CRM_Utils_Time::getTimeRaw() + $document['retry'];
       }
       $isChanged = TRUE;
@@ -104,7 +116,7 @@ class CRM_Core_CommunityMessages {
    * @return NULL|array parsed JSON
    */
   public function fetchDocument($url) {
-    list($status, $json) = $this->client->get(self::evalUrl($url));
+    list($status, $json) = $this->client->get(CRM_Utils_System::evalUrl($url));
     if ($status != CRM_Utils_HttpClient::STATUS_OK || empty($json)) {
       return NULL;
     }
@@ -134,11 +146,4 @@ class CRM_Core_CommunityMessages {
     throw new Exception('not implemented');
   }
 
-  /**
-   * @param string $markup
-   * @return string
-   */
-  public static function evalUrl($url) {
-    return $url; // FIXME
-  }
 }
