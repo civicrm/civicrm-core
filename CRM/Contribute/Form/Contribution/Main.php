@@ -57,6 +57,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public $_useForMember;
 
   protected $_ppType;
+  protected $_snippet;
 
   /**
    * Function to set variables up before form is built
@@ -67,16 +68,34 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public function preProcess() {
     parent::preProcess();
 
-    $this->_ppType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('ppType', FALSE);
-    if ($this->_ppType) {
-      $this->assign('ppType', TRUE);
-      return CRM_Core_Payment_ProcessorForm::preProcess($this);
-    }
+    $this->_snippet = CRM_Utils_Array::value('snippet', $_GET);
+    $this->assign('snippet', $this->_snippet);
 
-    //get payPal express id and make it available to template
     $paymentProcessors = $this->get('paymentProcessors');
+    $this->assign('ppType', FALSE);
+    $this->_ppType = NULL;
     if (!empty($paymentProcessors)) {
+      // Fetch type during ajax request
+      if (isset($_GET['type']) && $this->_snippet) {
+        $this->_ppType = $_GET['type'];
+      }
+      // Set default payment processor
+      else {
+        foreach ($paymentProcessors as $values) {
+          if (!empty($values['is_default']) || count($paymentProcessors) == 1) {
+            $this->_ppType = $values['id'];
+          }
+        }
+      }
+      if ($this->_ppType) {
+        $this->assign('ppType', TRUE);
+        CRM_Core_Payment_ProcessorForm::preProcess($this);
+        if ($this->_snippet) {
+          return;
+        }
+      }
+
+      //get payPal express id and make it available to template
       foreach ($paymentProcessors as $ppId => $values) {
         $payPalExpressId = ($values['payment_processor_type'] == 'PayPal_Express') ? $values['id'] : 0;
         $this->assign('payPalExpressId', $payPalExpressId);
@@ -387,7 +406,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   public function buildQuickForm() {
     if ($this->_ppType) {
-      return CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+      CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+      if ($this->_snippet) {
+        return;
+      }
     }
 
     $config = CRM_Core_Config::singleton();

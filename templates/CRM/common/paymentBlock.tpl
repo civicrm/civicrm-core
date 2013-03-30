@@ -60,18 +60,6 @@ function buildPaymentBlock( type ) {
 }
 
 cj( function() {
-    var processorTypeObj = cj('input[name="payment_processor"]');
-
-    if ( processorTypeObj.attr('type') == 'hidden' ) {
-        var processorTypeValue = processorTypeObj.val( );
-    } else {
-        var processorTypeValue = processorTypeObj.filter(':checked').val();
-    }
-
-    if ( processorTypeValue ) {
-        buildPaymentBlock( processorTypeValue );
-    }
-
     cj('input[name="payment_processor"]').change( function() {
         buildPaymentBlock( cj(this).val() );
     });

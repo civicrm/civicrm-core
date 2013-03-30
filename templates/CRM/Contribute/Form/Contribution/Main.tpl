@@ -23,7 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $ppType}
+{* Callback snippet: Load payment processor *}
+{if $ppType and $snippet}
 {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
   {if $is_monetary}
   {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
@@ -51,7 +52,8 @@
     {/if}
   {/if}
 
-{elseif $onbehalf}
+{* Callback snippet: Load on-behalf profile *}
+{elseif $onbehalf and $snippet}
   {include file=CRM/Contribute/Form/Contribution/OnBehalfOf.tpl}
 {else}
   {literal}
@@ -294,7 +296,12 @@
   </fieldset>
   {/if}
 
-  <div id="billing-payment-block"></div>
+  <div id="billing-payment-block">
+    {* If we have a payment processor, load it - otherwise it happens via ajax *}
+    {if $ppType}
+      {include file="CRM/Contribute/Form/Contribution/Main.tpl" snippet=4}
+    {/if}
+  </div>
   {include file="CRM/common/paymentBlock.tpl"}
 
   <div class="crm-group custom_post_profile-group">
