@@ -299,7 +299,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertEquals('<h1>Two</h1>', $doc1['messages'][1]['markup']);
 
     // randomly pick many times
-    $trials = 40;
+    $trials = 80;
     $freq = array(); // array($message => $count)
     for ($i = 0; $i < $trials; $i++) {
       $message = $communityMessages->pick();
@@ -307,8 +307,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     }
 
     // assert the probabilities
-    $this->assertApproxEquals(0.5, $freq['<h1>One</h1>'] / $trials, 0.2);
-    $this->assertApproxEquals(0.5, $freq['<h1>Two</h1>'] / $trials, 0.2);
+    $this->assertApproxEquals(0.5, $freq['<h1>One</h1>'] / $trials, 0.3);
+    $this->assertApproxEquals(0.5, $freq['<h1>Two</h1>'] / $trials, 0.3);
     $this->assertEquals($trials, $freq['<h1>One</h1>'] + $freq['<h1>Two</h1>']);
   }
 
