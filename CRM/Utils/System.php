@@ -1513,13 +1513,12 @@ class CRM_Utils_System {
   }
 
   /**
-   * Determine the URL which provides a feed of available extensions
+   * Evaluate any tokens in a URL
    *
    * @param string|FALSE $url
    * @return string|FALSE
    */
   public static function evalUrl($url) {
-    // boolean false means don't try to check extensions
     if ($url === FALSE) {
       return FALSE;
     }
@@ -1529,7 +1528,14 @@ class CRM_Utils_System {
         '{ver}' => CRM_Utils_System::version(),
         '{uf}' => $config->userFramework,
         '{php}' => phpversion(),
+        '{sid}' => md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL),
+        '{baseUrl}' => $config->userFrameworkBaseURL,
+        '{lang}' => $config->lcMessages,
+        '{co}' => $config->defaultContactCountry,
       );
+      foreach (array_keys($vars) as $k) {
+        $vars[$k] = urlencode($vars[$k]);
+      }
       return strtr($url, $vars);
     }
   }
