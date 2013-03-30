@@ -1513,6 +1513,29 @@ class CRM_Utils_System {
   }
 
   /**
+   * Determine the URL which provides a feed of available extensions
+   *
+   * @param string|FALSE $url
+   * @return string|FALSE
+   */
+  public static function evalUrl($url) {
+    // boolean false means don't try to check extensions
+    if ($url === FALSE) {
+      return FALSE;
+    }
+    else {
+      $config = CRM_Core_Config::singleton();
+      $vars = array(
+        '{ver}' => CRM_Utils_System::version(),
+        '{uf}' => $config->userFramework,
+        '{php}' => phpversion(),
+      );
+      return strtr($url, $vars);
+    }
+  }
+
+
+  /**
    * Determine whether this is a developmental system.
    *
    * @return bool
