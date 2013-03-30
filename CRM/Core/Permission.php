@@ -78,6 +78,21 @@ class CRM_Core_Permission {
   }
 
   /**
+   * Determine if any one of the permissions strings applies to current user
+   *
+   * @param array $perms
+   * @return bool
+   */
+  public static function checkAnyPerm($perms) {
+    foreach ($perms as $perm) {
+      if (CRM_Core_Permission::check($perm)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Given a group/role array, check for access requirements
    *
    * @param array $array the group/role to check

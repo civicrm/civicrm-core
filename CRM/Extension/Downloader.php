@@ -129,7 +129,7 @@ class CRM_Extension_Downloader {
    * @return boolean Whether the download was successful.
    */
   public function fetch($remoteFile, $localFile) {
-    $result = CRM_Utils_HttpClient::fetch($remoteFile, $localFile);
+    $result = CRM_Utils_HttpClient::singleton()->fetch($remoteFile, $localFile);
     switch ($result) {
       case CRM_Utils_HttpClient::STATUS_OK:
         return TRUE;

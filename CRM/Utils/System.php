@@ -1513,6 +1513,35 @@ class CRM_Utils_System {
   }
 
   /**
+   * Evaluate any tokens in a URL
+   *
+   * @param string|FALSE $url
+   * @return string|FALSE
+   */
+  public static function evalUrl($url) {
+    if ($url === FALSE) {
+      return FALSE;
+    }
+    else {
+      $config = CRM_Core_Config::singleton();
+      $vars = array(
+        '{ver}' => CRM_Utils_System::version(),
+        '{uf}' => $config->userFramework,
+        '{php}' => phpversion(),
+        '{sid}' => md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL),
+        '{baseUrl}' => $config->userFrameworkBaseURL,
+        '{lang}' => $config->lcMessages,
+        '{co}' => $config->defaultContactCountry,
+      );
+      foreach (array_keys($vars) as $k) {
+        $vars[$k] = urlencode($vars[$k]);
+      }
+      return strtr($url, $vars);
+    }
+  }
+
+
+  /**
    * Determine whether this is a developmental system.
    *
    * @return bool

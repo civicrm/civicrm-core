@@ -34,4 +34,10 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     ), false, null, false);
     $this->assertEquals($expected, $actual);
   }
+
+  public function testEvalUrl() {
+    $this->assertEquals(FALSE, CRM_Utils_System::evalUrl(FALSE));
+    $this->assertEquals('http://example.com/', CRM_Utils_System::evalUrl('http://example.com/'));
+    $this->assertEquals('http://example.com/?cms=UnitTests', CRM_Utils_System::evalUrl('http://example.com/?cms={uf}'));
+  }
 }

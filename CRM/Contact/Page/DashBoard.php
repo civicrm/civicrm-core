@@ -115,6 +115,14 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     $this->assign('ownerOrgOK', $ownerOrgOK);
     $this->assign('defaultMailboxOK', $defaultMailboxOK);
 
+    $communityMessages = CRM_Core_CommunityMessages::create();
+    if ($communityMessages->isEnabled()) {
+      $message = $communityMessages->pick();
+      if ($message) {
+        $this->assign('communityMessages', $communityMessages->evalMarkup($message['markup']));
+      }
+    }
+
     return parent::run();
   }
 }

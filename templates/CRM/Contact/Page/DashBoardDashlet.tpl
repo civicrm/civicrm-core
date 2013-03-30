@@ -57,6 +57,7 @@
     {/if}
     </div>
 {/if}
+{$communityMessages}
 <div class="crm-submit-buttons">
 <a href="#" id="crm-dashboard-configure" class="button show-add">
   <span><div class="icon settings-icon"></div>{ts}Configure Your Dashboard{/ts}</span></a>
