@@ -69,7 +69,7 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
-   * Get the messages document
+   * Get the messages document (either from the cache or by downloading)
    *
    * @return NULL|array
    */
@@ -98,6 +98,7 @@ class CRM_Core_CommunityMessages {
         $document['expires'] = CRM_Utils_Time::getTimeRaw() + $document['ttl'];
       }
       else {
+        // keep the old messages for now, try again later
         $document['expires'] = CRM_Utils_Time::getTimeRaw() + $document['retry'];
       }
       $isChanged = TRUE;
@@ -129,10 +130,8 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
-   * Pick one message
+   * Pick a message to display
    *
-   * @param callable $permChecker
-   * @param array $components
    * @return NULL|array
    */
   public function pick() {
@@ -168,7 +167,23 @@ class CRM_Core_CommunityMessages {
    * @return string
    */
   public static function evalMarkup($markup) {
-    throw new Exception('not implemented');
+    $config = CRM_Core_Config::singleton();
+    $vals = array(
+      'resourceUrl' => rtrim($config->resourceBase, '/'),
+      'ver' => CRM_Utils_System::version(),
+      'uf' => $config->userFramework,
+      'php' => phpversion(),
+      'sid' => md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL),
+      'baseUrl' => $config->userFrameworkBaseURL,
+      'lang' => $config->lcMessages,
+      'co' => $config->defaultContactCountry,
+    );
+    $vars = array();
+    foreach ($vals as $k => $v) {
+      $vars['%%'.$k.'%%'] = $v;
+      $vars['{{'.$k.'}}'] = urlencode($v);
+    }
+    return strtr($markup, $vars);
   }
 
   /**

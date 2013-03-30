@@ -336,6 +336,14 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertEquals($trials, $freq['<h1>Two</h1>']);
   }
 
+  function testEvalMarkup() {
+    $communityMessages = new CRM_Core_CommunityMessages(
+      $this->cache,
+      $this->expectNoHttpRequest()
+    );
+    $this->assertEquals('cms=UnitTests cms=UnitTests', $communityMessages->evalMarkup('cms=%%uf%% cms={{uf}}'));
+  }
+
   /**
    * Generate a mock HTTP client with the expectation that it is never called.
    *
