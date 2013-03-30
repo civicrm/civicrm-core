@@ -273,7 +273,8 @@
   {/if}
 
   {if $form.payment_processor.label}
-  <fieldset class="crm-group payment_options-group">
+  {* PP selection only works with JS enabled, so we hide it initially *}
+  <fieldset class="crm-group payment_options-group" style="display:none;">
     <legend>{ts}Payment Options{/ts}</legend>
     <div class="crm-section payment_processor-section">
       <div class="label">{$form.payment_processor.label}</div>

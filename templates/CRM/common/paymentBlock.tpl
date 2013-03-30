@@ -60,6 +60,8 @@ function buildPaymentBlock( type ) {
 }
 
 cj( function() {
+    cj('.crm-group.payment_options-group').show();
+
     cj('input[name="payment_processor"]').change( function() {
         buildPaymentBlock( cj(this).val() );
     });
