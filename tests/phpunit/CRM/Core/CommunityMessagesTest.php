@@ -38,64 +38,79 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   /**
    * @var array list of possible web responses
    */
-  protected $webResponses;
+  protected static $webResponses = NULL;
+
+  public static function initWebResponses() {
+    if (self::$webResponses === NULL) {
+      self::$webResponses = array(
+        'http-error' => array(
+          CRM_Utils_HttpClient::STATUS_DL_ERROR,
+          NULL
+        ),
+        'bad-json' => array(
+          CRM_Utils_HttpClient::STATUS_OK,
+          '<html>this is not json!</html>'
+        ),
+        'invalid-ttl-document' => array(
+          CRM_Utils_HttpClient::STATUS_OK,
+          json_encode(array(
+            'ttl' => 'z', // not an integer!
+            'retry' => 'z', // not an integer!
+            'messages' => array(
+              array(
+                'markup' => '<h1>Invalid document</h1>',
+              ),
+            ),
+          ))
+        ),
+        'hello-world' => array(
+          CRM_Utils_HttpClient::STATUS_OK,
+          json_encode(array(
+            'ttl' => 600,
+            'retry' => 600,
+            'messages' => array(
+              array(
+                'markup' => '<h1>Hello world</h1>',
+              ),
+            ),
+          ))
+        ),
+        'salut-a-tout' => array(
+          CRM_Utils_HttpClient::STATUS_OK,
+          json_encode(array(
+            'ttl' => 600,
+            'retry' => 600,
+            'messages' => array(
+              array(
+                'markup' => '<h1>Salut a tout</h1>',
+              ),
+            ),
+          ))
+        ),
+      );
+    }
+    return self::$webResponses;
+  }
 
   public function setUp() {
     parent::setUp();
-
     $this->cache = new CRM_Utils_Cache_Arraycache(array());
-
-    $this->webResponses = array(
-      'http-error' => array(
-        CRM_Utils_HttpClient::STATUS_DL_ERROR,
-        NULL
-      ),
-      'bad-json' => array(
-        CRM_Utils_HttpClient::STATUS_OK,
-        '<html>this is not json!</html>'
-      ),
-      'invalid-ttl-document' => array(
-        CRM_Utils_HttpClient::STATUS_OK,
-        json_encode(array(
-          'ttl' => 'z', // not an integer!
-          'retry' => 'z', // not an integer!
-          'messages' => array(
-            array(
-              'markup' => '<h1>Invalid document</h1>',
-            ),
-          ),
-        ))
-      ),
-      'hello-world' => array(
-        CRM_Utils_HttpClient::STATUS_OK,
-        json_encode(array(
-          'ttl' => 600,
-          'retry' => 600,
-          'messages' => array(
-            array(
-              'markup' => '<h1>Hello world</h1>',
-            ),
-          ),
-        ))
-      ),
-      'salut-a-tout' => array(
-        CRM_Utils_HttpClient::STATUS_OK,
-        json_encode(array(
-          'ttl' => 600,
-          'retry' => 600,
-          'messages' => array(
-            array(
-              'markup' => '<h1>Salut a tout</h1>',
-            ),
-          ),
-        ))
-      ),
-    );
+    self::initWebResponses();
   }
 
   public function tearDown() {
     parent::tearDown();
     CRM_Utils_Time::resetTime();
+  }
+
+  public function badWebRequests() {
+    self::initWebResponses();
+    $result = array(
+      array(self::$webResponses['http-error']),
+      array(self::$webResponses['bad-json']),
+      array(self::$webResponses['invalid-ttl-document']),
+    );
+    return $result;
   }
 
   public function testGetDocument_disabled() {
@@ -116,7 +131,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['hello-world'])
+      $this->expectOneHttpRequest(self::$webResponses['hello-world'])
     );
     $doc1 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Hello world</h1>', $doc1['messages'][0]['markup']);
@@ -136,7 +151,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['salut-a-tout'])
+      $this->expectOneHttpRequest(self::$webResponses['salut-a-tout'])
     );
     $doc3 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Salut a tout</h1>', $doc3['messages'][0]['markup']);
@@ -144,15 +159,19 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   }
 
   /**
-   * First download attempt fails. Store the NACK and retry after
-   * the default time period (DEFAULT_RETRY).
+   * First download attempt fails (due to some bad web request).
+   * Store the NACK and retry after the default time period (DEFAULT_RETRY).
+   *
+   * @dataProvider badWebRequests
    */
-  public function testGetDocument_NewFailure_CacheOK_UpdateOK() {
+  public function testGetDocument_NewFailure_CacheOK_UpdateOK($badWebRequest) {
+    $this->assertNotEmpty($badWebRequest);
+
     // first try, bad response
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['http-error'])
+      $this->expectOneHttpRequest($badWebRequest)
     );
     $doc1 = $communityMessages->getDocument();
     $this->assertEquals(array(), $doc1['messages']);
@@ -172,7 +191,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['hello-world'])
+      $this->expectOneHttpRequest(self::$webResponses['hello-world'])
     );
     $doc3 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Hello world</h1>', $doc3['messages'][0]['markup']);
@@ -181,16 +200,20 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
 
   /**
    * First download of new doc is OK.
-   * The update fails.
+   * The update fails (due to some bad web request)
    * The failure cached.
    * The failure eventually expires and new update succeeds.
+   *
+   * @dataProvider badWebRequests
    */
-  public function testGetDocument_NewOK_UpdateFailure_CacheOK_UpdateOK() {
+  public function testGetDocument_NewOK_UpdateFailure_CacheOK_UpdateOK($badWebRequest) {
+    $this->assertNotEmpty($badWebRequest);
+
     // first try, good response
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['hello-world'])
+      $this->expectOneHttpRequest(self::$webResponses['hello-world'])
     );
     $doc1 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Hello world</h1>', $doc1['messages'][0]['markup']);
@@ -200,7 +223,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['http-error'])
+      $this->expectOneHttpRequest($badWebRequest)
     );
     $doc2 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Hello world</h1>', $doc2['messages'][0]['markup']);
@@ -220,55 +243,11 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::setTime('2013-03-01 12:10:02');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['salut-a-tout'])
+      $this->expectOneHttpRequest(self::$webResponses['salut-a-tout'])
     );
     $doc4 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Salut a tout</h1>', $doc4['messages'][0]['markup']);
     $this->assertEquals(strtotime('2013-03-01 12:20:02'), $doc4['expires']);
-  }
-
-  public function testGetDocument_NewOK_UpdateParseError() {
-    // first try, good response
-    CRM_Utils_Time::setTime('2013-03-01 10:00:00');
-    $communityMessages = new CRM_Core_CommunityMessages(
-      $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['hello-world'])
-    );
-    $doc1 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc1['messages'][0]['markup']);
-    $this->assertEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires']);
-
-    // second try, $doc1 has expired; bad response; keep old data
-    CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
-    $communityMessages = new CRM_Core_CommunityMessages(
-      $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['bad-json'])
-    );
-    $doc2 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc2['messages'][0]['markup']);
-    $this->assertEquals(strtotime('2013-03-01 12:10:02'), $doc2['expires']);
-  }
-
-  public function testGetDocument_NewOK_UpdateInvalidDoc() {
-    // first try, good response
-    CRM_Utils_Time::setTime('2013-03-01 10:00:00');
-    $communityMessages = new CRM_Core_CommunityMessages(
-      $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['hello-world'])
-    );
-    $doc1 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc1['messages'][0]['markup']);
-    $this->assertEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires']);
-
-    // second try, $doc1 has expired; bad response; keep old data
-    CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
-    $communityMessages = new CRM_Core_CommunityMessages(
-      $this->cache,
-      $this->expectOneHttpRequest($this->webResponses['invalid-ttl-document'])
-    );
-    $doc2 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc2['messages'][0]['markup']);
-    $this->assertEquals(strtotime('2013-03-01 12:10:02'), $doc2['expires']);
   }
 
   /**
