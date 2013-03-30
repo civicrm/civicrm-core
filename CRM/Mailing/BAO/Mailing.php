@@ -769,6 +769,11 @@ ORDER BY   i.contact_id, i.{$tempColumn}
 
       if ($this->body_html) {
         $this->_getTokens('html');
+        if (!$this->body_text) {
+          // Since the text template was created from html, use the html tokens.
+          // @see CRM_Mailing_BAO_Mailing::getTemplates()
+          $this->tokens['text'] = $this->tokens['html'];
+        }
       }
 
       if ($this->body_text) {
