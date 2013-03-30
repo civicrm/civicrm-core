@@ -137,7 +137,14 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::resetTime();
   }
 
-  public function badWebRequests() {
+  /**
+   * A list of bad web-responses; in general, whenever the downloader
+   * encounters one of these bad responses, it should ignore the
+   * document, retain the old data, and retry again later.
+   *
+   * @return array
+   */
+  public function badWebResponses() {
     self::initWebResponses();
     $result = array(
       array(self::$webResponses['http-error']),
@@ -203,17 +210,17 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * First download attempt fails (due to some bad web request).
    * Store the NACK and retry after the default time period (DEFAULT_RETRY).
    *
-   * @dataProvider badWebRequests
-   * @param array $$badWebRequest Description of a web request that returns some kind of failure
+   * @dataProvider badWebResponses
+   * @param array $badWebResponse Description of a web request that returns some kind of failure
    */
-  public function testGetDocument_NewFailure_CacheOK_UpdateOK($badWebRequest) {
-    $this->assertNotEmpty($badWebRequest);
+  public function testGetDocument_NewFailure_CacheOK_UpdateOK($badWebResponse) {
+    $this->assertNotEmpty($badWebResponse);
 
     // first try, bad response
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest($badWebRequest)
+      $this->expectOneHttpRequest($badWebResponse)
     );
     $doc1 = $communityMessages->getDocument();
     $this->assertEquals(array(), $doc1['messages']);
@@ -242,15 +249,16 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
 
   /**
    * First download of new doc is OK.
-   * The update fails (due to some bad web request)
-   * The failure cached.
-   * The failure eventually expires and new update succeeds.
+   * The update fails (due to some bad web response).
+   * The old data is retained in the cache.
+   * The failure eventually expires.
+   * A new update succeeds.
    *
-   * @dataProvider badWebRequests
-   * @param array $$badWebRequest Description of a web request that returns some kind of failure
+   * @dataProvider badWebResponses
+   * @param array $badWebResponse Description of a web request that returns some kind of failure
    */
-  public function testGetDocument_NewOK_UpdateFailure_CacheOK_UpdateOK($badWebRequest) {
-    $this->assertNotEmpty($badWebRequest);
+  public function testGetDocument_NewOK_UpdateFailure_CacheOK_UpdateOK($badWebResponse) {
+    $this->assertNotEmpty($badWebResponse);
 
     // first try, good response
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
@@ -266,7 +274,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest($badWebRequest)
+      $this->expectOneHttpRequest($badWebResponse)
     );
     $doc2 = $communityMessages->getDocument();
     $this->assertEquals('<h1>First valid response</h1>', $doc2['messages'][0]['markup']);
