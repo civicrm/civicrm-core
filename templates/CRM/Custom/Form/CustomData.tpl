@@ -82,4 +82,5 @@
       });
     {/literal}
   </script>
+
 {/if}

@@ -76,18 +76,20 @@
                     <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('{$element_name}', '{$form.formName}'); return false;" >{ts}clear{/ts}</a>)</span>
                 {elseif $element.data_type eq 'File'}
                     {if $element.element_value.data}
+                      <div id="attachStatusMesg_{$element_name}" class="status hiddenElement"></div>
+                      <div id="attachFile_{$element_name}">
                         <span class="html-adjust"><br />
                             &nbsp;{ts}Attached File{/ts}: &nbsp;
-                            {if $element.element_value.displayURL }
+                            {if $element.element_value.displayURL}
                                 <a href="#" onclick="popUp('{$element.element_value.imageURL}'); return false;" ><img src="{$element.element_value.displayURL}" height = "{$element.element_value.imageThumbHeight}" width="{$element.element_value.imageThumbWidth}"></a>
                             {else}
                                 <a href="{$element.element_value.fileURL}">{$element.element_value.fileName}</a>
                             {/if}
-                            {if $element.element_value.deleteURL }
-                                <br />
-                            {$element.element_value.deleteURL}
+                            {if $element.element_value.deleteURL}
+                                   <a href="#" onclick="showDelete('{$element.element_value.fileName}', '{$element.element_value.deleteURLArgs}', {$element.element_value.fid}, '#attachStatusMesg_{$element_name}', '#attachFile_{$element_name}'); return false;" title="{ts}Delete this file{/ts}"><span class="icon red-icon delete-icon" style="margin:0px 0px -5px 20px" title="{ts}Delete this file{/ts}"></span></a>
                             {/if}
                         </span>
+                      </div>
                     {/if}
                 {elseif $element.html_type eq 'Autocomplete-Select'}
                   {if $element.data_type eq 'ContactReference'}
@@ -100,4 +102,3 @@
         </tr>
 
     {/if}
-
