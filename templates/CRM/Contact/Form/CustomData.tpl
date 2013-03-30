@@ -33,6 +33,7 @@
     {*include custom data js file*}
     {include file="CRM/common/customData.tpl"}
 
+
   {if $customValueCount }
     {literal}
     <script type="text/javascript">
@@ -48,3 +49,5 @@
     {/literal}
   {/if}
 {/if}
+
+{include file="CRM/Form/attachmentjs.tpl"}
