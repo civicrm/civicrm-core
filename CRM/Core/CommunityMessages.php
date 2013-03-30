@@ -30,7 +30,8 @@
  */
 class CRM_Core_CommunityMessages {
 
-  const DEFAULT_MESSAGES_URL = 'http://alert.civicrm.org/alert?prot=1&ver={ver}&uf={uf}&sid={sid}';
+  // const DEFAULT_MESSAGES_URL = 'http://alert.civicrm.org/alert?prot=1&ver={ver}&uf={uf}&sid={sid}';
+  const DEFAULT_MESSAGES_URL = 'http://civicrm.org/sites/civicrm.org/files/messages.json';
   const DEFAULT_PERMISSION = 'administer CiviCRM';
 
   /**
