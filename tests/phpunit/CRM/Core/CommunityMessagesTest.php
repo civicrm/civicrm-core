@@ -63,26 +63,26 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
             ),
           ))
         ),
-        'hello-world' => array(
+        'first-valid-response' => array(
           CRM_Utils_HttpClient::STATUS_OK,
           json_encode(array(
             'ttl' => 600,
             'retry' => 600,
             'messages' => array(
               array(
-                'markup' => '<h1>Hello world</h1>',
+                'markup' => '<h1>First valid response</h1>',
               ),
             ),
           ))
         ),
-        'salut-a-tout' => array(
+        'second-valid-response' => array(
           CRM_Utils_HttpClient::STATUS_OK,
           json_encode(array(
             'ttl' => 600,
             'retry' => 600,
             'messages' => array(
               array(
-                'markup' => '<h1>Salut a tout</h1>',
+                'markup' => '<h1>Second valid response</h1>',
               ),
             ),
           ))
@@ -131,10 +131,10 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest(self::$webResponses['hello-world'])
+      $this->expectOneHttpRequest(self::$webResponses['first-valid-response'])
     );
     $doc1 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc1['messages'][0]['markup']);
+    $this->assertEquals('<h1>First valid response</h1>', $doc1['messages'][0]['markup']);
     $this->assertEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires']);
 
     // second try, $doc1 hasn't expired yet, so still use it
@@ -144,17 +144,17 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectNoHttpRequest()
     );
     $doc2 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc2['messages'][0]['markup']);
+    $this->assertEquals('<h1>First valid response</h1>', $doc2['messages'][0]['markup']);
     $this->assertEquals(strtotime('2013-03-01 10:10:00'), $doc2['expires']);
 
     // third try, $doc1 expired, update it
     CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest(self::$webResponses['salut-a-tout'])
+      $this->expectOneHttpRequest(self::$webResponses['second-valid-response'])
     );
     $doc3 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Salut a tout</h1>', $doc3['messages'][0]['markup']);
+    $this->assertEquals('<h1>Second valid response</h1>', $doc3['messages'][0]['markup']);
     $this->assertEquals(strtotime('2013-03-01 12:10:02'), $doc3['expires']);
   }
 
@@ -163,6 +163,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * Store the NACK and retry after the default time period (DEFAULT_RETRY).
    *
    * @dataProvider badWebRequests
+   * @param array $$badWebRequest Description of a web request that returns some kind of failure
    */
   public function testGetDocument_NewFailure_CacheOK_UpdateOK($badWebRequest) {
     $this->assertNotEmpty($badWebRequest);
@@ -191,10 +192,10 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest(self::$webResponses['hello-world'])
+      $this->expectOneHttpRequest(self::$webResponses['first-valid-response'])
     );
     $doc3 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc3['messages'][0]['markup']);
+    $this->assertEquals('<h1>First valid response</h1>', $doc3['messages'][0]['markup']);
     $this->assertTrue($doc3['expires'] > CRM_Utils_Time::getTimeRaw());
   }
 
@@ -205,6 +206,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * The failure eventually expires and new update succeeds.
    *
    * @dataProvider badWebRequests
+   * @param array $$badWebRequest Description of a web request that returns some kind of failure
    */
   public function testGetDocument_NewOK_UpdateFailure_CacheOK_UpdateOK($badWebRequest) {
     $this->assertNotEmpty($badWebRequest);
@@ -213,10 +215,10 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest(self::$webResponses['hello-world'])
+      $this->expectOneHttpRequest(self::$webResponses['first-valid-response'])
     );
     $doc1 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc1['messages'][0]['markup']);
+    $this->assertEquals('<h1>First valid response</h1>', $doc1['messages'][0]['markup']);
     $this->assertEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires']);
 
     // second try, $doc1 has expired; bad response; keep old data
@@ -226,7 +228,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectOneHttpRequest($badWebRequest)
     );
     $doc2 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc2['messages'][0]['markup']);
+    $this->assertEquals('<h1>First valid response</h1>', $doc2['messages'][0]['markup']);
     $this->assertTrue($doc2['expires'] > CRM_Utils_Time::getTimeRaw());
 
     // third try, $doc2 hasn't expired yet; no request; keep old data
@@ -236,17 +238,17 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectNoHttpRequest()
     );
     $doc3 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Hello world</h1>', $doc3['messages'][0]['markup']);
+    $this->assertEquals('<h1>First valid response</h1>', $doc3['messages'][0]['markup']);
     $this->assertEquals($doc2['expires'], $doc3['expires']);
 
     // fourth try, $doc2 has expired yet; new request; replace data
     CRM_Utils_Time::setTime('2013-03-01 12:10:02');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
-      $this->expectOneHttpRequest(self::$webResponses['salut-a-tout'])
+      $this->expectOneHttpRequest(self::$webResponses['second-valid-response'])
     );
     $doc4 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Salut a tout</h1>', $doc4['messages'][0]['markup']);
+    $this->assertEquals('<h1>Second valid response</h1>', $doc4['messages'][0]['markup']);
     $this->assertEquals(strtotime('2013-03-01 12:20:02'), $doc4['expires']);
   }
 
