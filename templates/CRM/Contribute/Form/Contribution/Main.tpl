@@ -52,9 +52,7 @@
     {/if}
   {/if}
 
-{* Callback snippet: Load on-behalf profile *}
-{elseif $onbehalf and $snippet}
-  {include file=CRM/Contribute/Form/Contribution/OnBehalfOf.tpl}
+{* Main Form *}  
 {else}
   {literal}
   <script type="text/javascript">
@@ -181,8 +179,9 @@
   {/if}
 
   {if $is_for_organization}
-  <div id='onBehalfOfOrg' class="crm-section"></div>
-  {include file=CRM/Contribute/Form/Contribution/OnBehalfOf.tpl}
+  <div id='onBehalfOfOrg' class="crm-section">
+    {include file=CRM/Contribute/Form/Contribution/OnBehalfOf.tpl}
+  </div>
   {/if}
 
   {* User account registration option. Displays if enabled for one of the profiles on this page. *}

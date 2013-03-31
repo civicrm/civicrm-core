@@ -101,18 +101,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $this->_onbehalf = FALSE;
     if (CRM_Utils_Array::value('is_for_organization', $this->_values)) {
-      $urlParams = "&id={$this->_id}&qfKey={$this->controller->_key}";
-      $this->assign('urlParams', $urlParams);
-      $this->_onbehalf = CRM_Utils_Array::value('onbehalf', $_GET);
-
+      $this->_onbehalf = TRUE;
       CRM_Contribute_Form_Contribution_OnBehalfOf::preProcess($this);
-      if (CRM_Utils_Array::value('hidden_onbehalf_profile', $_POST) &&
-        (CRM_Utils_Array::value('is_for_organization', $_POST) ||
-          CRM_Utils_Array::value('is_for_organization', $this->_values) == 2
-        )
-      ) {
-        CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
-      }
     }
 
     if (CRM_Utils_Array::value('id', $this->_pcpInfo) &&
@@ -388,8 +378,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->_onBehalfRequired = 1;
     }
     if ($this->_onbehalf) {
-      $this->assign('onbehalf', TRUE);
-      return CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
+      CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
     }
 
     $this->applyFilter('__ALL__', 'trim');
