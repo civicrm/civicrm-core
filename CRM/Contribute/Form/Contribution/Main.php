@@ -68,41 +68,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public function preProcess() {
     parent::preProcess();
 
-    $this->_snippet = CRM_Utils_Array::value('snippet', $_GET);
-    $this->assign('snippet', $this->_snippet);
-
-    $paymentProcessors = $this->get('paymentProcessors');
-    $this->assign('ppType', FALSE);
-    $this->_ppType = NULL;
-    if (!empty($paymentProcessors)) {
-      // Fetch type during ajax request
-      if (isset($_GET['type']) && $this->_snippet) {
-        $this->_ppType = $_GET['type'];
-      }
-      // Set default payment processor
-      else {
-        foreach ($paymentProcessors as $values) {
-          if (!empty($values['is_default']) || count($paymentProcessors) == 1) {
-            $this->_ppType = $values['id'];
-          }
-        }
-      }
-      if ($this->_ppType) {
-        $this->assign('ppType', TRUE);
-        CRM_Core_Payment_ProcessorForm::preProcess($this);
-        if ($this->_snippet) {
-          return;
-        }
-      }
-
-      //get payPal express id and make it available to template
-      foreach ($paymentProcessors as $ppId => $values) {
-        $payPalExpressId = ($values['payment_processor_type'] == 'PayPal_Express') ? $values['id'] : 0;
-        $this->assign('payPalExpressId', $payPalExpressId);
-        if ($payPalExpressId) {
-          break;
-        }
-      }
+    self::preProcessPaymentOptions($this);
+    if ($this->_snippet) {
+      return;
     }
 
     // Make the contributionPageID avilable to the template
@@ -405,8 +373,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @access public
    */
   public function buildQuickForm() {
+    // Build payment processor form
     if ($this->_ppType) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+      // Return if we are in an ajax callback
       if ($this->_snippet) {
         return;
       }
@@ -1387,6 +1357,46 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       // redirect to thank you page
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
+    }
+  }
+
+  /**
+   * Handle Payment Processor switching
+   * For contribution and event registration forms
+   */
+  static function preProcessPaymentOptions(&$form) {
+    $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
+    $form->assign('snippet', $form->_snippet);
+
+    $paymentProcessors = $form->get('paymentProcessors');
+    $form->assign('ppType', FALSE);
+    $form->_ppType = NULL;
+    if (!empty($paymentProcessors)) {
+      // Fetch type during ajax request
+      if (isset($_GET['type']) && $form->_snippet) {
+        $form->_ppType = $_GET['type'];
+      }
+      // Set default payment processor
+      else {
+        foreach ($paymentProcessors as $values) {
+          if (!empty($values['is_default']) || count($paymentProcessors) == 1) {
+            $form->_ppType = $values['id'];
+          }
+        }
+      }
+      if ($form->_ppType) {
+        $form->assign('ppType', TRUE);
+        CRM_Core_Payment_ProcessorForm::preProcess($form);
+      }
+
+      //get payPal express id and make it available to template
+      foreach ($paymentProcessors as $ppId => $values) {
+        $payPalExpressId = ($values['payment_processor_type'] == 'PayPal_Express') ? $values['id'] : 0;
+        $form->assign('payPalExpressId', $payPalExpressId);
+        if ($payPalExpressId) {
+          break;
+        }
+      }
     }
   }
 }
