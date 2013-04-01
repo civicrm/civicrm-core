@@ -562,8 +562,8 @@ CRM.validate = CRM.validate || {
   $.fn.crmtooltip = function(){
     $('a.crm-summary-link')
     .addClass('crm-processed')
-    .live('mouseover',
-      function(e)  {
+    .on('mouseover',
+      function(e) {
           $(this).addClass('crm-tooltip-active');
           var topDistance = e.pageY - $(window).scrollTop();
           if (topDistance < 300 | topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
@@ -576,17 +576,13 @@ CRM.validate = CRM.validate || {
             .load(this.href);
         }
       })
-      .live('mouseout',
+      .on('mouseout',
       function(){
         $(this).removeClass('crm-tooltip-active');
         $(this).removeClass('crm-tooltip-down');
         }
       )
-    .live('click',
-      function(){
-        return false;
-        }
-      );
+    .on('click', false);
   };
 
   var h;
