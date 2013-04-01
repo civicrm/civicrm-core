@@ -565,7 +565,7 @@ CRM.validate = CRM.validate || {
     .live('mouseover',
       function(e)  {
           $(this).addClass('crm-tooltip-active');
-          topDistance = e.pageY - $(window).scrollTop();
+          var topDistance = e.pageY - $(window).scrollTop();
           if (topDistance < 300 | topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
                 $(this).addClass('crm-tooltip-down');
             }
