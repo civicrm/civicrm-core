@@ -84,27 +84,15 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
    * @return object
    */
   static function add(&$params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'MessageTemplate', CRM_Utils_Array::value('id', $params), $params);
+
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-
-    if (CRM_Utils_Array::value('id', $params)) {
-      CRM_Utils_Hook::pre('edit', 'MessageTemplate', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'MessageTemplate', NULL, $params);
-    }
-
     $messageTemplates = new CRM_Core_DAO_MessageTemplates();
     $messageTemplates->copyValues($params);
-
     $messageTemplates->save();
 
-    if (CRM_Utils_Array::value('id', $params)) {
-      CRM_Utils_Hook::post('edit', 'MessageTemplate', $messageTemplates->id, $messageTemplates);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'MessageTemplate', $messageTemplates->id, $messageTemplates);
-    }
-
+    CRM_Utils_Hook::post($hook, 'MessageTemplate', $messageTemplates>id, $messageTemplates);
     return $messageTemplates;
   }
 
