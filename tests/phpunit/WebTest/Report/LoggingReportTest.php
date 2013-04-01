@@ -114,7 +114,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       ));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', "Your Note has been saved.");
+    $this->waitForText('crm-notification-container', "deleted successfully");
 
     //add new relationship , disable it , delete it
     $this->waitForElementPresent("xpath=//li[@id='tab_rel']/a");
