@@ -849,6 +849,7 @@ SELECT  id
 
     // Internal field not exposed to forms
     unset($fields['Contact']['contact_type']);
+    unset($fields['Contact']['master_id']);
 
     // convert phone extension in to psedo-field phone + phone extension
     //unset extension
