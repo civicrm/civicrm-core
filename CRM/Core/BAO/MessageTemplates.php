@@ -111,6 +111,8 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
     $query = "UPDATE civicrm_mailing
                   SET msg_template_id = NULL
                   WHERE msg_template_id = %1";
+
+    $params = array(1 => array($messageTemplatesID, 'Integer'));
     CRM_Core_DAO::executeQuery($query, $params);
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplates();
