@@ -1123,4 +1123,3 @@ function printCaseReport( ) {
 
 {/if} {* view related cases if end *}
 </div>
-{include file="CRM/common/overlay.tpl"}
