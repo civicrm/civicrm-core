@@ -1242,7 +1242,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               if ($fieldVal['name'] == 'other_amount') {
                 $proceFieldAmount += $this->_submitValues['price_' . $fieldId];
               }
-              else {
+              elseif ($fieldVal['name'] == 'contribution_amount' && $this->_submitValues['price_' . $fieldId] > 0) {
                 $proceFieldAmount += $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
               }
               unset($params['price_' . $fieldId]);

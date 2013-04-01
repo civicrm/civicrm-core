@@ -163,6 +163,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             }
           } // if seperate payment we set contribution amount to be null, so that it will not show contribution amount same as membership amount.
           elseif ((CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock))
+              && CRM_Utils_Array::value($priceField->id, $this->_values['fee'])
               && ($this->_values['fee'][$priceField->id]['name'] == "other_amount")
               && CRM_Utils_Array::value("price_{$contriPriceId}", $this->_params) < 1
               && !CRM_Utils_Array::value("price_{$priceField->id}", $this->_params)) {
