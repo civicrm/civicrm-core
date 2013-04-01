@@ -219,9 +219,25 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $payments[$payment['id']] = $payment;
     }
 
-    asort($payments);
+    uasort($payments, 'self::defaultComparison');
     return $payments;
   }
+
+  /**
+   * compare 2 payment processors to see which should go first based on is_default
+   * (sort function for sortDefaultFirst)
+   * @param array $processor1
+   * @param array_type $processor2
+   * @return number
+   */
+    static function defaultComparison($processor1, $processor2){
+      $p1 = CRM_Utils_Array::value('is_default', $processor1);
+      $p2 = CRM_Utils_Array::value('is_default', $processor2);
+      if ($p1 == $p2) {
+        return 0;
+      }
+      return ($p1 > $p2) ? -1 : 1;
+    }
 
   /**
    * Function to build payment processor details
