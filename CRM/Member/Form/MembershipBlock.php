@@ -50,7 +50,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * @access public
    *
    * @return void
-   */ 
+   */
   function setDefaultValues() {
     //parent::setDefaultValues();
     $defaults = array();
@@ -210,7 +210,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
     $errors = array();
 
     if (CRM_Utils_Array::value('member_price_set_id', $params)) {
-      //check if this price set has membership type both auto-renew and non-auto-renew memberships.  
+      //check if this price set has membership type both auto-renew and non-auto-renew memberships.
       $bothTypes =  CRM_Price_BAO_Set::checkMembershipPriceSet($params['member_price_set_id']);
 
       //check for supporting payment processors
@@ -237,7 +237,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
           }
         }
-      }  
+      }
     }
     if (CRM_Utils_Array::value('member_is_active', $params)) {
 
@@ -251,7 +251,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         }
       }
 
-      if ($contributionPageId && CRM_Utils_Array::value('member_price_set_id', $params) && 
+      if ($contributionPageId && CRM_Utils_Array::value('member_price_set_id', $params) &&
         CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contributionPageId, 'amount_block_is_active')) {
         $errors['member_price_set_id'] = ts('You cannot use Membership Price Sets with the Contribution Amounts section. However, a membership price set may include additional fields for non-membership options that requires an additional fee (e.g. magazine subscription) or an additional voluntary contribution.');
       }
@@ -291,7 +291,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           $errors['is_separate_payment'] = ts('Please enable the contribution amount section to use this option.');
         }
       }
-      
+
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -353,7 +353,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         }
         elseif ($usedPriceSetId) {
           $setParams['extends'] = CRM_Core_Component::getComponentID('CiviMember');
-          $setParams['financial_type_id'] = CRM_Utils_Array::value( 'financial_type_id', $this->_values ); 
+          $setParams['financial_type_id'] = CRM_Utils_Array::value( 'financial_type_id', $this->_values );
           $setParams['id'] = $usedPriceSetId;
           $priceSet = CRM_Price_BAO_Set::create($setParams);
           $priceSetID = $priceSet->id;
@@ -371,7 +371,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         CRM_Price_BAO_Field::retrieve($editedFieldParams, $editedResults);
         if (!CRM_Utils_Array::value('id', $editedResults)) {
           $fieldParams['name'] = strtolower(CRM_Utils_String::munge('Membership Amount', '_', 245));
-          $fieldParams['label'] = CRM_Utils_Array::value('new_title', $params) ? $params['new_title'] : 'Membership';
+          $fieldParams['label'] = CRM_Utils_Array::value('new_title', $params) ? $params['new_title'] : ts('Membership Amount');
           if (!CRM_Utils_Array::value('mem_price_field_id', $params)) {
             CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_Field', 0, 1, array('price_set_id' => $priceSetID));
           }
