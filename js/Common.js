@@ -531,27 +531,27 @@ CRM.validate = CRM.validate || {
     advmultiselectResize();
     $().crmtooltip();
     $('.crm-container table.row-highlight').on('change', 'input.select-row, input.select-rows', function() {
-      var table = $(this).closest('table');
+      var target, table = $(this).closest('table');
       if ($(this).hasClass('select-rows')) {
-        var target = $('tbody tr', table);
+        target = $('tbody tr', table);
         $('input.select-row', table).prop('checked', $(this).prop('checked'));
       }
       else {
-        var target = $(this).closest('tr');
+        target = $(this).closest('tr');
         $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
       }
       target.toggleClass('crm-row-selected', $(this).is(':checked'));
     });
-    cj('#crm-container').live('click', function(event) {
-      if (cj(event.target).is('.btn-slide')) {
-          var currentActive = cj('#crm-container .btn-slide-active');
+    $('#crm-container').live('click', function(event) {
+      if ($(event.target).is('.btn-slide')) {
+          var currentActive = $('#crm-container .btn-slide-active');
           currentActive.children().hide();
           currentActive.removeClass('btn-slide-active');
-          cj(event.target).children().show();
-          cj(event.target).addClass('btn-slide-active');
+          $(event.target).children().show();
+          $(event.target).addClass('btn-slide-active');
       } else {
-          cj('.btn-slide .panel').hide();
-          cj('.btn-slide-active').removeClass('btn-slide-active');
+          $('.btn-slide .panel').hide();
+          $('.btn-slide-active').removeClass('btn-slide-active');
       }
     });
   });
@@ -559,30 +559,26 @@ CRM.validate = CRM.validate || {
     advmultiselectResize();
   });
 
-  $.fn.crmtooltip = function(){
-    $('a.crm-summary-link')
-    .addClass('crm-processed')
-    .on('mouseover',
-      function(e) {
-          $(this).addClass('crm-tooltip-active');
-          var topDistance = e.pageY - $(window).scrollTop();
-          if (topDistance < 300 | topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
-                $(this).addClass('crm-tooltip-down');
-            }
-        if ($(this).children('.crm-tooltip-wrapper').length == '') {
+  $.fn.crmtooltip = function() {
+    $('a.crm-summary-link:not(.crm-processed)')
+      .addClass('crm-processed')
+      .on('mouseover', function(e) {
+        $(this).addClass('crm-tooltip-active');
+        var topDistance = e.pageY - $(window).scrollTop();
+        if (topDistance < 300 | topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
+          $(this).addClass('crm-tooltip-down');
+        }
+        if (!$(this).children('.crm-tooltip-wrapper').length) {
           $(this).append('<div class="crm-tooltip-wrapper"><div class="crm-tooltip"></div></div>');
           $(this).children().children('.crm-tooltip')
             .html('<div class="crm-loading-element"></div>')
             .load(this.href);
         }
       })
-      .on('mouseout',
-      function(){
-        $(this).removeClass('crm-tooltip-active');
-        $(this).removeClass('crm-tooltip-down');
-        }
-      )
-    .on('click', false);
+      .on('mouseout', function() {
+        $(this).removeClass('crm-tooltip-active crm-tooltip-down');
+      })
+      .on('click', false);
   };
 
   var h;
@@ -598,11 +594,11 @@ CRM.validate = CRM.validate || {
       {
         data: params,
         dataType: 'html',
-        success: function(data) {
+        success: function (data) {
           $('#crm-notification-container .crm-help .notify-content:last').html(data);
           $('#crm-notification-container .crm-help').removeClass('crm-msg-loading').addClass('info');
         },
-        error: function(data) {
+        error: function () {
           $('#crm-notification-container .crm-help .notify-content:last').html('Unable to load help file.');
           $('#crm-notification-container .crm-help').removeClass('crm-msg-loading').addClass('error');
         }
@@ -634,7 +630,7 @@ CRM.validate = CRM.validate || {
         unique: true
       };
       options = $.extend(extra, options);
-      options.expires = options.expires === false ? 0 : parseInt(options.expires);
+      options.expires = options.expires === false ? 0 : parseInt(options.expires, 10);
       if (options.unique && options.unique !== '0') {
         $('#crm-notification-container .ui-notify-message').each(function() {
           if (title === $('h1', this).html() && text === $('.notify-content', this).html()) {
@@ -651,7 +647,7 @@ CRM.validate = CRM.validate || {
       alert(text);
       return null;
     }
-  }
+  };
 
   /**
    * Close whichever alert contains the given node
@@ -660,7 +656,7 @@ CRM.validate = CRM.validate || {
    */
   CRM.closeAlertByChild = function(node) {
     $(node).closest('.ui-notify-message').find('.icon.ui-notify-close').click();
-  }
+  };
 
   /**
    * Prompt the user for confirmation.
@@ -692,14 +688,14 @@ CRM.validate = CRM.validate || {
       settings.buttons[label] = function() {
         callback.call(dialog);
         dialog.dialog('close');
-      }
+      };
     });
     dialog = $('<div class="crm-container crm-confirm-dialog"></div>')
       .html(options.message)
       .appendTo('body')
       .dialog(settings);
     return dialog;
-  }
+  };
 
   /**
    * Sets an error message
@@ -738,22 +734,22 @@ CRM.validate = CRM.validate || {
       });}, 1000);
     }
     return msg;
-  }
+  };
 
   // Display system alerts through js notifications
   function messagesFromMarkup() {
     $('div.messages:visible', this).not('.help').not('.no-popup').each(function() {
+      var text, title = '';
       $(this).removeClass('status messages');
       var type = $(this).attr('class').split(' ')[0] || 'alert';
       type = type.replace('crm-', '');
       $('.icon', this).remove();
-      var title = '';
       if ($('.msg-text', this).length > 0) {
-        var text = $('.msg-text', this).html();
+        text = $('.msg-text', this).html();
         title = $('.msg-title', this).html();
       }
       else {
-        var text = $(this).html();
+        text = $(this).html();
       }
       var options = $(this).data('options') || {};
       $(this).remove();
@@ -782,14 +778,12 @@ CRM.validate = CRM.validate || {
   });
 
   $.fn.crmAccordions = function(speed) {
+    var container = $('#crm-container');
     if (speed === undefined) {
       speed = 200;
     }
     if ($(this).length > 0) {
-      var container = $(this);
-    }
-    else {
-      var container = $('#crm-container');
+      container = $(this);
     }
     if (container.length > 0 && !container.hasClass('crm-accordion-processed')) {
       // Allow normal clicking of links
@@ -807,7 +801,7 @@ CRM.validate = CRM.validate || {
         return false;
       });
       container.addClass('crm-accordion-processed');
-    };
+    }
   };
   $.fn.crmAccordionToggle = function(speed) {
     $(this).each(function() {
