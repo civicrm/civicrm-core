@@ -95,3 +95,6 @@
 
   {/literal}
  </script>
+
+{include file="CRM/Form/attachmentjs.tpl"}
+

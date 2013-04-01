@@ -86,7 +86,7 @@
                                 <a href="{$element.element_value.fileURL}">{$element.element_value.fileName}</a>
                             {/if}
                             {if $element.element_value.deleteURL}
-                                   <a href="#" onclick="showDelete('{$element.element_value.fileName}', '{$element.element_value.deleteURLArgs}', {$element.element_value.fid}, '#attachStatusMesg_{$element_name}', '#attachFile_{$element_name}'); return false;" title="{ts}Delete this file{/ts}"><span class="icon red-icon delete-icon" style="margin:0px 0px -5px 20px" title="{ts}Delete this file{/ts}"></span></a>
+                                   <a href="#" onclick="showDeleteAttachment('{$element.element_value.fileName}', '{$element.element_value.deleteURLArgs}', {$element.element_value.fid}, '#attachStatusMesg_{$element_name}', '#attachFile_{$element_name}'); return false;" title="{ts}Delete this file{/ts}"><span class="icon red-icon delete-icon" style="margin:0px 0px -5px 20px" title="{ts}Delete this file{/ts}"></span></a>
                             {/if}
                         </span>
                       </div>
