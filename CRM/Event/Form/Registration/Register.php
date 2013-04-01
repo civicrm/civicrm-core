@@ -234,6 +234,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $this->_defaults);
     }
 
+    // Set default payment processor as default payment_processor radio button value
+    if (!empty($this->_paymentProcessors)) {
+      foreach ($this->_paymentProcessors as $pid => $value) {
+        if (CRM_Utils_Array::value('is_default', $value)) {
+          $this->_defaults['payment_processor'] = $pid;
+        }
+      }
+    }
+
     //if event is monetary and pay later is enabled and payment
     //processor is not available then freeze the pay later checkbox with
     //default check
