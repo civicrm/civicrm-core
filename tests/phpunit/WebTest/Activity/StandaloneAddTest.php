@@ -127,11 +127,10 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("followup_activity_subject", "This is subject of schedule follow-up activity");
 
     // Clicking save.
-    $this->click("_qf_Activity_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Activity_upload');
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Activity '$subject' has been saved."), "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "Activity '$subject' has been saved.");
 
     $this->openCiviPage("activity/search", "reset=1", "_qf_Search_refresh");
 

@@ -90,10 +90,9 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select("status_id", "value=2");
 
     // click save
-    $this->click("_qf_Campaign_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Campaign_upload-bottom');
 
-    $this->assertTrue($this->isTextPresent("Campaign $title Campaign has been saved."), "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "Campaign $title Campaign has been saved.");
 
     ////////////// Create petition using New Individual profile //////////////////////
 
@@ -113,10 +112,9 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select("contact_profile_id", "value=4");
 
     // click save
-    $this->click("_qf_Petition_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Petition_next-bottom');
 
-    $this->assertTrue($this->isTextPresent("Petition has been saved."));
+    $this->waitForText('crm-notification-container', "Petition has been saved.");
 
     $this->waitForElementPresent("link=Add Petition");
 
@@ -151,9 +149,8 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", $email);
 
     // click Sign the petition.
-    $this->click("_qf_Signature_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Thank You"));
+    $this->clickLink('_qf_Signature_next-bottom', NULL);
+    $this->waitForText('page-title', "Thank You");
 
     // login
     $this->webtestLogin();
@@ -207,10 +204,9 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $this->fillRichTextField('thankyou_text', "Thank you for your kind contribution to support $title", 'CKEditor');
 
     // click save
-    $this->click("_qf_Petition_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Petition_next-bottom');
 
-    $this->assertTrue($this->isTextPresent("Petition has been saved."));
+    $this->waitForText('crm-notification-container', "Petition has been saved.");
 
     $this->waitForElementPresent("link=Add Petition");
 
@@ -243,12 +239,11 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", $email);
 
     // click Sign the petition.
-    $this->click("_qf_Signature_next-bottom");
-    $this->waitForElementPresent("thankyou_text");
+    $this->clickLink('_qf_Signature_next-bottom', 'thankyou_text');
 
     // check that thank-you page has appropriate title and message
-    $this->assertTrue($this->isTextPresent("Awesome $title donation"));
-    $this->assertTrue($this->isTextPresent("Thank you for your kind contribution to support $title"));
+    $this->waitForText('page-title', "Awesome $title donation");
+    $this->waitForText('thankyou_text', "Thank you for your kind contribution to support $title");
 
     // login
     $this->webtestLogin();
