@@ -66,6 +66,17 @@ class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
     $this->assign('caseId', $caseId);
     $this->assign('contactId', $this->_contactId);
 
+    // Make it easy to refresh this table
+    $params = array(
+      'caseId' => $caseId,
+      'type' => $type,
+      'context' => $this->_context,
+      'cid' => $this->_contactId,
+      'action' => $this->_action,
+      'snippet' => 4,
+    );
+    $this->assign('data_params', json_encode($params));
+
     return parent::run();
   }
 }
