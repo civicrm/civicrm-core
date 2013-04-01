@@ -135,7 +135,7 @@ function civicrm_api3_event_get($params) {
     $eventDAO->whereAdd( '( is_template = 1 )' );
   }
   else {
-  $eventDAO->whereAdd('( is_template IS NULL ) OR ( is_template = 0 )');
+    $eventDAO->whereAdd('( is_template IS NULL ) OR ( is_template = 0 )');
   }
 
   if (CRM_Utils_Array::value('isCurrent', $params)) {
