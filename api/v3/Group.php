@@ -105,6 +105,7 @@ function civicrm_api3_group_get($params) {
   $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
   if(is_array($returnProperties) && !empty($returnProperties)){
     // group function takes $returnProperties in non standard format & doesn't add id
+    unset($returnProperties['group_id']);
     $returnProperties['id'] = 1;
     $returnProperties = array_keys($returnProperties);
   }
