@@ -377,11 +377,11 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
             $choice[$opId]->freeze();
           }
         }
-        if (property_exists($qf, '_membershipBlock') && CRM_Utils_Array::value('is_separate_payment', $qf->_membershipBlock) && $field->name == 'contribution_amount') {
+        if (property_exists($qf, '_membershipBlock') && $field->name == 'contribution_amount') {
           $choice[] = $qf->createElement('radio', NULL, '', ts('No thank you'), '-1',
-                      array(
-                        'onclick' => 'clearAmountOther();',
-                      )
+            array(
+              'onclick' => 'clearAmountOther();',
+            )
           );
         }
 
@@ -405,7 +405,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
         $element = &$qf->addGroup($choice, $elementName, $label);
 
         // make contribution field required for quick config when membership block is enabled
-        if (($field->name == 'membership_amount' || ($field->name == 'contribution_amount' && CRM_Utils_Array::value('is_separate_payment', $qf->_membershipBlock))) 
+        if (($field->name == 'membership_amount' || $field->name == 'contribution_amount')
           && property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock) && !$field->is_required) {
           $useRequired = $field->is_required = TRUE;
         }
