@@ -833,8 +833,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
 
-        if ($membershipFieldId && (!CRM_Utils_Array::value('price_' . $contributionFieldId, $fields)
-          && !CRM_Utils_Array::value('price_' . $otherFieldId, $fields))) {
+        if ($membershipFieldId && !(CRM_Utils_Array::value('price_' . $contributionFieldId, $fields)
+          && $fields['price_' . $contributionFieldId] >= 0)
+          && !CRM_Utils_Array::value('price_' . $otherFieldId, $fields)) {
           $errors["price_{$errorKey}"] = ts('Additional Amount is required.');
         }
       }
