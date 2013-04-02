@@ -92,7 +92,7 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
     $messageTemplates->copyValues($params);
     $messageTemplates->save();
 
-    CRM_Utils_Hook::post($hook, 'MessageTemplate', $messageTemplates>id, $messageTemplates);
+    CRM_Utils_Hook::post($hook, 'MessageTemplate', $messageTemplates->id, $messageTemplates);
     return $messageTemplates;
   }
 
