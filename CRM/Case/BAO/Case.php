@@ -2506,7 +2506,7 @@ SELECT  id
         $mergeActSubject = ts("Case %1 reassigned client from %2 to %3. New Case ID is %4.",
           array(
             1 => $otherCaseId, 2 => $otherContactDisplayName,
-            3 => $mainContactDisplayName, 4 => $mainCaseId,
+            3 => $mainContactDisplayName, 4 => $mainCaseId
           )
         );
       }
@@ -2515,7 +2515,7 @@ SELECT  id
         $mergeActSubject = ts("Case %1 copied from contact id %2 to contact id %3 via merge. New Case ID is %4.",
           array(
             1 => $otherCaseId, 2 => $otherContactId,
-            3 => $mainContactId, 4 => $mainCaseId,
+            3 => $mainContactId, 4 => $mainCaseId
           )
         );
       }

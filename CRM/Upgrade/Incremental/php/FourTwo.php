@@ -55,7 +55,7 @@ class CRM_Upgrade_Incremental_php_FourTwo {
     if ($rev == '4.2.alpha1') {
       $tables = array('civicrm_contribution_page','civicrm_event','civicrm_group','civicrm_contact');
       if (!CRM_Core_DAO::schemaRequiresRebuilding($tables)){
-        $errors = ts("The upgrade has identified some schema integrity issues in the database. It seems some of your constraints are missing. You will have to rebuild your schema before re-trying the upgrade. Please refer to ".CRM_Utils_System::docURL2("Ensuring Schema Integrity on Upgrades", FALSE, "Ensuring Schema Integrity on Upgrades", NULL, NULL, "wiki"));
+        $errors = ts("The upgrade has identified some schema integrity issues in the database. It seems some of your constraints are missing. You will have to rebuild your schema before re-trying the upgrade. Please refer to %1.", array(1 => CRM_Utils_System::docURL2("Ensuring Schema Integrity on Upgrades", FALSE, "Ensuring Schema Integrity on Upgrades", NULL, NULL, "wiki")));
         CRM_Core_Error::fatal($errors);
         return FALSE;
       }
@@ -100,14 +100,14 @@ ORDER BY mp.contribution_id, mp.membership_id";
       // note: error conditions are also checked in upgrade_4_2_beta2()
       if (!defined('CIVICRM_SETTINGS_PATH')) {
         $preUpgradeMessage .= '<br />' . ts('Could not determine path to civicrm.settings.php. Please manually locate it and add these lines at the bottom: <pre>%1</pre>', array(
-          1 => self::SETTINGS_SNIPPET,
+          1 => self::SETTINGS_SNIPPET
         ));
       } elseif (preg_match(self::SETTINGS_SNIPPET_PATTERN, file_get_contents(CIVICRM_SETTINGS_PATH))) {
         // OK, nothing to do
       } elseif (!is_writable(CIVICRM_SETTINGS_PATH)) {
         $preUpgradeMessage .= '<br />' . ts('The settings file (%1) must be updated. Please make it writable or manually add these lines:<pre>%2</pre>', array(
           1 => CIVICRM_SETTINGS_PATH,
-          2 => self::SETTINGS_SNIPPET,
+          2 => self::SETTINGS_SNIPPET
         ));
       }
     }

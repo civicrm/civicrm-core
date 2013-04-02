@@ -718,11 +718,10 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       if ($showsumcontribs) {
         $totalandsum = array();
         foreach ($totals as $key => $total) {
-          $totalandsumvals = array(
+          $totalandsum[$key] = ts("%1 contributions: %2", array(
             1 => $total,
-            2 => CRM_Utils_Money::format($sumcontribs[$key]),
-          );
-          $totalandsum[$key] = ts("%1 contributions: %2", $totalandsumvals);
+            2 => CRM_Utils_Money::format($sumcontribs[$key])
+          ));
         }
         $this->assign('sectionTotals', $totalandsum);
       }

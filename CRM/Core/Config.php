@@ -677,9 +677,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       }
       if (!empty($modules_with_perms)) {
         CRM_Core_Session::setStatus(
-          ts('Some modules define permissions, but the CMS cannot store them: %1', array(
-            1 => implode(', ', $modules_with_perms),
-          )),
+          ts('Some modules define permissions, but the CMS cannot store them: %1', array(1 => implode(', ', $modules_with_perms))),
           ts('Permission Error'),
           'error'
         );
