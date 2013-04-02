@@ -84,12 +84,15 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
    * @return object
    */
   static function add(&$params) {
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'MessageTemplate', CRM_Utils_Array::value('id', $params), $params);
 
+    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $messageTemplates = new CRM_Core_DAO_MessageTemplates();
     $messageTemplates->copyValues($params);
-
     $messageTemplates->save();
+
+    CRM_Utils_Hook::post($hook, 'MessageTemplate', $messageTemplates->id, $messageTemplates);
     return $messageTemplates;
   }
 
@@ -182,9 +185,9 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
 
       // get replacement text for these tokens
       $returnProperties = array("preferred_mail_format" => 1);
-      if (isset($tokens['contact'])) { 
+      if (isset($tokens['contact'])) {
         foreach ($tokens['contact'] as $key => $value) {
-          $returnProperties[$value] = 1; 
+          $returnProperties[$value] = 1;
         }
       }
       list($details) = CRM_Utils_Token::getTokenDetails(array($contactId),
@@ -195,11 +198,11 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
       $contact = reset( $details );
 
       // call token hook
-      $hookTokens = array();            
+      $hookTokens = array();
       CRM_Utils_Hook::tokens($hookTokens);
       $categories = array_keys($hookTokens);
 
-      // do replacements in text and html body            
+      // do replacements in text and html body
       $type = array('html', 'text');
       foreach ($type as $key => $value) {
         $bodyType = "body_{$value}";
