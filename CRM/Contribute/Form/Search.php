@@ -152,7 +152,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
      * we allow the controller to set force/reset externally, useful when we are being
      * driven by the wizard framework
      */
-        
+
     $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
     $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit   = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
@@ -273,7 +273,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
      * add form checkboxes for each row. This is needed out here to conform to QF protocol
      * of all elements being declared in builQuickForm
      */
-    
+
     $rows = $this->get('rows');
     if (is_array($rows)) {
       if (!$this->_single) {
@@ -372,36 +372,36 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
       }
     }
-    
+
     $config = CRM_Core_Config::singleton();
     $tags = CRM_Utils_Array::value('contact_tags', $this->_formValues);
     if ($tags && !is_array($tags)) {
       unset($this->_formValues['contact_tags']);
       $this->_formValues['contact_tags'][$tags] = 1;
     }
-    
+
     if ($tags && is_array($tags)) {
       unset($this->_formValues['contact_tags']);
       foreach($tags as $notImportant => $tagID) {
           $this->_formValues['contact_tags'][$tagID] = 1;
       }
     }
-    
-    
+
+
     if (!$config->groupTree) {
       $group = CRM_Utils_Array::value('group', $this->_formValues);
       if ($group && !is_array($group)) {
         unset($this->_formValues['group']);
         $this->_formValues['group'][$group] = 1;
       }
-      
+
       if ($group && is_array($group)) {
         unset($this->_formValues['group']);
         foreach($group as $notImportant => $groupID) {
             $this->_formValues['group'][$groupID] = 1;
         }
       }
-      
+
     }
 
     CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
@@ -416,7 +416,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
 
       // hack, make sure we reset the task values
-      $stateMachine = &$this->controller->getStateMachine();
+      $stateMachine = $this->controller->getStateMachine();
       $formName = $stateMachine->getTaskFormName();
       $this->controller->resetPage($formName);
       return;
