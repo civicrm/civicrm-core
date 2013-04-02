@@ -47,8 +47,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   public $_relatedOrganizationFound;
 
-  public $_onBehalfRequired = 0;
-  public $_onbehalf = 0;
+  public $_onBehalfRequired = FALSE;
+  public $_onbehalf = FALSE;
   public $_paymentProcessors;
   protected $_defaults;
 
@@ -99,28 +99,43 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->assign('mainDisplay', $mainDisplay);
     }
 
+    // Possible values for 'is_for_organization':
+    // * 0 - org profile disabled
+    // * 1 - org profile optional
+    // * 2 - org profile required
     $this->_onbehalf = FALSE;
-    if (CRM_Utils_Array::value('is_for_organization', $this->_values)) {
-      $this->_onbehalf = TRUE;
-      CRM_Contribute_Form_Contribution_OnBehalfOf::preProcess($this);
+    if (!empty($this->_values['is_for_organization'])) {
+      if ($this->_values['is_for_organization'] == 2) {
+        $this->_onBehalfRequired = TRUE;
+      }
+      // Add organization profile if 1 of the following are true:
+      // If the org profile is required
+      if ($this->_onBehalfRequired ||
+        // Or we are building the form for the first time
+        empty($_POST) ||
+        // Or the user has submitted the form and checked the "On Behalf" checkbox
+        !empty($_POST['is_for_organization'])
+      ) {
+        $this->_onbehalf = TRUE;
+        CRM_Contribute_Form_Contribution_OnBehalfOf::preProcess($this);
+      }
     }
+    $this->assign('onBehalfRequired', $this->_onBehalfRequired);
 
-    if (CRM_Utils_Array::value('id', $this->_pcpInfo) &&
-      CRM_Utils_Array::value('intro_text', $this->_pcpInfo)
-    ) {
+    if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
     }
-    elseif (CRM_Utils_Array::value('intro_text', $this->_values)) {
+    elseif (!empty($this->_values['intro_text'])) {
       $this->assign('intro_text', $this->_values['intro_text']);
     }
 
     $qParams = "reset=1&amp;id={$this->_id}";
-    if ( $pcpId = CRM_Utils_Array::value( 'pcp_id', $this->_pcpInfo ) ) {
+    if ($pcpId = CRM_Utils_Array::value('pcp_id', $this->_pcpInfo)) {
       $qParams .= "&amp;pcpId={$pcpId}";
     }
-    $this->assign( 'qParams' , $qParams );
+    $this->assign('qParams', $qParams);
 
-    if (CRM_Utils_Array::value('footer_text', $this->_values)) {
+    if (!empty($this->_values['footer_text'])) {
       $this->assign('footer_text', $this->_values['footer_text']);
     }
 
@@ -167,10 +182,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   function setDefaultValues() {
-    if ($this->_onbehalf) {
-      return;
-    }
-
     // check if the user is registered and we have a contact ID
     $contactID = $this->_userID;
 
@@ -373,10 +384,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $config = CRM_Core_Config::singleton();
-    if (CRM_Utils_Array::value('is_for_organization', $this->_values) == 2) {
-      $this->assign('onBehalfRequired', TRUE);
-      $this->_onBehalfRequired = 1;
-    }
+
     if ($this->_onbehalf) {
       CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
     }
@@ -629,15 +637,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Core_BAO_Location::getValues($entityBlock, $this->_defaults);
     }
 
-    if ($this->_values['is_for_organization'] != 2) {
+    if (!$this->_onBehalfRequired) {
       $this->addElement('checkbox', 'is_for_organization',
         $this->_values['for_organization'],
         NULL, array('onclick' => "showOnBehalf( );")
       );
-    }
-    else {
-      $this->assign('onBehalfRequired', TRUE);
-      $this->_onBehalfRequired = 1;
     }
 
     $this->assign('is_for_organization', TRUE);
