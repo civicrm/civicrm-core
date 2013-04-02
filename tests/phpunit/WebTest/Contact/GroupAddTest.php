@@ -70,6 +70,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
+    $this->waitForVisible('crm-group-selector_processing');
     $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(text(), '{$params['name']}')]");
     $createdBy = $this->getText("xpath=//table[@id='crm-group-selector']/tbody/tr/td[3]/a");
     $this->click("xpath=//table[@id='crm-group-selector']/tbody/tr/td[7]/span/a[2]");
@@ -82,14 +83,22 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     //search groups using created by
     $this->type('created_by', $createdBy);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody//tr//td[3]/a");
+
+    //show maximum no. of groups on first result set page
+    //as many groups can be created by same creator
+    //and checking is done on first result set page
+    $this->waitForVisible('crm-group-selector_processing');
+    $this->select("xpath=//select[@name='crm-group-selector_length']", '100');
+    $this->waitForVisible('crm-group-selector_processing');
+
+    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody//tr/td[contains(text(), '{$params['name']}')]");
     $this->assertTrue($this->isElementPresent("xpath=//table[@id='crm-group-selector']/tbody//tr/td[1][text()='{$params['name']}']/following-sibling::td[2]/a[text()='{$createdBy}']"));
 
     //check link of the contact who created the group
     $this->click("xpath=//table[@id='crm-group-selector']/tbody//tr/td[1][text()='{$params['name']}']/following-sibling::td[2]/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $name = explode(',', $createdBy);
-    $name1 = trim($name[1]);
+    $name1 = isset($name[1]) ? trim($name[1]) : NULL;
     $name0 = trim($name[0]);
     $displayName = isset($name1) ? "{$name1} {$name0}" : "{$name0}";
     $this->assertElementContainsText("css=div.crm-summary-display_name", $displayName);
