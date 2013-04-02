@@ -116,6 +116,12 @@ function do_distmaker() {
   DM_VERSION=$version
   DM_REVISION=$rev
   DM_ZIP=$cmd_zip
+  DM_REF_CORE=${start_point}
+  DM_REF_DRUPAL=7.x-${start_point}
+  DM_REF_DRUPAL6=6.x-${start_point}
+  DM_REF_JOOMLA=${start_point}
+  DM_REF_WORDPRESS=${start_point}
+  DM_REF_PACKAGES=${start_point}
   " > $workdir/$version/export/distmaker/distmaker.conf
 
   # create a minimal civicrm.settings.php file
