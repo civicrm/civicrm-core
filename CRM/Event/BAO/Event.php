@@ -390,7 +390,7 @@ LIMIT      0, 10
     );
 
     $params = array(1 => array($optionGroupId, 'Integer'));
-
+    $mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'civicrm_event', 'id', 'entity_value');
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
       foreach ($properties as $property => $name) {
@@ -424,7 +424,7 @@ LIMIT      0, 10
 
             $eventSummary['events'][$dao->id][$property] = $set;
             if (in_array($dao->id, $permissions[CRM_Core_Permission::EDIT])) {
-              $eventSummary['events'][$dao->id]['configure'] = CRM_Utils_System::url("civicrm/admin/event", "action=update&id=$dao->id&reset=1");
+              $eventSummary['events'][$dao->id]['configure'] = CRM_Utils_System::url('civicrm/admin/event', "action=update&id=$dao->id&reset=1");
             }
             break;
 
@@ -494,8 +494,8 @@ LIMIT      0, 10
       $eventSummary['events'][$dao->id]['is_show_location'] = $dao->is_show_location;
       $eventSummary['events'][$dao->id]['is_subevent'] = $dao->slot_label_id;
       $eventSummary['events'][$dao->id]['is_pcp_enabled'] = $dao->is_pcp_enabled;
-      $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, 3);
-
+      $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
+      
       $statusTypes = CRM_Event_PseudoConstant::participantStatus();
       foreach ($statusValues as $statusId => $statusValue) {
         if (!array_key_exists($statusId, $statusTypes)) {
@@ -1214,7 +1214,7 @@ WHERE civicrm_event.is_active = 1
         $groupTitle = NULL;
         foreach ($fields as $k => $v) {
           if (!$groupTitle) {
-            $groupTitle = $v["groupTitle"];
+            $groupTitle = $v['groupTitle'];
           }
           // suppress all file fields from display
           if (
@@ -1294,7 +1294,7 @@ WHERE civicrm_event.is_active = 1
               unset($feeLevel[$key]);
             }
           }
-          $values[$fields['participant_fee_level']['title']] = implode(",", $feeLevel);
+          $values[$fields['participant_fee_level']['title']] = implode(',', $feeLevel);
         }
 
         unset($values[$fields['participant_id']['title']]);
@@ -1349,7 +1349,7 @@ WHERE civicrm_event.is_active = 1
 
       foreach ($fields as $v) {
         if (CRM_Utils_Array::value('groupTitle', $v)) {
-          $groupTitle['groupTitle'] = $v["groupTitle"];
+          $groupTitle['groupTitle'] = $v['groupTitle'];
           break;
         }
       }
