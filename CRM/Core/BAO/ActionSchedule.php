@@ -760,13 +760,12 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             $contactField = 'e.source_contact_id';
             break;
 
+          default:
           case 'Activity Targets':
             $contactField = 'r.target_contact_id';
             $join[] = 'INNER JOIN civicrm_activity_target r ON  r.activity_id = e.id';
             break;
 
-          default:
-            break;
         }
         // build where clause
         if (!empty($value)) {
