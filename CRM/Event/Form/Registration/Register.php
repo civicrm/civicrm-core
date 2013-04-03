@@ -68,7 +68,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    */
   public $_skipDupeRegistrationCheck = FALSE;
 
-  protected $_ppType;
+  public $_ppType;
+  public $_snippet;
 
   /**
    * Function to set variables up before form is built
@@ -78,24 +79,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    */
   function preProcess() {
     parent::preProcess();
-    $this->_ppType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('ppType', FALSE);
-    if ($this->_ppType) {
-      $this->assign('ppType', TRUE);
-      return CRM_Core_Payment_ProcessorForm::preProcess($this);
-    }
 
-    //get payPal express id and make it available to template
-    $paymentProcessors = $this->get('paymentProcessors');
-    $this->assign('payPalExpressId', 0);
-    if (!empty($paymentProcessors)) {
-      foreach ($paymentProcessors as $ppId => $values) {
-        $payPalExpressId = ($values['payment_processor_type'] == 'PayPal_Express') ? $values['id'] : 0;
-        $this->assign('payPalExpressId', $payPalExpressId);
-        if ($payPalExpressId) {
-          break;
-        }
-      }
+    CRM_Contribute_Form_Contribution_Main::preProcessPaymentOptions($this);
+    if ($this->_snippet) {
+      return;
     }
 
     //CRM-4320.
@@ -156,7 +143,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return None
    */
   function setDefaultValues() {
-    if ($this->_ppType && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
+    if ($this->_ppType && $this->_snippet && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
       // see function comment block for explanation of this
       return;
     }
@@ -353,8 +340,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @access public
    */
   public function buildQuickForm() {
+    // Build payment processor form
     if ($this->_ppType) {
-      return CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+      CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+      // Return if we are in an ajax callback
+      if ($this->_snippet) {
+        return;
+      }
     }
 
     $contactID = parent::getContactID();
@@ -563,7 +555,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    */
   static public function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
     //if payment done, no need to build the fee block.
-    if (isset($form->_paymentId) && $form->_paymentId) {
+    if (!empty($form->_paymentId)) {
       //fix to diaplay line item in update mode.
       $form->assign('priceSet', isset($form->_priceSet) ? $form->_priceSet : NULL);
       return;

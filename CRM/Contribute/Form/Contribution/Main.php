@@ -47,8 +47,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   public $_relatedOrganizationFound;
 
-  public $_onBehalfRequired = 0;
-  public $_onbehalf = 0;
+  public $_onBehalfRequired = FALSE;
+  public $_onbehalf = FALSE;
   public $_paymentProcessors;
   protected $_defaults;
 
@@ -57,6 +57,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public $_useForMember;
 
   protected $_ppType;
+  protected $_snippet;
 
   /**
    * Function to set variables up before form is built
@@ -67,23 +68,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public function preProcess() {
     parent::preProcess();
 
-    $this->_ppType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('ppType', FALSE);
-    if ($this->_ppType) {
-      $this->assign('ppType', TRUE);
-      return CRM_Core_Payment_ProcessorForm::preProcess($this);
-    }
-
-    //get payPal express id and make it available to template
-    $paymentProcessors = $this->get('paymentProcessors');
-    if (!empty($paymentProcessors)) {
-      foreach ($paymentProcessors as $ppId => $values) {
-        $payPalExpressId = ($values['payment_processor_type'] == 'PayPal_Express') ? $values['id'] : 0;
-        $this->assign('payPalExpressId', $payPalExpressId);
-        if ($payPalExpressId) {
-          break;
-        }
-      }
+    self::preProcessPaymentOptions($this);
+    if ($this->_snippet) {
+      return;
     }
 
     // Make the contributionPageID avilable to the template
@@ -112,38 +99,43 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->assign('mainDisplay', $mainDisplay);
     }
 
+    // Possible values for 'is_for_organization':
+    // * 0 - org profile disabled
+    // * 1 - org profile optional
+    // * 2 - org profile required
     $this->_onbehalf = FALSE;
-    if (CRM_Utils_Array::value('is_for_organization', $this->_values)) {
-      $urlParams = "&id={$this->_id}&qfKey={$this->controller->_key}";
-      $this->assign('urlParams', $urlParams);
-      $this->_onbehalf = CRM_Utils_Array::value('onbehalf', $_GET);
-
-      CRM_Contribute_Form_Contribution_OnBehalfOf::preProcess($this);
-      if (CRM_Utils_Array::value('hidden_onbehalf_profile', $_POST) &&
-        (CRM_Utils_Array::value('is_for_organization', $_POST) ||
-          CRM_Utils_Array::value('is_for_organization', $this->_values) == 2
-        )
+    if (!empty($this->_values['is_for_organization'])) {
+      if ($this->_values['is_for_organization'] == 2) {
+        $this->_onBehalfRequired = TRUE;
+      }
+      // Add organization profile if 1 of the following are true:
+      // If the org profile is required
+      if ($this->_onBehalfRequired ||
+        // Or we are building the form for the first time
+        empty($_POST) ||
+        // Or the user has submitted the form and checked the "On Behalf" checkbox
+        !empty($_POST['is_for_organization'])
       ) {
-        CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
+        $this->_onbehalf = TRUE;
+        CRM_Contribute_Form_Contribution_OnBehalfOf::preProcess($this);
       }
     }
+    $this->assign('onBehalfRequired', $this->_onBehalfRequired);
 
-    if (CRM_Utils_Array::value('id', $this->_pcpInfo) &&
-      CRM_Utils_Array::value('intro_text', $this->_pcpInfo)
-    ) {
+    if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
     }
-    elseif (CRM_Utils_Array::value('intro_text', $this->_values)) {
+    elseif (!empty($this->_values['intro_text'])) {
       $this->assign('intro_text', $this->_values['intro_text']);
     }
 
     $qParams = "reset=1&amp;id={$this->_id}";
-    if ( $pcpId = CRM_Utils_Array::value( 'pcp_id', $this->_pcpInfo ) ) {
+    if ($pcpId = CRM_Utils_Array::value('pcp_id', $this->_pcpInfo)) {
       $qParams .= "&amp;pcpId={$pcpId}";
     }
-    $this->assign( 'qParams' , $qParams );
+    $this->assign('qParams', $qParams);
 
-    if (CRM_Utils_Array::value('footer_text', $this->_values)) {
+    if (!empty($this->_values['footer_text'])) {
       $this->assign('footer_text', $this->_values['footer_text']);
     }
 
@@ -190,10 +182,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   function setDefaultValues() {
-    if ($this->_onbehalf) {
-      return;
-    }
-
     // check if the user is registered and we have a contact ID
     $contactID = $this->_userID;
 
@@ -386,18 +374,19 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @access public
    */
   public function buildQuickForm() {
+    // Build payment processor form
     if ($this->_ppType) {
-      return CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+      CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+      // Return if we are in an ajax callback
+      if ($this->_snippet) {
+        return;
+      }
     }
 
     $config = CRM_Core_Config::singleton();
-    if (CRM_Utils_Array::value('is_for_organization', $this->_values) == 2) {
-      $this->assign('onBehalfRequired', TRUE);
-      $this->_onBehalfRequired = 1;
-    }
+
     if ($this->_onbehalf) {
-      $this->assign('onbehalf', TRUE);
-      return CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
+      CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
     }
 
     $this->applyFilter('__ALL__', 'trim');
@@ -648,15 +637,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Core_BAO_Location::getValues($entityBlock, $this->_defaults);
     }
 
-    if ($this->_values['is_for_organization'] != 2) {
+    if (!$this->_onBehalfRequired) {
       $this->addElement('checkbox', 'is_for_organization',
         $this->_values['for_organization'],
         NULL, array('onclick' => "showOnBehalf( );")
       );
-    }
-    else {
-      $this->assign('onBehalfRequired', TRUE);
-      $this->_onBehalfRequired = 1;
     }
 
     $this->assign('is_for_organization', TRUE);
@@ -1365,6 +1350,46 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       // redirect to thank you page
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
+    }
+  }
+
+  /**
+   * Handle Payment Processor switching
+   * For contribution and event registration forms
+   */
+  static function preProcessPaymentOptions(&$form) {
+    $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
+    $form->assign('snippet', $form->_snippet);
+
+    $paymentProcessors = $form->get('paymentProcessors');
+    $form->assign('ppType', FALSE);
+    $form->_ppType = NULL;
+    if (!empty($paymentProcessors)) {
+      // Fetch type during ajax request
+      if (isset($_GET['type']) && $form->_snippet) {
+        $form->_ppType = $_GET['type'];
+      }
+      // Set default payment processor
+      else {
+        foreach ($paymentProcessors as $values) {
+          if (!empty($values['is_default']) || count($paymentProcessors) == 1) {
+            $form->_ppType = $values['id'];
+          }
+        }
+      }
+      if ($form->_ppType) {
+        $form->assign('ppType', TRUE);
+        CRM_Core_Payment_ProcessorForm::preProcess($form);
+      }
+
+      //get payPal express id and make it available to template
+      foreach ($paymentProcessors as $ppId => $values) {
+        $payPalExpressId = ($values['payment_processor_type'] == 'PayPal_Express') ? $values['id'] : 0;
+        $form->assign('payPalExpressId', $payPalExpressId);
+        if ($payPalExpressId) {
+          break;
+        }
+      }
     }
   }
 }

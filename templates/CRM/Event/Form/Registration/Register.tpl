@@ -23,7 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $ppType}
+{* Callback snippet: Load payment processor *}
+{if $ppType and $snippet}
   {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
 
 <div id="paypalExpress">
@@ -144,7 +145,7 @@
 {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
 
 {if $form.payment_processor.label}
-<fieldset class="crm-group payment_options-group">
+<fieldset class="crm-group payment_options-group" style="display:none;">
   <legend>{ts}Payment Options{/ts}</legend>
   <div class="crm-section payment_processor-section">
     <div class="label">{$form.payment_processor.label}</div>
@@ -154,7 +155,12 @@
 </fieldset>
 {/if}
 
-<div id="billing-payment-block"></div>
+<div id="billing-payment-block">
+  {* If we have a payment processor, load it - otherwise it happens via ajax *}
+  {if $ppType}
+    {include file="CRM/Event/Form/Registration/Register.tpl" snippet=4}
+  {/if}
+</div>
 {include file="CRM/common/paymentBlock.tpl"}
 
 {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
