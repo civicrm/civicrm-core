@@ -115,16 +115,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_allowConfirmation) {
       CRM_Event_Form_EventFees::preProcess($this);
     }
-
-    if (CRM_Utils_Array::value('hidden_processor', $_POST)) {
-      $this->set('type', CRM_Utils_Array::value('payment_processor', $_POST));
-      $this->set('mode', $this->_mode);
-      $this->set('paymentProcessor', $this->_paymentProcessor);
-
-      CRM_Core_Payment_ProcessorForm::preProcess($this);
-      CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-    }
-
   }
 
   /**
