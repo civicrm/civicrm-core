@@ -3571,18 +3571,18 @@ div.m ul#civicrm-menu,
 }
 
 /* in place edit  */
-#crm-container .crm-editable-enabled {
+.crm-container .crm-editable-enabled {
   white-space: nowrap;
 }
 
-#crm-container .crm-editable-enabled,
-#crm-container .crm-editable-textarea-enabled {
+.crm-container .crm-editable-enabled,
+.crm-container .crm-editable-textarea-enabled {
   display: block;
   padding-left: 2px;
   border: 2px dashed transparent;
 }
 
-#crm-container .crm-editable-enabled:hover {
+.crm-container .crm-editable-enabled:hover {
   display: block;
   padding-left: 2px;
   border: 2px dashed lightgrey;

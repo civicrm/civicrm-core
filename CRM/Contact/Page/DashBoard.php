@@ -47,9 +47,19 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
    */
   function run() {
     // Add dashboard js and css
-    CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'packages/jquery/plugins/jquery.dashboard.js', 0, 'html-header', FALSE)
-      ->addStyleFile('civicrm', 'packages/jquery/css/dashboard.css');
+    $resources = CRM_Core_Resources::singleton();
+    $resources->addScriptFile('civicrm', 'packages/jquery/plugins/jquery.dashboard.js', 0, 'html-header', FALSE);
+    $resources->addStyleFile('civicrm', 'packages/jquery/css/dashboard.css');
+
+    $config = CRM_Core_Config::singleton();
+
+    // Add dashlet-specific js files
+    // TODO: Need a much better way of managing on-the-fly js requirements. Require.js perhaps?
+    // Checking if a specific dashlet is enabled is a pain and including the js here sucks anyway
+    // So here's a compromise:
+    if (in_array('CiviCase', $config->enableComponents)) {
+      $resources->addScriptFile('civicrm', 'templates/CRM/Case/Form/ActivityChangeStatus.js');
+    }
 
     $resetCache = CRM_Utils_Request::retrieve('resetCache', 'Positive', CRM_Core_DAO::$_nullObject);
 
@@ -101,7 +111,6 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
         $ownerOrgOK = FALSE;
       }
 
-      $config = CRM_Core_Config::singleton();
       if (in_array('CiviMail', $config->enableComponents) &&
         CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG"
       ) {
