@@ -3777,6 +3777,11 @@ div.m ul#civicrm-menu,
   padding-top: 6px;
 }
 
+#crm-container.crm-public .calc-value {
+  padding-top: 6px;
+  font-size: 15px;
+}
+
 #crm-container.crm-public .crm-section,
 .crm-section {
   margin-bottom: 0;
