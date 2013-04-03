@@ -170,15 +170,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
-
-    if (CRM_Utils_Array::value('hidden_processor', $_POST)) {
-      $this->set('type', CRM_Utils_Array::value('payment_processor', $_POST));
-      $this->set('mode', $this->_mode);
-      $this->set('paymentProcessor', $this->_paymentProcessor);
-
-      CRM_Core_Payment_ProcessorForm::preProcess($this);
-      CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-    }
   }
 
   function setDefaultValues() {
@@ -1363,11 +1354,21 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $form->assign('snippet', $form->_snippet);
 
     $paymentProcessors = $form->get('paymentProcessors');
-    $form->assign('ppType', FALSE);
     $form->_ppType = NULL;
-    if (!empty($paymentProcessors)) {
+    if ($paymentProcessors) {
+      // Fetch type during form post
+      if (CRM_Utils_Array::value('hidden_processor', $_POST)) {
+        $form->_ppType = CRM_Utils_Array::value('payment_processor', $_POST);
+        $form->set('type', $form->_ppType);
+        $form->set('mode', $form->_mode);
+        $form->set('paymentProcessor', $form->_paymentProcessor);
+      }
+      // When user presses the back button
+      elseif (!empty($form->_submitValues)) {
+        $form->_ppType = CRM_Utils_Array::value('payment_processor', $form->_submitValues);
+      }
       // Fetch type during ajax request
-      if (isset($_GET['type']) && $form->_snippet) {
+      elseif (isset($_GET['type']) && $form->_snippet) {
         $form->_ppType = $_GET['type'];
       }
       // Set default payment processor
@@ -1379,7 +1380,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
       if ($form->_ppType) {
-        $form->assign('ppType', TRUE);
         CRM_Core_Payment_ProcessorForm::preProcess($form);
       }
 
@@ -1392,6 +1392,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
+    $form->assign('ppType', $form->_ppType);
   }
 }
 
