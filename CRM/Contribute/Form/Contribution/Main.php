@@ -816,6 +816,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         && $self->_values['amount_block_is_active']) {
         $membershipFieldId = $contributionFieldId = $errorKey = $otherFieldId = NULL;
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
+          // if 'No thank you' membership is selected then set $membershipFieldId
           if ($fieldValue['name'] == 'membership_amount' && CRM_Utils_Array::value('price_' . $fieldKey, $fields) == 0) {
             $membershipFieldId = $fieldKey;
           }
@@ -832,7 +833,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             }
           }
         }
-
+        // $membershipFieldId is set and additional amount is 'No thank you' or NULL then throw error
         if ($membershipFieldId && !(CRM_Utils_Array::value('price_' . $contributionFieldId, $fields, -1) > 0)
           && !CRM_Utils_Array::value('price_' . $otherFieldId, $fields)) {
           $errors["price_{$errorKey}"] = ts('Additional Contribution is required.');
