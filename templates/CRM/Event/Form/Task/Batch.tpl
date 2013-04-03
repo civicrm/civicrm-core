@@ -29,6 +29,9 @@
     {if $context EQ 'statusChange'} {* Update Participant Status task *}
         {ts}Update the status for each participant individually, OR change all statuses to:{/ts}
         {$form.status_change.html}  {help id="id-status_change"}
+        <div class="status">
+          {ts}Participants whose status is changed FROM Pending Pay Later TO Registered or Attended will receive a confirmation email and their payment status will be set to completed. If this is not what you want to do, you can change their participant status by editing their event registration record directly.{/ts}
+        </div>
         {if $notifyingStatuses}
           <div class="status">
             {ts 1=$notifyingStatuses}Participants whose status is changed TO any of the following will be automatically notified via email: %1.{/ts}
