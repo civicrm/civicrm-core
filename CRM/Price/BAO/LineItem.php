@@ -112,6 +112,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       pf.label as field_title,
       pf.html_type,
       pfv.membership_type_id,
+      pfv.membership_num_terms,
       li.price_field_id,
       li.participant_count,
       li.price_field_value_id,
@@ -158,6 +159,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         'description' => $dao->description,
         'entity_id' => $entityId,
         'membership_type_id' => $dao->membership_type_id,
+        'membership_num_terms' => $dao->membership_num_terms,
       );
     }
     return $lineItems;

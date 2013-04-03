@@ -1681,17 +1681,26 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             // else fall back to using current membership type
             $dao->free();
 
+            // Figure out number of terms
+            $numterms = 1;
+            $lineitems = CRM_Price_BAO_LineItem::getLineItems($contributionId, 'contribution');
+            foreach ($lineitems as $lineitem) {
+              if ($membership->membership_type_id == CRM_Utils_Array::value('membership_type_id', $lineitem)) {
+                $numterms = CRM_Utils_Array::value('membership_num_terms', $lineitem);
+                
+                // in case membership_num_terms comes through as null or zero
+                $numterms = $numterms >= 1 ? $numterms : 1;
+                break;
+              }
+            }
+
             if ($currentMembership) {
-              CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership,
-                $changeToday = NULL
-              );
-              $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id,
-                $changeToday = NULL
-              );
+              CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, NULL);
+              $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id, NULL, NULL, $numterms);
               $dates['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
             }
             else {
-              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id);
+              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id, null, null, null, $numterms);
             }
 
             //get the status for membership.
