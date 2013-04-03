@@ -317,25 +317,13 @@ class CRM_Contact_Form_Search_Criteria {
       }
 
       if ($select) {
-        $config = CRM_Core_Config::singleton();
-        $countryDefault = $config->defaultContactCountry;
-        $stateProvinceDefault = $config->defaultContactStateProvince;
-        $defaultValues = array();
         $stateCountryMap[] = array(
           'state_province' => 'state_province',
           'country' => 'country',
           'county' => 'county',
         );
         if ($select == 'stateProvince') {
-          if ($stateProvinceDefault) {
-            //for setdefault state/province
-            $defaultValues[$name] = $stateProvinceDefault;
-            $form->setDefaults($defaultValues);
-          }
-          if ($countryDefault && !isset($formValues['country'])) {
-            $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($countryDefault);
-          }
-          elseif ($formValues['country']) {
+          if (isset($formValues['country'])) {
             $selectElements = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($formValues['country']);
           }
           else {
@@ -345,11 +333,6 @@ class CRM_Contact_Form_Search_Criteria {
           $element = $form->addElement('select', $name, $title, $selectElements);
         }
         elseif ($select == 'country') {
-          if ($countryDefault) {
-            //for setdefault country
-            $defaultValues[$name] = $countryDefault;
-            $form->setDefaults($defaultValues);
-          }
           $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
           $element = $form->addElement('select', $name, $title, $selectElements);
         }
@@ -384,6 +367,8 @@ class CRM_Contact_Form_Search_Criteria {
       }
     }
 
+    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
+    
     // extend addresses with proximity search
     $form->addElement('text', 'prox_distance', ts('Find contacts within'));
     $form->addElement('select', 'prox_distance_unit', NULL, array('miles' => ts('Miles'), 'kilos' => ts('Kilometers')));
@@ -391,7 +376,6 @@ class CRM_Contact_Form_Search_Criteria {
     // is there another form rule that does decimals besides money ? ...
     $form->addRule('prox_distance', ts('Please enter positive number as a distance'), 'numeric');
 
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
     $worldRegions = array('' => ts('- any region -')) + CRM_Core_PseudoConstant::worldRegion();
     $form->addElement('select', 'world_region', ts('World Region'), $worldRegions);
 
