@@ -323,7 +323,7 @@ class CRM_Contact_Form_Search_Criteria {
           'county' => 'county',
         );
         if ($select == 'stateProvince') {
-          if (isset($formValues['country'])) {
+          if (CRM_Utils_Array::value('country', $formValues)) {
             $selectElements = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($formValues['country']);
           }
           else {
