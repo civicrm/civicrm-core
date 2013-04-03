@@ -341,11 +341,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     $contactID = parent::getContactID();
     $this->assign('contact_id', $contactID);
-    $display_name = '';
-    if ($contactID) {
-      $display_name = CRM_Contact_BAO_Contact::displayName($contactID);
-    }
-    $this->assign('display_name', $display_name);
+    $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
 
     $config = CRM_Core_Config::singleton();
     $this->add('hidden', 'scriptFee', NULL);
@@ -1374,7 +1370,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
+  static function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
     // CRM-3907, skip check for preview registrations
     // CRM-4320 participant need to walk wizard
     if (!$returnContactId &&
@@ -1389,10 +1385,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $contactID = parent::getContactID();
     }
 
-    if (!$contactID &&
-      is_array($fields) &&
-      !empty($fields)
-    ) {
+    if (!$contactID && is_array($fields) && $fields) {
 
       //CRM-6996
       //as we are allowing w/ same email address,
