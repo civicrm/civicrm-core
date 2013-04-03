@@ -189,7 +189,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // now fix all state country selectors
     CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
-    if ($this->_ppType) {
+    if ($this->_snippet) {
       return $this->_defaults;
     }
 
