@@ -78,7 +78,7 @@ class CRM_Utils_Migrate_Import {
               array(
                 1 => $keyName,
                 2 => $dao->$keyName,
-                3 => $dao->__table,
+                3 => $dao->__table
               )
             ), '', 'info');
           return FALSE;
@@ -364,7 +364,7 @@ AND        f.column_name = %2
                 array(
                   1 => $profileField->field_name,
                   2 => $tableName,
-                  3 => $columnName,
+                  3 => $columnName
                 )
               ) . "<br />");
           }
