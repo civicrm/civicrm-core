@@ -93,10 +93,10 @@
       <span class="crm-case-summary-label">{ts}Case Subject{/ts}:</span>&nbsp;{$caseDetails.case_subject}
     </td>
     <td class="crm-case-caseview-case_type label">
-      <span class="crm-case-summary-label">{ts}Case Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title={ts}"Change case type (creates activity record)"{/ts}><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Case Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-case_status label">
-      <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title={ts}"Change case status (creates activity record)"{/ts}><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-case_start_date label">
       <span class="crm-case-summary-label">{ts}Start Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
@@ -1123,4 +1123,3 @@ function printCaseReport( ) {
 
 {/if} {* view related cases if end *}
 </div>
-{include file="CRM/common/overlay.tpl"}

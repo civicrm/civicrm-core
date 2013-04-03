@@ -141,8 +141,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
         // FIXME: Is there an existing function?
         $query = 'UPDATE civicrm_relationship SET end_date=NULL WHERE id=%1';
         foreach ($rels as $relId => $relData) {
-          $relParams = array(1 => array($relId, 'Integer'),
-          );
+          $relParams = array(1 => array($relId, 'Integer'));
           CRM_Core_DAO::executeQuery($query, $relParams);
         }
       }
@@ -153,8 +152,9 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $activity->priority_id = $params['priority_id'];
 
     if ($activity->subject == 'null') {
-      $activity->subject = ts('Case status changed from %1 to %2', array(1 => CRM_Utils_Array::value($form->_defaults['case_status_id'], $form->_caseStatus),
-          2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus),
+      $activity->subject = ts('Case status changed from %1 to %2', array(
+          1 => CRM_Utils_Array::value($form->_defaults['case_status_id'], $form->_caseStatus),
+          2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus)
         )
       );
       $activity->save();

@@ -164,9 +164,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       try {
         $obj = $mapper->keyToInfo($key);
       } catch (CRM_Extension_Exception $ex) {
-        CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(
-          1 => $key,
-        )));
+        CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key)));
         continue;
       }
 

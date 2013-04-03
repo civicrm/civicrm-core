@@ -2711,7 +2711,7 @@ WHERE  id IN ( $groupIDs )
           LEFT JOIN civicrm_tag {$tActTable} ON ( {$etActTable}.tag_id = {$tActTable}.id  )";
 
       $this->_where[$grouping][] = "({$tTable}.name $op '". $value . "' OR {$tCaseTable}.name $op '". $value . "' OR {$tActTable}.name $op '". $value . "')";
-      $this->_qill[$grouping][] = ts('Tag '.$tagTypesText[2].' %1 ', array( 1 => $op)) . ' ' . $value;
+      $this->_qill[$grouping][] = ts('Tag %1 %2 ', array(1 => $tagTypesText[2], 2 => $op)) . ' ' . $value;
     } else {
       $etTable = "`civicrm_entity_tag-" . $value . "`";
       $tTable = "`civicrm_tag-" . $value . "`";
@@ -2786,7 +2786,7 @@ WHERE  id IN ( $groupIDs )
       else {
         $this->_where[$grouping][] = "({$etTable}.tag_id $op (". $value . ") OR {$etCaseTable}.tag_id $op (". $value . ") OR {$etActTable}.tag_id $op (". $value . "))";
       }
-      $this->_qill[$grouping][] = ts('Tag %1 '.$tagTypesText[2], array( 1 => $op)) . ' ' . $names;
+      $this->_qill[$grouping][] = ts('Tag %1 %2', array(1 => $op, 2 => $tagTypesText[2])) . ' ' . $names;
     } else {
       $this->_tables[$etTable] =
         $this->_whereTables[$etTable] =
