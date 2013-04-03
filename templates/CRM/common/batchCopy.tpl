@@ -139,7 +139,17 @@
         }
       }
       else {
-        elementId.val( firstElementValue ).change();
+        if (elementId.is('select') === true && firstElement.parent().find(':input').select().index() >= 1) {
+          // its a multiselect case       
+          firstElement.parent().find(':input').select().each( function(count) {
+            var firstElementValue = cj(this).val();
+            var elementId = cj('.crm-copy-fields [name^="field["][name*="[' + fname +'][' + count + '"][type!=hidden]');
+            elementId.val(firstElementValue).not(":first").change();
+          });
+        }
+        else {
+          elementId.val(firstElementValue).change();
+        }
       }
 
     // since we use different display field for date we also need to set it.
