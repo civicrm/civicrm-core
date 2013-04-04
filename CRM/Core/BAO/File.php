@@ -105,7 +105,7 @@
        list($sql, $params) = self::sql($entityTable, $entityID, $fileTypeID);
      }
      else {
-       list($sql, $params) = self::sql($entityTable, $entityID, NULL);
+       list($sql, $params) = self::sql($entityTable, $entityID, 0);
      }
 
      $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -154,11 +154,10 @@
    }
 
    /**
-    * The $useWhere is used so that the signature matches the parent class
+    * A static function wrapper that deletes the various objects that are
+    * connected to a file object (i.e. file, entityFile and customValue
     */
-   public function delete($useWhere = false) {
-     list($fileID, $entityID, $fieldID) = func_get_args();
-
+   public static function deleteFileReferences($fileID, $entityID, $fieldID) {
      $fileDAO = new CRM_Core_DAO_File();
      $fileDAO->id = $fileID;
      if (!$fileDAO->find(TRUE)) {
@@ -188,6 +187,15 @@
      $query = "UPDATE $tableName SET $columnName = null WHERE $columnName = %1";
      $params = array(1 => array($fileID, 'Integer'));
      CRM_Core_DAO::executeQuery($query, $params);
+   }
+
+   /**
+    * The $useWhere is used so that the signature matches the parent class
+    */
+   public function delete($useWhere = false) {
+     list($fileID, $entityID, $fieldID) = func_get_args();
+
+     self::deleteFileReferences($fileID, $entityID, $fieldID);
    }
 
    /**

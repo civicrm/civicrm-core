@@ -222,12 +222,7 @@ class CRM_Extension_System {
         $this->_repoUrl = false;
       }
       else {
-        $vars = array(
-          '{ver}' => CRM_Utils_System::version(),
-          '{uf}' => $config->userFramework,
-          '{php}' => phpversion(),
-        );
-        $this->_repoUrl = strtr($url, $vars);
+        $this->_repoUrl = CRM_Utils_System::evalUrl($url);
       }
     }
     return $this->_repoUrl;

@@ -1,21 +1,18 @@
 // http://civicrm.org/licensing
 cj(function($) {
-  $('.crm-container').on('click', 'a.crm-activity-change-status', function() {
-    changeActivityStatus(
-      $(this).attr('activity_id'),
-      $(this).attr('current_status'),
-      $(this).attr('case_id')
-    );
-    return false;
-  });
+  // Elements are sometimes in a jQuery dialog box which is outside crm-container,
+  // So gotta attach this handler to the whole body - sorry.
+  $('body').on('click', 'a.crm-activity-change-status', function() {
+    var link = $(this),
+      activityId = $(this).attr('activity_id'),
+      current_status_id = $(this).attr('current_status'),
+      caseId = $(this).attr('case_id'),
+      data = 'snippet=1&reset=1',
+      o = $('<div class="crm-container crm-activity_change_status"></div>');
+      o.block({theme:true});
 
-  function changeActivityStatus(activityId, current_status_id, caseId) {
-    var o = $('<div class="crm-container crm-activity_change_status"></div>');
-    addCiviOverlay(o);
-
-    var data = 'snippet=1&reset=1';
     o.load(CRM.url('civicrm/case/changeactivitystatus'), data, function() {
-      removeCiviOverlay(o);
+      o.unblock();
       cj("#activity_change_status").val(current_status_id);
     });
 
@@ -40,8 +37,16 @@ cj(function($) {
               return false;
             }
             else {
-              // just reload the page on success
-              window.location.reload();
+              // reload the table on success
+              if (window.buildCaseActivities) {
+                // If we are using a datatable
+                buildCaseActivities(true);
+              }
+              else {
+                // Legacy refresh for non-datatable screens
+                var table = link.closest('table.nestedActivitySelector');
+                table.parent().load(CRM.url('civicrm/case/details', table.data('params')));
+              }
             }
           },
           error : function(jqXHR) {
@@ -55,7 +60,8 @@ cj(function($) {
         message: o
       }
     );
-  }
+    return false;
+  });
 });
 
 

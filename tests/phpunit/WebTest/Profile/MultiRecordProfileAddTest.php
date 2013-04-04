@@ -37,7 +37,13 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
   }
 
   function testUserAddNewProfile() {
-    $this->webtestLogin();
+    //add the required permission
+    $permissions = array(
+      'edit-2-profile-listings-and-forms',
+      'edit-2-access-all-custom-data',
+      'edit-2-access-civicrm'
+    );
+    $this->changePermissions($permissions);
     list($id, $profileTitle) = $this->_addNewProfile(TRUE, FALSE, TRUE);
     $this->_deleteProfile($id, $profileTitle);
   }
@@ -49,7 +55,6 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
   }
 
   function testNonSearchableMultiProfile() {
-
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile(TRUE, TRUE);
     $this->_deleteProfile($id, $profileTitle);
@@ -195,13 +200,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->webtestLogout();
 
-      $this->open("{$this->sboxPath}user");
-      // Make sure login form is available
-      $this->waitForElementPresent('edit-submit');
-      $this->type('edit-name', $recordNew['firstname']);
-      $this->type('edit-pass', $recordNew['firstname']);
-      $this->click('edit-submit');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->webtestLogin($recordNew['firstname'], $recordNew['firstname']);
     }
     $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid", NULL);
     if (!$checkMultiRecord) {
@@ -278,6 +277,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
   }
 
   function _deleteProfile($gid, $profileTitle) {
+    $this->webtestLogin();
     $this->openCiviPage("admin/uf/group", "action=delete&id={$gid}", '_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());

@@ -359,18 +359,18 @@ invert              = 0
 
     function showRuleFields( ruleFields )
     {
-        var msg1 = '{/literal}{ts 1="' + ruleFields + '"}Primary participants will be able to register additional participants using the same e-email address.  The default "Fuzzy" Dedupe Rule will use the following fields to prevent duplicate registrations: %1.  First and Last Name will be used to check for matches among multiple participants.{/ts}{literal}';
+        var msg1 = '{/literal}{ts 1="' + ruleFields + '"}Primary participants will be able to register additional participants using the same e-email address.  The configured "Supervised" Dedupe Rule will use the following fields to prevent duplicate registrations: %1.  First and Last Name will be used to check for matches among multiple participants.{/ts}{literal}';
         var msg2 = '{/literal}{ts escape='js'}Primary participants will be allowed to register for this event multiple times.  No duplicate registration checking will be performed.{/ts}{literal}';
         var msg3 = '{/literal}{ts escape='js'}Primary participants will be able to register additional participants during registration.{/ts}{literal}';
 
         // Display info
-        cj('.ui-notify-message .icon.info').click();
+        cj('.ui-notify-message .ui-notify-close').click();
         if ( cj("#allow_same_participant_emails").attr( 'checked' ) && cj("#is_multiple_registrations").attr( 'checked' ) ) {
-            CRM.alert( msg1, '', 'info' );
+            CRM.alert( msg1, '', 'info', {expires:0} );
         } else if ( cj("#allow_same_participant_emails").attr( 'checked' ) && !cj("#is_multiple_registrations").attr( 'checked' ) ) {
-            CRM.alert( msg2, '', 'info' );
+            CRM.alert( msg2, '', 'info', {expires:0} );
         } else if ( !cj("#allow_same_participant_emails").attr( 'checked' ) && cj("#is_multiple_registrations").attr( 'checked' ) ) {
-            CRM.alert( msg3, '', 'info' );
+            CRM.alert( msg3, '', 'info', {expires:0} );
         }
     }
 

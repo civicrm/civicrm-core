@@ -118,7 +118,7 @@
                   <strong><a href="{$attVal.url}">{$attVal.cleanName}</a></strong>
                   {if $attVal.description}&nbsp;-&nbsp;{$attVal.description}{/if}
                   {if $attVal.deleteURLArgs}
-                   <a href="#" onclick="showDelete('{$attVal.cleanName}', '{$attVal.deleteURLArgs}', {$attVal.fileID}); return false;" title="{ts}Delete this attachment{/ts}"><span class="icon red-icon delete-icon" style="margin:0px 0px -5px 20px" title="{ts}Delete this attachment{/ts}"></span></a>
+                   <a href="#" onclick="showDeleteAttachment('{$attVal.cleanName}', '{$attVal.deleteURLArgs}', {$attVal.fileID}, '#attachStatusMesg', '#attachFileRecord_{$attVal.fileID}'); return false;" title="{ts}Delete this attachment{/ts}"><span class="icon red-icon delete-icon" style="margin:0px 0px -5px 20px" title="{ts}Delete this attachment{/ts}"></span></a>
                   {/if}
                   {if !empty($attVal.tag)}
                     <br/>
@@ -158,34 +158,10 @@
     </script>
     {/literal}
  {/if} {* edit/add if*}
+
 {if $currentAttachmentInfo}
-<script type="text/javascript">
-{literal}
-  function hideStatus( ) {
-    cj( '#attachStatusMesg' ).hide( );
-  }
-
-  function showDelete( fileName, postURLData, fileID ) {
-    var confirmMsg = '{/literal}{ts escape="js"}Are you sure you want to delete attachment: {/ts}{literal}' + fileName + '&nbsp; <a href="#" onclick="deleteAttachment( \'' + postURLData + '\',' + fileID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}Yes{/ts}{literal}</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="hideStatus( ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}</a>';
-    cj( '#attachStatusMesg' ).show( ).html( confirmMsg );
-  }
-
-  function deleteAttachment( postURLData, fileID ) {
-    var postUrl = {/literal}"{crmURL p='civicrm/file/delete' h=0 }"{literal};
-    cj.ajax({
-      type: "GET",
-      data:  postURLData,
-      url: postUrl,
-      success: function(html){
-        var resourceBase   = {/literal}"{$config->resourceBase}"{literal};
-        var successMsg = '{/literal}{ts escape="js"}The selected attachment has been deleted.{/ts}{literal} &nbsp;&nbsp;<a href="#" onclick="hideStatus( ); return false;"><img title="{/literal}{ts escape='js'}close{/ts}{literal}" src="' +resourceBase+'i/close.png"/></a>';
-        cj( '#attachFileRecord_' + fileID ).hide( );
-        cj( '#attachStatusMesg' ).show( ).html( successMsg );
-      }
-    });
-  }
-{/literal}
-</script>
+{include file="CRM/Form/attachmentjs.tpl"}
 {/if}
+
 {/if} {* top level if *}
 

@@ -75,38 +75,66 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    */
   static function buildQuickForm(&$form) {
     $form->add('static', 'pdf_format_header', NULL, ts('Page Format'));
-    $form->add('select', 'format_id', ts('Select Format'),
-      array(
-        0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE,
+    $form->add(
+      'select',
+      'format_id',
+      ts('Select Format'),
+      array(0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE),
+      FALSE,
       array('onChange' => "selectFormat( this.value, false );")
-    );
-    $form->add('select', 'paper_size', ts('Paper Size'),
-      array(
-        0 => ts('- default -')) + CRM_Core_BAO_PaperSize::getList(TRUE), FALSE,
+    );;
+    $form->add(
+      'select',
+      'paper_size',
+      ts('Paper Size'),
+      array(0 => ts('- default -')) + CRM_Core_BAO_PaperSize::getList(TRUE),
+      FALSE,
       array('onChange' => "selectPaper( this.value ); showUpdateFormatChkBox();")
     );
     $form->add('static', 'paper_dimensions', NULL, ts('Width x Height'));
-    $form->add('select', 'orientation', ts('Orientation'), CRM_Core_BAO_PdfFormat::getPageOrientations(), FALSE,
+    $form->add(
+      'select',
+      'orientation',
+      ts('Orientation'),
+      CRM_Core_BAO_PdfFormat::getPageOrientations(),
+      FALSE,
       array('onChange' => "updatePaperDimensions(); showUpdateFormatChkBox();")
     );
-    $form->add('select', 'metric', ts('Unit of Measure'), CRM_Core_BAO_PdfFormat::getUnits(), FALSE,
+    $form->add(
+      'select',
+      'metric',
+      ts('Unit of Measure'),
+      CRM_Core_BAO_PdfFormat::getUnits(),
+      FALSE,
       array('onChange' => "selectMetric( this.value );")
     );
-    $form->add('text', 'margin_left', ts('Left Margin'),
-      array(
-        'size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"), TRUE
+    $form->add(
+      'text',
+      'margin_left',
+      ts('Left Margin'),
+      array('size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"),
+      TRUE
     );
-    $form->add('text', 'margin_right', ts('Right Margin'),
-      array(
-        'size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"), TRUE
+    $form->add(
+      'text',
+      'margin_right',
+      ts('Right Margin'),
+      array('size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"),
+      TRUE
     );
-    $form->add('text', 'margin_top', ts('Top Margin'),
-      array(
-        'size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"), TRUE
+    $form->add(
+      'text',
+      'margin_top',
+      ts('Top Margin'),
+      array('size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"),
+      TRUE
     );
-    $form->add('text', 'margin_bottom', ts('Bottom Margin'),
-      array(
-        'size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"), TRUE
+    $form->add(
+      'text',
+      'margin_bottom',
+      ts('Bottom Margin'),
+      array('size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"),
+      TRUE
     );
     $form->add('checkbox', 'bind_format', ts('Always use this Page Format with the selected Template'));
     $form->add('checkbox', 'update_format', ts('Update Page Format (this will affect all templates that use this format)'));
@@ -118,9 +146,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     CRM_Mailing_BAO_Mailing::commonLetterCompose($form);
 
     if ($form->_single) {
-      $cancelURL = CRM_Utils_System::url('civicrm/contact/view',
+      $cancelURL = CRM_Utils_System::url(
+        'civicrm/contact/view',
         "reset=1&cid={$form->_cid}&selectedChild=activity",
-        FALSE, NULL, FALSE
+        FALSE,
+        NULL,
+        FALSE
       );
       if ($form->get('action') == CRM_Core_Action::VIEW) {
         $form->addButtons(array(

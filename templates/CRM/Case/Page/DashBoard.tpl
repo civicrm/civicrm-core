@@ -110,4 +110,3 @@
     {/if}
 {/if}
 </div>
-{include file="CRM/common/overlay.tpl"}

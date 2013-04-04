@@ -285,7 +285,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $contactID = $session->get('userID');
 
     //we need to get existing dashletes, so we know when to update or insert
-    $contactDashlets = CRM_Core_BAO_Dashboard::getContactDashlets(true);
+    $contactDashlets = self::getContactDashlets(TRUE);
 
     $dashletIDs = array();
     if (is_array($columns)) {

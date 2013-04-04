@@ -432,7 +432,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // Skip normal processing
         continue;
       }
-  
+
       // use UPDATE IGNORE + DELETE query pair to skip on situations when
       // there's a UNIQUE restriction on ($field, some_other_field) pair
       if (isset($cidRefs[$table])) {
@@ -474,7 +474,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
   /**
    * Find differences between contacts.
-   * 
+   *
    * @param array $main contact details
    * @param array $other contact details
    *
@@ -785,8 +785,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       if (CRM_Utils_array::value('preferred_communication_method', $contact)){
       // api 3 returns pref_comm_method as an array, which breaks the lookup; so we reconstruct
-      $prefCommList = is_array($specialValues[$moniker]['preferred_communication_method']) ? 
-        implode(CRM_Core_DAO::VALUE_SEPARATOR, $specialValues[$moniker]['preferred_communication_method']) : 
+      $prefCommList = is_array($specialValues[$moniker]['preferred_communication_method']) ?
+        implode(CRM_Core_DAO::VALUE_SEPARATOR, $specialValues[$moniker]['preferred_communication_method']) :
         $specialValues[$moniker]['preferred_communication_method'];
         $specialValues[$moniker]['preferred_communication_method'] = CRM_Core_DAO::VALUE_SEPARATOR . $prefCommList . CRM_Core_DAO::VALUE_SEPARATOR;
       }
@@ -1371,7 +1371,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // **** Do file custom fields related migrations
     // FIXME: move this someplace else (one of the BAOs) after discussing
-    // where to, and whether CRM_Core_BAO_File::delete() shouldn't actually,
+    // where to, and whether CRM_Core_BAO_File::deleteFileReferences() shouldn't actually,
     // like, delete a file...
 
     if (!isset($customFiles)) {
@@ -1391,7 +1391,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       // delete the main contact's file
       if (!empty($fileIds[$mainId])) {
-        CRM_Core_BAO_File::delete($fileIds[$mainId], $mainId, $customId);
+        CRM_Core_BAO_File::deleteFileReferences($fileIds[$mainId], $mainId, $customId);
       }
 
       // move the other contact's file to main contact

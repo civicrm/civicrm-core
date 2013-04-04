@@ -750,7 +750,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $from = "{$mapping->entity} e";
 
       if ($mapping->entity == 'civicrm_activity') {
-        switch ($recipientOptions[$actionSchedule->recipient]) {
+        switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
           case 'Activity Assignees':
             $contactField = 'r.assignee_contact_id';
             $join[] = 'INNER JOIN civicrm_activity_assignment r ON  r.activity_id = e.id';
@@ -760,13 +760,12 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             $contactField = 'e.source_contact_id';
             break;
 
+          default:
           case 'Activity Targets':
             $contactField = 'r.target_contact_id';
             $join[] = 'INNER JOIN civicrm_activity_target r ON  r.activity_id = e.id';
             break;
 
-          default:
-            break;
         }
         // build where clause
         if (!empty($value)) {
@@ -841,8 +840,14 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $where[] = "e.membership_type_id IS NULL";
         }
 
+        $where[] = "e.is_override IS NULL OR e.is_override = 0";
         $dateField = str_replace('membership_', 'e.', $actionSchedule->start_action_date);
         $notINClause = self::permissionedRelationships($contactField);
+        
+        $memershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "is_current_member = 1", 'id');
+        $mStatus = implode (',', $memershipStatus);
+        $where[] = "e.status_id IN ({$mStatus})";
+
       }
 
       if ($actionSchedule->group_id) {
@@ -863,8 +868,7 @@ reminder.entity_id          = e.id AND
 reminder.entity_table       = '{$mapping->entity}' AND
 reminder.action_schedule_id = %1";
 
-      $join[] = "INNER JOIN civicrm_contact c ON c.id = {$contactField}";
-      $where[] = 'c.is_deleted = 0';
+      $join[] = "INNER JOIN civicrm_contact c ON c.id = {$contactField} AND c.is_deleted = 0 AND c.is_deceased = 0 ";
 
       if ($actionSchedule->start_action_date) {
         $startDateClause   = array();

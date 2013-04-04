@@ -1245,7 +1245,7 @@ AND civicrm_membership.is_test = %2";
     if (is_a($result[1], 'CRM_Core_Error')) {
       $errors[1] = CRM_Core_Error::getMessages($result[1]);
     }
-    else {
+    elseif (CRM_Utils_Array::value(1, $result)) {
       // Save the contribution ID so that I can be used in email receipts
       // For example, if you need to generate a tax receipt for the donation only.
       $form->_values['contribution_other_id'] = $result[1]->id;

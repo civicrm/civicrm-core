@@ -849,6 +849,7 @@ SELECT  id
 
     // Internal field not exposed to forms
     unset($fields['Contact']['contact_type']);
+    unset($fields['Contact']['master_id']);
 
     // convert phone extension in to psedo-field phone + phone extension
     //unset extension
@@ -864,8 +865,7 @@ SELECT  id
     $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo();
     foreach ($subTypes as $name => $val) {
       //custom fields for sub type
-      $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($name);
-
+      $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($name, FALSE, FALSE, FALSE, TRUE, TRUE);
       if (array_key_exists($val['parent'], $fields)) {
         $fields[$name] = $fields[$val['parent']] + $subTypeFields;
       }

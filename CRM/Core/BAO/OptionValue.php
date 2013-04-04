@@ -111,7 +111,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
      }
      $bao->selectAdd();
      $bao->whereAdd("value REGEXP '^[0-9]+$'");
-     $bao->selectAdd('(ROUND(COALESCE(MAX(value),0)) +1) as nextvalue');
+     $bao->selectAdd('(ROUND(COALESCE(MAX(CONVERT(value, UNSIGNED)),0)) +1) as nextvalue');
      $bao->find(TRUE);
      return $bao->nextvalue;
   }

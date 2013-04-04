@@ -23,7 +23,13 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* This file provides the HTML for the on-behalf-of form. Can also be used for related contact edit form. *}
+{**
+ * This file provides the HTML for the on-behalf-of form. 
+ * Also used for related contact edit form.
+ * FIXME: This is way more complex than it needs to be
+ * FIXME: About 1% of this javascript is needed for contribution forms
+ * FIXME: Why are we not just using the dynamic form tpl to display this profile?
+ *}
 
 {if $buildOnBehalfForm or $onBehalfRequired}
 <fieldset id="for_organization" class="for_organization-group">
@@ -127,19 +133,13 @@
 
 {literal}
 <script type="text/javascript">
-  var reset            = {/literal}"{$reset}"{literal};
-  var onBehalfRequired = {/literal}"{$onBehalfRequired}"{literal};
-  var mainDisplay      = {/literal}"{$mainDisplay}"{literal};
-  var mode             = {/literal}"{$mode}"{literal};
   cj( "div#id-onbehalf-orgname-help").hide( );
 
-  if (mainDisplay) {
-    showOnBehalf(false);
-  }
+  showOnBehalf({/literal}"{$onBehalfRequired}"{literal});
 
   cj( "#mode" ).hide( );
   cj( "#mode" ).attr( 'checked', 'checked' );
-  if ( cj( "#mode" ).attr( 'checked' ) && !reset ) {
+  if ( cj( "#mode" ).attr( 'checked' ) && !{/literal}"{$reset}"{literal} ) {
     $text = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
     cj( "#createNewOrg" ).text( $text );
     cj( "#mode" ).removeAttr( 'checked' );
@@ -147,29 +147,28 @@
 
 function showOnBehalf(onBehalfRequired) {
   if ( cj( "#is_for_organization" ).attr( 'checked' ) || onBehalfRequired ) {
-    cj( "#for_organization" ).html( '' );
-    var urlPath = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&onbehalf=1'}"{literal};
-    urlPath     = urlPath  + {/literal}"{$urlParams}"{literal};
-    if ( mode == 'test' ) {
-      urlPath = urlPath  + '&action=preview';
+    var urlPath = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&onbehalf=1'}";
+    urlPath += "{$urlParams}";
+    {if $mode eq 'test'}
+      urlPath += '&action=preview';
+    {/if}
+    {if $reset}
+      urlPath += '&reset={$reset}';
+    {/if}{literal}
+    cj("#onBehalfOfOrg").show();
+    if (cj("#onBehalfOfOrg *").length < 1) {
+      cj.ajax({
+        url     : urlPath,
+        global  : false,
+        async   : false,
+        success : function ( content ) {
+          cj( "#onBehalfOfOrg" ).html( content );
+        }
+      });
     }
-    if ( reset ) {
-      urlPath = urlPath + '&reset=' + reset;
-    }
-
-    cj.ajax({
-      url     : urlPath,
-      async   : false,
-      global  : false,
-      success : function ( content ) {
-        cj( "#onBehalfOfOrg" ).html( content );
-      }
-    });
   }
   else {
-    cj( "#onBehalfOfOrg" ).html('');
-    cj( "#for_organization" ).html( '' );
-    return;
+    cj("#onBehalfOfOrg").hide();
   }
 }
 
@@ -193,14 +192,13 @@ function resetValues( filter ) {
 
 function createNew( ) {
   if (cj("#mode").attr('checked')) {
-    textMessage = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
+    var textMessage = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
     cj("#onbehalf_organization_name").removeAttr('readonly');
     cj("#mode").removeAttr('checked');
-
     resetValues( false );
   }
   else {
-    textMessage = ' {/literal}{ts escape="js"}Enter a new organization{/ts}{literal} ';
+    var textMessage = ' {/literal}{ts escape="js"}Enter a new organization{/ts}{literal} ';
     cj("#mode").attr('checked', 'checked');
     setOrgName( );
   }

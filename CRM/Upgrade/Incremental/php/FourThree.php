@@ -99,10 +99,10 @@ class CRM_Upgrade_Incremental_php_FourThree {
       }
       list($context, $orgName) = self::createDomainContacts();
       if ($context == 'added') {
-        $postUpgradeMessage .= '<br />' . ts("A new organization contact has been added as the default domain contact using the information from your Organization Address and Contact Info settings: '{$orgName}'.");
+        $postUpgradeMessage .= '<br />' . ts("A new organization contact has been added as the default domain contact using the information from your Organization Address and Contact Info settings: '%1'.", array(1 => $orgName));
       }
       elseif ($context == 'merged') {
-        $postUpgradeMessage .= '<br />' . ts("The existing organization contact record for '{$orgName}' has been marked as the default domain contact, and has been updated with information from your Organization Address and Contact Info settings.");
+        $postUpgradeMessage .= '<br />' . ts("The existing organization contact record for '%1' has been marked as the default domain contact, and has been updated with information from your Organization Address and Contact Info settings.", array(1 => $orgName));
       }
 
       $providerExists = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_sms_provider LIMIT 1");
@@ -199,10 +199,7 @@ WHERE ceft.entity_id IS NULL;";
     $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact');
     for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
       $endId = $startId + self::BATCH_SIZE - 1;
-      $title = ts('Upgrade timestamps (%1 => %2)', array(
-                 1 => $startId,
-                 2 => $endId,
-               ));
+      $title = ts('Upgrade timestamps (%1 => %2)', array(1 => $startId, 2 => $endId));
       $this->addTask($title, 'convertTimestamps', $startId, $endId);
     }
 

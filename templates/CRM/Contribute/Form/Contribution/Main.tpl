@@ -23,7 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $ppType}
+{* Callback snippet: Load payment processor *}
+{if $snippet}
 {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
   {if $is_monetary}
   {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
@@ -51,8 +52,7 @@
     {/if}
   {/if}
 
-{elseif $onbehalf}
-  {include file=CRM/Contribute/Form/Contribution/OnBehalfOf.tpl}
+{* Main Form *}  
 {else}
   {literal}
   <script type="text/javascript">
@@ -179,8 +179,9 @@
   {/if}
 
   {if $is_for_organization}
-  <div id='onBehalfOfOrg' class="crm-section"></div>
-  {include file=CRM/Contribute/Form/Contribution/OnBehalfOf.tpl}
+  <div id='onBehalfOfOrg' class="crm-section">
+    {include file=CRM/Contribute/Form/Contribution/OnBehalfOf.tpl}
+  </div>
   {/if}
 
   {* User account registration option. Displays if enabled for one of the profiles on this page. *}
@@ -271,7 +272,8 @@
   {/if}
 
   {if $form.payment_processor.label}
-  <fieldset class="crm-group payment_options-group">
+  {* PP selection only works with JS enabled, so we hide it initially *}
+  <fieldset class="crm-group payment_options-group" style="display:none;">
     <legend>{ts}Payment Options{/ts}</legend>
     <div class="crm-section payment_processor-section">
       <div class="label">{$form.payment_processor.label}</div>
@@ -294,7 +296,12 @@
   </fieldset>
   {/if}
 
-  <div id="billing-payment-block"></div>
+  <div id="billing-payment-block">
+    {* If we have a payment processor, load it - otherwise it happens via ajax *}
+    {if $ppType}
+      {include file="CRM/Contribute/Form/Contribution/Main.tpl" snippet=4}
+    {/if}
+  </div>
   {include file="CRM/common/paymentBlock.tpl"}
 
   <div class="crm-group custom_post_profile-group">
@@ -327,18 +334,6 @@
   {include file="CRM/common/SocialNetwork.tpl" url=$contributionUrl title=$title pageURL=$contributionUrl}
   {/if}
 </div>
-
-{* Hide Credit Card Block and Billing information if contribution is pay later. *}
-  {if $form.is_pay_later and $hidePaymentInformation}
-  {include file="CRM/common/showHideByFieldValue.tpl"
-  trigger_field_id    ="is_pay_later"
-  trigger_value       =""
-  target_element_id   ="billing-payment-block"
-  target_element_type ="table-row"
-  field_type          ="radio"
-  invert              = 1
-  }
-  {/if}
 
 <script type="text/javascript">
   {if $pcp}
