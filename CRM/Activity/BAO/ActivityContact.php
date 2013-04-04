@@ -61,4 +61,46 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
     $activityContact->copyValues($params);
     return $activityContact->save();
   }
+
+  /**
+   * function to retrieve names of contact by activity_id
+   *
+   * @param int    $id   ID of the activity
+   * @param string $type type of interaction
+   *
+   * @return array
+   *
+   * @access public
+   *
+   */
+  static function getNames($activityID, $recordType, $alsoIDs = FALSE) {
+    $names = array();
+    $ids   = array();
+
+    if (empty($activityID)) {
+      return $alsoIDs ? array($names, $ids) : $names;
+    }
+
+    $query = "
+SELECT     contact_a.id, contact_a.sort_name
+FROM       civicrm_contact contact_a
+INNER JOIN civicrm_activity_contact ON civicrm_activity_contact.contact_id = contact_a.id
+WHERE      civicrm_activity_contact.activity_id = %1
+AND        civicrm_activity_contact.record_type = %2
+AND        contact_a.is_deleted = 0
+";
+    $params = array(
+      1 => array($activityID, 'Integer'),
+      2 => array($recordType, 'String')
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    while ($dao->fetch()) {
+      $names[$dao->id] = $dao->sort_name;
+      $ids[] = $dao->id;
+    }
+
+    return $alsoIDs ? array($names, $ids) : $names;
+  }
+
 }

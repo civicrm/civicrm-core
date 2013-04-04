@@ -73,9 +73,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     'activity_status_id',
     'activity_status',
     'activity_subject',
-    'source_contact_id',
     'source_record_id',
-    'source_contact_name',
     'activity_type_id',
     'activity_type',
     'activity_is_test',
@@ -236,7 +234,8 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
    */
   function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
 
-    $result = $this->_query->searchQuery($offset, $rowCount, $sort,
+    $result = $this->_query->searchQuery(
+      $offset, $rowCount, $sort,
       FALSE, FALSE,
       FALSE, FALSE,
       FALSE,
@@ -271,12 +270,12 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         $contactId = CRM_Utils_Array::value('source_contact_id', $row);
       }
 
-      $row['target_contact_name'] = CRM_Activity_BAO_ActivityTarget::getTargetNames($row['activity_id']);
-      $row['assignee_contact_name'] = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($row['activity_id']);
+      $row['target_contact_name']   = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], 'Target');
+      $row['assignee_contact_name'] = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], 'Assignee');
+      list($row['source_contact_name'], $row['source_contact_id']) = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], 'Source', TRUE);
+      $row['source_contact_name'] = implode(',', array_values($row['source_contact_name']));
+      $row['source_contact_id'] = implode(',', $row['source_contact_id']);
 
-      if (CRM_Utils_Array::value('source_contact_id', $row)) {
-        $row['source_contact_name'] = CRM_Contact_BAO_Contact::displayName($row['source_contact_id']);
-      }
       if ($this->_context == 'search') {
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->activity_id;
       }
