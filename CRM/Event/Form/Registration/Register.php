@@ -115,16 +115,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_allowConfirmation) {
       CRM_Event_Form_EventFees::preProcess($this);
     }
-
-    if (CRM_Utils_Array::value('hidden_processor', $_POST)) {
-      $this->set('type', CRM_Utils_Array::value('payment_processor', $_POST));
-      $this->set('mode', $this->_mode);
-      $this->set('paymentProcessor', $this->_paymentProcessor);
-
-      CRM_Core_Payment_ProcessorForm::preProcess($this);
-      CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-    }
-
   }
 
   /**
@@ -189,7 +179,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // now fix all state country selectors
     CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
-    if ($this->_ppType) {
+    if ($this->_snippet) {
       return $this->_defaults;
     }
 
@@ -351,11 +341,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     $contactID = parent::getContactID();
     $this->assign('contact_id', $contactID);
-    $display_name = '';
-    if ($contactID) {
-      $display_name = CRM_Contact_BAO_Contact::displayName($contactID);
-    }
-    $this->assign('display_name', $display_name);
+    $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
 
     $config = CRM_Core_Config::singleton();
     $this->add('hidden', 'scriptFee', NULL);
@@ -1384,7 +1370,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
+  static function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
     // CRM-3907, skip check for preview registrations
     // CRM-4320 participant need to walk wizard
     if (!$returnContactId &&
@@ -1399,10 +1385,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $contactID = parent::getContactID();
     }
 
-    if (!$contactID &&
-      is_array($fields) &&
-      !empty($fields)
-    ) {
+    if (!$contactID && is_array($fields) && $fields) {
 
       //CRM-6996
       //as we are allowing w/ same email address,
