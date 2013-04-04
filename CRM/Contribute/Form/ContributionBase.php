@@ -510,7 +510,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     $config = CRM_Core_Config::singleton();
     if (isset($this->_values['is_recur']) &&
-      $this->_paymentProcessor['is_recur']
+      CRM_Utils_Array::value('is_recur', $this->_paymentProcessor)
     ) {
       $this->assign('is_recur_enabled', 1);
       $vars = array_merge($vars, array(
@@ -584,7 +584,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
 
     if ($this->_contributeMode == 'direct' && $assignCCInfo) {
-      if ($this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT) {
+      if ($this->_paymentProcessor &&
+        $this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
+      ) {
         $this->assign('payment_type', $this->_paymentProcessor['payment_type']);
         $this->assign('account_holder', $this->_params['account_holder']);
         $this->assign('bank_identification_number', $this->_params['bank_identification_number']);

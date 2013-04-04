@@ -847,7 +847,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
       // return if this is express mode
       $config = CRM_Core_Config::singleton();
-      if ($self->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
+      if ($self->_paymentProcessor &&
+        $self->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
+      ) {
         if (CRM_Utils_Array::value($self->_expressButtonName . '_x', $fields) ||
           CRM_Utils_Array::value($self->_expressButtonName . '_y', $fields) ||
           CRM_Utils_Array::value($self->_expressButtonName, $fields)
@@ -1099,7 +1101,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->_params[] = $params;
       $this->set('params', $this->_params);
 
-      if ($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
+      if ($this->_paymentProcessor &&
+        $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
+      ) {
         //get the button name
         $buttonName = $this->controller->getButtonName();
         if (in_array($buttonName,
@@ -1151,7 +1155,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           CRM_Utils_System::redirect($paymentURL);
         }
       }
-      elseif ($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY) {
+      elseif ($this->_paymentProcessor &&
+        $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
+      ) {
         $this->set('contributeMode', 'notify');
       }
     }
