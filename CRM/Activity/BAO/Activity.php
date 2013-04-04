@@ -1515,13 +1515,19 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
       $tokenHtml = CRM_Utils_Token::replaceContactTokens($html, $values, TRUE, $messageToken, FALSE, $escapeSmarty);
       $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $values, $categories, TRUE, $escapeSmarty);
 
-      $smsParams['To'] = $values['phone'];
+      // Only send if the phone is of type mobile
+      if($values['phone_type_id'] == 2) {
+        $smsParams['To'] = $values['phone'];
+      }else{
+      	$smsParams['To'] = '';
+      }
 
       if (self::sendSMSMessage($contactId,
           $tokenText,
           $tokenHtml,
           $smsParams,
-          $activityID
+          $activityID,
+          $userID
         )) {
         // even a single successful delivery should set this falg to true
         $sent = TRUE;
@@ -1546,7 +1552,8 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
     &$tokenText,
     &$tokenHtml,
     $smsParams = array(),
-    $activityID
+    $activityID,
+    $userID = null
   ) {
     $toDoNotSms = "";
     $toPhoneNumber = "";
@@ -1578,7 +1585,7 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
     $smsParams['parent_activity_id'] = $activityID;
 
     $providerObj = CRM_SMS_Provider::singleton(array('provider_id' => $smsParams['provider_id']));
-    if (!$providerObj->send($recipient, $smsParams, $message, NULL)) {
+    if (!$providerObj->send($recipient, $smsParams, $message, NULL, $userID)) {
       return FALSE;
     }
 
