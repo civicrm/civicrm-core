@@ -968,7 +968,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // return if this is express mode
     $config = CRM_Core_Config::singleton();
-    if ($self->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
+    if ($self->_paymentProcessor &&
+      $self->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
+    ) {
       if (CRM_Utils_Array::value($self->_expressButtonName . '_x', $fields) ||
         CRM_Utils_Array::value($self->_expressButtonName . '_y', $fields) ||
         CRM_Utils_Array::value($self->_expressButtonName, $fields)
@@ -1024,7 +1026,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // if the user has chosen a free membership or the amount is less than zero
     // i.e. we skip calling the payment processor and hence dont need credit card
     // info
-    if ((float ) $amount <= 0.0) {
+    if ((float) $amount <= 0.0) {
       return $errors;
     }
 
@@ -1285,7 +1287,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // default mode is direct
       $this->set('contributeMode', 'direct');
 
-      if ($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
+      if ($this->_paymentProcessor &&
+        $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
+      ) {
         //get the button name
         $buttonName = $this->controller->getButtonName();
         if (in_array($buttonName,
@@ -1316,7 +1320,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           CRM_Utils_System::redirect($paymentURL);
         }
       }
-      elseif ($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY) {
+      elseif ($this->_paymentProcessor &&
+        $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
+      ) {
         $this->set('contributeMode', 'notify');
       }
     }
@@ -1356,26 +1362,24 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $paymentProcessors = $form->get('paymentProcessors');
     $form->_ppType = NULL;
     if ($paymentProcessors) {
-      // Fetch type during form post
-      if (CRM_Utils_Array::value('hidden_processor', $_POST)) {
-        $form->_ppType = CRM_Utils_Array::value('payment_processor', $_POST);
+      // Fetch type during ajax request
+      if (isset($_GET['type']) && $form->_snippet) {
+        $form->_ppType = $_GET['type'];
+      }
+      // Remember type during form post
+      elseif (!empty($form->_submitValues)) {
+        $form->_ppType = CRM_Utils_Array::value('payment_processor', $form->_submitValues);
+        $form->_paymentProcessor = CRM_Utils_Array::value($form->_ppType, $paymentProcessors);
         $form->set('type', $form->_ppType);
         $form->set('mode', $form->_mode);
         $form->set('paymentProcessor', $form->_paymentProcessor);
-      }
-      // When user presses the back button
-      elseif (!empty($form->_submitValues)) {
-        $form->_ppType = CRM_Utils_Array::value('payment_processor', $form->_submitValues);
-      }
-      // Fetch type during ajax request
-      elseif (isset($_GET['type']) && $form->_snippet) {
-        $form->_ppType = $_GET['type'];
       }
       // Set default payment processor
       else {
         foreach ($paymentProcessors as $values) {
           if (!empty($values['is_default']) || count($paymentProcessors) == 1) {
             $form->_ppType = $values['id'];
+            break;
           }
         }
       }

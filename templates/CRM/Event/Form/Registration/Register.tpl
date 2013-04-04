@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Callback snippet: Load payment processor *}
-{if $ppType and $snippet}
+{if $snippet}
   {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
 
 <div id="paypalExpress">
