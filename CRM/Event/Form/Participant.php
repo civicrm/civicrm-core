@@ -1440,6 +1440,10 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
         //insert financial type name in receipt.
         $this->assign('contributionTypeName', CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $contributionParams['financial_type_id']));
         $contributionParams['skipLineItem'] = 1;
+        if ($this->_id) {
+          $contributionParams['contribution_mode'] = 'participant';
+          $contributionParams['participant_id'] = $this->_id;
+        }
         // Set is_pay_later flag for back-office offline Pending status contributions
         if ($contributionParams['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name')) {
           $contributionParams['is_pay_later'] = 1;
@@ -1469,7 +1473,13 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
         // CRM-11124
         if ($this->_quickConfig) {
-          CRM_Event_BAO_Participant::createDiscountTrxn($this->_eventId, $contributionParams, $this->_params['amount_priceset_level_radio']);
+          if (CRM_Utils_Array::value('amount_priceset_level_radio', $this->_params)) {
+            $feeLevel = $this->_params['amount_priceset_level_radio'];
+          }
+          else {
+            $feeLevel[] = $this->_params['fee_level'] ;
+          }
+          CRM_Event_BAO_Participant::createDiscountTrxn($this->_eventId, $contributionParams, $feeLevel);
         }
         $transaction->commit();
       }
