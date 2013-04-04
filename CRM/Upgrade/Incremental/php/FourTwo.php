@@ -442,7 +442,8 @@ WHERE     cpse.price_set_id IS NULL";
       CRM_Core_OptionGroup::getAssoc($options['optionGroup'], $optionValue);
       if (empty($optionValue))
         return;
-    }else{
+    }
+    else{
       //CRM-12273
       //if options group is empty then return, contribution should be default price set
       return;
@@ -636,12 +637,13 @@ WHERE     cpf.price_set_id = %1
 
         //CRM-12273
         //check if price_set_id is exist, if not use the default contribution amount
-        if(isset($result->price_set_id)){
+        if (isset($result->price_set_id)){
           $priceSetId = $result->price_set_id;
-        }else{
+        }
+        else{
           $defaultPriceSets = CRM_Price_BAO_Set::getDefaultPriceSet();
           foreach ($defaultPriceSets as $key => $pSet) {
-            if($pSet['name'] == 'contribution_amount'){
+            if ($pSet['name'] == 'contribution_amount'){
               $priceSetId = $pSet['setID'];
             }
           }
