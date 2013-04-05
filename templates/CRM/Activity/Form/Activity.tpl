@@ -31,7 +31,7 @@
     <div class="crm-block crm-content-block crm-activity-view-block">
   {else}
     {if $context NEQ 'standalone'}
-    <h3>{if $action eq 1 or $action eq 1024}{ts 1=$activityTypeName}New %1{/ts}{elseif $action eq 8}{ts 1=$activityTypeName}Delete %1{/ts}{else}{ts 1=$activityTypeName}Edit %1{/ts}{/if}</h3>
+    <h3>{if $action eq 1 or $action eq 1024}{ts 1=$activityTypeName}New activity: %1{/ts}{elseif $action eq 8}{ts 1=$activityTypeName}Delete %1{/ts}{else}{ts 1=$activityTypeName}Edit %1{/ts}{/if}</h3>
     {/if}
     {if $activityTypeDescription }
       <div class="help">{$activityTypeDescription}</div>
