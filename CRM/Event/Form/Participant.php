@@ -955,23 +955,11 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
     if (CRM_Utils_Array::value('payment_processor_id', $values)) {
       // make sure that credit card number and cvv are valid
-      if (CRM_Utils_Array::value('credit_card_type', $values)) {
-        if (CRM_Utils_Array::value('credit_card_number', $values) &&
-          !CRM_Utils_Rule::creditCardNumber($values['credit_card_number'], $values['credit_card_type'])
-        ) {
-          $errorMsg['credit_card_number'] = ts('Please enter a valid Credit Card Number');
-        }
-
-        if (CRM_Utils_Array::value('cvv2', $values) &&
-          !CRM_Utils_Rule::cvv($values['cvv2'], $values['credit_card_type'])
-        ) {
-          $errorMsg['cvv2'] = ts('Please enter a valid Credit Card Verification Number');
-        }
-      }
+      CRM_Core_Payment_Form::validateCreditCard($values, $errorMsg);
     }
 
-    if ( CRM_Utils_Array::value( 'record_contribution', $values ) && !  CRM_Utils_Array::value( 'financial_type_id', $values ) ) {
-      $errorMsg['financial_type_id'] = ts( 'Please enter the associated Financial Type' );
+    if (CRM_Utils_Array::value('record_contribution', $values) && !CRM_Utils_Array::value('financial_type_id', $values)) {
+      $errorMsg['financial_type_id'] = ts('Please enter the associated Financial Type');
     }
 
     // validate contribution status for 'Failed'.
