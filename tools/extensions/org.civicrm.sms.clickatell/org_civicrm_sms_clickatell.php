@@ -222,7 +222,7 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
    * @return mixed true on sucess or PEAR_Error object
    * @access public
    */
-  function send($recipients, $header, $message, $jobID = NULL) {
+  function send($recipients, $header, $message, $jobID = NULL, $userID = NULL) {
     if ($this->_apiType = 'http') {
       $postDataArray = array( );
       $url = $this->formURLPostData("/http/sendmsg", $postDataArray);
@@ -230,8 +230,12 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
       if (array_key_exists('from', $this->_providerInfo['api_params'])) {
         $postDataArray['from'] = $this->_providerInfo['api_params']['from'];
       }
+      if (array_key_exists('concat', $this->_providerInfo['api_params'])) {
+        $postDataArray['concat'] = $this->_providerInfo['api_params']['concat'];
+      }
+      //TODO:
       $postDataArray['to']   = $header['To'];
-      $postDataArray['text'] = substr($message, 0, 160); // max of 160 characters, is probably not multi-lingual
+      $postDataArray['text'] = substr($message, 0, 460); // max of 460 characters, is probably not multi-lingual
       if (array_key_exists('mo', $this->_providerInfo['api_params'])) {
         $postDataArray['mo'] = $this->_providerInfo['api_params']['mo'];
       }
@@ -280,16 +284,14 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
       $send = explode(":", $response['data']);
 
       if ($send[0] == "ID") {
-        $this->createActivity($send[1], $message, $header, $jobID);
+        $this->createActivity($send[1], $message, $header, $jobID, $userID);
         return $send[1];
       }
       else {
-        // delete any parent activity & throw error
-        if (CRM_Utils_Array::value('parent_activity_id', $header)) {
-          $params = array('id' => $header['parent_activity_id']);
-          CRM_Activity_BAO_Activity::deleteActivity($params);
-        }
-        return PEAR::raiseError($response['data']);
+      	// TODO: Should add a failed activity instead.
+      	
+        CRM_Core_Error::debug_log_message($response['data']);
+        return;
       }
     }
   }
