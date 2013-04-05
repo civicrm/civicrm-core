@@ -1515,7 +1515,12 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
       $tokenHtml = CRM_Utils_Token::replaceContactTokens($html, $values, TRUE, $messageToken, FALSE, $escapeSmarty);
       $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $values, $categories, TRUE, $escapeSmarty);
 
-      $smsParams['To'] = $values['phone'];
+      // Only send if the phone is of type mobile
+      if($values['phone_type_id'] == 2) {
+        $smsParams['To'] = $values['phone'];
+      }else{
+        $smsParams['To'] = '';
+      }
 
       if (self::sendSMSMessage($contactId,
           $tokenText,
