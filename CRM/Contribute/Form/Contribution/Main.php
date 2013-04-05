@@ -387,7 +387,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       TRUE
     );
     $this->addRule("email-{$this->_bltID}", ts('Email is not valid.'), 'email');
-    $this->_paymentProcessors = $this->get('paymentProcessors');
     $pps = array();
     if (!empty($this->_paymentProcessors)) {
       $pps = $this->_paymentProcessors;
@@ -1336,13 +1335,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Handle Payment Processor switching
    * For contribution and event registration forms
    */
-  static function preProcessPaymentOptions(&$form) {
+  static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
     $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
     $form->assign('snippet', $form->_snippet);
 
-    $paymentProcessors = $form->get('paymentProcessors');
+    $form->_paymentProcessors = $noFees ? array() : $form->get('paymentProcessors');
     $form->_ppType = NULL;
-    if ($paymentProcessors) {
+    if ($form->_paymentProcessors) {
       // Fetch type during ajax request
       if (isset($_GET['type']) && $form->_snippet) {
         $form->_ppType = $_GET['type'];
@@ -1350,15 +1349,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // Remember type during form post
       elseif (!empty($form->_submitValues)) {
         $form->_ppType = CRM_Utils_Array::value('payment_processor', $form->_submitValues);
-        $form->_paymentProcessor = CRM_Utils_Array::value($form->_ppType, $paymentProcessors);
+        $form->_paymentProcessor = CRM_Utils_Array::value($form->_ppType, $form->_paymentProcessors);
         $form->set('type', $form->_ppType);
         $form->set('mode', $form->_mode);
         $form->set('paymentProcessor', $form->_paymentProcessor);
       }
       // Set default payment processor
       else {
-        foreach ($paymentProcessors as $values) {
-          if (!empty($values['is_default']) || count($paymentProcessors) == 1) {
+        foreach ($form->_paymentProcessors as $values) {
+          if (!empty($values['is_default']) || count($form->_paymentProcessors) == 1) {
             $form->_ppType = $values['id'];
             break;
           }
@@ -1369,7 +1368,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
 
       //get payPal express id and make it available to template
-      foreach ($paymentProcessors as $ppId => $values) {
+      foreach ($form->_paymentProcessors as $ppId => $values) {
         $payPalExpressId = ($values['payment_processor_type'] == 'PayPal_Express') ? $values['id'] : 0;
         $form->assign('payPalExpressId', $payPalExpressId);
         if ($payPalExpressId) {

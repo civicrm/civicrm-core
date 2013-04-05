@@ -80,17 +80,20 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   function preProcess() {
     parent::preProcess();
 
-    CRM_Contribute_Form_Contribution_Main::preProcessPaymentOptions($this);
-    if ($this->_snippet) {
-      return;
-    }
-
     //CRM-4320.
     //here we can't use parent $this->_allowWaitlist as user might
     //walk back and we maight set this value in this postProcess.
     //(we set when spaces < group count and want to allow become part of waiting )
-
     $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $this->_values['event']));
+
+    // Get payment processors if appropriate for this event
+    // We hide the payment fields if the event is full or requires approval,
+    // and the current user has not yet been approved CRM-12279
+    $noFees = (($eventFull || $this->_requireApproval) && !$this->_allowConfirmation);
+    CRM_Contribute_Form_Contribution_Main::preProcessPaymentOptions($this, $noFees);
+    if ($this->_snippet) {
+      return;
+    }
 
     $this->_allowWaitlist = FALSE;
     if ($eventFull && !$this->_allowConfirmation &&
@@ -413,7 +416,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     $pps = NULL;
-    $this->_paymentProcessors = $this->get('paymentProcessors');
     if (!empty($this->_paymentProcessors)) {
       $pps = $this->_paymentProcessors;
       foreach ($pps as $key => & $name) {
