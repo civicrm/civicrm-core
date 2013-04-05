@@ -75,10 +75,10 @@ class CRM_Utils_Cache {
       // Going forward, CIVICRM_USE_xxxCACHE should be deprecated.
       if (defined('CIVICRM_USE_MEMCACHE') && CIVICRM_USE_MEMCACHE) {
         $className = 'Memcache';
-        }
+      }
       else if (defined('CIVICRM_USE_ARRAYCACHE') && CIVICRM_USE_ARRAYCACHE) {
         $className = 'ArrayCache';
-        }
+      }
       else if (defined('CIVICRM_DB_CACHE_CLASS') && CIVICRM_DB_CACHE_CLASS) {
         $className = CIVICRM_DB_CACHE_CLASS;
       }
@@ -88,7 +88,7 @@ class CRM_Utils_Cache {
       require_once(str_replace('_', DIRECTORY_SEPARATOR, $dbCacheClass) . '.php');
       $settings = self::getCacheSettings($className);
       self::$_singleton = new $dbCacheClass($settings);
-      }
+    }
     return self::$_singleton;
   }
 
