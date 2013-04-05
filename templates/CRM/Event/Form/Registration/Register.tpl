@@ -183,7 +183,7 @@
 <script type="text/javascript">
 {literal}
 function toggleConfirmButton() {
-  var payPalExpressId = {/literal}{$payPalExpressId}{literal};
+  var payPalExpressId = "{/literal}{$payPalExpressId}{literal}";
   var elementObj = cj('input[name="payment_processor"]');
    if ( elementObj.attr('type') == 'hidden' ) {
       var processorTypeId = elementObj.val( );
