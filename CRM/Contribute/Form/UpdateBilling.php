@@ -214,28 +214,12 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    * @static
    */
   static function formRule($fields, $files, $self) {
-    foreach ($self->_fields as $name => $fld) {
-      if ($fld['is_required'] &&
-        CRM_Utils_System::isNull(CRM_Utils_Array::value($name, $fields))
-      ) {
-        $errors[$name] = ts('%1 is a required field.', array(1 => $fld['title']));
-      }
-    }
+    $errors = array();
+    CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // make sure that credit card number and cvv are valid
-    if (CRM_Utils_Array::value('credit_card_type', $fields)) {
-      if (CRM_Utils_Array::value('credit_card_number', $fields) &&
-        !CRM_Utils_Rule::creditCardNumber($fields['credit_card_number'], $fields['credit_card_type'])
-      ) {
-        $errors['credit_card_number'] = ts('Please enter a valid Credit Card Number');
-      }
+    CRM_Core_Payment_Form::validateCreditCard($fields, $errors);
 
-      if (CRM_Utils_Array::value('cvv2', $fields) &&
-        !CRM_Utils_Rule::cvv($fields['cvv2'], $fields['credit_card_type'])
-      ) {
-        $errors['cvv2'] = ts('Please enter a valid Credit Card Verification Number');
-      }
-    }
     return empty($errors) ? TRUE : $errors;
   }
 

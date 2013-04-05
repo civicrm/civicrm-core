@@ -1239,5 +1239,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @access public
    */
   function cancelAction() {}
+
+  /**
+   * Helper function to verify that required fields have been filled
+   * Typically called within the scope of a FormRule function
+   */
+  static function validateMandatoryFields($fields, $values, &$errors) {
+    foreach ($fields as $name => $fld) {
+      if (!empty($fld['is_required']) && CRM_Utils_System::isNull(CRM_Utils_Array::value($name, $values))) {
+        $errors[$name] = ts('%1 is a required field.', array(1 => $fld['title']));
+      }
+    }
+  }
 }
 
