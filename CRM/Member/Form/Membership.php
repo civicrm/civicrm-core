@@ -895,19 +895,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     if (CRM_Utils_Array::value('payment_processor_id', $params)) {
       // make sure that credit card number and cvv are valid
-      if (CRM_Utils_Array::value('credit_card_type', $params)) {
-        if (CRM_Utils_Array::value('credit_card_number', $params) &&
-          !CRM_Utils_Rule::creditCardNumber($params['credit_card_number'], $params['credit_card_type'])
-        ) {
-          $errors['credit_card_number'] = ts('Please enter a valid Credit Card Number');
-        }
-
-        if (CRM_Utils_Array::value('cvv2', $params) &&
-          !CRM_Utils_Rule::cvv($params['cvv2'], $params['credit_card_type'])
-        ) {
-          $errors['cvv2'] = ts('Please enter a valid Credit Card Verification Number');
-        }
-      }
+      CRM_Core_Payment_Form::validateCreditCard($params, $errors);
     }
 
     $joinDate = NULL;

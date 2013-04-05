@@ -363,27 +363,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       if ($error) {
         $errors['_qf_default'] = $error;
       }
+      CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
-      foreach ($self->_fields as $name => $field) {
-        if ($field['is_required'] && CRM_Utils_System::isNull(CRM_Utils_Array::value($name, $fields))) {
-          $errors[$name] = ts('%1 is a required field.', array(1 => $field['title']));
-        }
-      }
-
-
-      if (CRM_Utils_Array::value('credit_card_type', $fields)) {
-        if (CRM_Utils_Array::value('credit_card_number', $fields) &&
-          !CRM_Utils_Rule::creditCardNumber($fields['credit_card_number'], $fields['credit_card_type'])
-        ) {
-          $errors['credit_card_number'] = ts("Please enter a valid Credit Card Number");
-        }
-
-        if (CRM_Utils_Array::value('cvv2', $fields) &&
-          !CRM_Utils_Rule::cvv($fields['cvv2'], $fields['credit_card_type'])
-        ) {
-          $errors['cvv2'] = ts("Please enter a valid Credit Card Verification Number");
-        }
-      }
+      // make sure that credit card number and cvv are valid
+      CRM_Core_Payment_Form::validateCreditCard($fields, $errors);
     }
 
     return empty($errors) ? TRUE : $errors;
