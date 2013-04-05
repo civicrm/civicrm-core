@@ -29,7 +29,7 @@
   {include file="CRM/Custom/Form/CustomData.tpl"}
 {else}
 <h3>{if $action eq 1 or $action eq 1024}
-  {ts 1=$activityTypeName}New %1{/ts}
+  {ts 1=$activityTypeName}New activity: %1{/ts}
   {elseif $action eq 8}{ts 1=$activityTypeName}Delete %1{/ts}
   {elseif $action eq 32768}{ts 1=$activityTypeName}Restore %1{/ts}
   {else}{ts 1=$activityTypeName}Edit %1{/ts}{/if}
