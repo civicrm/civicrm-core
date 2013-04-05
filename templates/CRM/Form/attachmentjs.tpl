@@ -17,9 +17,9 @@
       url: postUrl,
       success: function(html){
         var resourceBase   = {/literal}"{$config->resourceBase}"{literal};
-        var successMsg = '{/literal}{ts escape="js"}The selected attachment has been deleted.{/ts}{literal} &nbsp;&nbsp;<a href="#" onclick="hideStatusAttachment( \'' + divName + '\'); return false;"><img title="{/literal}{ts escape='js'}close{/ts}{literal}" src="' +resourceBase+'i/close.png"/></a>';
-        cj( divFile ).hide( );
-        cj( divName ).show( ).html( successMsg );
+        var successMsg = '{/literal}{ts escape="js"}The selected attachment has been deleted.{/ts}{literal}';
+        cj(divFile + ',' + divName).hide();
+        CRM.alert(successMsg, '{/literal}{ts escape="js"}Removed{/ts}{literal}', 'success');
       }
     });
   }
