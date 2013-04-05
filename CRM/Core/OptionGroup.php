@@ -355,6 +355,38 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * Get option_value.value from default option_value row for an option group
+   *
+   * @param string $groupName the name of the option group
+   *
+   * @access public
+   * @static
+   *
+   * @return string   the value from the row where is_default = true
+   */   
+  static function getDefaultValue($groupName) {
+    if (empty($groupName)) {
+      return NULL;
+    }
+    $query = "
+SELECT v.value
+FROM   civicrm_option_value v,
+       civicrm_option_group g
+WHERE  v.option_group_id = g.id
+  AND  g.name            = %1
+  AND  v.is_active       = 1
+  AND  g.is_active       = 1
+  AND  v.is_default      = 1
+";
+    if (in_array($groupName, self::$_domainIDGroups)) {
+      $query .= " AND v.domain_id = " . CRM_Core_Config::domainID();
+    }
+
+    $p = array(1 => array($groupName, 'String'));
+    return CRM_Core_DAO::singleValueQuery($query, $p);
+  }
+  
+  /**
    * Creates a new option group with the passed in values
    * @TODO: Should update the group if it already exists intelligently, so multi-lingual is
    * not messed up. Currently deletes the old group
