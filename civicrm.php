@@ -615,7 +615,7 @@ function civicrm_add_form_button($context) {
 }
 
 function civicrm_add_form_button_html() {
-  $title = _e("Please select a CiviCRM front-end page type.", "CiviCRM");
+  $title = ts("Please select a CiviCRM front-end page type.");
 
   $now = date("Ymdhis");
 
@@ -657,77 +657,52 @@ OR       ( start_date >= $now )
     $eventPages[$dao->id] = $dao->title;
   }
   ?>
-        <script>
-            function InsertCiviFrontPages( ) {
-                var form_id = jQuery("#add_civicomponent_id").val();
-                if (form_id == ""){
-                    alert ('Please select a frontend element.');
-                    return;
-                }
+  <script type="text/javascript">
+    jQuery(function($) {
+      $('#crm-wp-insert-shortcode').on('click', function() {
+        var form_id = $("#add_civicomponent_id").val();
+        if (form_id == ""){
+          alert ('Please select a frontend element.');
+          return;
+        }
 
-                var action;
-                var mode;
-                var pid;
-                var component = jQuery("#add_civicomponent_id").val( );
-                switch ( component ) {
-                    case 'contribution':
-                        var pid  = jQuery("#add_contributepage_id").val();
-                        var mode = jQuery("input[name='component_mode']:checked").val( );
-                        break;
-                    case 'event':
-                        var pid    = jQuery("#add_eventpage_id").val();
-                        var action = jQuery("input[name='event_action']:checked").val( );
-                        var mode   = jQuery("input[name='component_mode']:checked").val( );
-                        break;
-                    case 'user-dashboard':
-                        break;
-                }
+        var component = $("#add_civicomponent_id").val( );
+        var shortcode = '[civicrm component="' + component + '"';
 
-                // [ civicrm component=contribution/event/profile id=N mode=test/live action=info/register/create/search/edit/view ]
-                var shortcode = '[civicrm component="' + component + '"';
+        switch (component) {
+          case 'contribution':
+            shortcode += ' id="' + $("#add_contributepage_id").val() + '"';
+            shortcode += ' mode="' + $("input[name='component_mode']:checked").val() + '"';
+            break;
+          case 'event':
+            shortcode += ' id="' + $("#add_eventpage_id").val() + '"';
+            shortcode += ' action="' + $("input[name='event_action']:checked").val() + '"';
+            shortcode += ' mode="' + $("input[name='component_mode']:checked").val() + '"';
+            break;
+          case 'user-dashboard':
+            break;
+        }
+        shortcode += ']';
+        window.send_to_editor( shortcode );
+      });
 
-                if ( pid ) {
-                    shortcode = shortcode + ' id="'+ pid +'"';
-                }
-
-                if ( mode ) {
-                    shortcode = shortcode + ' mode="'+ mode +'"';
-                }
-
-                if ( action ) {
-                    shortcode = shortcode + ' action="'+ action +'"';
-                }
-
-                shortcode = shortcode + ']';
-                window.send_to_editor( shortcode );
-            }
-
-            jQuery(function() {
-                jQuery('#add_civicomponent_id').change(function(){
-                    var component = jQuery(this).val();
-                    switch ( component ) {
-                        case 'contribution':
-                            jQuery('#contribution-section').show();
-                            jQuery('#event-section').hide();
-                            jQuery('#component-section').show();
-                            jQuery('#action-section-event').hide();
-                            break;
-                        case 'event':
-                            jQuery('#contribution-section').hide();
-                            jQuery('#event-section').show();
-                            jQuery('#component-section').show();
-                            jQuery('#action-section-event').show();
-                            break;
-                        case 'user-dashboard':
-                            jQuery('#contribution-section').hide();
-                            jQuery('#event-section').hide();
-                            jQuery('#component-section').hide();
-                            jQuery('#action-section-event').hide();
-                            break;
-                    }
-                });
-            });
-        </script>
+      $('#add_civicomponent_id').on('change', function() {
+        switch ($(this).val()) {
+          case 'contribution':
+            $('#contribution-section, #component-section').show();
+            $('#event-section, #action-section-event').hide();
+            break;
+          case 'event':
+            $('#contribution-section').hide();
+            $('#event-section, #component-section, #action-section-event').show();
+            break;
+          default:
+            $('#contribution-section, #event-section, #component-section, #action-section-event').hide();
+            break;
+        }
+      });
+    });
+  </script>
 
         <div id="civicrm_frontend_pages" style="display:none;">
             <div class="wrap">
@@ -742,7 +717,7 @@ OR       ( start_date >= $now )
                     </div>
                     <div style="padding:15px 15px 0 15px;">
                         <select id="add_civicomponent_id">
-                            <option value="">  <?php _e("Select a frontend element."); ?>  </option>
+                            <option value="">  <?php echo ts("Select a frontend element."); ?>  </option>
                             <option value="contribution">Contribution Page</option>
                             <option value="event">Event Page</option>
                             <option value="user-dashboard">User Dashboard</option>
@@ -751,20 +726,20 @@ OR       ( start_date >= $now )
                          <span id="contribution-section" style="display:none;">
                             <select id="add_contributepage_id">
                             <?php
-  foreach ($contributionPages as $key => $value) { ?>
-                                    <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
-                                    <?php
-  }?>
+                              foreach ($contributionPages as $key => $value) { ?>
+                                <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+                                <?php
+                              }?>
                             </select>
                         </span>
 
                         <span id="event-section" style="display:none;">
                             <select id="add_eventpage_id">
                             <?php
-  foreach ($eventPages as $key => $value) { ?>
-                                    <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
-                                    <?php
-  }?>
+                              foreach ($eventPages as $key => $value) { ?>
+                                <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+                                <?php
+                              }?>
                             </select>
                         </span>
                         <br>
@@ -782,11 +757,11 @@ OR       ( start_date >= $now )
                            </div>
                         </span>
                         <br/>
-                        <div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php _e("Can't find your form? Make sure it is active.", "gravityforms"); ?></div>
+                        <div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php echo ts("Can't find your form? Make sure it is active."); ?></div>
                     </div>
                     <div style="padding:15px;">
-                        <input type="button" class="button-primary" value="Insert Form" onclick="InsertCiviFrontPages();"/>&nbsp;&nbsp;&nbsp;
-                    <a class="button" style="color:#bbb;" href="#" onclick="tb_remove(); return false;"><?php _e("Cancel"); ?></a>
+                      <input type="button" class="button-primary" value="Insert Form" id="crm-wp-insert-shortcode"/>&nbsp;&nbsp;&nbsp;
+                      <a class="button" style="color:#bbb;" href="#" onclick="tb_remove(); return false;"><?php echo ts("Cancel"); ?></a>
                     </div>
                 </div>
             </div>
