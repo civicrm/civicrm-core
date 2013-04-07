@@ -275,7 +275,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = &civicrm_api('relationship_type', 'create', $params);
+    $result = civicrm_api('relationship_type', 'create', $params);
     $this->assertNotNull($result['id']);
     unset($params['version']);
     // assertDBState compares expected values in $result to actual values in the DB
