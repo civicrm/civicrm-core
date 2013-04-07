@@ -137,7 +137,7 @@ INSERT INTO civicrm_currency (id, name, symbol, numeric_code, full_name) VALUES
 (113, "MXV", NULL, "979", "Mexican Unidad de Inversion (UID)"),
 (114, "MYR", "RM", "458", "Malaysian Ringgit"),
 (115, "MZN", "MT", "943", "Mozambique Metical"),
-(116, "NAD",  "$", "516", "Namibian Dollar"),
+(116, "NAD", "N$", "516", "Namibian Dollar"),
 (117, "NIO", "C$", "558", "Nicaraguan Cordoba Oro"),
 (118, "NOK", "kr", "578", "Norwegian Krone"),
 (119, "NPR",  "₨", "524", "Nepalese Rupee"),
