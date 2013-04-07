@@ -391,7 +391,8 @@ function civicrm_wp_frontend($shortcode = FALSE) {
     (
       CRM_Utils_Array::value(0, $args) == 'civicrm' &&
       CRM_Utils_Array::value(1, $args) == 'event' &&
-      CRM_Utils_Array::value(2, $args) == 'ical'
+      CRM_Utils_Array::value(2, $args) == 'ical' &&
+      CRM_Utils_Array::value('html', $_GET) != 1
     )
   ) {
     add_filter('init', 'civicrm_wp_invoke');
