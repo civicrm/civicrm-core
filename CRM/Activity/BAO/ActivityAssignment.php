@@ -84,8 +84,8 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
     }
 
     $sql = "
-SELECT     assignee_contact_id
-FROM       civicrm_activity_assignment
+SELECT     contact_id
+FROM       civicrm_activity_contact
 INNER JOIN civicrm_contact ON contact_id = civicrm_contact.id
 WHERE      activity_id = %1
 AND        record_type = 'Assignee'
@@ -125,7 +125,7 @@ AND        civicrm_contact.is_deleted = 0
     $query = "
 SELECT     contact_a.id, contact_a.sort_name, contact_a.display_name, ce.email
 FROM       civicrm_contact contact_a
-INNER JOIN civicrm_activity_contact ON civicrm_activity_contact_contact_id = contact_a.id
+INNER JOIN civicrm_activity_contact ON civicrm_activity_contact.contact_id = contact_a.id
 LEFT JOIN  civicrm_email ce ON ce.contact_id = contact_a.id
 WHERE      civicrm_activity_contact.activity_id = %1
 AND        contact_a.is_deleted = 0
