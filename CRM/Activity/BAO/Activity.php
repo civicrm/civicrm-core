@@ -198,8 +198,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       //log activty delete.CRM-4525.
       $logMsg          = 'Case Activity deleted for';
       $msgs            = array();
-      $sourceContactId = CRM_Core_DAO::getfieldValue('CRM_Activity_DAO_Activity',
-        $activity->id, 'source_contact_id'
+      $sourceContactId = CRM_Core_DAO::getFieldValue(
+        'CRM_Activity_DAO_Activity',
+        $activity->id,
+        'source_contact_id'
       );
       if ($sourceContactId) {
         $msgs[] = " source={$sourceContactId}";
@@ -247,67 +249,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @return null
    * @access public
    */
-  public static function deleteActivityAssignment($activityId) {
-    $assignment = new CRM_Activity_BAO_ActivityAssignment();
-    $assignment->activity_id = $activityId;
-    $assignment->record_type = 'Assignee';
-    $assignment->delete();
-  }
-
-  /**
-   * Delete activity target record
-   *
-   * @param int    $id  activity id
-   *
-   * @return null
-   * @access public
-   */
-  public static function deleteActivityTarget($activityId) {
-    $target = new CRM_Activity_BAO_ActivityTarget();
-    $target->activity_id = $activityId;
-    $target->record_type = 'Target';
-    $target->delete();
-  }
-
-  /**
-   * Create activity target record
-   *
-   * @param array    activity_id, target_contact_id
-   *
-   * @return null
-   * @access public
-   */
-  static function createActivityTarget($params) {
-    if (!$params['target_contact_id']) {
-      return;
+  public static function deleteActivityContact($activityId, $recordType = NULL) {
+    $activityContact = new CRM_Activity_BAO_ActivityContact();
+    $activityContact->activity_id = $activityId;
+    if ($recordType) {
+      $activityContact->record_type = $recordType;
     }
-
-    $target = new CRM_Activity_BAO_ActivityTarget();
-    $target->activity_id = $params['activity_id'];
-    $target->target_contact_id = $params['target_contact_id'];
-    // avoid duplicate entries, CRM-7484
-    // happens if sending email to the same contact with different email addresses
-    if (!$target->find(TRUE)) {
-      $target->save();
-    }
-  }
-
-  /**
-   * Create activity assignment record
-   *
-   * @param array    activity_id, assignee_contact_id
-   *
-   * @return null
-   * @access public
-   */
-  static function createActivityAssignment($params) {
-    if (!$params['assignee_contact_id']) {
-      return;
-    }
-    $assignee = new CRM_Activity_BAO_ActivityAssignment();
-    $assignee->activity_id = $params['activity_id'];
-    $assignee->assignee_contact_id = $params['assignee_contact_id'];
-    $assignee->save();
+    $activityContact->delete();
   }
 
   /**
@@ -394,8 +342,18 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     $activityId = $activity->id;
 
+    if (isset($params['source_contact_id'])) {
+      $acParams = array(
+        'activity_id' => $activityId,
+        'contact_id'  => $params['source_contact_id'],
+        'record_type' => 'Source'
+      );
+      CRM_Activity_BAO_ActivityContact::create($acParams);
+    }
+
     // check and attach and files as needed
     CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activityId);
+
 
     // attempt to save activity assignment
     $resultAssignment = NULL;
@@ -406,7 +364,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       if (is_array($params['assignee_contact_id'])) {
         if (CRM_Utils_Array::value('deleteActivityAssignment', $params, TRUE)) {
           // first delete existing assignments if any
-          self::deleteActivityAssignment($activityId);
+          self::deleteActivityContact($activityId, 'Assignee');
         }
 
         $values = array();
@@ -442,7 +400,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
     else {
       if (CRM_Utils_Array::value('deleteActivityAssignment', $params, TRUE)) {
-        self::deleteActivityAssignment($activityId);
+        self::deleteActivityContact($activityId, 'Assignee');
       }
     }
 
@@ -460,7 +418,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       if (is_array($params['target_contact_id'])) {
         if (CRM_Utils_Array::value('deleteActivityTarget', $params, TRUE)) {
           // first delete existing targets if any
-          self::deleteActivityTarget($activityId);
+          self::deleteActivityContact($activityId, 'Target');
         }
 
         $values = array();
@@ -497,7 +455,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
     else {
       if (CRM_Utils_Array::value('deleteActivityTarget', $params, TRUE)) {
-        self::deleteActivityTarget($activityId);
+        self::deleteActivityContact($activityId, 'Target');
       }
     }
 
@@ -1524,9 +1482,10 @@ INNER JOIN civicrm_contact contact ON activityContact.contact_id = contact.id
     // add activity target record for every sms that is send
     $activityTargetParams = array(
       'activity_id' => $activityID,
-      'target_contact_id' => $toID,
+      'contact_id'  => $toID,
+      'record_type' => 'Target'
     );
-    self::createActivityTarget($activityTargetParams);
+    CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
 
     return TRUE;
   }
@@ -1592,9 +1551,10 @@ INNER JOIN civicrm_contact contact ON activityContact.contact_id = contact.id
     // add activity target record for every mail that is send
     $activityTargetParams = array(
       'activity_id' => $activityID,
-      'target_contact_id' => $toID,
+      'contact_id' => $toID,
+      'record_type' => 'Target'
     );
-    self::createActivityTarget($activityTargetParams);
+    CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
     return TRUE;
   }
 
@@ -2174,44 +2134,29 @@ AND cl.modified_id  = c.id
 
     $transaction = new CRM_Core_Transaction();
 
-    // delete activity if there are no record in
-    // civicrm_activity_assignment or civicrm_activity_target
+    // delete activity if there is no record in
+    // civicrm_activity_contact
     // pointing to any other contact record.
-
-
     $activity = new CRM_Activity_DAO_Activity();
     $activity->source_contact_id = $contactId;
     $activity->find();
 
     while ($activity->fetch()) {
-      $noTarget = $noAssignee = TRUE;
+      $noOther = TRUE;
 
-      // check for target activity record.
-      $target = new CRM_Activity_DAO_ActivityTarget();
-      $target->activity_id = $activity->id;
-      $target->find();
-      while ($target->fetch()) {
-        if ($target->target_contact_id != $contactId) {
-          $noTarget = FALSE;
-          break;
-        }
-      }
-      $target->free();
-
-      // check for assignee activity record.
-      $assignee = new CRM_Activity_DAO_ActivityAssignment();
-      $assignee->activity_id = $activity->id;
-      $assignee->find();
-      while ($assignee->fetch()) {
-        if ($assignee->assignee_contact_id != $contactId) {
-          $noAssignee = FALSE;
-          break;
-        }
-      }
-      $assignee->free();
+      $sql = "
+SELECT count(*)
+FROM   civicrm_activity_contact
+WHERE  activity_id = %1
+AND    contact_id <> %2
+";
+      $params = array(
+        1 => array($activity->id, 'Integer'),
+        2 => array($contactId, 'Integer')
+      );
 
       // finally delete activity.
-      if ($noTarget && $noAssignee) {
+      if (CRM_Core_DAO::singleValueQuery($sql)) {
         $activityParams = array('id' => $activity->id);
         $result = self::deleteActivity($activityParams);
       }

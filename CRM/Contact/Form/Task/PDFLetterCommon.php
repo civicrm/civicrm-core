@@ -357,7 +357,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $session        = CRM_Core_Session::singleton();
     $userID         = $session->get('userID');
-    $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
+    $activityTypeID = CRM_Core_OptionGroup::getValue(
+      'activity_type',
       'Print PDF Letter',
       'name'
     );
@@ -385,9 +386,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     foreach ($form->_contactIds as $contactId) {
       $activityTargetParams = array(
         'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,
-        'target_contact_id' => $contactId,
+        'contact_id' => $contactId,
+        'record_type' => 'Target'
       );
-      CRM_Activity_BAO_Activity::createActivityTarget($activityTargetParams);
+      CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
     }
   }
 

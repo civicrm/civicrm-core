@@ -390,13 +390,13 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'activity_status':
-        $from = " $side JOIN civicrm_option_group option_group_activity_status ON (option_group_activity_status.name = 'activity_status')";
+        $from .= " $side JOIN civicrm_option_group option_group_activity_status ON (option_group_activity_status.name = 'activity_status')";
         $from .= " $side JOIN civicrm_option_value activity_status ON (civicrm_activity.status_id = activity_status.value
                                AND option_group_activity_status.id = activity_status.option_group_id ) ";
         break;
 
       case 'activity_type':
-        $from = " $side JOIN civicrm_option_group option_group_activity_type ON (option_group_activity_type.name = 'activity_type')";
+        $from .= " $side JOIN civicrm_option_group option_group_activity_type ON (option_group_activity_type.name = 'activity_type')";
         $from .= " $side JOIN civicrm_option_value activity_type ON (civicrm_activity.activity_type_id = activity_type.value
                                AND option_group_activity_type.id = activity_type.option_group_id ) ";
         break;
