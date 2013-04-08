@@ -106,10 +106,9 @@
       data:  "valueID=" + valueID + "&groupID=" + groupID +"&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
       url: postUrl,
       success: function(html){
-        cj( '#' + elementID ).hide( );
-        var resourceBase   = {/literal}"{$config->resourceBase}"{literal};
-        var successMsg = '{/literal}{ts escape='js'}The selected record has been deleted.{/ts}{literal} &nbsp;&nbsp;<a href="#" onclick="hideStatus( ' + valueID + ',' + groupID + '); return false;"><img title="{/literal}{ts escape='js'}close{/ts}{literal}" src="' +resourceBase+'i/close.png"/></a>';
-        cj( 'tr#statusmessg_'  + groupID + '_' + valueID ).show( ).children().find('span').html( successMsg );
+        cj('#'+ elementID).hide();
+        hideStatus(valueID, groupID);
+        CRM.alert('', '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}', 'success');
         var element = cj( '.ui-tabs-nav #tab_custom_' + groupID + ' a' );
         cj(element).html(cj(element).attr('title') + ' ('+ html+') ');
       }
