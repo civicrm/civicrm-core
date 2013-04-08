@@ -243,27 +243,20 @@ class CRM_Activity_BAO_Query {
       case 'activity_role':
         CRM_Contact_BAO_Query::$_activityRole = $values[2];
 
-        //for activity target name
-        $activityTargetName = $query->getWhereValues('activity_contact_name', $grouping);
-        if (!$activityTargetName[2]) {
-          $name = NULL;
-        }
-        else {
-          $name = trim($activityTargetName[2]);
-          $name = strtolower(CRM_Core_DAO::escapeString($name));
-        }
-
-        $query->_where[$grouping][] = " contact_activity_source.is_deleted = 0 AND contact_activity_source.sort_name LIKE '%{$name}%'";
-        if ($values[2] == 1) {
-          $query->_where[$grouping][] = " civicrm_activity.source_contact_id = contact_activity_source.id";
-          $query->_qill[$grouping][] = ts('Activity created by') . " '$name'";
+        if ($values[2]) {
           $query->_tables['civicrm_activity_contact'] = $query->_whereTables['civicrm_activity_contact'] = 1;
-        }
-        elseif ($values[2] == 2) {
-          $query->_where[$grouping][] = " civicrm_activity_assignment.activity_id = civicrm_activity.id AND civicrm_activity_assignment.assignee_contact_id = contact_activity_source.id";
-          $query->_tables['civicrm_activity_assignment'] = $query->_whereTables['civicrm_activity_assignment'] = 1;
-          $query->_tables['civicrm_activity_contact'] = $query->_whereTables['civicrm_activity_contact'] = 1;
-          $query->_qill[$grouping][] = ts('Activity assigned to') . " '$name'";
+          if ($values[2] == 1) {
+            $query->_where[$grouping][] = " civicrm_activity_contact.record_type = 'Source'";
+            $query->_qill[$grouping][] = ts('Activity created by');
+          }
+          else if ($values[2] == 2) {
+            $query->_where[$grouping][] = " civicrm_activity_contact.record_type = 'Assigneen'";
+            $query->_qill[$grouping][] = ts('Activity assigned to');
+          }
+          else if ($values[2] == 3) {
+            $query->_where[$grouping][] = " civicrm_activity_contact.record_type = 'Target'";
+            $query->_qill[$grouping][] = ts('Activity targeted to');
+          }
         }
         break;
 
@@ -350,6 +343,7 @@ class CRM_Activity_BAO_Query {
             }
           }
         }
+
       case 'activity_tags':
         $value = array_keys($value);
         $activityTags = CRM_Core_PseudoConstant::tag();
@@ -386,60 +380,13 @@ class CRM_Activity_BAO_Query {
         //from civicrm_activity_target or civicrm_activity_assignment.
         //as component specific activities does not have entry in
         //activity target table so lets consider civicrm_activity_assignment.
-        if (CRM_Contact_BAO_Query::$_considerCompActivities) {
-          $from .= " $side JOIN civicrm_activity_target
-                                      ON ( civicrm_activity_target.target_contact_id = contact_a.id ) ";
+        $from .= " INNER JOIN civicrm_activity_contact
+                      ON ( civicrm_activity_contact.contact_id = contact_a.id ) ";
+        $from .= " INNER JOIN civicrm_activity
+                      ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
+                      AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )";
 
-          $from .= " $side JOIN civicrm_activity_assignment activity_assignment
-                                      ON ( activity_assignment.assignee_contact_id = contact_a.id )";
-
-          $from .= " $side JOIN civicrm_activity
-                                      ON ( civicrm_activity.id = civicrm_activity_target.activity_id
-                                      AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )";
-        }
-        elseif (CRM_Contact_BAO_Query::$_withContactActivitiesOnly) {
-          //force the civicrm_activity_target table.
-          $from .= " $side JOIN civicrm_activity_target ON civicrm_activity_target.target_contact_id = contact_a.id ";
-          $from .= " $side JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_target.activity_id
-                                                            AND civicrm_activity.is_deleted = 0
-                                                            AND civicrm_activity.is_current_revision = 1 )";
-        }
-        else {
-          $activityRole = CRM_Contact_BAO_Query::$_activityRole;
-          switch ($activityRole) {
-            case 1:
-              $from .= " $side JOIN civicrm_activity ON ( civicrm_activity.source_contact_id = contact_a.id
-                        AND civicrm_activity.is_deleted = 0
-                        AND civicrm_activity.is_current_revision = 1 )";
-              break;
-
-            case 2:
-              $from .= " $side JOIN civicrm_activity_assignment activity_assignment ON ( activity_assignment.assignee_contact_id = contact_a.id )";
-              $from .= " $side JOIN civicrm_activity ON ( civicrm_activity.id = activity_assignment.activity_id
-                        AND civicrm_activity.is_deleted = 0
-                        AND civicrm_activity.is_current_revision = 1 )";
-              break;
-
-            default:
-              $from .= " $side JOIN civicrm_activity_target ON civicrm_activity_target.target_contact_id = contact_a.id ";
-              $from .= " $side JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_target.activity_id
-                            AND civicrm_activity.is_deleted = 0
-                            AND civicrm_activity.is_current_revision = 1 )";
-          }
-        }
-        break;
-
-      case 'civicrm_activity_contact':
         $activityRole = CRM_Contact_BAO_Query::$_activityRole;
-        if ($activityRole == 1) {
-          $from .= " $side JOIN civicrm_contact contact_activity_source ON civicrm_activity.source_contact_id = contact_activity_source.id
-                           LEFT JOIN civicrm_email email_activity_source ON (contact_activity_source.id = email_activity_source.contact_id AND email_activity_source.is_primary = 1)";
-        }
-        elseif ($activityRole == 2) {
-          $from .= " $side JOIN civicrm_activity_assignment ON civicrm_activity.id = civicrm_activity_assignment.activity_id ";
-          $from .= " $side JOIN civicrm_contact contact_activity_source ON civicrm_activity_assignment.assignee_contact_id = contact_activity_source.id
-                           LEFT JOIN civicrm_email email_activity_source ON (contact_activity_source.id = email_activity_source.contact_id AND email_activity_source.is_primary = 1)";
-        }
         break;
 
       case 'activity_status':
@@ -500,10 +447,12 @@ class CRM_Activity_BAO_Query {
 
     CRM_Core_Form_Date::buildDateRange($form, 'activity_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
 
-    $activityRoles = array(1 => ts('Created by'), 2 => ts('Assigned to'));
+    $activityRoles = array(
+      1 => ts('Created by'),
+      2 => ts('Assigned to'),
+      3 => ts('Targeted to')
+    );
     $form->addRadio('activity_role', NULL, $activityRoles);
-
-    $form->addElement('text', 'activity_contact_name', ts('Contact Name'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     foreach ($activityStatus as $activityStatusID => $activityStatusName) {

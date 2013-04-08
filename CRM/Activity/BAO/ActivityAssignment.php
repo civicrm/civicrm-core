@@ -37,7 +37,7 @@
  * This class is for activity assignment functions
  *
  */
-class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityAssignment {
+class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityContact {
 
   /**
    * class constructor
@@ -60,6 +60,10 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityAssig
     $assignment = new CRM_Activity_BAO_ActivityAssignment();
 
     $assignment->copyValues($params);
+    $assignment->record_type = 'Assignee';
+    if (isset($assignment->assignee_contact_id)) {
+      $assignment->contact_id = $assignment->assignee_contact_id;
+    }
     return $assignment->save();
   }
 
@@ -79,15 +83,17 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityAssig
       return $assigneeArray;
     }
 
-    $sql = '
-            SELECT assignee_contact_id
-            FROM civicrm_activity_assignment
-            JOIN civicrm_contact ON assignee_contact_id = civicrm_contact.id
-            WHERE activity_id = %1 AND civicrm_contact.is_deleted = 0
-        ';
+    $sql = "
+SELECT     assignee_contact_id
+FROM       civicrm_activity_assignment
+INNER JOIN civicrm_contact ON contact_id = civicrm_contact.id
+WHERE      activity_id = %1
+AND        record_type = 'Assignee'
+AND        civicrm_contact.is_deleted = 0
+";
     $assignment = CRM_Core_DAO::executeQuery($sql, array(1 => array($activity_id, 'Integer')));
     while ($assignment->fetch()) {
-      $assigneeArray[] = $assignment->assignee_contact_id;
+      $assigneeArray[] = $assignment->contact_id;
     }
 
     return $assigneeArray;
@@ -116,15 +122,16 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityAssig
       $whereClause = "  AND ce.is_primary= 1";
     }
 
-    $query = "SELECT contact_a.id, contact_a.sort_name, contact_a.display_name, ce.email   
-                  FROM civicrm_contact contact_a 
-                  LEFT JOIN civicrm_activity_assignment 
-                         ON civicrm_activity_assignment.assignee_contact_id = contact_a.id
-                  LEFT JOIN civicrm_email ce 
-                         ON ce.contact_id = contact_a.id
-                  WHERE civicrm_activity_assignment.activity_id = %1
-                        AND contact_a.is_deleted = 0
-                        {$whereClause}";
+    $query = "
+SELECT     contact_a.id, contact_a.sort_name, contact_a.display_name, ce.email
+FROM       civicrm_contact contact_a
+INNER JOIN civicrm_activity_contact ON civicrm_activity_contact_contact_id = contact_a.id
+LEFT JOIN  civicrm_email ce ON ce.contact_id = contact_a.id
+WHERE      civicrm_activity_contact.activity_id = %1
+AND        contact_a.is_deleted = 0
+AND        civicrm_activity_contact.record_type = 'Assignee'
+           {$whereClause}
+";
 
     $queryParam = array(1 => array($activityID, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $queryParam);
