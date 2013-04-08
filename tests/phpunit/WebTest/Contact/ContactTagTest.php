@@ -56,7 +56,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The tag '$tagName' has been saved."));
+    $this->waitForText('crm-notification-container', "The tag '$tagName' has been saved.");
 
     // Adding contact
     // We're using Quick Add block on the main page for this.
@@ -72,7 +72,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=.success");
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Saved"));
+    $this->waitForText('crm-notification-container', "Saved");
   }
 
   function testTagSetContact() {
@@ -100,7 +100,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The tag '$tagSetName' has been saved."));
+    $this->waitForText('crm-notification-container', "The tag '$tagSetName' has been saved.");
 
     // Adding contact
     // We're using Quick Add block on the main page for this.
@@ -148,7 +148,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     // Visit contact summary page.
     $this->click("css=div.ac_results-inner li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("tagset1, tagset2"));
+    $this->waitForText('tags', "tagset1, tagset2");
   }
 }
 

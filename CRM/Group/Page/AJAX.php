@@ -69,6 +69,18 @@ class CRM_Group_Page_AJAX {
       // get group list
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
 
+      // if no groups found with parent-child hierarchy and logged in user say can view child groups only (an ACL case),
+      // go ahead with flat hierarchy, CRM-12225 
+      if (empty($groups)) {
+        $groupsAccessible = CRM_Core_PseudoConstant::group();
+        $parentsOnly      = CRM_Utils_Array::value('parentsOnly', $params);
+        if (!empty($groupsAccessible) && $parentsOnly) {
+          // recompute group list with flat hierarchy
+          $params['parentsOnly'] = 0;
+          $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
+        }
+      }
+
       $iFilteredTotal = $iTotal = $params['total'];
       $selectorElements = array(
         'group_name', 'group_id', 'created_by', 'group_description',

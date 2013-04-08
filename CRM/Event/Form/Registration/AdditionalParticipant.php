@@ -546,33 +546,20 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
 
     if (!$validatePayement) {
-
       return TRUE;
-
     }
 
-    foreach ($self->_fields as $name => $fld) {
-      if ($fld['is_required'] &&
-        CRM_Utils_System::isNull(CRM_Utils_Array::value($name, $fields))
-      ) {
-        return FALSE;
-      }
-    }
+    $errors = array();
+
+    CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // make sure that credit card number and cvv are valid
-    if (CRM_Utils_Array::value('credit_card_type', $self->_params[0])) {
-      if (CRM_Utils_Array::value('credit_card_number', $self->_params[0]) &&
-        !CRM_Utils_Rule::creditCardNumber($self->_params[0]['credit_card_number'], $self->_params[0]['credit_card_type'])
-      ) {
-        return FALSE;
-      }
+    CRM_Core_Payment_Form::validateCreditCard($self->_params[0], $errors);
 
-      if (CRM_Utils_Array::value('cvv2', $self->_params[0]) &&
-        !CRM_Utils_Rule::cvv($self->_params[0]['cvv2'], $self->_params[0]['credit_card_type'])
-      ) {
-        return FALSE;
-      }
+    if ($errors) {
+      return FALSE;
     }
+
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       if ($greetingType = CRM_Utils_Array::value($greeting, $self->_params[0])) {
         $customizedValue = CRM_Core_OptionGroup::getValue($greeting, 'Customized', 'name');

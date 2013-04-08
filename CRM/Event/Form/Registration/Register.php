@@ -80,17 +80,20 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   function preProcess() {
     parent::preProcess();
 
-    CRM_Contribute_Form_Contribution_Main::preProcessPaymentOptions($this);
-    if ($this->_snippet) {
-      return;
-    }
-
     //CRM-4320.
     //here we can't use parent $this->_allowWaitlist as user might
     //walk back and we maight set this value in this postProcess.
     //(we set when spaces < group count and want to allow become part of waiting )
-
     $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $this->_values['event']));
+
+    // Get payment processors if appropriate for this event
+    // We hide the payment fields if the event is full or requires approval,
+    // and the current user has not yet been approved CRM-12279
+    $noFees = (($eventFull || $this->_requireApproval) && !$this->_allowConfirmation);
+    CRM_Contribute_Form_Contribution_Main::preProcessPaymentOptions($this, $noFees);
+    if ($this->_snippet) {
+      return;
+    }
 
     $this->_allowWaitlist = FALSE;
     if ($eventFull && !$this->_allowConfirmation &&
@@ -413,7 +416,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     $pps = NULL;
-    $this->_paymentProcessors = $this->get('paymentProcessors');
     if (!empty($this->_paymentProcessors)) {
       $pps = $this->_paymentProcessors;
       foreach ($pps as $key => & $name) {
@@ -891,30 +893,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       ) {
         return empty($errors) ? TRUE : $errors;
       }
-      if (property_exists($self, '_paymentFields') && !empty($self->_paymentFields )) {
-        foreach ($self->_paymentFields as $name => $fld) {
-          if ($fld['is_required'] &&
-            CRM_Utils_System::isNull(CRM_Utils_Array::value($name, $fields))
-          ) {
-            $errors[$name] = ts('%1 is a required field.', array(1 => $fld['title']));
-          }
-        }
+      if (!empty($self->_paymentFields)) {
+        CRM_Core_Form::validateMandatoryFields($self->_paymentFields, $fields, $errors);
       }
+      CRM_Core_Payment_Form::validateCreditCard($fields, $errors);
     }
-    // make sure that credit card number and cvv are valid
-    if (CRM_Utils_Array::value('credit_card_type', $fields)) {
-      if (CRM_Utils_Array::value('credit_card_number', $fields) &&
-        !CRM_Utils_Rule::creditCardNumber($fields['credit_card_number'], $fields['credit_card_type'])
-      ) {
-        $errors['credit_card_number'] = ts('Please enter a valid Credit Card Number');
-      }
 
-      if (CRM_Utils_Array::value('cvv2', $fields) &&
-        !CRM_Utils_Rule::cvv($fields['cvv2'], $fields['credit_card_type'])
-      ) {
-        $errors['cvv2'] = ts('Please enter a valid Credit Card Verification Number');
-      }
-    }
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
         $customizedValue = CRM_Core_OptionGroup::getValue($greeting, 'Customized', 'name');
