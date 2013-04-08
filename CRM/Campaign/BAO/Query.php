@@ -95,7 +95,7 @@ class CRM_Campaign_BAO_Query {
     //all below tables are require to fetch  result.
 
     //1. get survey activity target table in.
-    $query->_select['survey_activity_target_contact_id'] = 'civicrm_activity_target.target_contact_id as survey_activity_target_contact_id';
+    $query->_select['survey_activity_target_contact_id'] = 'civicrm_activity_contact.contact_id as survey_activity_target_contact_id';
     $query->_select['survey_activity_target_id'] = 'civicrm_activity_target.id as survey_activity_target_id';
     $query->_element['survey_activity_target_id'] = 1;
     $query->_element['survey_activity_target_contact_id'] = 1;
@@ -175,8 +175,7 @@ class CRM_Campaign_BAO_Query {
         return;
 
       case 'campaign_search_voter_for':
-        if (in_array($value, array(
-          'release', 'interview'))) {
+        if (in_array($value, array('release', 'interview'))) {
           $query->_where[$grouping][] = '(civicrm_activity.is_deleted = 0 OR civicrm_activity.is_deleted IS NULL)';
         }
         return;
@@ -207,13 +206,14 @@ class CRM_Campaign_BAO_Query {
 
     switch ($name) {
       case self::CIVICRM_ACTIVITY_TARGET:
-        $from = " INNER JOIN civicrm_activity_target ON ( civicrm_activity_target.target_contact_id = contact_a.id ) ";
+        $from = " INNER JOIN civicrm_activity_contact
+   ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type = 'Target') ";
         break;
 
       case self::CIVICRM_ACTIVITY:
         $surveyActivityTypes = CRM_Campaign_PseudoConstant::activityType();
         $surveyKeys          = "(" . implode(',', array_keys($surveyActivityTypes)) . ")";
-        $from                = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_target.activity_id
+        $from                = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
                                  AND civicrm_activity.activity_type_id IN $surveyKeys ) ";
         break;
 

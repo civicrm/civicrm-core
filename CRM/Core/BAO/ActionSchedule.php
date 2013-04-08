@@ -750,20 +750,19 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $from = "{$mapping->entity} e";
 
       if ($mapping->entity == 'civicrm_activity') {
+        $contactField = 'r.contact_id';
         switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
           case 'Activity Assignees':
-            $contactField = 'r.assignee_contact_id';
-            $join[] = 'INNER JOIN civicrm_activity_assignment r ON  r.activity_id = e.id';
+            $join[] =  "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type = 'Assignee'";
             break;
 
           case 'Activity Source':
-            $contactField = 'e.source_contact_id';
+            $join[] =  "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type = 'Source'";  
             break;
 
           default:
           case 'Activity Targets':
-            $contactField = 'r.target_contact_id';
-            $join[] = 'INNER JOIN civicrm_activity_target r ON  r.activity_id = e.id';
+            $join[] =  "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type = 'Target'";
             break;
 
         }
@@ -905,7 +904,7 @@ INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_sche
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
 {$whereClause} AND {$dateClause} {$notINClause}";
-
+      
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
       // if repeat is turned ON:
