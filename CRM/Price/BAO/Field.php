@@ -377,7 +377,8 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
             $choice[$opId]->freeze();
           }
         }
-        if (property_exists($qf, '_membershipBlock') && $field->name == 'contribution_amount') {
+        if (property_exists($qf, '_membershipBlock') && $qf->_membershipBlock 
+          && $field->name == 'contribution_amount') {
           $choice[] = $qf->createElement('radio', NULL, '', ts('No thank you'), '-1',
             array(
               'onclick' => 'clearAmountOther();',
