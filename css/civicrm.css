@@ -2581,6 +2581,10 @@ div.grippie {
   background-position: -3px -161px;
 }
 
+.crm-container .swap-target-assignee-icon {
+  background-position: -82px -81px;
+}
+
 #crm-container .geotag {
   padding: 2px 0 2px 20px !important;
   background: url('../i/geotag_16.png') left center no-repeat;
