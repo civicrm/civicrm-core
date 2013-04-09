@@ -34,8 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *
  */
 class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
-  protected $_cId_a;
-  protected $_cId_b;
   protected $_ppTypeID;
   protected $_apiversion;
   public $_eNoticeCompliant = TRUE;
@@ -51,14 +49,11 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
     parent::setUp();
     $this->_apiversion = 3;
-    $this->_cId_a      = $this->individualCreate(NULL);
-    $this->_cId_b      = $this->organizationCreate(NULL);
   }
 
   function tearDown() {
 
     $tablesToTruncate = array(
-      'civicrm_contact',
       'civicrm_payment_processor_type',
     );
     $this->quickCleanup($tablesToTruncate);
@@ -225,7 +220,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = &civicrm_api('payment_processor_type', 'create', $params);
+    $result = civicrm_api('payment_processor_type', 'create', $params);
     $this->assertNotNull($result['id']);
     unset($params['version']);
     // assertDBState compares expected values in $result to actual values in the DB

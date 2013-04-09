@@ -1366,7 +1366,7 @@ class CRM_Contact_BAO_Query {
       (substr($values[0], 0, 6) == 'grant_') ||
       (substr($values[0], 0, 7) == 'pledge_') ||
       (substr($values[0], 0, 5) == 'case_') ||
-      (substr($values[0], 0, 10) == 'financial_') 
+      (substr($values[0], 0, 10) == 'financial_')
     ) {
       return;
     }
@@ -1423,8 +1423,6 @@ class CRM_Contact_BAO_Query {
       case 'sort_name':
       case 'display_name':
         $this->sortName($values);
-        //force civicrm_activity_target, CRM-7812
-        self::$_withContactActivitiesOnly = TRUE;
         return;
 
       case 'email':
@@ -2702,10 +2700,10 @@ WHERE  id IN ( $groupIDs )
       $tActTable = "`civicrm_act_tag-" . $value . "`";
       $this->_tables[$etActTable] =
         $this->_whereTables[$etActTable] =
-        " LEFT JOIN civicrm_activity_target
-            ON ( civicrm_activity_target.target_contact_id = contact_a.id )
+        " LEFT JOIN civicrm_activity_contact
+            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type = 'Target' )
           LEFT JOIN civicrm_activity
-            ON ( civicrm_activity.id = civicrm_activity_target.activity_id
+            ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
             AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )
           LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = civicrm_activity.id )
           LEFT JOIN civicrm_tag {$tActTable} ON ( {$etActTable}.tag_id = {$tActTable}.id  )";
@@ -2772,10 +2770,10 @@ WHERE  id IN ( $groupIDs )
       $etActTable = "`civicrm_entity_act_tag-" . $value . "`";
       $this->_tables[$etActTable] =
         $this->_whereTables[$etActTable] =
-        " LEFT JOIN civicrm_activity_target
-            ON ( civicrm_activity_target.target_contact_id = contact_a.id )
+        " LEFT JOIN civicrm_activity_contact
+            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type = 'Target' )
           LEFT JOIN civicrm_activity
-            ON ( civicrm_activity.id = civicrm_activity_target.activity_id
+            ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
             AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )
           LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = civicrm_activity.id ) ";
 
