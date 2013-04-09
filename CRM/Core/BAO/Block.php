@@ -64,7 +64,8 @@ class CRM_Core_BAO_Block {
     if (empty($params)) {
       return NULL;
     }
-    eval('$block = new CRM_Core_BAO_' . $blockName . '( );');
+    $BAOString = 'CRM_Core_BAO_' . $blockName;
+    $block = new $BAOString( );
 
     $blocks = array();
     if (!isset($params['entity_table'])) {
@@ -83,7 +84,7 @@ class CRM_Core_BAO_Block {
 
       $count = 1;
       foreach ($blockIds as $blockId) {
-        eval('$block = new CRM_Core_BAO_' . $blockName . '( );');
+        $block = new $BAOString( );
         $block->id        = $blockId['id'];
         $getBlocks        = self::retrieveBlock($block, $blockName);
         $blocks[$count++] = array_pop($getBlocks);

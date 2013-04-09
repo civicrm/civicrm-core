@@ -595,7 +595,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         CRM_Core_Payment_Form::buildDirectDebit($this, TRUE);
       }
       else {
-        eval('CRM_Contribute_Form_AdditionalInfo::build' . $type . '( $this );');
+        $additionalInfoFormFunction = 'build' . $type ;
+        CRM_Contribute_Form_AdditionalInfo::$additionalInfoFormFunction( $this );
       }
     }
     if (empty($this->_recurPaymentProcessors)) {
