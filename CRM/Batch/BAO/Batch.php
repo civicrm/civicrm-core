@@ -300,7 +300,13 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $newLinks = array();
       }
       elseif ($params['context'] == 'financialBatch') {
-        $values['check'] = "<input type='checkbox' id='check_".$object->id."' name='check_".$object->id."' value='1'  data-status_id='".$values['status_id']."' class='select-row'></input>";
+        $values['check'] =
+          "<input type='checkbox' id='check_" .
+          $object->id .
+          "' name='check_" .
+          $object->id .
+          "' value='1'  data-status_id='" .
+          $values['status_id']."' class='select-row'></input>";
 
         switch ($values['status_id']) {
           case '1':
@@ -325,9 +331,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $tokens = array('id' => $object->id, 'status' => $values['status_id']);
       if ($values['status_id'] == CRM_Core_OptionGroup::getValue('batch_status', 'Exported')) {
         $aid = CRM_Core_OptionGroup::getValue('activity_type','Export Accounting Batch');
-        $activityParams = array('source_record_id' => $object->id, 'activity_type_id' => $aid );
+        $activityParams = array('source_record_id' => $object->id, 'activity_type_id' => $aid);
         $exportActivity = CRM_Activity_BAO_Activity::retrieve($activityParams, $val);
-        $fid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $exportActivity->id, 'file_id', 'entity_id' ); 
+        $fid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $exportActivity->id, 'file_id', 'entity_id');
         $tokens = array_merge(array('eid' => $exportActivity->id, 'fid' => $fid), $tokens);
       }
       $values['action'] = CRM_Core_Action::formLink(
@@ -703,9 +709,9 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       }
     }
     if (!empty($query->_where[0])) {
-      $where = implode(' AND ', $query->_where[0])."  
-      AND civicrm_entity_batch.batch_id IS NULL
-      AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution'";
+      $where = implode(' AND ', $query->_where[0]) .
+        " AND civicrm_entity_batch.batch_id IS NULL
+         AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution'";
       $searchValue = TRUE;
     }
     else {
@@ -724,10 +730,11 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       }
     }
 
-    $sql = "SELECT {$select}
-FROM {$from}
-WHERE {$where}
-{$orderBy}
+    $sql = "
+SELECT {$select}
+FROM   {$from}
+WHERE  {$where}
+       {$orderBy}
 ";
 
     if (isset($limit)) {
@@ -747,7 +754,7 @@ WHERE {$where}
   static function getBatchNames($batchIds) {
     $query = 'SELECT id, title
       FROM civicrm_batch
-      WHERE id IN ('.$batchIds.')';
+      WHERE id IN ('. $batchIds . ')';
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);
