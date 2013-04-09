@@ -155,7 +155,7 @@
     <tr class="crm-activity-form-block-swap_target_assignee">
       <td class="label"></td>
       <td>
-        <a class="button" id="swap_target_assignee">
+        <a href="#" class="button" id="swap_target_assignee">
           <span>
             <div class="icon swap-target-assignee-icon"></div>{ts}Swap Target and Assignee Contacts{/ts}
           </span>
@@ -336,6 +336,7 @@
             cj(targets).each( function() {
               cj('#assignee_contact_id').tokenInput("add", this);
             });
+            return false;
           });
         </script>
       {/literal}
