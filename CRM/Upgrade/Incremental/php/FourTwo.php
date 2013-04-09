@@ -443,6 +443,11 @@ WHERE     cpse.price_set_id IS NULL";
       if (empty($optionValue))
         return;
     }
+    else{
+      //CRM-12273
+      //if options group is empty then return, contribution should be default price set
+      return;
+    }
 
     if (! CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set', $pageTitle, 'id', 'name', true)) {
       $setParams['name'] = $pageTitle;
@@ -629,8 +634,23 @@ WHERE     cpf.price_set_id = %1
       }
       else {
         $sql .= "AND cpfv.amount = %2";
+
+        //CRM-12273
+        //check if price_set_id is exist, if not use the default contribution amount
+        if (isset($result->price_set_id)){
+          $priceSetId = $result->price_set_id;
+        }
+        else{
+          $defaultPriceSets = CRM_Price_BAO_Set::getDefaultPriceSet();
+          foreach ($defaultPriceSets as $key => $pSet) {
+            if ($pSet['name'] == 'contribution_amount'){
+              $priceSetId = $pSet['setID'];
+            }
+          }
+        }
+
         $params = array(
-          '1' => array($result->price_set_id, 'Integer'),
+          '1' => array($priceSetId, 'Integer'),
           '2' => array($result->total_amount, 'String'),
         );
         $res = CRM_Core_DAO::executeQuery($sql, $params);
@@ -647,7 +667,7 @@ WHERE     cpf.price_set_id = %1
         }
         else {
           $params = array(
-            'price_set_id' => $result->price_set_id,
+            'price_set_id' => $priceSetId,
             'name' => 'other_amount',
           );
           $defaults = array();
@@ -660,7 +680,7 @@ WHERE     cpf.price_set_id = %1
           }
           else {
             $lineParams['price_field_id'] =
-              CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $result->price_set_id, 'id', 'price_set_id');
+              CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $priceSetId, 'id', 'price_set_id');
             $lineParams['label'] = 'Contribution Amount';
           }
           $lineParams['qty'] = 1;
