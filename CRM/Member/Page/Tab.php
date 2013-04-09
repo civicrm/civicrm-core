@@ -152,7 +152,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
  SELECT COUNT(m.id)
    FROM civicrm_membership m
      LEFT JOIN civicrm_membership_status ms ON ms.id = m.status_id
-  WHERE m.owner_membership_id = {$dao->id} AND m.is_test = 0 AND ms.is_current_member = 1";
+     LEFT JOIN civicrm_contact ct ON ct.id = m.contact_id
+  WHERE m.owner_membership_id = {$dao->id} AND m.is_test = 0 AND ms.is_current_member = 1 AND ct.is_deleted = 0";
         $num_related = CRM_Core_DAO::singleValueQuery($query);
         $max_related = CRM_Utils_Array::value('max_related', $membership[$dao->id]);
         $membership[$dao->id]['related_count'] = ($max_related == '' ?
