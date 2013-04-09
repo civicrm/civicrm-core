@@ -359,7 +359,8 @@ class CRM_Core_BAO_Block {
       }
 
       $blockFields = array_merge($value, $contactFields);
-      eval('$blocks[] = CRM_Core_BAO_' . $name . '::add( $blockFields );');
+      $baoString = 'CRM_Core_BAO_' . $name;
+      $blocks[] = $baoString::add( $blockFields );
     }
 
     // we need to delete blocks that were deleted during update
