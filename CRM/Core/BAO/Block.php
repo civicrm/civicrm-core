@@ -177,6 +177,7 @@ class CRM_Core_BAO_Block {
    */
   static function getBlockIds($blockName, $contactId = NULL, $entityElements = NULL, $updateBlankLocInfo = FALSE) {
     $allBlocks = array();
+
     $name = ucfirst($blockName);
     if ($blockName == 'im') {
       $name = 'IM';
@@ -185,11 +186,19 @@ class CRM_Core_BAO_Block {
       $name = 'OpenID';
     }
 
+    $baoString = 'CRM_Core_BAO_' . $name;
     if ($contactId) {
-      eval('$allBlocks = CRM_Core_BAO_' . $name . '::all' . $name . 's( $contactId, $updateBlankLocInfo );');
+      //@todo a cleverer way to do this would be to use the same fn name on each
+      // BAO rather than constructing the fn
+      // it would also be easier to grep for
+      // e.g $bao = new $baoString;
+      // $bao->getAllBlocks()
+      $baoFunction = 'all' . $name . 's';
+      $allBlocks = $baoString::$baoFunction( $contactId, $updateBlankLocInfo );
     }
     elseif (!empty($entityElements) && $blockName != 'openid') {
-      eval('$allBlocks = CRM_Core_BAO_' . $name . '::allEntity' . $name . 's( $entityElements );');
+      $baoFunction = 'allEntity' . $name . 's';
+      $allBlocks = $baoString::$baoFunction( $entityElements );
     }
 
     return $allBlocks;
@@ -260,7 +269,8 @@ class CRM_Core_BAO_Block {
             }
           }
           if ($resetPrimaryId) {
-            eval('$block = new CRM_Core_BAO_' . $blockName . '( );');
+            $baoString = 'CRM_Core_BAO_' . $blockName;
+            $block = new $baoString( );
             $block->selectAdd();
             $block->selectAdd("id, is_primary");
             $block->id = $resetPrimaryId;
@@ -394,8 +404,8 @@ class CRM_Core_BAO_Block {
       $name = 'OpenID';
     }
 
-    require_once "CRM/Core/DAO/{$name}.php";
-    eval('$block = new CRM_Core_DAO_' . $name . '( );');
+    $baoString = 'CRM_Core_DAO_' . $name;
+    $block = new $baoString( );
 
     $block->copyValues($params);
     /*
