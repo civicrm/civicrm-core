@@ -256,9 +256,16 @@ cj(function($) {
   }
 
   function exportRecords(records) {
+    var query = {'batch_id': records, 'export_format': $('select.export-format').val()};
     var exportUrl = CRM.url('civicrm/financial/batch/export', 'reset=1');
-    $().redirect(exportUrl, {'batch_id': records, 'export_format': $('select.export-format').val()}, 'GET');
-    setTimeout(function() {batchSelector.fnDraw();}, 2000);
+    // jQuery redirect expects all query args as an object, so extract them from crm url
+    var urlParts = exportUrl.split('?');
+    $.each(urlParts[1].split('&'), function(key, val) {
+      var q = val.split('=');
+      query[q[0]] = q[1];
+    });
+    $().redirect(urlParts[0], query, 'GET');
+    setTimeout(function() {batchSelector.fnDraw();}, 4000);
   }
 
   function validateOp(records, op) {
