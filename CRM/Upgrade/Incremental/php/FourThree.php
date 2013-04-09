@@ -517,13 +517,13 @@ UPDATE civicrm_line_item li
        LEFT JOIN civicrm_participant cp
               ON (li.entity_id = cp.id AND li.entity_table = 'civicrm_participant')
        LEFT JOIN civicrm_event ce
-              ON ce.id = cp.event_id
+              ON ce.id = cp.event_id AND ce.financial_type_id
 SET    li.financial_type_id = CASE
          WHEN (con.contribution_page_id IS NULL || li.price_field_value_id IS NULL) AND cp.id IS NULL THEN
            con.financial_type_id
          WHEN (con.contribution_page_id IS NOT NULL AND cp.id IS NULL) || (cp.id IS NOT NULL AND  li.price_field_value_id IS NOT NULL) THEN
            cpfv.financial_type_id
-         WHEN cp.id IS NOT NULL AND  li.price_field_value_id IS NULL THEN
+         WHEN ce.id IS NOT NULL AND  li.price_field_value_id IS NULL THEN
            ce.financial_type_id
        END";
     CRM_Core_DAO::executeQuery($updateLineItemSql, $queryParams);
