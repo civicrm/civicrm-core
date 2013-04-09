@@ -1182,6 +1182,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($pId) {
         $params['contribution_mode'] = 'participant';
         $params['participant_id'] = $pId;
+        $params['skipLineItem'] = 1;
       }
       $params['line_item'] = $lineItem;
       $params['payment_processor_id'] = $params['payment_processor'] = CRM_Utils_Array::value('id', $this->_paymentProcessor);
