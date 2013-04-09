@@ -906,22 +906,24 @@ SELECT name, mail
     return $loginURL;
   }
 
-  /*
+  /**
    * Wrapper for og_membership creation
+   *
+   * @param integer $ogID Organic Group ID
+   * @param integer $drupalID drupal User ID
    */
   function og_membership_create($ogID, $drupalID){
-    $group_membership = og_membership_create($ogID, 'user', $drupalID, array('is_active' => 1));
-    $group_membership->save();
+    og_save_subscription( $ogID, $drupalID, array( 'is_active' => 1 ) );
   }
 
   /**
    * Wrapper for og_membership deletion
+   *
+   * @param integer $ogID Organic Group ID
+   * @param integer $drupalID drupal User ID
    */
   function og_membership_delete($ogID, $drupalID) {
-    $membership = og_get_group_membership($ogID, 'user', $drupalID);
-    if ($membership) {
-      og_membership_delete($membership->id);
-    }
+      og_delete_subscription( $ogID, $drupalID );
   }
 
   /**
