@@ -1086,12 +1086,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $this->_domain = CRM_Core_BAO_Domain::getDomain();
     }
 
-    list($verp, $urls, $headers) = $this->getVerpAndUrlsAndHeaders($job_id,
+    list($verp, $urls, $headers) = $this->getVerpAndUrlsAndHeaders(
+      $job_id,
       $event_queue_id,
       $hash,
       $email,
       $isForward
     );
+
     //set from email who is forwarding it and not original one.
     if ($fromEmail) {
       unset($headers['From']);
