@@ -81,6 +81,8 @@ class CRM_Utils_Token {
       'phone',
       'address',
       'email',
+      'id',
+      'description',
     ),
     'subscribe' => array( 'group' ),
     'unsubscribe' => array( 'group' ),
@@ -274,7 +276,7 @@ class CRM_Utils_Token {
         $addressCache[$cache_key] = $value;
       }
     }
-    elseif ($token == 'name' || $token == 'id') {
+    elseif ($token == 'name' || $token == 'id' || $token == 'description') {
       $value = $domain->$token;
     }
     elseif ($token == 'phone' || $token == 'email') {
