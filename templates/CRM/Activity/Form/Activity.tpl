@@ -157,7 +157,7 @@
       <td>
         <a href="#" class="button" id="swap_target_assignee">
           <span>
-            <div class="icon swap-target-assignee-icon"></div>{ts}Swap Target and Assignee Contacts{/ts}
+            <div class="icon swap-icon"></div>{ts}Swap Target and Assignee Contacts{/ts}
           </span>
         </div>
       </td>
