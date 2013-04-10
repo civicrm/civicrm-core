@@ -142,6 +142,10 @@ function _civicrm_api3_contact_create_spec(&$params) {
     'title' => 'Current Employer',
     'description' => 'Name of Current Employer',
   );
+  $params['dupe_check'] = array(
+    'title' => 'Check for Duplicates',
+    'description' => 'Throw error if contact create matches dedupe rule',
+  );
 }
 
 /**
