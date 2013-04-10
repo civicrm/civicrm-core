@@ -69,11 +69,23 @@ function civicrm_api3_generic_getfields($apiRequest) {
       $unique = FALSE;
     case 'get':
       $metadata = _civicrm_api_get_fields($apiRequest['entity'], $unique, $apiRequest['params']);
-      if (empty($metadata['id']) && !empty($metadata[strtolower($apiRequest['entity']) . '_id'])) {
-        $metadata['id'] = $metadata[$lcase_entity . '_id'];
-        $metadata['id']['api.aliases'] = array($lcase_entity . '_id');
-        unset($metadata[$lcase_entity . '_id']);
+      if (empty($metadata['id'])){
+        // if id is not set we will set it eg. 'id' from 'case_id', case_id will be an alias
+        if(!empty($metadata[strtolower($apiRequest['entity']) . '_id'])) {
+          $metadata['id'] = $metadata[$lcase_entity . '_id'];
+          unset($metadata[$lcase_entity . '_id']);
+          $metadata['id']['api.aliases'] = array($lcase_entity . '_id');
+        }
       }
+      else{
+        // really the preference would be to set the unique name in the xml
+        // question is which is a less risky fix this close to a release - setting in xml for the known failure
+        // (note) or setting for all api where fields is returning 'id' & we want to accept 'note_id' @ the api layer
+        // nb we don't officially accept note_id anyway - rationale here is more about centralising a now-tested
+        // inconsistency
+        $metadata['id']['api.aliases'] = array($lcase_entity . '_id');
+      }
+
       break;
 
     case 'delete':
