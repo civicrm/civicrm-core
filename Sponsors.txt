@@ -232,45 +232,27 @@ Progressive Technology Project http://www.progressivetech.org
 RVTC http://rvtc.us
 Volunteer Honduras http://www.volunteerhonduras.org
 
-Briney
-Matthew
-Brownsberger
-Will
-Burden
-Monica
-Calleeuw
-Bart
-Cimpian
-Casti
-Clarke
-Jill
-Cheryl
-Day
-Janette
-Gold
-Ariel
-Kehilat Hadar 
-Malkoun
-Anthony
-Matsushita
-Jun
-McNaughton
-Eileen
-Murray
-Joe
-Peter Davis
-Shaughnessy
-Brian
-Spagarino
-Andres
+Briney, Matthew
+Brownsberger, Will
+Burden, Monica
+Calleeuw, Bart
+Cimpian, Casti
+Clarke, Jill
+Davis, Peter
+Day, Janette
+Gold, Ariel
+Hadar, Kehilat 
+Malkoun, Anthony
+Matsushita, Jun
+McNaughton, Eileen
+Murray, Joe
+Shaughnessy, Brian
+Spagarino, Andres
 Speleo
-Stuart
-josh
+Stuart, josh
 Tabletguy
-Watts
-Danny
-Wistreich
-Nic
+Watts, Danny
+Wistreich, Nic
 
 ****************************************
 Sponsors for 3.3 Make-it-Happen Projects
