@@ -1519,11 +1519,13 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
       $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
       if ($values['phone_type_id'] == CRM_Utils_Array::value('Mobile', $phoneTypes)) {
         $smsParams['To'] = $values['phone'];
-      } else{
+      }
+      else {
         $smsParams['To'] = '';
       }
 
-      if (self::sendSMSMessage($contactId,
+      if (self::sendSMSMessage(
+          $contactId,
           $tokenText,
           $tokenHtml,
           $smsParams,
