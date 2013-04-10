@@ -230,8 +230,8 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
     $elementName,
     $fieldId,
     $inactiveNeeded,
-    $useRequired  = TRUE,
-    $label        = NULL,
+    $useRequired = TRUE,
+    $label = NULL,
     $fieldOptions = NULL,
     $feezeOptions = array()
   ) {
@@ -281,9 +281,9 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
     switch ($field->html_type) {
       case 'Text':
         $optionKey = key($customOption);
-        $count     = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
+        $count = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
         $max_value = CRM_Utils_Array::value('max_value', $customOption[$optionKey], '');
-        $priceVal  = implode($seperator, array($customOption[$optionKey][$valueFieldName], $count, $max_value));
+        $priceVal = implode($seperator, array($customOption[$optionKey][$valueFieldName], $count, $max_value));
 
         $extra = array();
         if (!empty($qf->_quickConfig) && !empty($qf->_contributionAmount)) {
@@ -347,9 +347,9 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
             $opt['label'] =  CRM_Utils_Array::value('label', $opt) ? $opt['label'] : '';
             $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
           }
-          $count     = CRM_Utils_Array::value('count', $opt, '');
+          $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal  = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
+          $priceVal = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
           $extra = array('price' => json_encode(array($elementName, $priceVal)),
                    'data-amount' => $opt[$valueFieldName],
                    'data-currency' => $currencyName,
@@ -453,9 +453,9 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
 
         $check = array();
         foreach ($customOption as $opId => $opt) {
-          $count     = CRM_Utils_Array::value('count', $opt, '');
+          $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal  = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
+          $priceVal = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
 
           if ($field->is_display_amounts) {
             $opt['label'] .= '&nbsp;-&nbsp;';
@@ -522,8 +522,8 @@ FROM
         civicrm_option_value option_value,
         civicrm_option_group option_group
 WHERE
-        option_group.name  = %1
-    AND option_group.id    = option_value.option_group_id
+        option_group.name = %1
+    AND option_group.id = option_value.option_group_id
     AND option_value.label = %2";
 
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($optionGroupName, 'String'), 2 => array($optionLabel, 'String')));
