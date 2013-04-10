@@ -57,6 +57,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'join_date' => '20120315',
       'start_date' => '20120315',
       'end_date' => '20120615',
+      'is_override' => 0,
     );
     $this->fixtures['phonecall'] = array( // createTestObject
       'status_id' => 1,
@@ -67,6 +68,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     );
     $this->fixtures['contact'] = array( // API
       'version' => 3,
+      'is_deceased' => 0,
       'contact_type' => 'Individual',
       'email' => 'test-member@example.com',
     );
@@ -274,7 +276,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * an email should be sent.
    */
   function testMembershipJoinDate_Match() {
-    $membership = $this->createTestObject('CRM_Member_DAO_Membership', $this->fixtures['rolling_membership']);
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
     $this->assertTrue(is_numeric($membership->id));
     $result = civicrm_api('Email', 'create', array(
       'contact_id' => $membership->contact_id,
@@ -284,6 +286,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
     $this->assertAPISuccess($result);
 
+    $contact = civicrm_api('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
     $actionSchedule = $this->fixtures['sched_membership_join_2week'];
     $actionSchedule['entity_value'] = $membership->membership_type_id;
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule, $ids);
@@ -340,13 +343,14 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   function testMembershipEndDate_Match() {
     // creates membership with end_date = 20120615
-    $membership = $this->createTestObject('CRM_Member_DAO_Membership', $this->fixtures['rolling_membership']);
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
     $this->assertTrue(is_numeric($membership->id));
     $result = civicrm_api('Email', 'create', array(
       'contact_id' => $membership->contact_id,
       'email' => 'test-member@example.com',
       'version' => 3,
     ));
+    $contact = civicrm_api('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
     $this->assertAPISuccess($result);
 
     $actionSchedule = $this->fixtures['sched_membership_end_2week'];
