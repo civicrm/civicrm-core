@@ -38,8 +38,6 @@
  *
  */
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
-  const FA_ASSET_ACCOUNT_RELATION = 6;
-
   /**
    * the id of the contribution that we are proceessing
    *
@@ -260,7 +258,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Set title
     if ($this->_contactID) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactID);
-    
+
       // Check if this is default domain contact CRM-10482
       if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactID)) {
         $displayName .= ' (' . ts('default organization') . ')';
@@ -269,7 +267,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
       CRM_Utils_System::setTitle(ts('Contribution from') .  ' ' . $displayName);
     }
-    
+
   }
 
   function setDefaultValues() {
@@ -296,11 +294,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if ($this->_mode) {
       $config = CRM_Core_Config::singleton();
-      // set default country from config if no country set                                                                                                                                                  
+      // set default country from config if no country set
       if (!CRM_Utils_Array::value("billing_country_id-{$this->_bltID}", $defaults)) {
         $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
       }
-      
+
       if (!CRM_Utils_Array::value("billing_state_province_id-{$this->_bltID}", $defaults)) {
         $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
       }
@@ -315,9 +313,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $fields[$name] = 1;
       }
 
-      if ($this->_contactID) {                                                                                                                                                                      
-        CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $defaults); 
-      }     
+      if ($this->_contactID) {
+        CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $defaults);
+      }
 
       foreach ($names as $name) {
         if (!empty($defaults[$name])) {
@@ -326,16 +324,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       // now fix all state country selectors
-      CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);  
+      CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     }
 
     if ($this->_id) {
       $this->_contactID = $defaults['contact_id'];
     }
-    
+
     // Set $newCredit variable in template to control whether link to credit card mode is included
     CRM_Core_Payment::allowBackofficeCreditCard($this);
-    
+
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['total_amount'])) {
       $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'], NULL, '%a');
@@ -617,7 +615,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
           array(
@@ -786,7 +784,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
             '' => ts('Choose price set')
           ) + $priceSets,
           NULL, array('onchange' => "buildAmount( this.value );")
-        ); 
+        );
         if ($this->_online && !($this->_action & CRM_Core_Action::UPDATE)) {
           $element->freeze();
         }
@@ -847,12 +845,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
         "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&reset=1&context=softcredit&cid={$this->_contactID}",
         FALSE, NULL, FALSE
-      );      
+      );
     } else {
       $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
         'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&reset=1&context=softcredit',
         FALSE, NULL, FALSE
-      );      
+      );
     }
     $this->assign('dataUrl', $dataUrl);
     $this->addElement('text', 'soft_credit_to', ts('Soft Credit To'));
@@ -895,7 +893,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // if status is Cancelled freeze Amount, Payment Instrument, Check #, Financial Type,
     // Net and Fee Amounts are frozen in AdditionalInfo::buildAdditionalDetail
     if ($this->_id && $this->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
-      if ($totalAmount) { 
+      if ($totalAmount) {
         $totalAmount->freeze();
       }
       $checkNumber->freeze();
@@ -964,8 +962,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $errors['pcp_made_through'] = ts('Please select a Personal Campaign Page, OR uncheck Display in Honor Roll and clear both the Honor Roll Name and the Personal Note field.');
       }
     }
-    
-    if (CRM_Utils_Array::value('total_amount', $fields) && (CRM_Utils_Array::value('net_amount', $fields) || CRM_Utils_Array::value('fee_amount', $fields))){      
+
+    if (CRM_Utils_Array::value('total_amount', $fields) && (CRM_Utils_Array::value('net_amount', $fields) || CRM_Utils_Array::value('fee_amount', $fields))){
       $sum = CRM_Utils_Rule::cleanMoney($fields['net_amount']) + CRM_Utils_Rule::cleanMoney($fields['fee_amount']);
       if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != $sum) {
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
@@ -1036,13 +1034,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if ($priceSetId) {
       CRM_Price_BAO_Set::processAmount($this->_priceSet['fields'],
-        $submittedValues, $lineItem[$priceSetId]); 
-      
+        $submittedValues, $lineItem[$priceSetId]);
+
       $submittedValues['total_amount'] = CRM_Utils_Array::value('amount', $submittedValues);
     }
     if ($this->_id) {
       //CRM-10964
-      $pId = ($this->_compId && $this->_context == 'participant') ? $this->_compId : CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'participant_id', 'contribution_id'); 
+      $pId = ($this->_compId && $this->_context == 'participant') ? $this->_compId : CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'participant_id', 'contribution_id');
     }
     if (!$priceSetId && CRM_Utils_Array::value('total_amount', $submittedValues) && $this->_id) {
       // 10117 update th line items for participants
@@ -1078,8 +1076,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config')) {
       $isQuickConfig = 1;
     }
-    //CRM-11529 for quick config backoffice transactions 
-    //when financial_type_id is passed in form, update the 
+    //CRM-11529 for quick config backoffice transactions
+    //when financial_type_id is passed in form, update the
     //lineitems with the financial type selected in form
     if ($isQuickConfig && CRM_Utils_Array::value('financial_type_id', $submittedValues)
       && CRM_Utils_Array::value($this->_priceSetId, $lineItem)) {
@@ -1087,7 +1085,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $values['financial_type_id'] = $submittedValues['financial_type_id'];
       }
     }
-    
+
     if (!CRM_Utils_Array::value('total_amount', $submittedValues)) {
       $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values);
     }
@@ -1253,7 +1251,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       //process premium
-      if ($contribution->id && isset($formValues['product_name'][0])) {       
+      if ($contribution->id && isset($formValues['product_name'][0])) {
         CRM_Contribute_Form_AdditionalInfo::processPremium($formValues, $contribution->id,
           $this->_premiumID, $this->_options
         );
@@ -1323,19 +1321,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           );
         }
       }
-            
+
       $statusMsg = ts('The contribution record has been saved.');
       if (CRM_Utils_Array::value('is_email_receipt', $formValues) && $sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
-      
+
       if ($relatedComponentStatusMsg) {
         $statusMsg .= ' ' . $relatedComponentStatusMsg;
       }
-      
+
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
       //Offline Contribution ends.
-    }      
+    }
     $buttonName = $this->controller->getButtonName();
     if ($this->_context == 'standalone') {
       if ($buttonName == $this->getButtonName('upload', 'new')) {
@@ -1360,7 +1358,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ));
     }
   }
-  
+
   public function processCreditCard($submittedValues, $config, $session, $pId, $lineItem) {
     $unsetParams = array(
       'trxn_id',
