@@ -172,8 +172,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     // set the cache in memory
     $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
     $cache = CRM_Utils_Cache::singleton();
-    $data = unserialize($dao->data);
-    $cache->set($argString, $data);
+    $cache->set($argString, $dao->data);
   }
 
   /**
