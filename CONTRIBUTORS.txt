@@ -1,70 +1,60 @@
-************************************************
-Sponsors and key contributors for 4.3
-************************************************
-The following people and organizations sponsored and/or contributed new and improved features for the 4.3 release.
+The following people and organizations sponsored and/or contributed new and improved features to the project.
 
-Allen Shaw
-Andrew Hunt
-Andrew Walker
-Alice Aguilar
-Brian Shaughnessy
-Chris Burgess
-Dave D
-Dave Moreton
-Eileen McNaughton
-Erik Hommel
-Frank Gomez
-Jamie McClelland
-Jag Kandasamy
-Jim Meehan
-Jon Goldberg
-Joe Murray
-Hershel Robinson
-Keith Morgan
-Ken West
-Ken Zalewski
-Marianela Zucotti Bozzano
-Mathieu Lutfy
-Micah Lee
-Nicolas Ganivet
-Noah Miller
-Parvez Saleh
-Paul Delbar
-Peter Davis
-Rajesh Sundararajan
-Samuel Vanhove
-Stuart Gaston
-Torrance Hodgeson
-Xavier Dutoit
+************************************************
+CiviCRM Team
+************************************************
+Coleman Watts
+David Greenberg
+Deepak Srivastava
+Donald Lobo
+Kurund Jalmi
+Michael McAndrew
+Pratik Joshi
+Ravish Nair
+Tim Otten
+Yashodha Chaku
 
-AGH Strategies
+************************************************
+Key Contributors and Sponsors for 4.3
+************************************************
+
+AGH Strategies - Andrew Hunt
 Backoffice Thinking
-Circle Interactive
-CiviDesk
-CiviHosting
+Chris Burgess
+Circle Intergactive - Andrew Walker, Dave Moreton
+CiviDesk - Nicolas Ganivet
+CiviHosting - Hershel Robinson
 Community Builders
 Compucorp
-Confluence
-EE-atWork
-Electronic Frontier Foundation
-emphanos
-Fuzion (NZ)
-Koumbit
-Korlon
-JMA Consulting
-Lighthouse Consulting and Design
-New York State Senate
-NfP Services (MTL Software Group)
+Confluence - Frank Gomez
+Dave Dantowitz
+EE-atWork - Erik Hommel
+Electronic Frontier Foundation - Micah Lee, Kellie Brownell
+Emphanos - Allen Shaw
+Fuzion, NZ - Eileen McNaughton, Peter Davis, Torrance Hodgeson
+Jim Meehan
+JMA Consulting - Joe Murray
+Keith Morgan
+Ken West
+Korlon - Stuart Gaston
+Koumbit - Samuel Vanhove
+Lighthouse Consulting and Design - Brian Shaughnessy
+Mathieu Lutfy
+New York State Senate - Ken Zalewski
+NfP Services (MTL Software Group) - Jag Kandasamy, Rajesh Sundararajan
 Niro Solutions
-Palente Technology Cooperative
-Progressive Technology Project
+Noah Miller
+Palente Technology Cooperative - Jon Goldberg
+Progressive Tech Project - Alice Aguilar, Jamie McClelland
+Paul Delbar
 Registered Nurses Association of Ontario
-San Francisco Baykeeper
-Tech to the People
+San Francisco Baykeeper - Eliet Henderson
+Tech to the People - Xavier Dutoit
 Third Sector Design
-Veda Consulting
-Web Access
-Zing
+Veda Consulting - Parvez Saleh
+Web Access - Pradeep Nayak
+Zing - Simon West, Andrew Tombs
+
 
 ************************************************
 Sponsors and key contributors for 4.2
@@ -96,7 +86,7 @@ Jon Goldberg
 Kasia Wakarecy
 Katie Horn
 Katy Jockelson
-Kellie Brownell
+
 Ken Zalewski
 Lisa Jervis
 Mathieu Lutfy
@@ -211,18 +201,18 @@ Sponsors for 3.4 / 4.0 Make-it-Happen Projects
 ************************************************
 The following people and organizations sponsored new and improved features for the 3.4 / 4.0 release.
 
-ACORN Canada http://acorncanada.org 
+ACORN Canada http://acorncanada.org
 Allora Consulting http://alloraconsulting.com
 American Friends Service Committee http://afsc.org/
 Australian Greens http://greens.org.au
 BREAZE http://breaze.org.au
 Canadian Paramedics http://www.peelparamedics.com
-Community Builders Australia Pty Ltd 
+Community Builders Australia Pty Ltd
 Corvair Society of America (CORSA) http://www.corvair.org/
-Donor Depot http://donordepot.com 
+Donor Depot http://donordepot.com
 Energetica http://energetica.com.au
 Fuzion http://fuzion.co.nz
-Gold Strategy Group http://www.goldstrategygroup.com 
+Gold Strategy Group http://www.goldstrategygroup.com
 JMA Consulting http://jmaconsulting.biz
 Joomkit Ltd http://joomkit.com
 Kabissa - Space for Change in Africa http://kabissa.org
@@ -241,7 +231,7 @@ Clarke, Jill
 Davis, Peter
 Day, Janette
 Gold, Ariel
-Hadar, Kehilat 
+Hadar, Kehilat
 Malkoun, Anthony
 Matsushita, Jun
 McNaughton, Eileen
@@ -291,6 +281,3 @@ Rayogram: http://www.rayogram.com/
 GingerFeet LLC: http://www.gingerfeet.com/
 Kabissa: http://kabissa.org
 Beth Hynes-Ciernia
-
-More details at:
-http://wiki.civicrm.org/confluence/display/CRMDOC33/Make+it+Happen!
