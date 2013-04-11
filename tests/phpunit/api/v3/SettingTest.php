@@ -327,7 +327,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('setting', 'create', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);
-    $config = CRM_Core_Config::singleton();
+    CRM_Core_BAO_Domain::setDomain($this->_domainID2);
+    $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    CRM_Core_BAO_Domain::resetDomain();
     $this->assertTrue($config->debug == 1);
     // this should NOT be stored in the settings table now - only in config
     $sql = " SELECT count(*) as c FROM civicrm_setting WHERE name LIKE '%debug%'";
