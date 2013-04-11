@@ -22,7 +22,7 @@ Electronic Frontier Foundation - Micah Lee, Kellie Brownell
 Emphanos - Allen Shaw
 Fuzion, NZ - Eileen McNaughton, Peter Davis, Torrance Hodgeson
 Jim Meehan
-JMA Consulting - Joe Murray
+JMA Consulting - Joe Murray, Pradeep Nayak
 Keith Morgan
 Ken West
 Korlon - Stuart Gaston
@@ -41,7 +41,7 @@ San Francisco Baykeeper - Eliet Henderson
 Tech to the People - Xavier Dutoit
 Third Sector Design
 Veda Consulting - Parvez Saleh
-Web Access - Pradeep Nayak
+Web Access
 Zing - Simon West, Andrew Tombs
 
 
