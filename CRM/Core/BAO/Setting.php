@@ -214,16 +214,23 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @access public
    */
   static function getItems(&$params, $domains = null, $settingsToReturn) {
+    $originalDomain = CRM_Core_Config::domainID();
     if (empty($domains)) {
-      $domains[] = CRM_Core_Config::domainID();
+      $domains[] = $originalDomain;
     }
     if (!empty($settingsToReturn) && !is_array($settingsToReturn)) {
       $settingsToReturn = array($settingsToReturn);
     }
-    $config = CRM_Core_Config::singleton();
+    $reloadConfig = FALSE;
+
     $fields = $result = array();
     $fieldsToGet = self::validateSettingsInput(array_flip($settingsToReturn), $fields, FALSE);
     foreach ($domains as $domain) {
+      CRM_Core_BAO_Domain::setDomain($domain);
+      if($domain != $originalDomain){
+        $reloadConfig = TRUE;
+      }
+      $config = CRM_Core_Config::singleton($reloadConfig, $reloadConfig);
       $result[$domain] = array();
       foreach ($fieldsToGet as $name => $value) {
         if(!empty($fields['values'][$name]['prefetch'])){
@@ -248,6 +255,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
           // e.g for revert of fill actions
           $result[$domain][$name] = $setting;
         }
+        CRM_Core_BAO_Domain::resetDomain();
       }
     }
     return $result;

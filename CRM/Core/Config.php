@@ -184,8 +184,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
       // first, attempt to get configuration object from cache
       $cache = CRM_Utils_Cache::singleton();
-      self::$_singleton = $cache->get('CRM_Core_Config');
-
+      self::$_singleton = $cache->get('CRM_Core_Config' . CRM_Core_Config::domainID());
       // if not in cache, fire off config construction
       if (!self::$_singleton) {
         self::$_singleton = new CRM_Core_Config;
@@ -199,7 +198,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
           // retrieve and overwrite stuff from the settings file
           self::$_singleton->setCoreVariables();
         }
-        $cache->set('CRM_Core_Config', self::$_singleton);
+        $cache->set('CRM_Core_Config' . CRM_Core_Config::domainID(), self::$_singleton);
       }
       else {
         // we retrieve the object from memcache, so we now initialize the objects
