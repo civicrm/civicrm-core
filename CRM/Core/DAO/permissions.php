@@ -392,6 +392,10 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   // Translate specific actions into their generic equivalents
   $snippet = substr($action, 0, 3);
   if ($action == 'replace' || $snippet == 'del') {
+    // 'Replace' is a combination of get+create+update+delete; however, the permissions
+    // on each of those will be tested separately at runtime. This is just a sniff-test
+    // based on the heuristic that 'delete' tends to be the most closesly guarded
+    // of the necessary permissions.
     $action = 'delete';
   }
   elseif ($action == 'setvalue' || $snippet == 'upd') {
