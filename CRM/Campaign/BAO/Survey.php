@@ -520,8 +520,8 @@ Group By  contact.id";
 
     $query = "
     SELECT  activity.id, activity.status_id,
-            activityTarget.target_contact_id as voter_id,
-            activityAssignment.assignee_contact_id as interviewer_id
+            activityTarget.contact_id as voter_id,
+            activityAssignment.contact_id as interviewer_id
       FROM  civicrm_activity activity
 INNER JOIN  civicrm_activity_contact activityTarget
   ON ( activityTarget.activity_id = activity.id AND activityTarget.record_type = 'Target')
