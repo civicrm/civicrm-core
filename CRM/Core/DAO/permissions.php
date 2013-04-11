@@ -39,7 +39,32 @@
 function _civicrm_api3_permissions($entity, $action, &$params) {
   $entity = strtolower($entity);
   $action = strtolower($action);
+
+  /**
+   * @var array of permissions
+   *
+   * For each entity, we declare an array of permissions required for each action
+   * The action is the array key, possible values:
+   *  * create: applies to create (with no id in params)
+   *  * update: applies to update, setvalue, create (with id in params)
+   *  * get: applies to getcount, getsingle, getvalue and other gets
+   *  * delete: applies to delete, replace
+   *  * meta: applies to getfields, getoptions, getspec
+   *  * default: catch-all for anything not declared
+   *
+   *  Note: some APIs declare other actions as well
+   */
   $permissions = array();
+
+  // These are the default permissions - if any entity does not declare permissions for a given action,
+  // (or the entity does not declare permissions at all) - then the action will be used from here
+  $permissions['default'] = array(
+    // applies to getfields, getoptions, etc.
+    'meta' => array('access CiviCRM'),
+    // catch-all, applies to create, get, delete, etc.
+    // If an entity declares it's own 'default' action it will override this one
+    'default' => array('administer CiviCRM'),
+  );
 
   $permissions['activity'] = array(
     'delete' => array(
@@ -550,10 +575,37 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
 
+  // Translate 'create' action to 'update' if id is set
+  if ($action == 'create' && (!empty($params['id']) || !empty($params[$entity . '_id']))) {
+    $action = 'update';
+  }
+
   // let third parties modify the permissions
   CRM_Utils_Hook::alterAPIPermissions($entity, $action, $params, $permissions);
 
-  return isset($permissions[$entity][$action]) ? $permissions[$entity][$action] : array('administer CiviCRM');
+  // Merge permissions for this entity with the defaults
+  $perm = CRM_Utils_Array::value($entity, $permissions, array()) + $permissions['default'];
+
+  // Return exact match if permission for this action has been declared
+  if (isset($perm[$action])) {
+    return $perm[$action];
+  }
+
+  // Translate specific actions into their generic equivalents
+  $snippet = substr($action, 0, 3);
+  if ($action == 'replace' || $snippet == 'del') {
+    $action = 'delete';
+  }
+  elseif ($action == 'setvalue' || $snippet == 'upd') {
+    $action = 'update';
+  }
+  elseif ($action == 'getfields' || $action == 'getspec' || $action == 'getoptions') {
+    $action = 'meta';
+  }
+  elseif ($snippet == 'get') {
+    $action = 'get';
+  }
+  return isset($perm[$action]) ? $perm[$action] : $perm['default'];
 }
 
 # FIXME: not sure how to permission the following API 3 calls:
