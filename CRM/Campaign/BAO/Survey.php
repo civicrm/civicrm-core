@@ -1005,7 +1005,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     SELECT  contact.id as id,
             contact.sort_name as sort_name
       FROM  civicrm_contact contact
-INNER JOIN  civicrm_activity_assignment assignment ON ( assignment.assignee_contact_id = contact.id )
+INNER JOIN civicrm_activity_contact assignment ON ( assignment.contact_id = contact.id AND record_type = 'Assignee' )
 INNER JOIN  civicrm_activity activity ON ( activity.id = assignment.activity_id )
 INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
             {$whereClause}";
