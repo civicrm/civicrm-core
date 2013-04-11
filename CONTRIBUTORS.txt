@@ -1,23 +1,12 @@
 The following people and organizations sponsored and/or contributed new and improved features to the project.
 
 ************************************************
-CiviCRM Team
-************************************************
-Coleman Watts
-David Greenberg
-Deepak Srivastava
-Donald Lobo
-Kurund Jalmi
-Michael McAndrew
-Pratik Joshi
-Ravish Nair
-Tim Otten
-Yashodha Chaku
-
-************************************************
 Key Contributors and Sponsors for 4.3
 ************************************************
 
+CiviCRM Team - Coleman Watts, David Greenberg, Deepak Srivastava, Donald Lobo,
+               Kurund Jalmi, Michael McAndrew, Pratik Joshi, Ravish Nair,
+               Tim Otten, Yashodha Chaku
 AGH Strategies - Andrew Hunt
 Backoffice Thinking
 Chris Burgess
