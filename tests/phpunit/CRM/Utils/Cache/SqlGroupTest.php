@@ -55,29 +55,33 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Add item to one cache instance then read (and prefetch) with another
+   * Add item to one cache instance then read (with or without prefetch) from another
    */
   function testPrefetch() {
+    // 1. put data in cache
     $a = new CRM_Utils_Cache_SqlGroup(array(
       'group' => 'testPrefetch',
+      'prefetch' => FALSE,
     ));
     $fooValue = array('whiz' => 'bang', 'bar' => 4);
     $a->set('foo', $fooValue);
     $this->assertEquals($a->get('foo'), array('whiz' => 'bang', 'bar' => 4));
 
+    // 2. see what happens when prefetch is TRUE
     $b = new CRM_Utils_Cache_SqlGroup(array(
       'group' => 'testPrefetch',
       'prefetch' => TRUE,
     ));
-    // assuming the values have been prefetched in $b, we can do a stale
-    // read -- i.e. change the underlying data table and then read the
-    // prefetched value from $b
-    $fooValue2 = 'muahahaha';
-    $a->set('foo', $fooValue2);
-    $this->assertEquals($b->get('foo'), array('whiz' => 'bang', 'bar' => 4));
-    
-    // ok, enough with the stale reading
-    $b->prefetch();
-    $this->assertEquals($b->get('foo'), 'muahahaha');
+    $this->assertEquals($fooValue, $b->getFromFrontCache('foo')); // should work b/c value was prefetched
+    $this->assertEquals($fooValue, $b->get('foo')); // should work b/c value was prefetched
+
+    // 3. see what happens when prefetch is FALSE
+    $c = new CRM_Utils_Cache_SqlGroup(array(
+      'group' => 'testPrefetch',
+      'prefetch' => FALSE,
+    ));
+    $this->assertEquals(NULL, $c->getFromFrontCache('foo')); // should be NULL b/c value was NOT prefetched
+    $this->assertEquals($fooValue, $c->get('foo')); // should work b/c value is fetched on demand
+    $this->assertEquals($fooValue, $c->getFromFrontCache('foo')); // should work b/c value was fetched on demand
   }
 }
