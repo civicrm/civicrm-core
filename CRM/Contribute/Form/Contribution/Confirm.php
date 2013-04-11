@@ -919,7 +919,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             }
           }
         }
-        
+
         CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
           $this, $premiumParams, $customFieldsFormatted,
           $fieldTypes
@@ -1100,8 +1100,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $contributionType->id;
-    $params['is_email_receipt'] = CRM_Utils_Array::value( 'is_email_receipt', $form->_values );
-
+    //@todo - this is being set from the form to resolve CRM-10188 - an
+    // eNotice caused by it not being set @ the front end
+    // however, we then get it being over-written with null for backend contributions
+    // a better fix would be to set the values in the respective forms rather than require
+    // a function being shared by two forms to deal with their respective values
+    // moving it to the BAO & not taking the $form as a param would make sense here.
+    if(!isset($params['is_email_receipt'])){
+      $params['is_email_receipt'] = CRM_Utils_Array::value( 'is_email_receipt', $form->_values );
+    }
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $contributionType, $online);
 
     if (!$online && isset($params['honor_contact_id'])) {

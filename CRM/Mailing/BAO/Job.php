@@ -874,7 +874,6 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
         'source_contact_id' => $mailing->scheduled_id,
         // CRM-9519
         'target_contact_id' => array_unique($targetParams),
-        'target_contact_id' => $targetParams,
         'activity_type_id' => $activityTypeID,
         'source_record_id' => $this->mailing_id,
         'activity_date_time' => $job_date,

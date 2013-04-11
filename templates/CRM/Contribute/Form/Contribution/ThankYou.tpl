@@ -176,9 +176,9 @@
     {include file="CRM/Contribute/Form/Contribution/Honor.tpl"}
 
     {if $customPre}
-            <fieldset class="label-left">
-                {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
-            </fieldset>
+      <fieldset class="label-left crm-profile-view">
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+      </fieldset>
     {/if}
 
     {if $pcpBlock}
@@ -208,7 +208,7 @@
     {/if}
 
     {if $onbehalfProfile}
-      <div class="crm-group onBehalf_display-group">
+      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
          {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile}
          <div class="crm-section organization_email-section">
             <div class="label">{ts}Organization Email{/ts}</div>
@@ -281,9 +281,9 @@
     {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="thankContribution"}
 
     {if $customPost}
-            <fieldset class="label-left">
-                {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
-            </fieldset>
+      <fieldset class="label-left crm-profile-view">
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+      </fieldset>
     {/if}
 
     <div id="thankyou_footer" class="contribution_thankyou_footer-section">

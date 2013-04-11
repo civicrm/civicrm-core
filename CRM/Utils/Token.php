@@ -81,6 +81,8 @@ class CRM_Utils_Token {
       'phone',
       'address',
       'email',
+      'id',
+      'description',
     ),
     'subscribe' => array( 'group' ),
     'unsubscribe' => array( 'group' ),
@@ -219,15 +221,26 @@ class CRM_Utils_Token {
    * @access public
    * @static
    */
-  public static function &replaceDomainTokens($str, &$domain, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
+  public static function &replaceDomainTokens(
+    $str,
+    &$domain,
+    $html = FALSE,
+    $knownTokens = NULL,
+    $escapeSmarty = FALSE
+  ) {
     $key = 'domain';
-    if (!$knownTokens ||
+    if (
+      !$knownTokens ||
       !CRM_Utils_Array::value($key, $knownTokens)
     ) {
       return $str;
     }
 
-    $str = preg_replace(self::tokenRegex($key), 'self::getDomainTokenReplacement(\'\\1\',$domain,$html)', $str);
+    $str = preg_replace(
+      self::tokenRegex($key),
+      'self::getDomainTokenReplacement(\'\\1\',$domain,$html)',
+      $str
+    );
     return $str;
   }
 
@@ -263,7 +276,7 @@ class CRM_Utils_Token {
         $addressCache[$cache_key] = $value;
       }
     }
-    elseif ($token == 'name' || $token == 'id') {
+    elseif ($token == 'name' || $token == 'id' || $token == 'description') {
       $value = $domain->$token;
     }
     elseif ($token == 'phone' || $token == 'email') {
@@ -297,9 +310,11 @@ class CRM_Utils_Token {
    * @static
    */
   public static function &replaceOrgTokens($str, &$org, $html = FALSE, $escapeSmarty = FALSE) {
-    self::$_tokens['org'] = array_merge(array_keys(CRM_Contact_BAO_Contact::importableFields('Organization')),
-      array('address', 'display_name', 'checksum', 'contact_id')
-    );
+    self::$_tokens['org'] =
+      array_merge(
+        array_keys(CRM_Contact_BAO_Contact::importableFields('Organization')),
+        array('address', 'display_name', 'checksum', 'contact_id')
+      );
 
     $cv = NULL;
     foreach (self::$_tokens['org'] as $token) {
@@ -372,7 +387,13 @@ class CRM_Utils_Token {
    * @access public
    * @static
    */
-  public static function &replaceMailingTokens($str, &$mailing, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
+  public static function &replaceMailingTokens(
+    $str,
+    &$mailing,
+    $html = FALSE,
+    $knownTokens = NULL,
+    $escapeSmarty = FALSE
+  ) {
     $key = 'mailing';
     if (!$knownTokens || !isset($knownTokens[$key])) {
       return $str;
@@ -505,7 +526,13 @@ class CRM_Utils_Token {
     return $str;
   }
 
-  public static function getActionTokenReplacement($token, &$addresses, &$urls, $html = FALSE, $escapeSmarty = FALSE) {
+  public static function getActionTokenReplacement(
+    $token,
+    &$addresses,
+    &$urls,
+    $html = FALSE,
+    $escapeSmarty = FALSE
+  ) {
     /* If the token is an email action, use it.  Otherwise, find the
          * appropriate URL */
 
@@ -550,16 +577,23 @@ class CRM_Utils_Token {
    * @access public
    * @static
    */
-  public static function &replaceContactTokens($str, &$contact, $html = FALSE, $knownTokens = NULL,
-    $returnBlankToken = FALSE, $escapeSmarty = FALSE
+  public static function &replaceContactTokens(
+    $str,
+    &$contact,
+    $html = FALSE,
+    $knownTokens = NULL,
+    $returnBlankToken = FALSE,
+    $escapeSmarty = FALSE
   ) {
     $key = 'contact';
     if (self::$_tokens[$key] == NULL) {
       /* This should come from UF */
 
-      self::$_tokens[$key] = array_merge(array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
-        array('checksum', 'contact_id')
-      );
+      self::$_tokens[$key] =
+        array_merge(
+          array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
+          array('checksum', 'contact_id')
+        );
     }
 
     // here we intersect with the list of pre-configured valid tokens
@@ -570,7 +604,8 @@ class CRM_Utils_Token {
       return $str;
     }
 
-    $str = preg_replace(self::tokenRegex($key),
+    $str = preg_replace(
+      self::tokenRegex($key),
       'self::getContactTokenReplacement(\'\\1\', $contact, $html, $returnBlankToken, $escapeSmarty)',
       $str
     );
@@ -579,15 +614,21 @@ class CRM_Utils_Token {
     return $str;
   }
 
-  public static function getContactTokenReplacement($token, &$contact, $html = FALSE,
-    $returnBlankToken = FALSE, $escapeSmarty = FALSE
+  public static function getContactTokenReplacement(
+    $token,
+    &$contact,
+    $html = FALSE,
+    $returnBlankToken = FALSE,
+    $escapeSmarty = FALSE
   ) {
     if (self::$_tokens['contact'] == NULL) {
       /* This should come from UF */
 
-      self::$_tokens['contact'] = array_merge(array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
-        array('checksum', 'contact_id')
-      );
+      self::$_tokens['contact'] =
+        array_merge(
+          array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
+          array('checksum', 'contact_id')
+        );
     }
 
     /* Construct value from $token and $contact */
@@ -643,10 +684,16 @@ class CRM_Utils_Token {
    * @access public
    * @static
    */
-  public static function &replaceHookTokens($str, &$contact, &$categories, $html = FALSE, $escapeSmarty = FALSE) {
-
+  public static function &replaceHookTokens(
+    $str,
+    &$contact,
+    &$categories,
+    $html = FALSE,
+    $escapeSmarty = FALSE
+  ) {
     foreach ($categories as $key) {
-      $str = preg_replace(self::tokenRegex($key),
+      $str = preg_replace(
+        self::tokenRegex($key),
         'self::getHookTokenReplacement(\'\\1\', $contact, $key, $html, $escapeSmarty)',
         $str
       );
@@ -654,12 +701,16 @@ class CRM_Utils_Token {
     return $str;
   }
 
-  public static function getHookTokenReplacement($token, &$contact, $category, $html = FALSE, $escapeSmarty = FALSE) {
+  public static function getHookTokenReplacement(
+    $token,
+    &$contact,
+    $category,
+    $html = FALSE,
+    $escapeSmarty = FALSE
+  ) {
     $value = CRM_Utils_Array::value("{$category}.{$token}", $contact);
 
-    if ($value &&
-      !$html
-    ) {
+    if ($value && !$html) {
       $value = str_replace('&amp;', '&', $value);
     }
 
