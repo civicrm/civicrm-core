@@ -143,7 +143,7 @@ function civicrm_api3_event_get($params) {
   if (CRM_Utils_Array::value('is_template', $params)) {
     $eventDAO->whereAdd( '( is_template = 1 )' );
   }
-  else {
+  elseif(empty($eventDAO->id)){
     $eventDAO->whereAdd('( is_template IS NULL ) OR ( is_template = 0 )');
   }
 

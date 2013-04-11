@@ -124,9 +124,9 @@
     {include file="CRM/Contribute/Form/Contribution/Honor.tpl"}
 
     {if $customPre}
-            <fieldset class="label-left">
-                {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
-            </fieldset>
+      <fieldset class="label-left crm-profile-view">
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+      </fieldset>
     {/if}
 
     {if $pcpBlock}
@@ -156,7 +156,7 @@
     {/if}
 
     {if $onbehalfProfile}
-      <div class="crm-group onBehalf_display-group">
+      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
          {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile}
          <div class="crm-section organization_email-section">
             <div class="label">{ts}Organization Email{/ts}</div>
@@ -228,7 +228,7 @@
                 {/if}
             {else}
                 <div class="crm-section no-label credit_card_details-section">
-                    <div class="content">{$credit_card_type}</div>
+                  <div class="content">{$credit_card_type}</div>
                   <div class="content">{$credit_card_number}</div>
                   <div class="content">{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}</div>
                   <div class="clear"></div>
@@ -242,9 +242,9 @@
     {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="confirmContribution"}
 
     {if $customPost}
-            <fieldset class="label-left">
-                {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
-            </fieldset>
+      <fieldset class="label-left crm-profile-view">
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+      </fieldset>
     {/if}
 
     {if $contributeMode NEQ 'notify' and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) } {* In 'notify mode, contributor is taken to processor payment forms next *}
