@@ -225,13 +225,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
     $fields = $result = array();
     $fieldsToGet = self::validateSettingsInput(array_flip($settingsToReturn), $fields, FALSE);
-    foreach ($domains as $domain) {
-      CRM_Core_BAO_Domain::setDomain($domain);
-      if($domain != $originalDomain){
+    foreach ($domains as $domainID) {
+      if($domainID != CRM_Core_Config::domainID()){
         $reloadConfig = TRUE;
+        CRM_Core_BAO_Domain::setDomain($domainID);
       }
       $config = CRM_Core_Config::singleton($reloadConfig, $reloadConfig);
-      $result[$domain] = array();
+      $result[$domainID] = array();
       foreach ($fieldsToGet as $name => $value) {
         if(!empty($fields['values'][$name]['prefetch'])){
           $configKey = CRM_Utils_Array::value('config_key', $fields['values'][$name],  $name);
@@ -247,16 +247,16 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
             CRM_Utils_Array::value('component_id', $params),
             CRM_Utils_Array::value('default_value', $params),
             CRM_Utils_Array::value('contact_id', $params),
-            $domain
+            $domainID
           );
         }
         if (!is_null($setting)) {
           // we won't return if not set - helps in return all scenario - otherwise we can't indentify the missing ones
           // e.g for revert of fill actions
-          $result[$domain][$name] = $setting;
+          $result[$domainID][$name] = $setting;
         }
-        CRM_Core_BAO_Domain::resetDomain();
       }
+      CRM_Core_BAO_Domain::resetDomain();
     }
     return $result;
   }
@@ -346,9 +346,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @access public
    */
   static function setItems(&$params, $domains = null) {
+    $originalDomain = CRM_Core_Config::domainID();
     if (empty($domains)) {
-      $domains[] = CRM_Core_Config::domainID();
+      $domains[] = $originalDomain;
     }
+    $reloadConfig = FALSE;
     $fields = $config_keys = array();
     $fieldsToSet = self::validateSettingsInput($params, $fields);
 
@@ -356,8 +358,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       self::validateSetting($settingValue, $fields['values'][$settingField]);
     }
 
-    foreach ($domains as $domain) {
-      $result[$domain] = array();
+    foreach ($domains as $domainID) {
+      if($domainID != CRM_Core_Config::domainID()){
+        $reloadConfig = TRUE;
+        CRM_Core_BAO_Domain::setDomain($domainID);
+      }
+      $result[$domainID] = array();
       foreach ($fieldsToSet as $name => $value) {
         if(empty($fields['values'][$name]['config_only'])){
           CRM_Core_BAO_Setting::setItem(
@@ -367,7 +373,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
           CRM_Utils_Array::value('component_id', $params),
           CRM_Utils_Array::value('contact_id', $params),
           CRM_Utils_Array::value('created_id', $params),
-          $domain
+          $domainID
          );
         }
         if(!empty($fields['values'][$name]['prefetch'])){
@@ -376,9 +382,18 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
           }
           $config_keys[$name] = $value;
         }
-        $result[$domain][$name] = $value;
+        $result[$domainID][$name] = $value;
       }
-      CRM_Core_BAO_ConfigSetting::create($config_keys);
+      if($reloadConfig){
+        CRM_Core_Config::singleton($reloadConfig, $reloadConfig);
+      }
+
+      if(!empty($config_keys)){
+        CRM_Core_BAO_ConfigSetting::create($config_keys);
+      }
+      if($reloadConfig){
+        CRM_Core_BAO_Domain::resetDomain();
+      }
     }
 
     return $result;
