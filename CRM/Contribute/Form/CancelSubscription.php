@@ -69,7 +69,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
       $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
       $this->assign('amount', $this->_subscriptionDetails->amount);
       $this->assign('installments', $this->_subscriptionDetails->installments);
-      
+
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
       if ($this->_subscriptionDetails->membership_id) {
         $this->_mid = $this->_subscriptionDetails->membership_id;
@@ -96,14 +96,15 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
       }
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
-    
+
       $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
       $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
       $this->assign('amount', $this->_subscriptionDetails->amount);
       $this->assign('installments', $this->_subscriptionDetails->installments);
     }
 
-    if ((!$this->_crid && !$this->_coid && !$this->_mid) ||
+    if (
+      (!$this->_crid && !$this->_coid && !$this->_mid) ||
       ($this->_subscriptionDetails == CRM_Core_DAO::$_nullObject)
     ) {
       CRM_Core_Error::fatal('Required information missing.');
@@ -125,7 +126,8 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
     $this->assign('mode', $this->_mode);
 
     if ($this->_subscriptionDetails->contact_id) {
-      list($this->_donorDisplayName, $this->_donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+      list($this->_donorDisplayName, $this->_donorEmail) =
+        CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
     }
   }
 
@@ -143,10 +145,15 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
       $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
       $searchRange[] = $this->createElement('radio', NULL, NULL, ts('No'), '0');
 
-      $this->addGroup($searchRange, 'send_cancel_request', ts('Send cancellation request to %1 ?', array(1 => $this->_paymentProcessorObj->_processorName)));
+      $this->addGroup(
+        $searchRange,
+        'send_cancel_request',
+        ts('Send cancellation request to %1 ?',
+          array(1 => $this->_paymentProcessorObj->_processorName))
+      );
     }
     $this->assign('cancelSupported', $cancelSupported);
-    
+
     if ($this->_donorEmail) {
       $this->add('checkbox', 'is_notify', ts('Notify Contributor?'));
     }
@@ -187,8 +194,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    * @access public
    */
   function setDefaultValues() {
-    $defaults = array();
-    $defaults['is_notify'] = 1;
+    $defaults = array('is_notify' => 1);
     return $defaults;
   }
 
@@ -206,10 +212,13 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
     if ($this->_selfService) {
       // for self service force sending-request & notify
-      if ($this->_paymentProcessorObj->isSupported('cancelSubscription'))
+      if ($this->_paymentProcessorObj->isSupported('cancelSubscription')) {
         $params['send_cancel_request'] = 1;
-      if ($this->_donorEmail)
+      }
+
+      if ($this->_donorEmail) {
         $params['is_notify'] = 1;
+      }
     }
 
     if (CRM_Utils_Array::value('send_cancel_request', $params) == 1) {
@@ -221,20 +230,27 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
       CRM_Core_Error::displaySessionError($cancelSubscription);
     }
     elseif ($cancelSubscription) {
-      $activityParams = array('subject' => $this->_mid ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
-        'details' => $message,
+      $activityParams =
+        array(
+          'subject' => $this->_mid ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
+          'details' => $message,
+        );
+      $cancelStatus = CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(
+        $this->_subscriptionDetails->recur_id,
+        CRM_Core_DAO::$_nullObject,
+        $activityParams
       );
-      $cancelStatus = CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($this->_subscriptionDetails->recur_id,
-        CRM_Core_DAO::$_nullObject, $activityParams
-      );
+
       if ($cancelStatus) {
         $tplParams = array();
         if ($this->_mid) {
           $inputParams = array('id' => $this->_mid);
           CRM_Member_BAO_Membership::getValues($inputParams, $tplParams);
           $tplParams = $tplParams[$this->_mid];
-          $tplParams['membership_status'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $tplParams['status_id']);
-          $tplParams['membershipType'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $tplParams['membership_type_id']);
+          $tplParams['membership_status'] =
+            CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $tplParams['status_id']);
+          $tplParams['membershipType'] =
+            CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $tplParams['membership_type_id']);
           $status = ts('The automatic renewal of your %1 membership has been cancelled as requested. This does not affect the status of your membership - you will receive a separate notification when your membership is up for renewal.', array(1 => $tplParams['membershipType']));
           $msgTitle = 'Membership Renewal Cancelled';
           $msgType = 'info';
@@ -257,22 +273,27 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
         if (CRM_Utils_Array::value('is_notify', $params) == 1) {
           if ($this->_subscriptionDetails->contribution_page_id) {
-            CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id',
-                                            $this->_subscriptionDetails->contribution_page_id, 
-                                            $value, array('title',
-                                                          'receipt_from_name',
-                                                          'receipt_from_email',
-                                                          )
-                                            );
-            $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$this->_subscriptionDetails->contribution_page_id]) . '" <' . $value[$this->_subscriptionDetails->contribution_page_id]['receipt_from_email'] . '>';
+            CRM_Core_DAO::commonRetrieveAll(
+              'CRM_Contribute_DAO_ContributionPage',
+              'id',
+              $this->_subscriptionDetails->contribution_page_id,
+              $value,
+              array('title', 'receipt_from_name', 'receipt_from_email')
+            );
+            $receiptFrom =
+              '"' .
+              CRM_Utils_Array::value('receipt_from_name', $value[$this->_subscriptionDetails->contribution_page_id]) .
+              '" <' .
+              $value[$this->_subscriptionDetails->contribution_page_id]['receipt_from_email'] .
+              '>';
           }
           else {
             $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
             $receiptFrom = "$domainValues[0] <$domainValues[1]>";
           }
-          
+
           // send notification
-          $sendTemplateParams = 
+          $sendTemplateParams =
             array(
                   'groupName' => $this->_mode == 'auto_renew' ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
                   'valueName' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
@@ -310,12 +331,11 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
       $session->setStatus($status, $msgTitle, $msgType);
     }
     elseif (!$userID) {
-      if ($status) 
+      if ($status)
         CRM_Utils_System::setUFMessage($status);
       // keep result as 1, since we not displaying anything on the redirected page anyway
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus', 
+      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
                                                               "reset=1&task=cancel&result=1"));
     }
   }
 }
-
