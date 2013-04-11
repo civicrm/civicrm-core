@@ -6,7 +6,7 @@ Key Contributors and Sponsors for 4.3
 
 CiviCRM Team - Coleman Watts, David Greenberg, Deepak Srivastava, Donald Lobo,
                Kurund Jalmi, Michael McAndrew, Pratik Joshi, Ravish Nair,
-               Tim Otten, Yashodha Chaku
+               Tim Otten, Yashodha Chaku, Eileen McNaughton
 AGH Strategies - Andrew Hunt
 Backoffice Thinking
 Chris Burgess
