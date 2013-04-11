@@ -388,7 +388,7 @@
 
 .crm-container fieldset legend {
   display: block;
-  font-family: helvetica;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   font-weight: bold;
   padding: 4px;
@@ -430,13 +430,15 @@
   border: none;
 }
 
-.crm-container .crm-section {
+.crm-container .crm-section,
+.crm-container-snippet .crm-section {
   margin-bottom: 1em;
 }
 
-.crm-container .crm-section .label {
+.crm-container .crm-section .label,
+.crm-container-snippet .crm-section .label {
   float: left;
-  width: 15%;
+  width: 17%;
   text-align: right;
 }
 
@@ -444,8 +446,9 @@
   text-align: left;
 }
 
-.crm-container .crm-section .content {
-  margin-left: 16%;
+.crm-container .crm-section .content,
+.crm-container-snippet .crm-section .content {
+  margin-left: 19%;
 }
 
 .crm-container .no-label .content {
@@ -707,7 +710,8 @@
   color: #000080;
 }
 
-.crm-container .crm-marker {
+.crm-container .crm-marker,
+.crm-container-snippet .crm-marker {
   color: #8A1F11;
   font-weight: bold;
   margin-right: 5px;
@@ -773,7 +777,7 @@
   /* h3 used as table header for civicrm */
   background-color: #CDE8FE;
   font-size: 15px;
-  font-family: Helvetica, Arial, Sans;
+  font-family: Helvetica, Arial, sans-serif;
   font-weight: bold;
   color: #121A2D;
   padding: 4px 6px;
@@ -1250,7 +1254,7 @@
   height: auto;
   margin: 0 1px;
   padding: 2px 5px;
-  font-family: Helvetica;
+  font-family: Helvetica, Arial, sans-serif; 
 }
 
 .crm-container #alpha-filter a {
@@ -2581,6 +2585,10 @@ div.grippie {
   background-position: -3px -161px;
 }
 
+.crm-container .swap-icon {
+  background-position: -82px -81px;
+}
+
 #crm-container .geotag {
   padding: 2px 0 2px 20px !important;
   background: url('../i/geotag_16.png') left center no-repeat;
@@ -3774,6 +3782,10 @@ div.m ul#civicrm-menu,
 }
 
 #crm-container.crm-public .label {
+  padding-top: 6px;
+}
+
+.crm-public .crm-profile-view .content {
   padding-top: 6px;
 }
 

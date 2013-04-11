@@ -101,9 +101,6 @@
         </div>
     {/if}
 {/if}
-{if $initialPayment}
-  {include file="CRM/Price/Form/InitialPayment.tpl" extends="Contribution" paymentMode='online'}
-{/if}
 {if $pcp && $is_honor_roll }
     <fieldset class="crm-group pcp-group">
         <div class="crm-section pcp-section">
@@ -183,7 +180,7 @@
 <script type="text/javascript">
 {literal}
 function toggleConfirmButton() {
-  var payPalExpressId = {/literal}{$payPalExpressId}{literal};
+  var payPalExpressId = "{/literal}{$payPalExpressId}{literal}";
   var elementObj = cj('input[name="payment_processor"]');
    if ( elementObj.attr('type') == 'hidden' ) {
       var processorTypeId = elementObj.val( );

@@ -106,6 +106,7 @@ class CRM_Core_HTMLInputCoder implements API_Wrapper {
         'sqlQuery', // CRM-6673
         'pcp_title',
         'pcp_intro_text',
+        'new', // The 'new' text in word replacements
       );
     }
     return self::$skipFields;
@@ -117,13 +118,23 @@ class CRM_Core_HTMLInputCoder implements API_Wrapper {
    */
   public static function isSkippedField($fldName) {
     $skipFields = self::getSkipFields();
-    return (
-      // should be skipped...
-      in_array($fldName, $skipFields)
-      or
-      // is multilingual and after cutting off _xx_YY should be skipped (CRM-7230)…
-      (preg_match('/_[a-z][a-z]_[A-Z][A-Z]$/', $fldName) and in_array(substr($fldName, 0, -6), $skipFields))
-    );
+
+    // Field should be skipped
+    if (in_array($fldName, $skipFields)) {
+      return TRUE;
+    }
+    // Field is multilingual and after cutting off _xx_YY should be skipped (CRM-7230)…
+    if ((preg_match('/_[a-z][a-z]_[A-Z][A-Z]$/', $fldName) && in_array(substr($fldName, 0, -6), $skipFields))) {
+      return TRUE;
+    }
+    // Field can take multiple entries, eg. fieldName[1], fieldName[2], etc.
+    // We remove the index and check again if the fieldName in the list of skipped fields.
+    $matches = array();
+    if (preg_match('/^(.*)\[\d+\]/', $fldName, $matches) && in_array($matches[1], $skipFields)) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**

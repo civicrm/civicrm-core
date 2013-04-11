@@ -277,7 +277,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         $script = get_permalink($post->ID);
       }
 
-      // when shortcode is inlcuded in page
+      // when shortcode is included in page
       // also make sure we have valid query object
       global $wp_query;
       if ( method_exists( $wp_query, 'get' ) ) {
@@ -310,7 +310,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
 
     if (isset($path)) {
-        if (isset($query)) {
+      if (isset($query)) {
         if ($permlinkStructure != '' && ($pageID || $script != '')) {
           return $script . '?page=CiviCRM&q=' . $path . $pageID . $separator . $query . $fragment;
         }
@@ -328,7 +328,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
     }
     else {
-        if (isset($query)) {
+      if (isset($query)) {
         if ($permlinkStructure != '' && ($pageID || $script != '')) {
           return $script . '?' . $query . $pageID . $fragment;
         }
@@ -337,10 +337,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         }
       }
       else {
-          return $base . $fragment;
-        }
+        return $base . $fragment;
       }
     }
+  }
 
   /**
    * Authenticate the user against the wordpress db

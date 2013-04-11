@@ -325,10 +325,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           self::updatePendingOnlineContribution($key, $value['status_id']);
         }
       }
-      CRM_Core_Session::setStatus(ts('The updates have been saved.'), t('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The updates have been saved.'), ts('Saved'), 'success');
     }
     else {
-      CRM_Core_Session::setStatus(ts('No updates have been saved.'), t('Not Saved'), 'alert');
+      CRM_Core_Session::setStatus(ts('No updates have been saved.'), ts('Not Saved'), 'alert');
     }
   }
   //end of function

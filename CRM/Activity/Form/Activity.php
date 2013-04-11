@@ -600,6 +600,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $priority = CRM_Core_PseudoConstant::priority();
       $defaults['priority_id'] = array_search('Normal', $priority);
     }
+    if (!CRM_Utils_Array::value('status_id', $defaults)) {
+      $defaults['status_id'] = CRM_Core_OptionGroup::getDefaultValue('activity_status');
+    }
     return $defaults;
   }
 

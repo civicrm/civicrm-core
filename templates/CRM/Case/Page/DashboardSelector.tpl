@@ -146,7 +146,7 @@ function showCaseActivities( caseId, type, context ) {
 function hideCaseActivities( caseId , type, context ) {
     cj('#' + context + '-' + type +'-casedetails-' + caseId).hide();
     cj('#' + context+type+caseId+'_show').show();
-    cj('minus'+context+type+caseId+'_hide').hide();
+    cj('#minus'+context+type+caseId+'_hide').hide();
 }
 
 </script>

@@ -189,9 +189,7 @@
 
   <civicrm_activity />
 
-  <civicrm_activity_assignment />
-
-  <civicrm_activity_target />
+  <civicrm_activity_contact />
 
   <civicrm_case_activity />
 

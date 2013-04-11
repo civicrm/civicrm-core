@@ -328,6 +328,25 @@ class CRM_Core_Payment_Form {
   }
 
   /**
+   * Make sure that credit card number and cvv are valid
+   * Called within the scope of a QF formRule function
+   */
+  static function validateCreditCard($values, &$errors) {
+    if (!empty($values['credit_card_type'])) {
+      if (!empty($values['credit_card_number']) &&
+        !CRM_Utils_Rule::creditCardNumber($values['credit_card_number'], $values['credit_card_type'])
+      ) {
+        $errors['credit_card_number'] = ts('Please enter a valid Credit Card Number');
+      }
+      if (!empty($values['cvv2']) &&
+        !CRM_Utils_Rule::cvv($values['cvv2'], $values['credit_card_type'])
+      ) {
+        $errors['cvv2'] = ts('Please enter a valid Credit Card Verification Number');
+      }
+    }
+  }
+
+  /**
    * function to map address fields
    *
    * @return void

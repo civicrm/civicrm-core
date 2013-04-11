@@ -127,9 +127,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
     return NULL;
   }
 
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
-    $includeContactIDs = FALSE, $justIDs = FALSE,
-  ) {
+  function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     //redirect if custom group not select in search criteria
     if (!CRM_Utils_Array::value('custom_group', $this->_formValues)) {
       CRM_Core_Error::statusBounce(ts("You must select at least one Custom Group as a search criteria."),

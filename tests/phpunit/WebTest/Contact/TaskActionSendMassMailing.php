@@ -47,9 +47,9 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
 
     // Click "check all" box and act on "Add to group" action
     $this->click("//form[@id='Advanced']/div[3]/div/div[2]/table/thead/tr/th[1]/input");
+    $this->waitForText('search-status', "50 Selected records only");
     $this->select("task", "label=Schedule/Send a Mass Mailing");
-    $this->click("Go");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("Go");
 
     //-------select recipients----------
 
@@ -77,7 +77,7 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     $this->type("subject", "Test subject {$mailingName} for Webtest");
 
     // check for default option enabled
-    $this->assertChecked("CIVICRM_QFID_1_4");
+    $this->assertChecked("CIVICRM_QFID_1_upload_type");
 
     // HTML format message
     $HTMLMessage = "This is HTML formatted content for Mailing {$mailingName} Webtest.";
@@ -107,8 +107,8 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     //----------end New Mailing-------------
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertTrue($this->isTextPresent("Scheduled and Sent Mailings"));
-    $this->assertTrue($this->isTextPresent("$mailingName"));
+    $this->waitForText('page-title', "Scheduled and Sent Mailings");
+    $this->waitForText('css=.selector', "$mailingName");
 
     //--------- mail delivery verification---------
 
@@ -119,7 +119,7 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify undelivered status message
-    $this->assertTrue($this->isTextPresent("Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently."));
+    $this->waitForText("css=.messages", "Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task \('cron job'\) is running - and how frequently.");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
