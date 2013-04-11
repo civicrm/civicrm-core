@@ -45,7 +45,7 @@ done
 cp $SRC/agpl-3.0.txt $TRG
 cp $SRC/gpl.txt $TRG
 cp $SRC/README.txt $TRG
-cp $SRC/Sponsors.txt $TRG
+cp $SRC/CONTRIBUTORS.txt $TRG
 cp $SRC/agpl-3.0.exception.txt $TRG
 
 # gen tarball
