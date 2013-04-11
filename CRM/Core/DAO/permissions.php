@@ -66,34 +66,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     'default' => array('administer CiviCRM'),
   );
 
-  $permissions['activity'] = array(
-    'delete' => array(
-      'access CiviCRM',
-      'delete activities',
-    ),
-    'get' => array(
-      'access CiviCRM',
-      'view all activities',
-    ),
-  );
-  $permissions['address'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'add contacts',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
-    ),
-    'get' => array(
-      'access CiviCRM',
-      'view all contacts',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'edit all contacts',
-    ),
-  );
+  // Contact permissions
   $permissions['contact'] = array(
     'create' => array(
       'access CiviCRM',
@@ -109,91 +82,91 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'access CiviCRM',
       'edit all contacts',
     ),
-    'getquick' => array('access CiviCRM'),
+    'getquick' => array(
+      'access CiviCRM',
+    ),
   );
-  $permissions['contribution'] = array(
+
+  // Contact-related data permissions
+  $permissions['address'] = array(
+    'get' => array(
+      'access CiviCRM',
+      'view all contacts',
+    ),
+    'delete' => array(
+      'access CiviCRM',
+      'delete contacts',
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'edit all contacts',
+    ),
+  );
+  $permissions['email'] = $permissions['address'];
+  $permissions['phone'] = $permissions['address'];
+  $permissions['website'] = $permissions['address'];
+  $permissions['im'] = $permissions['address'];
+  $permissions['loc_block'] = $permissions['address'];
+  $permissions['entity_tag'] = $permissions['address'];
+  $permissions['note'] = $permissions['address'];
+
+  // Activity permissions
+  $permissions['activity'] = array(
+    'delete' => array(
+      'access CiviCRM',
+      'delete activities',
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'view all activities',
+    ),
+  );
+
+  // Case permissions
+  $permissions['case'] = array(
     'create' => array(
       'access CiviCRM',
+      'add cases',
+    ),
+    'delete' => array(
+      'access CiviCRM',
+      'delete in CiviCase',
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'access all cases and activities',
+    ),
+  );
+
+  // Financial permissions
+  $permissions['contribution'] = array(
+    'get' => array(
+      'access CiviCRM',
       'access CiviContribute',
-      'edit contributions',
     ),
     'delete' => array(
       'access CiviCRM',
       'access CiviContribute',
       'delete in CiviContribute',
     ),
-    'get' => array(
-      'access CiviCRM',
-      'access CiviContribute',
-    ),
-    'update' => array(
+    'default' => array(
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
     ),
   );
+  $permissions['line_item'] = $permissions['contribution'];
+
+  // Custom field permissions
   $permissions['custom_field'] = array(
-    'create' => array(
+    'default' => array(
       'administer CiviCRM',
-      'access CiviCRM',
-      'access all custom data',
-    ),
-    'delete' => array(
-      'administer CiviCRM',
-      'access CiviCRM',
-      'access all custom data',
-    ),
-    'get' => array(
-      'administer CiviCRM',
-      'access CiviCRM',
-      'access all custom data',
-    ),
-    'update' => array(
-      'administer CiviCRM',
-      'access CiviCRM',
       'access all custom data',
     ),
   );
-  $permissions['custom_group'] = array(
-    'create' => array(
-      'administer CiviCRM',
-      'access CiviCRM',
-      'access all custom data',
-    ),
-    'delete' => array(
-      'administer CiviCRM',
-      'access CiviCRM',
-      'access all custom data',
-    ),
-    'get' => array(
-      'administer CiviCRM',
-      'access CiviCRM',
-      'access all custom data',
-    ),
-    'update' => array(
-      'administer CiviCRM',
-      'access CiviCRM',
-      'access all custom data',
-    ),
-  );
-  $permissions['email'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'add contacts',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
-    ),
-    'get' => array(
-      'access CiviCRM',
-      'view all contacts',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'edit all contacts',
-    ),
-  );
+  $permissions['custom_group'] = $permissions['custom_field'];
+
+  // Event permissions
   $permissions['event'] = array(
     'create' => array(
       'access CiviCRM',
@@ -216,137 +189,49 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'edit all events',
     ),
   );
+
+  // File permissions
   $permissions['file'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'access uploaded files',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'access uploaded files',
-    ),
-    'get' => array(
-      'access CiviCRM',
-      'access uploaded files',
-    ),
-    'update' => array(
+    'default' => array(
       'access CiviCRM',
       'access uploaded files',
     ),
   );
-  $permissions['files_by_entity'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'access uploaded files',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'access uploaded files',
-    ),
-    'get' => array(
-      'access CiviCRM',
-      'access uploaded files',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'access uploaded files',
-    ),
-  );
+  $permissions['files_by_entity'] = $permissions['file'];
+
+  // Group permissions
   $permissions['group'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-  );
-  $permissions['group_contact'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-  );
-  $permissions['group_nesting'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-  );
-  $permissions['group_organization'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'edit groups',
-    ),
-  );
-  $permissions['location'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'add contacts',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
-    ),
     'get' => array(
       'access CiviCRM',
-      'view all contacts',
     ),
-    'update' => array(
+    'default' => array(
       'access CiviCRM',
-      'edit all contacts',
+      'edit groups',
     ),
   );
+  $permissions['group_contact'] = $permissions['group'];
+  $permissions['group_nesting'] = $permissions['group'];
+  $permissions['group_organization'] = $permissions['group'];
+
+  // Membership permissions
   $permissions['membership'] = array(
-    'create' => array(
+    'get' => array(
       'access CiviCRM',
       'access CiviMember',
-      'edit memberships',
     ),
     'delete' => array(
       'access CiviCRM',
       'access CiviMember',
       'delete in CiviMember',
     ),
-    'get' => array(
-      'access CiviCRM',
-      'access CiviMember',
-    ),
-    'update' => array(
+    'default' => array(
       'access CiviCRM',
       'access CiviMember',
       'edit memberships',
     ),
   );
+  $permissions['membership_status'] = $permissions['membership'];
+  $permissions['membership_type'] = $permissions['membership'];
   $permissions['membership_payment'] = array(
     'create' => array(
       'access CiviCRM',
@@ -375,66 +260,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'edit contributions',
     ),
   );
-  $permissions['membership_status'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'access CiviMember',
-      'edit memberships',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'access CiviMember',
-      'delete in CiviMember',
-    ),
-    'get' => array(
-      'access CiviCRM',
-      'access CiviMember',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'access CiviMember',
-      'edit memberships',
-    ),
-  );
-  $permissions['membership_type'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'access CiviMember',
-      'edit memberships'
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'access CiviMember',
-      'delete in CiviMember',
-    ),
-    'get' => array(
-      'access CiviCRM',
-      'access CiviMember',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'access CiviMember',
-      'edit memberships',
-    ),
-  );
-  $permissions['note'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'add contacts'
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
-    ),
-    'get' => array(
-      'access CiviCRM',
-      'view all contacts',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'edit all contacts',
-    ),
-  );
+
+  // Participant permissions
   $permissions['participant'] = array(
     'create' => array(
       'access CiviCRM',
@@ -486,24 +313,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'edit contributions',
     ),
   );
-  $permissions['phone'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'add contacts',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
-    ),
-    'get' => array(
-      'access CiviCRM',
-      'view all contacts',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'edit all contacts',
-    ),
-  );
+
+  // Pledge permissions
   $permissions['pledge'] = array(
     'create' => array(
       'access CiviCRM',
@@ -553,27 +364,14 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'edit contributions',
     ),
   );
-  $permissions['system'] = array(
-    'flush' => array('administer CiviCRM'),
-  );
-  $permissions['website'] = array(
-    'create' => array(
-      'access CiviCRM',
-      'add contacts',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
-    ),
+
+  // Profile permissions
+  $permissions['uf_group'] = array(
     'get' => array(
       'access CiviCRM',
-      'view all contacts',
-    ),
-    'update' => array(
-      'access CiviCRM',
-      'edit all contacts',
     ),
   );
+  $permissions['uf_field'] = $permissions['uf_group'];
 
   // Translate 'create' action to 'update' if id is set
   if ($action == 'create' && (!empty($params['id']) || !empty($params[$entity . '_id']))) {
