@@ -101,6 +101,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   static function setDomain($domainID){
     CRM_Core_Config::domainID($domainID);
     self::getDomain($domainID);
+    CRM_Core_Config::singleton(TRUE, TRUE);
   }
 
   /**
