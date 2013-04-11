@@ -21,7 +21,7 @@ Key Contributors and Sponsors for 4.3
 AGH Strategies - Andrew Hunt
 Backoffice Thinking
 Chris Burgess
-Circle Intergactive - Andrew Walker, Dave Moreton
+Circle Interactive - Andrew Walker, Dave Moreton
 CiviDesk - Nicolas Ganivet
 CiviHosting - Hershel Robinson
 Community Builders
