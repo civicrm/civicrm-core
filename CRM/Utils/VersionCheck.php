@@ -129,7 +129,7 @@ class CRM_Utils_VersionCheck {
           if (!$fp) {
             if (CRM_Core_Permission::check('administer CiviCRM')) {
               CRM_Core_Session::setStatus(
-                ts('Unable to write file') . ":$cachefile<br />" . t('Please check your system file permissions.'),
+                ts('Unable to write file') . ":$cachefile<br />" . ts('Please check your system file permissions.'),
                 ts('File Error'), 'error');
             }
             return;
