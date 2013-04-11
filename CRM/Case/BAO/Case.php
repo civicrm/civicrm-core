@@ -1004,9 +1004,9 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
                   LEFT JOIN civicrm_entity_file ef on ef.entity_table = "civicrm_activity" AND ef.entity_id = ca.id
                   LEFT OUTER JOIN civicrm_option_group og ON og.name="activity_status"
                   LEFT OUTER JOIN civicrm_option_value ov ON ov.option_group_id=og.id AND ov.name="Scheduled"
-                  LEFT JOIN civicrm_activity_assignment caa
-                                ON caa.activity_id = ca.id
-                               LEFT JOIN civicrm_contact acc ON acc.id = caa.assignee_contact_id  ';
+                  LEFT JOIN civicrm_activity_contact caa
+                                ON caa.activity_id = ca.id AND caa.record_type = "Assignee"                  
+                  LEFT JOIN civicrm_contact acc ON acc.id = caa.contact_id  ';
 
     $where = 'WHERE cca.case_id= %1
                     AND ca.is_current_revision = 1';

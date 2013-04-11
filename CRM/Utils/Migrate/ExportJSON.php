@@ -379,14 +379,14 @@ AND    entity_table = 'civicrm_contact'
     $sql = "(
   SELECT     a.*
   FROM       civicrm_activity a
-  INNER JOIN civicrm_activity_assignment aa ON aa.activity_id = a.id
-  WHERE      aa.assignee_contact_id IN ( $ids )
+  INNER JOIN civicrm_activity_contact aa ON aa.activity_id = a.id AND aa.record_type = 'Assignee'
+  WHERE      aa.contact_id IN ( $ids )
     AND      ( a.activity_type_id != 3 AND a.activity_type_id != 20 )
 ) UNION (
   SELECT     a.*
   FROM       civicrm_activity a
-  INNER JOIN civicrm_activity_target at ON at.activity_id = a.id
-  WHERE      at.target_contact_id IN ( $ids )
+  INNER JOIN civicrm_activity_contact at ON at.activity_id = a.id AND at.record_type = 'Target'  
+  WHERE      at.contact_id IN ( $ids )
     AND      ( a.activity_type_id != 3 AND a.activity_type_id != 20 )
 )
 ";
