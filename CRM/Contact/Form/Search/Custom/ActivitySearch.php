@@ -236,10 +236,10 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
                  ON activity.source_contact_id = contact_b.id
             LEFT JOIN civicrm_case_activity cca
                  ON activity.id = cca.activity_id
-            LEFT JOIN civicrm_activity_assignment assignment
-                 ON activity.id = assignment.activity_id
+            LEFT JOIN civicrm_activity_contact assignment
+                 ON activity.id = assignment.activity_id AND assignment.record_type = 'Assignee'
             LEFT JOIN civicrm_contact contact_c
-                 ON assignment.assignee_contact_id = contact_c.id ";
+                 ON assignment.contact_id = contact_c.id ";
   }
 
   /*
