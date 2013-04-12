@@ -121,19 +121,23 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    *
    **/
   function testConvertAndFillSettings() {
-    $sql = " DELETE FROM civicrm_setting WHERE name = 'max_attachments'";
-    CRM_Core_DAO::executeQuery($sql);
-
     $settings = array('maxAttachments' => 6);
     CRM_Core_BAO_ConfigSetting::add($settings);
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
     $this->assertEquals(6, $config->maxAttachments);
-    $checkSQL = "SELECT  count(*) FROM civicrm_domain WHERE config_backend LIKE '%Max%' AND id = 1
+    $checkSQL = "SELECT  count(*) FROM civicrm_domain WHERE config_backend LIKE '%\"maxAttachments\";i:6%' AND id = 1
     ";
     $checkresult = CRM_Core_DAO::singleValueQuery($checkSQL);
     $this->assertEquals(1, $checkresult, "Check that maxAttachments has been saved to database not just stored in config");
-    CRM_Core_BAO_Setting::updateSettingsFromMetaData();
+    $sql = " DELETE FROM civicrm_setting WHERE name = 'max_attachments'";
+    CRM_Core_DAO::executeQuery($sql);
 
+    $currentDomain = CRM_Core_Config::domainID();
+    // we are setting up an artificial situation here as we are trying to drive out
+    // previous memory of this setting so we need to flush it out
+    $cachekey =  CRM_Core_BAO_Setting::inCache('CiviCRM Preferences', 'max_attachments', NULL, NULL, TRUE, $currentDomain);
+    CRM_Core_BAO_Setting::flushCache($cachekey);
+    CRM_Core_BAO_Setting::updateSettingsFromMetaData();
     //check current domain
     $value = civicrm_api('setting', 'getvalue', array(
       'version' => 3,

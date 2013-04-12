@@ -8,7 +8,6 @@ $params = array(
   'version' => 3,
   'domain_id' => 'all',
   'uniq_email_per_site' => 1,
-  'debug' => 1,
 );
 
   $result = civicrm_api( 'setting','create',$params );
@@ -35,11 +34,6 @@ function setting_create_expectedresult(){
       '3' => array( 
           'uniq_email_per_site' => '1',
         ),
-    ),
-  'xdebug' => array( 
-      'peakMemory' => 127711392,
-      'memory' => 123061848,
-      'timeIndex' => '1357.0696148872',
     ),
 );
 

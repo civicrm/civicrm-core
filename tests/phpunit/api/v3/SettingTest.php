@@ -248,7 +248,6 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $params = array('version' => $this->_apiversion,
         'domain_id' => 'all',
         'uniq_email_per_site' => 1,
-      'debug' =>1,
     );
     $result = civicrm_api('setting', 'create', $params);
     $description = "shows setting a variable for all domains";
@@ -328,7 +327,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('setting', 'create', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);
-    $config = CRM_Core_Config::singleton();
+    CRM_Core_BAO_Domain::setDomain($this->_domainID2);
+    $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    CRM_Core_BAO_Domain::resetDomain();
     $this->assertTrue($config->debug == 1);
     // this should NOT be stored in the settings table now - only in config
     $sql = " SELECT count(*) as c FROM civicrm_setting WHERE name LIKE '%debug%'";
@@ -343,12 +344,39 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $settings = civicrm_api('setting', 'get', array(
       'name' => 'defaultCurrency',
       'version' => $this->_apiversion,
-      'sequential' => 1,
-      'debug' => 1)
+      'sequential' => 1,)
     );
     $this->assertAPISuccess($settings);
     $this->assertEquals('USD', $settings['values'][0]['defaultCurrency']);
   }
+
+  /**
+   * setting api should set & fetch settings stored in config as well as those in settings table
+   */
+  function testGetSetConfigSettingMultipleDomains() {
+    $settings = civicrm_api('setting', 'create', array(
+      'defaultCurrency' => 'USD',
+      'version' => $this->_apiversion,
+      'domain_id' => $this->_currentDomain)
+    );
+    $settings = civicrm_api('setting', 'create', array(
+      'defaultCurrency' => 'CAD',
+      'version' => $this->_apiversion,
+      'domain_id' => $this->_domainID2)
+    );
+    $this->assertAPISuccess($settings);
+    $settings = civicrm_api('setting', 'get', array(
+      'return' => 'defaultCurrency',
+      'version' => $this->_apiversion,
+      'domain_id' => 'all',
+      )
+    );
+    $this->assertEquals('USD', $settings['values'][$this->_currentDomain]['defaultCurrency']);
+    $this->assertEquals('CAD', $settings['values'][$this->_domainID2]['defaultCurrency'],
+      "second domain (id {$this->_domainID2} ) should be set to CAD. First dom was {$this->_currentDomain} & was USD");
+
+  }
+
 /*
  * Use getValue against a config setting
  */
@@ -483,6 +511,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = civicrm_api('setting', 'get', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);
     $this->assertArrayHasKey('tag_unconfirmed', $result['values'][$dom['id']]);
+    $this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
     $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);
   }
 }
