@@ -130,16 +130,9 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $checkresult = CRM_Core_DAO::singleValueQuery($checkSQL);
     $this->assertEquals(1, $checkresult, "Check that maxAttachments has been saved to database not just stored in config");
     $sql = " DELETE FROM civicrm_setting WHERE name = 'max_attachments'";
+    CRM_Core_DAO::executeQuery($sql);
+
     $currentDomain = CRM_Core_Config::domainID();
-<<<<<<< Updated upstream
-
-    CRM_Core_DAO::executeQuery($sql);
-    CRM_Core_BAO_Setting::inCache('CiviCRM Preferences', 'max_attachments', NULL, NULL, TRUE, $currentDomain, TRUE);
-    CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-=======
->>>>>>> Stashed changes
-
-    CRM_Core_DAO::executeQuery($sql);
     // we are setting up an artificial situation here as we are trying to drive out
     // previous memory of this setting so we need to flush it out
     $cachekey =  CRM_Core_BAO_Setting::inCache('CiviCRM Preferences', 'max_attachments', NULL, NULL, TRUE, $currentDomain);
