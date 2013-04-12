@@ -231,10 +231,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       ),
       'civicrm_activity_assignment' =>
       array(
-        'dao' => 'CRM_Activity_DAO_ActivityAssignment',
+        'dao' => 'CRM_Activity_DAO_ActivityContact',
         'fields' =>
         array(
-          'assignee_contact_id' =>
+          'contact_id' =>
           array(
             'no_display' => TRUE,
             'required' => TRUE,
@@ -244,10 +244,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       ),
       'civicrm_activity_target' =>
       array(
-        'dao' => 'CRM_Activity_DAO_ActivityTarget',
+        'dao' => 'CRM_Activity_DAO_ActivityContact',
         'fields' =>
         array(
-          'target_contact_id' =>
+          'contact_id' =>
           array(
             'no_display' => TRUE,
             'required' => TRUE,
@@ -348,20 +348,21 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   function from() {
-
     $this->_from = "
         FROM civicrm_activity {$this->_aliases['civicrm_activity']}
 
-             LEFT JOIN civicrm_activity_target  {$this->_aliases['civicrm_activity_target']}
-                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_target']}.activity_id
-             LEFT JOIN civicrm_activity_assignment {$this->_aliases['civicrm_activity_assignment']}
-                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_assignment']}.activity_id
+             LEFT JOIN civicrm_activity_contact  {$this->_aliases['civicrm_activity_target']}
+                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_target']}.activity_id AND 
+                       {$this->_aliases['civicrm_activity_target']}.record_type = 'Target'
+             LEFT JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_assignment']}
+                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_assignment']}.activity_id AND 
+                       {$this->_aliases['civicrm_activity_assignment']}.record_type = 'Assignee' 
              LEFT JOIN civicrm_contact civicrm_contact_source
                     ON {$this->_aliases['civicrm_activity']}.source_contact_id = civicrm_contact_source.id
              LEFT JOIN civicrm_contact contact_civireport
-                    ON {$this->_aliases['civicrm_activity_target']}.target_contact_id = contact_civireport.id
+                    ON {$this->_aliases['civicrm_activity_target']}.contact_id = contact_civireport.id
              LEFT JOIN civicrm_contact civicrm_contact_assignee
-                    ON {$this->_aliases['civicrm_activity_assignment']}.assignee_contact_id = civicrm_contact_assignee.id
+                    ON {$this->_aliases['civicrm_activity_assignment']}.contact_id = civicrm_contact_assignee.id
 
              {$this->_aclFrom}
              LEFT JOIN civicrm_option_value
@@ -508,10 +509,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       $onHover    = ts('View Contact Summary for this Contact');
       $onHoverAct = ts('View Activity Record');
     }
-    foreach ($rows as $rowNum => $row) {
 
+    foreach ($rows as $rowNum => $row) {
       if (array_key_exists('civicrm_contact_contact_source', $row)) {
-        if ($value = $row['civicrm_activity_source_contact_id']) {
+        if ($value = $row['civicrm_activity_assignment_contact_id']) {
           if ($viewLinks) {
             $url = CRM_Utils_System::url("civicrm/contact/view",
               'reset=1&cid=' . $value,
@@ -526,7 +527,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
       if (array_key_exists('civicrm_contact_contact_assignee', $row)) {
         $assigneeNames = explode($seperator, $row['civicrm_contact_contact_assignee']);
-        if ($value = $row['civicrm_activity_assignment_assignee_contact_id']) {
+        if ($value = $row['civicrm_activity_assignment_contact_id']) {
           $assigneeContactIds = explode($seperator, $value);
           $link = array();
           if ($viewLinks) {
@@ -545,7 +546,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
       if (array_key_exists('civicrm_contact_contact_target', $row)) {
         $targetNames = explode($seperator, $row['civicrm_contact_contact_target']);
-        if ($value = $row['civicrm_activity_target_target_contact_id']) {
+        if ($value = $row['civicrm_activity_target_contact_id']) {
           $targetContactIds = explode($seperator, $value);
           $link = array();
           if ($viewLinks) {
