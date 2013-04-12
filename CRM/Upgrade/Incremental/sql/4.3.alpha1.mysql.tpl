@@ -291,7 +291,10 @@ ALTER TABLE `civicrm_financial_item`
 ALTER TABLE `civicrm_entity_financial_trxn`
 DROP currency;
 
--- CRM 9189 and CRM-8425 change fk's to financial_account.id in our branch that will need to be changed to an fk to financial_type.id
+-- CRM-12312
+UPDATE civicrm_event SET contribution_type_id = NULL WHERE contribution_type_id = 0;
+
+-- CRM-9189 and CRM-8425 change fk's to financial_account.id in our branch that will need to be changed to an fk to financial_type.id
 
 ALTER TABLE `civicrm_pledge`
 DROP FOREIGN KEY FK_civicrm_pledge_contribution_type_id,

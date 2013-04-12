@@ -51,7 +51,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     // we do this before we
     _civicrm_api3_swap_out_aliases($apiRequest);
     if (strtolower($action) != 'getfields') {
-      if (!CRM_Utils_Array::value('id', $params)) {
+      if (!CRM_Utils_Array::value('id', $apiRequest['params'])) {
         $apiRequest['params'] = array_merge(_civicrm_api3_getdefaults($apiRequest), $apiRequest['params']);
       }
       //if 'id' is set then only 'version' will be checked but should still be checked for consistency

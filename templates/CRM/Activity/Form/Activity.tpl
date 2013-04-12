@@ -150,6 +150,19 @@
       </td>
     {/if}
   </tr>
+  
+  {if $action neq 4}
+    <tr class="crm-activity-form-block-swap_target_assignee">
+      <td class="label"></td>
+      <td>
+        <a href="#" class="button" id="swap_target_assignee">
+          <span>
+            <div class="icon swap-icon"></div>{ts}Swap Target and Assignee Contacts{/ts}
+          </span>
+        </div>
+      </td>
+    </tr>
+  {/if}
 
   <tr class="crm-activity-form-block-assignee_contact_id">
     {if $action eq 4}
@@ -311,6 +324,19 @@
                 cj(this).parent('.collapsed').crmAccordionToggle();
               }
             });
+          });
+          cj('#swap_target_assignee').click( function() {
+            var assignees = cj('input#assignee_contact_id').tokenInput("get");
+            var targets = cj('input#contact_1').tokenInput("get");
+            cj('#assignee_contact_id').tokenInput("clear");
+            cj('#contact_1').tokenInput("clear");
+            cj(assignees).each( function() {
+              cj('#contact_1').tokenInput("add", this);
+            });
+            cj(targets).each( function() {
+              cj('#assignee_contact_id').tokenInput("add", this);
+            });
+            return false;
           });
         </script>
       {/literal}
