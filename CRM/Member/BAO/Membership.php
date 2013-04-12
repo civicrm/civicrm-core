@@ -1166,7 +1166,7 @@ AND civicrm_membership.is_test = %2";
    *
    * @return
    */
-  function statusAvilability($contactId) {
+  static function statusAvailabilty($contactId) {
     $membership = new CRM_Member_DAO_MembershipStatus();
     $membership->whereAdd('is_active=1');
     $count = $membership->count();
