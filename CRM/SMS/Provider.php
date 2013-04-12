@@ -160,30 +160,65 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
   }
 
   function inbound($from, $body, $to = NULL, $trackID = NULL) {
-  	$formatFrom   = $this->formatPhone($this->stripPhone($from), $like, "like"); 
-    $escapedFrom  = CRM_Utils_Type::escape($formatFrom, 'String');
-    $fromContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone WHERE phone LIKE "' . $escapedFrom . '"');
+
+    $formatFrom = $this->formatPhone($this->stripPhone($from), $like, "like"); 
+    $escapedFrom = CRM_Utils_Type::escape($formatFrom, 'String');
+
+    // try and match against the number that comes back from the SMS server
+    $phoneParams[1] = array('%'.$escapedFrom, 'String');
+    $phoneQuery = "SELECT contact_id FROM civicrm_phone AS cp JOIN civicrm_contact AS cc ON cp.contact_id = cc.id AND !cc.is_deleted AND phone_numeric like %1";
+    $match = CRM_Core_DAO::executeQuery($phoneQuery, $phoneParams);
+
+    //if there is no match, and the number returned from the server starts with
+    //the country code of the default country, try removing the country code and
+    //matching again
+
+    if(!$match->N){
+
+      //get the country code
+
+      $config = CRM_Core_Config::singleton();
+      $ccParams[1] = array($config->defaultContactCountry(), 'String');
+      $ccQuery = "SELECT country_code FROM civicrm_country WHERE iso_code = 'GB'";
+      $ccResult = CRM_Core_DAO::executeQuery($ccQuery, $ccParams);
+      $ccResult->fetch();
+      $countryCode = $ccResult->country_code;
+
+      //if the number from clickatell has the country code at the start of it,
+      //remove it and search based on the 'national' (rather than 'international')
+      //number
+
+      if(strpos($escapedFrom, $countryCode) === 0){
+        $phoneParams[1] = array('%'.substr($escapedFrom,strlen($countryCode)), 'String');
+        $match = CRM_Core_DAO::executeQuery($phoneQuery, $phoneParams);
+      }
+    }
+    
+    if($match->N){
+      $match->fetch();
+      $fromContactID = $match->contact_id;
+    }
     
     if (! $fromContactID) {
-    	// unknown mobile sender -- create new contact
-    	// use fake @mobile.sms email address for new contact since civi
-    	// requires email or name for all contacts
-    	$locationTypes =& CRM_Core_PseudoConstant::locationType();
-    	$phoneTypes    =& CRM_Core_PseudoConstant::phoneType();
-    	$phoneloc  = array_search( 'Home',  $locationTypes );
-    	$phonetype = array_search( 'Mobile', $phoneTypes );
-    	$stripFrom = $this->stripPhone($from);
-    	$contactparams = 
+      // unknown mobile sender -- create new contact
+      // use fake @mobile.sms email address for new contact since civi
+      // requires email or name for all contacts
+      $locationTypes =& CRM_Core_PseudoConstant::locationType();
+      $phoneTypes    =& CRM_Core_PseudoConstant::phoneType();
+      $phoneloc  = array_search( 'Home',  $locationTypes );
+      $phonetype = array_search( 'Mobile', $phoneTypes );
+      $stripFrom = $this->stripPhone($from);
+      $contactparams = 
         Array ( 'contact_type' => 'Individual',
-                'email' => Array ( 1 => Array ( 'location_type_id' => $phoneloc,
-                                                'email' => $stripFrom . '@mobile.sms' )
-                                   ),
-                'phone' => Array ( 1 => Array( 'phone_type_id' => $phonetype,
-                                               'location_type_id' => $phoneloc,
-                                               'phone' => $stripFrom )
-                                   )
-                );
-    	$fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);
+          'email' => Array ( 1 => Array ( 'location_type_id' => $phoneloc,
+          'email' => $stripFrom . '@mobile.sms' )
+        ),
+        'phone' => Array ( 1 => Array( 'phone_type_id' => $phonetype,
+        'location_type_id' => $phoneloc,
+        'phone' => $stripFrom )
+      )
+    );
+      $fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);
       $fromContactID = $fromContact->id;
     }
 
