@@ -117,6 +117,113 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->_testdeleteProfile($profileTitle);
   }
 
+  function testProfileAddContactstoGroup() {
+    $this->webtestLogin();
+    
+    // take group name and create group
+    $groupName = 'group_' . substr(sha1(rand()), 0, 7);
+    $this->WebtestAddGroup($groupName);
+     
+     // Add new profile.
+    $this->openCiviPage('admin/uf/group', 'reset=1');
+
+    $this->click('newCiviCRMProfile-top');
+
+    $this->waitForElementPresent('_qf_Group_next-bottom');
+
+    //Name of profile
+    $profileTitle = 'profile_' . substr(sha1(rand()), 0, 7);
+    $this->type('title', $profileTitle);
+
+    //Profile Advance Settings
+    $this->click("//form[@id='Group']/div[2]/div[2]/div[1]");
+
+    //Select the newly created group for adding new contacts into it.
+    $this->select('add_contact_to_group', "label=$groupName");
+
+    //click on save
+    $this->clickLink('_qf_Group_next');
+    
+    //check for  profile create
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+
+    //Add fields to profile
+    $fields = array(
+      'first_name' => 'Individual',
+      'last_name'  => 'Individual',
+      'email'      => 'Contact'
+    );
+    foreach ($fields as $field => $type) {
+      $this->click('field_name_0');
+      $this->select('field_name_0', "value=$type");
+      $this->click("//option[@value='$type']");
+      $this->click('field_name_1');
+      $this->select('field_name_1', "value=$field");
+      $this->clickLink('_qf_Field_next_new-top'); 
+    }
+
+    // create mode
+    $gid = $this->urlArg('gid');
+    $this->openCiviPage('profile/create', "gid=$gid&reset=1", NULL);
+    $firstName1 = "John_" . substr(sha1(rand()), 0, 7);
+    $lastName1  = "Smiths_x" . substr(sha1(rand()), 0, 7);
+    $this->type('first_name', $firstName1);
+    $this->type('last_name', $lastName1);
+    $this->type('email-Primary', "$firstName1.$lastName1@example.com");
+    $this->clickLink('_qf_Edit_next', NULL);
+   
+    //anonymous contact
+    $this->webtestLogout();
+    $this->openCiviPage('profile/create', "gid=$gid&reset=1", NULL);
+    $firstName2 = "John12_" . substr(sha1(rand()), 0, 7);
+    $lastName2  = "Smiths34_x" . substr(sha1(rand()), 0, 7);
+    $this->type('first_name', $firstName2);
+    $this->type('last_name', $lastName2);
+    $this->type('email-Primary', "$firstName2.$lastName2@example.com");
+    $this->clickLink('_qf_Edit_next', NULL);
+    
+    $this->webtestLogin();
+    //check the existence of the two contacts in the group
+    $this->openCiviPage('group', 'reset=1');
+    $this->type('title', $groupName);
+    $this->click('_qf_Search_refresh');
+    $this->waitForVisible('crm-group-selector_processing');
+    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(text(), '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
+    $this->clickLink("xpath=//table[@id='crm-group-selector']/tbody/tr/td[1][text()= '$groupName']/following-sibling::td[@class='crm-group-group_links']/span/a");
+    $contactEmails = array( 
+      1 => "$lastName1, $firstName1", 
+      2 => "$lastName2, $firstName2"
+    );
+    foreach ($contactEmails as $row => $name) {
+      $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[$row]/td[4]/a[contains(text(), '$name')]"));
+    }
+
+    //add the api keys in the recaptcha settings
+    $this->openCiviPage('admin/setting/misc', 'reset=1');
+    $this->type('recaptchaPublicKey', '6Lcexd8SAAAAAOwcoLCRALkyRrmPX7jY7b4V5iju');
+    $this->type('recaptchaPrivateKey', '6Lcexd8SAAAAANZXtyU5SVrnl9-_ckwFxUAZgxQp');
+    $this->clickLink('_qf_Miscellaneous_next-bottom');
+
+    //enable recaptcha in the profile
+    $this->openCiviPage('admin/uf/group', 'reset=1');
+    $this->clickLink("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td[1]/span[text()= '$profileTitle']/../following-sibling::td[4]/span/a[2]");
+    $this->click("//form[@id='Group']/div[2]/div[2]/div[1]");
+    //reCaptcha settings
+    $this->click('add_captcha');
+    $this->clickLink('_qf_Group_next-bottom');
+
+    //check if recaptcha loads for anonymous profile
+    $this->webtestLogout();
+    $this->openCiviPage('profile/create', "gid=$gid&reset=1", NULL);
+    $this->waitForElementPresent('recaptcha_widget_div');
+    $this->assertTrue($this->isElementPresent('recaptcha_area'));
+
+    // delete the profile
+    $this->webtestLogin();
+    $this->openCiviPage('admin/uf/group', 'reset=1');
+    $this->_testdeleteProfile($profileTitle);
+  }
+  
   function _testdeleteProfile($profileTitle) {
     //$this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("//div[@id='user-profiles']/div/div/table/tbody//tr/td[1]/span[text() = '$profileTitle']/../following-sibling::td[4]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
