@@ -47,8 +47,9 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
   protected $_customGroupExtends = array('Contact', 'Individual', 'Household', 'Organization', 'Activity');
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
-  private static $_surveyRespondentStatus; function __construct() {
+  private static $_surveyRespondentStatus;
 
+  function __construct() {
     //filter options for survey activity status.
     $responseStatus = array('' => '- Any -');
     self::$_surveyRespondentStatus = array();
@@ -314,9 +315,9 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     $this->_from = " FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom} ";
 
     //get the activity table joins.
-    $this->_from .= " INNER JOIN civicrm_activity_target ON ( {$this->_aliases['civicrm_contact']}.id = civicrm_activity_target.target_contact_id )\n";
+    $this->_from .= " INNER JOIN civicrm_activity_contact civicrm_activity_target ON ( {$this->_aliases['civicrm_contact']}.id = civicrm_activity_target.contact_id AND civicrm_activity_target.record_type = 'Target') \n";
     $this->_from .= " INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id )\n";
-    $this->_from .= " INNER JOIN civicrm_activity_assignment {$this->_aliases['civicrm_activity_assignment']} ON ( {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_assignment']}.activity_id )\n";
+    $this->_from .= " INNER JOIN civicrm_activity_contact civicrm_activity_assignment ON ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id  AND civicrm_activity_assignment.record_type = 'Assignee' )\n";
 
     //get the address table.
     $this->_from .= " LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
