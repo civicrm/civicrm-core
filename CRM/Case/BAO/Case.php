@@ -2399,11 +2399,13 @@ SELECT  id
         $mainCaseActivity->free();
 
         //migrate target activities.
-        $otherTargetActivity = new CRM_Activity_DAO_ActivityTarget();
+        $otherTargetActivity = new CRM_Activity_DAO_ActivityContact();
         $otherTargetActivity->activity_id = $otherActivityId;
+        $otherTargetActivity->record_type = 'Target';
         $otherTargetActivity->find();
         while ($otherTargetActivity->fetch()) {
-          $mainActivityTarget = new CRM_Activity_DAO_ActivityTarget();
+          $mainActivityTarget = new CRM_Activity_DAO_ActivityContact();
+          $mainActivityTarget->record_type = 'Target';
           $mainActivityTarget->activity_id = $mainActivityId;
           $mainActivityTarget->target_contact_id = $otherTargetActivity->target_contact_id;
           if ($mainActivityTarget->target_contact_id == $otherContactId) {
@@ -2418,12 +2420,14 @@ SELECT  id
         $otherTargetActivity->free();
 
         //migrate assignee activities.
-        $otherAssigneeActivity = new CRM_Activity_DAO_ActivityAssignment();
+        $otherAssigneeActivity = new CRM_Activity_DAO_ActivityContact();
         $otherAssigneeActivity->activity_id = $otherActivityId;
+        $otherAssigneeActivity->record_type = 'Assignee';
         $otherAssigneeActivity->find();
         while ($otherAssigneeActivity->fetch()) {
-          $mainAssigneeActivity = new CRM_Activity_DAO_ActivityAssignment();
+          $mainAssigneeActivity = new CRM_Activity_DAO_ActivityContact();
           $mainAssigneeActivity->activity_id = $mainActivityId;
+          $mainAssigneeActivity->record_type = 'Assignee';
           $mainAssigneeActivity->assignee_contact_id = $otherAssigneeActivity->assignee_contact_id;
           if ($mainAssigneeActivity->assignee_contact_id == $otherContactId) {
             $mainAssigneeActivity->assignee_contact_id = $mainContactId;
@@ -2720,15 +2724,17 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
               //view - contact must be source/assignee/target
               $isTarget = $isAssignee = $isSource = FALSE;
 
-              $target = new CRM_Activity_DAO_ActivityTarget();
+              $target = new CRM_Activity_DAO_ActivityContact();
+              $target->record_type = 'Target';
               $target->activity_id = $activityId;
               $target->target_contact_id = $contactId;
               if ($target->find(TRUE)) {
                 $isTarget = TRUE;
               }
 
-              $assignee = new CRM_Activity_DAO_ActivityAssignment();
+              $assignee = new CRM_Activity_DAO_ActivityContact();
               $assignee->activity_id = $activityId;
+              $assignee->record_type = 'Assignee';
               $assignee->assignee_contact_id = $contactId;
               if ($assignee->find(TRUE)) {
                 $isAssignee = TRUE;
