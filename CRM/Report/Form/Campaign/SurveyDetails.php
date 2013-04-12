@@ -80,12 +80,12 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     $allSurveyInterviewers = CRM_Campaign_BAO_Survey::getInterviewers();
 
     $this->_columns = array(
-      'civicrm_activity_assignment' =>
+      'civicrm_activity_contact' =>
       array(
-        'dao' => 'CRM_Activity_DAO_ActivityAssignment',
-        'fields' => array('assignee_contact_id' => array('title' => ts('Interviewer Name'))),
+        'dao' => 'CRM_Activity_DAO_ActivityContact',
+        'fields' => array('contact_id' => array('title' => ts('Interviewer Name'))),
         'filters' => array(
-          'assignee_contact_id' => array('name' => 'assignee_contact_id',
+          'contact_id' => array('name' => 'contact_id',
             'title' => ts('Interviewer Name'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' =>
