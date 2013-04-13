@@ -763,8 +763,8 @@ CRM.validate = CRM.validate || {
     });
   }
 
-  $(document).ready(function() {
-    if (CRM && CRM.config && CRM.config.urlIsPublic === false) {
+  $(function() {
+    if ($('#crm-notification-container').length) {
       // Initialize notifications
       $('#crm-notification-container').notify();
       messagesFromMarkup.call($('#crm-container'));

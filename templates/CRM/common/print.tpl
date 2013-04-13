@@ -35,7 +35,6 @@
 </head>
 
 <body>
-{include file="CRM/common/scripts.tpl"}
 {if $config->debug}
   {include file="CRM/common/debug.tpl"}
 {/if}
