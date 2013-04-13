@@ -202,7 +202,7 @@ class CRM_Core_Resources {
     $this->settings = $this->mergeSettings($this->settings, $settings);
     if (!$this->addedSettings) {
       $resources = $this;
-      CRM_Core_Region::instance('settings')->add(array(
+      CRM_Core_Region::instance('html-header')->add(array(
         'callback' => function(&$snippet, &$html) use ($resources) {
           $html .= "\n" . $resources->renderSetting();
         }
@@ -219,7 +219,6 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addSettingsFactory($callable) {
-    $this->addSetting(array()); // ensure that 'settings' region is created, even if empty
     $this->settingsFactories[] = $callable;
     return $this;
   }
@@ -260,7 +259,8 @@ class CRM_Core_Resources {
    * @return string
    */
   public function renderSetting() {
-    return 'CRM = cj.extend(true, ' . json_encode($this->getSettings()) . ', CRM);';
+    $js = 'var CRM = cj.extend(true, ' . json_encode($this->getSettings()) . ', CRM || {});';
+    return sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $js);
   }
 
   /**
@@ -449,6 +449,13 @@ class CRM_Core_Resources {
       $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
       $js = "CRM.url('init', '$url');";
       $this->addScript($js, $jsWeight++, $region);
+
+      // Add global settings
+      $settings = array(
+        'userFramework' => json_encode($config->userFramework),
+        'resourceBase' => json_encode($config->resourceBase),
+      );
+      $this->addSetting(array('config' => $settings));
 
       // Give control of jQuery back to the CMS - this loads last
       $this->addScriptFile('civicrm', 'js/noconflict.js', 9999, $region, FALSE);

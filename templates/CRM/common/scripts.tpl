@@ -42,13 +42,8 @@
     strings: {},
     config: {{/literal}
       urlIsPublic: {if $urlIsPublic}true{else}false{/if},
-      userFramework: '{$config->userFramework}',
-      resourceBase: '{$config->resourceBase}',
       search_autocomplete_count: {crmSetting name="search_autocomplete_count" group="Search Preferences"}
     {literal}},
   }, CRM);
   {/literal}
-  {* Dynamically add server-side variables to the CRM object *}
-  {crmRegion name='settings'}
-  {/crmRegion}
 </script>
