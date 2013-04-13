@@ -445,6 +445,11 @@ class CRM_Core_Resources {
         }
       }
 
+      // Initialize CRM.url
+      $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
+      $js = "CRM.url('init', '$url');";
+      $this->addScript($js, $jsWeight++, $region);
+
       // Give control of jQuery back to the CMS - this loads last
       $this->addScriptFile('civicrm', 'js/noconflict.js', 9999, $region, FALSE);
 

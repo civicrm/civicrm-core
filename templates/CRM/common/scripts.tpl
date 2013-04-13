@@ -25,9 +25,6 @@
 *}
 
 <script type="text/javascript">
-  {* Initialize CRM.url *}
-  CRM.url('init', '{crmURL p="civicrm/example" q="placeholder" h=0 }');
-
 {*/*
  * Here we define the CRM object,
  * A single global variable to hold everything that needs to be accessed from the global scope
