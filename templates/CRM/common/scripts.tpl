@@ -42,16 +42,7 @@
   {literal}
   var CRM = CRM || {};
   CRM = cj.extend(true, {
-    strings: {{/literal}
-      '- select -': '{ts escape="js"}- select -{/ts}',
-      Ok: '{ts escape="js"}Ok{/ts}',
-      Cancel: '{ts escape="js"}Cancel{/ts}',
-      Yes: '{ts escape="js"}Yes{/ts}',
-      No: '{ts escape="js"}No{/ts}',
-      Saved: '{ts escape="js"}Saved{/ts}',
-      Error: '{ts escape="js"}Error{/ts}',
-      Removed: '{ts escape="js"}Removed{/ts}'
-    {literal}},
+    strings: {},
     config: {{/literal}
       urlIsPublic: {if $urlIsPublic}true{else}false{/if},
       userFramework: '{$config->userFramework}',

@@ -425,7 +425,9 @@ class CRM_Core_Resources {
       $jsWeight = -9999;
       foreach ($files as $file => $type) {
         if ($type == 'js') {
-          $this->addScriptFile('civicrm', $file, $jsWeight++, $region, FALSE);
+          // Don't bother  looking for ts() calls in packages, there aren't any
+          $translate = (substr($file, 0, 9) != 'packages/');
+          $this->addScriptFile('civicrm', $file, $jsWeight++, $region, $translate);
         }
         elseif ($type == 'css') {
           $this->addStyleFile('civicrm', $file, -100, $region);
