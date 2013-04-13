@@ -90,7 +90,7 @@ class CRM_Utils_VersionCheck {
       require_once ($localfile);
       if (function_exists('civicrmVersion')) {
         $info = civicrmVersion();
-        $this->localVersion = $info['version'];
+        $this->localVersion = trim($info['version']);
       }
     }
     if ($config->versionCheck) {
@@ -99,7 +99,7 @@ class CRM_Utils_VersionCheck {
       // if there's a cachefile and it's not stale use it to
       // read the latestVersion, else read it from the Internet
       if (file_exists($cachefile) && (filemtime($cachefile) > $expiryTime)) {
-        $this->latestVersion = file_get_contents($cachefile);
+        $this->latestVersion = trim(file_get_contents($cachefile));
       }
       else {
         $siteKey = md5(defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '');
@@ -168,10 +168,12 @@ class CRM_Utils_VersionCheck {
       $latest = array_pad(explode('.', $this->latestVersion), 3, 0);
 
       for ($i = 0; $i < 3; $i++) {
-        if ($local[$i] > $latest[$i]) {
+        $loc = (int) $local[$i];
+        $lat = (int) $latest[$i];
+        if ($loc > $lat) {
           return NULL;
         }
-        elseif ($local[$i] < $latest[$i]) {
+        elseif ($loc < $lat) {
           return $this->latestVersion;
         }
       }
