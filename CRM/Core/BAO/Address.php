@@ -665,8 +665,14 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
 
   static function fixAllStateSelects(&$form, $defaults, $batchFieldNames = false) {
     $config = CRM_Core_Config::singleton();
-    
-    $map = is_array($batchFieldNames) ? $batchFieldNames : $config->stateCountryMap;
+
+    $map = null;
+    if (is_array($batchFieldNames)) {
+      $map = $batchFieldNames;
+    }
+    else if (!empty($config->stateCountryMap)) {
+      $map = $config->stateCountryMap;
+    }
 
     if (!empty($map)) {
       foreach ($map as $index => $match) {
