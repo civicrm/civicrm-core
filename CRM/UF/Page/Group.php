@@ -235,8 +235,8 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     }
     $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
 
-    // FIXME: (CRM-3587) hack to make standalone profile in joomla work
-    // without administrator login
+    // FIXME: (CRM-3587) hack to make standalone profile work
+    // in wordpress and joomla without administrator login
     if ($config->userFramework == 'Joomla') {
       $profile = str_replace('/administrator/', '/index.php', $profile);
     }
@@ -249,7 +249,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     // add jquery files
     $profile = CRM_Utils_String::addJqueryFiles($profile);
 
-    // prevent jquery conflict
     $this->assign('profile', htmlentities($profile, ENT_NOQUOTES, 'UTF-8'));
     //get the title of uf group
     if ($gid) {
