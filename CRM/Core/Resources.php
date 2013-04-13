@@ -219,6 +219,8 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addSettingsFactory($callable) {
+    // Make sure our callback has been registered
+    $this->addSetting(array());
     $this->settingsFactories[] = $callable;
     return $this;
   }
