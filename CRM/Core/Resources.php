@@ -205,7 +205,8 @@ class CRM_Core_Resources {
       CRM_Core_Region::instance('html-header')->add(array(
         'callback' => function(&$snippet, &$html) use ($resources) {
           $html .= "\n" . $resources->renderSetting();
-        }
+        },
+        'weight' => -100000,
       ));
       $this->addedSettings = TRUE;
     }
@@ -261,7 +262,7 @@ class CRM_Core_Resources {
    * @return string
    */
   public function renderSetting() {
-    $js = 'var CRM = cj.extend(true, ' . json_encode($this->getSettings()) . ', CRM || {});';
+    $js = 'var CRM = ' . json_encode($this->getSettings()) . ';';
     return sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $js);
   }
 
