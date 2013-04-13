@@ -596,4 +596,5 @@ function civicrm_api3_job_group_rebuild( $params ) {
   $limit = CRM_Utils_Array::value( 'limit', $params, 0 );
 
   CRM_Contact_BAO_GroupContactCache::loadAll(null, $limit);
+  return civicrm_api3_create_success();
 }
