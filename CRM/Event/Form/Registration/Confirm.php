@@ -351,7 +351,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $formattedValues[$count][$prefix1 . 'CustomPostGroupTitle'] = $groupName;
         }
         $count++;
-      }  
+      }
       $this->_fields = $profileFields;
     }
     if (!empty($formattedValues) ) {
@@ -462,7 +462,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contactID = $this->_params[0]['contact_id'];
     }
     else {
-      $contactID = parent::getContactID();
+      $contactID = $this->getContactID();
     }
 
     // if a discount has been applied, lets now deduct it from the amount
@@ -563,7 +563,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // we dont store in userID in case the user is doing multiple
       // transactions etc
       // for things like tell a friend
-      if (!parent::getContactID() && CRM_Utils_Array::value('is_primary', $value)) {
+      if (!$this->getContactID() && CRM_Utils_Array::value('is_primary', $value)) {
         $session->set('transaction.userID', $contactID);
       }
 
