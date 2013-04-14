@@ -522,14 +522,14 @@ ul#civicrm-menu li#crm-qsearch {
 #crm-container input,
 #crm-container select {
   font-size: 12px;
-  height: 16px;
   margin-bottom: auto;
   margin-right: 4px;
   width: auto;
   padding: 2px 4px;
 }
-#crm-container select {
-  height: 22px;
+#crm-container textarea,
+#crm-container input {
+  height: 16px;
 }
 #crm-container input[type=submit] {
   height: auto;
