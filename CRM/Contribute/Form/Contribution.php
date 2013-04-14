@@ -647,7 +647,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $financialType = $this->add('select', 'financial_type_id',
       ts('Financial Type'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(),
-      TRUE
+      TRUE,
+      array('onChange' => "CRM.buildCustomData( 'Contribution', this.value );")
     );
 
     if (!$this->_mode) {
