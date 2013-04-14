@@ -134,8 +134,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       $this->res->getSettings()
     );
     $actual = $this->res->renderSetting();
-    $expected = 'CRM = cj.extend(true, ' . json_encode(array('fruit' => array('yours' => 'orange', 'mine' => 'apple'))) . ', CRM);';
-    $this->assertEquals($expected, $actual);
+    $expected = json_encode(array('fruit' => array('yours' => 'orange', 'mine' => 'apple')));
+    $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
 
   function testAddSettingFactory() {
