@@ -55,7 +55,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     */ function setUp() {
     parent::setUp();
 
-    $this->toBeImplemented['get'] = array('ParticipantPayment', 'Profile', 'CustomValue', 'Website','Constant', 'CustomSearch', 'Extension', 'ReportTemplate', 'System');
+    $this->toBeImplemented['get'] = array('Profile', 'CustomValue', 'Constant', 'CustomSearch', 'Extension', 'ReportTemplate', 'System', 'Setting');
     $this->toBeImplemented['create'] = array('SurveyRespondant', 'OptionGroup', 'MailingRecipients', 'UFMatch', 'LocationType', 'CustomSearch', 'Extension', 'ReportTemplate', 'System');
     $this->toBeImplemented['delete'] = array('MembershipPayment', 'OptionGroup', 'SurveyRespondant', 'UFJoin', 'UFMatch', 'Extension', 'LocationType', 'System');
     $this->onlyIDNonZeroCount['get'] = array('ActivityType', 'Entity', 'Domain','Setting');
@@ -399,10 +399,12 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     // we'll fix this once beta1 is released
     //        return;
 
-    $result = civicrm_api($Entity, 'Get', array('version' => 3, 'id' => $nonExistantID));
+    $result = civicrm_api($Entity, 'Get', array( 'debug' => 1, 'version' => 3, 'id' => $nonExistantID));
 
     if ($result['is_error']) {
       // just to get a clearer message in the log
+      print_r($result);
+      die;
       $this->assertEquals("only id should be enough", $result['error_message']);
     }
     if (!in_array($Entity, $this->onlyIDNonZeroCount['get'])) {
