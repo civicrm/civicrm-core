@@ -140,9 +140,13 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     }
     return $entities;
   }
-
+/**
+ * Generate list of entities to test for get by id functions
+ * @param boolean $sequential
+ * @return multitype:string |multitype:multitype:string
+ */
   public static function toBeSkipped_automock($sequential = FALSE) {
-    $entitiesWithoutGet = array('Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
+    $entitiesWithoutGet = array('EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
     }
@@ -217,6 +221,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       'PledgePayment',
       'ContributionPage',
       'Phone',
+      'PaymentProcessor',
       'MailSettings',
       'Setting',
     );
