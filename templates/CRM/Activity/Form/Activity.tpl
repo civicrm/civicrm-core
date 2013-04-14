@@ -130,7 +130,7 @@
       <td class="view-value" style="white-space: normal">
         {$with|escape}
         <br/>
-        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label}
+        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
       </td>
       {elseif $action neq 4}
       <td class="label">{ts}With Contact{/ts}</td>
