@@ -109,8 +109,12 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
   // docs inherited from interface
   public function registerTab() {
-    // this component doesn't use contact record tabs
-    return NULL;
+    return array(
+      'title' => ts('Mailings'),
+      'id' => 'mailing',
+      'url' => 'mailing',
+      'weight' => 45,
+    );
   }
 
   // docs inherited from interface
