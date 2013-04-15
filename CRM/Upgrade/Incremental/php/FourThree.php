@@ -382,14 +382,13 @@ AND       ceft.entity_table = 'civicrm_contribution'
     );
 
     $accountType = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' "));
-    $financialAccountId =
-      $query = "
+    $query = "
 SELECT id
 FROM   civicrm_financial_account
 WHERE  is_default = 1
 AND    financial_account_type_id = {$accountType}
 ";
-    CRM_Core_DAO::singleValueQuery($query);
+    $financialAccountId = CRM_Core_DAO::singleValueQuery($query);
 
     $accountRelationsips = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL);
 
