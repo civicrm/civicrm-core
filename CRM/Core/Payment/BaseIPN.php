@@ -170,14 +170,14 @@ class CRM_Core_Payment_BaseIPN {
           if ($membership) {
             $membership->status_id = 4;
             $membership->save();
-            
+
             //update related Memberships.
             $params = array('status_id' => 4);
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
           }
         }
       }
-      
+
       if ($participant) {
         $participant->status_id = 4;
         $participant->save();
@@ -228,14 +228,14 @@ class CRM_Core_Payment_BaseIPN {
           if ($membership) {
             $membership->status_id = 6;
             $membership->save();
-            
+
             //update related Memberships.
             $params = array('status_id' => 6);
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
           }
         }
       }
-      
+
       if ($participant) {
         $participant->status_id = 4;
         $participant->save();
@@ -376,7 +376,7 @@ LIMIT 1;";
 
             //update related Memberships.
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $formatedParams);
-            
+
             //update the membership type key of membership relatedObjects array
             //if it has changed after membership update
             if ($membershipTypeIdKey != $membership->membership_type_id) {
@@ -410,11 +410,11 @@ LIMIT 1;";
         'entity_id'    => $ids['event'],
         'module'       => 'CiviEvent',
       );
-      
+
       list($custom_pre_id,
            $custom_post_ids
            ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-            
+
       $values['custom_pre_id'] = $custom_pre_id;
       $values['custom_post_id'] = $custom_post_ids;
 
@@ -439,7 +439,7 @@ LIMIT 1;";
     if (empty($contribution->id)) {
       $addLineItems = TRUE;
     }
-    
+
     $contribution->contribution_status_id = 1;
     $contribution->is_test = $input['is_test'];
     $contribution->fee_amount = CRM_Utils_Array::value('fee_amount', $input, 0);
@@ -456,7 +456,7 @@ LIMIT 1;";
     if (CRM_Utils_Array::value('payment_instrument_id', $input)) {
       $contribution->payment_instrument_id = $input['payment_instrument_id'];
     }
-  
+
     if ($contribution->id) {
       $contributionId['id'] = $contribution->id;
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues($contributionId, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
@@ -483,7 +483,7 @@ LIMIT 1;";
 
     if ($contribution->id) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      if (!$input['prevContribution']->is_pay_later &&  
+      if (!$input['prevContribution']->is_pay_later &&
         $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)) {
         $input['payment_processor'] = $paymentProcessorId;
       }
@@ -493,7 +493,7 @@ LIMIT 1;";
         $input['contribution_mode'] = 'participant';
         $input['participant_id'] = $contribution->_relatedObjects['participant']->id;
       }
-      
+
       CRM_Contribute_BAO_Contribution::recordFinancialAccounts($input, NULL);
     }
 
