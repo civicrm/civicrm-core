@@ -523,9 +523,10 @@ LIMIT 1;";
       $values['is_email_receipt'] == 1
     ) {
       self::sendMail($input, $ids, $objects, $values, $recur, FALSE);
+      CRM_Core_Error::debug_log_message("Receipt sent");
     }
 
-    CRM_Core_Error::debug_log_message("Success: Database updated and mail sent");
+    CRM_Core_Error::debug_log_message("Success: Database updated");
   }
 
   function getBillingID(&$ids) {
