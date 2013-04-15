@@ -466,8 +466,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return FALSE;
   }
 
-  function changeSubscriptionAmount(&$message = '', $params = array(
-    )) {
+  function changeSubscriptionAmount(&$message = '', $params = array()) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
       $config = CRM_Core_Config::singleton();
       $args = array();
@@ -610,12 +609,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
       $paypalParams += array(
         'cmd' => '_xclick-subscriptions',
-        'a3' => $params['amount'],
-        'p3' => $params['frequency_interval'],
-        't3' => ucfirst(substr($params['frequency_unit'], 0, 1)),
+        'a3'  => $params['amount'],
+        'p3'  => $params['frequency_interval'],
+        't3'  => ucfirst(substr($params['frequency_unit'], 0, 1)),
         'src' => 1,
         'sra' => 1,
-        'srt' => ($params['installments'] > 0) ? $params['installments'] : NULL,
+        'srt' => CRM_Utils_Array::value('installments', $params),
         'no_note' => 1,
         'modify' => 0,
       );
