@@ -403,8 +403,6 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
 
     if ($result['is_error']) {
       // just to get a clearer message in the log
-      print_r($result);
-      die;
       $this->assertEquals("only id should be enough", $result['error_message']);
     }
     if (!in_array($Entity, $this->onlyIDNonZeroCount['get'])) {
