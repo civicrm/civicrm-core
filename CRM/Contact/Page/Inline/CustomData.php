@@ -34,7 +34,7 @@
  */
 
 /**
- * This page displays custom data during inline edit 
+ * This page displays custom data during inline edit
  *
  */
 class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
@@ -52,17 +52,19 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $cgId = CRM_Utils_Request::retrieve('groupID', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
- 
+    $customRecId = CRM_Utils_Request::retrieve('customRecId', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1, $_REQUEST);
+
     //custom groups Inline
     $entityType    = CRM_Contact_BAO_Contact::getContactType($contactId);
     $entitySubType = CRM_Contact_BAO_Contact::getContactSubType($contactId);
     $groupTree     = &CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $contactId,
       $cgId, $entitySubType
       );
-
     $details = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
-    $fields = array_pop($details[$cgId]);
+    //get the fields of single custom group record
+    $fields = CRM_Utils_Array::value($customRecId, $details[$cgId]);
 
+    $this->assign('customRecId', $customRecId);
     $this->assign('contactId', $contactId);
     $this->assign('customGroupId', $cgId);
     $this->assign_by_ref('cd_edit', $fields);
@@ -70,8 +72,7 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);
     
-    // finally call parent 
+    // finally call parent
     parent::run();
   }
 }
-
