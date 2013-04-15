@@ -188,7 +188,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     if ($this->_action & CRM_Core_Action::ADD) {
       //check whether any active membership statuses are available - redirects back to contact summary if not
-      CRM_Member_BAO_Membership::statusAvilability($this->_contactID);
+      CRM_Member_BAO_Membership::statusAvailabilty($this->_contactID);
 
       if ($this->_contactID) {
         //check whether contact has a current membership so we can alert user that they may want to do a renewal instead
@@ -888,7 +888,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if ($priceSetId && !$self->_mode && !CRM_Utils_Array::value('record_contribution', $params)) {
       $errors['record_contribution'] = ts('Record Membership Payment is required when you using price set.');
     }
-    
+
     if (!$priceSetId && $self->_mode && !CRM_Utils_Array::value('financial_type_id', $params)) {
       $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
@@ -1273,7 +1273,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       else {
         $params['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues, 0);
       }
-        
+
       if ($priceSetId && !$isQuickConfig) {
         $params['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_Set',
           $priceSetId,

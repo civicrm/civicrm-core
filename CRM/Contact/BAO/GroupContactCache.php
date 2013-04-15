@@ -103,8 +103,8 @@ AND     ( g.cache_date IS NULL OR
           ( $now >= g.refresh_date )
         )
         $groupIDClause
-        $limitClause
         $orderClause
+        $limitClause
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);

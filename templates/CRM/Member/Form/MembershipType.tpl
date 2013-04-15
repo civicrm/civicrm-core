@@ -99,7 +99,7 @@
       <tr id="fixed_rollover_day_row" class="crm-membership-type-form-block-fixed_period_rollover_day">
         <td class="label">{$form.fixed_period_rollover_day.label}</td>
         <td>{$form.fixed_period_rollover_day.html}<br />
-          <span class="description">{ts}Membership signups on or after this date cover the following calendar year as well. Example: If the rollover day is November 31, membership period for signups during December will cover the following year.{/ts}</span>
+          <span class="description">{ts}Membership signups on or after this date cover the following calendar year as well. Example: If the rollover day is November 30, membership period for signups during December will cover the following year.{/ts}</span>
         </td>
       </tr>
       <tr id="month_fixed_rollover_day_row" class="crm-membership-type-form-block-fixed_period_rollover_day">

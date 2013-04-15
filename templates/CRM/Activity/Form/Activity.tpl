@@ -130,7 +130,7 @@
       <td class="view-value" style="white-space: normal">
         {$with|escape}
         <br/>
-        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label}
+        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
       </td>
       {elseif $action neq 4}
       <td class="label">{ts}With Contact{/ts}</td>
@@ -163,7 +163,7 @@
       <td>{$form.assignee_contact_id.html}
         {edit}
           <span class="description">{ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
-          {if $config->activityAssigneeNotification}
+          {if $activityAssigneeNotification}
             <br />{ts}A copy of this activity will be emailed to each Assignee.{/ts}
           {/if}
           </span>

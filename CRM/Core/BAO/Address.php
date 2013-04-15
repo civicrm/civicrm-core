@@ -663,11 +663,19 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     $config->stateCountryMap = array_merge($config->stateCountryMap, $stateCountryMap);
   }
 
-  static function fixAllStateSelects(&$form, &$defaults) {
+  static function fixAllStateSelects(&$form, $defaults, $batchFieldNames = false) {
     $config = CRM_Core_Config::singleton();
 
-    if (!empty($config->stateCountryMap)) {
-      foreach ($config->stateCountryMap as $index => $match) {
+    $map = null;
+    if (is_array($batchFieldNames)) {
+      $map = $batchFieldNames;
+    }
+    else if (!empty($config->stateCountryMap)) {
+      $map = $config->stateCountryMap;
+    }
+
+    if (!empty($map)) {
+      foreach ($map as $index => $match) {
         if (
           array_key_exists('state_province', $match) &&
           array_key_exists('country', $match)

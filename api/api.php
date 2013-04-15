@@ -51,7 +51,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     // we do this before we
     _civicrm_api3_swap_out_aliases($apiRequest);
     if (strtolower($action) != 'getfields') {
-      if (!CRM_Utils_Array::value('id', $params)) {
+      if (!CRM_Utils_Array::value('id', $apiRequest['params'])) {
         $apiRequest['params'] = array_merge(_civicrm_api3_getdefaults($apiRequest), $apiRequest['params']);
       }
       //if 'id' is set then only 'version' will be checked but should still be checked for consistency
@@ -517,6 +517,8 @@ function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResu
  *
  * @param string $entity entity name in various formats e.g. Contribution, contribution, OptionValue, option_value, UFJoin, uf_join
  * @return string $entity entity name in underscore separated format
+ *
+ * FIXME: Why isn't this called first thing in civicrm_api wrapper?
  */
 function _civicrm_api_get_entity_name_from_camel($entity) {
   if ($entity == strtolower($entity)) {

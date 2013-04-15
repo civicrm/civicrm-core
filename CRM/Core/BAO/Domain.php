@@ -101,6 +101,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   static function setDomain($domainID){
     CRM_Core_Config::domainID($domainID);
     self::getDomain($domainID);
+    CRM_Core_Config::singleton(TRUE, TRUE);
   }
 
   /**
@@ -114,6 +115,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   static function resetDomain(){
     CRM_Core_Config::domainID(null, true);
     self::getDomain(null, true);
+    CRM_Core_Config::singleton(TRUE, TRUE);
   }
 
   static function version( $skipUsingCache = false ) {

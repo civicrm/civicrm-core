@@ -407,7 +407,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $urlParams .= "&qfKey=$qfKey";
       }
       $path = CRM_Utils_System::currentPath();
-      if ($this->_compContext == 'advanced' || 
+      if ($this->_compContext == 'advanced' ||
         $path == 'civicrm/contact/search/advanced') {
         $urlString = 'civicrm/contact/search/advanced';
       }
@@ -885,6 +885,17 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     $this->addFormRule(array('CRM_Activity_Form_Activity', 'formRule'), $this);
+
+    if (CRM_Core_BAO_Setting::getItem(
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'activity_assignee_notification'
+      )
+    ) {
+      $this->assign('activityAssigneeNotification', TRUE);
+    }
+    else {
+      $this->assign('activityAssigneeNotification', FALSE);
+    }
   }
 
   /**
