@@ -241,7 +241,13 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     //$args['desc']           = 'Recurring Contribution';
     $args['totalbillingcycles'] = $params['installments'];
     $args['version'] = '56.0';
-    $args['profilereference'] = "i={$params['invoiceID']}" . "&m=$component" . "&c={$params['contactID']}" . "&r={$params['contributionRecurID']}" . "&b={$params['contributionID']}" . "&p={$params['contributionPageID']}";
+    $args['profilereference'] =
+      "i={$params['invoiceID']}" .
+      "&m=$component" .
+      "&c={$params['contactID']}" .
+      "&r={$params['contributionRecurID']}" .
+      "&b={$params['contributionID']}" .
+      "&p={$params['contributionPageID']}";
 
     $result = $this->invokeAPI($args);
 
@@ -316,11 +322,18 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['billingfrequency'] = $params['frequency_interval'];
       $args['method'] = "CreateRecurringPaymentsProfile";
       $args['profilestartdate'] = $start_date;
-      $args['desc'] = $params['description'] . ": " . $params['amount'] . " Per " . $params['frequency_interval'] . " " . $params['frequency_unit'];
+      $args['desc'] =
+        $params['description'] . ": " .
+        $params['amount'] . " Per " .
+        $params['frequency_interval'] . " " .
+        $params['frequency_unit'];
       $args['amt'] = $params['amount'];
       $args['totalbillingcycles'] = $params['installments'];
       $args['version'] = 56.0;
-      $args['PROFILEREFERENCE'] = "i=" . $params['invoiceID'] . "&m=" . $component . "&c=" . $params['contactID'] . "&r=" . $params['contributionRecurID'] . "&b=" . $params['contributionID'] . "&p=" . $params['contributionPageID'];
+      $args['PROFILEREFERENCE'] =
+        "i=" . $params['invoiceID'] . "&m=" . $component .
+        "&c=" . $params['contactID'] . "&r=" . $params['contributionRecurID'] .
+        "&b=" . $params['contributionID'] . "&p=" . $params['contributionPageID'];
     }
 
     // Allow further manipulation of the arguments via custom hooks ..
@@ -355,7 +368,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   function checkConfig() {
     $error = array();
     $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
-    if ($this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal_Standard', $paymentProcessorType) ||
+    if (
+      $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal_Standard', $paymentProcessorType) ||
       $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal', $paymentProcessorType)
     ) {
       if (empty($this->_paymentProcessor['user_name'])) {
@@ -512,10 +526,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $cancelUrlString = "$cancel=1&cancel=1&qfKey={$params['qfKey']}";
     if (CRM_Utils_Array::value('is_recur', $params)) {
-      $cancelUrlString .= "&isRecur=1&recurId={$params['contributionRecurID']}&contribId={$params[contributionID]}";
+      $cancelUrlString .= "&isRecur=1&recurId={$params['contributionRecurID']}&contribId={$params['contributionID']}";
     }
 
-    $cancelURL = CRM_Utils_System::url($url,
+    $cancelURL = CRM_Utils_System::url(
+      $url,
       $cancelUrlString,
       TRUE, NULL, FALSE
     );
