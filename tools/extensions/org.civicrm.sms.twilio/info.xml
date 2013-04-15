@@ -4,7 +4,13 @@
   <file>twilio</file>
   <name>twilio</name>
   <description>Twilio integration allows delivering short message service (SMS) messages through its Twilio Gateway to mobile phone users.</description>
-  <license>http://civicrm.org/licensing</license>
+  <urls>
+    <url desc="Main Extension Page">http://civicrm.org</url>
+    <url desc="Documentation">http://wiki.civicrm.org/confluence/display/CRMDOC43/Setting+up+a+SMS+Provider+for+CiviSMS</url>
+    <url desc="Support">http://forum.civicrm.org</url>
+    <url desc="Licensing">http://civicrm.org/licensing</url>
+  </urls>
+  <license>AGPL</license>
   <maintainer>
     <author>CiviCRM LLC</author>
     <email>info@civicrm.org</email>
@@ -13,7 +19,7 @@
   <version>1.0</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>4.2</ver>
+    <ver>4.3</ver>
   </compatibility>
   <comments>For support, please contact project team on the forums.</comments>
 </extension>
