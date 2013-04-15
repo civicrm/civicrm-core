@@ -1026,7 +1026,10 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
 
     // build main activity table select clause
     $sourceSelect = '';
-    $sourceJoin = '';
+    $sourceJoin = "
+INNER JOIN civicrm_activity_contact ac ON ac.activity_id = civicrm_activity.id
+INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
+";
 
     if (!$input['count']) {
       $sourceSelect = ',
@@ -1044,10 +1047,6 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
                 contact.sort_name as sort_name
             ';
 
-      $sourceJoin = "
-INNER JOIN civicrm_activity_contact activityContact ON activityContact.activity_id = civicrm_activity.id
-INNER JOIN civicrm_contact contact ON activityContact.contact_id = contact.id
-";
     }
 
     $sourceClause = "
@@ -1112,7 +1111,7 @@ INNER JOIN civicrm_contact contact ON activityContact.contact_id = contact.id
             ";
     }
 
-    $returnClause = " {$sourceClause}  union all {$caseClause} ";
+    $returnClause = " {$sourceClause} {$caseClause} ";
 
     return array($returnClause, $params);
   }
