@@ -80,6 +80,16 @@ class Givi {
   protected $repos;
 
   /**
+   * @var bool
+   */
+  protected $useGencode = FALSE;
+
+  /**
+   * @var bool
+   */
+  protected $useSetup = FALSE;
+
+  /**
    * @var array, non-hyphenated arguments after the basedir
    */
   protected $arguments;
@@ -158,6 +168,13 @@ class Givi {
         return $this->returnError("unrecognized action: {$this->action}\n");
     }
 
+    if ($this->useSetup) {
+      $this->run('core', $this->civiRoot . '/bin', 'bash', 'setup.sh');
+    }
+    elseif ($this->useGencode) {
+      $this->run('core', $this->civiRoot . '/xml', 'php', 'GenCode.php');
+    }
+
     $this->dirStack->pop();
   }
 
@@ -178,6 +195,12 @@ class Givi {
       }
       elseif ($arg == '--dry-run' || $arg == '-n') {
         $this->dryRun = TRUE;
+      }
+      elseif ($arg == '--gencode') {
+        $this->useGencode = TRUE;
+      }
+      elseif ($arg == '--setup') {
+        $this->useSetup = TRUE;
       }
       elseif (preg_match('/^--d([678])/', $arg, $matches)) {
         $this->drupalVersion = $matches[1];
@@ -236,6 +259,8 @@ class Givi {
     echo "  --fetch: Fetch the latest code before creating, updating, or checking-out anything\n";
     echo "  --repos=X: Restrict operations to the listed repos (comma-delimited list) (default: all)";
     echo "  --root=X: Specify CiviCRM root directory (default: .)\n";
+    echo "  --gencode: Run xml/GenCode after checking out code\n";
+    echo "  --setup: Run bin/setup.sh (incl xml/GenCode) after checking out code\n";
     echo "Special options:\n";
     echo "  --core=X: Specify the branch to use on the core repository\n";
     echo "  --packages=X: Specify the branch to use on the packages repository\n";
