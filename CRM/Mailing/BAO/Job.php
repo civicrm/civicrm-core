@@ -669,7 +669,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
           // seems like we have too many of them in a row, we should
           // write stuff to disk and abort the cron job
-          $this->writeToDB($deliveredParams,
+          $this->writeToDB(
+            $deliveredParams,
             $targetParams,
             $mailing,
             $job_date
@@ -699,7 +700,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
         $count++;
         if ($count % CRM_Core_DAO::BULK_MAIL_INSERT_COUNT == 0) {
-          $this->writeToDB($deliveredParams,
+          $this->writeToDB(
+            $deliveredParams,
             $targetParams,
             $mailing,
             $job_date
@@ -733,7 +735,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       }
     }
 
-    $result = $this->writeToDB($deliveredParams,
+    $result = $this->writeToDB(
+      $deliveredParams,
       $targetParams,
       $mailing,
       $job_date
@@ -835,32 +838,48 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
     return '';
   }
 
-  public function writeToDB(&$deliveredParams,
+  public function writeToDB(
+    &$deliveredParams,
     &$targetParams,
     &$mailing,
     $job_date
   ) {
     static $activityTypeID = NULL;
+    static $writeActivity = NULL;
 
     if (!empty($deliveredParams)) {
       CRM_Mailing_Event_BAO_Delivered::bulkCreate($deliveredParams);
       $deliveredParams = array();
     }
 
-    $result = TRUE;
-    if (!empty($targetParams) &&
-      !empty($mailing->scheduled_id)
-    ) {
+    if ($writeActivity === NULL) {
+      $writeActivity = CRM_Core_BAO_Setting::getItem(
+        CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+        'write_activity_record',
+        NULL,
+        TRUE
+      );
+    }
 
+    if (!$writeActivity) {
+      return TRUE;
+    }
+
+    $result = TRUE;
+    if (!empty($targetParams) && !empty($mailing->scheduled_id)) {
       if (!$activityTypeID) {
-        $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-          'Bulk Email',
-          'name'
-        );
         if ($mailing->sms_provider_id) {
           $mailing->subject = $mailing->name;
-          $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
+          $activityTypeID = CRM_Core_OptionGroup::getValue(
+            'activity_type',
             'Mass SMS',
+            'name'
+          );
+        }
+        else {
+          $activityTypeID = CRM_Core_OptionGroup::getValue(
+            'activity_type',
+            'Bulk Email',
             'name'
           );
         }
@@ -868,7 +887,6 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
           CRM_Core_Error::fatal();
         }
       }
-
 
       $activity = array(
         'source_contact_id' => $mailing->scheduled_id,
@@ -889,14 +907,14 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
 SELECT id
 FROM   civicrm_activity
 WHERE  civicrm_activity.activity_type_id = %1
-AND    civicrm_activity.source_record_id = %2";
+AND    civicrm_activity.source_record_id = %2
+";
 
-      $queryParams = array(1 => array($activityTypeID, 'Integer'),
+      $queryParams = array(
+        1 => array($activityTypeID, 'Integer'),
         2 => array($this->mailing_id, 'Integer'),
       );
-      $activityID = CRM_Core_DAO::singleValueQuery($query,
-        $queryParams
-      );
+      $activityID = CRM_Core_DAO::singleValueQuery($query, $queryParams);
 
       if ($activityID) {
         $activity['id'] = $activityID;
@@ -913,9 +931,7 @@ AND    civicrm_activity.source_record_id = %2";
         }
       }
 
-      if (is_a(CRM_Activity_BAO_Activity::create($activity),
-          'CRM_Core_Error'
-        )) {
+      if (is_a(CRM_Activity_BAO_Activity::create($activity), 'CRM_Core_Error')) {
         $result = FALSE;
       }
 

@@ -111,7 +111,7 @@ function civicrm_api3_group_contact_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */
@@ -158,7 +158,7 @@ function civicrm_api3_group_contact_pending($params) {
  * @param string $op
  *
  * @return Array
- * @todo behaviour is highly non-standard - need to figure out how to make this 'behave' 
+ * @todo behaviour is highly non-standard - need to figure out how to make this 'behave'
  * & at the very least return IDs & details of the groups created / changed
  */
 function _civicrm_api3_group_contact_common($params, $op = 'Added') {
@@ -185,7 +185,6 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
   $method = CRM_Utils_Array::value('method', $params, 'API');
   $status = CRM_Utils_Array::value('status', $params, $op);
   $tracking = CRM_Utils_Array::value('tracking', $params);
-  
 
   if ($op == 'Added' || $op == 'Pending') {
     $extraReturnValues= array(

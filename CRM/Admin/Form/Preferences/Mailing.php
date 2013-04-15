@@ -92,6 +92,13 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
           'weight' => 7,
           'description' => NULL,
         ),
+        'write_activity_record' =>
+        array(
+          'html_type' => 'checkbox',
+          'title' => ts('Enable CiviMail to create activities on delivery'),
+          'weight' => 8,
+          'description' => NULL,
+        ),
       ),
     );
 

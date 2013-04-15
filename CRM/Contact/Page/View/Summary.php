@@ -270,9 +270,23 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $components = CRM_Core_Component::getEnabledComponents();
 
     foreach ($components as $name => $component) {
-      if (CRM_Utils_Array::value($name, $this->_viewOptions) &&
-        CRM_Core_Permission::access($component->name)
+      if (
+         (CRM_Utils_Array::value($name, $this->_viewOptions) ||
+           $name == 'CiviMail') &&
+         CRM_Core_Permission::access($component->name)
       ) {
+        if ($name == 'CiviMail') {
+          // if we are writing activity records, we skip the tab
+          if (CRM_Core_BAO_Setting::getItem(
+              CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+              'write_activity_record',
+              NULL,
+              TRUE
+            )) {
+            continue;
+          }
+        }
+
         $elem = $component->registerTab();
 
         // FIXME: not very elegant, probably needs better approach
@@ -306,7 +320,27 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
 
-    $rest = array('activity' => ts('Activities'),
+    // check if mailings is enabled
+    // and we dont create activities for mailings
+    $mailingComp = CRM_Utils_Array::value('CiviMail', $components);
+    if (
+      $mailingComp &&
+      CRM_Core_Permission::access($mailingComp->name)
+    ) {
+      $writeActivity = CRM_Core_BAO_Setting::getItem(
+        CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+        'write_activity_record',
+        NULL,
+        TRUE
+      );
+      if (!$writeActivity) {
+        $elem = $mailingCom->registerTab();
+
+      }
+    }
+
+    $rest = array(
+      'activity' => ts('Activities'),
       'case' => ts('Cases'),
       'rel' => ts('Relationships'),
       'group' => ts('Groups'),
@@ -332,7 +366,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
     // now add all the custom tabs
     $entityType = $this->get('contactType');
-    $activeGroups = CRM_Core_BAO_CustomGroup::getActiveGroups($entityType,
+    $activeGroups = CRM_Core_BAO_CustomGroup::getActiveGroups(
+      $entityType,
       'civicrm/contact/view/cd',
       $this->_contactId
     );
