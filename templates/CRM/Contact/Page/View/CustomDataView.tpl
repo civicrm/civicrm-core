@@ -33,8 +33,11 @@
         <div class="collapsible-title">
           {$cd_edit.title}
         </div>
-        <div class="crm-summary-block" id="custom-set-block-{$customGroupId}">
-          {include file="CRM/Contact/Page/View/CustomDataFieldView.tpl" customGroupId=$customGroupId}
+        {if $cvID eq 0}
+          {assign var='cvID' value='-1'}
+        {/if}
+        <div class="crm-summary-block" id="custom-set-block-{$customGroupId}-{$cvID}">
+          {include file="CRM/Contact/Page/View/CustomDataFieldView.tpl" customGroupId=$customGroupId customRecId=$cvID}
         </div>
       </div>
     {/foreach}
