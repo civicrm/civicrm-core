@@ -38,7 +38,7 @@
  */
 class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
 
-  /*
+  /**
    * Create email address - note that the create function calls 'add' but
    * has more business logic
    *
@@ -46,18 +46,11 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    */
   static function create($params) {
     // if id is set & is_primary isn't we can assume no change
-    $alterPrimary = is_numeric(CRM_Utils_Array::value('is_primary', $params)) || empty($params['id']);
-
-    if ($alterPrimary) {
+    if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) || empty($params['id'])) {
       CRM_Core_BAO_Block::handlePrimary($params, get_class());
     }
 
     $email = CRM_Core_BAO_Email::add($params);
-
-    if ($alterPrimary) {
-      // update the UF user email if that has changed
-      CRM_Core_BAO_UFMatch::updateUFName($email->contact_id);
-    }
 
     return $email;
   }
@@ -97,6 +90,11 @@ WHERE  contact_id = {$params['contact_id']}
     self::holdEmail($email);
 
     $email->save();
+
+    if ($email->is_primary) {
+      // update the UF user email if that has changed
+      CRM_Core_BAO_UFMatch::updateUFName($email->contact_id);
+    }
 
     CRM_Utils_Hook::post($hook, 'Email', $email->id, $email);
     return $email;
