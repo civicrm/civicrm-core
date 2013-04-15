@@ -234,12 +234,12 @@ AND    ac.case_id = %1
       }
 
       $query = "
-SELECT     a.*, aa.assignee_contact_id as assigneeID, at.target_contact_id as targetID
+SELECT     a.*, aa.contact_id as assigneeID, at.contact_id as targetID
 {$selectCaseActivity}
 FROM       civicrm_activity a
 {$joinCaseActivity}
-LEFT JOIN civicrm_activity_target at ON a.id = at.activity_id
-LEFT JOIN civicrm_activity_assignment aa ON a.id = aa.activity_id
+LEFT JOIN civicrm_activity_contact at ON a.id = at.activity_id AND at.record_type = 'Target'
+LEFT JOIN civicrm_activity_contact aa ON a.id = aa.activity_id AND aa.record_type = 'Assignee'
 WHERE      a.id = %1
     ";
       $params = array(1 => array($activityID, 'Integer'));
