@@ -45,13 +45,19 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    * @param array $params input parameters
    */
   static function create($params) {
-    if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) ||
-      // if id is set & is_primary isn't we can assume no change
-      empty($params['id'])
-    ) {
+    // if id is set & is_primary isn't we can assume no change
+    $alterPrimary = is_numeric(CRM_Utils_Array::value('is_primary', $params)) || empty($params['id']);
+
+    if ($alterPrimary) {
       CRM_Core_BAO_Block::handlePrimary($params, get_class());
     }
+
     $email = CRM_Core_BAO_Email::add($params);
+
+    if ($alterPrimary) {
+      // update the UF user email if that has changed
+      CRM_Core_BAO_UFMatch::updateUFName($email->contact_id);
+    }
 
     return $email;
   }
