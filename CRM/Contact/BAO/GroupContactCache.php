@@ -78,7 +78,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
       // note escapeString is a must here and we can't send the imploded value as second arguement to
       // the executeQuery(), since that would put single quote around the string and such a string
       // of comma separated integers would not work.
-      $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupID));
+      $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupIDs));
 
       $groupIDClause = "AND (g.id IN ( {$groupIDString} ))";
     }
