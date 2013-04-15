@@ -29,7 +29,7 @@
 <h3>{if $action eq 1}{ts}New Message Template{/ts}{elseif $action eq 2}{ts}Edit Message Template{/ts}{else}{ts}Delete Message Template{/ts}{/if}</h3>
 {if $action neq 8}
 <div id="help">
-    {ts}Use this form to add or edit re-usable message templates.{/ts} {help id="id-msgTplIntro" file="CRM/Admin/Page/MessageTemplates.hlp"}
+    {ts}Use this form to add or edit re-usable message templates.{/ts} {help id="id-intro" file="CRM/Admin/Page/MessageTemplates.hlp"}
 </div>
 {/if}
 
