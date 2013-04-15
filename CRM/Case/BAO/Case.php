@@ -2407,9 +2407,9 @@ SELECT  id
           $mainActivityTarget = new CRM_Activity_DAO_ActivityContact();
           $mainActivityTarget->record_type = 'Target';
           $mainActivityTarget->activity_id = $mainActivityId;
-          $mainActivityTarget->target_contact_id = $otherTargetActivity->target_contact_id;
-          if ($mainActivityTarget->target_contact_id == $otherContactId) {
-            $mainActivityTarget->target_contact_id = $mainContactId;
+          $mainActivityTarget->contact_id = $otherTargetActivity->contact_id;
+          if ($mainActivityTarget->contact_id == $otherContactId) {
+            $mainActivityTarget->contact_id = $mainContactId;
           }
           //avoid duplicate object.
           if (!$mainActivityTarget->find(TRUE)) {
@@ -2428,9 +2428,9 @@ SELECT  id
           $mainAssigneeActivity = new CRM_Activity_DAO_ActivityContact();
           $mainAssigneeActivity->activity_id = $mainActivityId;
           $mainAssigneeActivity->record_type = 'Assignee';
-          $mainAssigneeActivity->assignee_contact_id = $otherAssigneeActivity->assignee_contact_id;
-          if ($mainAssigneeActivity->assignee_contact_id == $otherContactId) {
-            $mainAssigneeActivity->assignee_contact_id = $mainContactId;
+          $mainAssigneeActivity->contact_id = $otherAssigneeActivity->contact_id;
+          if ($mainAssigneeActivity->contact_id == $otherContactId) {
+            $mainAssigneeActivity->contact_id = $mainContactId;
           }
           //avoid duplicate object.
           if (!$mainAssigneeActivity->find(TRUE)) {
@@ -2727,7 +2727,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
               $target = new CRM_Activity_DAO_ActivityContact();
               $target->record_type = 'Target';
               $target->activity_id = $activityId;
-              $target->target_contact_id = $contactId;
+              $target->contact_id = $contactId;
               if ($target->find(TRUE)) {
                 $isTarget = TRUE;
               }
@@ -2735,7 +2735,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
               $assignee = new CRM_Activity_DAO_ActivityContact();
               $assignee->activity_id = $activityId;
               $assignee->record_type = 'Assignee';
-              $assignee->assignee_contact_id = $contactId;
+              $assignee->contact_id = $contactId;
               if ($assignee->find(TRUE)) {
                 $isAssignee = TRUE;
               }
