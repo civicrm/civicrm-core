@@ -711,13 +711,6 @@ LEFT JOIN civicrm_email ce ON ce.id = clb.email_id ;
 ' ;
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()) {
-      $params = array(
-        'sort_name' => $dao->name,
-        'display_name' => $dao->name,
-        'legal_name' => $dao->name,
-        'organization_name' => $dao->name,
-        'contact_type' => 'Organization'
-      );
       $query = "
 SELECT    cc.id FROM civicrm_contact cc
 LEFT JOIN civicrm_email ce ON ce.contact_id = cc.id
@@ -731,6 +724,13 @@ WHERE     cc.contact_type = 'Organization' AND cc.organization_name = %1
       $contactID = CRM_Core_DAO::singleValueQuery($query, $params);
       $context[1] = $dao->name;
       if (empty($contactID)) {
+        $params = array(
+          'sort_name' => $dao->name,
+          'display_name' => $dao->name,
+          'legal_name' => $dao->name,
+          'organization_name' => $dao->name,
+          'contact_type' => 'Organization'
+        );
         $contact = CRM_Contact_BAO_Contact::add($params);
         $contactID = $contact->id;
         $context[0] = 'added';
