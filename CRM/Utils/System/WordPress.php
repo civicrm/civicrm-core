@@ -433,26 +433,42 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return true;
   }
 
+  function validInstallDir($dir) {
+    $includePath = "$dir/wp-includes";
+    if (
+      @opendir($includePath) &&
+      file_exists("$includePath/version.php")
+    ) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
   function cmsRootPath() {
     $cmsRoot = $valid = NULL;
-    $pathVars = explode('/', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
-
-    //might be windows installation.
-    $firstVar = array_shift($pathVars);
-    if ($firstVar) {
-      $cmsRoot = $firstVar;
-    }
-
-    //start w/ csm dir search.
-    foreach ($pathVars as $var) {
-      $cmsRoot .= "/$var";
-      $cmsIncludePath = "$cmsRoot/wp-includes";
-      //stop as we found bootstrap.
-      if (@opendir($cmsIncludePath) &&
-        file_exists("$cmsIncludePath/version.php")
-      ) {
+    if (defined('CIVICRM_CMSDIR')) {
+      if ($this->validInstallDir(CIVICRM_CMSDIR)) {
+        $cmsRoot = CIVICRM_CMSDIR;
         $valid = TRUE;
-        break;
+      }
+    }
+    else {
+      $pathVars = explode('/', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
+
+      //might be windows installation.
+      $firstVar = array_shift($pathVars);
+      if ($firstVar) {
+        $cmsRoot = $firstVar;
+      }
+
+      //start w/ csm dir search.
+      foreach ($pathVars as $var) {
+        $cmsRoot .= "/$var";
+        if ($this->validInstallDir($cmsRoot)) {
+          //stop as we found bootstrap.
+          $valid = TRUE;
+          break;
+        }
       }
     }
 

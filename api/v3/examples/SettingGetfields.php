@@ -21,7 +21,7 @@ function setting_getfields_expectedresult(){
   $expectedResult = array( 
   'is_error' => 0,
   'version' => 3,
-  'count' => 72,
+  'count' => 73,
   'values' => array( 
       'address_standardization_provider' => array( 
           'group_name' => 'Address Preferences',
@@ -258,7 +258,7 @@ function setting_getfields_expectedresult(){
           'group' => 'core',
           'name' => 'address_format',
           'type' => 'String',
-          'html_type' => 'Text',
+          'html_type' => 'TextArea',
           'default' => '{contact.address_name}
 {contact.street_address}
 {contact.supplemental_address_1}
@@ -381,6 +381,9 @@ function setting_getfields_expectedresult(){
           'name' => 'contact_autocomplete_options',
           'type' => 'String',
           'html_type' => 'checkboxes',
+          'pseudoconstant' => array( 
+              'optionGroupName' => 'contact_autocomplete_options',
+            ),
           'default' => array( 
               '0' => '1',
               '1' => '2',
@@ -616,6 +619,27 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => '',
           'help_text' => '',
         ),
+      'communityMessagesUrl' => array( 
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'communityMessagesUrl',
+          'prefetch' => 0,
+          'config_only' => 1,
+          'type' => 'String',
+          'quick_form_type' => 'Element',
+          'html_type' => 'Text',
+          'html_attributes' => array( 
+              'size' => 64,
+              'maxlength' => 128,
+            ),
+          'default' => '*default*',
+          'add' => '4.3',
+          'title' => 'Community Messages URL',
+          'is_domain' => 1,
+          'is_contact' => 0,
+          'description' => 'Service providing CiviCRM community messages',
+          'help_text' => 'Use "*default*" for the system default or override with a custom URL',
+        ),
       'resCacheCode' => array( 
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
@@ -664,7 +688,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'title' => 'Enable Debugging',
           'is_domain' => 1,
           'is_contact' => 0,
-          'description' => 'Set this value to Yes if you want to use one of CiviCRM's debugging tools. This feature should NOT be enabled for production sites',
+          'description' => 'Set this value to Yes if you want to use one of CiviCRM\'s debugging tools. This feature should NOT be enabled for production sites',
           'prefetch' => 1,
           'help_text' => 'Do not turn this on on production sites',
         ),
@@ -682,8 +706,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'is_contact' => 0,
           'description' => 'Set this value to Yes if you want CiviCRM error/debugging messages to also appear in Drupal error logs',
           'prefetch' => 1,
-          'help_text' => 'Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS' error log.
-In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)',
+          'help_text' => 'Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS\' error log.
+In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal\'s watchdog enabled)',
         ),
       'backtrace' => array( 
           'group_name' => 'Developer Preferences',

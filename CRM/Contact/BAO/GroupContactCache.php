@@ -78,7 +78,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
       // note escapeString is a must here and we can't send the imploded value as second arguement to
       // the executeQuery(), since that would put single quote around the string and such a string
       // of comma separated integers would not work.
-      $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupID));
+      $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupIDs));
 
       $groupIDClause = "AND (g.id IN ( {$groupIDString} ))";
     }
@@ -103,8 +103,8 @@ AND     ( g.cache_date IS NULL OR
           ( $now >= g.refresh_date )
         )
         $groupIDClause
-        $limitClause
         $orderClause
+        $limitClause
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -123,7 +123,7 @@ AND     ( g.cache_date IS NULL OR
     }
 
     if (!empty($refreshGroupIDs)) {
-      $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDString));
+      $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDs));
       $time  = CRM_Utils_Date::getUTCTime('YmdHis', $smartGroupCacheTimeout * 60);
       $query = "
 UPDATE civicrm_group g
@@ -131,6 +131,7 @@ SET    g.refresh_date = $time
 WHERE  g.id IN ( {$refreshGroupIDString} )
 AND    g.refresh_date IS NULL
 ";
+      CRM_Core_DAO::executeQuery($query);
     }
 
     if (empty($processGroupIDs)) {

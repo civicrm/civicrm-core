@@ -141,7 +141,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       return;
     }
 
-    $contactID = parent::getContactID();
+    $contactID = $this->getContactID();
     if ($contactID) {
       //@todo CRM-11915 I observed that even when the billing block is not present the routine to retrieve the billing defaults is still called - which seems a bit redundant.
       $names = array(
@@ -342,7 +342,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
-    $contactID = parent::getContactID();
+    $contactID = $this->getContactID();
     $this->assign('contact_id', $contactID);
     $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
 
@@ -449,7 +449,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->assign('bypassPayment', $bypassPayment);
     $this->assign('showHidePaymentInformation', $showHidePaymentInformation);
 
-    $userID = parent::getContactID();
+    $userID = $this->getContactID();
 
     if (!$userID) {
       $createCMSUser = FALSE;
@@ -1225,7 +1225,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           $contactID = $value['contact_id'];
         }
         else {
-          $contactID = parent::getContactID();
+          $contactID = $this->getContactID();
         }
 
         CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields);
@@ -1240,7 +1240,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         // we dont store in userID in case the user is doing multiple
         // transactions etc
         // for things like tell a friend
-        if (!parent::getContactID() && CRM_Utils_Array::value('is_primary', $value)) {
+        if (!$this->getContactID() && CRM_Utils_Array::value('is_primary', $value)) {
           $session->set('transaction.userID', $contactID);
         }
 
@@ -1372,7 +1372,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $contactID = NULL;
     $session = CRM_Core_Session::singleton();
     if (!$isAdditional) {
-      $contactID = parent::getContactID();
+      $contactID = $self->getContactID();
     }
 
     if (!$contactID && is_array($fields) && $fields) {

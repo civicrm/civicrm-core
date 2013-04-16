@@ -38,8 +38,6 @@
  *
  */
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
-  const FA_ASSET_ACCOUNT_RELATION = 6;
-
   /**
    * the id of the contribution that we are proceessing
    *
@@ -650,7 +648,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $financialType = $this->add('select', 'financial_type_id',
       ts('Financial Type'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(),
-      TRUE
+      TRUE,
+      array('onChange' => "CRM.buildCustomData( 'Contribution', this.value );")
     );
 
     if (!$this->_mode) {
@@ -1183,6 +1182,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($pId) {
         $params['contribution_mode'] = 'participant';
         $params['participant_id'] = $pId;
+        $params['skipLineItem'] = 1;
       }
       $params['line_item'] = $lineItem;
       $params['payment_processor_id'] = $params['payment_processor'] = CRM_Utils_Array::value('id', $this->_paymentProcessor);
