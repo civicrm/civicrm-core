@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.sms.twilio" type="module">
-  <downloadUrl>http://svn.civicrm.org/tools/trunk/extensions/org.civicrm.sms.twilio.zip</downloadUrl>
+  <downloadUrl>https://github.com/civicrm/civicrm-core/blob/4.3/tools/extensions/org.civicrm.sms.twilio.zip?raw=true</downloadUrl>
   <file>twilio</file>
   <name>twilio</name>
   <description>Twilio integration allows delivering short message service (SMS) messages through its Twilio Gateway to mobile phone users.</description>
@@ -12,12 +12,12 @@
   </urls>
   <license>AGPL</license>
   <maintainer>
-    <author>CiviCRM LLC</author>
+    <author>Community Contributed</author>
     <email>info@civicrm.org</email>
   </maintainer>
   <releaseDate>2012-11-19</releaseDate>
   <version>1.0</version>
-  <develStage>alpha</develStage>
+  <develStage>stable</develStage>
   <compatibility>
     <ver>4.3</ver>
   </compatibility>
