@@ -56,14 +56,13 @@ cj(function($) {
   // use civicrm notifications when there are errors
   params.invalidHandler = function(form, validator) {
     var errors = validator.errorList;
-    if (CRM && CRM.config && CRM.config.urlIsPublic === false) {
+    {/literal}{if !$urlIsPublic}{literal}
       for (var i in errors) {
         $(errors[i].element).crmError(errors[i].message);
       }
-    }
-    else {
-      alert({/literal}"{ts escape='js'}Please review and correct the highlighted fields before continuing.{/ts}"{literal});
-    }
+    {/literal}{else}
+      alert("{ts escape='js'}Please review and correct the highlighted fields before continuing.{/ts}");
+    {/if}{literal}
   };
 
   CRM.validate.params = CRM.validate.params || {};
