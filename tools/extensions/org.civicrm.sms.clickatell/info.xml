@@ -17,7 +17,7 @@
   </maintainer>
   <releaseDate>2012-11-15</releaseDate>
   <version>1.0</version>
-  <develStage>alpha</develStage>
+  <develStage>stable</develStage>
   <compatibility>
     <ver>4.3</ver>
   </compatibility>
