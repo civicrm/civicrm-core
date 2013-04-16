@@ -529,37 +529,41 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         else {
           $isPreError = FALSE;
         }
-        //check for additional custom post profile
-        $additionalCustomPostId = CRM_Utils_Array::value('additional_custom_post_id', $values);
-        if (!empty($additionalCustomPostId)) {
-          if (!($additionalCustomPostId == 'none')) {
-            $customPostId = $additionalCustomPostId;
+        
+        // We don't have required Individual fields in the pre-custom profile, so now check the post-custom profile
+        if ($isPreError) {
+          $additionalCustomPostId = CRM_Utils_Array::value('additional_custom_post_id', $values);
+          if (!empty($additionalCustomPostId)) {
+            if (!($additionalCustomPostId == 'none')) {
+              $customPostId = $additionalCustomPostId;
+            }
+            else {
+              $isPostError = FALSE;
+            }
+          }
+          else {
+            $customPostId = CRM_Utils_Array::value('custom_post_id', $values) ? $values['custom_post_id'] : NULL;
+          }
+          //check whether the additional custom post profile is of type 'Individual' and its subtypes
+          if (!empty($customPostId)) {
+            $profileTypes = CRM_Core_BAO_UFGroup::profileGroups($customPostId);
+            foreach ($types as $individualTypes) {
+              if (in_array($individualTypes, $profileTypes)) {
+                $isPostError = FALSE;
+                break;
+              }
+            }
           }
           else {
             $isPostError = FALSE;
           }
-        }
-        else {
-          $customPostId = CRM_Utils_Array::value('custom_post_id', $values) ? $values['custom_post_id'] : NULL;
-        }
-        //check whether the additional custom post profile is of type 'Individual' and its subtypes
-        if (!empty($customPostId)) {
-          $profileTypes = CRM_Core_BAO_UFGroup::profileGroups($customPostId);
-          foreach ($types as $individualTypes) {
-            if (in_array($individualTypes, $profileTypes)) {
-              $isPostError = FALSE;
-              break;
-            }
+
+          if (empty($customPreId) && empty($customPostId)) {
+            $errorMsg['additional_custom_pre_id'] = ts("Allow multiple registrations from the same email address requires a profile of type 'Individual'");
           }
-        }
-        else {
-          $isPostError = FALSE;
-        }
-        if ($isPreError || (empty($customPreId) && empty($customPostId))) {
-          $errorMsg['additional_custom_pre_id'] = ts("Allow multiple registrations from the same email address requires a profile of type 'Individual'");
-        }
-        if ($isPostError) {
-          $errorMsg['additional_custom_post_id'] = ts("Allow multiple registrations from the same email address requires a profile of type 'Individual'");
+          if ($isPostError) {
+            $errorMsg['additional_custom_post_id'] = ts("Allow multiple registrations from the same email address requires a profile of type 'Individual'");
+          }
         }
       }
       if (!$isProfileComplete) {
