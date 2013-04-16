@@ -536,9 +536,11 @@ class CRM_Utils_REST {
    **/
   static function ajaxJson() {
     require_once 'api/v3/utils.php';
-    if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
+    if (!$config->debug &&
+      (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
         $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-      )) {
+      )
+    ) {
       $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api().",
         array(
           'IP' => $_SERVER['REMOTE_ADDR'],
@@ -590,7 +592,7 @@ class CRM_Utils_REST {
     // restrict calls to this etc
     // the request has to be sent by an ajax call. First line of protection against csrf
     $config = CRM_Core_Config::singleton();
-    if (!$config->debug &&
+    if (0 && !$config->debug &&
       (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
         $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
       )
