@@ -364,12 +364,15 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       CRM_Utils_Address_USPS::checkAddress($params);
 
       // do street parsing again if enabled, since street address might have changed
-      $parseStreetAddress = CRM_Utils_Array::value('street_address_parsing',
-        CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-          'address_options'
-        ),
-        FALSE
-      );
+      $parseStreetAddress =
+        CRM_Utils_Array::value(
+          'street_address_parsing',
+          CRM_Core_BAO_Setting::valueOptions(
+            CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+            'address_options'
+          ),
+          FALSE
+        );
 
       if ($parseStreetAddress && !empty($params['street_address'])) {
         foreach (array(
@@ -875,9 +878,11 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   static function validateAddressOptions($fields) {
     static $addressOptions = NULL;
     if (!$addressOptions) {
-      $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'address_options', TRUE, NULL, TRUE
-      );
+      $addressOptions =
+        CRM_Core_BAO_Setting::valueOptions(
+          CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+          'address_options'
+        );
     }
 
     if (is_array($fields) && !empty($fields)) {
