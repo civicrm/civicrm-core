@@ -123,7 +123,7 @@ AND     ( g.cache_date IS NULL OR
     }
 
     if (!empty($refreshGroupIDs)) {
-      $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDString));
+      $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDs));
       $time  = CRM_Utils_Date::getUTCTime('YmdHis', $smartGroupCacheTimeout * 60);
       $query = "
 UPDATE civicrm_group g
@@ -131,6 +131,7 @@ SET    g.refresh_date = $time
 WHERE  g.id IN ( {$refreshGroupIDString} )
 AND    g.refresh_date IS NULL
 ";
+      CRM_Core_DAO::executeQuery($query);
     }
 
     if (empty($processGroupIDs)) {
