@@ -440,8 +440,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
             }
             else {
               // check with first_name and last_name for additional participants
-              if ((CRM_Utils_Array::value('first_name',$value) == $fields['first_name']) &&
-                (CRM_Utils_Array::value('last_name',$value) == $fields['last_name'])
+              if (!empty($value['first_name']) && ($value['first_name'] == CRM_Utils_Array::value('first_name', $fields)) &&
+                (CRM_Utils_Array::value('last_name',$value) == CRM_Utils_Array::value('last_name', $fields))
               ) {
                 $errors['first_name'] = ts('The first name and last name must be unique for each participant.');
                 break;
