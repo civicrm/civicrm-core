@@ -27,6 +27,64 @@ class DirStack {
   }
 }
 
+/**
+ * FIXME: Why am I doing this? Can't we get a proper build-system for little
+ * CLI tools -- and then use prepackaged libraries?
+ */
+class PullRequest {
+
+  /**
+   * Given a link to a pull-request, determine which local repo
+   * it applies to and fetch any metadata.
+   *
+   * @param string $url
+   * @param array $repos list of locally known repos
+   * @return PullRequest|NULL
+   */
+  public static function get($url, $repos) {
+    foreach ($repos as $repo => $relPath) {
+      if (preg_match("/^https:\/\/github.com\/(.*)\/(civicrm-{$repo})\/pull\/([0-9]+)$/", $url, $matches)) {
+        list ($full, $githubUser, $githubRepo, $githubPr) = $matches;
+
+        $pr = new PullRequest();
+        $pr->repo = $repo;
+        $pr->data = HttpClient::getJson("https://api.github.com/repos/$githubUser/$githubRepo/pulls/$githubPr");
+        if (empty($pr->data)) {
+          return NULL;
+        }
+
+        return $pr;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * @var string local repo name e.g. "core", "drupal"
+   */
+  public $repo;
+
+  protected $data;
+
+  public function getNumber() {
+    return $this->data->number;
+  }
+
+  /**
+   * @return string name of the branch on the requestor's repo
+   */
+  public function getRequestorBranch() {
+    return $this->data->head->ref;
+  }
+
+  /**
+   * @return string URL of the requestor's repo
+   */
+  public function getRequestorRepoUrl() {
+    return $this->data->head->repo->git_url;
+  }
+}
+
 class Givi {
 
   /**
@@ -63,6 +121,11 @@ class Givi {
    * @var bool
    */
   protected $fetch = FALSE;
+
+  /**
+   * @var bool
+   */
+  protected $force = FALSE;
 
   /**
    * @var bool
@@ -154,6 +217,9 @@ class Givi {
       case 'resume':
         call_user_func_array(array($this, 'doResume'), $this->arguments);
         break;
+      case 'review':
+        call_user_func_array(array($this, 'doReview'), $this->arguments);
+        break;
       //case 'merge-forward':
       //  call_user_func_array(array($this, 'doMergeForward'), $this->arguments);
       //  break;
@@ -196,6 +262,9 @@ class Givi {
       elseif ($arg == '--dry-run' || $arg == '-n') {
         $this->dryRun = TRUE;
       }
+      elseif ($arg == '--force' || $arg == '-f') {
+        $this->force = TRUE;
+      }
       elseif ($arg == '--gencode') {
         $this->useGencode = TRUE;
       }
@@ -225,6 +294,7 @@ class Givi {
 
     $this->program = @array_shift($this->arguments);
     $this->action = @array_shift($this->arguments);
+
     return TRUE;
   }
 
@@ -242,6 +312,7 @@ class Givi {
     echo "  $program [options] status\n";
     echo "  $program [options] begin <base-branch> [--core=<new-branch>|--drupal=<new-branch>|...] \n";
     echo "  $program [options] resume [--rebase] <base-branch> [--core=<custom-branch>|--drupal=<custom-branch>|...] \n";
+    echo "  $program [options] review <base-branch> <pr-url-1> <pr-url-2>...\n";
     #echo "  $program [options] merge-forward <maintenace-branch> <development-branch>\n";
     #echo "  $program [options] push <remote> <branch>[:<branch>]\n";
     echo "Actions:\n";
@@ -250,12 +321,14 @@ class Givi {
     echo "  status: Display status on all repos\n";
     echo "  begin: Begin work on a new branch on some repo (and use base-branch for all others)\n";
     echo "  resume: Resume work on an existing branch on some repo (and use base-branch for all others)\n";
+    echo "  review: Test work provided by someone else's pull-request. (If each repo has related PRs, then you can link to each of them.)\n";
     #echo "  merge-forward: On each repo, merge changes from maintenance branch to development branch\n";
     #echo "  push: On each repo, push a branch to a remote (Note: only intended for use with merge-forward)\n";
     echo "Common options:\n";
     echo "  --dry-run: Don't do anything; only print commands that would be run\n";
     echo "  --d6: Specify that Drupal branches should use 6.x-* prefixes\n";
     echo "  --d7: Specify that Drupal branches should use 7.x-* prefixes (default)\n";
+    echo "  -f: When switching branches, proceed even if the index or the working tree differs from HEAD. This is used to throw away local changes.\n";
     echo "  --fetch: Fetch the latest code before creating, updating, or checking-out anything\n";
     echo "  --repos=X: Restrict operations to the listed repos (comma-delimited list) (default: all)";
     echo "  --root=X: Specify CiviCRM root directory (default: .)\n";
@@ -288,7 +361,7 @@ class Givi {
 
     foreach ($this->repos as $repo => $relPath) {
       $filteredBranch = $this->filterBranchName($repo, $branches[$repo]);
-      $this->run($repo, $relPath, 'git', 'checkout', $filteredBranch);
+      $this->run($repo, $relPath, 'git', 'checkout', $filteredBranch, $this->force ? '-f' : NULL);
     }
     return TRUE;
   }
@@ -317,12 +390,14 @@ class Givi {
       $filteredBaseBranch = $this->filterBranchName($repo, $baseBranch);
 
       if ($filteredBranch == $filteredBaseBranch) {
-        $this->run($repo, $relPath, 'git', 'checkout', $filteredBranch);
+        $this->run($repo, $relPath, 'git', 'checkout', $filteredBranch, $this->force ? '-f' : NULL);
       }
       else {
-        $this->run($repo, $relPath, 'git', 'checkout', '-b', $filteredBranch, $filteredBaseBranch);
+        $this->run($repo, $relPath, 'git', 'checkout', '-b', $filteredBranch, $filteredBaseBranch, $this->force ? '-f' : NULL);
       }
     }
+
+    return TRUE;
   }
 
   function doResume($baseBranch = NULL) {
@@ -341,12 +416,45 @@ class Givi {
       $filteredBranch = $this->filterBranchName($repo, $branches[$repo]);
       $filteredBaseBranch = $this->filterBranchName($repo, $baseBranch);
 
-      $this->run($repo, $relPath, 'git', 'checkout', $filteredBranch);
+      $this->run($repo, $relPath, 'git', 'checkout', $filteredBranch, $this->force ? '-f' : NULL);
       if ($filteredBranch != $filteredBaseBranch && $this->rebase) {
         list ($baseRemoteRepo, $baseRemoteBranch) = $this->parseBranchRepo($filteredBaseBranch);
         $this->run($repo, $relPath, 'git', 'pull', '--rebase', $baseRemoteRepo, $baseRemoteBranch);
       }
     }
+
+    return TRUE;
+  }
+
+  function doReview($baseBranch = NULL) {
+    if (! $this->doCheckoutAll($baseBranch)) {
+      return FALSE;
+    }
+
+    $args = func_get_args();
+    array_shift($args); // $baseBranch
+
+    $pullRequests = array();
+    foreach ($args as $prUrl) {
+      $pullRequest = PullRequest::get($prUrl, $this->repos);
+      if ($pullRequest) {
+        $pullRequests[] = $pullRequest;
+      } else {
+        return $this->returnError("Invalid pull-request URL: $prUrl");
+      }
+    }
+
+    foreach ($pullRequests as $pullRequest) {
+      $repo = $pullRequest->repo;
+      $branchName = 'pull-request-' . $pullRequest->getNumber();
+      if ($this->hasLocalBranch($repo, $branchName)) {
+        $this->run($repo, $this->repos[$repo], 'git', 'branch', '-D', $branchName);
+      }
+      $this->run($repo, $this->repos[$repo], 'git', 'checkout', '-b', $branchName); ## based on whatever was chosen by doCheckoutAll()
+      $this->run($repo, $this->repos[$repo], 'git', 'pull', $pullRequest->getRequestorRepoUrl(), $pullRequest->getRequestorBranch());
+    }
+
+    return TRUE;
   }
 
   /*
@@ -405,6 +513,19 @@ class Givi {
       }
     }
 
+    return TRUE;
+  }
+
+  /**
+   * Determine if a branch exists locally
+   *
+   * @param string $repo
+   * @param string $name branch name
+   * @return bool
+   */
+  function hasLocalBranch($repo, $name) {
+    $path = $this->repos[$repo] . '/.git/refs/heads/' . $name;
+    return file_exists($path);
   }
 
   /**
@@ -445,7 +566,9 @@ class Givi {
     array_shift($args);
     array_shift($args);
     foreach ($args as $arg) {
-      $command .= ' ' . escapeshellarg($arg);
+      if ($arg !== NULL) {
+        $command .= ' ' . escapeshellarg($arg);
+      }
     }
     printf("\n\n\nRUN [%s]: %s\n", $repoName, $command);
     if ($this->dryRun) {
@@ -514,9 +637,52 @@ class Givi {
   }
 
   function returnError($message) {
-    echo "ERROR: ", $message, "\n";
+    echo "\nERROR: ", $message, "\n\n";
     $this->doHelp();
     return FALSE;
+  }
+}
+
+class HttpClient {
+  static function download($url, $file) {
+    // PHP native client is unreliable PITA for HTTPS
+    if (exec("which wget")) {
+      self::run('wget', '-q', '-O', $file, $url);
+    } elseif (exec("which curl")) {
+      self::run('curl', '-o', $file, $url);
+    }
+
+    // FIXME: really detect errors
+    return TRUE;
+  }
+
+  static function getJson($url) {
+    $file = tempnam(sys_get_temp_dir(), 'givi-json-');
+    HttpClient::download($url, $file);
+    $data = json_decode(file_get_contents($file));
+    unlink($file);
+    return $data;
+  }
+
+  /**
+   * Run a command
+   *
+   * Any items after $command will be escaped and added to $command
+   *
+   * @param string $runDir
+   * @param string $command
+   * @return string
+   */
+  static function run($command) {
+    $args = func_get_args();
+    array_shift($args);
+    foreach ($args as $arg) {
+      $command .= ' ' . escapeshellarg($arg);
+    }
+    printf("\n\n\nRUN: %s\n", $command);
+    $r = system($command);
+
+    return $r;
   }
 }
 
