@@ -380,7 +380,7 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     return FALSE;
   }
 
-  function inbound() {
+  function inbound($from, $body, $to = NULL, $trackID = NULL) {
     $like      = "";
     $fromPhone = $this->retrieve('from', 'String');
     $fromPhone = $this->formatPhone($this->stripPhone($fromPhone), $like, "like");
