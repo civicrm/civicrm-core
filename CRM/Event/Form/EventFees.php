@@ -99,7 +99,7 @@ class CRM_Event_Form_EventFees {
           }
         }
 
-        if ($form->_discountId) {
+        if ($form->_discountId && CRM_Utils_Array::value($defaults[$form->_pId]['discount_id'], $discounts)) {
           $form->assign('discount', $discounts[$defaults[$form->_pId]['discount_id']]);
         }
 
