@@ -28,12 +28,14 @@
       <headerPattern>/(activity.)?source(.contact(.id)?)?/i</headerPattern>
       <comment>Contact ID of the person scheduling or logging this Activity. Usually the authenticated user.</comment>
       <add>1.1</add>
+      <drop>4.4</drop>
   </field>
   <foreignKey>
        <name>source_contact_id</name>
        <table>civicrm_contact</table>
        <key>id</key>
        <add>1.1</add>
+       <drop>4.4</drop>
        <onDelete>SET NULL</onDelete>
   </foreignKey>  
   <index>

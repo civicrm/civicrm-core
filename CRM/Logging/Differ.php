@@ -83,9 +83,9 @@ class CRM_Logging_Differ {
         break;
       case 'civicrm_activity':
         $join  = "
-LEFT JOIN civicrm_activity_target at ON at.activity_id = lt.id     AND at.target_contact_id = %3
-LEFT JOIN civicrm_activity_assignment aa ON aa.activity_id = lt.id AND aa.assignee_contact_id = %3
-LEFT JOIN civicrm_activity source ON source.id = lt.id             AND source.source_contact_id = %3";
+LEFT JOIN civicrm_activity_contact at ON at.activity_id = lt.id AND at.contact_id = %3 AND at.record_type = 'Target'
+LEFT JOIN civicrm_activity_contact aa ON aa.activity_id = lt.id AND aa.contact_id = %3 AND aa.record_type = 'Assignee'
+LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND source.contact_id = %3 AND source.record_type = 'Source' ";
         $contactIdClause = "AND (at.id IS NOT NULL OR aa.id IS NOT NULL OR source.id IS NOT NULL)";
         break;
       case 'civicrm_case':
@@ -106,6 +106,7 @@ SELECT DISTINCT lt.id FROM `{$this->db}`.`log_$table` lt
 WHERE log_conn_id = %1 AND 
       log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval}) 
       {$contactIdClause}";
+
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
       $diffs = array_merge($diffs, $this->diffsInTableForId($table, $dao->id));
