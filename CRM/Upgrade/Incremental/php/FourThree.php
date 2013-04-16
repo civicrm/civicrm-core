@@ -382,14 +382,13 @@ AND       ceft.entity_table = 'civicrm_contribution'
     );
 
     $accountType = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' "));
-    $financialAccountId =
-      $query = "
+    $query = "
 SELECT id
 FROM   civicrm_financial_account
 WHERE  is_default = 1
 AND    financial_account_type_id = {$accountType}
 ";
-    CRM_Core_DAO::singleValueQuery($query);
+    $financialAccountId = CRM_Core_DAO::singleValueQuery($query);
 
     $accountRelationsips = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL);
 
@@ -444,15 +443,14 @@ AND   con.contribution_status_id = {$pendingStatus}
     //create a temp table to hold financial account id related to payment instruments
     $tempTableName1 = CRM_Core_DAO::createTempTableName();
 
-    $sql =  "CREATE TEMPORARY TABLE {$tempTableName1}";
-    CRM_Core_DAO::executeQuery($sql);
-
-    $sql = "
+    $sql =  "
+CREATE TEMPORARY TABLE {$tempTableName1}
 SELECT     ceft.financial_account_id financial_account_id, cov.value as instrument_id
 FROM       civicrm_entity_financial_account ceft
 INNER JOIN civicrm_option_value cov ON cov.id = ceft.entity_id AND ceft.entity_table = 'civicrm_option_value'
 INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
-WHERE      cog.name = 'payment_instrument'";
+WHERE      cog.name = 'payment_instrument'
+";
     CRM_Core_DAO::executeQuery($sql);
 
     //CRM-12141
@@ -461,10 +459,8 @@ WHERE      cog.name = 'payment_instrument'";
 
     //create temp table to process completed / cancelled contribution
     $tempTableName2 = CRM_Core_DAO::createTempTableName();
-    $sql = "CREATE TEMPORARY TABLE {$tempTableName2}";
-    CRM_Core_DAO::executeQuery($sql);
-
     $sql = "
+CREATE TEMPORARY TABLE {$tempTableName2}
 SELECT con.id as contribution_id, con.payment_instrument_id,
        IF(con.currency IN ('{$validCurrencyCodes}'), con.currency, '{$defaultCurrency}') as currency,
        con.total_amount, con.net_amount, con.fee_amount, con.trxn_id, con.contribution_status_id,
@@ -509,7 +505,8 @@ SELECT   tempI.contribution_id, tempI.payment_instrument_id, tempI.currency, tem
          tempI.fee_amount,    tempI.trxn_id,   tempI.contribution_status_id, tempI.check_number,
          tempI.to_financial_account_id, tempI.from_financial_account_id, tempI.trxn_date
 FROM {$tempTableName2} tempI
-WHERE tempI.action = 'insert';";
+WHERE tempI.action = 'insert'
+";
     CRM_Core_DAO::executeQuery($sql);
 
     //update of existing records
