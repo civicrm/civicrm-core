@@ -167,17 +167,20 @@ function do_publish() {
 #################################################
 ## Update Version Info
 function do_update() {
-  # FIXME: This assumes one-digit point versions
-  point=(${version: -1})
-  point=`expr $point + 1`
-  new_ver=(${version:0:4})
-  new_ver=$new_ver$point
-  cd $workdir/$version/export
-  sed -i -e "s/$version/$new_ver/g" xml/version.xml
-  sed -i -e "s/$version/$new_ver/g" sql/civicrm_generated.mysql
-  git add xml/version.xml sql/civicrm_generated.mysql
-  git commit -m "Update version to $new_ver"
-  git push origin "$version"
+  echo "VERSION UPDATE: Please enter the version that comes after $version"
+  read new_ver
+  if [ -n "$new_ver" ]; then
+    cd $workdir/$version/export
+    for file in xml/version.xml sql/civicrm_generated.mysql; do
+      sed "s/$version/$new_ver/g" < $file > $file.tmp
+      mv $file.tmp $file
+      git add $file
+    done
+    git commit -m "Update version to $new_ver"
+    git push origin "$start_point"
+  else
+    echo "No version entered. Aborting version update."
+  fi 
 }
 
 #################################################
