@@ -455,8 +455,8 @@ class CRM_Core_Resources {
 
       // Add global settings
       $settings = array(
-        'userFramework' => json_encode($config->userFramework),
-        'resourceBase' => json_encode($config->resourceBase),
+        'userFramework' => $config->userFramework,
+        'resourceBase' => $config->resourceBase,
       );
       $this->addSetting(array('config' => $settings));
 
