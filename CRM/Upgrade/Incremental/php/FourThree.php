@@ -456,7 +456,7 @@ WHERE      cog.name = 'payment_instrument'";
     CRM_Core_DAO::executeQuery($sql);
 
     //CRM-12141
-    $sql = "ALTER TABLE {$tempTableName1} ADD INDEX index_instrument_id (instrument_id);";
+    $sql = "ALTER TABLE {$tempTableName1} ADD INDEX index_instrument_id (instrument_id(200));";
     CRM_Core_DAO::executeQuery($sql);
 
     //create temp table to process completed / cancelled contribution
