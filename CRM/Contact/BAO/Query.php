@@ -495,10 +495,12 @@ class CRM_Contact_BAO_Query {
     $trashParamExists = FALSE;
     $paramByGroup    = array();
     foreach ( $this->_params as $k => $param ) {
-      if ( $param[0] == 'contact_is_deleted' ) {
+      if (!empty($param[0]) && $param[0] == 'contact_is_deleted' ) {
         $trashParamExists = TRUE;
       }
-      $paramByGroup[$param[3]][$k] = $param;
+      if (!empty($param[3])) {
+        $paramByGroup[$param[3]][$k] = $param;
+      }
     }
 
     if ( $trashParamExists ) {
