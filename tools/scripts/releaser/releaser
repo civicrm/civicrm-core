@@ -19,8 +19,9 @@ if [ -z "$start_point" -o -z "$version" -o -z "$first_act" ]; then
   echo "Usage:"
   echo "  $0 <start_point> <version> --build"
   echo "  $0 <start_point> <version> --publish"
+  echo "  $0 <start_point> <version> --update"
   echo "  $0 <start_point> <version> --clean"
-  echo "  $0 <start_point> <version> --build --publish --clean [[ORDER SIGNIFICANT]]"
+  echo "  $0 <start_point> <version> --build --publish --update --clean [[ORDER SIGNIFICANT]]"
   echo "Arguments:"
   echo "  <start_point> is a branch name (e.g. \"master\")"
   echo "  <version> is Civi release (e.g. \"4.3.beta2\"); it will become a tag name"
@@ -164,6 +165,22 @@ function do_publish() {
 }
 
 #################################################
+## Update Version Info
+function do_update() {
+  # FIXME: This assumes one-digit point versions
+  point=(${version: -1})
+  point=`expr $point + 1`
+  new_ver=(${version:0:4})
+  new_ver=$new_ver$point
+  cd $workdir/$version/export
+  sed -i -e "s/$version/$new_ver/g" xml/version.xml
+  sed -i -e "s/$version/$new_ver/g" sql/civicrm_generated.mysql
+  git add xml/version.xml sql/civicrm_generated.mysql
+  git commit -m "Update version to $new_ver"
+  git push origin "$version"
+}
+
+#################################################
 ## Cleanup
 function do_cleanup() {
   cd $workdir/$version
@@ -191,6 +208,11 @@ for ACT in "$@" ; do
       set -ex
       do_git_tag_push
       do_publish
+      set +x
+      ;;
+    --update)
+      set -ex
+      do_update
       set +x
       ;;
     --clean)
