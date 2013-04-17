@@ -138,7 +138,7 @@
         {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true multiClient=true}
         {if $action eq 1}
         <br/>
-        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label}
+        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
         {/if}
       </td>
       {else}
