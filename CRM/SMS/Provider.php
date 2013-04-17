@@ -291,5 +291,17 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         return $phone;
     }
   }
+
+  function urlEncode($values) {
+    $uri = '';
+    foreach ($values as $key => $value) {
+      $value = urlencode($value);
+      $uri .= "&{$key}={$value}";
+    }
+    if (!empty($uri)) {
+      $uri = substr($uri, 1);
+    }
+    return $uri;
+  }
 }
 
