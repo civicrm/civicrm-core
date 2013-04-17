@@ -208,8 +208,8 @@
         );
       }
       ,{
-        title: ts('Delete case role'),
-        message: ts('Are you sure you want to delete this case role.')
+        title: '{/literal}{ts escape="js"}Delete case role{/ts}{literal}',
+        message: '{/literal}{ts escape="js"}Are you sure you want to delete this case role?{/ts}{literal}'
       });
       return false;
     });

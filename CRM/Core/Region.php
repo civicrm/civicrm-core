@@ -166,7 +166,7 @@ class CRM_Core_Region {
           $smarty->assign('snippet', $tmp);
           break;
         case 'callback':
-          $args = is_array($snippet['arguments']) ? $snippet['arguments'] : array(&$snippet, &$html);
+          $args = isset($snippet['arguments']) ? $snippet['arguments'] : array(&$snippet, &$html);
           $html .= call_user_func_array($snippet['callback'], $args);
           break;
         case 'scriptUrl':

@@ -10,7 +10,6 @@
 h2.entity {cursor:pointer}
 {/literal}
 </style>
-{include file="CRM/common/scripts.tpl"}
 <script>
 if (!jQuery) {ldelim}  
 var head= document.getElementsByTagName('head')[0];

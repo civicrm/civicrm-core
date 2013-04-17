@@ -261,11 +261,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @access public
    */
   public function addScriptUrl($url, $region) {
-    if ($region == 'html-header') {
-      $document = JFactory::getDocument();
-      $document->addScript($url);
-      return TRUE;
-    }
     return FALSE;
   }
 
@@ -282,11 +277,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @access public
    */
   public function addScript($code, $region) {
-    if ($region == 'html-header') {
-      $document = JFactory::getDocument();
-      $document->addScriptDeclaration($code);
-      return TRUE;
-    }
     return FALSE;
   }
 

@@ -70,9 +70,8 @@ cj(function( ) {
       minChars: 1,
       matchContains: true,
       delay: 400,
-      max: CRM.config.search_autocomplete_count,
+      max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal},
       extraParams:{
-        limit: CRM.config.search_autocomplete_count,
         fieldName:function () {
           return  cj('input[name=quickSearchField]:checked').val();
         },
