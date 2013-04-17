@@ -507,27 +507,28 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
-  function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
+  function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE, $isPayLater = FALSE) {
     if ($anonymous) {
       $this->webtestLogout();
     }
     $this->open($registerUrl);
-
+    $this->waitForPageToLoad($this->getTimeoutMsec());   
     $this->select("additional_participants", "value=" . $numberRegistrations);
     $this->type("email-Primary", "smith" . substr(sha1(rand()), 0, 7) . "@example.org");
-
-    $this->select("credit_card_type", "value=Visa");
-    $this->type("credit_card_number", "4111111111111111");
-    $this->type("cvv2", "000");
-    $this->select("credit_card_exp_date[M]", "value=1");
-    $this->select("credit_card_exp_date[Y]", "value=2020");
-    $this->type("billing_first_name", "Jane");
-    $this->type("billing_last_name", "Smith" . substr(sha1(rand()), 0, 7));
-    $this->type("billing_street_address-5", "15 Main St.");
-    $this->type(" billing_city-5", "San Jose");
-    $this->select("billing_country_id-5", "value=1228");
-    $this->select("billing_state_province_id-5", "value=1004");
-    $this->type("billing_postal_code-5", "94129");
+    if (!$isPayLater) {
+      $this->select("credit_card_type", "value=Visa");
+      $this->type("credit_card_number", "4111111111111111");
+      $this->type("cvv2", "000");
+      $this->select("credit_card_exp_date[M]", "value=1");
+      $this->select("credit_card_exp_date[Y]", "value=2020");
+      $this->type("billing_first_name", "Jane");
+      $this->type("billing_last_name", "Smith" . substr(sha1(rand()), 0, 7));
+      $this->type("billing_street_address-5", "15 Main St.");
+      $this->type(" billing_city-5", "San Jose");
+      $this->select("billing_country_id-5", "value=1228");
+      $this->select("billing_state_province_id-5", "value=1004");
+      $this->type("billing_postal_code-5", "94129");
+    }
 
     $this->click("_qf_Register_upload-bottom");
 
@@ -543,11 +544,20 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
-    $confirmStrings = array("Event Fee(s)", "Billing Name and Address", "Credit Card Information");
+    $confirmStrings = array("Event Fee(s)");    
+    if (!$isPayLater) { 
+      $confirmStrings += array("Billing Name and Address", "Credit Card Information");   
+    }
     $this->assertStringsPresent($confirmStrings);
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $thankStrings = array("Thank You for Registering", "Event Total", "Transaction Date");
+    $thankStrings = array("Thank You for Registering", "Event Total"); 
+    if (!$isPayLater) { 
+      $thankStrings = array("Transaction Date");
+    }
+    else {
+      $thankStrings += array("testing later instructions");
+    }
     $this->assertStringsPresent($thankStrings);
   }
 
@@ -593,4 +603,91 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     }
   }
 
+  function testEventAddMultipleParticipant() {
+    // Log in using webtestLogin() method
+    $this->webtestLogin(); 
+    $this->openCiviPage("event/add", "reset=1&action=add");
+
+    $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
+    $eventDescription = "Here is a description for this conference.";
+    $this->_testAddEventInfo($eventTitle, $eventDescription);
+    $streetAddress = "100 Main Street";
+    $this->_testAddLocation($streetAddress);
+
+    $this->_testAddFees(FALSE, FALSE, NULL, FALSE, TRUE);
+    $registerIntro = "Fill in all the fields below and click Continue.";
+    $multipleRegistrations = TRUE;
+    $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
+    $eventInfoStrings = array($eventTitle, $eventDescription, $streetAddress);
+    $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);
+
+    $registerStrings = array("225.00", "Member", "300.00", "Non-member", $registerIntro);
+    $registerUrl = $this->_testVerifyRegisterPage($registerStrings);
+
+    $numberRegistrations = 3;
+    $anonymous = TRUE;
+    // add participant and 3 additional participant and change status of participant from edit participant
+    $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous, TRUE);
+    $this->webtestLogin(); 
+
+    $this->openCiviPage("event/search?reset=1", "reset=1");
+    $this->type('event_name', $eventTitle);
+    $this->click("event_name");
+    $this->waitForElementPresent("css=div.ac_results-inner li");
+    $this->click("css=div.ac_results-inner li");
+    $this->click("xpath=//td[@class='crm-event-form-block-participant_status']/div[@class='listing-box']//div/label[text()='Pending from pay later']");
+    $this->click('_qf_Search_refresh');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->select('status_id', 'label=Registered');
+    $this->click('record_contribution');
+    $this->select('contribution_status_id', 'label=Completed');
+    $pID = $this->urlArg('id');
+    $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $pID, 'contribution_id', 'participant_id');
+    $this->click('_qf_Participant_upload-top');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->verifyFinancialRecords($contributionID);
+       
+    // add participant and 3 additional participant and change status of participant from edit contribution
+    $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous, TRUE);
+    $this->webtestLogin(); 
+
+    $this->openCiviPage("event/search?reset=1", "reset=1"); $this->type('event_name', $eventTitle);
+    $this->click("event_name");
+    $this->waitForElementPresent("css=div.ac_results-inner li");
+    $this->click("css=div.ac_results-inner li");
+    $this->click("xpath=//td[@class='crm-event-form-block-participant_status']/div[@class='listing-box']//div/label[text()='Pending from pay later']");
+    $this->click('_qf_Search_refresh');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $pID = $this->urlArg('id');
+    $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $pID, 'contribution_id', 'participant_id');
+    $this->click("xpath=//tr[@id='rowid$contributionID']/td[8]/span//a[text()='Edit']");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->select('contribution_status_id', 'label=Completed');
+    $this->click('_qf_Contribution_upload-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->verifyFinancialRecords($contributionID);
+  }
+
+  function verifyFinancialRecords($contributionID) {
+    // check count for civicrm_contribution and civicrm_financial_item in civicrm_entity_financial_trxn
+    $query = "SELECT COUNT(DISTINCT(c1.id)) civicrm_contribution, COUNT(c2.id) civicrm_financial_item  FROM civicrm_entity_financial_trxn c1
+LEFT JOIN civicrm_entity_financial_trxn c2 ON c1.financial_trxn_id = c2.financial_trxn_id AND c2.entity_table ='civicrm_financial_item'
+LEFT JOIN civicrm_financial_item cfi ON cfi.id = c2.entity_id
+WHERE c1.entity_table  = 'civicrm_contribution' AND c1.entity_id = %1 AND cfi.status_id = 1";
+    $params = array(1 => array($contributionID, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $dao->fetch();
+    $this->assertEquals('2', $dao->civicrm_contribution, 'civicrm_financial_trxn count does not match');
+    $this->assertEquals('8',$dao->civicrm_financial_item, 'civicrm_financial_item count does not match');
+    $query = "SELECT COUNT(cft.id) civicrm_financial_trxn FROM civicrm_entity_financial_trxn ceft 
+INNER JOIN civicrm_financial_trxn cft ON ceft.financial_trxn_id = cft.id 
+WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $dao->fetch();
+    $this->assertEquals('2', $dao->civicrm_financial_trxn, 'civicrm_financial_trxn count does not match');
+  }
 }
