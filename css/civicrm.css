@@ -3757,20 +3757,29 @@ div.m ul#civicrm-menu,
   margin: 0.5em 0 1em;
   padding: 0 0 0 0.5em;
 }
-.crm-container div.ui-notify-message div.icon {
+
+.crm-container div.ui-notify-message div.icon,
+.crm-status-icon {
   background: transparent url("../i/message-icons.png") no-repeat 0 0;
   width: 24px;
   height: 24px;
   margin-right: 6px;
 }
-.crm-container div.ui-notify-message.success div.icon {
+.crm-container div.ui-notify-message.success div.icon,
+.crm-status-icon.success {
   background-position: -24px 0px;
 }
-.crm-container div.ui-notify-message.info div.icon {
+.crm-container div.ui-notify-message.info div.icon,
+.crm-status-icon.info {
   background-position: -48px 0px;
 }
-.crm-container div.ui-notify-message.error div.icon {
+.crm-container div.ui-notify-message.error div.icon,
+.crm-status-icon.error {
   background-position: -72px 0px;
+}
+
+span.crm-status-icon {
+  display: inline-block;
 }
 
 /* Public Pages */
