@@ -184,8 +184,8 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
         $this->_providerInfo['api_params']['is_test'] == 1 ) {
         $response = array('data' => 'OK:' . rand());
     } else {
-      $postData = CRM_Utils_Array::urlEncode($postDataArray);
-        $response = $this->curl($url, $postData);
+      $postData = $this->urlEncode($postDataArray);
+      $response = $this->curl($url, $postData);
     }
     if (PEAR::isError($response)) {
       return $response;
@@ -271,7 +271,7 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
         $response = array('data' => 'ID:' . rand());
       }
       else {
-        $postData = CRM_Utils_Array::urlEncode($postDataArray);
+        $postData = $this->urlEncode($postDataArray);
         $response = $this->curl($url, $postData);
       }
       if (PEAR::isError($response)) {

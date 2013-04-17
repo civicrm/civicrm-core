@@ -162,41 +162,38 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('Could not find a mailing id'));
     }
 
-    foreach (array(
-      'now', 'start_date', 'start_date_time') as $parameter) {
-      $params[$parameter] = $this->controller->exportValue($this->_name,
-        $parameter
-      );
+    foreach (array('now', 'start_date', 'start_date_time') as $parameter) {
+      $params[$parameter] = $this->controller->exportValue($this->_name, $parameter);
     }
 
-    $mailing = new CRM_Mailing_BAO_Mailing();
-    $mailing->id = $ids['mailing_id'];
-    if ($mailing->find(TRUE)) {
-      $job             = new CRM_Mailing_BAO_Job();
-      $job->mailing_id = $mailing->id;
-      $job->is_test    = 0;
-      if ($job->find(TRUE)) {
-        CRM_Core_Error::fatal(ts('A job for this mailing already exists'));
-      }
-
-      if (empty($mailing->is_template)) {
-        $job->status = 'Scheduled';
-        if ($params['now']) {
-          $job->scheduled_date = date('YmdHis');
-        }
-        else {
-          $job->scheduled_date = CRM_Utils_Date::processDate($params['start_date'] . ' ' . $params['start_date_time']);
-        }
-        $job->save();
-      }
-
-      // also set the scheduled_id
-      $session = CRM_Core_Session::singleton();
-      $mailing->scheduled_id = $session->get('userID');
-      $mailing->scheduled_date = date('YmdHis');
-      $mailing->created_date = CRM_Utils_Date::isoToMysql($mailing->created_date);
-      $mailing->save();
+    if ($params['now']) {
+      $params['scheduled_date'] = date('YmdHis');
     }
+    else {
+      $params['scheduled_date'] = CRM_Utils_Date::processDate($params['start_date'] . ' ' . $params['start_date_time']);
+    }
+
+    $session = CRM_Core_Session::singleton();
+    // set the scheduled_id
+    $params['scheduled_id'] = $session->get('userID');
+    $params['scheduled_date'] = date('YmdHis');
+
+    // set approval details if workflow is not enabled
+    if (!CRM_Mailing_Info::workflowEnabled()) {
+      $params['approver_id'] = $session->get('userID');
+      $params['approval_date'] = date('YmdHis');
+      $params['approval_status_id'] = 1;
+    }
+
+    if ($params['now']) {
+      $params['scheduled_date'] = date('YmdHis');
+    }
+    else {
+      $params['scheduled_date'] = CRM_Utils_Date::processDate($params['start_date'] . ' ' . $params['start_date_time']);
+    }
+
+    /* Build the mailing object */
+    CRM_Mailing_BAO_Mailing::create($params, $ids);
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/mailing/browse/scheduled',
