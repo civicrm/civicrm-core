@@ -43,11 +43,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
   public function __construct() {}
 
-  function run($clientID,
-    $caseID,
-    $activitySetName,
-    $params
-  ) {
+  function run($clientID, $caseID, $activitySetName, $params) {
     $contents = self::getCaseReport($clientID,
       $caseID,
       $activitySetName,
@@ -166,11 +162,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
     return NULL;
   }
 
-  function getActivities($clientID,
-    $caseID,
-    $activityTypes,
-    &$activities
-  ) {
+  function getActivities($clientID, $caseID, $activityTypes, &$activities) {
     // get all activities for this case that in this activityTypes set
     foreach ($activityTypes as $aType) {
       $map[$aType['id']] = $aType;
@@ -265,11 +257,7 @@ WHERE      a.id = %1
     return $activityInfos[$index];
   }
 
-  function &getActivity($clientID,
-    $activityDAO,
-    &$activityTypeInfo
-  ) {
-
+  function &getActivity($clientID, $activityDAO, &$activityTypeInfo) {
     if (empty($this->_redactionStringRules)) {
       $this->_redactionStringRules = array();
     }
@@ -315,8 +303,7 @@ WHERE      a.id = %1
       $targetNames   = CRM_Activity_BAO_ActivityTarget::getTargetNames($activityDAO->id);
       $processTarget = FALSE;
       $label         = ts('With Contact(s)');
-      if (in_array($activityTypeInfo['name'], array(
-        'Email', 'Inbound Email'))) {
+      if (in_array($activityTypeInfo['name'], array('Email', 'Inbound Email'))) {
         $processTarget = TRUE;
         $label = ts('Recipient');
       }
@@ -356,13 +343,13 @@ WHERE      a.id = %1
 
     // Activity Type info is a special field
     $activity['fields'][] = array(
-      'label' => 'Activity Type',
+      'label' => ts('Activity Type'),
       'value' => $activityTypeInfo['label'],
       'type' => 'String',
     );
 
     $activity['fields'][] = array(
-      'label' => 'Subject',
+      'label' => ts('Subject'),
       'value' => htmlspecialchars($this->redact($activityDAO->subject)),
       'type' => 'Memo',
     );
@@ -375,7 +362,7 @@ WHERE      a.id = %1
       );
     }
     $activity['fields'][] = array(
-      'label' => 'Created By',
+      'label' => ts('Created By'),
       'value' => $this->redact($creator),
       'type' => 'String',
     );
@@ -402,7 +389,7 @@ WHERE      a.id = %1
     }
 
     $activity['fields'][] = array(
-      'label' => 'Reported By',
+      'label' => ts('Reported By'),
       'value' => $this->redact($reporter),
       'type' => 'String',
     );
@@ -420,7 +407,7 @@ WHERE      a.id = %1
       }
       $assigneeContacts = implode(', ', $assignee_contact_names);
       $activity['fields'][] = array(
-        'label' => 'Assigned To',
+        'label' => ts('Assigned To'),
         'value' => $assigneeContacts,
         'type' => 'String',
       );
@@ -428,7 +415,7 @@ WHERE      a.id = %1
 
     if ($activityDAO->medium_id) {
       $activity['fields'][] = array(
-        'label' => 'Medium',
+        'label' => ts('Medium'),
         'value' => CRM_Core_OptionGroup::getLabel('encounter_medium',
           $activityDAO->medium_id, FALSE
         ),
@@ -437,19 +424,19 @@ WHERE      a.id = %1
     }
 
     $activity['fields'][] = array(
-      'label' => 'Location',
+      'label' => ts('Location'),
       'value' => $activityDAO->location,
       'type' => 'String',
     );
 
     $activity['fields'][] = array(
-      'label' => 'Date and Time',
+      'label' => ts('Date and Time'),
       'value' => $activityDAO->activity_date_time,
       'type' => 'Date',
     );
 
     $activity['fields'][] = array(
-      'label' => 'Details',
+      'label' => ts('Details'),
       'value' => $this->redact(CRM_Utils_String::stripAlternatives($activityDAO->details)),
       'type' => 'Memo',
     );
@@ -457,13 +444,13 @@ WHERE      a.id = %1
     // Skip Duration field if empty (to avoid " minutes" output). Might want to do this for all fields at some point. dgg
     if ($activityDAO->duration) {
       $activity['fields'][] = array(
-        'label' => 'Duration',
+        'label' => ts('Duration'),
         'value' => $activityDAO->duration . ' ' . ts('minutes'),
         'type' => 'Int',
       );
     }
     $activity['fields'][] = array(
-      'label' => 'Status',
+      'label' => ts('Status'),
       'value' => CRM_Core_OptionGroup::getLabel('activity_status',
         $activityDAO->status_id
       ),
@@ -471,7 +458,7 @@ WHERE      a.id = %1
     );
 
     $activity['fields'][] = array(
-      'label' => 'Priority',
+      'label' => ts('Priority'),
       'value' => CRM_Core_OptionGroup::getLabel('priority',
         $activityDAO->priority_id
       ),
@@ -487,10 +474,7 @@ WHERE      a.id = %1
     return $activity;
   }
 
-  function getCustomData($clientID,
-    $activityDAO,
-    &$activityTypeInfo
-  ) {
+  function getCustomData($clientID, $activityDAO, &$activityTypeInfo) {
     list($typeValues, $options, $sql) = $this->getActivityTypeCustomSQL($activityTypeInfo['id'], '%Y-%m-%d');
 
     $params = array(1 => array($activityDAO->id, 'Integer'));
