@@ -27,63 +27,63 @@
 {literal}
 <script type="text/javascript">
 cj(function($) {
-  $(document).ready( function() {
-    $().crmAccordions();
-    // Bind first click of accordion header to load crm-accordion-body with snippet
-    // everything else is taken care of by crmAccordions()
-    $('.crm-search_criteria_basic-accordion .crm-accordion-header').addClass('active');
-    $('.crm-ajax-accordion').on('click', '.crm-accordion-header:not(.active)', function() {
-      loadPanes($(this).attr('id'));
-    });
-    $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function() {
-      loadPanes($(this).attr('id'));
-    });
-    $('.crm-ajax-accordion').on('click', '.crm-close-accordion', function() {
-      var header = $(this).parent();
-      header.next().html('');
-      header.removeClass('active');
-      header.parent('.crm-ajax-accordion:not(.collapsed)').crmAccordionToggle();
-      // Reset results-display mode if it depends on this pane
-      var mode = modes[$('#component_mode').val()] || null;
-      if (mode && header.attr('id') == mode) {
-        var oldMode = $('#component_mode :selected').text();
-        $('#component_mode').val('1');
-        {/literal}
-        var msg = '{ts escape="js"}Displaying results as "%1" is not available without search criteria from the pane you just closed.{/ts}';
-        msg = msg.replace('%1', oldMode);
-        CRM.alert(msg, '{ts escape="js"}Display Results have been Reset{/ts}');
-        {literal}
-      }
-      $(this).remove();
-      return false;
-    });
-    // TODO: Why are the modes numeric? If they used the string there would be no need for this map
-    var modes = {
-      '2': 'CiviContribute',
-      '3': 'CiviEvent',
-      '4': 'activity',
-      '5': 'CiviMember',
-      '6': 'CiviCase',
-    };
-    // Handle change of results mode
-    $('#component_mode').change(function() {
-      // Reset task dropdown
-      $('#task').val('');
-      var mode = modes[$('#component_mode').val()] || null;
-      if (mode) {
-        $('.crm-' + mode + '-accordion.collapsed').crmAccordionToggle();
-        loadPanes(mode);
-      }
-      if ($('#component_mode').val() == '7') {
-        $('#crm-display_relationship_type').show();
-      }
-      else {
-        $('#display_relationship_type').val('');
-        $('#crm-display_relationship_type').hide();
-      }
-    }).change();
+  $().crmAccordions();
+  // Bind first click of accordion header to load crm-accordion-body with snippet
+  // everything else is taken care of by crmAccordions()
+  $('.crm-search_criteria_basic-accordion .crm-accordion-header').addClass('active');
+  $('.crm-ajax-accordion').on('click', '.crm-accordion-header:not(.active)', function() {
+    loadPanes($(this).attr('id'));
   });
-  // Loads snippet based on id of crm-accordion-header
+  $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function() {
+    loadPanes($(this).attr('id'));
+  });
+  $('.crm-ajax-accordion').on('click', '.crm-close-accordion', function() {
+    var header = $(this).parent();
+    header.next().html('');
+    header.removeClass('active');
+    header.parent('.crm-ajax-accordion:not(.collapsed)').crmAccordionToggle();
+    // Reset results-display mode if it depends on this pane
+    var mode = modes[$('#component_mode').val()] || null;
+    if (mode && header.attr('id') == mode) {
+      var oldMode = $('#component_mode :selected').text();
+      $('#component_mode').val('1');
+      {/literal}
+      var msg = '{ts escape="js"}Displaying results as "%1" is not available without search criteria from the pane you just closed.{/ts}';
+      msg = msg.replace('%1', oldMode);
+      CRM.alert(msg, '{ts escape="js"}Display Results have been Reset{/ts}');
+      {literal}
+    }
+    $(this).remove();
+    return false;
+  });
+  // TODO: Why are the modes numeric? If they used the string there would be no need for this map
+  var modes = {
+    '2': 'CiviContribute',
+    '3': 'CiviEvent',
+    '4': 'activity',
+    '5': 'CiviMember',
+    '6': 'CiviCase',
+  };
+  // Handle change of results mode
+  $('#component_mode').change(function() {
+    // Reset task dropdown
+    $('#task').val('');
+    var mode = modes[$('#component_mode').val()] || null;
+    if (mode) {
+      $('.crm-' + mode + '-accordion.collapsed').crmAccordionToggle();
+      loadPanes(mode);
+    }
+    if ($('#component_mode').val() == '7') {
+      $('#crm-display_relationship_type').show();
+    }
+    else {
+      $('#display_relationship_type').val('');
+      $('#crm-display_relationship_type').hide();
+    }
+  }).change();
+  /**
+  * Loads snippet based on id of crm-accordion-header
+  */
   function loadPanes(id) {
     var url = "{/literal}{crmURL p='civicrm/contact/search/advanced' q="snippet=1&qfKey=`$qfKey`&searchPane=" h=0}{literal}" + id;
     var header = $('#' + id);
