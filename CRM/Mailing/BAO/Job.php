@@ -526,7 +526,10 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       CRM_Core_Smarty::registerStringResource();
     }
 
-    $isDelivered = FALSE;
+    // CRM-12376
+    // This handles the edge case scenario where all the mails
+    // have been delivered in prior jobs
+    $isDelivered = TRUE;
 
     // make sure that there's no more than $config->mailerBatchLimit mails processed in a run
     while ($eq->fetch()) {
@@ -534,7 +537,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       // CRM_Utils_System::xMemory( "$mailsProcessed: " );
       // }
 
-      if ($config->mailerBatchLimit > 0 &&
+      if (
+        $config->mailerBatchLimit > 0 &&
         $mailsProcessed >= $config->mailerBatchLimit
       ) {
         if (!empty($fields)) {
