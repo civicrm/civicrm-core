@@ -296,7 +296,7 @@ $earthDistanceSQL  <= $distance
       if (isset($proximityAddress['state_province_id'])) {
         $proximityAddress['country_id'] = CRM_Core_PseudoConstant::countryForState($proximityAddress['state_province_id']);
       }
-      else {
+      elseif (isset($config->defaultContactCountry)) {
         $proximityAddress['country_id'] = $config->defaultContactCountry;
       }
     }
