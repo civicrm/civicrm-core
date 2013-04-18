@@ -331,6 +331,8 @@ $earthDistanceSQL  <= $distance
       CRM_Core_Error::fatal(ts('Proximity searching requires you to set a valid geocoding provider'));
     }
 
+    $query->_tables['civicrm_address'] = $query->_whereTables['civicrm_address'] = 1;
+
     require_once (str_replace('_', DIRECTORY_SEPARATOR, $fnName) . '.php');
     $fnName::format($proximityAddress);
     if (
@@ -345,7 +347,6 @@ $earthDistanceSQL  <= $distance
     }
 
     $query->_qill[$grouping][] = $qill;
-    $query->_tables['civicrm_address'] = $query->_whereTables['civicrm_address'] = 1;
     $query->_where[$grouping][] = self::where(
       $proximityAddress['geo_code_1'],
       $proximityAddress['geo_code_2'],
