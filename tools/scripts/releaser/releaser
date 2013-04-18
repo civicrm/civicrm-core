@@ -167,17 +167,32 @@ function do_publish() {
 #################################################
 ## Update Version Info
 function do_update() {
-  echo "VERSION UPDATE: Please enter the version that comes after $version"
+  echo "VERSION UPDATE: Enter the version that comes after $version (or enter nothing to abort)"
   read new_ver
   if [ -n "$new_ver" ]; then
     cd $workdir/$version/export
+    # escape regex special chars
+    arg=`echo "$version" | sed 's:[]\[\^\$\.\*\/]:\\\\&:g'`
     for file in xml/version.xml sql/civicrm_generated.mysql; do
-      sed "s/$version/$new_ver/g" < $file > $file.tmp
+      set -ex
+      git checkout $file
+      sed "s/$arg/$new_ver/" < $file > $file.tmp
       mv $file.tmp $file
-      git add $file
+      set +x
     done
-    git commit -m "Update version to $new_ver"
-    git push origin "$start_point"
+    # print the diff directly to the screen
+    git diff | cat
+    echo "Push these changes? y/n"
+    read input
+    if [ "$input" = "y" ]; then
+      set -ex
+      git add  xml/version.xml sql/civicrm_generated.mysql
+      git commit -m "Update version to $new_ver"
+      git push origin "$start_point"
+      set +x
+    else
+      do_update
+    fi
   else
     echo "No version entered. Aborting version update."
   fi 
@@ -214,9 +229,8 @@ for ACT in "$@" ; do
       set +x
       ;;
     --update)
-      set -ex
-      do_update
       set +x
+      do_update
       ;;
     --clean)
       set -ex
