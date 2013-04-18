@@ -66,11 +66,15 @@ function smarty_function_help($params, &$smarty) {
   else {
     $name = trim(strip_tags($params['title']));
   }
-  $title = ts('%1 Help', array(1 => $name));
-  unset($params['text'], $params['title']);
+  // Escape for html
+  $title = htmlspecialchars(ts('%1 Help', array(1 => $name)));
+  // Escape for html and js
+  $name = htmlspecialchars(json_encode($name), ENT_QUOTES);
+
   // Format params to survive being passed through json & the url
+  unset($params['text'], $params['title']);
   foreach ($params as &$param) {
     $param = is_bool($param) || is_numeric($param) ? (int) $param : (string) $param;
   }
-  return '<a class="helpicon" title="' . $title . '" href="#" onclick=\'CRM.help("' . $name . '", ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
+  return '<a class="helpicon" title="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
 }

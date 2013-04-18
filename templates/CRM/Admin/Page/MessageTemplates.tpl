@@ -100,9 +100,10 @@
       <div id="{if $type eq 'userTemplates'}user{else}workflow{/if}" class='ui-tabs-panel ui-widget-content ui-corner-bottom'>
           <div class="help">
           {if $type eq 'userTemplates'}
-            {ts}User-driven message templates allow you to save and re-use messages with layouts. They are useful if you need to send similar emails to contacts on a recurring basis. You can also use them in CiviMail Mailings and they are required for CiviMember membership renewal reminders.{/ts} {help id="id-intro"}
+            {capture assign=schedRemURL}{crmURL p='civicrm/admin/scheduleReminders' q="reset=1"}{/capture}
+            {ts 1=$schedRemURL}User-driven message templates allow you to save and re-use messages with layouts. They are useful if you need to send similar emails or letters to contacts on a recurring basis. You can also use them in CiviMail mailings. Messages used for membership renewal reminders, as well as event and activity related reminders should be created via <a href="%1">Scheduled Reminders</a>.{/ts} {help id="id-intro"}
           {else}
-            {ts}System workflow message templates are used to generate the emails sent to consituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.{/ts} {help id="id-system-workflow"}
+            {ts}System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.{/ts} {help id="id-system-workflow"}
           {/if}
           </div>
         <div>

@@ -134,14 +134,22 @@ cj(function( ) {
      cj('#civicrm-menu').css({ 'width': '97%' });
   }
 {/literal}{else}{* Special menu hacks for Joomla *}{literal}
-  cj('div#toolbar-box div.m').html(cj("#menu-container").html());
+  // below div is present in older version of joomla 2.5.x
+  var elementExists = cj('div#toolbar-box div.m').length;
+  if ( elementExists > 0 ) {
+    cj('div#toolbar-box div.m').html(cj("#menu-container").html());
+  }
+  else {
+    cj("#menu-container").show().css({'padding-bottom': '10px'});
+  }
+  
   cj('#civicrm-menu').ready(function() {
     cj('#root-menu-div .outerbox').css({ 'margin-top': '6px'});
     cj('#root-menu-div .outerbox').first().css({ 'margin-top': '20px'});
     cj('#root-menu-div .menu-ul li').css({ 'padding-bottom' : '2px', 'margin-top' : '2px' });
     cj('img.menu-item-arrow').css({ 'top' : '4px' });
   });
-{/literal}{/if}{literal}
+  {/literal}{/if}{literal}
   cj('#civicrm-menu').menu( {arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'} );
 </script>
 {/literal}

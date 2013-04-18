@@ -530,7 +530,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       if ($employerId && ($isDisabled || $relChanged)) {
         CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['current_employee_id']);
       }
-    
+
       //if field key doesn't exists in params that means the user has unchecked checkbox,
       //hence fill FALSE to params
       $params['is_active'] = $isDisabled ? FALSE : TRUE;
@@ -561,7 +561,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     //special case to handle if all checkboxes are unchecked
     $customFields = CRM_Core_BAO_CustomField::getFields('Relationship', FALSE, FALSE, $relationshipTypeId);
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
+      $params,
       $customFields,
       $this->_relationshipId,
       'Relationship'

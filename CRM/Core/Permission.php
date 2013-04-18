@@ -500,15 +500,6 @@ class CRM_Core_Permission {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
-    if (self::isMultisiteEnabled()) {
-      // For multisite just check if there are contacts in acl_contact_cache table for now.
-      // FixMe: so even if a user in multisite has very limited permission could still
-      // see search / contact navigation options for example.
-      return CRM_Contact_BAO_Contact_Permission::hasContactsInCache(CRM_Core_Permission::VIEW,
-        $contactID
-      );
-    }
-
     //check for acl.
     $aclPermission = self::getPermission();
     if (in_array($aclPermission, array(

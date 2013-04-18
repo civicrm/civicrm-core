@@ -67,7 +67,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       // creating a new relationship
       $dataExists = self::dataExists($params);
       if (!$dataExists) {
-        return NULL;
+        return array(FALSE, TRUE, FALSE, FALSE, NULL);
       }
       $relationshipIds = array();
       foreach ($params['contact_check'] as $key => $value) {
@@ -114,7 +114,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         )
       ) {
         $duplicate++;
-        return array($valid, $invalid, $duplicate);
+        return array($valid, $invalid, $duplicate, $saved, NULL);
       }
 
       $validContacts = TRUE;
@@ -1297,7 +1297,7 @@ SELECT count(*)
     AND is_current_member = 1";
             $result = CRM_Core_DAO::singleValueQuery($query);
             if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
-              CRM_Member_BAO_Membership::create($membershipValues, CRM_Core_DAO::$_nullArray);              
+              CRM_Member_BAO_Membership::create($membershipValues, CRM_Core_DAO::$_nullArray);
             }
           }
         }

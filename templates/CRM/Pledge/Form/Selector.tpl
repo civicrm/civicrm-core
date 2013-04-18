@@ -79,7 +79,7 @@
             <td class="right">{$row.pledge_amount|crmMoney:$row.pledge_currency}</td>
             <td class="right">{$row.pledge_total_paid|crmMoney:$row.pledge_currency}</td>
             <td class="right">{$row.pledge_amount-$row.pledge_total_paid|crmMoney:$row.pledge_currency}</td>
-            <td>{$row.pledge_contribution_type}</td>
+            <td>{$row.pledge_financial_type}</td>
             <td>{$row.pledge_create_date|truncate:10:''|crmDate}</td>
             <td>{$row.pledge_next_pay_date|truncate:10:''|crmDate}</td>
             <td class="right">{$row.pledge_next_pay_amount|crmMoney:$row.pledge_currency}</td>

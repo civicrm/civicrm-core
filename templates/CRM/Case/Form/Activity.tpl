@@ -147,7 +147,7 @@
         {edit}
           <span class="description">
           {ts}You can optionally assign this activity to someone.{/ts}
-          {if $config->activityAssigneeNotification}
+          {if $activityAssigneeNotification}
             <br />{ts}A copy of this activity will be emailed to each Assignee.{/ts}
           {/if}
           </span>

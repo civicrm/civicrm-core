@@ -96,6 +96,10 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     return $this->frontCache[$key];
   }
 
+  function getFromFrontCache($key, $default = NULL) {
+    return CRM_Utils_Array::value($key, $this->frontCache, $default);
+  }
+
   function delete($key) {
     CRM_Core_BAO_Cache::deleteGroup($this->group, $key);
     unset($this->frontCache[$key]);

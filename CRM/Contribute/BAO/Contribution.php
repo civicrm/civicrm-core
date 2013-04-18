@@ -2635,22 +2635,27 @@ WHERE  contribution_id = %1 ";
    */
   static function recordFinancialAccounts(&$params, $ids) {
     $skipRecords = $update = FALSE;
+    $additionalPaticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     if (CRM_Utils_Array::value('contribution_mode', $params) == 'participant') {
       $entityId = $params['participant_id'];
       $entityTable = 'civicrm_participant';
+      $additionalPaticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
     }
     else {
       $entityId = $params['contribution']->id;
       $entityTable = 'civicrm_contribution';
     }
-    $entityID = $entityId;
+    $entityID[] = $entityId;
+    if (!empty($additionalPaticipantId)) {
+      $entityID += $additionalPaticipantId;
+    }
     if (!CRM_Utils_Array::value('prevContribution', $params)) {
       $entityID = NULL;
     }
     // build line item array if its not set in $params
-    if (!CRM_Utils_Array::value('line_item', $params)) {
+    if (!CRM_Utils_Array::value('line_item', $params) || $additionalPaticipantId) {
       CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
     }
 
@@ -2873,22 +2878,29 @@ WHERE  contribution_id = %1 ";
     if ($context == 'changedStatus') {
       if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)) &&
         ($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus))) {
-        $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2";
+        $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
+        $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
+        
+        $entityParams = array(
+          'entity_table' => 'civicrm_financial_item',
+          'financial_trxn_id' => $trxn->id,
+        );
         foreach ($params['line_item'] as $fieldId => $fields) {
           foreach ($fields as $fieldValueId => $fieldValues) {
             $fparams = array(
               1 => array(CRM_Core_OptionGroup::getValue('financial_item_status', 'Paid', 'name'), 'Integer'),
               2 => array($fieldValues['id'], 'Integer'),
             );
-            $entityParams = array(
-              'entity_table' => 'civicrm_financial_item',
-              'financial_trxn_id' => $trxn->id,
-            );
             CRM_Core_DAO::executeQuery($query, $fparams);
-            // FIXME:need to change
-            $entityParams['amount'] = $fieldValues['line_total'];
-            $entityParams['entity_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialItem', $fieldValues['id'], 'id', 'entity_id');
-            CRM_Financial_BAO_FinancialItem::createEntityTrxn($entityParams);
+            $fparams = array(
+              1 => array($fieldValues['id'], 'Integer'),
+            );
+            $financialItem = CRM_Core_DAO::executeQuery($sql, $fparams);
+            while ($financialItem->fetch()) {
+              $entityParams['entity_id'] = $financialItem->id;
+              $entityParams['amount'] = $financialItem->amount;
+              CRM_Financial_BAO_FinancialItem::createEntityTrxn($entityParams);
+            }
           }
         }
         return;

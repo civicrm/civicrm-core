@@ -466,8 +466,8 @@ ul#civicrm-menu {
     border: none;
     left:0px;
     height:0px;
-    padding: 2px 0px 22px 2px !important;
-    padding-bottom:22px !important; /*moz bottom */
+    padding: 2px 0px 25px 2px !important;
+    padding-bottom:25px !important; /*moz bottom */
     padding-bottom:2px; /*ie bottom */
 }
 
@@ -522,14 +522,14 @@ ul#civicrm-menu li#crm-qsearch {
 #crm-container input,
 #crm-container select {
   font-size: 12px;
-  height: 16px;
   margin-bottom: auto;
   margin-right: 4px;
   width: auto;
   padding: 2px 4px;
 }
-#crm-container select {
-  height: 22px;
+#crm-container textarea,
+#crm-container input {
+  height: 16px;
 }
 #crm-container input[type=submit] {
   height: auto;

@@ -644,7 +644,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   /**
    * check relationship update
    */
-  function testRelationshipUpdate() {
+  function testRelationshipCreateDuplicate() {
     $relParams = array(
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
@@ -661,7 +661,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->_relationID = $result['id'];
 
     $params = array(
-      'relationship_id' => $this->_relationID,
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
       'relationship_type_id' => $this->_relTypeID,

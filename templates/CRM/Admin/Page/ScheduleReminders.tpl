@@ -29,6 +29,10 @@
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
+{capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
+<div class="help">
+  {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
+</div>
 {if $rows}
     <div id="reminder">
       {include file="CRM/Admin/Page/Reminders.tpl"}

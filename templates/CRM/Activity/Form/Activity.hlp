@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
@@ -23,44 +22,10 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
- */
-
-/**
- * This class generates form components
- * for previewing Civicrm Profile Group
- *
- */
-class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
-
-  /**
-   * pre processing work done here.
-   *
-   * gets session variables for group or field id
-   *
-   * @param
-   *
-   * @return void
-   *
-   * @access public
-   *
-   */
-  function preProcess() {
-    // Inline forms don't get menu-level permission checks
-    if (!CRM_Core_Permission::check('access CiviCRM')) {
-      CRM_Core_Error::fatal(ts('Permission denied'));
-    }
-    $gid = CRM_Utils_Request::retrieve('id', 'Positive');
-    $fields = CRM_Core_BAO_UFGroup::getFields($gid);
-    $this->setProfile($fields);
-  }
-
-}
-
+*}
+{htxt id="id-is_multi_activity-title"}
+  {ts}Create Separate Activity Records?{/ts}
+{/htxt}
+{htxt id="id-is_multi_activity"}
+  <p>{ts}By default a single activity record will be created and linked to all the contacts listed above. However, if you think you might be editing the activity later - and entering different information for different contacts - check this box to create separate activity records.{/ts}</p>
+{/htxt}
