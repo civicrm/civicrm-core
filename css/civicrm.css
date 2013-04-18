@@ -6,7 +6,7 @@
  * All styles should start with .crm-container unless they are specific to the main div only
  */
 
-.crm-container label {
+div.crm-container label {
   font-weight: normal;
   display: inline;
 }
@@ -2752,15 +2752,18 @@ div.grippie {
   background-color: #2E3471;
 }
 
-.crm-container .crm-accordion-header a.close-accordion {
+.crm-container .crm-accordion-header a.crm-close-accordion {
   font-weight: normal !important;
   float: right;
   color: #FFF !important;
-  text-decoration: none;
 }
 
-.crm-container .crm-accordion-header a.close-accordion:hover {
-  text-decoration: underline !important;
+.crm-container .crm-accordion-header a.crm-close-accordion span {
+  visibility: hidden;
+}
+
+.crm-container .crm-accordion-header a.crm-close-accordion:hover span {
+  visibility: visible;
 }
 
 .crm-container .crm-master-accordion-header.crm-accordion-header:hover,

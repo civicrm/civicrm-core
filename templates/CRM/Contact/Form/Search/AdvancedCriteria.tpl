@@ -38,7 +38,7 @@ cj(function($) {
     $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function() {
       loadPanes($(this).attr('id'));
     });
-    $('.crm-ajax-accordion').on('click', '.close-accordion', function() {
+    $('.crm-ajax-accordion').on('click', '.crm-close-accordion', function() {
       var header = $(this).parent();
       header.next().html('');
       header.removeClass('active');
@@ -90,7 +90,7 @@ cj(function($) {
     var body = $('.crm-accordion-body.' + id);
     if (header.length > 0 && body.length > 0 && !body.html()) {
       body.html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Loading{/ts}{literal}...</span></div>');
-      header.append('<a href="#" class="close-accordion" title="{/literal}{ts escape='js'}Remove from search criteria{/ts}{literal}">{/literal}{ts escape='js'}Reset{/ts}{literal} [x]</a>');
+      header.append('{/literal}<a href="#" class="crm-close-accordion" title="{ts escape='js'}Remove from search criteria{/ts}"><span>{ts escape='js'}Reset{/ts}</span> &nbsp;<img src="{$config->resourceBase}i/close.png" /></a>{literal}');
       header.addClass('active');
       $.ajax({
         url : url,
@@ -99,7 +99,7 @@ cj(function($) {
         },
         error: function() {
           CRM.alert({/literal}'{ts escape="js"}Sorry, could not load the requested information from the server.{/ts}', '{ts escape="js"}Network Error{/ts}'{literal});
-          $('.close-accordion', header).click();
+          $('.crm-close-accordion', header).click();
         }
       });
     }
