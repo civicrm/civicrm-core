@@ -1,0 +1,17 @@
+#!/usr/bin/env /bin/bash
+
+source `dirname $0`/demo.conf
+
+pushd .
+
+if [ $WORDPRESS_DEMO_DBNAME ]; then
+  # wordpress pristine
+  if [ -f $WORDPRESS_DEMO_PRISTINE ]; then
+    mysqladmin -f drop $WORDPRESS_DEMO_DBNAME
+    echo "Reloading civicrm-wordpress-demo db from pristine.."
+    mysqladmin create $WORDPRESS_DEMO_DBNAME
+    mysql $WORDPRESS_DEMO_DBNAME < $WORDPRESS_DEMO_PRISTINE
+  fi
+fi
+
+popd
