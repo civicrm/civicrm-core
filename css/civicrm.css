@@ -6,7 +6,7 @@
  * All styles should start with .crm-container unless they are specific to the main div only
  */
 
-.crm-container label {
+div.crm-container label {
   font-weight: normal;
   display: inline;
 }
@@ -777,7 +777,7 @@
   /* h3 used as table header for civicrm */
   background-color: #CDE8FE;
   font-size: 15px;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   color: #121A2D;
   padding: 4px 6px;
@@ -1254,7 +1254,7 @@
   height: auto;
   margin: 0 1px;
   padding: 2px 5px;
-  font-family: Helvetica, Arial, sans-serif; 
+  font-family: Arial, Helvetica, sans-serif; 
 }
 
 .crm-container #alpha-filter a {
@@ -2752,15 +2752,18 @@ div.grippie {
   background-color: #2E3471;
 }
 
-.crm-container .crm-accordion-header a.close-accordion {
+.crm-container .crm-accordion-header a.crm-close-accordion {
   font-weight: normal !important;
   float: right;
   color: #FFF !important;
-  text-decoration: none;
 }
 
-.crm-container .crm-accordion-header a.close-accordion:hover {
-  text-decoration: underline !important;
+.crm-container .crm-accordion-header a.crm-close-accordion span {
+  visibility: hidden;
+}
+
+.crm-container .crm-accordion-header a.crm-close-accordion:hover span {
+  visibility: visible;
 }
 
 .crm-container .crm-master-accordion-header.crm-accordion-header:hover,
