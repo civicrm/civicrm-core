@@ -656,6 +656,25 @@ OR       ( start_date >= $now )
   while ($dao->fetch()) {
     $eventPages[$dao->id] = $dao->title;
   }
+
+
+  $sql = "
+SELECT g.id as id, g.title as title
+FROM   civicrm_uf_group g, civicrm_uf_join j
+WHERE  g.is_active = 1
+AND    j.is_active = 1
+AND    ( group_type LIKE '%Individual%'
+   OR    group_type LIKE '%Contact%' )
+AND    g.id = j.uf_group_id
+AND    j.module = 'Profile'
+";
+
+  $dao = CRM_Core_DAO::executeQuery($sql);
+  $profilePages = array();
+  while ($dao->fetch()) {
+    $profilePages[$dao->id] = $dao->title;
+  }
+
   ?>
   <script type="text/javascript">
     jQuery(function($) {
@@ -679,6 +698,10 @@ OR       ( start_date >= $now )
             shortcode += ' action="' + $("input[name='event_action']:checked").val() + '"';
             shortcode += ' mode="' + $("input[name='component_mode']:checked").val() + '"';
             break;
+          case 'profile':
+            shortcode += ' gid="' + $("#add_profilepage_id").val() + '"';
+            shortcode += ' mode="' + $("input[name='profile_mode']:checked").val() + '"';
+            break;
           case 'user-dashboard':
             break;
         }
@@ -690,14 +713,22 @@ OR       ( start_date >= $now )
         switch ($(this).val()) {
           case 'contribution':
             $('#contribution-section, #component-section').show();
+            $('#profile-section, #profile-mode-section').hide();
             $('#event-section, #action-section-event').hide();
             break;
           case 'event':
             $('#contribution-section').hide();
+            $('#profile-section, #profile-mode-section').hide();
             $('#event-section, #component-section, #action-section-event').show();
+            break;
+          case 'profile':
+            $('#contribution-section, #component-section').hide();
+            $('#profile-section, #profile-mode-section').show();
+            $('#event-section, #action-section-event').hide();
             break;
           default:
             $('#contribution-section, #event-section, #component-section, #action-section-event').hide();
+            $('#profile-section, #profile-mode-section').hide();
             break;
         }
       });
@@ -720,6 +751,7 @@ OR       ( start_date >= $now )
                             <option value="">  <?php echo ts("Select a frontend element."); ?>  </option>
                             <option value="contribution">Contribution Page</option>
                             <option value="event">Event Page</option>
+                            <option value="profile">Profile</option>
                             <option value="user-dashboard">User Dashboard</option>
                         </select>
 
@@ -757,6 +789,26 @@ OR       ( start_date >= $now )
                            </div>
                         </span>
                         <br/>
+
+                        <span id="profile-section" style="display:none;">
+                           <select id="add_profilepage_id">
+                           <?php
+                             foreach ($profilePages as $key => $value) { ?>
+                               <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+                               <?php
+                            }?>
+                           </select>
+                        </span>
+                        <br/>
+
+                        <span id="profile-mode-section" style="display:none;">
+                           <div style="padding:15px 15px 0 15px;">
+                            <input type="radio" name="profile_mode" value="create" checked="checked"/> Create
+                            <input type="radio" name="profile_mode" value="edit" /> Edit
+                            <input type="radio" name="profile_mode" value="edit" /> View
+                           </div>
+                        </span>
+
                         <div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php echo ts("Can't find your form? Make sure it is active."); ?></div>
                     </div>
                     <div style="padding:15px;">
@@ -785,7 +837,7 @@ function civicrm_shortcode_handler($atts) {
 
   $args = array(
     'reset' => 1,
-    'id' => $id,
+    'id'    => $id,
   );
 
   switch ($component) {
@@ -818,6 +870,19 @@ function civicrm_shortcode_handler($atts) {
     case 'user-dashboard':
       $args['q'] = 'civicrm/user';
       unset($args['id']);
+      break;
+
+    case 'profile':
+      if ($mode == 'edit') {
+        $args['q'] = 'civicrm/profile/edit';
+      }
+      else if ($mode == 'view') {
+        $args['q'] = 'civicrm/profile/view';
+      }
+      else {
+        $args['q'] = 'civicrm/profile/create';
+      }
+      $args['gid'] = $gid;
       break;
 
     default:
