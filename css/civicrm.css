@@ -777,7 +777,7 @@ div.crm-container label {
   /* h3 used as table header for civicrm */
   background-color: #CDE8FE;
   font-size: 15px;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   color: #121A2D;
   padding: 4px 6px;
@@ -1254,7 +1254,7 @@ div.crm-container label {
   height: auto;
   margin: 0 1px;
   padding: 2px 5px;
-  font-family: Helvetica, Arial, sans-serif; 
+  font-family: Arial, Helvetica, sans-serif; 
 }
 
 .crm-container #alpha-filter a {
