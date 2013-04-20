@@ -574,11 +574,11 @@ INNER JOIN  civicrm_activity_contact activityAssignment
     }
 
     if ($interviewerId) {
-      $where[] = "( activityAssignment.assignee_contact_id =  $interviewerId )";
+      $where[] = "( activityAssignment.contact_id =  $interviewerId )";
     }
 
     if (!empty($voterIds)) {
-      $where[] = "( activityTarget.target_contact_id IN ( " . implode(',', $voterIds) . " ) )";
+      $where[] = "( activityTarget.contact_id IN ( " . implode(',', $voterIds) . " ) )";
     }
 
     $whereClause = NULL;
@@ -597,8 +597,8 @@ INNER JOIN  civicrm_activity_contact activityAssignment
     else {
       $select = "
     SELECT  activity.id, activity.status_id,
-            activityTarget.target_contact_id as voter_id,
-            activityAssignment.assignee_contact_id as interviewer_id,
+            activityTarget.contact_id as voter_id,
+            activityAssignment.contact_id as interviewer_id,
             activity.result as result,
             activity.activity_date_time as activity_date_time,
             contact_a.display_name as voter_name";
