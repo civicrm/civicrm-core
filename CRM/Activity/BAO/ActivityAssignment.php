@@ -58,9 +58,11 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    */
   public static function create(&$params) {
     $assignment = new CRM_Activity_BAO_ActivityAssignment();
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $assignment->copyValues($params);
-    $assignment->record_type = 'Assignee';
+    $assignment->record_type_id = $assigneeID;
     if (isset($assignment->assignee_contact_id)) {
       $assignment->contact_id = $assignment->assignee_contact_id;
     }
@@ -83,12 +85,15 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
       return $assigneeArray;
     }
 
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+
     $sql = "
 SELECT     contact_id
 FROM       civicrm_activity_contact
 INNER JOIN civicrm_contact ON contact_id = civicrm_contact.id
 WHERE      activity_id = %1
-AND        record_type = 'Assignee'
+AND        record_type_id = $assigneeID
 AND        civicrm_contact.is_deleted = 0
 ";
     $assignment = CRM_Core_DAO::executeQuery($sql, array(1 => array($activity_id, 'Integer')));
@@ -116,6 +121,8 @@ AND        civicrm_contact.is_deleted = 0
     if (empty($activityID)) {
       return $assigneeNames;
     }
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $whereClause = "";
     if (!$skipDetails) {
@@ -129,7 +136,7 @@ INNER JOIN civicrm_activity_contact ON civicrm_activity_contact.contact_id = con
 LEFT JOIN  civicrm_email ce ON ce.contact_id = contact_a.id
 WHERE      civicrm_activity_contact.activity_id = %1
 AND        contact_a.is_deleted = 0
-AND        civicrm_activity_contact.record_type = 'Assignee'
+AND        civicrm_activity_contact.record_type_id = $assigneeID 
            {$whereClause}
 ";
 

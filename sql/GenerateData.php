@@ -1137,7 +1137,7 @@ class CRM_GCD {
     $contactDAO->find();
 
     $count = 0;
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     while ($contactDAO->fetch()) {
       if ($count++ > 2) {
         break;
@@ -1156,14 +1156,14 @@ class CRM_GCD {
         $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
         $activityContactDAO->activity_id = $activityDAO->id;
         $activityContactDAO->contact_id = $contactDAO->id;
-        $activityContactDAO->record_type = 'Source';
+        $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $this->_insert($activityContactDAO);
 
         if (in_array($activityTypeID, array(6, 9))) {
           $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
           $activityContactDAO->activity_id = $activityDAO->id;
           $activityContactDAO->contact_id = mt_rand(1, 101);
-          $activityContactDAO->record_type = 'Target';
+          $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Targets', $activityContacts);
           $this->_insert($activityContactDAO);
         }
 
@@ -1171,7 +1171,7 @@ class CRM_GCD {
           $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
           $activityContactDAO->activity_id = $activityDAO->id;
           $activityContactDAO->contact_id = mt_rand(1, 101);
-          $activityContactDAO->record_type = 'Assignee';
+          $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
           $this->_insert($activityContactDAO);
         }
       }
@@ -1256,6 +1256,7 @@ class CRM_GCD {
   private function addMembership() {
     $contact = new CRM_Contact_DAO_Contact();
     $contact->query("SELECT id FROM civicrm_contact where contact_type = 'Individual'");
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     while ($contact->fetch()) {
       $contacts[] = $contact->id;
     }
@@ -1282,16 +1283,17 @@ VALUES
 
     $activityContact = "
 INSERT INTO civicrm_activity_contact
-  (activity_id, contact_id, record_type)
+  (activity_id, contact_id, record_type_id)
 VALUES
 ";
 
     $currentActivityID = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_activity");
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     foreach ($randomContacts as $count => $dontCare) {
       $source = $this->randomItem($sources);
       $activitySourceId = $count + 1;
       $currentActivityID++;
-      $activityContact .= "( $currentActivityID, {$randomContacts[$count]}, 'Source' )";
+      $activityContact .= "( $currentActivityID, {$randomContacts[$count]}, {$sourceID} )";
       if ((($count + 1) % 11 == 0)) {
         // lifetime membership, status can be anything
         $startDate = date('Y-m-d', mktime(0, 0, 0, date('m'), (date('d') - $count), date('Y')));
@@ -1621,15 +1623,16 @@ VALUES
 
     $activityContact = "
 INSERT INTO civicrm_activity_contact
-  (contact_id, activity_id, record_type)
+  (contact_id, activity_id, record_type_id)
 VALUES
 ";
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     $currentActivityID = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_activity");
     $currentActivityID -= 50;
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     for ($i = 0; $i < 50; $i++) {
       $currentActivityID++;
-      $activityContact .= "({$randomContacts[$i]}, $currentActivityID, 'Source')";
+      $activityContact .= "({$randomContacts[$i]}, $currentActivityID, $sourceID)";
       if ($i != 49) {
         $activityContact .= ", ";
       }
@@ -1691,14 +1694,14 @@ VALUES
 
     $activityContact = "
 INSERT INTO civicrm_activity_contact
-  (contact_id, activity_id, record_type)
+  (contact_id, activity_id, record_type_id)
 VALUES
 ";
 
     $arbitraryNumbers = array(2, 4, 6, 8, 16, 19, 82, 92, 34, 71, 43, 32, 32);
     for ($i = 0; $i < count($arbitraryNumbers); $i++) {
       $currentActivityID++;
-      $activityContact .= "({$arbitraryNumbers[$i]}, $currentActivityID, 'Source')";
+      $activityContact .= "({$arbitraryNumbers[$i]}, $currentActivityID, 2)";
       if ($i != count($arbitraryNumbers) - 1) {
         $activityContact .= ", ";
       }
@@ -1853,8 +1856,8 @@ WHERE cps.name = 'default_membership_type_amount'";
 SELECT id, 6, CONCAT('$ ', total_amount, ' - ', source), now(), 2, 'Membership Payment' FROM civicrm_contribution WHERE id > $maxContribution";
     $this->_query($sql);
 
-    $sql = "INSERT INTO civicrm_activity_contact(contact_id, activity_id, record_type)
-SELECT c.contact_id, a.id, 'Source'
+    $sql = "INSERT INTO civicrm_activity_contact(contact_id, activity_id, record_type_id)
+SELECT c.contact_id, a.id, 2
 FROM   civicrm_contribution c, civicrm_activity a
 WHERE  c.id > $maxContribution
 AND    a.source_record_id = c.id
@@ -1884,8 +1887,8 @@ WHERE cc.id > $maxContribution";
 SELECT id, 6, CONCAT('$ ', total_amount, ' - ', source), now(), 2, 'Participant' FROM `civicrm_contribution` WHERE id > $maxContribution";
     $this->_query($sql);
 
-    $sql = "INSERT INTO civicrm_activity_contact(contact_id, activity_id, record_type)
-SELECT c.contact_id, a.id, 'Source'
+    $sql = "INSERT INTO civicrm_activity_contact(contact_id, activity_id, record_type_id)
+SELECT c.contact_id, a.id, 2
 FROM   civicrm_contribution c, civicrm_activity a
 WHERE  c.id > $maxContribution
 AND    a.source_record_id = c.id
