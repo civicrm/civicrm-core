@@ -2261,7 +2261,6 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
  
-    if (isset($params
     $processCaseIds = array($otherCaseId);
     if ($duplicateContacts && !$duplicateCases) {
       if ($changeClient) {
