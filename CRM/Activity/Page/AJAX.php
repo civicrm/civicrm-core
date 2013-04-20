@@ -361,11 +361,17 @@ class CRM_Activity_Page_AJAX {
     if (!empty($params['targetContactIds'])) {
       $targetContacts = array_unique(explode(',', $params['targetContactIds']));
     }
+    
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
     foreach ($targetContacts as $key => $value) {
       $targ_params = array(
         'activity_id' => $mainActivityId,
         'contact_id' => $value,
-        'record_type' => 'Target'
+        'record_type_id' => $targetID
       );
       CRM_Activity_BAO_ActivityContact::create($targ_params);
     }
@@ -379,7 +385,7 @@ class CRM_Activity_Page_AJAX {
       $assigneeParams = array(
         'activity_id' => $mainActivityId,
         'contact_id' => $value,
-        'record_type' => 'Assignee'
+        'record_type_id' => $assigneeID
       );
       CRM_Activity_BAO_ActivityContact::create($assigneeParams);
     }

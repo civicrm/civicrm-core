@@ -2698,10 +2698,13 @@ WHERE  id IN ( $groupIDs )
       // search tag in activities
       $etActTable = "`civicrm_entity_act_tag-" . $value . "`";
       $tActTable = "`civicrm_act_tag-" . $value . "`";
+      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+      
       $this->_tables[$etActTable] =
         $this->_whereTables[$etActTable] =
         " LEFT JOIN civicrm_activity_contact
-            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type = 'Target' )
+            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type_id = {$targetID} )
           LEFT JOIN civicrm_activity
             ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
             AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )
@@ -2759,6 +2762,9 @@ WHERE  id IN ( $groupIDs )
 
       // search tag in cases
       $etCaseTable = "`civicrm_entity_case_tag-" . $value . "`";
+      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
       $this->_tables[$etCaseTable] =
         $this->_whereTables[$etCaseTable] =
         " LEFT JOIN civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
@@ -2771,7 +2777,7 @@ WHERE  id IN ( $groupIDs )
       $this->_tables[$etActTable] =
         $this->_whereTables[$etActTable] =
         " LEFT JOIN civicrm_activity_contact
-            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type = 'Target' )
+            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type_id = {$targetID} )
           LEFT JOIN civicrm_activity
             ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
             AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )

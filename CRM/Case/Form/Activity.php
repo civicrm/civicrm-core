@@ -592,11 +592,12 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     );
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
 
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     // create activity assignee records
     $assigneeParams = array(
       'activity_id' => $activity->id,
-      'record_type' => 'Assignee'
+      'record_type_id' => $assigneeID 
     );
 
     if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {

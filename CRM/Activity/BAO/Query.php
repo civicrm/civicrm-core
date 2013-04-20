@@ -242,19 +242,23 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_role':
         CRM_Contact_BAO_Query::$_activityRole = $values[2];
-
+        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+        $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+ 
         if ($values[2]) {
           $query->_tables['civicrm_activity_contact'] = $query->_whereTables['civicrm_activity_contact'] = 1;
           if ($values[2] == 1) {
-            $query->_where[$grouping][] = " civicrm_activity_contact.record_type = 'Source'";
+            $query->_where[$grouping][] = " civicrm_activity_contact.record_type_id = $sourceID";
             $query->_qill[$grouping][] = ts('Activity created by');
           }
           else if ($values[2] == 2) {
-            $query->_where[$grouping][] = " civicrm_activity_contact.record_type = 'Assigneen'";
+            $query->_where[$grouping][] = " civicrm_activity_contact.record_type_id = $assigneeID";
             $query->_qill[$grouping][] = ts('Activity assigned to');
           }
           else if ($values[2] == 3) {
-            $query->_where[$grouping][] = " civicrm_activity_contact.record_type = 'Target'";
+            $query->_where[$grouping][] = " civicrm_activity_contact.record_type_id = $targetID";
             $query->_qill[$grouping][] = ts('Activity targeted to');
           }
         }
