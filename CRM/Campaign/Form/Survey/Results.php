@@ -399,7 +399,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     $survey = CRM_Campaign_BAO_Survey::create($params);
 
     // create report if required.
-    if ( !$this->_reportId && $survey->id && $params['create_report'] ) {
+    if ( !$this->_reportId && $survey->id && CRM_Utils_Array::value('create_report', $params) ) {
       $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
       $activityStatus = array_flip($activityStatus);
       $this->_params = 

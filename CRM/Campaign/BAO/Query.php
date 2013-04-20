@@ -414,7 +414,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
    * @return $voterClause as a string
    * @static
    */
-  function voterClause($params) {
+  static public function voterClause($params) {
     $voterClause = array();
     $fromClause = $whereClause = NULL;
     if (!is_array($params) || empty($params)) {
