@@ -517,16 +517,19 @@ Group By  contact.id";
     }
 
     $targetContactIds = ' ( ' . implode(',', $voterIds) . ' ) ';
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+ 
     $query = "
     SELECT  activity.id, activity.status_id,
             activityTarget.contact_id as voter_id,
             activityAssignment.contact_id as interviewer_id
       FROM  civicrm_activity activity
 INNER JOIN  civicrm_activity_contact activityTarget
-  ON ( activityTarget.activity_id = activity.id AND activityTarget.record_type = 'Target')
+  ON ( activityTarget.activity_id = activity.id AND activityTarget.record_type_id = $targetID )
 INNER JOIN  civicrm_activity_contact activityAssignment
-  ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type = 'Assignee')
+  ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
      WHERE  activity.source_record_id = %1
        AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
        AND  activityAssignment.contact_id = %2
@@ -604,13 +607,17 @@ INNER JOIN  civicrm_activity_contact activityAssignment
             contact_a.display_name as voter_name";
     }
 
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
     $query = "
             $select
       FROM  civicrm_activity activity
 INNER JOIN  civicrm_activity_contact activityTarget
-  ON ( activityTarget.activity_id = activity.id AND activityTarget.record_type = 'Target')
+  ON ( activityTarget.activity_id = activity.id AND activityTarget.record_type_id = $targetID )
 INNER JOIN  civicrm_activity_contact activityAssignment
-  ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type = 'Assignee')
+  ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
 INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a.id )
      WHERE  activity.source_record_id = %1
        AND  activity.activity_type_id = %2
@@ -1000,12 +1007,14 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     }
 
     $interviewers = array();
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $query = "
     SELECT  contact.id as id,
             contact.sort_name as sort_name
       FROM  civicrm_contact contact
-INNER JOIN civicrm_activity_contact assignment ON ( assignment.contact_id = contact.id AND record_type = 'Assignee' )
+INNER JOIN civicrm_activity_contact assignment ON ( assignment.contact_id = contact.id AND record_type_id = $assigneeID )
 INNER JOIN  civicrm_activity activity ON ( activity.id = assignment.activity_id )
 INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
             {$whereClause}";

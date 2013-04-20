@@ -348,15 +348,19 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   function from() {
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
     $this->_from = "
         FROM civicrm_activity {$this->_aliases['civicrm_activity']}
 
              LEFT JOIN civicrm_activity_contact  {$this->_aliases['civicrm_activity_target']}
                     ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_target']}.activity_id AND 
-                       {$this->_aliases['civicrm_activity_target']}.record_type = 'Target'
+                       {$this->_aliases['civicrm_activity_target']}.record_type_id = {$targetID}
              LEFT JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_assignment']}
                     ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_assignment']}.activity_id AND 
-                       {$this->_aliases['civicrm_activity_assignment']}.record_type = 'Assignee' 
+                       {$this->_aliases['civicrm_activity_assignment']}.record_type_id = {$assigneeID} 
              LEFT JOIN civicrm_contact civicrm_contact_source
                     ON {$this->_aliases['civicrm_activity']}.source_contact_id = civicrm_contact_source.id
              LEFT JOIN civicrm_contact contact_civireport

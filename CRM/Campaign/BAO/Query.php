@@ -204,10 +204,15 @@ class CRM_Campaign_BAO_Query {
       return $from;
     }
 
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    
     switch ($name) {
       case self::CIVICRM_ACTIVITY_TARGET:
         $from = " INNER JOIN civicrm_activity_contact civicrm_activity_target
-   ON ( civicrm_activity_target.contact_id = contact_a.id AND civicrm_activity_target.record_type = 'Target') ";
+   ON ( civicrm_activity_target.contact_id = contact_a.id AND civicrm_activity_target.record_type_id = $targetID) ";
         break;
 
       case self::CIVICRM_ACTIVITY:
@@ -220,7 +225,7 @@ class CRM_Campaign_BAO_Query {
       case self::CIVICRM_ACTIVITY_ASSIGNMENT:
         $from = "
 INNER JOIN  civicrm_activity_contact civicrm_activity_assignment ON ( civicrm_activity.id = civicrm_activity_assignment.activity_id AND
-civicrm_activity_assignment.record_type = 'Assignee' ) ";
+civicrm_activity_assignment.record_type_id = $assigneeID ) ";
         break;
 
       case 'civicrm_survey':
