@@ -117,15 +117,19 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       else {
         $defaults['target_contact_value'] = ts('(recipients)');
       }
+      
+      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+      $sourceContactId = self::getActivityContact($activity->id, $sourceID);
 
-      if ($activity->source_contact_id &&
+      if ($sourceContactId &&
         !CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $activity->source_contact_id,
+          $sourceContactId,
           'is_deleted'
         )
       ) {
         $defaults['source_contact'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $activity->source_contact_id,
+          $sourceContactId,
           'sort_name'
         );
       }
@@ -2259,7 +2263,6 @@ AND    contact_id <> %2
       return $allow;
     }
 
-
     //first check the component permission.
     $sql = "
     SELECT  component_id
@@ -2294,7 +2297,10 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
 
     //check for source contact.
     if (!$componentId || $allow) {
-      $allow = CRM_Contact_BAO_Contact_Permission::allow($activity->source_contact_id, $permission);
+      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+      $sourceContactId = self::getActivityContact($activity->id, $sourceID);
+      $allow = CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission);
     }
 
     //check for target and assignee contacts.
@@ -2531,6 +2537,17 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
 
     // copy activity attachments ( if any )
     CRM_Core_BAO_File::copyEntityFile('civicrm_activity', $params['activityID'], 'civicrm_activity', $params['mainActivityId']);
+  }
+
+  public static function getActivityContact($activityId, $recordTypeID = NULL, $column = 'contact_id') {
+    $activityContact = new CRM_Activity_BAO_ActivityContact();
+    $activityContact->activity_id = $activityId;
+    if ($recordTypeID) {
+      $activityContact->record_type_id = $recordTypeID;
+    }
+    if ($activityContact->find(TRUE)) {
+      return $activityContact->$column;  
+    }
   }
 }
 
