@@ -385,7 +385,7 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     $fromPhone = $this->retrieve('from', 'String');
     $fromPhone = $this->formatPhone($this->stripPhone($fromPhone), $like, "like");
 
-    return parent::inbound($fromPhone, $this->retrieve('text', 'String'), NULL, $this->retrieve('moMsgId', 'String'));
+    return parent::record_inbound_msg($fromPhone, $this->retrieve('text', 'String'), NULL, $this->retrieve('moMsgId', 'String'));
   }
 
   /**

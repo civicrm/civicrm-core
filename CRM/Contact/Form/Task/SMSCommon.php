@@ -393,11 +393,13 @@ class CRM_Contact_Form_Task_SMSCommon {
     $smsParams = $thisValues;
     unset($smsParams['text_message']);
     $smsParams['provider_id'] = $fromSmsProviderId;
+    $contactIds = array_keys($form->_contactDetails);
+    $allContactIds = array_keys($form->_allContactDetails);
 
     list($sent, $activityId) = CRM_Activity_BAO_Activity::sendSMS($formattedContactDetails,
       $thisValues,
       $smsParams,
-      array_keys($form->_contactDetails)
+      $contactIds
     );
 
     if ($sent) {
@@ -406,13 +408,13 @@ class CRM_Contact_Form_Task_SMSCommon {
     }
 
     //Display the name and number of contacts for those sms is not sent.
-    $smsNotSent = array_diff_assoc($form->_allContactDetails, $form->_contactDetails);
+    $smsNotSent = array_diff_assoc($allContactIds, $contactIds);
 
     if (!empty($smsNotSent)) {
       $not_sent = array();
-      foreach ($smsNotSent as $contactId => $values) {
-        $displayName    = $values['display_name'];
-        $phone          = $values['phone'];
+      foreach ($smsNotSent as $index => $contactId) {
+        $displayName    = $form->_allContactDetails[$contactId]['display_name'];
+        $phone          = $form->_allContactDetails[$contactId]['phone'];
         $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$contactId");
         $not_sent[] = "<a href='$contactViewUrl' title='$phone'>$displayName</a>";
       }
