@@ -141,11 +141,6 @@ function civicrm_run_installer() {
   include ($installFile);
 }
 
-function civicrm_wp_set_title($title = '') {
-  global $civicrm_wp_title;
-  return empty($civicrm_wp_title) ? $title : $civicrm_wp_title;
-}
-
 function civicrm_setup_warning() {
   $installLink = admin_url() . "options-general.php?page=civicrm-install";
   echo '<div id="civicrm-warning" class="updated fade"><p><strong>' . t('CiviCRM is almost ready.') . '</strong> ' . t('You must <a href="!1">configure CiviCRM</a> for it to work.', array(
@@ -159,8 +154,19 @@ function civicrm_remove_wp_magic_quotes() {
   $_REQUEST = stripslashes_deep($_REQUEST);
 }
 
+/**
+ * This was the original name of the initialization function and is
+ * retained for backward compatibility
+ */
 function civicrm_wp_initialize() {
+  return civicrm_initialize();
+}
 
+/**
+ * Initialize CiviCRM. Call this function from other modules too if
+ * they use the CiviCRM API.
+ */
+function civicrm_initialize() {
   static $initialized = FALSE;
   static $failure = FALSE;
 
@@ -169,11 +175,10 @@ function civicrm_wp_initialize() {
   }
 
   if (!$initialized) {
-
-    // Check for php version and ensure its greater than 5.
-    // do a fatal exit if
-    if ((int ) substr(PHP_VERSION, 0, 1) < 5) {
-      echo "CiviCRM requires PHP Version 5.2 or greater. You are running PHP Version " . PHP_VERSION . "<p>";
+    // Check for php version and ensure its greater than minPhpVersion
+    $minPhpVersion = '5.3.3';
+    if (version_compare(PHP_VERSION, $minPhpVersion) < 0) {
+      echo "CiviCRM requires PHP Version $minPhpVersion or greater. You are running PHP Version " . PHP_VERSION . "<p>";
       exit();
     }
 
@@ -291,7 +296,7 @@ function civicrm_wp_invoke() {
   }
 
   $alreadyInvoked = TRUE;
-  if (!civicrm_wp_initialize()) {
+  if (!civicrm_initialize()) {
     return '';
   }
 
@@ -342,7 +347,7 @@ function civicrm_wp_head() {
 }
 
 function civicrm_wp_frontend($shortcode = FALSE) {
-  if (!civicrm_wp_initialize()) {
+  if (!civicrm_initialize()) {
     return;
   }
 
@@ -484,14 +489,16 @@ function civicrm_check_permission($args) {
 
   // an event registration page is valid
   if (in_array('CiviEvent', $config->enableComponents)) {
-    if ($arg1 == 'event' &&
+    if (
+      $arg1 == 'event' &&
       in_array($arg2, array('register', 'info', 'participant', 'ical', 'confirm'))
     ) {
       return TRUE;
     }
 
     // also allow events to be mapped
-    if ($arg1 == 'contact' &&
+    if (
+      $arg1 == 'contact' &&
       $arg2 == 'map' &&
       $arg3 == 'event'
     ) {
@@ -551,11 +558,14 @@ function wp_civicrm_capability() {
 
 function civicrm_wp_main() {
   add_action('init', 'wp_civicrm_capability');
-  if (is_admin()) {
+
+  $isAdmin = is_admin();
+  if ($isAdmin) {
     add_action('admin_menu', 'civicrm_wp_add_menu_items');
 
     //Adding "embed form" button
-    if (in_array(basename($_SERVER['PHP_SELF']),
+    if (in_array(
+        basename($_SERVER['PHP_SELF']),
         array('post.php', 'page.php', 'page-new.php', 'post-new.php')
       )) {
       add_action('media_buttons_context', 'civicrm_add_form_button');
@@ -571,6 +581,8 @@ function civicrm_wp_main() {
         add_action('admin_notices', 'civicrm_setup_warning');
       }
     }
+
+    add_action('admin_head', 'civicrm_wp_head');
   }
 
   add_action('user_register', 'civicrm_user_register');
@@ -578,13 +590,8 @@ function civicrm_wp_main() {
 
   add_shortcode('civicrm', 'civicrm_shortcode_handler');
 
-  if (is_admin()) {
-    add_action('admin_head', 'civicrm_wp_head');
-  } else {
+  if (! $isAdmin) {
     add_action('wp_head', 'civicrm_wp_head');
-  }
-
-  if (!is_admin()) {
     add_filter('get_header', 'civicrm_wp_shortcode_includes');
   }
 
@@ -592,19 +599,18 @@ function civicrm_wp_main() {
     return;
   }
 
-  if (!is_admin()) {
+  if (!$isAdmin) {
     add_action('wp_footer', 'civicrm_buffer_end');
 
     // we do this here rather than as an action, since we dont control
     // the order
     civicrm_buffer_start();
-
     civicrm_wp_frontend();
   }
 }
 
 function civicrm_add_form_button($context) {
-  if (!civicrm_wp_initialize()) {
+  if (!civicrm_initialize()) {
     return '';
   }
 
@@ -908,7 +914,10 @@ function civicrm_wp_in_civicrm() {
 function civicrm_wp_shortcode_includes() {
   global $post;
   if (preg_match('/\[civicrm/', $post->post_content)) {
-    civicrm_wp_initialize();
+    if (!civicrm_initialize()) {
+      return;
+    }
+
     CRM_Core_Resources::singleton()->addCoreResources();
   }
 }
@@ -942,10 +951,13 @@ function civicrm_profile_update($userID) {
 function _civicrm_update_user($userID) {
   $user = get_userdata($userID);
   if ($user) {
-    civicrm_wp_initialize();
+    if (!civicrm_initialize()) {
+      return;
+    }
 
     require_once 'CRM/Core/BAO/UFMatch.php';
-    CRM_Core_BAO_UFMatch::synchronize($user,
+    CRM_Core_BAO_UFMatch::synchronize(
+      $user,
       TRUE,
       'WordPress',
       'Individual'
