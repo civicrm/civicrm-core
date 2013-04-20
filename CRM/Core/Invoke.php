@@ -460,6 +460,7 @@ class CRM_Core_Invoke {
 
     CRM_Core_BAO_SETTING::updateSettingsFromMetaData();
     CRM_Core_Resources::singleton()->resetCacheCode();
+
     // also rebuild triggers if requested explicitly
     if (
       $triggerRebuild ||

@@ -625,7 +625,7 @@ SET    version = '$version'
 
     // cleanup caches CRM-8739
     $config = CRM_Core_Config::singleton();
-    $config->cleanupCaches(1, FALSE);
+    $config->cleanupCaches(1);
 
     // Rebuild all triggers and re-enable logging if needed
     $logging = new CRM_Logging_Schema();
