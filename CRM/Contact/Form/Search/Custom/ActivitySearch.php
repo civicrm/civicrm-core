@@ -224,6 +224,8 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
 
   // Regular JOIN statements here to limit results to contacts who have activities.
   function from() {
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     return "
         civicrm_contact contact_a
             JOIN civicrm_activity activity
@@ -237,7 +239,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
             LEFT JOIN civicrm_case_activity cca
                  ON activity.id = cca.activity_id
             LEFT JOIN civicrm_activity_contact assignment
-                 ON activity.id = assignment.activity_id AND assignment.record_type = 'Assignee'
+                 ON activity.id = assignment.activity_id AND assignment.record_type_id = {$assigneeID}
             LEFT JOIN civicrm_contact contact_c
                  ON assignment.contact_id = contact_c.id ";
   }

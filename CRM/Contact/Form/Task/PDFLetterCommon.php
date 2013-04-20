@@ -383,11 +383,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       }
     }
 
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+ 
     foreach ($form->_contactIds as $contactId) {
       $activityTargetParams = array(
         'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,
         'contact_id' => $contactId,
-        'record_type' => 'Target'
+        'record_type_id' => $targetID
       );
       CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
     }

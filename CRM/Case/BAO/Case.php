@@ -974,6 +974,9 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   static function getCaseActivity($caseID, &$params, $contactID, $context = NULL, $userID = NULL, $type = NULL) {
     $values = array();
 
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+
     // CRM-5081 - formatting the dates to omit seconds.
     // Note the 00 in the date format string is needed otherwise later on it thinks scheduled ones are overdue.
     $select = "SELECT count(ca.id) as ismultiple, ca.id as id,
@@ -1005,7 +1008,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
                   LEFT OUTER JOIN civicrm_option_group og ON og.name="activity_status"
                   LEFT OUTER JOIN civicrm_option_value ov ON ov.option_group_id=og.id AND ov.name="Scheduled"
                   LEFT JOIN civicrm_activity_contact caa
-                                ON caa.activity_id = ca.id AND caa.record_type = "Assignee"                  
+                                ON caa.activity_id = ca.id AND caa.record_type_id = $assigneeID                  
                   LEFT JOIN civicrm_contact acc ON acc.id = caa.contact_id  ';
 
     $where = 'WHERE cca.case_id= %1
@@ -2253,7 +2256,11 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
 
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name');
     $activityStatuses = CRM_Core_PseudoConstant::activityStatus('name');
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+ 
     $processCaseIds = array($otherCaseId);
     if ($duplicateContacts && !$duplicateCases) {
       if ($changeClient) {
@@ -2401,11 +2408,11 @@ SELECT  id
         //migrate target activities.
         $otherTargetActivity = new CRM_Activity_DAO_ActivityContact();
         $otherTargetActivity->activity_id = $otherActivityId;
-        $otherTargetActivity->record_type = 'Target';
+        $otherTargetActivity->record_type_id = $targetID;
         $otherTargetActivity->find();
         while ($otherTargetActivity->fetch()) {
           $mainActivityTarget = new CRM_Activity_DAO_ActivityContact();
-          $mainActivityTarget->record_type = 'Target';
+          $mainActivityTarget->record_type_id = $targetID;
           $mainActivityTarget->activity_id = $mainActivityId;
           $mainActivityTarget->contact_id = $otherTargetActivity->contact_id;
           if ($mainActivityTarget->contact_id == $otherContactId) {
@@ -2422,12 +2429,12 @@ SELECT  id
         //migrate assignee activities.
         $otherAssigneeActivity = new CRM_Activity_DAO_ActivityContact();
         $otherAssigneeActivity->activity_id = $otherActivityId;
-        $otherAssigneeActivity->record_type = 'Assignee';
+        $otherAssigneeActivity->record_type_id = $assigneeID;
         $otherAssigneeActivity->find();
         while ($otherAssigneeActivity->fetch()) {
           $mainAssigneeActivity = new CRM_Activity_DAO_ActivityContact();
           $mainAssigneeActivity->activity_id = $mainActivityId;
-          $mainAssigneeActivity->record_type = 'Assignee';
+          $mainAssigneeActivity->record_type_id = $assigneeID;
           $mainAssigneeActivity->contact_id = $otherAssigneeActivity->contact_id;
           if ($mainAssigneeActivity->contact_id == $otherContactId) {
             $mainAssigneeActivity->contact_id = $mainContactId;
@@ -2725,7 +2732,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
               $isTarget = $isAssignee = $isSource = FALSE;
 
               $target = new CRM_Activity_DAO_ActivityContact();
-              $target->record_type = 'Target';
+              $target->record_type_id = $targetID;
               $target->activity_id = $activityId;
               $target->contact_id = $contactId;
               if ($target->find(TRUE)) {
@@ -2734,7 +2741,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
               $assignee = new CRM_Activity_DAO_ActivityContact();
               $assignee->activity_id = $activityId;
-              $assignee->record_type = 'Assignee';
+              $assignee->record_type_id = $assigneeID;
               $assignee->contact_id = $contactId;
               if ($assignee->find(TRUE)) {
                 $isAssignee = TRUE;
