@@ -2366,6 +2366,10 @@ AND       civicrm_openid.is_primary = 1";
         );
         return CRM_Activity_BAO_Activity::getActivitiesCount($input);
 
+      case 'mailing':
+          //FIX ME: calculate count
+
+        return;  
       default:
         $custom = explode('_', $component);
         if ($custom['0'] = 'custom') {
