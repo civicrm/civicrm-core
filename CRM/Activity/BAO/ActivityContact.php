@@ -103,4 +103,40 @@ AND        contact_a.is_deleted = 0
     return $alsoIDs ? array($names, $ids) : $names;
   }
 
+  /**
+   * function to retrieve id of target contact by activity_id 
+   *
+   * @param int    $id  ID of the activity
+   *
+   * @return mixed
+   *
+   * @access public
+   *
+   */
+  static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
+    $activityContact = array();
+    if (!CRM_Utils_Rule::positiveInteger($activityID) ||
+        !CRM_Utils_Rule::positiveInteger($recordTypeID)) {
+      return $activityContact;
+    }
+
+    $sql = "                                                                                                                                                                                             SELECT     contact_id
+FROM       civicrm_activity_contact
+INNER JOIN civicrm_contact ON contact_id = civicrm_contact.id
+WHERE      activity_id = %1
+AND        record_type_id = %2 
+AND        civicrm_contact.is_deleted = 0 
+";
+    $params = array(
+      1 => array($activityID, 'Integer'),
+      2 => array($recordTypeID, 'Integer')
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    while ($dao->fetch()) {
+      $activityContact[] = $dao->contact_id;
+    }
+    return $activityContact;
+  }
+
 }
