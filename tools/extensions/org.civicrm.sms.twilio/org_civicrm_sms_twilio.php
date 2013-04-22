@@ -183,7 +183,7 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
   function inbound() {
     $like      = "";
     $fromPhone = $this->retrieve('From', 'String');
-    return parent::inbound($fromPhone, $this->retrieve('Body', 'String'), NULL, $this->retrieve('SmsSid', 'String'));
+    return parent::record_inbound_msg($fromPhone, $this->retrieve('Body', 'String'), NULL, $this->retrieve('SmsSid', 'String'));
   }
   
   /**
