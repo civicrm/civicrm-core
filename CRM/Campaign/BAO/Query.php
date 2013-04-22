@@ -218,7 +218,7 @@ class CRM_Campaign_BAO_Query {
       case self::CIVICRM_ACTIVITY:
         $surveyActivityTypes = CRM_Campaign_PseudoConstant::activityType();
         $surveyKeys          = "(" . implode(',', array_keys($surveyActivityTypes)) . ")";
-        $from                = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
+        $from                = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_target.activity_id
                                  AND civicrm_activity.activity_type_id IN $surveyKeys ) ";
         break;
 

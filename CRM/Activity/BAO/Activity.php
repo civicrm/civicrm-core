@@ -759,16 +759,14 @@ LEFT JOIN  civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.ac
 INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name )
 SELECT     ac.activity_id,
            ac.contact_id,
-           ac.record_type_id
+           ac.record_type_id,
            c.sort_name
 FROM       civicrm_activity_contact ac
-INNER JOIN {$activityTempTable} ON ( ac.activity_id = {$activityTempTable}.activity_id
-INNER JOIN civicrm_contact c ON c.id = at.contact_id
+INNER JOIN {$activityTempTable} ON ( ac.activity_id = {$activityTempTable}.activity_id {$notbulkActivityClause} )
+INNER JOIN civicrm_contact c ON c.id = ac.contact_id
 WHERE      c.is_deleted = 0
-           {$notbulkActivityClause} )
+          
 ";
-    CRM_Core_DAO::executeQuery($query);
-
     CRM_Core_DAO::executeQuery($query);
 
     // step 3: Combine all temp tables to get final query for activity selector
@@ -776,7 +774,7 @@ WHERE      c.is_deleted = 0
 SELECT     {$activityTempTable}.*,
            {$activityContactTempTable}.contact_id,
            {$activityContactTempTable}.record_type_id,
-           {$activityContactTempTable}.contact_name,
+           {$activityContactTempTable}.contact_name
 FROM       {$activityTempTable}
 INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$activityContactTempTable}.activity_id
         ";
@@ -1055,14 +1053,10 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
                 civicrm_activity.status_id,
                 civicrm_activity.subject,
                 civicrm_activity.source_record_id,
-                sourceContact.sort_name as source_contact_name,
                 civicrm_option_value.value as activity_type_id,
                 civicrm_option_value.label as activity_type,
                 null as case_id, null as case_subject,
-                civicrm_activity.campaign_id as campaign_id,
-                activityContact.contact_id as contact_id,
-                activityContact.record_type_id as record_type_id,
-                contact.sort_name as sort_name
+                civicrm_activity.campaign_id as campaign_id
             ';
 
     }
@@ -1094,7 +1088,6 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
                 civicrm_activity.subject,
                 civicrm_activity.source_contact_id,
                 civicrm_activity.source_record_id,
-                sourceContact.sort_name as source_contact_name,
                 civicrm_option_value.value as activity_type_id,
                 civicrm_option_value.label as activity_type,
                 null as case_id, null as case_subject,
