@@ -41,8 +41,8 @@ class CRM_Utils_VersionCheck {
     LOCALFILE_NAME = 'civicrm-version.php',
     // relative to $config->uploadDir
     CACHEFILE_NAME = 'latest-version-cache.txt',
-    // cachefile expiry time (in seconds) - a week
-    CACHEFILE_EXPIRE = 604800;
+    // cachefile expiry time (in seconds) - one day
+    CACHEFILE_EXPIRE = 86400;
 
   /**
    * We only need one instance of this object, so we use the
