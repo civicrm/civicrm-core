@@ -163,7 +163,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       $activityContact->contact_id = $contact;
       $activityContact->find(TRUE);
       if (empty($activityContact->id)) {
-        $resultTarget = CRM_Activity_BAO_ActivityTarget::create($targetParams);
+        $resultTarget = CRM_Activity_BAO_ActivityContact::create($targetParams);
       }
     }
 
