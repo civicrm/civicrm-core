@@ -1498,6 +1498,7 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
       );
     }
 
+    $success = 0;
     $escapeSmarty = $sent = FALSE;
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
@@ -1533,10 +1534,11 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
         )) {
         // even a single successful delivery should set this falg to true
         $sent = TRUE;
+        $success++;
       }
     }
 
-    return array($sent, $activity->id);
+    return array($sent, $activity->id, $success);
   }
 
   /**
