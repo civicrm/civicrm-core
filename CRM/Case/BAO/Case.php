@@ -1001,7 +1001,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
     $from = 'FROM civicrm_case_activity cca
                   INNER JOIN civicrm_activity ca ON ca.id = cca.activity_id
-                  INNER JOIN civicrm_contact cc ON cc.id = ca.source_contact_id
+                  INNER JOIN civicrm_activity_contact cac ON cac.activity_id = ca.id
+                  INNER JOIN civicrm_contact cc ON cc.id = cac.contact_id
                   INNER JOIN civicrm_option_group cog ON cog.name = "activity_type"
                   INNER JOIN civicrm_option_value cov ON cov.option_group_id = cog.id
                          AND cov.value = ca.activity_type_id AND cov.is_active = 1
@@ -1009,7 +1010,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
                   LEFT OUTER JOIN civicrm_option_group og ON og.name="activity_status"
                   LEFT OUTER JOIN civicrm_option_value ov ON ov.option_group_id=og.id AND ov.name="Scheduled"
                   LEFT JOIN civicrm_activity_contact caa
-                                ON caa.activity_id = ca.id AND caa.record_type_id = $assigneeID                  
+                                ON caa.activity_id = ca.id AND caa.record_type_id = "$assigneeID"                  
                   LEFT JOIN civicrm_contact acc ON acc.id = caa.contact_id  ';
 
     $where = 'WHERE cca.case_id= %1
