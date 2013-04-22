@@ -1078,13 +1078,15 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   protected function processActivity(&$params) {
     $activityAssigned = array();
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     // format assignee params
     if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
       //skip those assignee contacts which are already assigned
       //while sending a copy.CRM-4509.
       $activityAssigned = array_flip($params['assignee_contact_id']);
       if ($this->_activityId) {
-        $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($this->_activityId);
+        $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($this->_activityId, $assigneeID);
         $activityAssigned = array_diff_key($activityAssigned, $assigneeContacts);
       }
     }
@@ -1139,7 +1141,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       )
     ) {
       $mailToContacts = array();
-      $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activity->id, TRUE, FALSE);
+      //FIX ME : add more parameters to 'getNames' function
+      $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($activity->id, $assigneeID, TRUE, FALSE);
 
       //build an associative array with unique email addresses.
       foreach ($activityAssigned as $id => $dnc) {

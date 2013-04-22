@@ -313,10 +313,13 @@ WHERE      a.id = %1
       );
     }
 
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     if (!empty($activityDAO->targetID)) {
       // Re-lookup the target ID since the DAO only has the first recipient if there are multiple.
       // Maybe not the best solution.
-      $targetNames   = CRM_Activity_BAO_ActivityTarget::getTargetNames($activityDAO->id);
+      $targetNames   = CRM_Activity_BAO_ActivityContact::getNames($activityDAO->id, $targetID);
       $processTarget = FALSE;
       $label         = ts('With Contact(s)');
       if (in_array($activityTypeInfo['name'], array(
@@ -383,9 +386,11 @@ WHERE      a.id = %1
       'value' => $this->redact($creator),
       'type' => 'String',
     );
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $source_contact_id = CRM_Activity_BAO_Activity::getActivityContact($activityDAO->id, $sourceID);
     $reporter = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $activityDAO->source_contact_id,
+      $source_contact_id,
       'display_name'
     );
 
@@ -413,7 +418,7 @@ WHERE      a.id = %1
 
     if (!empty($activityDAO->assigneeID)) {
       //allow multiple assignee contacts.CRM-4503.
-      $assignee_contact_names = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityDAO->id, TRUE);
+        $assignee_contact_names = CRM_Activity_BAO_ActivityContact::getNames($activityDAO->id, $assigneeID, TRUE);
 
       foreach ($assignee_contact_names as & $assignee) {
         // add Assignee to the strings to be redacted across the case session

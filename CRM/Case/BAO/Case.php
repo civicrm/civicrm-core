@@ -976,6 +976,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
     $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     // CRM-5081 - formatting the dates to omit seconds.
     // Note the 00 in the date format string is needed otherwise later on it thinks scheduled ones are overdue.
@@ -1028,7 +1029,6 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     else {
       $where .= " AND ca.is_deleted = 0";
     }
-
 
     if (CRM_Utils_Array::value('activity_type_id', $params)) {
       $where .= " AND ca.activity_type_id = " . CRM_Utils_Type::escape($params['activity_type_id'], 'Integer');
@@ -1180,8 +1180,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
         $reporterName = '<a href="' . $contactViewUrl . $dao->reporter_id . '">' . $dao->reporter . '</a>';
       }
       $values[$dao->id]['reporter'] = $reporterName;
-
-      $targetNames = CRM_Activity_BAO_ActivityTarget::getTargetNames($dao->id);
+      $targetNames = CRM_Activity_BAO_ActivityContact::getNames($dao->id, $targetID);
       $targetContactUrls = $withContacts = array();
       foreach ($targetNames as $targetId => $targetName) {
         if (!in_array($targetId, $clientIds)) {

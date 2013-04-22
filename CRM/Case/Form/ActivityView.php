@@ -132,7 +132,9 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
     //viewing activity should get diplayed in recent list.CRM-4670
     $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityID, 'activity_type_id');
 
-    $activityTargetContacts = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityID);
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    $activityTargetContacts = CRM_Activity_BAO_ActivityContact::retrieveContactIdsByActivityId($activityID, $targetID);
     if (!empty($activityTargetContacts)) {
       $recentContactId = $activityTargetContacts[0];
     }
