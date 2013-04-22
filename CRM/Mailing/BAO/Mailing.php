@@ -1600,7 +1600,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $job->scheduled_date = $params['scheduled_date'];
       $job->save();
       // Populate the recipients.
-      $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, true, false);
+      $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
     }
 
     return $mailing;
@@ -2149,7 +2149,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // get all the groups that this user can access
     // if they dont have universal access
-    $groups = CRM_Core_PseudoConstant::group(null, false);
+    $groups = CRM_Core_PseudoConstant::group(NULL, FALSE);
     if (!empty($groups)) {
       $groupIDs = implode(',', array_keys($groups));
       $selectClause = ($count) ? 'COUNT( DISTINCT m.id) as count' : 'DISTINCT( m.id ) as id';
@@ -2728,6 +2728,81 @@ AND        m.id = %1
 ";
     $params = array( 1 => array( $mid, 'Integer' ) );
     return CRM_Core_DAO::singleValueQuery($sql, $params);
+  }
+
+  /**
+   * This function is a wrapper for ajax activity selector
+   *
+   * @param  array   $params associated array for params record id.
+   *
+   * @return array   $contactActivities associated array of contact activities
+   * @access public
+   */
+  public static function getContactMailingSelector(&$params) {
+    // format the params
+    $params['offset']   = ($params['page'] - 1) * $params['rp'];
+    $params['rowCount'] = $params['rp'];
+    $params['sort']     = CRM_Utils_Array::value('sortBy', $params);
+    $params['caseId']   = NULL;
+    $context            = CRM_Utils_Array::value('context', $params);
+
+    // get contact mailings
+    $mailings = CRM_Mailing_BAO_Mailing::getContactMailings($params);
+
+    // add total
+    $params['total'] = CRM_Mailing_BAO_Mailing::getContactMailingsCount($params);
+
+    // format params and add links
+    $contactMailings = array();
+    foreach ($mailings as $mailingId => $values) {
+      $contactMailings[$mailingId]['subject'] = $values['subject'];
+      $contactMailings[$mailingId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
+
+      $contactMailings[$mailingId]['mailing_creator'] = CRM_Utils_System::href(
+          $values['creator_name'],
+          'civicrm/contact/view',
+          "reset=1&cid={$values['creator_id']}");
+
+      $contactMailings[$mailingId]['links'] = CRM_Utils_System::href(
+        ts('View Mailing'),
+        'civicrm/mailing/view',
+        "reset=1&id={$values['mailing_id']}");
+    }
+
+    return $contactMailings;
+  }
+
+  /**
+   * Function to retrieve contact mailing
+   *
+   * @param array $params associated array
+   *
+   * @return array of mailings for a contact
+   *
+   * @static
+   * @access public
+   */
+  static public function getContactMailings(&$params) {
+    $params['version'] = 3;
+    $result = civicrm_api('MailingContact', 'get', $params);
+    return $result['values'];
+  }
+
+  /**
+   * Function to retrieve contact mailing count
+   *
+   * @param array $params associated array
+   *
+   * @return int count of mailings for a contact
+   *
+   * @static
+   * @access public
+   */
+  static public function getContactMailingsCount(&$params) {
+    //FIX ME: need to implement getcount api for MailingContact
+    $params['version'] = 3;
+    $result = civicrm_api('MailingContact', 'get', $params);
+    return count($result['values']);
   }
 }
 
