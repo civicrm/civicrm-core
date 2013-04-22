@@ -69,6 +69,17 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     require_once 'CiviSeleniumSettings.php';
     $this->settings = new CiviSeleniumSettings();
+    if (property_exists($this->settings, 'serverStartupTimeOut') && $this->settings->serverStartupTimeOut) {
+      global $CiviSeleniumTestCase_polled;
+      if (!$CiviSeleniumTestCase_polled) {
+        $CiviSeleniumTestCase_polled = TRUE;
+        CRM_Utils_Network::waitForServiceStartup(
+          $this->drivers[0]->getHost(),
+          $this->drivers[0]->getPort(),
+          $this->settings->serverStartupTimeOut
+        );
+      }
+    }
 
     // autoload
     require_once 'CRM/Core/ClassLoader.php';
@@ -84,6 +95,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // Make sure that below strings have path separator at the end
     $this->setBrowserUrl($this->settings->sandboxURL);
     $this->sboxPath = $this->settings->sandboxPATH;
+    if (property_exists($this->settings, 'rcHost') && $this->settings->rcHost) {
+      $this->setHost($this->settings->rcHost);
+    }
+    if (property_exists($this->settings, 'rcPort') && $this->settings->rcPort) {
+      $this->setPort($this->settings->rcPort);
+    }
   }
 
   protected function tearDown() {
