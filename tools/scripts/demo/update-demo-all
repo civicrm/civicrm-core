@@ -12,18 +12,18 @@ cd $CIVI_DEMO_DIR/bin
 echo "cd $CIVI_DEMO_DIR/sql"
 cd $CIVI_DEMO_DIR/sql
 
-if [ $DRUPAL_DEMO_DBNAME ]; then
+if [ $DRUPAL_DEMO_CRM_DBNAME ]; then
   # drupal pristine
   echo "Reloading civicrm-drupal-demo db from generated.mysql .."
-  mysqladmin -f drop $DRUPAL_DEMO_DBNAME
-  mysqladmin create $DRUPAL_DEMO_DBNAME
-  mysql $DRUPAL_DEMO_DBNAME < civicrm.mysql
-  mysql $DRUPAL_DEMO_DBNAME < civicrm_generated.mysql
+  mysqladmin -f drop $DRUPAL_DEMO_CRM_DBNAME
+  mysqladmin create $DRUPAL_DEMO_CRM_DBNAME
+  mysql $DRUPAL_DEMO_CRM_DBNAME < civicrm.mysql
+  mysql $DRUPAL_DEMO_CRM_DBNAME < civicrm_generated.mysql
   echo "Taking civicrm-drupal-demo dump.."
-  mysqldump $DRUPAL_DEMO_DBNAME > $TMP_DUMP_FILE
-  if [ -f $DRUPAL_DEMO_PRISTINE ]; then
+  mysqldump $DRUPAL_DEMO_CRM_DBNAME > $TMP_DUMP_FILE
+  if [ -f $DRUPAL_DEMO_CRM_PRISTINE ]; then
     echo "Creating civicrm-drupal-demo pristine.."
-    cp $TMP_DUMP_FILE $DRUPAL_DEMO_PRISTINE
+    cp $TMP_DUMP_FILE $DRUPAL_DEMO_CRM_PRISTINE
   fi
 fi
 
@@ -31,16 +31,16 @@ if [ ! -f $TMP_DUMP_FILE ]; then
   exit 1
 fi
 
-if [ $WORDPRESS_DEMO_DBNAME ]; then
+if [ $WORDPRESS_DEMO_CRM_DBNAME ]; then
   # wordpress pristine
-  if [ -f $WORDPRESS_DEMO_PRISTINE ]; then
+  if [ -f $WORDPRESS_DEMO_CRM_PRISTINE ]; then
     echo "Creating civicrm-wordpress-demo pristine.."
-    cp $TMP_DUMP_FILE $WORDPRESS_DEMO_PRISTINE
+    cp $TMP_DUMP_FILE $WORDPRESS_DEMO_CRM_PRISTINE
   fi
-  mysqladmin -f drop $WORDPRESS_DEMO_DBNAME
+  mysqladmin -f drop $WORDPRESS_DEMO_CRM_DBNAME
   echo "Reloading civicrm-wordpress-demo from pristine.."
-  mysqladmin create $WORDPRESS_DEMO_DBNAME
-  mysql $WORDPRESS_DEMO_DBNAME < $TMP_DUMP_FILE
+  mysqladmin create $WORDPRESS_DEMO_CRM_DBNAME
+  mysql $WORDPRESS_DEMO_CRM_DBNAME < $TMP_DUMP_FILE
 fi
 
 if [ $JOOMLA_DEMO_DBNAME ]; then

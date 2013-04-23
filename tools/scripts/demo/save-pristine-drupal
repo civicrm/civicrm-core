@@ -1,0 +1,26 @@
+#!/usr/bin/env /bin/bash
+
+source `dirname $0`/demo.conf
+
+pushd .
+
+# drupal pristine
+if [ "$1" == "cms" ] && [ $DRUPAL_DEMO_CMS_DBNAME ]; then
+  echo "Creating drupal-demo db dump.."
+  mysqldump $DRUPAL_DEMO_CMS_DBNAME > $TMP_DUMP_FILE
+  if [ -f $DRUPAL_DEMO_CMS_PRISTINE ]; then
+    echo "Creating drupal-demo db pristine from dump.."
+    cp $TMP_DUMP_FILE $DRUPAL_DEMO_CMS_PRISTINE
+  fi
+elif [ -z "$1" ] && [ $DRUPAL_DEMO_CRM_DBNAME ]; then
+  echo "Creating civicrm-drupal-demo db dump.."
+  mysqldump $DRUPAL_DEMO_CRM_DBNAME > $TMP_DUMP_FILE
+  if [ -f $DRUPAL_DEMO_CRM_PRISTINE ]; then
+    echo "Creating civicrm-drupal-demo db pristine from dump.."
+    cp $TMP_DUMP_FILE $DRUPAL_DEMO_CRM_PRISTINE
+  fi
+else
+    echo "Sorry i couldn't do anything.."
+fi
+
+popd
