@@ -122,6 +122,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
 
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
+      $activity->source_contact_id = $sourceContactId;
 
       if ($sourceContactId &&
         !CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
@@ -658,7 +659,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    */
   static function &getActivities($input) {
     //step 1: Get the basic activity data
-    $bulkActivityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
+    $bulkActivityTypeID = CRM_Core_OptionGroup::getValue(
+      'activity_type',
       'Bulk Email',
       'name'
     );
@@ -987,7 +989,7 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
       "civicrm_option_group.name = 'activity_type'",
       "civicrm_activity.is_deleted = 0",
       "civicrm_activity.is_current_revision =  1",
-      "civicrm_activity.is_test = 0",
+      "civicrm_activity.is_test= 0",
     );
 
     if ($input['context'] != 'activity') {
