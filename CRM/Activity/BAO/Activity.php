@@ -625,7 +625,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
     if (!$id) {
-      $id = $activity->source_contact_id;
+      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+      $id = self::getActivityContact($activity->id. $sourceID);
     }
     $logParams = array(
       'entity_table' => 'civicrm_activity',
@@ -1698,7 +1700,6 @@ WHERE      activity.id IN ($activityIds)";
     $activityStatuses = CRM_Core_OptionGroup::values('activity_status');
 
     while ($dao->fetch()) {
-      //$activities[$dao->activity_id]['source_contact_id'] = $dao->source_contact_id;
       $activities[$dao->activity_id]['id'] = $dao->activity_id;
       $activities[$dao->activity_id]['activity_type_id'] = $dao->activity_type_id;
       $activities[$dao->activity_id]['subject'] = $dao->subject;
@@ -2168,6 +2169,8 @@ AND cl.modified_id  = c.id
     // delete activity if there is no record in
     // civicrm_activity_contact
     // pointing to any other contact record.
+    // FIXME: this will be an awful query, figure out what function does
+    // and clean up
     $activity = new CRM_Activity_DAO_Activity();
     $activity->source_contact_id = $contactId;
     $activity->find();
