@@ -187,22 +187,9 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   function generateListAll($tables) {
-    $allDAO = "<?php\n\$dao = array ();";
-    $dao = array();
-
-    foreach ($tables as $table) {
-      $base = $table['base'] . $table['objectName'];
-      if (!array_key_exists($table['objectName'], $dao)) {
-        $dao[$table['objectName']] = str_replace('/', '_', $base);
-        $allDAO .= "\n\$dao['" . $table['objectName'] . "'] = '" . str_replace('/', '_', $base) . "';";
-      }
-      else {
-        $allDAO .= "\n//NAMESPACE ERROR: " . $table['objectName'] . " already used . " . str_replace('/', '_', $base) . " ignored.";
-      }
-    }
-
-    // TODO deal with the BAO's too ?
-    file_put_contents($this->CoreDAOCodePath . "listAll.php", $allDAO);
+    $this->smarty->clear_all_assign();
+    $this->smarty->assign('tables', $tables);
+    file_put_contents($this->CoreDAOCodePath . "../AllCoreTables.php", $this->smarty->fetch('listAll.tpl'));
   }
 
   function generateCiviTestTruncate($tables) {
