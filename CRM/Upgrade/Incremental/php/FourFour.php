@@ -78,36 +78,79 @@ class CRM_Upgrade_Incremental_php_FourFour {
    */
   static function activityContacts(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
+
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $ovValue[] = $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $ovValue[] = $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $ovValue[] = $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    
+    $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_contacts', 'id', 'name');
+    if (!empty($ovValue)) {
+      $ovValues = implode(', ', $ovValue);
+      $query = "
+UPDATE civicrm_option_value 
+SET    is_reserved = 1
+WHERE  option_group_id = {$optionGroupID} AND value IN ($ovValues)";
+
+      $dao = CRM_Core_DAO::executeQuery($query);
+    }
+
+    if (!$assigneeID) {
+      $assigneeID = 1;
+      $value[] = "({$optionGroupID}, 'Activity Assignees', 1, 'Activity Assignees', 1, 1, 1)";
+    }
+    if (!$sourceID) {
+      $sourceID = 2;
+      $value[] = "({$optionGroupID}, 'Activity Source', 2, 'Activity Source', 2, 1, 1)";
+    }
+    if (!$targetID) {
+      $targetID = 3;
+      $value[] = "({$optionGroupID}, 'Activity Targets', 3, 'Activity Targets', 3, 1, 1)";
+    }
+
+    if (!$assigneeID || !$sourceID || !$targetID ) {
+      $insert =  "                                                                                                                                                                                    
+INSERT INTO civicrm_option_value
+(option_group_id, label, value, name, weight, is_reserved, is_active)
+VALUES
+
+";
+      $values = implode(', ', $value);
+      $query = $insert . $values;
+      $dao = CRM_Core_DAO::executeQuery($query);
+    }
+
+
     $query = "
-CREATE TABLE IF NOT EXISTS `civicrm_activity_contact` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Activity contact id',
-  `activity_id` int(10) unsigned NOT NULL COMMENT 'Foreign key to the activity for this record.',
-  `contact_id` int(10) unsigned NOT NULL COMMENT 'Foreign key to the contact for this record.',
-  `record_type` enum('Source','Assignee','Target') COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'The record type for this row',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UI_activity_contact_id` (`contact_id`,`activity_id`,`record_type`),
-  KEY `FK_civicrm_activity_contact_activity_id` (`activity_id`)
+CREATE TABLE IF NOT EXISTS civicrm_activity_contact (
+  id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Activity contact id',
+  activity_id int(10) unsigned NOT NULL COMMENT 'Foreign key to the activity for this record.',
+  contact_id int(10) unsigned NOT NULL COMMENT 'Foreign key to the contact for this record.',
+  record_type_id int(10) unsigned DEFAULT NULL COMMENT 'The record type id for this row',
+  PRIMARY KEY (id),
+  UNIQUE KEY UI_activity_contact (contact_id,activity_id,record_type_id),
+  KEY FK_civicrm_activity_contact_activity_id (activity_id)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
     
     $query = " 
-INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type)
-SELECT      activity_id, target_contact_id, 'Target' as record_type
+INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type_id)
+SELECT      activity_id, target_contact_id, {$targetID} as record_type_id
 FROM        civicrm_activity_target";
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
     $query = "  
-INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type)
-SELECT      activity_id, assignee_contact_id, 'Assignee' as record_type
+INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type_id)
+SELECT      activity_id, assignee_contact_id, {$assigneeID} as record_type_id
 FROM        civicrm_activity_assignment";
     $dao = CRM_Core_DAO::executeQuery($query);
     
     $query = "
-  INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type)
-SELECT      id, source_contact_id, 'Source' as record_type
+  INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type_id)
+SELECT      id, source_contact_id, {$sourceID} as record_type_id
 FROM        civicrm_activity 
 WHERE       source_contact_id IS NOT NULL";
 
