@@ -4,14 +4,23 @@ source `dirname $0`/demo.conf
 
 pushd .
 
-# creating wordpress pristine
-if [ $WORDPRESS_DEMO_DBNAME ]; then
-  if [ -f $WORDPRESS_DEMO_PRISTINE ]; then
-    echo "Taking civicrm-wordpress-demo db dump.."
-    mysqldump $WORDPRESS_DEMO_DBNAME > $TMP_DUMP_FILE
-    echo "Creating civicrm-wordpress-demo pristine from dump.."
-    cp $TMP_DUMP_FILE $WORDPRESS_DEMO_PRISTINE
+# wordpress pristine
+if [ "$1" == "cms" ] && [ $WORDPRESS_DEMO_CMS_DBNAME ]; then
+  echo "Creating wordpress-demo db dump.."
+  mysqldump $WORDPRESS_DEMO_CMS_DBNAME > $TMP_DUMP_FILE
+  if [ -f $WORDPRESS_DEMO_CMS_PRISTINE ]; then
+    echo "Creating wordpress-demo db pristine from dump.."
+    cp $TMP_DUMP_FILE $WORDPRESS_DEMO_CMS_PRISTINE
   fi
+elif [ -z "$1" ] && [ $WORDPRESS_DEMO_CRM_DBNAME ]; then
+  echo "Creating civicrm-wordpress-demo db dump.."
+  mysqldump $WORDPRESS_DEMO_CRM_DBNAME > $TMP_DUMP_FILE
+  if [ -f $WORDPRESS_DEMO_CRM_PRISTINE ]; then
+    echo "Creating civicrm-wordpress-demo db pristine from dump.."
+    cp $TMP_DUMP_FILE $WORDPRESS_DEMO_CRM_PRISTINE
+  fi
+else
+    echo "Sorry i couldn't do anything.."
 fi
 
 popd
