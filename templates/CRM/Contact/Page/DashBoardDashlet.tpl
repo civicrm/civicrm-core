@@ -51,7 +51,7 @@
         <div class="finalconf-button">
             <a href="{$fixDefaultMailbox}" id="fixDefaultMailbox" class="button"><span><div class="icon settings-icon"></div>{ts}Go{/ts}</span></a>
         </div>
-        <div class="finalconf-itemdesc">{ts}Please configure a default mailbox for CiviMail.{/ts} (<a href="http://en.flossmanuals.net/civicrm/ch042_system-configuration/" title="{ts}opens online user guide in a new window{/ts}" target="_blank">{ts}learn more{/ts}</a>)</div>
+        <div class="finalconf-itemdesc">{ts}Please configure a default mailbox for CiviMail.{/ts} (<a href="http://http://book.civicrm.org/user/current/initial-set-up/email-system-configuration/0" title="{ts}opens online user guide in a new window{/ts}" target="_blank">{ts}learn more{/ts}</a>)</div>
         <h4 class="finalconf-item"><div class="icon alert-icon"></div> &nbsp;{ts}Default CiviMail Mailbox{/ts}</h4>
         <div style="clear:both"></div>
     {/if}
