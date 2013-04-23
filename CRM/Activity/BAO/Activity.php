@@ -120,7 +120,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       else {
         $defaults['target_contact_value'] = ts('(recipients)');
       }
-      
+
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
 
       if ($sourceContactId &&
@@ -391,7 +391,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
       }
       else {
-        $assignmentParams['assignee_contact_id'] = $params['assignee_contact_id'];
+        $assignmentParams['contact_id'] = $params['assignee_contact_id'];
         $assignmentParams['record_type_id'] = $assigneeID;
         if (CRM_Utils_Array::value('id', $params)) {
           $assignment = new CRM_Activity_BAO_ActivityAssignment();
@@ -399,7 +399,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           $assignment->record_type_id = $assigneeID;
           $assignment->find(TRUE);
 
-          if ($assignment->assignee_contact_id != $params['assignee_contact_id']) {
+          if ($assignment->contact_id != $params['assignee_contact_id']) {
             $assignmentParams['id'] = $assignment->id;
             $resultAssignment = CRM_Activity_BAO_ActivityContact::create($assignmentParams);
           }
@@ -447,7 +447,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
       }
       else {
-        $targetParams['target_contact_id'] = $params['target_contact_id'];
+        $targetParams['contact_id'] = $params['target_contact_id'];
         $targetParams['record_type_id'] = $targetID;
         if (CRM_Utils_Array::value('id', $params)) {
           $target = new CRM_Activity_BAO_ActivityContact();
@@ -455,7 +455,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           $target->record_type_id = $targetID;
           $target->find(TRUE);
 
-          if ($target->target_contact_id != $params['target_contact_id']) {
+          if ($target->contact_id != $params['target_contact_id']) {
             $targetParams['id'] = $target->id;
             $resultTarget = CRM_Activity_BAO_ActivityContact::create($targetParams);
           }
@@ -765,7 +765,7 @@ FROM       civicrm_activity_contact ac
 INNER JOIN {$activityTempTable} ON ( ac.activity_id = {$activityTempTable}.activity_id {$notbulkActivityClause} )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
 WHERE      c.is_deleted = 0
-          
+
 ";
     CRM_Core_DAO::executeQuery($query);
 
@@ -798,7 +798,7 @@ INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$a
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
 
     while ($dao->fetch()) {
       $activityID = $dao->activity_id;
@@ -1494,7 +1494,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
 
     $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
 
     // add activity target record for every sms that is send
     $activityTargetParams = array(
@@ -1574,7 +1574,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
     $activityTargetParams = array(
       'activity_id' => $activityID,
       'contact_id' => $toID,
-      'record_type_id' => $targetID 
+      'record_type_id' => $targetID
     );
     CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
     return TRUE;
@@ -1653,7 +1653,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
 
     // First look for activities where contactId is one of the targets
     $query = "
@@ -2547,7 +2547,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
       $activityContact->record_type_id = $recordTypeID;
     }
     if ($activityContact->find(TRUE)) {
-      return $activityContact->$column;  
+      return $activityContact->$column;
     }
   }
 }
