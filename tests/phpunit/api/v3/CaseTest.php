@@ -103,8 +103,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
       'civicrm_case',
       'civicrm_case_contact',
       'civicrm_case_activity',
-      'civicrm_activity_target',
-      'civicrm_activity_assignment',
+      'civicrm_activity_contact',
       'civicrm_relationship',
       'civicrm_relationship_type',
     );
@@ -238,8 +237,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
       'civicrm_case',
       'civicrm_case_contact',
       'civicrm_case_activity',
-      'civicrm_activity_target',
-      'civicrm_activity_assignment',
+      'civicrm_activity_contact',
       'civicrm_relationship',
       'civicrm_relationship_type',
     );
@@ -413,11 +411,12 @@ class api_v3_CaseTest extends CiviUnitTestCase {
     $this->assertEquals($dao->find(), 1, 'case_activity table not populated correctly in line ' . __LINE__);
     $dao->free();
 
-    require_once 'CRM/Activity/DAO/ActivityTarget.php';
-    $dao = new CRM_Activity_DAO_ActivityTarget();
+    require_once 'CRM/Activity/DAO/ActivityContact.php';
+    $dao = new CRM_Activity_DAO_ActivityContact();
     $dao->activity_id = $this->_caseActivityId;
-    $dao->target_contact_id = $this->_params['contact_id'];
-    $this->assertEquals($dao->find(), 1, 'activity_target table not populated correctly in line ' . __LINE__);
+    $dao->contact_id = $this->_params['contact_id'];
+    $dao->record_type_id = 3;
+    $this->assertEquals($dao->find(), 1, 'activity_contact table not populated correctly in line ' . __LINE__);
     $dao->free();
 
     // TODO: There's more things we could check
