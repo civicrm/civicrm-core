@@ -360,6 +360,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         'contact_id'  => $params['source_contact_id'],
         'record_type_id' => $sourceID
       );
+      self::deleteActivityContact($activityId, $sourceID);
       CRM_Activity_BAO_ActivityContact::create($acParams);
     }
 
