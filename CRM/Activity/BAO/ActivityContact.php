@@ -59,7 +59,10 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
     $activityContact = new CRM_Activity_DAO_ActivityContact();
 
     $activityContact->copyValues($params);
-    return $activityContact->save();
+    if (!$activityContact->find(TRUE)) {
+      return $activityContact->save();
+    }
+    return $activityContact;
   }
 
   /**
@@ -104,7 +107,7 @@ AND        contact_a.is_deleted = 0
   }
 
   /**
-   * function to retrieve id of target contact by activity_id 
+   * function to retrieve id of target contact by activity_id
    *
    * @param int    $id  ID of the activity
    *
@@ -124,8 +127,8 @@ AND        contact_a.is_deleted = 0
 FROM       civicrm_activity_contact
 INNER JOIN civicrm_contact ON contact_id = civicrm_contact.id
 WHERE      activity_id = %1
-AND        record_type_id = %2 
-AND        civicrm_contact.is_deleted = 0 
+AND        record_type_id = %2
+AND        civicrm_contact.is_deleted = 0
 ";
     $params = array(
       1 => array($activityID, 'Integer'),
