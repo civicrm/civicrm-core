@@ -80,18 +80,31 @@ class CRM_Upgrade_Incremental_php_FourFour {
     $upgrade = new CRM_Upgrade_Form();
 
     $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
-    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    $ovValue[] = $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $ovValue[] = $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $ovValue[] = $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     
     $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_contacts', 'id', 'name');
+    if (!empty($ovValue)) {
+      $ovValues = implode(', ', $ovValue);
+      $query = "
+UPDATE civicrm_option_value 
+SET    is_reserved = 1
+WHERE  option_group_id = {$optionGroupID} AND value IN ($ovValues)";
+
+      $dao = CRM_Core_DAO::executeQuery($query);
+    }
+
     if (!$assigneeID) {
+      $assigneeID = 1;
       $value[] = "({$optionGroupID}, 'Activity Assignees', 1, 'Activity Assignees', 1, 1, 1)";
     }
     if (!$sourceID) {
+      $sourceID = 2;
       $value[] = "({$optionGroupID}, 'Activity Source', 2, 'Activity Source', 2, 1, 1)";
     }
     if (!$targetID) {
+      $targetID = 3;
       $value[] = "({$optionGroupID}, 'Activity Targets', 3, 'Activity Targets', 3, 1, 1)";
     }
 
