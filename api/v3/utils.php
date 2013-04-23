@@ -269,11 +269,6 @@ function _civicrm_api3_load_DAO($entity) {
  * eg. "civicrm_api3_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
  */
 function _civicrm_api3_get_DAO($name) {
-  static $dao = NULL;
-  if (!$dao) {
-    require ('CRM/Core/DAO/listAll.php');
-  }
-
   if (strpos($name, 'civicrm_api3') !== FALSE) {
     $last = strrpos($name, '_');
     // len ('civicrm_api3_') == 13
@@ -306,7 +301,7 @@ function _civicrm_api3_get_DAO($name) {
   }
 
 
-  return CRM_Utils_Array::value(_civicrm_api_get_camel_name($name, 3), $dao);
+  return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
 }
 
 /**
