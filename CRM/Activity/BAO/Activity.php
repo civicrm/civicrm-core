@@ -2164,40 +2164,28 @@ AND cl.modified_id  = c.id
     if (!$contactId) {
       return $result;
     }
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
     $transaction = new CRM_Core_Transaction();
 
     // delete activity if there is no record in
     // civicrm_activity_contact
     // pointing to any other contact record.
-    // FIXME: this will be an awful query, figure out what function does
-    // and clean up
-    $activity = new CRM_Activity_DAO_Activity();
-    $activity->source_contact_id = $contactId;
-    $activity->find();
+    $activityContact = new CRM_Activity_DAO_ActivityContact();
+    $activityContact->contact_id = $contactId;
+    $activityContact->record_type_id = $sourceID;
+    $activityContact->find();
 
-    while ($activity->fetch()) {
-      $noOther = TRUE;
-
-      $sql = "
-SELECT count(*)
-FROM   civicrm_activity_contact
-WHERE  activity_id = %1
-AND    contact_id <> %2
-";
-      $params = array(
-        1 => array($activity->id, 'Integer'),
-        2 => array($contactId, 'Integer')
-      );
-
+    while ($activityContact->fetch()) {
       // finally delete activity.
       if (CRM_Core_DAO::singleValueQuery($sql)) {
-        $activityParams = array('id' => $activity->id);
+        $activityParams = array('id' => $activityContact->activity_id);
         $result = self::deleteActivity($activityParams);
       }
     }
-    $activity->free();
 
+    $activityContact->free();
     $transaction->commit();
 
     return $result;
