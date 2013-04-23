@@ -53,6 +53,7 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $cgId = CRM_Utils_Request::retrieve('groupID', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $customRecId = CRM_Utils_Request::retrieve('customRecId', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1, $_REQUEST);
+    $cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1, $_REQUEST);
 
     //custom groups Inline
     $entityType    = CRM_Contact_BAO_Contact::getContactType($contactId);
@@ -62,8 +63,13 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
       );
     $details = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
     //get the fields of single custom group record
-    $fields = CRM_Utils_Array::value($customRecId, $details[$cgId]);
-
+    if ($customRecId == 1) {
+      $fields = reset($details[$cgId]);
+    }
+    else {
+      $fields = CRM_Utils_Array::value($customRecId, $details[$cgId]);
+    }
+    $this->assign('cgcount', $cgcount);
     $this->assign('customRecId', $customRecId);
     $this->assign('contactId', $contactId);
     $this->assign('customGroupId', $cgId);
@@ -71,7 +77,7 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
 
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);
-    
+
     // finally call parent
     parent::run();
   }

@@ -274,7 +274,9 @@ WHERE     ceft.entity_id IS NULL;
       CRM_Core_DAO::executeQuery('ALTER TABLE `log_civicrm_financial_trxn` CHANGE `trxn_id` `trxn_id` VARCHAR(255) NULL DEFAULT NULL');
     }
     // CRM-12142 - some sites didn't get this column added yet, and sites which installed 4.3 from scratch will already have it
-    if (
+    // CRM-12367 - add this column to single lingual sites only
+    $upgrade = new CRM_Upgrade_Form();
+    if (!$upgrade->multilingual &&
       !CRM_Core_DAO::checkFieldExists('civicrm_premiums', 'premiums_nothankyou_label')
     ) {
       $query = "
@@ -282,7 +284,7 @@ ALTER TABLE civicrm_premiums
 ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
   COMMENT 'Label displayed for No Thank-you option in premiums block (e.g. No thank you)'
 ";
-      CRM_Core_DAO::executeQuery($query);
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
     }
     $this->addTask(ts('Upgrade DB to 4.3.beta5: SQL'), 'task_4_3_x_runSql', $rev);
   }
@@ -454,7 +456,7 @@ WHERE      cog.name = 'payment_instrument'
     CRM_Core_DAO::executeQuery($sql);
 
     //CRM-12141
-    $sql = "ALTER TABLE {$tempTableName1} ADD INDEX index_instrument_id (instrument_id);";
+    $sql = "ALTER TABLE {$tempTableName1} ADD INDEX index_instrument_id (instrument_id(200));";
     CRM_Core_DAO::executeQuery($sql);
 
     //create temp table to process completed / cancelled contribution

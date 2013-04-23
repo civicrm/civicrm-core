@@ -6,7 +6,7 @@
  * All styles should start with .crm-container unless they are specific to the main div only
  */
 
-.crm-container label {
+div.crm-container label {
   font-weight: normal;
   display: inline;
 }
@@ -777,7 +777,7 @@
   /* h3 used as table header for civicrm */
   background-color: #CDE8FE;
   font-size: 15px;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   color: #121A2D;
   padding: 4px 6px;
@@ -1254,7 +1254,7 @@
   height: auto;
   margin: 0 1px;
   padding: 2px 5px;
-  font-family: Helvetica, Arial, sans-serif; 
+  font-family: Arial, Helvetica, sans-serif; 
 }
 
 .crm-container #alpha-filter a {
@@ -2756,15 +2756,18 @@ div.grippie {
   background-color: #2E3471;
 }
 
-.crm-container .crm-accordion-header a.close-accordion {
+.crm-container .crm-accordion-header a.crm-close-accordion {
   font-weight: normal !important;
   float: right;
   color: #FFF !important;
-  text-decoration: none;
 }
 
-.crm-container .crm-accordion-header a.close-accordion:hover {
-  text-decoration: underline !important;
+.crm-container .crm-accordion-header a.crm-close-accordion span {
+  visibility: hidden;
+}
+
+.crm-container .crm-accordion-header a.crm-close-accordion:hover span {
+  visibility: visible;
 }
 
 .crm-container .crm-master-accordion-header.crm-accordion-header:hover,
@@ -2808,21 +2811,27 @@ div.grippie {
 /* Pop-up help icon - eliminate forced line break */
 .crm-container a.helpicon,
 .crm-container .crm-master-accordion-header a.helpicon {
-  background-position: -128px -98px;
-  background-image: url(../i/icons/jquery-ui-2786C2.png);
-  background-color: transparent;
-  width: 16px;
-  height: 16px;
+  background-color: #6177D5;
+  background-image: url("../i/icons/jquery-ui-F5F6F1.png");
+  background-position: -50px -146px;
+  border-radius: 6px;
   display: inline-block;
+  height: 12px;
+  width: 12px;
+  opacity: .7;
+  position: relative;
+  top: 2px;
 }
 
 div.crm-accordion-header a.helpicon {
-  background-image: url(../i/icons/jquery-ui-F5F6F1.png);
+  background-color: #F5F6F1;
+  background-image: url(../i/icons/jquery-ui-2786C2.png);
 }
 
 div a.helpicon:hover,
 div a.helpicon:focus {
   background-image: url(../i/icons/jquery-ui-91CE00.png);
+  opacity: 1;
 }
 
 .crm-container .crm-summary-link {
@@ -3755,20 +3764,29 @@ div.m ul#civicrm-menu,
   margin: 0.5em 0 1em;
   padding: 0 0 0 0.5em;
 }
-.crm-container div.ui-notify-message div.icon {
+
+.crm-container div.ui-notify-message div.icon,
+.crm-status-icon {
   background: transparent url("../i/message-icons.png") no-repeat 0 0;
   width: 24px;
   height: 24px;
   margin-right: 6px;
 }
-.crm-container div.ui-notify-message.success div.icon {
+.crm-container div.ui-notify-message.success div.icon,
+.crm-status-icon.success {
   background-position: -24px 0px;
 }
-.crm-container div.ui-notify-message.info div.icon {
+.crm-container div.ui-notify-message.info div.icon,
+.crm-status-icon.info {
   background-position: -48px 0px;
 }
-.crm-container div.ui-notify-message.error div.icon {
+.crm-container div.ui-notify-message.error div.icon,
+.crm-status-icon.error {
   background-position: -72px 0px;
+}
+
+span.crm-status-icon {
+  display: inline-block;
 }
 
 /* Public Pages */

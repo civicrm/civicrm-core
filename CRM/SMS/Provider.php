@@ -159,7 +159,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     return $value;
   }
 
-  function inbound($from, $body, $to = NULL, $trackID = NULL) {
+  function processInbound($from, $body, $to = NULL, $trackID = NULL) {
   	$formatFrom   = $this->formatPhone($this->stripPhone($from), $like, "like"); 
     $escapedFrom  = CRM_Utils_Type::escape($formatFrom, 'String');
     $fromContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone WHERE phone LIKE "' . $escapedFrom . '"');
@@ -290,6 +290,18 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       default:
         return $phone;
     }
+  }
+
+  function urlEncode($values) {
+    $uri = '';
+    foreach ($values as $key => $value) {
+      $value = urlencode($value);
+      $uri .= "&{$key}={$value}";
+    }
+    if (!empty($uri)) {
+      $uri = substr($uri, 1);
+    }
+    return $uri;
   }
 }
 

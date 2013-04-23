@@ -63,7 +63,7 @@ function civicrm_api3_loc_block_create($params) {
         }
         // Bother calling the api
         else {
-          $info['version'] = 3;
+          $info['version'] = $params['version'];
           $info['contact_id'] = CRM_Utils_Array::value('contact_id', $info, 'null');
           $result = civicrm_api($item, 'create', $info);
           if (!empty($result['is_error'])) {

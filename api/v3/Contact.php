@@ -732,6 +732,13 @@ function civicrm_api3_contact_getquick($params) {
       ";
   }
 
+  $orderByInner = "";
+  $orderByOuter = "ORDER BY exactFirst";
+  if ($config->includeOrderByClause) {
+    $orderByInner = "ORDER BY sort_name";
+    $orderByOuter .= ", sort_name";
+  }
+
   //CRM-5954
   $query = "
         SELECT DISTINCT(id), data, sort_name {$selectAliases}
@@ -748,10 +755,10 @@ function civicrm_api3_contact_getquick($params) {
     {$aclFrom}
     {$additionalFrom} {$includeEmailFrom}
     {$whereClause}
-    ORDER BY sort_name
+    {$orderByInner}
     LIMIT 0, {$limit} )
 ) t
-ORDER BY exactFirst, sort_name
+{$orderByOuter}
 LIMIT    0, {$limit}
     ";
   // send query to hook to be modified if needed

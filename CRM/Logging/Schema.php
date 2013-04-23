@@ -37,6 +37,7 @@ class CRM_Logging_Schema {
   private $tables = array();
 
   private $db;
+  private $useDBPrefix = TRUE;
 
   private $reports = array(
     'logging/contact/detail',
@@ -74,7 +75,14 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     // do not log civicrm_mailing_event* tables, CRM-12300
     $this->tables = preg_grep('/^civicrm_mailing_event_/', $this->tables, PREG_GREP_INVERT);
 
-    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+    if (defined('CIVICRM_LOGGING_DSN')) {
+      $dsn = DB::parseDSN(CIVICRM_LOGGING_DSN);
+      $this->useDBPrefix = (CIVICRM_LOGGING_DSN != CIVICRM_DSN);
+    }
+    else {
+      $dsn = DB::parseDSN(CIVICRM_DSN);
+      $this->useDBPrefix = FALSE;
+    }
     $this->db = $dsn['database'];
 
     $dao = CRM_Core_DAO::executeQuery("
@@ -402,7 +410,12 @@ COLS;
       $suppressLoggingCond = "@civicrm_disable_logging IS NULL OR @civicrm_disable_logging = 0";
       $updateSQL = "IF ( (" . implode( ' OR ', $cond ) . ") AND ( $suppressLoggingCond ) ) THEN ";
 
-      $sqlStmt = "INSERT INTO `{$this->db}`.log_{tableName} (";
+      if ($this->useDBPrefix) {
+        $sqlStmt = "INSERT INTO `{$this->db}`.log_{tableName} (";
+      }
+      else {
+        $sqlStmt = "INSERT INTO log_{tableName} (";
+      }
       foreach ($columns as $column) {
         $sqlStmt .= "$column, ";
       }

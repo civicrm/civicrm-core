@@ -400,8 +400,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->click('CIVICRM_QFID_ts_all_4');
     $this->click('Go');
     $this->waitForElementPresent('_qf_Reserve_next_reserveToInterview-top');
-    $this->click('_qf_Reserve_next_reserveToInterview-top');
-    $this->waitForElementPresent('_qf_Interview_cancel_interview');
+    $this->clickLink('_qf_Reserve_next_reserveToInterview-top', '_qf_Interview_cancel_interview');
 
     $this->isElementPresent("xpath=//table[@id='voterRecords']/tbody//tr/td[text()='{$Name2}']");
     $this->isElementPresent("xpath=//table[@id='voterRecords']/tbody//tr/td[text()='{$Name1}']");

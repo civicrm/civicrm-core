@@ -26,6 +26,7 @@
 {* Custom Data view mode*}
 {assign var="customGroupCount" value = 1}
 {foreach from=$viewCustomData item=customValues key=customGroupId}
+  {assign var="cgcount" value=1}
   {assign var="count" value=$customGroupCount%2}
   {if ($count eq $side) or $skipTitle }
     {foreach from=$customValues item=cd_edit key=cvID}
@@ -37,9 +38,10 @@
           {assign var='cvID' value='-1'}
         {/if}
         <div class="crm-summary-block" id="custom-set-block-{$customGroupId}-{$cvID}">
-          {include file="CRM/Contact/Page/View/CustomDataFieldView.tpl" customGroupId=$customGroupId customRecId=$cvID}
+          {include file="CRM/Contact/Page/View/CustomDataFieldView.tpl" customGroupId=$customGroupId customRecId=$cvID cgcount=$cgcount}
         </div>
       </div>
+      {assign var="cgcount" value=$cgcount+1}
     {/foreach}
   {/if}
   {assign var="customGroupCount" value = $customGroupCount+1}

@@ -1402,6 +1402,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
       );
     }
 
+    $success = 0;
     $escapeSmarty = $sent = FALSE;
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
@@ -1437,10 +1438,11 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
         )) {
         // even a single successful delivery should set this falg to true
         $sent = TRUE;
+        $success++;
       }
     }
 
-    return array($sent, $activity->id);
+    return array($sent, $activity->id, $success);
   }
 
   /**

@@ -41,8 +41,8 @@ class CRM_Utils_VersionCheck {
     LOCALFILE_NAME = 'civicrm-version.php',
     // relative to $config->uploadDir
     CACHEFILE_NAME = 'latest-version-cache.txt',
-    // cachefile expiry time (in seconds) - a week
-    CACHEFILE_EXPIRE = 604800;
+    // cachefile expiry time (in seconds) - one day
+    CACHEFILE_EXPIRE = 86400;
 
   /**
    * We only need one instance of this object, so we use the
@@ -113,6 +113,7 @@ class CRM_Utils_VersionCheck {
           'ufv' => $config->userFrameworkVersion,
           'PHP' => phpversion(),
           'MySQL' => CRM_CORE_DAO::singleValueQuery('SELECT VERSION()'),
+          'communityMessagesUrl' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'communityMessagesUrl', NULL, '*default*'),
         );
 
         // Add usage stats
