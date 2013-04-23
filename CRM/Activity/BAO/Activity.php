@@ -96,8 +96,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
       $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
-      $defaults['source_contact'] = CRM_Activity_BAO_ActivityContact::retrieveContactIdsByActivityId($activity->id, $sourceID);
-
       // TODO: at some stage we'll have to deal
       // TODO: with multiple values for assignees and targets, but
       // TODO: for now, let's just fetch first row
