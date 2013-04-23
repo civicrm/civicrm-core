@@ -644,6 +644,18 @@ class CRM_Utils_REST {
     $q = CRM_Utils_array::value('q', $_REQUEST);
     $args = explode('/', $q);
 
+    // If no 'q' parameter is provided, try to populate args
+    // with entity and action (API v3)
+    if ( empty($args) || $args[0] == '' ) {
+        $entity = CRM_Utils_array::value( 'entity', $_REQUEST );
+        $action = CRM_Utils_array::value( 'action', $_REQUEST );
+        if (($entity !== null) && ($action !== null)) {
+            $args[0] = 'civicrm';
+            $args[1] = $entity;
+            $args[2] = $action;
+        }
+    }
+
     // If the function isn't in the civicrm namespace or request
     // is for login or ping
     if (empty($args) || $args[0] != 'civicrm' ||
