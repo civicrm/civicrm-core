@@ -396,7 +396,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'participant_id' => $this->_participantID4,
       'contribution_id' => $contributionID,
       'version' => $this->_apiversion,
-      'debug' => 1,
     );
 
     $result = civicrm_api('participant_payment', 'get', $params);

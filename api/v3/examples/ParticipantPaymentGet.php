@@ -38,9 +38,9 @@ function participant_payment_get_expectedresult(){
         ),
     ),
   'xdebug' => array( 
-      'peakMemory' => 31758384,
-      'memory' => 31463600,
-      'timeIndex' => '45.313442230225',
+      'peakMemory' => 34740680,
+      'memory' => 33998960,
+      'timeIndex' => '79.778831005096',
     ),
 );
 
