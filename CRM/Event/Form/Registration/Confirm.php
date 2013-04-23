@@ -866,6 +866,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $this->assign('lineItem', $lineItem);
           }
           $this->_values['params']['additionalParticipant'] = TRUE;
+          $this->assign('isAdditionalParticipant', $this->_values['params']['additionalParticipant']);
         }
 
         //pass these variables since these are run time calculated.
