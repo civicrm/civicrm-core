@@ -679,6 +679,11 @@ class CRM_Utils_REST {
     if ($uid) {
       CRM_Utils_System::loadBootStrap(array('uid' => $uid), TRUE, FALSE);
     }
+    else {
+      $err = array('error_message' => 'no CMS user associated with given api-key', 'is_error' => 1);
+      echo self::output($err);
+      CRM_Utils_System::civiExit();
+    }
   }
 }
 
