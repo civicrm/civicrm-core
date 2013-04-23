@@ -840,12 +840,12 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $where[] = "e.membership_type_id IS NULL";
         }
 
-        $where[] = "e.is_override IS NULL OR e.is_override = 0";
+        $where[] = "( e.is_override IS NULL OR e.is_override = 0 )";
         $dateField = str_replace('membership_', 'e.', $actionSchedule->start_action_date);
         $notINClause = self::permissionedRelationships($contactField);
         
-        $memershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "is_current_member = 1", 'id');
-        $mStatus = implode (',', $memershipStatus);
+        $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "is_current_member = 1 OR name = 'Expired'", 'id');
+        $mStatus = implode (',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
 
       }
