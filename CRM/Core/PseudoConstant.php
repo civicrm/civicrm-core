@@ -1933,6 +1933,31 @@ ORDER BY name";
   }
 
   /**
+   * Given a state ID return the country ID, this allows
+   * us to populate forms and values for downstream code
+   *
+   * @param $stateID int
+   *
+   * @return int the country id that the state belongs to
+   * @static
+   * @public
+   */
+  static function countryIDForStateID($stateID) {
+    if (empty($stateID)) {
+      return NULL;
+    }
+
+    $query = "
+SELECT country_id
+FROM   civicrm_state_province
+WHERE  id = %1
+";
+    $params = array(1 => array($stateID, 'Integer'));
+
+    return CRM_Core_DAO::singleValueQuery($query, $params);
+  }
+
+  /**
    * Get all types of Greetings.
    *
    * The static array of greeting is returned

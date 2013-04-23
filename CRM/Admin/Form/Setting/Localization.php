@@ -133,7 +133,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     $includeState->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 
     $this->addElement('select', 'defaultContactCountry', ts('Default Country'), array('' => ts('- select -')) + $country);
-    
+
     /***Default State/Province***/
     $stateCountryMap = array();
     $stateCountryMap[] = array(
@@ -157,8 +157,9 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     // state country js
     CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
+
+    $defaults = array();
     CRM_Core_BAO_Address::fixAllStateSelects($form, $defaults);
-    /***Default State/Province***/
 
     // we do this only to initialize currencySymbols, kinda hackish but works!
     $config->defaultCurrencySymbol();
@@ -226,7 +227,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       )
     ) {
       $errors['defaultContactCountry'] = ts('Please select a default country that is in the list of available countries.');
-    } 
+    }
 
     return empty($errors) ? TRUE : $errors;
   }
