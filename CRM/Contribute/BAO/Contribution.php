@@ -1687,7 +1687,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             foreach ($lineitems as $lineitem) {
               if ($membership->membership_type_id == CRM_Utils_Array::value('membership_type_id', $lineitem)) {
                 $numterms = CRM_Utils_Array::value('membership_num_terms', $lineitem);
-                
+
                 // in case membership_num_terms comes through as null or zero
                 $numterms = $numterms >= 1 ? $numterms : 1;
                 break;
@@ -1907,13 +1907,21 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
     if ($activityTypeId && $contributorId) {
       $activityQuery = "
-SELECT source_contact_id
-  FROM civicrm_activity
- WHERE activity_type_id   = %1
-   AND source_record_id   = %2";
+SELECT     civicrm_activity_contact.contact_id
+  FROM     civicrm_activity_contact
+INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_activity.id
+ WHERE     civicrm_activity.activity_type_id   = %1
+   AND     civicrm_activity.source_record_id   = %2
+   AND     civicrm_activity_contact.record_type_id = %3
+";
 
-      $params = array(1 => array($activityTypeId, 'Integer'),
+      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+
+      $params = array(
+        1 => array($activityTypeId, 'Integer'),
         2 => array($contributionId, 'Integer'),
+        3 => array($sourceID, 'Integer'),
       );
 
       $sourceContactId = CRM_Core_DAO::singleValueQuery($activityQuery, $params);
@@ -2880,7 +2888,7 @@ WHERE  contribution_id = %1 ";
         ($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus))) {
         $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
         $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
-        
+
         $entityParams = array(
           'entity_table' => 'civicrm_financial_item',
           'financial_trxn_id' => $trxn->id,
@@ -2990,7 +2998,7 @@ WHERE  contribution_id = %1 ";
    *
    * CRM-12155
    *
-   * @param integer $contactId contact id 
+   * @param integer $contactId contact id
    *
    * @access public
    * @static
