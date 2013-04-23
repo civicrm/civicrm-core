@@ -290,25 +290,25 @@ $earthDistanceSQL  <= $distance
       $qill[] = $proximityAddress['state_province'];
     }
 
+    $config = CRM_Core_Config::singleton();
+    if (!isset($proximityAddress['country_id'])) {
+      // get it from state if state is present
+      if (isset($proximityAddress['state_province_id'])) {
+        $proximityAddress['country_id'] = CRM_Core_PseudoConstant::countryForState($proximityAddress['state_province_id']);
+      }
+      elseif (isset($config->defaultContactCountry)) {
+        $proximityAddress['country_id'] = $config->defaultContactCountry;
+      }
+    }
+
     if (isset($proximityAddress['country_id'])) {
       $proximityAddress['country'] = CRM_Core_PseudoConstant::country($proximityAddress['country_id']);
       $qill[] = $proximityAddress['country'];
     }
 
-    $config = CRM_Core_Config::singleton();
-    if (empty($config->geocodeMethod)) {
-      CRM_Core_Error::fatal(ts('Proximity searching requires you to set a valid geocoding provider'));
-    }
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $config->geocodeMethod) . '.php');
-    eval($config->geocodeMethod . '::format( $proximityAddress );');
-    if (!is_numeric(CRM_Utils_Array::value('geo_code_1', $proximityAddress)) ||
-      !is_numeric(CRM_Utils_Array::value('geo_code_2', $proximityAddress))
-    ) {
-      return;
-    }
-
-    if (isset($proximityAddress['distance_unit']) &&
+    if (
+      isset($proximityAddress['distance_unit']) &&
       $proximityAddress['distance_unit'] == 'miles'
     ) {
       $qillUnits = " {$distance} " . ts('miles');
@@ -326,12 +326,33 @@ $earthDistanceSQL  <= $distance
       )
     );
 
+    $fnName = isset($config->geocodeMethod) ? $config->geocodeMethod : NULL;
+    if (empty($fnName)) {
+      CRM_Core_Error::fatal(ts('Proximity searching requires you to set a valid geocoding provider'));
+    }
+
     $query->_tables['civicrm_address'] = $query->_whereTables['civicrm_address'] = 1;
-    $query->_where[$grouping][] = self::where($proximityAddress['geo_code_1'],
+
+    require_once (str_replace('_', DIRECTORY_SEPARATOR, $fnName) . '.php');
+    $fnName::format($proximityAddress);
+    if (
+      !is_numeric(CRM_Utils_Array::value('geo_code_1', $proximityAddress)) ||
+      !is_numeric(CRM_Utils_Array::value('geo_code_2', $proximityAddress))
+    ) {
+      // we are setting the where clause to 0 here, so we wont return anything
+      $qill .= ': ' . ts('We could not geocode the destination address.');
+      $query->_qill[$grouping][] = $qill;
+      $query->_where[$grouping][] = ' (0) ';
+      return;
+    }
+
+    $query->_qill[$grouping][] = $qill;
+    $query->_where[$grouping][] = self::where(
+      $proximityAddress['geo_code_1'],
       $proximityAddress['geo_code_2'],
       $distance
     );
-    $query->_qill[$grouping][] = $qill;
+
     return;
   }
 
