@@ -84,6 +84,30 @@ class CRM_Upgrade_Incremental_php_FourFour {
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     
+    $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_contacts', 'id', 'name');
+    if (!$assigneeID) {
+      $value[] = "({$optionGroupID}, 'Activity Assignees', 1, 'Activity Assignees', 1, 1, 1)";
+    }
+    if (!$sourceID) {
+      $value[] = "({$optionGroupID}, 'Activity Source', 2, 'Activity Source', 2, 1, 1)";
+    }
+    if (!$targetID) {
+      $value[] = "({$optionGroupID}, 'Activity Targets', 3, 'Activity Targets', 3, 1, 1)";
+    }
+
+    if (!$assigneeID || !$sourceID || !$targetID ) {
+      $insert =  "                                                                                                                                                                                    
+INSERT INTO civicrm_option_value
+(option_group_id, label, value, name, weight, is_reserved, is_active)
+VALUES
+
+";
+      $values = implode(', ', $value);
+      $query = $insert . $values;
+      $dao = CRM_Core_DAO::executeQuery($query);
+    }
+
+
     $query = "
 CREATE TABLE IF NOT EXISTS civicrm_activity_contact (
   id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Activity contact id',
