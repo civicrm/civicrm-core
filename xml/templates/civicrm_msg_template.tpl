@@ -21,6 +21,10 @@
 -- | GNU Affero General Public License or the licensing of CiviCRM,     |
 -- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 -- +--------------------------------------------------------------------+
+--
+-- Generated from {$smarty.template}
+-- {$generated}
+--
 {* not sure how to define the below in Smarty, so doing it in PHP instead *}
 {php}
   $ogNames = array(

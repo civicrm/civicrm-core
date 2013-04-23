@@ -30,8 +30,9 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
  *
+ * Generated from {$table.sourceFile}
+ * {$generated}
  */
 
 require_once 'CRM/Core/DAO.php';
