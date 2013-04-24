@@ -42,6 +42,7 @@ Author URI: http://civicrm.org/
 License: AGPL3
 */
 
+// prevent CiviCRM from rendering its own header
 define('CIVICRM_UF_HEAD', TRUE);
 
 // there is no session handling in WP hence we start it for CiviCRM pages
@@ -57,19 +58,22 @@ else {
   $_GET['civicrm_install_type'] = 'wordpress';
 }
 
+// CMW: tell WordPress to call plugin activation method
+register_activation_hook( __FILE__, 'civicrm_activate' );
+
 /**
  * Method that runs only when civicrm plugin is activated.
  */
-register_activation_hook( __FILE__, 'civicrm_activate');
-
 function civicrm_activate() {
   // Assign minimum capabilities for all wordpress roles and create anonymous_user' role
   civicrm_wp_set_capabilities();
 }
 
-/*
+/**
  * Function to create anonymous_user' role, if 'anonymous_user' role is not in the wordpress installation
  * and assign minimum capabilities for all wordpress roles
+ * 
+ * CMW: This function is called on plugin activation and also from upgrade_4_3_alpha1()
  */
 function civicrm_wp_set_capabilities() {
   global $wp_roles;
@@ -77,7 +81,7 @@ function civicrm_wp_set_capabilities() {
     $wp_roles = new WP_Roles();
   }
 
-  //Minimum capabilities (Civicrm permissions) arrays
+  // Minimum capabilities (Civicrm permissions) arrays
   $min_capabilities =  array(
     'access_civimail_subscribe_unsubscribe_pages' => 1,
     'access_all_custom_data' => 1,
@@ -100,7 +104,7 @@ function civicrm_wp_set_capabilities() {
     }
   }
 
-  //Add the 'anonymous_user' role with minimum capabilities.
+  // Add the 'anonymous_user' role with minimum capabilities.
   if (!in_array('anonymous_user' , $wp_roles->roles)) {
     add_role(
       'anonymous_user',
@@ -110,13 +114,22 @@ function civicrm_wp_set_capabilities() {
   }
 }
 
+/**
+ * Callback method for 'admin_menu' hook as set in civicrm_wp_main()
+ * 
+ * Adds menu items to WordPress admin menu
+ */
 function civicrm_wp_add_menu_items() {
+  // CMW: better to use plugin_dir_path(__FILE__) instead of WP_PLUGIN_DIR
+  // see http://codex.wordpress.org/Function_Reference/plugin_dir_path
   $settingsFile =
     WP_PLUGIN_DIR . DIRECTORY_SEPARATOR .
     'civicrm'     . DIRECTORY_SEPARATOR .
     'civicrm.settings.php';
 
   if (file_exists($settingsFile)) {
+    // CMW: better to use plugins_url( 'path/to/file.png', __FILE__ )
+    // see http://codex.wordpress.org/Function_Reference/plugins_url
     $civilogo =
       plugins_url() . DIRECTORY_SEPARATOR .
       'civicrm'     . DIRECTORY_SEPARATOR .
@@ -131,7 +144,12 @@ function civicrm_wp_add_menu_items() {
   }
 }
 
+/**
+ * Callback function for add_options_page() that runs the CiviCRM installer
+ */
 function civicrm_run_installer() {
+  // CMW: better to use plugin_dir_path(__FILE__) instead of WP_PLUGIN_DIR
+  // see http://codex.wordpress.org/Function_Reference/plugin_dir_path
   $installFile =
     WP_PLUGIN_DIR . DIRECTORY_SEPARATOR .
     'civicrm' . DIRECTORY_SEPARATOR .
@@ -141,12 +159,18 @@ function civicrm_run_installer() {
   include ($installFile);
 }
 
+/**
+ * Callback function for missing settings file in civicrm_wp_main()
+ */
 function civicrm_setup_warning() {
   $installLink = admin_url() . "options-general.php?page=civicrm-install";
   echo '<div id="civicrm-warning" class="updated fade"><p><strong>' . t('CiviCRM is almost ready.') . '</strong> ' . t('You must <a href="!1">configure CiviCRM</a> for it to work.', array(
     '!1' => $installLink)) . '</p></div>';
 }
 
+/**
+ * Only called by civicrm_wp_invoke() to undo WordPress default behaviour
+ */
 function civicrm_remove_wp_magic_quotes() {
   $_GET     = stripslashes_deep($_GET);
   $_POST    = stripslashes_deep($_POST);
@@ -289,6 +313,14 @@ function civicrm_get_ctype($default = NULL) {
   return $ctype;
 }
 
+/**
+ * Invoke CiviCRM in a WordPress context
+ *
+ * Callback function from add_menu_page() 
+ * Callback from WordPress 'init' and 'the_content' hooks
+ *
+ * Also used by civicrm_wp_shortcode_includes() and _civicrm_update_user()
+ */
 function civicrm_wp_invoke() {
   static $alreadyInvoked = FALSE;
   if ($alreadyInvoked) {
@@ -334,6 +366,12 @@ function civicrm_wp_invoke() {
   CRM_Core_Invoke::invoke($args);
 }
 
+/**
+ * merge CiviCRM's HTML header with the WordPress theme's header
+ *
+ * Callback from WordPress 'admin_head' and 'wp_head' hooks
+ *
+ */
 function civicrm_wp_head() {
   // CRM-11823 - If Civi bootstrapped, then merge its HTML header with the CMS's header
   global $civicrm_root;
@@ -346,6 +384,12 @@ function civicrm_wp_head() {
   }
 }
 
+/**
+ * CiviCRM's theme integration method
+ *
+ * Called by civicrm_wp_main() and civicrm_shortcode_handler()
+ *
+ */
 function civicrm_wp_frontend($shortcode = FALSE) {
   if (!civicrm_initialize()) {
     return;
@@ -419,14 +463,26 @@ function civicrm_wp_frontend($shortcode = FALSE) {
   }
 }
 
+/**
+ * Callback from 'edit_post_link' hook to remove edit link in civicrm_set_post_blank()
+ *
+ */
 function civicrm_set_blank() {
   return;
 }
 
+/**
+ * Called when authentication fails in civicrm_wp_frontend()
+ *
+ */
 function civicrm_set_frontendmessage() {
   return ts('You do not have permission to execute this url.');
 }
 
+/**
+ * Override WordPress post attributes in civicrm_wp_frontend()
+ *
+ */
 function civicrm_set_post_blank() {
   global $post;
   // to hide posted on
@@ -437,11 +493,19 @@ function civicrm_set_post_blank() {
   add_action('edit_post_link', 'civicrm_set_blank');
 }
 
+/**
+ * Override WordPress post comment status attribute in civicrm_wp_frontend()
+ *
+ */
 function civicrm_turn_comments_off() {
   global $post;
   $post->comment_status = "closed";
 }
 
+/**
+ * Authentication function used by civicrm_wp_frontend()
+ *
+ */
 function civicrm_check_permission($args) {
   if ($args[0] != 'civicrm') {
     return FALSE;
@@ -535,6 +599,13 @@ function civicrm_check_permission($args) {
   return FALSE;
 }
 
+/**
+ * add CiviCRM access capabilities to WordPress roles
+ *
+ * Called by postProcess() in civicrm/CRM/ACL/Form/WordPress/Permissions.php
+ * Also a callback for the 'init' hook in civicrm_wp_main()
+ *
+ */
 function wp_civicrm_capability() {
   global $wp_roles;
   if (!isset($wp_roles)) {
@@ -556,6 +627,10 @@ function wp_civicrm_capability() {
   }
 }
 
+/**
+ * register the plugin's WordPress hooks
+ *
+ */
 function civicrm_wp_main() {
   add_action('init', 'wp_civicrm_capability');
 
@@ -563,7 +638,9 @@ function civicrm_wp_main() {
   if ($isAdmin) {
     add_action('admin_menu', 'civicrm_wp_add_menu_items');
 
-    //Adding "embed form" button
+    // Adding "embed form" button
+    // CMW: better to use get_current_screen()
+    // see http://codex.wordpress.org/Function_Reference/get_current_screen
     if (in_array(
         basename($_SERVER['PHP_SELF']),
         array('post.php', 'page.php', 'page-new.php', 'post-new.php')
@@ -575,6 +652,7 @@ function civicrm_wp_main() {
     // check if settings file exist, do not show configuration link on
     // install / settings page
     if (isset($_GET['page']) && $_GET['page'] != 'civicrm-install') {
+      // CMW: this is discovered several times - a method whereby there no need to re-discover would be useful
       $settingsFile = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
 
       if (!file_exists($settingsFile)) {
@@ -609,6 +687,10 @@ function civicrm_wp_main() {
   }
 }
 
+/**
+ * callback method for 'media_buttons_context' hook as set in civicrm_wp_main()
+ *
+ */
 function civicrm_add_form_button($context) {
   if (!civicrm_initialize()) {
     return '';
@@ -620,6 +702,10 @@ function civicrm_add_form_button($context) {
   return $context . $out;
 }
 
+/**
+ * callback method for 'admin_footer' hook as set in civicrm_wp_main()
+ *
+ */
 function civicrm_add_form_button_html() {
   $title = ts("Please select a CiviCRM front-end page type.");
 
@@ -828,6 +914,9 @@ AND    j.module = 'Profile'
 <?php
 }
 
+/**
+ * Handles CiviCRM-defined shortcodes
+ */
 function civicrm_shortcode_handler($atts) {
   extract(shortcode_atts(array(
         'component' => 'contribution',
@@ -905,12 +994,23 @@ function civicrm_shortcode_handler($atts) {
   return civicrm_wp_frontend(TRUE);
 }
 
+/**
+ * Test if CiviCRM is currently being displayed in WordPress
+ * 
+ * Called by setTitle() in civicrm/CRM/Utils/System/WordPress.php
+ * Also called at the top of this plugin file to determine AJAX status
+ * 
+ */
 function civicrm_wp_in_civicrm() {
   return (isset($_GET['page']) &&
     $_GET['page'] == 'CiviCRM'
   ) ? TRUE : FALSE;
 }
 
+/**
+ * Callback function for 'get_header' hook
+ * 
+ */
 function civicrm_wp_shortcode_includes() {
   global $post;
   if (preg_match('/\[civicrm/', $post->post_content)) {
@@ -922,17 +1022,34 @@ function civicrm_wp_shortcode_includes() {
   }
 }
 
+/**
+ * Getter function for global $wp_set_breadCrumb
+ * 
+ * Called by appendBreadCrumb() in civicrm/CRM/Utils/System/WordPress.php
+ * 
+ */
 function wp_get_breadcrumb() {
   global $wp_set_breadCrumb;
   return $wp_set_breadCrumb;
 }
 
+/**
+ * Setter function for global $wp_set_breadCrumb
+ * 
+ * Called by appendBreadCrumb() in civicrm/CRM/Utils/System/WordPress.php
+ * Called by resetBreadCrumb() in civicrm/CRM/Utils/System/WordPress.php
+ * 
+ */
 function wp_set_breadcrumb($breadCrumb) {
   global $wp_set_breadCrumb;
   $wp_set_breadCrumb = $breadCrumb;
   return $wp_set_breadCrumb;
 }
 
+/**
+ * String replacement function similar to sprintf
+ * 
+ */
 function t($str, $sub = NULL) {
   if (is_array($sub)) {
     $str = str_replace(array_keys($sub), array_values($sub), $str);
@@ -940,14 +1057,29 @@ function t($str, $sub = NULL) {
   return $str;
 }
 
+/**
+ * Callback function for 'user_register' hook
+ * 
+ */
 function civicrm_user_register($userID) {
   _civicrm_update_user($userID);
 }
 
+/**
+ * Callback function for 'profile_update' hook
+ * 
+ */
 function civicrm_profile_update($userID) {
   _civicrm_update_user($userID);
 }
 
+/**
+ * Common function for user create/update hooks above
+ * 
+ * Seems to (wrongly) create new CiviCRM Contact every time a user changes their
+ * first_name or last_name attributes
+ * 
+ */
 function _civicrm_update_user($userID) {
   $user = get_userdata($userID);
   if ($user) {
@@ -965,17 +1097,30 @@ function _civicrm_update_user($userID) {
   }
 }
 
+/**
+ * Start buffering
+ * 
+ */
 function civicrm_buffer_start() {
   ob_start("civicrm_buffer_callback");
 }
 
+/**
+ * Flush buffer
+ * 
+ */
 function civicrm_buffer_end() {
   ob_end_flush();
 }
 
+/**
+ * Callback output buffer above
+ * 
+ */
 function civicrm_buffer_callback($buffer) {
   // modify buffer here, and then return the updated code
   return $buffer;
 }
 
+// run main plugin procedure
 civicrm_wp_main();
