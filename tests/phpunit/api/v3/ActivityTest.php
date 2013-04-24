@@ -78,11 +78,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     //create activity types
     $activityTypes = civicrm_api('option_value', 'create', array(
-      'version' => API_LATEST_VERSION, 'option_group_id' => 2,
-        'name' => 'Test activity type',
-        'label' => 'Test activity type',
-        'sequential' => 1,
-      ));
+                       'version' => API_LATEST_VERSION, 'option_group_id' => 2,
+                       'name' => 'Test activity type',
+                       'label' => 'Test activity type',
+                       'sequential' => 1,
+                     ));
     $this->test_activity_type_value = $activityTypes['values'][0]['value'];
     $this->test_activity_type_id = $activityTypes['id'];
     $this->_params = array(
@@ -196,7 +196,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     );
 
     $result = civicrm_api('activity', 'create', $params);
-
     // we should use the session contact ID, CRM-8180
     $this->assertAPISuccess($result);
   }
@@ -362,7 +361,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result, ' in line ' . __LINE__);
     $result = civicrm_api('activity', 'get', $this->_params);
     $this->assertAPISuccess($result, ' in line ' . __LINE__);
-    //$this->assertEquals($result['values'][$result['id']]['source_contact_id'], 17, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['duration'], 120, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['subject'], 'test activity type id', 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['activity_date_time'], '2011-06-02 14:36:13', 'in line ' . __LINE__);
@@ -407,8 +405,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     //$this->assertEquals($result['values'][$result['id']]['source_contact_id'], 17, 'in line ' . __LINE__);
     $result = civicrm_api('activity', 'get', array('id' => $result['id'], 'version' => $this->_apiversion));
-    $this->assertEquals($result['values'][$result['id']]['source_contact_id'], 17, 'in line ' . __LINE__);
-
     $this->assertEquals($result['values'][$result['id']]['duration'], 120, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['subject'], 'Make-it-Happen Meeting', 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['activity_date_time'], '2011-03-16 00:00:00', 'in line ' . __LINE__);
@@ -450,7 +446,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   function testActivityCreateExample() {
-
     /**
      *  Test civicrm_activity_create() using example code
      */
@@ -489,7 +484,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    $this->assertEquals( $result['is_error'], 0,
    "Error message: " . CRM_Utils_Array::value( 'error_message', $result ) );
 
-   $this->assertEquals( $result['values'][$result['id']]['source_contact_id'], 17 );
    $this->assertEquals( $result['values'][$result['id']]['duration'], 120 );
    // This field gets lost
    $this->assertEquals( $result['values'][$result['id']]['subject'], 'Make-it-Happen Meeting' );
@@ -499,7 +493,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    $this->assertEquals( $result['values'][$result['id']]['status_id'], 1 );
 
    }
-   */
+  */
 
   /**
    *  Test civicrm_activity_create() with valid parameters
@@ -547,7 +541,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $result = civicrm_api($this->_entity, 'create', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertAPISuccess($result, ' in line ' . __LINE__);
-    $result = civicrm_api($this->_entity, 'get', array('return.custom_' . $customField => 1, 'version' => 3, 'id' => $result['id']));
+    $result = civicrm_api($this->_entity, 'get', array('return.custom_' . $customField['id'] => 1, 'version' => 3, 'id' => $result['id']));
     $this->documentMe($params, $result, __FUNCTION__, __FILE__, 'Get with Contact Ref Custom Field', 'ContactRefCustomFieldGet');
 
     $this->assertEquals('Contact, Test', $result['values'][$result['id']]['custom_' . $customField['id']], ' in line ' . __LINE__);
@@ -605,7 +599,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals($result['is_error'], 0,
       "Error message: " . CRM_Utils_Array::value('error_message', $result) . ' in line ' . __LINE__
     );
-    //$this->assertEquals($result['values'][$result['id']]['source_contact_id'], 17, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['duration'], 120, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['subject'], 'Make-it-Happen Meeting', 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['activity_date_time'], date('Ymd') . '000000', 'in line ' . __LINE__);
@@ -634,14 +627,14 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $activity   = civicrm_api('activity', 'create', $this->_params);
 
     $contact = civicrm_api('Contact', 'Create', array(
-      'first_name' => "The Rock",
-       'last_name' =>'roccky',
-        'contact_type' => 'Individual',
-        'version' => 3,
-        'api.activity.create' => array(
-          'id' => $activity['id'], 'assignee_contact_id' => '$value.id',
-        ),
-      ));
+                 'first_name' => "The Rock",
+                 'last_name' =>'roccky',
+                 'contact_type' => 'Individual',
+                 'version' => 3,
+                 'api.activity.create' => array(
+                   'id' => $activity['id'], 'assignee_contact_id' => '$value.id',
+                 ),
+               ));
 
     $params = array(
       'activity_id' => $activity['id'],
@@ -659,7 +652,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
 
     $this->assertEquals($activity['id'], $result['id'], 'In line ' . __LINE__);
-    //$this->assertEquals(17, $result['values'][0]['source_contact_id'], 'In line ' . __LINE__);
 
     $this->assertEquals($contact['id'], $result['values'][0]['assignee_contact_id'][0], 'In line ' . __LINE__);
 
@@ -669,8 +661,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /*
-     * test that get functioning does filtering
-     */
+   * test that get functioning does filtering
+   */
   function testGetFilter() {
     $params = array(
       'source_contact_id' => 17,
@@ -691,8 +683,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     civicrm_api('Activity', 'Delete', array('version' => 3, 'id' => $result['id']));
   }
   /*
-     * test that get functioning does filtering
-     */
+   * test that get functioning does filtering
+   */
   function testGetStatusID() {
     $params = array(
       'source_contact_id' => 17,
@@ -708,30 +700,30 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     );
     civicrm_api('Activity', 'Create', $params);
     $result = civicrm_api('Activity', 'Get', array(
-      'version' => $this->_apiversion,
-      'activity_status_id' => '1'));
+                'version' => $this->_apiversion,
+                'activity_status_id' => '1'));
     $this->assertEquals(1, $result['count'], 'one activity of status 1 should exist');
 
     $result = civicrm_api('Activity', 'Get', array(
-      'version' => $this->_apiversion,
-      'status_id' => '1'));
+                'version' => $this->_apiversion,
+                'status_id' => '1'));
     $this->assertEquals(1, $result['count'], 'status_id should also work');
 
     $result = civicrm_api('Activity', 'Get', array(
-      'version' => $this->_apiversion,
-      'activity_status_id' => '2'));
+                'version' => $this->_apiversion,
+                'activity_status_id' => '2'));
     $this->assertEquals(0, $result['count'], 'No activities of status 1 should exist');
-     $result = civicrm_api('Activity', 'Get', array(
-      'version' => $this->_apiversion,
-      'status_id' => '2'));
+    $result = civicrm_api('Activity', 'Get', array(
+                'version' => $this->_apiversion,
+                'status_id' => '2'));
     $this->assertEquals(0, $result['count'], 'No activities of status 1 should exist');
 
 
- }
+  }
 
   /*
-     * test that get functioning does filtering
-     */
+   * test that get functioning does filtering
+   */
   function testGetFilterMaxDate() {
     $params = array(
       'source_contact_id' => 17,
@@ -749,8 +741,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $params['activity_date_time'] = 20120216;
     $activityTwo = civicrm_api('Activity', 'Create', $params);
     $result = civicrm_api('Activity', 'Get', array(
-        'version' => 3,
-      ));
+                'version' => 3,
+              ));
     $description = "demonstrates _low filter (at time of writing doesn't work if contact_id is set";
     $subfile = "DateTimeLow";
     $this->assertEquals(2, $result['count']);
@@ -806,7 +798,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals("custom string", $result['values'][0]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
 
-    //$this->assertEquals(17, $result['values'][0]['source_contact_id'], 'In line ' . __LINE__);
     $this->assertEquals($this->test_activity_type_value, $result['values'][0]['activity_type_id'], 'In line ' . __LINE__);
     $this->assertEquals('test activity type id', $result['values'][0]['subject'], 'In line ' . __LINE__);
     $this->customFieldDelete($ids['custom_field_id']);
@@ -838,7 +829,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['is_error'], "Error message: " . CRM_Utils_Array::value('error_message', $result));
     $this->assertEquals("custom string", $result['values'][0]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
-    //$this->assertEquals(17, $result['values'][0]['source_contact_id'], 'In line ' . __LINE__);
     $this->assertEquals($this->test_activity_type_value, $result['values'][0]['activity_type_id'], 'In line ' . __LINE__);
     $this->assertEquals('test activity type id', $result['values'][0]['subject'], 'In line ' . __LINE__);
     $this->assertEquals($result['values'][0]['id'], $result['id'], 'in line ' . __LINE__);
@@ -1010,6 +1000,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
     //hack on date comparison - really we should make getAndCheck smarter to handle dates
     $params['activity_date_time'] = '2009-10-11 12:34:56';
+    // we also unset source_contact_id since it is stored in an aux table
+    unset($params['source_contact_id']);
     $this->getAndCheck($params, $result['id'], 'activity');
   }
 
@@ -1155,7 +1147,17 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $this->assertEquals($activityId, $result['id'], ' in line ' . __LINE__);
 
-    $result = civicrm_api($this->_entity, 'get', array('return.assignee_contact_id' => 1, 'return.target_contact_id' => 1, 'version' => 3, 'id' => $result['id']));
+    $result = civicrm_api(
+      $this->_entity,
+      'get',
+      array(
+        'return.assignee_contact_id' => 1,
+        'return.target_contact_id' => 1,
+        'return.source_contact_id' => 1,
+        'version' => 3,
+        'id' => $result['id']
+      )
+    );
 
     $assignee = $result['values'][$result['id']]['assignee_contact_id'];
     $target = $result['values'][$result['id']]['target_contact_id'];
@@ -1196,6 +1198,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
     //hack on date comparison - really we should make getAndCheck smarter to handle dates
     $params['activity_date_time'] = $this->_params['activity_date_time'];
+    // we also unset source_contact_id since it is stored in an aux table
+    unset($params['source_contact_id']);
     $this->getAndCheck($params, $result['id'], 'activity');
   }
 
@@ -1253,7 +1257,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $findactivity = civicrm_api('Activity', 'Get', array('id' => $activity['id'], 'version' => 3));
 
     $this->assertAPISuccess($findactivity);
-    //$this->assertEquals(17, $findactivity['values'][$findactivity['id']]['source_contact_id'], 'In line ' . __LINE__);
   }
 
   /**
@@ -1276,31 +1279,31 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals('Test activity type', $result['values'][$activity2['id']]['activity_name'], 'In line ' . __LINE__);
   }
   /*
- * test chained Activity format
- */
+   * test chained Activity format
+   */
   function testchainedActivityGet() {
 
-   $activity = civicrm_api('Contact', 'Create', array(
-      'version' => $this->_apiversion,
-        'display_name' => "bob brown",
-        'contact_type' => 'Individual',
-        'api.activity_type.create' => array(
-          'weight' => '2',
-          'label' => 'send out letters',
-          'filter' => 0,
-          'is_active' => 1,
-          'is_optgroup' => 1,
-          'is_default' => 0,
-        ), 'api.activity.create' => array('subject' => 'send letter', 'activity_type_id' => '$value.api.activity_type.create.values.0.value'),
-      ));
+    $activity = civicrm_api('Contact', 'Create', array(
+                  'version' => $this->_apiversion,
+                  'display_name' => "bob brown",
+                  'contact_type' => 'Individual',
+                  'api.activity_type.create' => array(
+                    'weight' => '2',
+                    'label' => 'send out letters',
+                    'filter' => 0,
+                    'is_active' => 1,
+                    'is_optgroup' => 1,
+                    'is_default' => 0,
+                  ), 'api.activity.create' => array('subject' => 'send letter', 'activity_type_id' => '$value.api.activity_type.create.values.0.value'),
+                ));
 
     $this->assertAPISuccess($activity, 'in line ' . __LINE__);
     $result = civicrm_api('Activity', 'Get', array(
-        'version' => 3,
-        'id' => $activity['id'],
-        'return.assignee_contact_id' => 1,
-        'api.contact.get' => array('api.pledge.get' => 1),
-      ));
+                'version' => 3,
+                'id' => $activity['id'],
+                'return.assignee_contact_id' => 1,
+                'api.contact.get' => array('api.pledge.get' => 1),
+              ));
   }
 
   /**
