@@ -213,11 +213,15 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
-    // $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
     $contact = civicrm_api('contact', 'create', $this->fixtures['contact']);
-    $activity->source_contact_id = $contact['id'];
     $activity->save();
+
+    $source['contact_id'] = $contact['id'];
+    $source['activity_id'] = $activity->id;
+    $source['record_type_id'] = 2;
+    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
+    $activityContact->save();
 
     $this->assertCronRuns(array(
       array( // Before the 24-hour mark, no email
@@ -242,8 +246,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
     $contact = civicrm_api('contact', 'create', $this->fixtures['contact']);
-    $activity->source_contact_id = $contact['id'];
     $activity->save();
+
+    $source['contact_id'] = $contact['id'];
+    $source['activity_id'] = $activity->id;
+    $source['record_type_id'] =2;
+    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
+    $activityContact->save();
 
     $this->assertCronRuns(array(
       array( // Before the 24-hour mark, no email

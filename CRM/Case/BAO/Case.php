@@ -1425,13 +1425,13 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       $tplParams['contact'] = $info;
       self::buildPermissionLinks($tplParams, $activityParams);
 
-      $displayName = $info['display_name'];
+      $displayName = CRM_Utils_Array::value('display_name', $info);
 
-      list($result[$info['contact_id']], $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate(
+      list($result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate(
         array(
           'groupName' => 'msg_tpl_workflow_case',
           'valueName' => 'case_activity',
-          'contactId' => $info['contact_id'],
+          'contactId' => CRM_Utils_Array::value('contact_id', $info),
           'tplParams' => $tplParams,
           'from' => $receiptFrom,
           'toName' => $displayName,
@@ -1443,7 +1443,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       $activityParams['subject'] = $activitySubject . ' - copy sent to ' . $displayName;
       $activityParams['details'] = $message;
 
-      if ($result[$info['contact_id']]) {
+      if (!empty($result[$info['contact_id']])) {
         /*
          * Really only need to record one activity with all the targets combined.
          * Originally the template was going to possibly have different content, e.g. depending on permissions,
@@ -1458,7 +1458,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
         $recordedActivityParams['target_contact_id'][] = $info['contact_id'];
       }
       else {
-        unset($result[$info['contact_id']]);
+        unset($result[CRM_Utils_Array::value('contact_id', $info)]);
       }
     }
 
