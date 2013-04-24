@@ -1116,18 +1116,17 @@ class CRM_GCD {
     $contactDAO->find();
 
     $count = 0;
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
 
     while ($contactDAO->fetch()) {
       if ($count++ > 2) {
         break;
       }
       for ($i = 0; $i < self::NUM_ACTIVITY; $i++) {
-        require_once 'CRM/Activity/DAO/Activity.php';
         $activityDAO = new CRM_Activity_DAO_Activity();
         $activityDAO->source_contact_id = $contactDAO->id;
         $activityTypeID = mt_rand(7, 10);
-        require_once 'CRM/Core/PseudoConstant.php';
-        $activity = CRM_Core_PseudoConstant::activityType();
+
         $activityDAO->activity_type_id = $activityTypeID;
         $activityDAO->subject = "Subject for $activity[$activityTypeID]";
         $activityDAO->activity_date_time = $this->_getRandomDate();
@@ -1135,28 +1134,33 @@ class CRM_GCD {
         $activityDAO->status_id = 2;
         $this->_insert($activityDAO);
 
+        $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
+        $activityContactDAO->activity_id = $activityDAO->id;
+        $activityContactDAO->contact_id = mt_rand(1, 101);
+        $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $this->_insert($activityContactDAO);
+
         if (in_array($activityTypeID, array(
           6, 9))) {
-          require_once 'CRM/Activity/DAO/ActivityTarget.php';
-          $activityTargetDAO = new CRM_Activity_DAO_ActivityTarget();
+          $activityTargetDAO = new CRM_Activity_DAO_ActivityContact();
           $activityTargetDAO->activity_id = $activityDAO->id;
-          $activityTargetDAO->target_contact_id = mt_rand(1, 101);
+          $activityTargetDAO->contact_id = mt_rand(1, 101);
+          $activityTargetDAO->record_type_id = CRM_Utils_Array::key('Activity Targets', $activityContacts);
           $this->_insert($activityTargetDAO);
         }
 
         if ($activityTypeID == 7) {
-          require_once 'CRM/Activity/DAO/ActivityAssignment.php';
-          $activityAssignmentDAO = new CRM_Activity_DAO_ActivityAssignment();
+          $activityAssignmentDAO = new CRM_Activity_DAO_ActivityContact();
           $activityAssignmentDAO->activity_id = $activityDAO->id;
-          $activityAssignmentDAO->assignee_contact_id = mt_rand(1, 101);
+          $activityAssignmentDAO->contact_id = mt_rand(1, 101);
+          $activityAssignmentDAO->record_type_id = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
           $this->_insert($activityAssignmentDAO);
         }
       }
     }
   }
 
-  static
-  function getZipCodeInfo() {
+  static function getZipCodeInfo() {
     $stateID = mt_rand(1000, 5132);
     $offset = mt_rand(1, 4132);
 
@@ -1170,8 +1174,7 @@ class CRM_GCD {
     return array();
   }
 
-  static
-  function getLatLong($zipCode) {
+  static function getLatLong($zipCode) {
     $query = "http://maps.google.com/maps?q=$zipCode&output=js";
     $userAgent = "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0";
 
@@ -1294,8 +1297,7 @@ VALUES
     CRM_Core_DAO::executeQuery($activity, CRM_Core_DAO::$_nullArray);
   }
 
-  static
-  function repairDate($date) {
+  static function repairDate($date) {
     $dropArray = array('-' => '', ':' => '', ' ' => '');
     return strtr($date, $dropArray);
   }

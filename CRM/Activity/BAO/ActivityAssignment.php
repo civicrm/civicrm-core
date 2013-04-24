@@ -57,15 +57,13 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    *
    */
   public static function create(&$params) {
-    $assignment = new CRM_Activity_BAO_ActivityAssignment();
+    $assignment = new CRM_Activity_BAO_ActivityContact();
     $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $assignment->copyValues($params);
     $assignment->record_type_id = $assigneeID;
-    if (isset($assignment->assignee_contact_id)) {
-      $assignment->contact_id = $assignment->assignee_contact_id;
-    }
+
     return $assignment->save();
   }
 
