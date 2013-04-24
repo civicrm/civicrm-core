@@ -397,7 +397,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $assignmentParams['contact_id'] = $params['assignee_contact_id'];
         $assignmentParams['record_type_id'] = $assigneeID;
         if (CRM_Utils_Array::value('id', $params)) {
-          $assignment = new CRM_Activity_BAO_ActivityAssignment();
+          $assignment = new CRM_Activity_BAO_ActivityContact();
           $assignment->activity_id = $activityId;
           $assignment->record_type_id = $assigneeID;
           $assignment->find(TRUE);
