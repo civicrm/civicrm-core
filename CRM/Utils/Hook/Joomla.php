@@ -43,14 +43,21 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
     // not execute hooks if joomla is not loaded
     if (defined('_JEXEC')) {
       //Invoke the Joomla plugin system to observe to civicrm events.
-           jimport( 'joomla.plugin.helper' );
+      jimport( 'joomla.plugin.helper' );
       JPluginHelper::importPlugin('civicrm');
 
-           // get app based on cli or web
-           if ( PHP_SAPI != 'cli' ) {
-             $app = JFactory::getApplication( 'administrator' );
-           } else {
-        $app = JCli::getInstance();
+      // get app based on cli or web
+      if ( PHP_SAPI != 'cli' ) {
+        $app = JFactory::getApplication( 'administrator' );
+      }
+      else {
+        // condition on Joomla version
+        if( version_compare(JVERSION, '3.0', 'lt') ) {
+          $app = JCli::getInstance();
+        }
+        else {
+          $app = JApplicationCli::getInstance();
+        }
       }
 
       $result = $app->triggerEvent($fnSuffix, array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5));
