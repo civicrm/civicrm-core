@@ -1,11 +1,7 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
-class CRM_Contact_BAO_DupeContactTest extends CiviUnitTestCase {
-  function setUp() {
-    parent::setUp();
-  }
-
+class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   function testFuzzyDupes() {
     // make dupe checks based on based on following contact sets:
     // FIRST - LAST - EMAIL
