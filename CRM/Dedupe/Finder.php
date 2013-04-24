@@ -54,8 +54,7 @@ class CRM_Dedupe_Finder {
     $rgBao->id         = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
-        //FIXME:
-      CRM_Core_Error::fatal("$level rule for $ctype does not exist");
+      CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
     }
 
     $rgBao->fillTable();

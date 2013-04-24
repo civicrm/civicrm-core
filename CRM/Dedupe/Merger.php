@@ -33,17 +33,6 @@
  *
  */
 class CRM_Dedupe_Merger {
-  // FIXME: this should be auto-generated from the schema
-  static $validFields = array(
-    'addressee', 'addressee_custom', 'birth_date', 'contact_source', 'contact_type',
-    'deceased_date', 'do_not_email', 'do_not_mail', 'do_not_sms', 'do_not_phone',
-    'do_not_trade', 'external_identifier', 'email_greeting', 'email_greeting_custom', 'first_name', 'gender',
-    'home_URL', 'household_name', 'image_URL',
-    'individual_prefix', 'prefix_id', 'individual_suffix', 'suffix_id', 'is_deceased', 'is_opt_out',
-    'job_title', 'last_name', 'legal_identifier', 'legal_name',
-    'middle_name', 'nick_name', 'organization_name', 'postal_greeting', 'postal_greeting_custom',
-    'preferred_communication_method', 'preferred_mail_format', 'sic_code', 'current_employer_id'
-  );
 
   // FIXME: consider creating a common structure with cidRefs() and eidRefs()
   // FIXME: the sub-pages references by the URLs should
@@ -484,7 +473,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'contact' => array(),
       'custom' => array(),
     );
-    foreach (self::$validFields as $validField) {
+    foreach (self::getContactFields() as $validField) {
       if (CRM_Utils_Array::value($validField, $main) != CRM_Utils_Array::value($validField, $other)) {
         $result['contact'][] = $validField;
       }
@@ -660,7 +649,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         unset($migrationInfo[$key]);
         continue;
       }
-      elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::$validFields) or
+      elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) or
           substr($key, 0, 12) == 'move_custom_'
         ) and $val != NULL) {
         // Rule: if both main-contact has other-contact, let $mode decide if to merge a
@@ -758,7 +747,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // Fetch contacts
     foreach (array('main' => $mainId, 'other' => $otherId) as $moniker => $cid) {
-      $params = array('contact_id' => $cid, 'version' => 3, 'return' => array_merge(array('display_name'), self::$validFields));
+      $params = array('contact_id' => $cid, 'version' => 3, 'return' => array_merge(array('display_name'), self::getContactFields()));
       $result = civicrm_api('contact', 'get', $params);
 
       if (empty($result['values'][$cid]['contact_type'])) {
@@ -1141,7 +1130,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if ($value == $qfZeroBug) {
         $value = '0';
       }
-      if ((in_array(substr($key, 5), CRM_Dedupe_Merger::$validFields) or
+      if ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) or
           substr($key, 0, 12) == 'move_custom_'
         ) and $value != NULL) {
         $submitted[substr($key, 5)] = $value;
@@ -1482,6 +1471,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     return TRUE;
+  }
+
+  /**
+   * @return array of field names which will be compared, so everything except ID.
+   */
+  static function getContactFields() {
+    $contactFields = CRM_Contact_DAO_Contact::fields();
+    unset($contactFields['id']);
+
+    return array_keys($contactFields);
   }
 }
 
