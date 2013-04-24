@@ -253,6 +253,11 @@ function civicrm_api3_activity_get($params) {
           $activities[$key]['target_contact_id'] = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityArray['id']);
         }
         break;
+      case 'source_contact_id':
+        foreach ($activities as $key => $activityArray) {
+          $activities[$key]['source_contact_id'] = CRM_Activity_BAO_Activity::getSourceContactID($activityArray['id']);
+        }
+        break;
       default:
         if (substr($n, 0, 6) == 'custom') {
           $returnProperties[$n] = $v;
@@ -261,7 +266,6 @@ function civicrm_api3_activity_get($params) {
   }
   if (!empty($activities) && (!empty($returnProperties) || !empty($params['contact_id']))) {
     foreach ($activities as $activityId => $values) {
-
       _civicrm_api3_custom_data_get($activities[$activityId], 'Activity', $activityId, NULL, $values['activity_type_id']);
     }
   }
@@ -305,15 +309,16 @@ function civicrm_api3_activity_delete($params) {
 function _civicrm_api3_activity_check_params(&$params) {
 
   $contactIDFields = array_intersect_key($params,
-    array(
-      'source_contact_id' => 1,
-      'assignee_contact_id' => 1,
-      'target_contact_id' => 1,
-    )
+                     array(
+                       'source_contact_id' => 1,
+                       'assignee_contact_id' => 1,
+                       'target_contact_id' => 1,
+                     )
   );
-   // this should be handled by wrapper layer & probably the api would already manage it
-   //correctly by doing post validation - ie. a failure should result in a roll-back = an error
-   // needs testing
+
+  // this should be handled by wrapper layer & probably the api would already manage it
+  //correctly by doing post validation - ie. a failure should result in a roll-back = an error
+  // needs testing
   if (!empty($contactIDFields)) {
     $contactIds = array();
     foreach ($contactIDFields as $fieldname => $contactfield) {
@@ -342,8 +347,8 @@ SELECT  count(*)
 
 
   $activityIds = array('activity' => CRM_Utils_Array::value('id', $params),
-    'parent' => CRM_Utils_Array::value('parent_id', $params),
-    'original' => CRM_Utils_Array::value('original_id', $params),
+                 'parent' => CRM_Utils_Array::value('parent_id', $params),
+                 'original' => CRM_Utils_Array::value('original_id', $params),
   );
 
   foreach ($activityIds as $id => $value) {

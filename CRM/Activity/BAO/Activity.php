@@ -122,7 +122,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
 
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
-      $activity->source_contact_id = $sourceContactId;
+      $defaults['source_contact_id'] =
+        $activity->source_contact_id = $sourceContactId;
 
       if ($sourceContactId &&
         !CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
@@ -1678,7 +1679,7 @@ WHERE  contact_id = $contactId
       }
       else {
         // do source stuff here
-        $activities[$dao->activity_id]['source_contact_id'][] = $contactId;
+        $activities[$dao->activity_id]['source_contact_id'] = $contactId;
       }
     }
 
@@ -1710,6 +1711,11 @@ WHERE      activity.id IN ($activityIds)";
       $activities[$dao->activity_id]['status_id'] = $dao->status_id;
       $activities[$dao->activity_id]['activity_name'] = $activityTypes[$dao->activity_type_id];
       $activities[$dao->activity_id]['status'] = $activityStatuses[$dao->status_id];
+
+      // set to null if not set
+      if (!isset($activities[$dao->activity_id]['source_contact_id'])) {
+        $activities[$dao->activity_id]['source_contact_id'] = NULL;
+      }
     }
     return $activities;
   }
@@ -2545,6 +2551,18 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     if ($activityContact->find(TRUE)) {
       return $activityContact->$column;
     }
+    return NULL;
   }
+
+  public static function getSourceContactID($activityId) {
+    static $sourceID = NULL;
+    if (!$sourceID) {
+      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    }
+
+    return self::getActivityContact($activityId, $sourceID);
+  }
+
 }
 
