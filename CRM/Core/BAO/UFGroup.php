@@ -2527,15 +2527,15 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @access public
    */
   static function setRegisterDefaults(&$fields, &$defaults) {
+    $config = CRM_Core_Config::singleton();
     foreach ($fields as $name => $field) {
       if (substr($name, 0, 8) == 'country-') {
-        $config = CRM_Core_Config::singleton();
-        if ($config->defaultContactCountry) {
+        if (!empty($config->defaultContactCountry)) {
           $defaults[$name] = $config->defaultContactCountry;
         }
       }
       elseif (substr($name, 0, 15) == 'state_province-') {
-        if ($config->defaultContactStateProvince) {
+        if (!empty($config->defaultContactStateProvince)) {
           $defaults[$name] = $config->defaultContactStateProvince;
         }
       }
