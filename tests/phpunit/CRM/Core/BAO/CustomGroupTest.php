@@ -475,6 +475,45 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
       'Database check for custom group record.'
     );
     $this->assertEquals($params['title'], $dbCustomGroupTitle);
+
+    $dbCustomGroupTableName = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'table_name', 'id',
+      'Database check for custom group record.'
+    );
+    $this->assertEquals(strtolower("civicrm_value_{$params['name']}_{$customGroup->id}"), $dbCustomGroupTableName,
+        "The table name should be suffixed with '_ID' unless specified.");
+
+    Custom::deleteGroup($customGroup);
+  }
+
+  /**
+   * Function to test create() given a table_name
+   */
+  function testCreateTableName() {
+    $params = array(
+      'title' => 'Test_Group_2',
+      'name' => 'test_group_2',
+      'table_name' => 'test_otherTableName',
+      'extends' => array(0 => 'Individual', 1 => array()),
+      'weight' => 4,
+      'collapse_display' => 1,
+      'style' => 'Inline',
+      'help_pre' => 'This is Pre Help For Test Group 1',
+      'help_post' => 'This is Post Help For Test Group 1',
+      'is_active' => 1,
+      'version' => 3,
+    );
+    $customGroup = CRM_Core_BAO_CustomGroup::create($params);
+
+    $dbCustomGroupTitle = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'title', 'id',
+      'Database check for custom group record.'
+    );
+    $this->assertEquals($params['title'], $dbCustomGroupTitle);
+
+    $dbCustomGroupTableName = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'table_name', 'id',
+      'Database check for custom group record.'
+    );
+    $this->assertEquals($params['table_name'], $dbCustomGroupTableName);
+
     Custom::deleteGroup($customGroup);
   }
 
