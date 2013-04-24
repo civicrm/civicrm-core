@@ -190,20 +190,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @access protected
    */
   function initialize() {
-    $links = $this->links();
-    if (empty($links)) {
-      return;
-    }
-
     $this->_connect();
-
-    if (!isset($GLOBALS['_DB_DATAOBJECT']['LINKS'][$this->_database])) {
-      $GLOBALS['_DB_DATAOBJECT']['LINKS'][$this->_database] = array();
-    }
-
-    if (!array_key_exists($this->__table, $GLOBALS['_DB_DATAOBJECT']['LINKS'][$this->_database])) {
-      $GLOBALS['_DB_DATAOBJECT']['LINKS'][$this->_database][$this->__table] = $links;
-    }
   }
 
   /**
@@ -240,12 +227,13 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * returns list of FK relationships
    *
+   * @static
    * @access public
    *
-   * @return array
+   * @return array of CRM_Core_EntityReference
    */
-  function links() {
-    return NULL;
+  static function getReferenceColumns() {
+    return array();
   }
 
   /**
@@ -272,9 +260,6 @@ class CRM_Core_DAO extends DB_DataObject {
         }
       }
     }
-
-    // set the links
-    $this->links();
 
     return $table;
   }
@@ -1687,30 +1672,70 @@ SELECT contact_id
   }
 
   /**
-   * Check the tables sent in, to see if there are any tables where there is a value for
-   * a column
+   * Find all records which refer to this entity.
    *
-   * This is typically used when we want to delete a row, but want to avoid the FK errors
-   * that it might cause due to this being a required FK
-   *
-   * @param array an array of values (tableName, columnName)
-   * @param array the parameter array with the value and type
-   * @param array (reference) the tables which had an entry for this value
-   *
-   * @return boolean true if no value exists in all the tables
-   * @static
+   * @return array of objects referencing this
    */
-  public static function doesValueExistInTable(&$tables, $params, &$errors) {
-    $errors = array();
-    foreach ($tables as $table) {
-      $sql = "SELECT count(*) FROM {$table['table']} WHERE {$table['column']} = %1";
-      $count = self::singleValueQuery($sql, $params);
-      if ($count > 0) {
-        $errors[$table['table']] = $count;
+  function findReferences() {
+    $links = self::getReferencesToTable(static::getTableName());
+
+    $occurrences = array();
+    foreach ($links as $refSpec) {
+      $refColumn = $refSpec->getReferenceKey();
+      $targetColumn = $refSpec->getTargetKey();
+      $params = array(1 => array($this->$targetColumn, 'String'));
+      $sql = <<<EOS
+SELECT id
+FROM {$refSpec->getReferenceTable()}
+WHERE {$refColumn} = %1
+EOS;
+      if ($refSpec->isGeneric()) {
+        $params[2] = array(static::getTableName(), 'String');
+        $sql .= <<<EOS
+    AND {$refSpec->getTypeColumn()} = %2
+EOS;
+      }
+      $daoName = CRM_Core_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
+      $result = self::executeQuery($sql, $params, TRUE, $daoName);
+      while ($result->fetch()) {
+        $obj = new $daoName();
+        $obj->id = $result->id;
+        $occurrences[] = $obj;
       }
     }
 
-    return (empty($errors)) ? FALSE : TRUE;
+    return $occurrences;
+  }
+
+  /**
+   * List all tables which have hard foreign keys to this table.
+   *
+   * For now, this returns a description of every entity_id/entity_table
+   * reference.
+   * TODO: filter dynamic entity references on the $tableName, based on
+   * schema metadata in dynamicForeignKey which enumerates a restricted
+   * set of possible entity_table's.
+   *
+   * @param string $tableName table referred to
+   *
+   * @return array structure of table and column, listing every table with a
+   * foreign key reference to $tableName, and the column where the key appears.
+   */
+  static function getReferencesToTable($tableName) {
+    $refsFound = array();
+    foreach (CRM_Core_AllCoreTables::getClasses() as $daoClassName) {
+      $links = $daoClassName::getReferenceColumns();
+      $daoTableName = $daoClassName::getTableName();
+
+      foreach ($links as $refSpec) {
+        if ($refSpec->getTargetTable() === $tableName
+              or $refSpec->isGeneric()
+        ) {
+          $refsFound[] = $refSpec;
+        }
+      }
+    }
+    return $refsFound;
   }
 
   /**

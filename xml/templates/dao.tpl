@@ -122,22 +122,27 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
         parent::__construct( );
     {rdelim}
 
-{if $table.foreignKey}
+{if $table.foreignKey || $table.dynamicForeignKey}
     /**
-     * return foreign links
+     * return foreign keys and entity references
      *
+     * @static
      * @access public
-     * @return array
+     * @return array of CRM_Core_EntityReference
      */
-    function links( ) {ldelim}
-  if ( ! ( self::$_links ) ) {ldelim}
-       self::$_links = array(
+    static function getReferenceColumns() {ldelim}
+      if (!self::$_links) {ldelim}
+        self::$_links = array(
 {foreach from=$table.foreignKey item=foreign}
-                                   '{$foreign.name}' => '{$foreign.table}:{$foreign.key}',
+          new CRM_Core_EntityReference(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}'),
 {/foreach}
-                             );
-        {rdelim}
-        return self::$_links;
+
+{foreach from=$table.dynamicForeignKey item=foreign}
+          new CRM_Core_EntityReference(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}'),
+{/foreach}
+        );
+      {rdelim}
+      return self::$_links;
     {rdelim}
 {/if} {* table.foreignKey *}
 

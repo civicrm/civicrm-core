@@ -32,6 +32,11 @@
     <comment>entry in table</comment>
     <add>1.7</add>
   </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.7</add>
+  </dynamicForeignKey>
   <field>
     <name>price_field_id</name>
     <type>int unsigned</type>

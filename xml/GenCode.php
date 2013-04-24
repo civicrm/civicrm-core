@@ -585,6 +585,19 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       $table['foreignKey'] = &$foreign;
     }
 
+    if ($this->value('dynamicForeignKey', $tableXML)) {
+      $dynamicForeign = array();
+      foreach ($tableXML->dynamicForeignKey as $foreignXML) {
+        if ($this->value('drop', $foreignXML, 0) > 0 and $this->value('drop', $foreignXML, 0) <= $this->buildVersion) {
+          continue;
+        }
+        if ($this->value('add', $foreignXML, 0) <= $this->buildVersion) {
+          $this->getDynamicForeignKey($foreignXML, $dynamicForeign, $name);
+        }
+      }
+      $table['dynamicForeignKey'] = $dynamicForeign;
+    }
+
     $tables[$name] = &$table;
     return;
   }
@@ -826,6 +839,15 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       'onDelete' => $this->value('onDelete', $foreignXML, FALSE),
     );
     $foreignKeys[$name] = &$foreignKey;
+  }
+
+  function getDynamicForeignKey(&$foreignXML, &$dynamicForeignKeys) {
+    $foreignKey = array(
+      'idColumn' => trim($foreignXML->idColumn),
+      'typeColumn' => trim($foreignXML->typeColumn),
+      'key' => trim($this->value('key', $foreignXML)),
+    );
+    $dynamicForeignKeys[] = $foreignKey;
   }
 
   protected function value($key, &$object, $default = NULL) {

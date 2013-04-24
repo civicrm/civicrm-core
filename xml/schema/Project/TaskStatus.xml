@@ -47,6 +47,11 @@
        <comment>Foreign key to responsible entity (contact, group, etc.).</comment>
        <add>1.5</add>
   </field>
+  <dynamicForeignKey>
+       <idColumn>responsible_entity_id</idColumn>
+       <typeColumn>responsible_entity_table</typeColumn>
+       <add>1.5</add>
+  </dynamicForeignKey>
   <field>
        <name>target_entity_table</name>
        <type>varchar</type>
@@ -63,6 +68,11 @@
        <comment>Foreign key to target entity (contact, group, etc.).</comment>
        <add>1.5</add>
   </field>
+  <dynamicForeignKey>
+       <idColumn>target_entity_id</idColumn>
+       <typeColumn>target_entity_table</typeColumn>
+       <add>1.5</add>
+  </dynamicForeignKey>
   <field> 
       <name>status_detail</name> 
       <title>Status Details</title>

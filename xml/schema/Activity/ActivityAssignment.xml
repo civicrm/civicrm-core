@@ -38,6 +38,13 @@
     <drop>2.0</drop>    
   </field>
 
+  <dynamicForeignKey>
+    <idColumn>activity_entity_id</idColumn>
+    <typeColumn>activity_entity_table</typeColumn>
+    <add>1.8</add>
+    <drop>2.0</drop>    
+  </dynamicForeignKey>
+
   <field> 
     <name>target_entity_table</name>
     <type>varchar</type>
@@ -56,6 +63,13 @@
     <add>1.1</add>
     <drop>2.0</drop>    
    </field>
+
+   <dynamicForeignKey>
+    <idColumn>target_entity_id</idColumn>
+    <typeColumn>target_entity_table</typeColumn>
+    <add>1.8</add>
+    <drop>2.0</drop>    
+   </dynamicForeignKey>
 
    <field> 
     <name>activity_id</name>

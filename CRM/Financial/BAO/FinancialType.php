@@ -117,39 +117,19 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @static
    */
   static function del($financialTypeId) {
-    //checking if financial type is present
-    $check = false;
+    $financialType = new CRM_Financial_DAO_FinancialType( );
+    $financialType->id = $financialTypeId;
+    $financialType->find(true);
+    //TODO: if (!$financialType->find(true)) {
 
-    // ensure that we have no objects that have an FK to this financial type id that cannot be null
-    $tables =
-      array(
-        array(
-          'table'  => 'civicrm_contribution',
-          'column' => 'financial_type_id'
-        ),
-        array(
-          'table'  => 'civicrm_contribution_page',
-          'column' => 'financial_type_id'
-        ),
-        array(
-          'table'  => 'civicrm_contribution_recur',
-          'column' => 'financial_type_id'
-        ),
-        array(
-          'table'  => 'civicrm_membership_type',
-          'column' => 'financial_type_id'
-        ),
-        array(
-          'table'  => 'civicrm_pledge',
-          'column' => 'financial_type_id',
-        ),
-      );
-
-    $errors = array();
-    $params = array( 1 => array($financialTypeId, 'Integer'));
-    if (CRM_Core_DAO::doesValueExistInTable( $tables, $params, $errors)) {
-      $message  = ts('The following tables have an entry for this financial type') . ': ';
-      $message .= implode( ', ', array_keys($errors));
+    // ensure that we have no objects that have an FK to this financial type id TODO: that cannot be null
+    $occurrences = $financialType->findReferences();
+    if ($occurrences) {
+      $tables = array();
+      foreach ($occurrences as $occurence) {
+        $tables[] = get_class($occurence);
+      }
+      $message = ts('The following tables have an entry for this financial type: %1', array( '%1' => implode(', ', $tables) ));
 
       $errors = array();
       $errors['is_error'] = 1;
@@ -158,14 +138,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
 
     //delete from financial Type table
-    $financialType = new CRM_Financial_DAO_FinancialType( );
-    $financialType->id = $financialTypeId;
     $financialType->delete();
 
     $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount( );
     $entityFinancialType->entity_id = $financialTypeId;
     $entityFinancialType->entity_table = 'civicrm_financial_type';
-    $entityFinancialType ->delete();
+    $entityFinancialType->delete();
     return FALSE;
   }
   

@@ -31,6 +31,11 @@
       <required>true</required>
       <add>1.4</add>
   </field>
+  <dynamicForeignKey>
+      <idColumn>entity_id</idColumn>
+      <typeColumn>entity_table</typeColumn>
+      <add>1.4</add>
+  </dynamicForeignKey>
   <field> 
       <name>premiums_active </name> 
       <type>boolean</type> 

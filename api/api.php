@@ -354,14 +354,8 @@ function civicrm_error($result) {
 }
 
 function _civicrm_api_get_camel_name($entity, $version = NULL) {
-  static $_map = NULL;
-
   if (empty($version)) {
     $version = civicrm_get_api_version();
-  }
-
-  if (isset($_map[$version][strtolower($entity)])) {
-    return $_map[$version][strtolower($entity)];
   }
 
   $fragments = explode('_', $entity);
