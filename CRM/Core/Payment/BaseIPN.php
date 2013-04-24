@@ -489,6 +489,8 @@ LIMIT 1;";
       }
       $input['total_amount'] = $input['amount'];
       $input['contribution'] = $contribution;
+      $input['financial_type_id'] = $contribution->financial_type_id;
+
       if (CRM_Utils_Array::value('participant', $contribution->_relatedObjects)) {
         $input['contribution_mode'] = 'participant';
         $input['participant_id'] = $contribution->_relatedObjects['participant']->id;

@@ -705,8 +705,8 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $activityParams = array(
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
-            'source_contact_id' => $session->get('userID') ?
-            $session->get('userID') : $dao->contact_id,
+            'source_contact_id' =>
+            $session->get('userID') ? $session->get('userID') : $dao->contact_id,
             'target_contact_id' => $dao->contact_id,
             'activity_date_time' => date('YmdHis'),
             'status_id' => $activityStatusID,
@@ -751,18 +751,23 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 
       if ($mapping->entity == 'civicrm_activity') {
         $contactField = 'r.contact_id';
+        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+        $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
         switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
           case 'Activity Assignees':
-            $join[] =  "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type = 'Assignee'";
+            $join[] =  "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$assigneeID}";
             break;
 
           case 'Activity Source':
-            $join[] =  "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type = 'Source'";  
+            $join[] =  "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$sourceID}";
             break;
 
           default:
           case 'Activity Targets':
-            $join[] =  "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type = 'Target'";
+            $join[] =  "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
             break;
 
         }
@@ -839,12 +844,12 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $where[] = "e.membership_type_id IS NULL";
         }
 
-        $where[] = "e.is_override IS NULL OR e.is_override = 0";
+        $where[] = "( e.is_override IS NULL OR e.is_override = 0 )";
         $dateField = str_replace('membership_', 'e.', $actionSchedule->start_action_date);
         $notINClause = self::permissionedRelationships($contactField);
-        
-        $memershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "is_current_member = 1", 'id');
-        $mStatus = implode (',', $memershipStatus);
+
+        $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "is_current_member = 1 OR name = 'Expired'", 'id');
+        $mStatus = implode (',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
 
       }
@@ -904,7 +909,7 @@ INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_sche
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
 {$whereClause} AND {$dateClause} {$notINClause}";
-      
+
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
       // if repeat is turned ON:

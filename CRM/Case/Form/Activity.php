@@ -592,11 +592,12 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     );
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
 
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     // create activity assignee records
     $assigneeParams = array(
       'activity_id' => $activity->id,
-      'record_type' => 'Assignee'
+      'record_type_id' => $assigneeID 
     );
 
     if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
@@ -604,7 +605,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       //while sending a copy.CRM-4509.
       $activityAssigned = array_flip($params['assignee_contact_id']);
       $activityId       = isset($this->_activityId) ? $this->_activityId : $activity->id;
-      $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityId);
+      $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($activityId, $assigneeID);
       $activityAssigned = array_diff_key($activityAssigned, $assigneeContacts);
 
       foreach ($params['assignee_contact_id'] as $key => $id) {
@@ -627,7 +628,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     //CRM-5695
     //check for notification settings for assignee contacts
     $selectedContacts = array('contact_check');
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'activity_assignee_notification'
       )) {
@@ -640,7 +642,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
           $mailStatus = ts("A copy of the activity has also been sent to selected contacts(s).");
         }
         else {
-          $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activity->id, TRUE, FALSE);
+          $this->_relatedContacts = CRM_Activity_BAO_ActivityContact::getNames($activity->id, $assigneeID, TRUE, FALSE);
           $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contacts(s).");
         }
         //build an associative array with unique email addresses.

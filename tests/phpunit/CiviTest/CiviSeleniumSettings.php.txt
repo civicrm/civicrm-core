@@ -6,6 +6,16 @@ class CiviSeleniumSettings {
 
   var $browser = '*firefox';
 
+  /**
+   * @var string SeleniumRC host name
+   */
+  var $rcHost = 'localhost';
+
+  /**
+   * @var int SeleniumRC port number
+   */
+  var $rcPort = 4444;
+
   var $sandboxURL = 'http://devel.drupal.tests.dev.civicrm.org';
 
   var $sandboxPATH = '';
@@ -24,6 +34,16 @@ class CiviSeleniumSettings {
    * @var int seconds
    */
   var $timeout = 30;
+
+  /**
+   * @var int|NULL seconds to wait for SeleniumRC to become available
+   *
+   * If you have custom scripts which launch Selenium and PHPUnit in tandem, then
+   * Selenium may initialize somewhat slowly. Set $serverStartupTimeOut to wait
+   * for Selenium to startup. If you launch Selenium independently or otherwise
+   * prefer to fail immediately, then leave the default value NULL.
+   */
+  var $serverStartupTimeOut = NULL;
 
   function __construct() {
     $this->fullSandboxPath = $this->sandboxURL . $this->sandboxPATH;

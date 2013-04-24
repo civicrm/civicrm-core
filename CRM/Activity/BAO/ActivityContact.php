@@ -59,7 +59,10 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
     $activityContact = new CRM_Activity_DAO_ActivityContact();
 
     $activityContact->copyValues($params);
-    return $activityContact->save();
+    if (!$activityContact->find(TRUE)) {
+      return $activityContact->save();
+    }
+    return $activityContact;
   }
 
   /**
@@ -73,7 +76,7 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    * @access public
    *
    */
-  static function getNames($activityID, $recordType, $alsoIDs = FALSE) {
+  static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
     $names = array();
     $ids   = array();
 
@@ -86,12 +89,12 @@ SELECT     contact_a.id, contact_a.sort_name
 FROM       civicrm_contact contact_a
 INNER JOIN civicrm_activity_contact ON civicrm_activity_contact.contact_id = contact_a.id
 WHERE      civicrm_activity_contact.activity_id = %1
-AND        civicrm_activity_contact.record_type = %2
+AND        civicrm_activity_contact.record_type_id = %2
 AND        contact_a.is_deleted = 0
 ";
     $params = array(
       1 => array($activityID, 'Integer'),
-      2 => array($recordType, 'String')
+      2 => array($recordTypeID, 'Integer')
     );
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
@@ -101,6 +104,42 @@ AND        contact_a.is_deleted = 0
     }
 
     return $alsoIDs ? array($names, $ids) : $names;
+  }
+
+  /**
+   * function to retrieve id of target contact by activity_id
+   *
+   * @param int    $id  ID of the activity
+   *
+   * @return mixed
+   *
+   * @access public
+   *
+   */
+  static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
+    $activityContact = array();
+    if (!CRM_Utils_Rule::positiveInteger($activityID) ||
+        !CRM_Utils_Rule::positiveInteger($recordTypeID)) {
+      return $activityContact;
+    }
+
+    $sql = "                                                                                                                                                                                             SELECT     contact_id
+FROM       civicrm_activity_contact
+INNER JOIN civicrm_contact ON contact_id = civicrm_contact.id
+WHERE      activity_id = %1
+AND        record_type_id = %2
+AND        civicrm_contact.is_deleted = 0
+";
+    $params = array(
+      1 => array($activityID, 'Integer'),
+      2 => array($recordTypeID, 'Integer')
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    while ($dao->fetch()) {
+      $activityContact[] = $dao->contact_id;
+    }
+    return $activityContact;
   }
 
 }

@@ -142,8 +142,10 @@ class CRM_Contact_Form_Task_SMSCommon {
           continue;
         }
 
+        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
         //target contacts limit check
-        $ids = array_keys(CRM_Activity_BAO_ActivityTarget::getTargetNames($id));
+        $ids = array_keys(CRM_Activity_BAO_ActivityContact::getNames($id, $targetID));
 
         if (count($ids) > 1) {
           $extendTargetContacts++;
@@ -170,7 +172,7 @@ class CRM_Contact_Form_Task_SMSCommon {
       }
     }
 
-    if (is_array($form->_contactIds) && $toSetDefault) {
+    if (is_array($form->_contactIds) && !empty($form->_contactIds) && $toSetDefault) {
       $returnProperties = array(
         'sort_name' => 1,
         'phone' => 1,
@@ -393,26 +395,27 @@ class CRM_Contact_Form_Task_SMSCommon {
     $smsParams = $thisValues;
     unset($smsParams['text_message']);
     $smsParams['provider_id'] = $fromSmsProviderId;
+    $contactIds = array_keys($form->_contactDetails);
+    $allContactIds = array_keys($form->_allContactDetails);
 
-    list($sent, $activityId) = CRM_Activity_BAO_Activity::sendSMS($formattedContactDetails,
+    list($sent, $activityId, $countSuccess) = CRM_Activity_BAO_Activity::sendSMS($formattedContactDetails,
       $thisValues,
       $smsParams,
-      array_keys($form->_contactDetails)
+      $contactIds
     );
 
     if ($sent) {
-      $count_success = count($form->_contactDetails);
-      CRM_Core_Session::setStatus(ts('One message was sent successfully.', array('plural' => '%count messages were sent successfully.', 'count' => $count_success)), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
+      CRM_Core_Session::setStatus(ts('One message was sent successfully.', array('plural' => '%count messages were sent successfully.', 'count' => $countSuccess)), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $countSuccess)), 'success');
     }
 
     //Display the name and number of contacts for those sms is not sent.
-    $smsNotSent = array_diff_assoc($form->_allContactDetails, $form->_contactDetails);
+    $smsNotSent = array_diff_assoc($allContactIds, $contactIds);
 
     if (!empty($smsNotSent)) {
       $not_sent = array();
-      foreach ($smsNotSent as $contactId => $values) {
-        $displayName    = $values['display_name'];
-        $phone          = $values['phone'];
+      foreach ($smsNotSent as $index => $contactId) {
+        $displayName    = $form->_allContactDetails[$contactId]['display_name'];
+        $phone          = $form->_allContactDetails[$contactId]['phone'];
         $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$contactId");
         $not_sent[] = "<a href='$contactViewUrl' title='$phone'>$displayName</a>";
       }

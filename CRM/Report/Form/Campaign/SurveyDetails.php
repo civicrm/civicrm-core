@@ -313,21 +313,30 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
   function from() {
     $this->_from = " FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom} ";
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     //get the activity table joins.
-    $this->_from .= " INNER JOIN civicrm_activity_contact civicrm_activity_target ON ( {$this->_aliases['civicrm_contact']}.id = civicrm_activity_target.contact_id AND civicrm_activity_target.record_type = 'Target') \n";
-    $this->_from .= " INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id )\n";
-    $this->_from .= " INNER JOIN civicrm_activity_contact civicrm_activity_assignment ON ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id  AND civicrm_activity_assignment.record_type = 'Assignee' )\n";
+    $this->_from .= " INNER JOIN civicrm_activity_contact civicrm_activity_target ON 
+                      ( {$this->_aliases['civicrm_contact']}.id = civicrm_activity_target.contact_id AND civicrm_activity_target.record_type_id = {$targetID}) \n";
+    $this->_from .= " INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON 
+                      ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id )\n";
+    $this->_from .= " INNER JOIN civicrm_activity_contact civicrm_activity_assignment ON 
+                      ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id  AND civicrm_activity_assignment.record_type_id = {$assigneeID} )\n";
 
     //get the address table.
-    $this->_from .= " LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
+    $this->_from .= " LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} ON 
+                      {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
 
     if ($this->_emailField) {
-      $this->_from .= "LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND {$this->_aliases['civicrm_email']}.is_primary = 1\n";
+      $this->_from .= "LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} ON 
+                       {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
 
     if ($this->_phoneField) {
-      $this->_from .= "LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
+      $this->_from .= "LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']} ON 
+                       {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
     }
 
     if($this->_locationBasedPhoneField){

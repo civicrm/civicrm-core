@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
@@ -22,45 +23,59 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
+*/
 
-<script type="text/javascript">
-  {* Initialize CRM.url *}
-  CRM.url('init', '{crmURL p="civicrm/example" q="placeholder" h=0 }');
-
-{*/*
- * Here we define the CRM object,
- * A single global variable to hold everything that needs to be accessed from the global scope
- * Translated strings are stored in the CRM.strings object, and can be accessed via ts() in javascript
- * Very common strings are included here for convenience. Others should be added dynamically per-page.
+/**
  *
- * To extend this object from php:
- * CRM_Core_Resources::singleton()->addSetting(array('myNamespace' => array('foo' => 'bar')));
- * It can then be accessed client-side via CRM.myNamespace.foo
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2013
+ * $Id: $
+ *
  */
- *}
-  {literal}
-  var CRM = CRM || {};
-  CRM = cj.extend(true, {
-    strings: {{/literal}
-      '- select -': '{ts escape="js"}- select -{/ts}',
-      Ok: '{ts escape="js"}Ok{/ts}',
-      Cancel: '{ts escape="js"}Cancel{/ts}',
-      Yes: '{ts escape="js"}Yes{/ts}',
-      No: '{ts escape="js"}No{/ts}',
-      Saved: '{ts escape="js"}Saved{/ts}',
-      Error: '{ts escape="js"}Error{/ts}',
-      Removed: '{ts escape="js"}Removed{/ts}'
-    {literal}},
-    config: {{/literal}
-      urlIsPublic: {if $urlIsPublic}true{else}false{/if},
-      userFramework: '{$config->userFramework}',
-      resourceBase: '{$config->resourceBase}',
-      search_autocomplete_count: {crmSetting name="search_autocomplete_count" group="Search Preferences"}
-    {literal}},
-  }, CRM);
-  {/literal}
-  {* Dynamically add server-side variables to the CRM object *}
-  {crmRegion name='settings'}
-  {/crmRegion}
-</script>
+
+/**
+ * Simple static helpers for network operations
+ */
+class CRM_Utils_Network {
+  /**
+   * Try connecting to a TCP service; if it fails, retry. Repeat until serverStartupTimeOut elapses.
+   *
+   * @param int $serverStartupTimeOut seconds
+   * @param float $interval seconds to wait in between pollings
+   * @return bool TRUE if service is online
+   */
+  public static function waitForServiceStartup($host, $port, $serverStartupTimeOut, $interval = 0.333) {
+    $start = time();
+    $end = $start + $serverStartupTimeOut;
+    $found = FALSE;
+    $interval_usec = (int) 1000000 * $interval;
+
+    while (!$found && $end >= time()) {
+      $found = self::checkService($host, $port, $end - time());
+      if ($found) {
+        return TRUE;
+      }
+      usleep($interval_usec);
+    }
+    return FALSE;
+  }
+
+  /**
+   * Check whether a TCP service is available on $host and $port
+   */
+  public static function checkService($host, $port, $serverConnectionTimeOut) {
+    $old_error_reporting = error_reporting();
+    error_reporting($old_error_reporting & ~E_WARNING);
+    try {
+      $fh = fsockopen($host, $port, $errno, $errstr, $serverConnectionTimeOut);
+      if ($fh) {
+        fclose($fh);
+        error_reporting($old_error_reporting);
+        return TRUE;
+      }
+    } catch (Exception $e) {
+    }
+    error_reporting($old_error_reporting);
+    return FALSE;
+  }
+}

@@ -274,7 +274,9 @@ WHERE     ceft.entity_id IS NULL;
       CRM_Core_DAO::executeQuery('ALTER TABLE `log_civicrm_financial_trxn` CHANGE `trxn_id` `trxn_id` VARCHAR(255) NULL DEFAULT NULL');
     }
     // CRM-12142 - some sites didn't get this column added yet, and sites which installed 4.3 from scratch will already have it
-    if (
+    // CRM-12367 - add this column to single lingual sites only
+    $upgrade = new CRM_Upgrade_Form();
+    if (!$upgrade->multilingual &&
       !CRM_Core_DAO::checkFieldExists('civicrm_premiums', 'premiums_nothankyou_label')
     ) {
       $query = "
@@ -282,7 +284,7 @@ ALTER TABLE civicrm_premiums
 ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
   COMMENT 'Label displayed for No Thank-you option in premiums block (e.g. No thank you)'
 ";
-      CRM_Core_DAO::executeQuery($query);
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
     }
     $this->addTask(ts('Upgrade DB to 4.3.beta5: SQL'), 'task_4_3_x_runSql', $rev);
   }
@@ -382,14 +384,13 @@ AND       ceft.entity_table = 'civicrm_contribution'
     );
 
     $accountType = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' "));
-    $financialAccountId =
-      $query = "
+    $query = "
 SELECT id
 FROM   civicrm_financial_account
 WHERE  is_default = 1
 AND    financial_account_type_id = {$accountType}
 ";
-    CRM_Core_DAO::singleValueQuery($query);
+    $financialAccountId = CRM_Core_DAO::singleValueQuery($query);
 
     $accountRelationsips = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL);
 
@@ -444,27 +445,24 @@ AND   con.contribution_status_id = {$pendingStatus}
     //create a temp table to hold financial account id related to payment instruments
     $tempTableName1 = CRM_Core_DAO::createTempTableName();
 
-    $sql =  "CREATE TEMPORARY TABLE {$tempTableName1}";
-    CRM_Core_DAO::executeQuery($sql);
-
-    $sql = "
+    $sql =  "
+CREATE TEMPORARY TABLE {$tempTableName1}
 SELECT     ceft.financial_account_id financial_account_id, cov.value as instrument_id
 FROM       civicrm_entity_financial_account ceft
 INNER JOIN civicrm_option_value cov ON cov.id = ceft.entity_id AND ceft.entity_table = 'civicrm_option_value'
 INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
-WHERE      cog.name = 'payment_instrument'";
+WHERE      cog.name = 'payment_instrument'
+";
     CRM_Core_DAO::executeQuery($sql);
 
     //CRM-12141
-    $sql = "ALTER TABLE {$tempTableName1} ADD INDEX index_instrument_id (instrument_id);";
+    $sql = "ALTER TABLE {$tempTableName1} ADD INDEX index_instrument_id (instrument_id(200));";
     CRM_Core_DAO::executeQuery($sql);
 
     //create temp table to process completed / cancelled contribution
     $tempTableName2 = CRM_Core_DAO::createTempTableName();
-    $sql = "CREATE TEMPORARY TABLE {$tempTableName2}";
-    CRM_Core_DAO::executeQuery($sql);
-
     $sql = "
+CREATE TEMPORARY TABLE {$tempTableName2}
 SELECT con.id as contribution_id, con.payment_instrument_id,
        IF(con.currency IN ('{$validCurrencyCodes}'), con.currency, '{$defaultCurrency}') as currency,
        con.total_amount, con.net_amount, con.fee_amount, con.trxn_id, con.contribution_status_id,
@@ -509,7 +507,8 @@ SELECT   tempI.contribution_id, tempI.payment_instrument_id, tempI.currency, tem
          tempI.fee_amount,    tempI.trxn_id,   tempI.contribution_status_id, tempI.check_number,
          tempI.to_financial_account_id, tempI.from_financial_account_id, tempI.trxn_date
 FROM {$tempTableName2} tempI
-WHERE tempI.action = 'insert';";
+WHERE tempI.action = 'insert'
+";
     CRM_Core_DAO::executeQuery($sql);
 
     //update of existing records
@@ -714,13 +713,6 @@ LEFT JOIN civicrm_email ce ON ce.id = clb.email_id ;
 ' ;
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()) {
-      $params = array(
-        'sort_name' => $dao->name,
-        'display_name' => $dao->name,
-        'legal_name' => $dao->name,
-        'organization_name' => $dao->name,
-        'contact_type' => 'Organization'
-      );
       $query = "
 SELECT    cc.id FROM civicrm_contact cc
 LEFT JOIN civicrm_email ce ON ce.contact_id = cc.id
@@ -734,6 +726,13 @@ WHERE     cc.contact_type = 'Organization' AND cc.organization_name = %1
       $contactID = CRM_Core_DAO::singleValueQuery($query, $params);
       $context[1] = $dao->name;
       if (empty($contactID)) {
+        $params = array(
+          'sort_name' => $dao->name,
+          'display_name' => $dao->name,
+          'legal_name' => $dao->name,
+          'organization_name' => $dao->name,
+          'contact_type' => 'Organization'
+        );
         $contact = CRM_Contact_BAO_Contact::add($params);
         $contactID = $contact->id;
         $context[0] = 'added';

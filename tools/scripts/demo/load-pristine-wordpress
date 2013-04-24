@@ -1,0 +1,28 @@
+#!/usr/bin/env /bin/bash
+
+source `dirname $0`/demo.conf
+
+pushd .
+
+# load wordpress demo pristines
+if [ $WORDPRESS_DEMO_CRM_DBNAME ]; then
+  mysqladmin -f drop $WORDPRESS_DEMO_CRM_DBNAME
+  echo "Creating civicrm-wordpress-demo db.."
+  mysqladmin create $WORDPRESS_DEMO_CRM_DBNAME
+  if [ -f $WORDPRESS_DEMO_CRM_PRISTINE ]; then
+    echo "Reloading civicrm-wordpress-demo db from pristine.."
+    mysql $WORDPRESS_DEMO_CRM_DBNAME < $WORDPRESS_DEMO_CRM_PRISTINE
+  fi
+fi
+
+if [ $WORDPRESS_DEMO_CMS_DBNAME ]; then
+  mysqladmin -f drop $WORDPRESS_DEMO_CMS_DBNAME
+  echo "Creating wordpress-demo db.."
+  mysqladmin create $WORDPRESS_DEMO_CMS_DBNAME
+  if [ -f $WORDPRESS_DEMO_CMS_PRISTINE ]; then
+    echo "Reloading wordpress-demo db from pristine.."
+    mysql $WORDPRESS_DEMO_CMS_DBNAME < $WORDPRESS_DEMO_CMS_PRISTINE
+  fi
+fi
+
+popd

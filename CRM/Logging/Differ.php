@@ -82,10 +82,15 @@ class CRM_Logging_Differ {
         $contactIdClause = "AND (contact_id_a = %3 OR contact_id_b = %3)";
         break;
       case 'civicrm_activity':
+        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+        $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
         $join  = "
-LEFT JOIN civicrm_activity_contact at ON at.activity_id = lt.id AND at.contact_id = %3 AND at.record_type = 'Target'
-LEFT JOIN civicrm_activity_contact aa ON aa.activity_id = lt.id AND aa.contact_id = %3 AND aa.record_type = 'Assignee'
-LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND source.contact_id = %3 AND source.record_type = 'Source' ";
+LEFT JOIN civicrm_activity_contact at ON at.activity_id = lt.id AND at.contact_id = %3 AND at.record_type_id = {$targetID}
+LEFT JOIN civicrm_activity_contact aa ON aa.activity_id = lt.id AND aa.contact_id = %3 AND aa.record_type_id = {$assigneeID}
+LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND source.contact_id = %3 AND source.record_type_id = {$sourceID} ";
         $contactIdClause = "AND (at.id IS NOT NULL OR aa.id IS NOT NULL OR source.id IS NOT NULL)";
         break;
       case 'civicrm_case':

@@ -19,8 +19,9 @@ if [ -z "$start_point" -o -z "$version" -o -z "$first_act" ]; then
   echo "Usage:"
   echo "  $0 <start_point> <version> --build"
   echo "  $0 <start_point> <version> --publish"
+  echo "  $0 <start_point> <version> --update"
   echo "  $0 <start_point> <version> --clean"
-  echo "  $0 <start_point> <version> --build --publish --clean [[ORDER SIGNIFICANT]]"
+  echo "  $0 <start_point> <version> --build --publish --update --clean [[ORDER SIGNIFICANT]]"
   echo "Arguments:"
   echo "  <start_point> is a branch name (e.g. \"master\")"
   echo "  <version> is Civi release (e.g. \"4.3.beta2\"); it will become a tag name"
@@ -164,6 +165,40 @@ function do_publish() {
 }
 
 #################################################
+## Update Version Info
+function do_update() {
+  echo "VERSION UPDATE: Enter the version that comes after $version (or enter nothing to abort)"
+  read new_ver
+  if [ -n "$new_ver" ]; then
+    cd $workdir/$version/export
+    # escape regex special chars
+    arg=`echo "$version" | sed 's:[]\[\^\$\.\*\/]:\\\\&:g'`
+    for file in xml/version.xml sql/civicrm_generated.mysql; do
+      set -ex
+      git checkout $file
+      sed "s/$arg/$new_ver/" < $file > $file.tmp
+      mv $file.tmp $file
+      set +x
+    done
+    # print the diff directly to the screen
+    git diff | cat
+    echo "Push these changes? y/n"
+    read input
+    if [ "$input" = "y" ]; then
+      set -ex
+      git add  xml/version.xml sql/civicrm_generated.mysql
+      git commit -m "Update version to $new_ver"
+      git push origin "$start_point"
+      set +x
+    else
+      do_update
+    fi
+  else
+    echo "No version entered. Aborting version update."
+  fi 
+}
+
+#################################################
 ## Cleanup
 function do_cleanup() {
   cd $workdir/$version
@@ -192,6 +227,10 @@ for ACT in "$@" ; do
       do_git_tag_push
       do_publish
       set +x
+      ;;
+    --update)
+      set +x
+      do_update
       ;;
     --clean)
       set -ex

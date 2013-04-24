@@ -1098,7 +1098,8 @@ INSERT INTO civicrm_mailing_bounce_pattern
         VALUES
     (@bounceTypeID, 'name(server entry| lookup failure)'),
     (@bounceTypeID, 'no (mail server|matches to nameserver query|dns entries)'),
-    (@bounceTypeID, 'reverse dns entry');
+    (@bounceTypeID, 'reverse dns entry'),
+    (@bounceTypeID, 'Host or domain name not found');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
@@ -1122,7 +1123,9 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'not a gateway'),
     (@bounceTypeID, 'server is down or unreachable'),
     (@bounceTypeID, 'too many connections'),
-    (@bounceTypeID, 'unable to connect');
+    (@bounceTypeID, 'unable to connect'),
+    (@bounceTypeID, 'lost connection'),
+    (@bounceTypeID, 'conversation with [^ ]* timed out while');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
@@ -1250,7 +1253,9 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'relay (not permitted|access denied)'),
     (@bounceTypeID, 'relayed mail to .+? not allowed'),
     (@bounceTypeID, 'sender ip must resolve'),
-    (@bounceTypeID, 'unable to relay');
+    (@bounceTypeID, 'unable to relay'),
+    (@bounceTypeID, 'No route to host'),
+    (@bounceTypeID, 'Network is unreachable');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)

@@ -16,7 +16,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   function tearDown() {
     // truncate a few tables
-    $tablesToTruncate = array('civicrm_contact', 'civicrm_activity', 'civicrm_activity_target', 'civicrm_activity_assignment');
+    $tablesToTruncate = array('civicrm_contact', 'civicrm_activity', 'civicrm_activity_contact');
     $this->quickCleanup($tablesToTruncate);
   }
 
@@ -122,8 +122,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'subject', 'Database check for created activity.'
     );
 
-    $activityTargetId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityTarget', $targetContactId,
-      'id', 'target_contact_id',
+    $activityTargetId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact', $targetContactId,
+      'id', 'contact_id',
       'Database check for created activity target.'
     );
 
@@ -131,11 +131,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activity = CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
     $this->assertEquals($activity->subject, 'Scheduling Meeting', 'Verify activity subject is correct.');
-    $this->assertEquals($activity->source_contact_id, $contactId, 'Verify source contact id is correct.');
     $this->assertEquals($activity->activity_type_id, 2, 'Verify activity type id is correct.');
+    $this->assertEquals($activity->source_contact_id, $contactId, 'Verify source contact id is correct.');
 
     $this->assertEquals($defaults['subject'], 'Scheduling Meeting', 'Verify activity subject is correct.');
-    $this->assertEquals($defaults['source_contact_id'], $contactId, 'Verify source contact id is correct.');
     $this->assertEquals($defaults['activity_type_id'], 2, 'Verify activity type id is correct.');
 
     $this->assertEquals($defaults['target_contact'][0], $targetContactId, 'Verify target contact id is correct.');
@@ -171,8 +170,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'subject', 'Database check for created activity.'
     );
 
-    $activityTargetId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityTarget', $targetContactId,
-      'id', 'target_contact_id',
+    $activityTargetId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact', $targetContactId,
+      'id', 'contact_id',
       'Database check for created activity target.'
     );
     $params = array(
@@ -217,15 +216,15 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'subject', 'Database check for created activity.'
     );
 
-    $activityTargetId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityTarget', $targetContactId,
-      'id', 'target_contact_id',
+    $activityTargetId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact', $targetContactId,
+      'id', 'contact_id',
       'Database check for created activity target.'
     );
 
-    CRM_Activity_BAO_Activity::deleteActivityTarget($activityId);
+    CRM_Activity_BAO_Activity::deleteActivityContact($activityId, 3);
 
-    $this->assertDBNull('CRM_Activity_DAO_ActivityTarget', $targetContactId, 'id',
-      'target_contact_id', 'Database check for deleted activity target.'
+    $this->assertDBNull('CRM_Activity_DAO_ActivityContact', $targetContactId, 'id',
+      'contact_id', 'Database check for deleted activity target.'
     );
 
     Contact::delete($contactId);
@@ -258,15 +257,15 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'subject', 'Database check for created activity.'
     );
 
-    $activityAssignmentId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityAssignment',
-      $assigneeContactId, 'id', 'target_contact_id',
+    $activityAssignmentId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact',
+      $assigneeContactId, 'id', 'contact_id',
       'Database check for created activity assignment.'
     );
 
-    CRM_Activity_BAO_Activity::deleteActivityAssignment($activityId);
+    CRM_Activity_BAO_Activity::deleteActivityContact($activityId, 1);
 
-    $this->assertDBNull('CRM_Activity_DAO_ActivityAssignment', $assigneeContactId, 'id',
-      'assignee_contact_id', 'Database check for deleted activity assignment.'
+    $this->assertDBNull('CRM_Activity_DAO_ActivityContact', $assigneeContactId, 'id',
+      'contact_id', 'Database check for deleted activity assignment.'
     );
 
     Contact::delete($contactId);

@@ -1,0 +1,1 @@
+{include file='../CRM/Upgrade/4.4.alpha1.msg_template/civicrm_msg_template.tpl'}

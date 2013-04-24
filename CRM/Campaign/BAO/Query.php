@@ -204,23 +204,28 @@ class CRM_Campaign_BAO_Query {
       return $from;
     }
 
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    
     switch ($name) {
       case self::CIVICRM_ACTIVITY_TARGET:
         $from = " INNER JOIN civicrm_activity_contact civicrm_activity_target
-   ON ( civicrm_activity_target.contact_id = contact_a.id AND civicrm_activity_target.record_type = 'Target') ";
+   ON ( civicrm_activity_target.contact_id = contact_a.id AND civicrm_activity_target.record_type_id = $targetID) ";
         break;
 
       case self::CIVICRM_ACTIVITY:
         $surveyActivityTypes = CRM_Campaign_PseudoConstant::activityType();
         $surveyKeys          = "(" . implode(',', array_keys($surveyActivityTypes)) . ")";
-        $from                = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
+        $from                = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_target.activity_id
                                  AND civicrm_activity.activity_type_id IN $surveyKeys ) ";
         break;
 
       case self::CIVICRM_ACTIVITY_ASSIGNMENT:
         $from = "
 INNER JOIN  civicrm_activity_contact civicrm_activity_assignment ON ( civicrm_activity.id = civicrm_activity_assignment.activity_id AND
-civicrm_activity_assignment.record_type = 'Assignee' ) ";
+civicrm_activity_assignment.record_type_id = $assigneeID ) ";
         break;
 
       case 'civicrm_survey':
@@ -415,7 +420,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
    * @return $voterClause as a string
    * @static
    */
-  function voterClause($params) {
+  static public function voterClause($params) {
     $voterClause = array();
     $fromClause = $whereClause = NULL;
     if (!is_array($params) || empty($params)) {

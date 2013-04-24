@@ -187,7 +187,7 @@ class CRM_Extension_Browser {
     $files      = scandir($cachedPath);
     foreach ($files as $dc => $fname) {
       if (substr($fname, -4) == '.xml') {
-        $result[] = array('key' => trim($fname, '.xml'));
+        $result[] = array('key' => substr($fname, 0, -4));
       }
     }
     return $result;
@@ -231,7 +231,7 @@ class CRM_Extension_Browser {
         $extsRaw[] = $out;
         $key = strip_tags($out[1]);
         if (substr($key, -4) == '.xml') {
-          $exts[] = array('key' => trim($key, '.xml'));
+          $exts[] = array('key' => substr($key, 0, -4));
         }
       }
     }

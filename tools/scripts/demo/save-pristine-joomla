@@ -1,0 +1,17 @@
+#!/usr/bin/env /bin/bash
+
+source `dirname $0`/demo.conf
+
+pushd .
+
+# create joomla pristine
+if [ $JOOMLA_DEMO_DBNAME ]; then
+  echo "Taking civicrm-joomla-demo db dump.."
+  mysqldump $JOOMLA_DEMO_DBNAME > $TMP_DUMP_FILE
+  if [ -f $JOOMLA_DEMO_PRISTINE ]; then
+    echo "Creating civicrm-joomla-demo pristine from dump.."
+    cp $TMP_DUMP_FILE $JOOMLA_DEMO_PRISTINE
+  fi
+fi
+
+popd

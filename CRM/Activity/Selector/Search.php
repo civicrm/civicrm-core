@@ -249,7 +249,11 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    
     while ($result->fetch()) {
       $row = array();
 
@@ -270,9 +274,9 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         $contactId = CRM_Utils_Array::value('source_contact_id', $row);
       }
 
-      $row['target_contact_name']   = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], 'Target');
-      $row['assignee_contact_name'] = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], 'Assignee');
-      list($row['source_contact_name'], $row['source_contact_id']) = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], 'Source', TRUE);
+      $row['target_contact_name']   = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], $targetID);
+      $row['assignee_contact_name'] = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], $assigneeID);
+      list($row['source_contact_name'], $row['source_contact_id']) = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], $sourceID, TRUE);
       $row['source_contact_name'] = implode(',', array_values($row['source_contact_name']));
       $row['source_contact_id'] = implode(',', $row['source_contact_id']);
 

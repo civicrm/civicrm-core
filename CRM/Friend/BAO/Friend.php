@@ -135,7 +135,9 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     //activity creation
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+ 
     //friend contacts creation
     foreach ($contactParams as $key => $value) {
 
@@ -152,7 +154,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       $targetParams = array(
         'activity_id' => $activity->id,
         'contact_id'  => $contact,
-        'record_type' => 'Target'
+        'record_type_id' => $targetID
       );
 
       // See if it already exists
@@ -161,7 +163,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       $activityContact->contact_id = $contact;
       $activityContact->find(TRUE);
       if (empty($activityContact->id)) {
-        $resultTarget = CRM_Activity_BAO_ActivityTarget::create($targetParams);
+        $resultTarget = CRM_Activity_BAO_ActivityContact::create($targetParams);
       }
     }
 

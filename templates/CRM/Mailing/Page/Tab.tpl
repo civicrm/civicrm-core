@@ -32,7 +32,6 @@
       <th class='crm-mailing-contact_created'>{ts}Created By{/ts}</th>
       <th class='crm-mailing-contact-date'>{ts}Date{/ts}</th>
       <th class='crm-mailing-contact-links nosort'>&nbsp;</th>
-      <th class='hiddenElement'>&nbsp;</th>
     </tr>
     </thead>
   </table>
@@ -46,14 +45,13 @@
   });
 
 function buildMailingContact() {
-  oTable.fnDestroy();
 
   var columns = '';
-  var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/rest" h=0 q="entity=MailingContact&action=get&sequential=1&json=1&contact_id=$contactId"}'{literal};
+  var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/contactmailing" h=0 q="contact_id=$contactId"}'{literal};
 
   var ZeroRecordText = {/literal}'{ts escape="js"}No mailings found{/ts}.'{literal};
 
-  oTable = cj('#mailing-contact-selector').dataTable({
+  oTable = cj('#contact-mailing-selector').dataTable({
     "bFilter"    : false,
     "bAutoWidth" : false,
     "aaSorting"  : [],
@@ -61,8 +59,7 @@ function buildMailingContact() {
       {sClass:'crm-mailing-contact-subject'},
       {sClass:'crm-mailing-contact_created'},
       {sClass:'crm-mailing-contact-date'},
-      {sClass:'crm-mailing-contact-links', bSortable:false},
-      {sClass:'hiddenElement', bSortable:false}
+      {sClass:'crm-mailing-contact-links', bSortable:false}
     ],
     "bProcessing": true,
     "sPaginationType": "full_numbers",
@@ -85,22 +82,6 @@ function buildMailingContact() {
         "sNext":     {/literal}"{ts escape='js'}Next{/ts}"{literal},
         "sLast":     {/literal}"{ts escape='js'}Last{/ts}"{literal}
       }
-    },
-    "fnDrawCallback": function() { setSelectorClass(); },
-    "fnServerData": function ( sSource, aoData, fnCallback ) {
-        aoData.push( {name:'contact_id', value: {/literal}{$contactId}{literal}},
-      {name:'admin',   value: {/literal}'{$admin}'{literal}}
-      );
-
-      cj.ajax( {
-        "dataType": 'json',
-        "type": "POST",
-        "url": sSource,
-        "data": aoData,
-        "success": fnCallxback,
-        // CRM-10244
-        "dataFilter": function(data, type) { return data.replace(/[\n\v\t]/g, " "); }
-      });
     }
   });
 }

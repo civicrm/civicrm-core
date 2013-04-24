@@ -28,33 +28,45 @@
     <h2>{$pageTitle}</h2>
 {/if}
 {if !$upgraded}
-    <div style="margin-top: 2em; padding: 1em; background-color: #0C0; border: 1px #070 solid; color: white; font-weight: normal">
+  <div class="crm-container" style="margin-top: 2em; padding: 1em; background-color: #FFFFE3; border: 1px #F8FF00 solid; color: black;">
     <form method="post">
-        <p>{ts 1=$currentVersion 2=$newVersion}Use this utility to upgrade your CiviCRM database from %1 to %2.{/ts}</p>
+        <p>
+          <span class="crm-status-icon info"> </span>
+          {ts 1=$currentVersion 2=$newVersion}Use this utility to upgrade your CiviCRM database from %1 to %2.{/ts}
+        </p>
         {if $preUpgradeMessage}
             <div style="background-color: #E43D2B; padding: 10px;"><strong>{ts}Warning:{/ts}&nbsp;</strong>{$preUpgradeMessage}</div>
         {/if}
         <p><strong>{ts}Back up your database before continuing.{/ts}</strong>
-            {capture assign=docLink}{docURL page="Installation and Upgrades" text="Upgrade Documentation" style="color: white; text-decoration: underline;" resource="wiki"}{/capture}
+            {capture assign=docLink}{docURL page="Installation and Upgrades" text="Upgrade Documentation" style="text-decoration: underline;" resource="wiki"}{/capture}
             {ts 1=$docLink}This process may change your database structure and values. In case of emergency you may need to revert to a backup. For more detailed information, refer to the %1.{/ts}</p>
         <p>{ts}Click 'Upgrade Now' if you are ready to proceed. Otherwise click 'Cancel' to return to the CiviCRM home page.{/ts}</p>
         <input type="hidden" name="action" value="begin" />
         <input type="submit" value="{ts}Upgrade Now{/ts}" name="upgrade" onclick="return confirm('{ts}Are you sure you are ready to upgrade now?{/ts}');" /> &nbsp;&nbsp;
         <input type="button" value="{ts}Cancel{/ts}" onclick="window.location='{$cancelURL}';" />
     </form>
-    </div>
+  </div>
 
 {else}
-    <div style="margin-top: 3em; padding: 1em; background-color: #0C0; border: 1px #070 solid; color: white; font-weight: bold">
-        <p>{$message}</p>
-        <p>{$afterUpgradeMessage}</p>
-        <p><a href="{$menuRebuildURL}" title="{ts}CiviCRM home page{/ts}" style="color: white; text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
-      <div class="upgrade-success">
-        <table>
-          <tr><td class="tasklist">
-            {ts 1='http://civicrm.org/civicrm/profile/create?reset=1&gid=15'}Have you registered this site at CiviCRM.org? If not, please help strengthen the CiviCRM ecosystem by taking a few minutes to <a href="%1" target="_blank">fill out the site registration form</a>. The information collected will help us prioritize improvements, target our communications and build the community. If you have a technical role for this site, be sure to check "Keep in Touch" to receive technical updates (a low volume mailing list).{/ts}</td>
-          </tr>
-        </table>
+    <div class="crm-container" style="margin-top: 2em; padding: 1em; background-color: #EEFFEE; border: 1px #070 solid; color: black;">
+      <p><span class="crm-status-icon success"> </span><strong>{$message}</strong></p>
+      <div style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
+        <p>
+          <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
+          {ts 1='http://civicrm.org/civicrm/profile/create?reset=1&gid=15'}
+          This release was made possible by contributions from people like <strong>you</strong>. <a href="%1" target="_blank">Register your site</a> to join the community.
+          {/ts}
+        </p>
+        <p>
+          {ts 1='http://civicrm.org/contribute' 2='http://civicrm.org/make-it-happen'}
+          If CiviCRM is useful to your organization, consider making a <a href="%1" target="_blank">monthly contribution</a>, or helping to <a href="%2" target="_blank">fund a proposed improvement</a>.
+          {/ts}
+        </p>
       </div>
+      {if $afterUpgradeMessage}
+        <h3>Important Notes</h3>
+        <p>{$afterUpgradeMessage}</p>
+      {/if}
+      <p><a href="{$menuRebuildURL}" title="{ts}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
     </div>
 {/if}
