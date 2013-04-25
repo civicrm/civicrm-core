@@ -404,29 +404,39 @@ class CRM_Contact_Form_Task_SMSCommon {
       $contactIds
     );
 
-    if ($sent) {
-      CRM_Core_Session::setStatus(ts('One message was sent successfully.', array('plural' => '%count messages were sent successfully.', 'count' => $countSuccess)), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $countSuccess)), 'success');
-    }
-
-    //Display the name and number of contacts for those sms is not sent.
-    $smsNotSent = array_diff_assoc($allContactIds, $contactIds);
-
-    if (!empty($smsNotSent)) {
-      $not_sent = array();
-      foreach ($smsNotSent as $index => $contactId) {
-        $displayName    = $form->_allContactDetails[$contactId]['display_name'];
-        $phone          = $form->_allContactDetails[$contactId]['phone'];
-        $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$contactId");
-        $not_sent[] = "<a href='$contactViewUrl' title='$phone'>$displayName</a>";
+    if (is_array($sent)) {
+      // At least one PEAR_Error object was generated.
+      // Display the error messages to the user.
+      $status = '<ul>';
+      foreach ($sent as $errMsg) {
+        $status .= '<li>' . $errMsg . '</li>';
       }
-      $status = '(' . ts('because no phone number on file or communication preferences specify DO NOT SMS or Contact is deceased');
-      if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Form_Task_SMS') {
-        $status .= ' ' . ts("or the contact is not part of the activity '%1'", array(1 => self::RECIEVED_SMS_ACTIVITY_SUBJECT));
+      $status .= '</ul>';
+      CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array('count' => count($sent), 'plural' => '%count Messages Not Sent')), 'info');
+    } else {
+      if ($sent) {
+        CRM_Core_Session::setStatus(ts('One message was sent successfully.', array('plural' => '%count messages were sent successfully.', 'count' => $countSuccess)), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $countSuccess)), 'success');
       }
-      $status .= ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array('count' => count($smsNotSent), 'plural' => '%count Messages Not Sent')), 'info');
-    }
 
+      //Display the name and number of contacts for those sms is not sent.
+      $smsNotSent = array_diff_assoc($allContactIds, $contactIds);
+
+      if (!empty($smsNotSent)) {
+        $not_sent = array();
+        foreach ($smsNotSent as $index => $contactId) {
+          $displayName    = $form->_allContactDetails[$contactId]['display_name'];
+          $phone          = $form->_allContactDetails[$contactId]['phone'];
+          $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$contactId");
+          $not_sent[] = "<a href='$contactViewUrl' title='$phone'>$displayName</a>";
+        }
+        $status = '(' . ts('because no phone number on file or communication preferences specify DO NOT SMS or Contact is deceased');
+        if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Form_Task_SMS') {
+          $status .= ' ' . ts("or the contact is not part of the activity '%1'", array(1 => self::RECIEVED_SMS_ACTIVITY_SUBJECT));
+        }
+        $status .= ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
+        CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array('count' => count($smsNotSent), 'plural' => '%count Messages Not Sent')), 'info');
+      }
+    }
   }
 }
 
