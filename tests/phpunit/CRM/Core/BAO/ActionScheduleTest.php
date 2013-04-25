@@ -59,6 +59,20 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => '20120615',
       'is_override' => 0,
     );
+
+    $this->fixtures['rolling_membership_past'] = array( // createTestObject
+      'membership_type_id' => array(
+        'period_type' => 'rolling',
+        'duration_unit' => 'month',
+        'duration_interval' => '3',
+        'is_active' => 1,
+      ),
+      'join_date' => '20100310',
+      'start_date' => '20100310',
+      'end_date' => '20100610',
+      'is_override' => 'NULL',
+    );
+    
     $this->fixtures['phonecall'] = array( // createTestObject
       'status_id' => 1,
       'activity_type_id' => 2,
@@ -188,6 +202,37 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'week',
       'subject' => 'subject sched_membership_end_2week',
     );
+
+    $this->fixtures['sched_membership_end_2month'] = array( // create()
+      'name' => 'sched_membership_end_2month',
+      'title' => 'sched_membership_end_2month',
+      'absolute_date' => '',
+      'body_html' => '<p>body sched_membership_end_2month</p>',
+      'body_text' => 'body sched_membership_end_2month',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => '',
+      'entity_value' => '',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 4,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_end_date',
+      'start_action_offset' => '2',
+      'start_action_unit' => 'month',
+      'subject' => 'subject sched_membership_end_2month',
+    );
+
     $this->_setUp();
     $this->quickCleanup(array('civicrm_action_log', 'civicrm_action_schedule'));
   }
@@ -371,6 +416,44 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ),
     ));
   }
+
+
+  /**
+  * For contacts/members which match schedule based on end date,
+  * an email should be sent.
+  */
+  function testMembershipEndDate_NoMatch() {
+    // creates membership with end_date = 20120615
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership_past'], array('status_id' => 3)));
+    $this->assertTrue(is_numeric($membership->id));
+    $result = civicrm_api('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'test-member@example.com',
+      'version' => 3,
+    ));
+    $contact = civicrm_api('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+    $this->assertAPISuccess($result);
+
+    $actionSchedule = $this->fixtures['sched_membership_end_2month'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule, $ids);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    // end_date=2012-06-15 ; schedule is 2 weeks before end_date
+    $this->assertCronRuns(array(
+      array( // Before the 2-week mark, no email
+        'time' => '2012-05-31 01:00:00',
+        // 'time' => '2012-06-01 01:00:00', // FIXME: Is this the right boundary?
+        'recipients' => array(),
+      ),
+      array( // After the 2-week mark, send an email
+        'time' => '2013-05-01 01:00:00',
+        'recipients' => array(),
+      ),
+    ));
+  }
+
+
 
   // TODO // function testMembershipEndDate_NonMatch() { }
   // TODO // function testEventTypeStartDate_Match() { }
