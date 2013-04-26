@@ -41,11 +41,12 @@ CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMult
   if ( subName ) {
     dataUrl = dataUrl + '&subName=' + subName;
     cj('#customData' + subName ).show();
-  } else {
+  }
+  else {
     cj('#customData').show();
   }
   if ( groupID ) {
-         dataUrl = dataUrl + '&groupID=' + groupID;
+      dataUrl = dataUrl + '&groupID=' + groupID;
   }
 
   {/literal}
@@ -66,7 +67,8 @@ CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMult
   if ( !cgCount ) {
     cgCount = 1;
     var prevCount = 1;
-  } else if ( cgCount >= 1 ) {
+  }
+  else if ( cgCount >= 1 ) {
     var prevCount = cgCount;
     cgCount++;
   }
@@ -75,16 +77,19 @@ CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMult
 
 
   if ( isMultiple ) {
-         var fname = '#custom_group_' + groupID + '_' + prevCount;
+    var fname = '#custom_group_' + groupID + '_' + prevCount;
     if (cj(".add-more-link-" + groupID + "-" + prevCount ).length) {
       cj(".add-more-link-" + groupID + "-" + prevCount).hide();
-    } else {
-                  cj("#add-more-link-"+prevCount).hide();
     }
-  } else {
+    else {
+      cj("#add-more-link-"+prevCount).hide();
+    }
+  }
+  else {
     if ( subName && subName != 'null' ) {
       var fname = '#customData' + subName ;
-    } else {
+    }
+    else {
       var fname = '#customData';
     }
   }
@@ -92,6 +97,7 @@ CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMult
   cj.ajax({
     url: dataUrl,
     dataType: 'html',
+    async: false,
     success: function(response) {
       var target = cj(fname);
       var storage = {};
@@ -117,7 +123,6 @@ CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMult
       storage = null;
     }
   });
-
 };
 
 </script>
