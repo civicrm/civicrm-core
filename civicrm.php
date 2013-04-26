@@ -694,9 +694,9 @@ function civicrm_add_form_button($context) {
  *
  */
 function civicrm_add_form_button_html() {
-  $title = ts("Please select a CiviCRM front-end page type.");
+  $title = ts('Please select a CiviCRM front-end page type.');
 
-  $now = date("Ymdhis");
+  $now = date('Ymdhis');
 
   $sql = "
 SELECT id, title
@@ -1089,7 +1089,7 @@ function _civicrm_update_user($userID) {
  * 
  */
 function civicrm_buffer_start() {
-  ob_start("civicrm_buffer_callback");
+  ob_start('civicrm_buffer_callback');
 }
 
 /**
