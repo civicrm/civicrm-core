@@ -30,8 +30,9 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
  *
+ * Generated from {$smarty.template}
+ * {$generated}
  */
 class CRM_Core_I18n_SchemaStructure
 {ldelim}
