@@ -145,7 +145,7 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
    *
    * @param array the message with a to/from/text
    *
-   * @return mixed true on sucess or PEAR_Error object
+   * @return mixed true on success or PEAR_Error object
    * @access public
    */
   function send($recipients, $header, $message, $jobID = NULL) {
@@ -171,7 +171,14 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
         return $sid;
       }
       else {
-        return PEAR::raiseError($response['data']);
+        $errMsg = $send->RestException->Message
+          . ' For more information, see '
+          . $send->RestException->MoreInfo;
+        return PEAR::raiseError(
+          $errMsg,
+          null,
+          PEAR_ERROR_RETURN
+        );
       }
     }
   }
@@ -209,10 +216,10 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
     $response['http_code'] = curl_getinfo($this->_ch, CURLINFO_HTTP_CODE);
     
     if (empty($response['http_code'])) {
-      return PEAR::raiseError('No HTTP Status Code was returned.');
+      return PEAR::raiseError('No HTTP Status Code was returned.', null, PEAR_ERROR_RETURN);
     }
     elseif ($response['http_code'] === 0) {
-      return PEAR::raiseError('Cannot connect to the Twilio API Server.');
+      return PEAR::raiseError('Cannot connect to the Twilio API Server.', null, PEAR_ERROR_RETURN);
     }
 
     $response['data'] = $status;
