@@ -42,6 +42,10 @@ Author URI: http://civicrm.org/
 License: AGPL3
 */
 
+// define commonly used items as constants
+define('CIVICRM_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('CIVICRM_SETTINGS_PATH', CIVICRM_PLUGIN_DIR.'civicrm.settings.php');
+
 // prevent CiviCRM from rendering its own header
 define('CIVICRM_UF_HEAD', TRUE);
 
@@ -120,22 +124,13 @@ function civicrm_wp_set_capabilities() {
  * Adds menu items to WordPress admin menu
  */
 function civicrm_wp_add_menu_items() {
-  // CMW: better to use plugin_dir_path(__FILE__) instead of WP_PLUGIN_DIR
-  // see http://codex.wordpress.org/Function_Reference/plugin_dir_path
-  $settingsFile =
-    WP_PLUGIN_DIR . DIRECTORY_SEPARATOR .
-    'civicrm'     . DIRECTORY_SEPARATOR .
-    'civicrm.settings.php';
-
-  if (file_exists($settingsFile)) {
-    // CMW: better to use plugins_url( 'path/to/file.png', __FILE__ )
+  if (file_exists(CIVICRM_SETTINGS_PATH)) {
+    // use plugins_url( 'path/to/file.png', __FILE__ )
     // see http://codex.wordpress.org/Function_Reference/plugins_url
-    $civilogo =
-      plugins_url() . DIRECTORY_SEPARATOR .
-      'civicrm'     . DIRECTORY_SEPARATOR .
-      'civicrm'     . DIRECTORY_SEPARATOR .
-      'i'           . DIRECTORY_SEPARATOR .
-      'logo16px.png';
+    $civilogo = plugins_url(
+      'civicrm' . DIRECTORY_SEPARATOR . 'i' . DIRECTORY_SEPARATOR . 'logo16px.png',
+      __FILE__
+    );
 
     add_menu_page('CiviCRM', 'CiviCRM', 'access_civicrm', 'CiviCRM', 'civicrm_wp_invoke', $civilogo);
   }
@@ -148,11 +143,9 @@ function civicrm_wp_add_menu_items() {
  * Callback function for add_options_page() that runs the CiviCRM installer
  */
 function civicrm_run_installer() {
-  // CMW: better to use plugin_dir_path(__FILE__) instead of WP_PLUGIN_DIR
-  // see http://codex.wordpress.org/Function_Reference/plugin_dir_path
+  // uses CIVICRM_PLUGIN_DIR instead of WP_PLUGIN_DIR
   $installFile =
-    WP_PLUGIN_DIR . DIRECTORY_SEPARATOR .
-    'civicrm' . DIRECTORY_SEPARATOR .
+    CIVICRM_PLUGIN_DIR .
     'civicrm' . DIRECTORY_SEPARATOR .
     'install' . DIRECTORY_SEPARATOR .
     'index.php';
@@ -206,14 +199,11 @@ function civicrm_initialize() {
       exit();
     }
 
-    $settingsFile = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
-
-    if (!file_exists($settingsFile)) {
+    if (!file_exists(CIVICRM_SETTINGS_PATH)) {
       $error = FALSE;
     }
     else {
-      define('CIVICRM_SETTINGS_PATH', $settingsFile);
-      $error = include_once ($settingsFile);
+      $error = include_once (CIVICRM_SETTINGS_PATH);
     }
 
     // autoload
@@ -250,7 +240,7 @@ function civicrm_initialize() {
       //FIX ME
       wp_die("<strong><p class='error'>" .
         t("Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (!1).",
-          array('!1' => $settingsFile)
+          array('!1' => CIVICRM_SETTINGS_PATH)
         ) .
         "</p><p class='error'> &raquo; " .
         t("civicrm_root is currently set to: <em>!1</em>.", array(
@@ -652,10 +642,7 @@ function civicrm_wp_main() {
     // check if settings file exist, do not show configuration link on
     // install / settings page
     if (isset($_GET['page']) && $_GET['page'] != 'civicrm-install') {
-      // CMW: this is discovered several times - a method whereby there no need to re-discover would be useful
-      $settingsFile = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
-
-      if (!file_exists($settingsFile)) {
+      if (!file_exists(CIVICRM_SETTINGS_PATH)) {
         add_action('admin_notices', 'civicrm_setup_warning');
       }
     }
