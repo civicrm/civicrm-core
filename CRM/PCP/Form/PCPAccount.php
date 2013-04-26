@@ -64,7 +64,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this);
     $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
-    if (!$this->_pageId && $config->userFrameworkFrontend) {
+    if (!$this->_pageId && $config->userFramework == 'Joomla' && $config->userFrameworkFrontend) {
       $this->_pageId = $this->_id;
     }
 
