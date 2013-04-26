@@ -1499,7 +1499,8 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
     }
 
     $success = 0;
-    $escapeSmarty = $sent = FALSE;
+    $escapeSmarty = FALSE;
+    $errMsgs = array();
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
 
@@ -1525,17 +1526,31 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
         $smsParams['To'] = '';
       }
 
-      if (self::sendSMSMessage(
-          $contactId,
-          $tokenText,
-          $tokenHtml,
-          $smsParams,
-          $activityID
-        )) {
-        // even a single successful delivery should set this falg to true
-        $sent = TRUE;
+      $sendResult = self::sendSMSMessage(
+        $contactId,
+        $tokenText,
+        $tokenHtml,
+        $smsParams,
+        $activityID
+      );
+
+      if (PEAR::isError($sendResult)) {
+        // Collect all of the PEAR_Error objects
+        $errMsgs[] = $sendResult;
+      } else {
         $success++;
       }
+    }
+
+    // If at least one message was sent and no errors
+    // were generated then return a boolean value of TRUE.
+    // Otherwise, return FALSE (no messages sent) or
+    // and array of 1 or more PEAR_Error objects.
+    $sent = FALSE;
+    if ($success > 0 && count($errMsgs) == 0) {
+      $sent = TRUE;
+    } elseif (count($errMsgs) > 0) {
+      $sent = $errMsgs;
     }
 
     return array($sent, $activity->id, $success);
@@ -1548,7 +1563,7 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
    * @param int    $activityID        the activity ID that tracks the message
    * @param array  $smsParams         the params used for sending sms
    *
-   * @return boolean                  true if successfull else false.
+   * @return mixed                    true on success or PEAR_Error object
    * @access public
    * @static
    */
@@ -1579,7 +1594,11 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
     // make sure both phone are valid
     // and that the recipient wants to receive sms
     if (empty($toPhoneNumber) or $toDoNotSms) {
-      return FALSE;
+      return PEAR::raiseError(
+        'Recipient phone number is invalid or recipient does not want to receive SMS',
+        null,
+        PEAR_ERROR_RETURN
+      );
     }
 
     $message = $tokenHtml ? $tokenHtml : $tokenText;
@@ -1588,8 +1607,9 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
     $smsParams['parent_activity_id'] = $activityID;
 
     $providerObj = CRM_SMS_Provider::singleton(array('provider_id' => $smsParams['provider_id']));
-    if (!$providerObj->send($recipient, $smsParams, $message, NULL)) {
-      return FALSE;
+    $sendResult = $providerObj->send($recipient, $smsParams, $message, NULL);
+    if (PEAR::isError($sendResult)) {
+      return $sendResult;
     }
 
     // add activity target record for every sms that is send
