@@ -1836,6 +1836,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
+          // respect pseudofield to filter spec so fields can be marked as
+          // not to be handled here
+          if(!empty($field['pseudofield'])){
+            continue;
+          }
           $clause = NULL;
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
             if (CRM_Utils_Array::value('operatorType', $field) == CRM_Report_Form::OP_MONTH) {
