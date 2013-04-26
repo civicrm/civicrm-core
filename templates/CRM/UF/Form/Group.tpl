@@ -25,7 +25,7 @@
 *}
 {* add/update/view CiviCRM Profile *}
 {if $action eq 8}
- <h3> {ts}Delete CiviCRM Profile{/ts}</h3>
+ <h3> {ts}Delete CiviCRM Profile{/ts} - {$profileTitle}</h3>
 {/if}
 <div class=" crm-block crm-form-block crm-uf_group-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
