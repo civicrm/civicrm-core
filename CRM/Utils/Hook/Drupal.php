@@ -90,7 +90,7 @@ class CRM_Utils_Hook_Drupal extends CRM_Utils_Hook {
         if ( $moduleName == 'civicrm' ) {
           if (!empty($this->civiModules)) {
             foreach( $this->civiModules as $civiModuleName) {
-              $this->allModules[$civiModules] = $civiModuleName;
+              $this->allModules[$civiModuleName] = $civiModuleName;
             }
           }
         }
