@@ -39,6 +39,11 @@
         <comment>ID of the group/contact object being joined</comment>
         <add>1.6</add>
     </field>
+    <dynamicForeignKey>
+        <idColumn>entity_id</idColumn>
+        <typeColumn>entity_table</typeColumn>
+        <add>1.6</add>
+    </dynamicForeignKey>
     <field>
        <name>is_active</name>
        <type>boolean</type>

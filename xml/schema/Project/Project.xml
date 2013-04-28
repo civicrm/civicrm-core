@@ -59,6 +59,11 @@
        <comment>Foreign key to project owner (contact, group, etc.).</comment>
        <add>1.5</add>
   </field>
+  <dynamicForeignKey>
+       <idColumn>owner_entity_id</idColumn>
+       <typeColumn>owner_entity_table</typeColumn>
+       <add>1.5</add>
+  </dynamicForeignKey>
   <field> 
       <name>start_date</name> 
       <title>Start Date</title>

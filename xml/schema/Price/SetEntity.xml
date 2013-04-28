@@ -32,6 +32,11 @@
       <comment>Item in table</comment>
       <add>1.8</add>
   </field>
+  <dynamicForeignKey>
+      <idColumn>entity_id</idColumn>
+      <typeColumn>entity_table</typeColumn>
+      <add>1.8</add>
+  </dynamicForeignKey>
   <field>
       <name>price_set_id</name>
       <type>int unsigned</type>

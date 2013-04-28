@@ -47,6 +47,11 @@
         <comment>ID of the object possessing this ACL</comment>
         <add>1.6</add>
     </field>
+    <dynamicForeignKey>
+        <idColumn>entity_id</idColumn>
+        <typeColumn>entity_table</typeColumn>
+        <add>1.6</add>
+    </dynamicForeignKey>
     <field>
         <name>operation</name>
         <type>enum</type>

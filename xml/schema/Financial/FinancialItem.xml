@@ -107,6 +107,11 @@
     <comment>The specific source item that is responsible for the creation of this financial_item</comment>
     <add>4.3</add>
   </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>4.3</add>
+  </dynamicForeignKey>
   <index>
     <name>UI_id</name>
     <fieldName>id</fieldName>
