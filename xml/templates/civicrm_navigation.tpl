@@ -22,6 +22,9 @@
 -- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 -- +--------------------------------------------------------------------+
 -- Navigation Menu, Preferences and Mail Settings
+--
+-- Generated from {$smarty.template}
+-- {$generated}
 
 SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 

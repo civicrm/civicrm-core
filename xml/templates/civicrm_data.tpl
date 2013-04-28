@@ -21,6 +21,10 @@
 -- | GNU Affero General Public License or the licensing of CiviCRM,     |
 -- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 -- +--------------------------------------------------------------------+
+--
+-- Generated from {$smarty.template}
+-- {$generated}
+--
 -- This file provides template to civicrm_data.mysql. Inserts all base data needed for a new CiviCRM DB
 
 SET @domainName := 'Default Domain Name';

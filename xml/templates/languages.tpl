@@ -1,3 +1,7 @@
+--
+-- Generated from {$smarty.template}
+-- {$generated}
+--
 -- CRM-6138
 -- language list from http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 -- most common languages, according to http://en.wikipedia.org/wiki/List_of_languages_by_number_of_native_speakers enabled
