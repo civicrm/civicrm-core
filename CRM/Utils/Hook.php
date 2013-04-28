@@ -97,7 +97,7 @@ abstract class CRM_Utils_Hook {
   ) {
 
     $this->commonBuildModuleList($fnPrefix);
-    
+
     return $this->runHooks($this->commonCiviModules, $fnSuffix,
       $numParams, $arg1, $arg2, $arg3, $arg4, $arg5
     );
@@ -176,17 +176,24 @@ abstract class CRM_Utils_Hook {
 
   function requireCiviModules(&$moduleList) {
     $civiModules = CRM_Core_PseudoConstant::getModuleExtensions();
-    foreach ($civiModules as $civiModule) {
-      if (!file_exists($civiModule['filePath'])) {
-        CRM_Core_Session::setStatus(
-        	ts( 'Error loading module file (%1). Please restore the file or disable the module.', array(1 => $civiModule['filePath']) ),
-        	ts( 'Warning'), 'error');
-        continue;
+    // Insert extensions immediately after the 'civicrm' entry.
+    // @see CRM-12370
+    if ($civiModules) {
+      $position = array_search('civicrm', array_keys($moduleList)) + 1;
+      $moduleList2 = array_splice($moduleList, $position);
+      foreach ($civiModules as $civiModule) {
+        if (!file_exists($civiModule['filePath'])) {
+          CRM_Core_Session::setStatus(
+            ts( 'Error loading module file (%1). Please restore the file or disable the module.', array(1 => $civiModule['filePath']) ),
+            ts( 'Warning'), 'error');
+          continue;
+        }
+        include_once $civiModule['filePath'];
+        $moduleList[$civiModule['prefix']] = $civiModule['prefix'];
       }
-      include_once $civiModule['filePath'];
-      $moduleList[$civiModule['prefix']] = $civiModule['prefix'];
-      }
+      $moduleList = array_merge($moduleList, $moduleList2);
     }
+  }
 
   /**
    * This hook is called before a db write on some core objects.
