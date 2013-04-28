@@ -31,6 +31,11 @@
     <comment>FK to entity table specified in entity_table column.</comment>
     <add>2.1</add>
   </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>2.1</add>
+  </dynamicForeignKey>
   <index>
     <name>index_entity</name>
     <fieldName>entity_table</fieldName>
@@ -73,6 +78,10 @@
     <add>4.3</add>
     <onDelete>CASCADE</onDelete>
   </foreignKey>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+  </dynamicForeignKey>
   <index>
     <name>index_entity_option_id</name>
     <fieldName>entity_table</fieldName>

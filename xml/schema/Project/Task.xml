@@ -57,6 +57,11 @@
        <comment>Foreign key to Task owner (contact, group, etc.).</comment>
        <add>1.5</add>
   </field>
+  <dynamicForeignKey>
+       <idColumn>owner_entity_id</idColumn>
+       <typeColumn>owner_entity_table</typeColumn>
+       <add>1.5</add>
+  </dynamicForeignKey>
   <field>
        <name>parent_entity_table</name>
        <type>varchar</type>
@@ -71,6 +76,11 @@
        <comment>Optional foreign key to Task Parent (project, another task, etc.).</comment>
        <add>1.5</add>
   </field>
+  <dynamicForeignKey>
+       <idColumn>parent_entity_id</idColumn>
+       <typeColumn>parent_entity_table</typeColumn>
+       <add>1.5</add>
+  </dynamicForeignKey>
   <field> 
       <name>due_date</name> 
       <title>Due Date</title>

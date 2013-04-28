@@ -187,22 +187,9 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   function generateListAll($tables) {
-    $allDAO = "<?php\n\$dao = array ();";
-    $dao = array();
-
-    foreach ($tables as $table) {
-      $base = $table['base'] . $table['objectName'];
-      if (!array_key_exists($table['objectName'], $dao)) {
-        $dao[$table['objectName']] = str_replace('/', '_', $base);
-        $allDAO .= "\n\$dao['" . $table['objectName'] . "'] = '" . str_replace('/', '_', $base) . "';";
-      }
-      else {
-        $allDAO .= "\n//NAMESPACE ERROR: " . $table['objectName'] . " already used . " . str_replace('/', '_', $base) . " ignored.";
-      }
-    }
-
-    // TODO deal with the BAO's too ?
-    file_put_contents($this->CoreDAOCodePath . "listAll.php", $allDAO);
+    $this->smarty->clear_all_assign();
+    $this->smarty->assign('tables', $tables);
+    file_put_contents($this->CoreDAOCodePath . "../AllCoreTables.php", $this->smarty->fetch('listAll.tpl'));
   }
 
   function generateCiviTestTruncate($tables) {
@@ -599,6 +586,19 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       $table['foreignKey'] = &$foreign;
     }
 
+    if ($this->value('dynamicForeignKey', $tableXML)) {
+      $dynamicForeign = array();
+      foreach ($tableXML->dynamicForeignKey as $foreignXML) {
+        if ($this->value('drop', $foreignXML, 0) > 0 and $this->value('drop', $foreignXML, 0) <= $this->buildVersion) {
+          continue;
+        }
+        if ($this->value('add', $foreignXML, 0) <= $this->buildVersion) {
+          $this->getDynamicForeignKey($foreignXML, $dynamicForeign, $name);
+        }
+      }
+      $table['dynamicForeignKey'] = $dynamicForeign;
+    }
+
     $tables[$name] = &$table;
     return;
   }
@@ -840,6 +840,15 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       'onDelete' => $this->value('onDelete', $foreignXML, FALSE),
     );
     $foreignKeys[$name] = &$foreignKey;
+  }
+
+  function getDynamicForeignKey(&$foreignXML, &$dynamicForeignKeys) {
+    $foreignKey = array(
+      'idColumn' => trim($foreignXML->idColumn),
+      'typeColumn' => trim($foreignXML->typeColumn),
+      'key' => trim($this->value('key', $foreignXML)),
+    );
+    $dynamicForeignKeys[] = $foreignKey;
   }
 
   protected function value($key, &$object, $default = NULL) {

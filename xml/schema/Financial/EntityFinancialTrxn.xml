@@ -31,6 +31,11 @@
     <required>true</required>  
     <add>3.2</add>  
   </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>3.2</add>  
+  </dynamicForeignKey>
   <field>  
     <name>financial_trxn_id</name>  
     <type>int unsigned</type>  
