@@ -121,7 +121,7 @@ class CRM_Report_Form_Instance {
         foreach ($user_roles_array as $key => $value) {
           $user_roles[$value] = $value;
         }
-        $form->addElement('advmultiselect',
+        $grouprole = &$form->addElement('advmultiselect',
           'grouprole',
           ts('ACL Group/Role'),
           $user_roles,
@@ -131,6 +131,8 @@ class CRM_Report_Form_Instance {
             'class' => 'advmultiselect',
           )
         );
+        $grouprole->setButtonAttributes('add', array('value' => ts('Add >>')));
+        $grouprole->setButtonAttributes('remove', array('value' => ts('<< Remove')));
       }
     }
 
