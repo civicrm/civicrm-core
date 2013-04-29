@@ -48,7 +48,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   //protected $_mapperPhoneType;
 
   /**
-   * Array of succesfully imported contribution id's
+   * Array of successfully imported contribution id's
    *
    * @array
    */
@@ -183,7 +183,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
           case 'cancel_date':
             if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
-              $params[$key] = $dateValue;  
+              $params[$key] = $dateValue;
             }
             else {
               CRM_Import_Parser_Contact::addToErrorMsg('Cancel Date', $errorMessage);
@@ -394,7 +394,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
 
           $newContribution = CRM_Contribute_BAO_Contribution::create($formatted, $ids);
-         
+
           $this->_newContributions[] = $newContribution->id;
 
           //return soft valid since we need to show how soft credits were added
@@ -573,7 +573,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * Get the array of succesfully imported contribution id's
+   * Get the array of successfully imported contribution id's
    *
    * @return array
    * @access public

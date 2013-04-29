@@ -275,7 +275,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     curl_close($ch);
 
     //----------------------------------------------------------------------------------------------------
-    // Payment succesfully sent to gateway - process the response now
+    // Payment successfully sent to gateway - process the response now
     //----------------------------------------------------------------------------------------------------
     //
     $processorResponse = lphp::decodeXML($responseData);

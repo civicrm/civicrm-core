@@ -35,7 +35,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Payflow Pro');
   }
-  
+
   /**
    * singleton function used to manage this object
    *
@@ -66,7 +66,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     /*
      * define variables for connecting with the gateway
      */
-    
+
     // Are you using the Payflow Fraud Protection Service?
     // Default is YES, change to NO or blank if not.
     //This has not been investigated as part of writing this payment processor
@@ -272,7 +272,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     $responseData = self::submit_transaction($submiturl, $payflow_query);
 
     /*
-     * Payment succesfully sent to gateway - process the response now
+     * Payment successfully sent to gateway - process the response now
      */
     $result = strstr($responseData, "RESULT");
     $nvpArray = array();
@@ -395,7 +395,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * returns string $errorMsg if any errors found - null if OK
    *
    */
-  
+
   //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
 
   // CiviCRM V2.0 Declaration
@@ -440,7 +440,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     /*
      * Submit transaction using CuRL
      */
-      
+
     // get data ready for API
     $user_agent = $_SERVER['HTTP_USER_AGENT'];
     // Here's your custom headers; adjust appropriately for your setup:
@@ -582,7 +582,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     /*
      * define variables for connecting with the gateway
      */
-    
+
     //if you have not set up a separate user account the vendor name is used as the username
     if (!$this->_paymentProcessor['subject']) {
       $user = $this->_paymentProcessor['user_name'];
@@ -623,9 +623,9 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     //ie. url at payment processor to submit to.
     $responseData = self::submit_transaction($submiturl, $payflow_query);
     /*
-     * Payment succesfully sent to gateway - process the response now
+     * Payment successfully sent to gateway - process the response now
      */
-    
+
     $result = strstr($responseData, "RESULT");
     $nvpArray = array();
     while (strlen($result)) {

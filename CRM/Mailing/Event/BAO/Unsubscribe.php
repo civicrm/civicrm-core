@@ -50,7 +50,7 @@ class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscrib
    * @param int $queue_id     The Queue Event ID of the recipient
    * @param string $hash      The hash
    *
-   * @return boolean          Was the contact succesfully unsubscribed?
+   * @return boolean          Was the contact successfully unsubscribed?
    * @access public
    * @static
    */
@@ -143,8 +143,8 @@ WHERE  email = %2
     $gc = $gcObject->getTableName();
 
     //We Need the mailing Id for the hook...
-    $do->query("SELECT $job.mailing_id as mailing_id 
-                     FROM   $job 
+    $do->query("SELECT $job.mailing_id as mailing_id
+                     FROM   $job
                      WHERE $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
     $do->fetch();
     $mailing_id = $do->mailing_id;
@@ -159,11 +159,11 @@ WHERE  email = %2
             INNER JOIN  $group
                 ON      $mg.entity_id = $group.id
             WHERE       $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer') . "
-                AND     $mg.group_type IN ('Include', 'Base') 
+                AND     $mg.group_type IN ('Include', 'Base')
                 AND     $group.is_hidden = 0"
     );
 
-    /* Make a list of groups and a list of prior mailings that received 
+    /* Make a list of groups and a list of prior mailings that received
          * this mailing */
 
 
@@ -310,9 +310,9 @@ WHERE  email = %2
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $dao = new CRM_Mailing_BAO_Mailing();
-    $dao->query("   SELECT * FROM $mailingTable 
+    $dao->query("   SELECT * FROM $mailingTable
                         INNER JOIN $jobTable ON
-                            $jobTable.mailing_id = $mailingTable.id 
+                            $jobTable.mailing_id = $mailingTable.id
                         WHERE $jobTable.id = $job");
     $dao->fetch();
 
