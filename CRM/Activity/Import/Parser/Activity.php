@@ -48,7 +48,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   private $_activityDateIndex;
 
   /**
-   * Array of succesfully imported activity id's
+   * Array of successfully imported activity id's
    *
    * @array
    */

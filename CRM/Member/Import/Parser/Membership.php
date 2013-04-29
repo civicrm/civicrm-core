@@ -49,7 +49,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   private $_membershipStatusIndex;
 
   /**
-   * Array of succesfully imported membership id's
+   * Array of successfully imported membership id's
    *
    * @array
    */
@@ -588,7 +588,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   }
 
   /**
-   * Get the array of succesfully imported membership id's
+   * Get the array of successfully imported membership id's
    *
    * @return array
    * @access public

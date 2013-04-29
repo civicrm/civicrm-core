@@ -176,7 +176,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    * @param array $files      Any files posted to the form
    * @param array $self       an current this object
    *
-   * @return boolean          true on succesful SMTP handoff
+   * @return boolean          true on successful SMTP handoff
    * @access public
    */
   static function testMail($testParams, $files, $self) {
@@ -260,7 +260,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('_qf_Test_next', $testParams) && 
+    if (CRM_Utils_Array::value('_qf_Test_next', $testParams) &&
       $self->get('count') <= 0) {
       return array(
         '_qf_default' =>

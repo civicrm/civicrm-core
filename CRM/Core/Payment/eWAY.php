@@ -344,7 +344,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     curl_close($submit);
 
     //----------------------------------------------------------------------------------------------------
-    // Payment succesfully sent to gateway - process the response now
+    // Payment successfully sent to gateway - process the response now
     //----------------------------------------------------------------------------------------------------
     $eWAYResponse->ProcessResponse($responseData);
 
