@@ -1306,7 +1306,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * domain and mailing tokens
    *
    */
-  function tokenReplace(&$mailing) {
+  public static function tokenReplace(&$mailing) {
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     foreach (array(
