@@ -222,7 +222,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Add JavaScript variables to the global CRM object.
+   * Add JavaScript variables to the global CRM object via a callback function.
    *
    * @param $callable function
    * @return CRM_Core_Resources
@@ -234,6 +234,9 @@ class CRM_Core_Resources {
     return $this;
   }
 
+  /**
+   * Helper fn for addSettingsFactory
+   */
   public function getSettings() {
     $result = $this->settings;
     foreach ($this->settingsFactories as $callable) {
