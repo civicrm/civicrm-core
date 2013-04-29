@@ -8,6 +8,9 @@
 
 if ( ! defined( 'CIVICRM_DSN' ) && ! empty( $GLOBALS['mysql_user'] ) ) {
   $dbName = ! empty( $GLOBALS['mysql_db'] ) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
+  if ( empty( $GLOBALS['mysql_pass'] ) && $GLOBALS['mysql_pass_need_password'] ) {
+    $GLOBALS['mysql_pass'] = PHPUnit_TextUI_Command::getPassword( 'Password' );
+  }
   define( 'CIVICRM_DSN'          , "mysql://{$GLOBALS['mysql_user']}:{$GLOBALS['mysql_pass']}@{$GLOBALS['mysql_host']}/{$dbName}?new_link=true" );
 }
 
