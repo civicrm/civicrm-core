@@ -174,11 +174,16 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $upgrade = new CRM_Upgrade_Form();
     $template = CRM_Core_Smarty::singleton();
 
-    // TODO: Use structured message store
-    $postUpgradeMessage = file_get_contents($this->get('postUpgradeMessageFile'));
+    list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
+    if ($currentVer != $latestVer) {
+      // TODO: Use structured message store
+      $postUpgradeMessage = file_get_contents($this->get('postUpgradeMessageFile'));
 
-    // This destroys $session, so do it after ge('postUpgradeMessageFile')
-    CRM_Upgrade_Form::doFinish();
+      // This destroys $session, so do it after get('postUpgradeMessageFile')
+      CRM_Upgrade_Form::doFinish();
+    } else {
+      $postUpgradeMessage = ''; // Session was destroyed! Can't recover messages.
+    }
 
     // do a version check - after doFinish() sets the final version
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
