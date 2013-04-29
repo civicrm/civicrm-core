@@ -285,9 +285,8 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
       }
       else {
         // TODO: Should add a failed activity instead.
-      	
-        CRM_Core_Error::debug_log_message($response['data']  . " - for phone: {$postDataArray['to']}");
-        return;
+        CRM_Core_Error::debug_log_message($response['data']);
+        return PEAR::raiseError($response['data'], null, PEAR_ERROR_RETURN);
       }
     }
   }
