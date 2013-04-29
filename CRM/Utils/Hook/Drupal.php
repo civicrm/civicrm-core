@@ -56,8 +56,8 @@ class CRM_Utils_Hook_Drupal extends CRM_Utils_Hook {
   private $drupalModules = NULL;
 
   function invoke($numParams,
-    &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
-    $fnSuffix
+                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
+                  $fnSuffix
   ) {
 
     $this->buildModuleList();
@@ -89,15 +89,16 @@ class CRM_Utils_Hook_Drupal extends CRM_Utils_Hook {
       if ($this->drupalModules !== NULL) {
         foreach ($this->drupalModules as $moduleName) {
           $this->allModules[$moduleName] = $moduleName;
-          if ( $moduleName == 'civicrm' ) {
+          if ($moduleName == 'civicrm') {
             if (!empty($this->civiModules)) {
-              foreach( $this->civiModules as $civiModuleName) {
+              foreach ($this->civiModules as $civiModuleName) {
                 $this->allModules[$civiModuleName] = $civiModuleName;
               }
             }
           }
         }
-      } else {
+      }
+      else {
         $this->allModules = (array) $this->civiModules;
       }
 
