@@ -72,5 +72,11 @@
    <drop>2.0</drop>   
   </field>
 
+  <dynamicForeignKey>
+   <idColumn>activity_entity_id</idColumn>
+   <typeColumn>activity_entity_table</typeColumn>
+   <add>1.8</add>
+   <drop>2.0</drop>
+  </dynamicForeignKey>
 
 </table>

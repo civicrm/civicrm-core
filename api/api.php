@@ -354,14 +354,8 @@ function civicrm_error($result) {
 }
 
 function _civicrm_api_get_camel_name($entity, $version = NULL) {
-  static $_map = NULL;
-
   if (empty($version)) {
     $version = civicrm_get_api_version();
-  }
-
-  if (isset($_map[$version][strtolower($entity)])) {
-    return $_map[$version][strtolower($entity)];
   }
 
   $fragments = explode('_', $entity);
@@ -540,11 +534,7 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
  */
 function _civicrm_api_get_entity_name_from_dao($bao){
   $daoName = str_replace("BAO", "DAO", get_class($bao));
-  $dao = array();
-  require ('CRM/Core/DAO/listAll.php');
-  $daos = array_flip($dao);
-  return _civicrm_api_get_entity_name_from_camel($daos[$daoName]);
-
+  return _civicrm_api_get_entity_name_from_camel(CRM_Core_AllCoreTables::getFullName($daoName));
 }
 
 

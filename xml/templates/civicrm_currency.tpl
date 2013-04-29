@@ -21,6 +21,10 @@
 -- | GNU Affero General Public License or the licensing of CiviCRM,     |
 -- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 -- +--------------------------------------------------------------------+
+--
+-- Generated from {$smarty.template}
+-- {$generated}
+--
 -- currencies
 INSERT INTO civicrm_currency (id, name, symbol, numeric_code, full_name) VALUES
 (  1, "AUD",  "$", "036", "Australian Dollar"),

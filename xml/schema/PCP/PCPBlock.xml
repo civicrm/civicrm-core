@@ -31,6 +31,11 @@
       <comment>FK to civicrm_contribution_page.id OR civicrm_event.id</comment>
       <add>2.2</add>
   </field>
+  <dynamicForeignKey>
+      <idColumn>entity_id</idColumn>
+      <typeColumn>entity_table</typeColumn>
+      <add>2.2</add>
+  </dynamicForeignKey>
   <foreignKey> 
       <name>entity_id</name> 
       <table>civicrm_contribution_page</table> 
@@ -54,6 +59,12 @@
       <comment>The entity that this pcp targets</comment>
       <add>4.1</add>
   </field>
+  <dynamicForeignKey>
+      <idColumn>target_entity_id</idColumn>
+      <!-- FIXME: typename and not tablename? -->
+      <typeColumn>target_entity_type</typeColumn>
+      <add>4.1</add>
+  </dynamicForeignKey>
   <field>  
       <name>supporter_profile_id</name>  
       <type>int unsigned</type>                  

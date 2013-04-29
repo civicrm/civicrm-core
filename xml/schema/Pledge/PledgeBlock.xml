@@ -30,8 +30,13 @@
       <type>int unsigned</type>
       <required>true</required>
       <comment>FK to entity table specified in entity_table column.</comment>
-       <add>2.1</add>
+      <add>2.1</add>
   </field>
+  <dynamicForeignKey>
+      <idColumn>entity_id</idColumn>
+      <typeColumn>entity_table</typeColumn>
+      <add>2.1</add>
+  </dynamicForeignKey>
   <index>
        <name>index_entity</name>
        <fieldName>entity_table</fieldName>

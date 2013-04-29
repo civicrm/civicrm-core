@@ -30,8 +30,13 @@
        <required>true</required>
        <comment>Foreign key to the referenced item.</comment>
        <add>2.0</add>
-  </field>  
-  <field>     
+  </field>
+  <dynamicForeignKey>
+       <idColumn>entity_id</idColumn>
+       <typeColumn>entity_table</typeColumn>
+       <add>2.0</add>
+  </dynamicForeignKey>
+  <field>
       <name>title</name>  
       <type>varchar</type>
       <length>255</length>

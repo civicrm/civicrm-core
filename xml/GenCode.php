@@ -187,22 +187,9 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   function generateListAll($tables) {
-    $allDAO = "<?php\n\$dao = array ();";
-    $dao = array();
-
-    foreach ($tables as $table) {
-      $base = $table['base'] . $table['objectName'];
-      if (!array_key_exists($table['objectName'], $dao)) {
-        $dao[$table['objectName']] = str_replace('/', '_', $base);
-        $allDAO .= "\n\$dao['" . $table['objectName'] . "'] = '" . str_replace('/', '_', $base) . "';";
-      }
-      else {
-        $allDAO .= "\n//NAMESPACE ERROR: " . $table['objectName'] . " already used . " . str_replace('/', '_', $base) . " ignored.";
-      }
-    }
-
-    // TODO deal with the BAO's too ?
-    file_put_contents($this->CoreDAOCodePath . "listAll.php", $allDAO);
+    $this->smarty->clear_all_assign();
+    $this->smarty->assign('tables', $tables);
+    file_put_contents($this->CoreDAOCodePath . "../AllCoreTables.php", $this->smarty->fetch('listAll.tpl'));
   }
 
   function generateCiviTestTruncate($tables) {
@@ -223,7 +210,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
 
   function generateCreateSql($database, $tables, $fileName = 'civicrm.mysql') {
     echo "Generating sql file\n";
-    $this->smarty->clear_all_assign();
+    $this->reset_smarty_assignments();
     $this->smarty->assign_by_ref('database', $database);
     $this->smarty->assign_by_ref('tables', $tables);
     $dropOrder = array_reverse(array_keys($tables));
@@ -241,12 +228,12 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
 
   function generateNavigation() {
     echo "Generating navigation file\n";
-    $this->smarty->clear_all_assign();
+    $this->reset_smarty_assignments();
     file_put_contents($this->sqlCodePath . "civicrm_navigation.mysql", $this->smarty->fetch('civicrm_navigation.tpl'));
   }
 
   function generateLocalDataSql($db_version, $locales) {
-    $this->smarty->clear_all_assign();
+    $this->reset_smarty_assignments();
 
     global $tsLocale;
     $oldTsLocale = $tsLocale;
@@ -277,7 +264,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   function generateSample() {
-    $this->smarty->clear_all_assign();
+    $this->reset_smarty_assignments();
     $sample = $this->smarty->fetch('civicrm_sample.tpl');
     $sample .= $this->smarty->fetch('civicrm_acl.tpl');
     file_put_contents($this->sqlCodePath . 'civicrm_sample.mysql', $sample);
@@ -296,11 +283,10 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   function generateDAOs($tables) {
-    $this->smarty->clear_all_assign();
     foreach (array_keys($tables) as $name) {
       $this->smarty->clear_all_cache();
       echo "Generating $name as " . $tables[$name]['fileName'] . "\n";
-      $this->smarty->clear_all_assign();
+      $this->reset_smarty_assignments();
 
       $this->smarty->assign_by_ref('table', $tables[$name]);
       $php = $this->smarty->fetch('dao.tpl');
@@ -347,8 +333,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       }
     }
 
-    $this->smarty->clear_all_cache();
-    $this->smarty->clear_all_assign();
+    $this->reset_smarty_assignments();
     $this->smarty->assign_by_ref('columns', $columns);
     $this->smarty->assign_by_ref('indices', $indices);
 
@@ -518,8 +503,10 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   function getTable($tableXML, &$database, &$tables) {
     $name = trim((string ) $tableXML->name);
     $klass = trim((string ) $tableXML->class);
-    $base = $this->value('base', $tableXML) . '/DAO/';
-    $pre = str_replace('/', '_', $base);
+    $base = $this->value('base', $tableXML);
+    $sourceFile = "xml/schema/{$base}/{$klass}.xml";
+    $daoPath = "{$base}/DAO/";
+    $pre = str_replace('/', '_', $daoPath);
     $this->classNames[$name] = $pre . $klass;
 
     $localizable = FALSE;
@@ -532,7 +519,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
 
     $table = array(
       'name' => $name,
-      'base' => $base,
+      'base' => $daoPath,
+      'sourceFile' => $sourceFile,
       'fileName' => $klass . '.php',
       'objectName' => $klass,
       'labelName' => substr($name, 8),
@@ -596,6 +584,19 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
         }
       }
       $table['foreignKey'] = &$foreign;
+    }
+
+    if ($this->value('dynamicForeignKey', $tableXML)) {
+      $dynamicForeign = array();
+      foreach ($tableXML->dynamicForeignKey as $foreignXML) {
+        if ($this->value('drop', $foreignXML, 0) > 0 and $this->value('drop', $foreignXML, 0) <= $this->buildVersion) {
+          continue;
+        }
+        if ($this->value('add', $foreignXML, 0) <= $this->buildVersion) {
+          $this->getDynamicForeignKey($foreignXML, $dynamicForeign, $name);
+        }
+      }
+      $table['dynamicForeignKey'] = $dynamicForeign;
     }
 
     $tables[$name] = &$table;
@@ -841,6 +842,15 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $foreignKeys[$name] = &$foreignKey;
   }
 
+  function getDynamicForeignKey(&$foreignXML, &$dynamicForeignKeys) {
+    $foreignKey = array(
+      'idColumn' => trim($foreignXML->idColumn),
+      'typeColumn' => trim($foreignXML->typeColumn),
+      'key' => trim($this->value('key', $foreignXML)),
+    );
+    $dynamicForeignKeys[] = $foreignKey;
+  }
+
   protected function value($key, &$object, $default = NULL) {
     if (isset($object->$key)) {
       return (string ) $object->$key;
@@ -916,5 +926,14 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       }
     }
     return 'CRM_Utils_Type::HUGE';
+  }
+
+  /**
+   * Clear the smarty cache and assign default values
+   */
+  function reset_smarty_assignments() {
+    $this->smarty->clear_all_assign();
+    $this->smarty->clear_all_cache();
+    $this->smarty->assign('generated', "DO NOT EDIT.  Generated by " . basename(__FILE__));
   }
 }

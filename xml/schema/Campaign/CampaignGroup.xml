@@ -57,4 +57,10 @@
     <comment>Entity id of referenced table.</comment>
     <add>3.3</add>
   </field>
+
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>3.3</add>
+  </dynamicForeignKey>
 </table>

@@ -34,6 +34,11 @@
     <add>4.3</add>
     <comment>Links to an id in the entity_table, such as vid in civicrm_financial_type</comment>
   </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>4.3</add>
+  </dynamicForeignKey>
   <field>  
     <name>account_relationship</name>  
     <type>int unsigned</type>  

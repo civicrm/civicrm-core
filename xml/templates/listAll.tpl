@@ -30,58 +30,42 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
+ * $Id$
  *
- * Generated from {$smarty.template}
- * {$generated}
  */
-class CRM_Core_I18n_SchemaStructure
-{ldelim}
-    static function &columns()
-    {ldelim}
-        static $result = null;
-        if (!$result) {ldelim}
-          $result = array(
-            {foreach from=$columns key=table item=types}
-              '{$table}' => array(
-                {foreach from=$types key=column item=type}
-                  '{$column}' => "{$type}",
-                {/foreach}
-              ),
-            {/foreach}
-          );
-        {rdelim}
-        return $result;
-    {rdelim}
-    static function &indices()
-    {ldelim}
-        static $result = null;
-        if (!$result) {ldelim}
-          $result = array(
-            {foreach from=$indices key=table item=tableIndices}
-              '{$table}' => array(
-                {foreach from=$tableIndices key=name item=info}
-                  '{$name}' => array(
-                      'name' => '{$info.name}',
-                      'field' => array(
-                        {foreach from=$info.field item=field}
-                          '{$field}',
-                        {/foreach}
-                      ),
-                      {if $info.unique}'unique' => 1,{/if}
-                  ),
-                {/foreach}
-              ),
-            {/foreach}
-          );
-        {rdelim}
-        return $result;
-    {rdelim}
-    static function &tables()
-    {ldelim}
-        static $result = null;
-        if (!$result) {ldelim}
-            $result = array_keys(self::columns());
-        {rdelim}
-        return $result;
-    {rdelim}
+
+class CRM_Core_AllCoreTables {ldelim}
+
+  static protected $tables = array(
+{foreach from=$tables key=tableName item=table}
+    '{$tableName}' => '{$table.className}',
+{/foreach} {* tables *}
+  );
+
+  static protected $daoToClass = array(
+{foreach from=$tables item=table}
+    '{$table.objectName}' => '{$table.className}',
+{/foreach} {* tables *}
+  );
+
+  static public function getCoreTables() {ldelim}
+    return self::$tables;
+  {rdelim}
+
+  static public function isCoreTable($tableName) {ldelim}
+    return FALSE !== array_search($tableName, self::$tables);
+  {rdelim}
+
+  static public function getClasses() {ldelim}
+    return array_values(self::$tables);
+  {rdelim}
+
+  static public function getClassForTable($tableName) {ldelim}
+    return CRM_Utils_Array::value($tableName, self::$tables);
+  {rdelim}
+
+  static public function getFullName($daoName) {ldelim}
+    return CRM_Utils_Array::value($daoName, self::$daoToClass);
+  {rdelim}
+
 {rdelim}
