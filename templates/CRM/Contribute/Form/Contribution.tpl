@@ -106,7 +106,7 @@
       <td>{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}</td>
     </tr>
     {else}
-    <tr  class="crm-contribution-form-block-total_amount">
+    <tr class="crm-contribution-form-block-total_amount">
       <td class="label">{$form.total_amount.label}</td>
       <td {$valueStyle}>
         <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>
@@ -219,14 +219,6 @@
         </td>
       </tr>
     {/if}
-  <tr id="softCreditID" class="crm-contribution-form-block-soft_credit_to"><td class="label">{$form.soft_credit_to.label}</td>
-    <td {$valueStyle}>
-      {$form.soft_credit_to.html} {help id="id-soft_credit"}
-      {if $siteHasPCPs}
-        <div id="showPCPLink"><a href='#' onclick='showPCP(); return false;'>{ts}credit this contribution to a personal campaign page{/ts}</a>{help id="id-link_pcp"}</div>
-      {/if}
-    </td>
-  </tr>
     {if $siteHasPCPs}{* Credit contribution to PCP. *}
     <tr id="pcpID" class="crm-contribution-form-block-pcp_made_through_id">
       <td class="label">{$form.pcp_made_through.label}</td>
@@ -257,6 +249,36 @@
     </tr>
     {/if}
   </table>
+    {if !$contributionMode}
+    <div class="crm-accordion-wrapper" id="softCredit_Accordion">
+      <div class="crm-accordion-header">
+        {ts}Soft Credit{/ts}
+      </div>
+      <div class="crm-accordion-body">
+        <table class="form-layout-compressed" >
+          <tr>
+            <td>
+            </td>
+            <td colspan=2>
+              {if $siteHasPCPs}
+                <div id="showPCPLink"><a href='#' onclick='showPCP(); return false;'>{ts}credit this contribution to a personal campaign page{/ts}</a> {help id="id-link_pcp"}</div>
+              {/if}
+            </td>
+          </tr>
+          <tr id="softCreditID" class="crm-contribution-form-block-soft_credit">
+            <td class="label">{$form.soft_credit_to.label}</td>
+            <td {$valueStyle}>
+              {$form.soft_credit_to.html} {help id="id-soft_credit"}
+            </td>
+            <td class="label">{$form.total_amount.label}</td>
+            <td {$valueStyle}>
+              <span id='softCreditAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    {/if}
     {if !$contributionMode}
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
       <div class="crm-accordion-header">
@@ -542,11 +564,11 @@ cj(function() {
 
   {literal}
   function hideSoftCredit ( ){
-    cj("#softCreditID").hide();
+    cj("#softCredit_Accordion").hide();
   }
   function showPCP( ) {
     cj('#pcpID').show();
-    cj("#softCreditID").hide();
+    cj("#softCredit_Accordion").hide();
   }
   function showSoftCredit( ) {
     cj('#pcp_made_through_id').val('');
@@ -555,7 +577,7 @@ cj(function() {
     cj('#pcp_personal_note').val('');
     cj('#pcp_display_in_roll').attr('checked', false);
     cj("#pcpID").hide();
-    cj('#softCreditID').show();
+    cj('#softCredit_Accordion').show();
   }
   {/literal}
 {/if}
