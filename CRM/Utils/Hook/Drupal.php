@@ -85,6 +85,7 @@ class CRM_Utils_Hook_Drupal extends CRM_Utils_Hook {
       }
 
       // we should add civicrm's module's just after main civicrm drupal module
+      // Note: Assume that drupalModules and civiModules may each be array() or NULL
       if ($this->drupalModules !== NULL) {
         foreach ($this->drupalModules as $moduleName) {
           $this->allModules[$moduleName] = $moduleName;
@@ -96,6 +97,8 @@ class CRM_Utils_Hook_Drupal extends CRM_Utils_Hook {
             }
           }
         }
+      } else {
+        $this->allModules = (array) $this->civiModules;
       }
 
       if ($this->drupalModules !== NULL && $this->civiModules !== NULL) {
