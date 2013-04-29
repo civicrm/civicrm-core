@@ -235,6 +235,26 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/Membership.js');
         }
       }
+      else { 
+        $resources = CRM_Core_Resources::singleton();
+        $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/MembershipStandalone.js');
+        $statuses = array();
+        $membershipStatus = new CRM_Member_DAO_MembershipStatus();
+        $membershipStatus->is_current_member = 1;
+        $membershipStatus->find();
+        $membershipStatus->selectAdd();
+        $membershipStatus->selectAdd('id');
+        while ($membershipStatus->fetch()) {
+          $statuses[$membershipStatus->id] = $membershipStatus->label;
+        }
+        $membershipStatus->free();
+        $passthru = array(
+          'typeorgs' => CRM_Member_BAO_MembershipType::getMembershipTypeOrganization(),
+          'memtypes' => CRM_Member_BAO_MembershipType::getMembershipTypes(false),
+          'statuses' => $statuses,
+        );
+        $resources->addSetting(array('existingMems' => $passthru));
+      }
     }
 
     // when custom data is included in this page
