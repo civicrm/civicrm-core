@@ -80,7 +80,8 @@ function civicrm_api3_mailing_contact_get($params) {
   return $fnName(
     $params['contact_id'],
     $params['offset'],
-    $params['limit']
+    $params['limit'],
+    CRM_Utils_Array::value('sort', $params)
   );
 }
 
@@ -91,7 +92,8 @@ function _civicrm_api3_mailing_contact_query(
   $limit,
   $selectFields,
   $fromClause,
-  $whereClause
+  $whereClause,
+  $sort
 ) {
   $defaultFields = array(
     'm.id'       => 'mailing_id',
@@ -113,6 +115,11 @@ function _civicrm_api3_mailing_contact_query(
   }
   $select = implode(', ', $select);
 
+  $orderBy = 'ORDER BY j.start_date';
+  if ($sort) {
+    $orderBy = "ORDER BY $sort";
+  }
+
   $sql = "
 SELECT     $select
 FROM       civicrm_mailing m
@@ -124,7 +131,7 @@ WHERE      j.is_test = 0
 AND        meq.contact_id = %1
            $whereClause
 GROUP BY   m.id
-ORDER BY   j.start_date
+{$orderBy}
 ";
 
   if ($limit > 0) {
@@ -159,7 +166,8 @@ LIMIT %2, %3
 function _civicrm_api3_mailing_contact_get_delivered(
   $contactID,
   $offset,
-  $limit
+  $limit,
+  $sort
 ) {
   $selectFields = array('med.time_stamp' => 'start_date');
 
@@ -179,14 +187,16 @@ AND        meb.id IS NULL
     $limit,
     $selectFields,
     $fromClause,
-    $whereClause
+    $whereClause,
+    $sort
   );
 }
 
 function _civicrm_api3_mailing_contact_get_bounced(
   $contactID,
   $offset,
-  $limit
+  $limit,
+  $sort
 ) {
   $fromClause = "
 INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
@@ -199,6 +209,7 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
     $limit,
     NULL,
     $fromClause,
-    NULL
+    NULL,
+    $sort
   );
 }
