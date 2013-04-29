@@ -195,6 +195,14 @@ class CRM_Core_Resources {
   /**
    * Add JavaScript variables to the global CRM object.
    *
+   * Example:
+   * From the server:
+   * CRM_Core_Resources::singleton()->addSetting(array('myNamespace' => array('foo' => 'bar')));
+   * From javascript:
+   * CRM.myNamespace.foo // "bar"
+   *
+   * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/Javascript+Reference
+   *
    * @param $settings array
    * @return CRM_Core_Resources
    */
@@ -252,12 +260,6 @@ class CRM_Core_Resources {
   /**
    * Helper fn for addSetting
    * Render JavaScript variables for the global CRM object.
-   *
-   * Example:
-   * From the server:
-   * CRM_Core_Resources::singleton()->addSetting(array('myNamespace' => array('foo' => 'bar')));
-   * From javascript:
-   * CRM.myNamespace.foo // "bar"
    *
    * @return string
    */
