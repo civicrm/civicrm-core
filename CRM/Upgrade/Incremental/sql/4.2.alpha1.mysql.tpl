@@ -244,6 +244,15 @@ INSERT INTO civicrm_country (name,iso_code,region_id,is_province_abbreviated) VA
 INSERT INTO civicrm_country (name,iso_code,region_id,is_province_abbreviated) VALUES("Sint Maarten (Dutch Part)", "SX", @region_id, 0);
 INSERT INTO civicrm_country (name,iso_code,region_id,is_province_abbreviated) VALUES("Bonaire, Saint Eustatius and Saba", "BQ", @region_id, 0);
 
+-- CRM-12428
+{if $multilingual}
+    {foreach from=$locales item=locale}
+    	ALTER TABLE `civicrm_price_field_value` CHANGE label_{$locale} label_{$locale} VARCHAR(255)  NULL DEFAULT NULL;
+    {/foreach}
+{else}
+	ALTER TABLE `civicrm_price_field_value` CHANGE `label` `label` VARCHAR(255)  NULL DEFAULT NULL;
+{/if}
+
 -- CRM-9714 create a default price set for contribution and membership
 ALTER TABLE `civicrm_price_set`
 ADD         `is_quick_config` TINYINT(4) NOT NULL DEFAULT '0'
