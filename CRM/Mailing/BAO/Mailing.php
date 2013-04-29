@@ -2784,6 +2784,10 @@ AND        m.id = %1
    */
   static public function getContactMailings(&$params) {
     $params['version'] = 3;
+    $params['offset']  = ($params['page'] - 1) * $params['rp'];
+    $params['limit']   = $params['rp'];
+    $params['sort']    = CRM_Utils_Array::value('sortBy', $params);
+
     $result = civicrm_api('MailingContact', 'get', $params);
     return $result['values'];
   }
@@ -2801,6 +2805,8 @@ AND        m.id = %1
   static public function getContactMailingsCount(&$params) {
     //FIX ME: need to implement getcount api for MailingContact
     $params['version'] = 3;
+    unset($params['offset']);
+    unset($params['limit']);
     $result = civicrm_api('MailingContact', 'get', $params);
     return count($result['values']);
   }
