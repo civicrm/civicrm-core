@@ -419,6 +419,9 @@ class CRM_Core_PseudoConstant {
   public static function get($daoName, $fieldName, $params = array()) {
     $dao = new $daoName;
     $fields = $dao->fields();
+    if (empty($fields[$fieldName])) {
+      return FALSE;
+    }
     $fieldSpec = $fields[$fieldName];
 
     // If the field is an enum, use explode the enum definition and return the array.
