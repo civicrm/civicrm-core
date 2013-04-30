@@ -372,8 +372,11 @@ class CRM_Core_OptionValue {
   static function select(&$query) {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {
       $field = self::getFields();
-      foreach ($field as $name => $title) {
-        list($tableName, $fieldName) = explode('.', $title['where']);
+      foreach ($field as $name => $values) {
+        if ($values['pseudoconstant']) {
+          continue;
+        }
+        list($tableName, $fieldName) = explode('.', $values['where']);
         if (CRM_Utils_Array::value($name, $query->_returnProperties)) {
           $query->_select["{$name}_id"] = "{$name}.value as {$name}_id";
           $query->_element["{$name}_id"] = 1;

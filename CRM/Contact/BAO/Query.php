@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
-nnnnnnnnn *
+ *
  */
 
 /**
@@ -587,6 +587,10 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
+      if ($field['pseudoconstant']) {
+        continue;
+      }
+
       // redirect to activity select clause
       if (substr($name, 0, 9) == 'activity_') {
         CRM_Activity_BAO_Query::select($this);
@@ -909,7 +913,7 @@ class CRM_Contact_BAO_Query {
           }
         }
 
-        // check if there is a value, if so also add to where Clause
+        // Check if there is a value, if so also add to where Clause
         $addWhere = FALSE;
         if ($this->_params) {
           $nm = $elementName;
@@ -1198,6 +1202,7 @@ class CRM_Contact_BAO_Query {
       $this->filterRelatedContacts($from, $where, $having);
     }
 
+    // CRM_Core_Error::debug($this);
     return array($select, $from, $where, $having);
   }
 
