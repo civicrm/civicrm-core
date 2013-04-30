@@ -57,6 +57,13 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
+   * static cache for pseudoconstant arrays
+   * @var array
+   * @static
+   */
+  private static $cache;
+
+  /**
    * location type
    * @var array
    * @static
@@ -111,13 +118,6 @@ class CRM_Core_PseudoConstant {
    * @static
    */
   private static $individualSuffix;
-
-  /**
-   * gender
-   * @var array
-   * @static
-   */
-  private static $gender;
 
   /**
    * im protocols
@@ -795,26 +795,6 @@ class CRM_Core_PseudoConstant {
       self::$individualSuffix = CRM_Core_OptionGroup::values('individual_suffix');
     }
     return self::$individualSuffix;
-  }
-
-  /**
-   * Get all Gender.
-   *
-   * The static array gender is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All Gender - default is to get only active ones.
-   *
-   * @return array - array reference of all gender.
-   *
-   */
-  public static function &gender($localize = FALSE) {
-    if (!self::$gender) {
-      self::$gender = CRM_Core_OptionGroup::values('gender', FALSE, FALSE, $localize);
-    }
-    return self::$gender;
   }
 
   /**

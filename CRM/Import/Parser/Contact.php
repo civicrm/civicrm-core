@@ -1305,7 +1305,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
       return FALSE;
     }
 
-    $allGenders = CRM_Core_PseudoConstant::gender();
+    $allGenders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     foreach ($allGenders as $key => $value) {
       if (strlen($gender) > strlen($value)) {
         continue;

@@ -94,7 +94,7 @@ function civicrm_api3_contact_create($params) {
   }
 
   if (isset($params['gender_id']) && !(is_numeric($params['gender_id']))) {
-    $params['gender_id'] = array_search($params['gender_id'], CRM_Core_PseudoConstant::gender());
+    $params['gender_id'] = array_search($params['gender_id'], CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'));
   }
 
   $error = _civicrm_api3_greeting_format_params($params);

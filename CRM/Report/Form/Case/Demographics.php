@@ -235,7 +235,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
       );
     }
 
-    $this->_genders = CRM_Core_PseudoConstant::gender();
+    $this->_genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
 
     parent::__construct();
   }

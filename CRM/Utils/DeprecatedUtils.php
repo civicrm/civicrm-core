@@ -872,7 +872,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
   if (isset($values['gender'])) {
     if (CRM_Utils_Array::value('gender_id', $params)) {
       $genders          = array();
-      $genders          = CRM_Core_PseudoConstant::gender();
+      $genders          = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
       $params['gender'] = $genders[$params['gender_id']];
     }
     else {

@@ -175,7 +175,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
             'name' => 'gender_id',
             'title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::gender(),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
           ),
           'contact_type' =>
           array(
@@ -384,7 +384,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
 
     $grantTypes = CRM_Grant_PseudoConstant::grantType();
     $countries  = CRM_Core_PseudoConstant::country();
-    $gender     = CRM_Core_PseudoConstant::gender();
+    $gender     = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
 
     $grantAmountTotal = "
 SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
