@@ -47,10 +47,13 @@ class CRM_Contribute_Form_SoftCredit {
    * @return void
    */
   static function buildQuickForm(&$form) {
+    $prefix = 'soft_credit_';
+    $form->_softCredit['item_count'] = 10;
     for ($rowNumber = 1; $rowNumber <= $form->_softCredit['item_count']; $rowNumber++) {
-      CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, TRUE, 'soft_credit_');
+      CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, $prefix);
+      $form->add('text', "{$prefix}contact[{$rowNumber}][amount]");
     }
-
+    
     // If we have a contact for this contribution, pass cid= to the dataUrl to exclude current contact from autocomplete results
     if ($form->_contactID) {
       $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
