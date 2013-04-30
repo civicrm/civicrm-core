@@ -36,7 +36,12 @@
       <title>Address Location Type</title>
       <type>int unsigned</type>
       <comment>Which Location does this address belong to.</comment>
-       <add>2.0</add>
+      <add>2.0</add>
+      <pseudoconstant>
+        <table>civicrm_location_type</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
   </field>
   <index>
     <name>index_location_type</name>
