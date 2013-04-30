@@ -62,7 +62,7 @@ else {
   $_GET['civicrm_install_type'] = 'wordpress';
 }
 
-// CMW: tell WordPress to call plugin activation method
+// tell WordPress to call plugin activation method
 register_activation_hook( __FILE__, 'civicrm_activate' );
 
 /**
@@ -77,7 +77,7 @@ function civicrm_activate() {
  * Function to create anonymous_user' role, if 'anonymous_user' role is not in the wordpress installation
  * and assign minimum capabilities for all wordpress roles
  * 
- * CMW: This function is called on plugin activation and also from upgrade_4_3_alpha1()
+ * This function is called on plugin activation and also from upgrade_4_3_alpha1()
  */
 function civicrm_wp_set_capabilities() {
   global $wp_roles;
@@ -475,9 +475,14 @@ function civicrm_set_frontendmessage() {
  */
 function civicrm_set_post_blank() {
   global $post;
+  // kick out when there's no post object, eg on 404 pages
+  if ( !is_object( $post ) ) return;
   // to hide posted on
+  // CMW: this is a big no-no and affects much more than "posted on"
   $post->post_type = '';
   // to hide post title
+  // CMW: depending on the theme, this may or may not be effective.
+  // perhaps better to set the post title to the CiviCRM entity title?
   $post->post_title = '';
   // hide the edit link
   add_action('edit_post_link', 'civicrm_set_blank');
@@ -489,6 +494,8 @@ function civicrm_set_post_blank() {
  */
 function civicrm_turn_comments_off() {
   global $post;
+  // kick out when there's no post object, eg on 404 pages
+  if ( !is_object( $post ) ) return;
   $post->comment_status = "closed";
 }
 
@@ -1000,6 +1007,8 @@ function civicrm_wp_in_civicrm() {
  */
 function civicrm_wp_shortcode_includes() {
   global $post;
+  // don't parse content when there's no post object, eg on 404 pages
+  if ( !is_object( $post ) ) return;
   if (preg_match('/\[civicrm/', $post->post_content)) {
     if (!civicrm_initialize()) {
       return;
