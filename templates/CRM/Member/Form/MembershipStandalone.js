@@ -9,11 +9,11 @@ cj(function($) {
           checkExistingMemOrg();
         }
       }});
-      });
+    });
       
   checkExistingMemOrg();
 
-  $("select[name='membership_type_id[0]']").change(function() { checkExistingMemOrg(); });
+  $("select[name='membership_type_id[0]']").change( checkExistingMemOrg );
 
   function checkExistingMemOrg () {
     if (memberResults) {
@@ -26,7 +26,7 @@ cj(function($) {
               var andEndDate = '';
               var endDate = this.membership_end_date;
               if (endDate) {
-                andEndDate = ts(" and end date of %1", {1:endDate});
+                andEndDate = ' ' + ts("and end date of %1", {1:endDate});
               }
               
               var renewUrl = CRM.url('civicrm/contact/view/membership',
