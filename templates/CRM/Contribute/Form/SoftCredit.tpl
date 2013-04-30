@@ -25,10 +25,10 @@
 *}
 {* template for adding form elements for soft credit form*}
 
-<table class="form-layout-compressed">
+<table class="form-layout-compressed crm-soft-credit-block">
 {section name='i' start=1 loop=$rowCount}
 {assign var='rowNumber' value=$smarty.section.i.index}
-  <tr id="soft-credit-row-{$rowNumber}" class="crm-contribution-form-block-soft_credit_to">
+  <tr id="soft-credit-row-{$rowNumber}" class="crm-contribution-form-block-soft_credit_to {if $rowNumber gt 1}hiddenElement{/if}">
     <td class="label">{ts}Soft Credit To{/ts}</td>
     <td>
       {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true blockNo=$rowNumber
@@ -39,4 +39,10 @@
 	  </td>
   </tr>
 {/section}
+	<tr>
+		<td></td>
+		<td>
+			<a href="#" id="addMoreSoftCredit">{ts}add another soft credit{/ts}</a>
+		</td>
+	</tr>
 </table>
