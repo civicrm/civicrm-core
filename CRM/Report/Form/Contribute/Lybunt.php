@@ -435,7 +435,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
-  static function getOperationPair($type = "string", $fieldName = NULL) {
+  function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'yid') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
     }
