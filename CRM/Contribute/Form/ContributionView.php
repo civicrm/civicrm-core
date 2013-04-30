@@ -56,9 +56,9 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     $softParams = array('contribution_id' => CRM_Utils_Array::value('contribution_id', $values));
     $softContribution = CRM_Contribute_BAO_Contribution::getSoftContribution($softParams, TRUE);
-    if ($softContribution) {
-      $values = array_merge($values, $softContribution);
-    }
+//    if ($softContribution) {
+//      $values = array_merge($values, $softContribution);
+//    }
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
 
     if (CRM_Utils_Array::value('contribution_page_id', $values)) {
@@ -135,6 +135,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     //get soft credit record if exists.
+    //FIXME: The next line seems really inefficient.  Can't we just check the length of the array?
     if ($softContribution = CRM_Contribute_BAO_Contribution::getSoftContribution($softParams)) {
 
       $softContribution['softCreditToName'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
