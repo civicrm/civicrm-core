@@ -219,6 +219,7 @@
         </td>
       </tr>
     {/if}
+
   <tr id="softCreditID" class="crm-contribution-form-block-soft_credit_to"><td class="label">{$form.soft_credit_to.label}</td>
     <td {$valueStyle}>
       {$form.soft_credit_to.html} {help id="id-soft_credit"}
@@ -257,6 +258,14 @@
     </tr>
     {/if}
   </table>
+  <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="softCredit">
+    <div class="crm-accordion-header">
+      {ts}Soft Credit{/ts}
+    </div>
+    <div class="crm-accordion-body">
+      {include file="CRM/Contribute/Form/SoftCredit.tpl"}
+    </div>
+  </div>
     {if !$contributionMode}
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
       <div class="crm-accordion-header">
