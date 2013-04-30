@@ -1831,7 +1831,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif ($fieldName === 'gender') {
       $genderOptions = array();
-      $gender = CRM_Core_PseudoConstant::gender();
+      $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
       foreach ($gender as $key => $var) {
         $genderOptions[$key] = $form->createElement('radio', NULL, ts('Gender'), $var, $key);
       }

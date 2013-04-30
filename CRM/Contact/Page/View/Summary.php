@@ -198,7 +198,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     if (CRM_Utils_Array::value('gender_id', $defaults)) {
-      $gender = CRM_Core_PseudoConstant::gender(TRUE);
+      $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
       $defaults['gender_display'] = $gender[CRM_Utils_Array::value('gender_id', $defaults)];
     }
 

@@ -522,7 +522,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     CRM_Contact_BAO_Contact::resolveDefaults($params);
 
     //check the resolve values.
-    $genders = CRM_Core_PseudoConstant::gender();
+    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     $this->assertEquals($genders[$params['gender_id']], $params['gender'], 'Check for gender.');
     $prefix = CRM_Core_PseudoConstant::individualPrefix();
     $this->assertEquals($prefix[$params['prefix_id']], $params['prefix'], 'Check for prefix.');

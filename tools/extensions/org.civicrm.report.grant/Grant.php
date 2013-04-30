@@ -57,7 +57,7 @@ class org_civicrm_report_grant extends CRM_Report_Form {
           'gender_id' =>
           array('title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::gender(),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
           ),
         ),
       ),

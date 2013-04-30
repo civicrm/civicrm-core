@@ -470,7 +470,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->add('hidden', 'hidden_demographics', 1);
     // radio button for gender
     $genderOptions = array();
-    $gender = CRM_Core_PseudoConstant::gender();
+    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     foreach ($gender as $key => $var) {
       $genderOptions[$key] = $form->createElement('radio', NULL,
         ts('Gender'), $var, $key,
