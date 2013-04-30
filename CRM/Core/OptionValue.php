@@ -327,23 +327,26 @@ class CRM_Core_OptionValue {
               'title' => ts('Gender'),
               'headerPattern' => '/^gender$/i',
               'pseudoconstant' => $contactFields['gender_id']['pseudoconstant'],
-            ),
+              'where' => 'contact_a.gender_id',
+             ),
             'individual_prefix' => array(
               'name' => 'individual_prefix',
               'title' => ts('Individual Prefix'),
               'headerPattern' => '/^(prefix|title)/i',
               'pseudoconstant' => $contactFields['prefix_id']['pseudoconstant'],
+              'where' => 'contact_a.prefix_id',
             ),
             'individual_suffix' => array(
               'name' => 'individual_suffix',
               'title' => ts('Individual Suffix'),
               'headerPattern' => '/^suffix$/i',
               'pseudoconstant' => $contactFields['suffix_id']['pseudoconstant'],
-            ),
-          );
-          $nameTitle = array_merge($nameTitle, $title);
-        }
-      }
+              'where' => 'contact_a.suffix_id',
+             ),
+           );
+           $nameTitle = array_merge($nameTitle, $title);
+         }
+       }
 
       if (is_array($nameTitle)) {
         foreach ($nameTitle as $name => $attribs) {

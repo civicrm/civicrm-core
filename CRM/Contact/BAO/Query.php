@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
- *
+nnnnnnnnn *
  */
 
 /**
@@ -142,6 +142,7 @@ class CRM_Contact_BAO_Query {
    *
    */
   public $_permissionWhereClause;
+
   /**
    * the from string
    *
@@ -619,8 +620,7 @@ class CRM_Contact_BAO_Query {
             }
 
             if (
-              $tableName == 'gender' || $tableName == 'individual_prefix' ||
-              $tableName == 'individual_suffix' || $tableName == 'im_provider' ||
+              $tableName == 'im_provider' ||
               $tableName == 'email_greeting' || $tableName == 'postal_greeting' ||
               $tableName == 'addressee'
             ) {
@@ -1726,7 +1726,9 @@ class CRM_Contact_BAO_Query {
         $name, $op, $value, $grouping,
         CRM_Core_PseudoConstant::{$field['pseudoconstant']['name']}(),
         $field,
-        $field['title']
+        $field['title'],
+        'String',
+        TRUE
       );
       if ($name == 'gender') {
         self::$_openedPanes[ts('Demographics')] = TRUE;
@@ -2284,21 +2286,6 @@ class CRM_Contact_BAO_Query {
           $from .= " $side JOIN civicrm_subscription_history
                                    ON civicrm_group_contact.contact_id = civicrm_subscription_history.contact_id
                                   AND civicrm_group_contact.group_id =  civicrm_subscription_history.group_id";
-          continue;
-
-        case 'individual_prefix':
-          $from .= " $side JOIN civicrm_option_group option_group_prefix ON (option_group_prefix.name = 'individual_prefix')";
-          $from .= " $side JOIN civicrm_option_value individual_prefix ON (contact_a.prefix_id = individual_prefix.value AND option_group_prefix.id = individual_prefix.option_group_id ) ";
-          continue;
-
-        case 'individual_suffix':
-          $from .= " $side JOIN civicrm_option_group option_group_suffix ON (option_group_suffix.name = 'individual_suffix')";
-          $from .= " $side JOIN civicrm_option_value individual_suffix ON (contact_a.suffix_id = individual_suffix.value AND option_group_suffix.id = individual_suffix.option_group_id ) ";
-          continue;
-
-        case 'gender':
-          $from .= " $side JOIN civicrm_option_group option_group_gender ON (option_group_gender.name = 'gender')";
-          $from .= " $side JOIN civicrm_option_value gender ON (contact_a.gender_id = gender.value AND option_group_gender.id = gender.option_group_id) ";
           continue;
 
         case 'civicrm_relationship':
@@ -4893,11 +4880,12 @@ AND   displayRelType.is_active = 1
     $selectValues,
     $field,
     $label,
-    $dataType = 'String'
+    $dataType = 'String',
+    $useIDsOnly = FALSE
   ) {
     $qill = $value;
     if (is_numeric($value)) {
-      $qill = $value = $selectValues[(int ) $value];
+      $qill = $selectValues[(int ) $value];
     }
     elseif ($op == 'IN' || $op == 'NOT IN') {
       $values = self::parseSearchBuilderString($value);
@@ -4910,12 +4898,17 @@ AND   displayRelType.is_active = 1
         $qill = implode(', ', $value);
       }
     }
-    $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
+    else {
+      // its a string, lets get the int value
+      $value = array_search($value, $selectValues);
+    }
+    $wc = self::caseImportant($op) && ! $useIDsOnly ? "LOWER({$field['where']})" : "{$field['where']}";
     $this->_where[$grouping][] = self::buildClause($wc, $op, $value, $dataType);
     $this->_qill[$grouping][] = $label . " $op '$qill'";
   }
 
-  /** function to check and explode a user defined numeric string into an array
+  /**
+   * function to check and explode a user defined numeric string into an array
    * this was the protocol used by search builder in the old old days before we had
    * super nice js widgets to do the hard work
    *
