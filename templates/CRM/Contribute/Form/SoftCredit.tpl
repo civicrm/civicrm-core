@@ -24,7 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 {* template for adding form elements for soft credit form*}
-  <tr id="softCreditID" class="crm-contribution-form-block-soft_credit_to"><td class="label">{$form.soft_credit_to.label}</td>
+
+  {include file="CRM/Contact/Form/NewContact.tpl"}
+{*  <tr id="softCreditID" class="crm-contribution-form-block-soft_credit_to"><td class="label">{$form.soft_credit_to.label}</td>
     <td {$valueStyle}>
       {$form.soft_credit_to.html} {help id="id-soft_credit"}
       {if $siteHasPCPs}
@@ -32,7 +34,7 @@
       {/if}
     </td>
   </tr>
-    {if $siteHasPCPs}{* Credit contribution to PCP. *}
+    {if $siteHasPCPs}
     <tr id="pcpID" class="crm-contribution-form-block-pcp_made_through_id">
       <td class="label">{$form.pcp_made_through.label}</td>
       <td>
@@ -61,7 +63,7 @@
       </td>
     </tr>
     {/if}
-
+*}
  {literal}
  <script type="text/javascript">
  var url = "{/literal}{$dataUrl}{literal}";
