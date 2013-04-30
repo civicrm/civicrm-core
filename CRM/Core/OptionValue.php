@@ -298,13 +298,15 @@ class CRM_Core_OptionValue {
         if (in_array($contactType, array(
           'Individual', 'Household', 'Organization', 'All'))) {
           $nameTitle = array(
-            'addressee' => array('name' => 'addressee',
+            'addressee' => array(
+              'name' => 'addressee',
               'title' => ts('Addressee'),
               'headerPattern' => '/^addressee$/i',
             ),
           );
           $title = array(
-            'email_greeting' => array('name' => 'email_greeting',
+            'email_greeting' => array(
+              'name' => 'email_greeting',
               'title' => ts('Email Greeting'),
               'headerPattern' => '/^email_greeting$/i',
             ),
@@ -318,20 +320,25 @@ class CRM_Core_OptionValue {
         }
 
         if ($contactType == 'Individual' || $contactType == 'All') {
+          $contactFields = CRM_Contact_DAO_Contact::fields();
           $title = array(
-            'gender' => array('name' => 'gender',
+            'gender' => array(
+              'name' => 'gender',
               'title' => ts('Gender'),
               'headerPattern' => '/^gender$/i',
+              'pseudoconstant' => $contactFields['gender_id']['pseudoconstant'],
             ),
             'individual_prefix' => array(
               'name' => 'individual_prefix',
               'title' => ts('Individual Prefix'),
               'headerPattern' => '/^(prefix|title)/i',
+              'pseudoconstant' => $contactFields['prefix_id']['pseudoconstant'],
             ),
             'individual_suffix' => array(
               'name' => 'individual_suffix',
               'title' => ts('Individual Suffix'),
               'headerPattern' => '/^suffix$/i',
+              'pseudoconstant' => $contactFields['suffix_id']['pseudoconstant'],
             ),
           );
           $nameTitle = array_merge($nameTitle, $title);
@@ -342,9 +349,6 @@ class CRM_Core_OptionValue {
         foreach ($nameTitle as $name => $attribs) {
           self::$_fields[$key][$name] = $optionName;
           list($tableName, $fieldName) = explode('.', $optionName['where']);
-          // not sure of this fix, so keeping it commented for now
-          // this is from CRM-1541
-          // self::$_fields[$mode][$name]['where'] = $name . '.' . $fieldName;
           self::$_fields[$key][$name]['where'] = "{$name}.label";
           foreach ($attribs as $k => $val) {
             self::$_fields[$key][$name][$k] = $val;

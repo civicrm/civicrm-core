@@ -578,7 +578,8 @@ class CRM_Contact_BAO_Query {
       // skip component fields
       // there are done by the alter query below
       // and need not be done on every field
-      if ((substr($name, 0, 12) == 'participant_') ||
+      if (
+        (substr($name, 0, 12) == 'participant_') ||
         (substr($name, 0, 7) == 'pledge_') ||
         (substr($name, 0, 5) == 'case_')
       ) {
@@ -598,11 +599,10 @@ class CRM_Contact_BAO_Query {
       }
 
       $cfID = CRM_Core_BAO_CustomField::getKeyID($name);
-
-      if (CRM_Utils_Array::value($name, $this->_paramLookup) ||
+      if (
+        CRM_Utils_Array::value($name, $this->_paramLookup) ||
         CRM_Utils_Array::value($name, $this->_returnProperties)
       ) {
-
         if ($cfID) {
           // add to cfIDs array if not present
           if (!array_key_exists($cfID, $this->_cfIDs)) {
@@ -612,21 +612,25 @@ class CRM_Contact_BAO_Query {
         elseif (isset($field['where'])) {
           list($tableName, $fieldName) = explode('.', $field['where'], 2);
           if (isset($tableName)) {
-
             if (CRM_Utils_Array::value($tableName, self::$_dependencies)) {
               $this->_tables['civicrm_address'] = 1;
               $this->_select['address_id'] = 'civicrm_address.id as address_id';
               $this->_element['address_id'] = 1;
             }
 
-            if ($tableName == 'gender' || $tableName == 'individual_prefix'
-              || $tableName == 'individual_suffix' || $tableName == 'im_provider'
-              || $tableName == 'email_greeting' || $tableName == 'postal_greeting'
-              || $tableName == 'addressee'
+            if (
+              $tableName == 'gender' || $tableName == 'individual_prefix' ||
+              $tableName == 'individual_suffix' || $tableName == 'im_provider' ||
+              $tableName == 'email_greeting' || $tableName == 'postal_greeting' ||
+              $tableName == 'addressee'
             ) {
               CRM_Core_OptionValue::select($this);
-              if (in_array($tableName, array(
-                'email_greeting', 'postal_greeting', 'addressee'))) {
+              if (
+                in_array(
+                  $tableName,
+                  array('email_greeting', 'postal_greeting', 'addressee')
+                )
+              ) {
                 //get display
                 $greetField = "{$name}_display";
                 $this->_select[$greetField] = "contact_a.{$greetField} as {$greetField}";
@@ -1717,6 +1721,17 @@ class CRM_Contact_BAO_Query {
         $this->_qill[$grouping][] = ts('State') . " ($lType) $op '$value'";
       }
     }
+    elseif ($field['pseudoconstant']) {
+      $this->optionValueQuery(
+        $name, $op, $value, $grouping,
+        CRM_Core_PseudoConstant::{$field['pseudoconstant']['name']}(),
+        $field,
+        $field['title']
+      );
+      if ($name == 'gender') {
+        self::$_openedPanes[ts('Demographics')] = TRUE;
+      }
+    }
     elseif (substr($name, 0, 7) === 'country') {
       if (isset($locType[1]) && is_numeric($locType[1])) {
         $setTables = FALSE;
@@ -1782,31 +1797,6 @@ class CRM_Contact_BAO_Query {
         $field,
         ts('World Region')
       );
-    }
-    elseif ($name === 'individual_prefix') {
-      $this->optionValueQuery(
-        $name, $op, $value, $grouping,
-        CRM_Core_PseudoConstant::individualPrefix(),
-        $field,
-        ts('Individual Prefix')
-      );
-    }
-    elseif ($name === 'individual_suffix') {
-      $this->optionValueQuery(
-        $name, $op, $value, $grouping,
-        CRM_Core_PseudoConstant::individualSuffix(),
-        $field,
-        ts('Individual Suffix')
-      );
-    }
-    elseif ($name === 'gender') {
-      $this->optionValueQuery(
-        $name, $op, $value, $grouping,
-        CRM_Core_PseudoConstant::gender(),
-        $field,
-        ts('Gender')
-      );
-      self::$_openedPanes[ts('Demographics')] = TRUE;
     }
     elseif ($name === 'birth_date') {
       $date = CRM_Utils_Date::processDate($value);
@@ -2702,7 +2692,7 @@ WHERE  id IN ( $groupIDs )
       $tActTable = "`civicrm_act_tag-" . $value . "`";
       $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-      
+
       $this->_tables[$etActTable] =
         $this->_whereTables[$etActTable] =
         " LEFT JOIN civicrm_activity_contact
@@ -4262,7 +4252,7 @@ civicrm_relationship.start_date > CURDATE()
       return CRM_Core_DAO::singleValueQuery($query);
     }
 
-    //crm_core_error::debug('$query', $query); //exit;
+    // crm_core_error::debug('$query', $query); exit;
 
     $dao = CRM_Core_DAO::executeQuery($query);
     if ($groupContacts) {
