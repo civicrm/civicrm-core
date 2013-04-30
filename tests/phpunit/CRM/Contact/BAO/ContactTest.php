@@ -524,9 +524,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //check the resolve values.
     $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     $this->assertEquals($genders[$params['gender_id']], $params['gender'], 'Check for gender.');
-    $prefix = CRM_Core_PseudoConstant::individualPrefix();
+    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
     $this->assertEquals($prefix[$params['prefix_id']], $params['prefix'], 'Check for prefix.');
-    $suffix = CRM_Core_PseudoConstant::individualSuffix();
+    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
     $this->assertEquals($suffix[$params['suffix_id']], $params['suffix'], 'Check for suffix.');
     $this->assertEquals(CRM_Core_PseudoConstant::stateProvince($params['address'][1]['state_province_id']),
       $params['address'][1]['state_province'],
@@ -1266,8 +1266,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //get display name.
     $dbDisplayName = CRM_Contact_BAO_Contact::displayName($contactId);
 
-    $prefix = CRM_Core_PseudoConstant::individualPrefix();
-    $suffix = CRM_Core_PseudoConstant::individualSuffix();
+    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
 
     //build display name
     $paramsDisplayName = $prefix[$params['prefix_id']] . ' ' . $params['first_name'] . ' ' . $params['last_name'] . ' ' . $suffix[$params['suffix_id']];
@@ -1296,8 +1296,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $checkImage = CRM_Contact_BAO_Contact_Utils::getImage($params['contact_type'], FALSE, $contactId);
 
-    $prefix = CRM_Core_PseudoConstant::individualPrefix();
-    $suffix = CRM_Core_PseudoConstant::individualSuffix();
+    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
 
     //build display name
     $paramsDisplayName = $prefix[$params['prefix_id']] . ' ' . $params['first_name'] . ' ' . $params['last_name'] . ' ' . $suffix[$params['suffix_id']];

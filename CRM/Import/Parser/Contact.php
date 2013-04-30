@@ -1386,13 +1386,13 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
             break;
 
           case 'individual_prefix':
-            if (!self::in_value($value, CRM_Core_PseudoConstant::individualPrefix())) {
+            if (!self::in_value($value, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'))) {
               self::addToErrorMsg(ts('Individual Prefix'), $errorMessage);
             }
             break;
 
           case 'individual_suffix':
-            if (!self::in_value($value, CRM_Core_PseudoConstant::individualSuffix())) {
+            if (!self::in_value($value, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'))) {
               self::addToErrorMsg(ts('Individual Suffix'), $errorMessage);
             }
             break;

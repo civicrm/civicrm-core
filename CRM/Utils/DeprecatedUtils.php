@@ -801,7 +801,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
   if (isset($values['individual_prefix'])) {
     if (CRM_Utils_Array::value('prefix_id', $params)) {
       $prefixes         = array();
-      $prefixes         = CRM_Core_PseudoConstant::individualPrefix();
+      $prefixes         = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
       $params['prefix'] = $prefixes[$params['prefix_id']];
     }
     else {
@@ -813,7 +813,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
   if (isset($values['individual_suffix'])) {
     if (CRM_Utils_Array::value('suffix_id', $params)) {
       $suffixes         = array();
-      $suffixes         = CRM_Core_PseudoConstant::individualSuffix();
+      $suffixes         = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
       $params['suffix'] = $suffixes[$params['suffix_id']];
     }
     else {

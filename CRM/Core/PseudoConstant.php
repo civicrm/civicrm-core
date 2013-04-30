@@ -99,20 +99,6 @@ class CRM_Core_PseudoConstant {
   private static $component;
 
   /**
-   * individual prefix
-   * @var array
-   * @static
-   */
-  private static $individualPrefix;
-
-  /**
-   * individual suffix
-   * @var array
-   * @static
-   */
-  private static $individualSuffix;
-
-  /**
    * im protocols
    * @var array
    * @static
@@ -729,27 +715,6 @@ class CRM_Core_PseudoConstant {
     return self::$component;
   }
 
-
-  /**
-   * Get all Individual Prefix.
-   *
-   * The static array individualPrefix is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All Individual Prefix - default is to get only active ones.
-   *
-   * @return array - array reference of all individual prefix.
-   *
-   */
-  public static function &individualPrefix() {
-    if (!self::$individualPrefix) {
-      self::$individualPrefix = CRM_Core_OptionGroup::values('individual_prefix');
-    }
-    return self::$individualPrefix;
-  }
-
   /**
    * Get all phone type
    * The static array phoneType is returned
@@ -768,26 +733,6 @@ class CRM_Core_PseudoConstant {
       self::$phoneType = CRM_Core_OptionGroup::values('phone_type');
     }
     return self::$phoneType;
-  }
-
-  /**
-   * Get all Individual Suffix.
-   *
-   * The static array individualSuffix is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All Individual Suffix - default is to get only active ones.
-   *
-   * @return array - array reference of all individual suffix.
-   *
-   */
-  public static function &individualSuffix() {
-    if (!self::$individualSuffix) {
-      self::$individualSuffix = CRM_Core_OptionGroup::values('individual_suffix');
-    }
-    return self::$individualSuffix;
   }
 
   /**

@@ -1400,11 +1400,11 @@ WHERE civicrm_event.is_active = 1
           $values[$index] = $gender[$params[$name]];
         }
         elseif ('individual_prefix' == substr($name, 0, 17)) {
-          $prefix = CRM_Core_PseudoConstant::individualPrefix();
+          $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
           $values[$index] = $prefix[$params[$name]];
         }
         elseif ('individual_suffix' == substr($name, 0, 17)) {
-          $suffix = CRM_Core_PseudoConstant::individualSuffix();
+          $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
           $values[$index] = $suffix[$params[$name]];
         }
         elseif (in_array($name, array(

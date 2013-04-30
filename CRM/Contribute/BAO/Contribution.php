@@ -2245,7 +2245,7 @@ WHERE  contribution_id = %1 ";
 
       $template->assign('honor_block_is_active', 1);
       if (CRM_Utils_Array::value('prefix_id', $honorDefault)) {
-        $prefix = CRM_Core_PseudoConstant::individualPrefix();
+        $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
         $template->assign('honor_prefix', $prefix[$honorDefault['prefix_id']]);
       }
       $template->assign('honor_first_name', CRM_Utils_Array::value('first_name', $honorDefault));
