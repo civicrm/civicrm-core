@@ -49,7 +49,7 @@ define( 'CIVICRM_PLUGIN_VERSION', '4.3' );
 
 // define commonly used items as constants
 define( 'CIVICRM_PLUGIN_DIR', plugin_dir_path(__FILE__) );
-define( 'CIVICRM_SETTINGS_PATH', CIVICRM_PLUGIN_DIR.'civicrm.settings.php' );
+define( 'CIVICRM_SETTINGS_PATH', CIVICRM_PLUGIN_DIR . 'civicrm.settings.php' );
 
 // prevent CiviCRM from rendering its own header
 define( 'CIVICRM_UF_HEAD', true );
@@ -164,12 +164,12 @@ class CiviCRM_For_WordPress {
 			// Adding "embed form" button
 			// CMW: better to use get_current_screen()
 			// see http://codex.wordpress.org/Function_Reference/get_current_screen
-			if (in_array(
+			if ( in_array(
 			
-				basename($_SERVER['PHP_SELF']),
-				array('post.php', 'page.php', 'page-new.php', 'post-new.php')
+				basename( $_SERVER['PHP_SELF'] ),
+				array( 'post.php', 'page.php', 'page-new.php', 'post-new.php' )
 				
-			)) {
+			) ) {
 				
 				// CMW: the check above does not allow Custom Post Types to make
 				// use of the CiviCRM shortcode...
@@ -275,7 +275,7 @@ class CiviCRM_For_WordPress {
 	 * @description: invoke CiviCRM in a WordPress context
 	 * Callback function from add_menu_page() 
 	 * Callback from WordPress 'init' and 'the_content' hooks
-	 * Also used by civicrm_wp_shortcode_includes() and _civicrm_update_user()
+	 * Also used by add_shortcode_includes() and _civicrm_update_user()
 	 */
 	public function invoke() {
 
@@ -535,7 +535,7 @@ class CiviCRM_For_WordPress {
 
 
 	/**
-	 * @description: Callback for ob_start() in civicrm_buffer_start()
+	 * @description: Callback for ob_start() in buffer_start()
 	 * @return string $buffer the markup
 	 */
 	public function buffer_callback($buffer) {
@@ -683,7 +683,7 @@ class CiviCRM_For_WordPress {
 
 
 	/**
-	 * @description: callback from 'edit_post_link' hook to remove edit link in civicrm_set_post_blank()
+	 * @description: callback from 'edit_post_link' hook to remove edit link in set_post_blank()
 	 * @return string always empty
 	 */
 	public function set_blank() {
@@ -815,7 +815,7 @@ class CiviCRM_For_WordPress {
 
 
 	/**
-	 * @description: only called by civicrm_wp_invoke() to undo WordPress default behaviour
+	 * @description: only called by wp_invoke() to undo WordPress default behaviour
 	 */
 	public function remove_wp_magic_quotes() {
 	
