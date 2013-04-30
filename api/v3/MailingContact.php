@@ -47,7 +47,7 @@
  * @return array API result
  * @static void
  * @access public
- * @example CRM/Mailing/Page/Tab.php
+ * @example CRM/Mailing/BAO/Mailing.php
  *
  */
 function civicrm_api3_mailing_contact_get($params) {
@@ -71,7 +71,6 @@ function civicrm_api3_mailing_contact_get($params) {
     $params['offset'] = 0;
   }
 
-
   if (!isset($params['limit'])) {
     $params['limit'] = 50;
   }
@@ -80,7 +79,9 @@ function civicrm_api3_mailing_contact_get($params) {
   return $fnName(
     $params['contact_id'],
     $params['offset'],
-    $params['limit']
+    $params['limit'],
+    CRM_Utils_Array::value('sort', $params),
+    CRM_Utils_Array::value('getcount', $params)
   );
 }
 
@@ -91,29 +92,64 @@ function _civicrm_api3_mailing_contact_query(
   $limit,
   $selectFields,
   $fromClause,
-  $whereClause
+  $whereClause,
+  $sort,
+  $getCount
 ) {
-  $defaultFields = array(
-    'm.id'       => 'mailing_id',
-    'm.subject'  => 'subject',
-    'c.id' => 'creator_id',
-    'c.sort_name' => 'creator_name',
-  );
 
-  if ($selectFields) {
-    $fields = array_merge($selectFields, $defaultFields);
+  if ($getCount) {
+    $sql = "
+SELECT     count(*)
+FROM       civicrm_mailing m
+INNER JOIN civicrm_contact c ON m.created_id = c.id
+INNER JOIN civicrm_mailing_job j ON j.mailing_id = m.id
+INNER JOIN civicrm_mailing_event_queue meq ON meq.job_id = j.id
+           $fromClause
+WHERE      j.is_test = 0
+AND        meq.contact_id = %1
+           $whereClause
+GROUP BY   m.id
+";
+
+    $qParams = array(
+      1 => array($contactID, 'Integer')
+    );
+    $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
+
+    $params = array(
+      'type'   => $type,
+      'contact_id' => $contactID
+    );
+
+    $results = array('count' => $dao->N);
   }
   else {
-    $fields = $defaultFields;
-  }
+    $defaultFields = array(
+      'm.id'       => 'mailing_id',
+      'm.subject'  => 'subject',
+      'c.id' => 'creator_id',
+      'c.sort_name' => 'creator_name',
+    );
 
-  $select = array();
-  foreach ($fields as $n => $l) {
-    $select[] = "$n as $l";
-  }
-  $select = implode(', ', $select);
+    if ($selectFields) {
+      $fields = array_merge($selectFields, $defaultFields);
+    }
+    else {
+      $fields = $defaultFields;
+    }
 
-  $sql = "
+    $select = array();
+    foreach ($fields as $n => $l) {
+      $select[] = "$n as $l";
+    }
+    $select = implode(', ', $select);
+
+    $orderBy = 'ORDER BY j.start_date';
+    if ($sort) {
+      $orderBy = "ORDER BY $sort";
+    }
+
+    $sql = "
 SELECT     $select
 FROM       civicrm_mailing m
 INNER JOIN civicrm_contact c ON m.created_id = c.id
@@ -124,42 +160,46 @@ WHERE      j.is_test = 0
 AND        meq.contact_id = %1
            $whereClause
 GROUP BY   m.id
-ORDER BY   j.start_date
+{$orderBy}
 ";
 
-  if ($limit > 0) {
-    $sql .= "
+    if ($limit > 0) {
+      $sql .= "
 LIMIT %2, %3
 ";
-  }
-
-  $qParams = array(
-    1 => array($contactID, 'Integer'),
-    2 => array($offset, 'Integer'),
-    3 => array($limit, 'Integer')
-  );
-  $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
-
-  $results = array();
-  while ($dao->fetch()) {
-    foreach ($fields as $n => $l) {
-      $results[$dao->mailing_id][$l] = $dao->$l;
     }
+
+    $qParams = array(
+      1 => array($contactID, 'Integer'),
+      2 => array($offset, 'Integer'),
+      3 => array($limit, 'Integer')
+    );
+    $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
+
+    $results = array();
+    while ($dao->fetch()) {
+      foreach ($fields as $n => $l) {
+        $results[$dao->mailing_id][$l] = $dao->$l;
+      }
+    }
+
+    $params = array(
+      'type'   => $type,
+      'contact_id' => $contactID,
+      'offset' => $offset,
+      'limit'  => $limit
+    );
   }
 
-  $params = array(
-    'type'   => $type,
-    'contact_id' => $contactID,
-    'offset' => $offset,
-    'limit'  => $limit
-  );
   return civicrm_api3_create_success($results, $params);
 }
 
 function _civicrm_api3_mailing_contact_get_delivered(
   $contactID,
   $offset,
-  $limit
+  $limit,
+  $sort,
+  $getCount
 ) {
   $selectFields = array('med.time_stamp' => 'start_date');
 
@@ -179,14 +219,18 @@ AND        meb.id IS NULL
     $limit,
     $selectFields,
     $fromClause,
-    $whereClause
+    $whereClause,
+    $sort,
+    $getCount
   );
 }
 
 function _civicrm_api3_mailing_contact_get_bounced(
   $contactID,
   $offset,
-  $limit
+  $limit,
+  $sort,
+  $getCount
 ) {
   $fromClause = "
 INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
@@ -199,6 +243,32 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
     $limit,
     NULL,
     $fromClause,
-    NULL
+    NULL,
+    $sort,
+    $getCount
   );
+}
+
+/**
+ * Get count of all the mailings that a contact was involved with
+ *
+ * @param array    $params input parameters
+ *                    - key: contact_id, value: int - required
+ *                    - key: type, value: Delivered | Bounced - optional, defaults to Delivered
+ *                    - Future extensions will include: Opened, Clicked, Forwarded
+ *
+ * @return array API result
+ * @static void
+ * @access public
+ * @example CRM/Mailing/BAO/Mailing.php
+ *
+ */
+function civicrm_api3_mailing_contact_getcount($params) {
+  if (empty($params['contact_id'])) {
+    return civicrm_api3_create_error('contact_id is a required field');
+  }
+
+  // set the count mode for the api
+  $params['getcount'] = 1;
+  return civicrm_api3_mailing_contact_get($params);
 }

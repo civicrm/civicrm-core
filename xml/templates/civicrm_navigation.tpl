@@ -71,6 +71,7 @@ VALUES
   ( @domainID, NULL, 1, 'Mailing Preferences', 'civimail_workflow', '{serialize}0{/serialize}' ),
   ( @domainID, NULL, 1, 'Mailing Preferences', 'civimail_server_wide_lock', '{serialize}0{/serialize}' ),
   ( @domainID, NULL, 1, 'Mailing Preferences', 'mailing_backend', {literal}'a:1:{s:15:"outBound_option";s:1:"3";}'{/literal} ),
+  ( @domainID, NULL, 1, 'Mailing Preferences', 'write_activity_record', '{serialize}1{/serialize}' ),
   ( @domainID, NULL, 1, 'Member Preferences' , 'default_renewal_contribution_page', NULL ),
   ( @domainID, NULL, 1, 'Multi Site Preferences', 'is_enabled', '{serialize}0{/serialize}' ),
   ( @domainID, NULL, 1, 'Multi Site Preferences', 'uniq_email_per_site', '{serialize}0{/serialize}' ),

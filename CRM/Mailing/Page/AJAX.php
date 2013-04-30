@@ -68,7 +68,7 @@ class CRM_Mailing_Page_AJAX {
     //$context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
 
     $sortMapper = array(
-      0 => 'subject', 1 => 'mailing_creator', 2 => 'start_date', 3 => 'links',
+      0 => 'subject', 1 => 'creator_name', 2 => 'start_date', 3 => 'links',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
