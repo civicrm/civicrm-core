@@ -323,6 +323,7 @@ class CRM_Core_OptionValue {
           $title = array(
             'gender' => array(
               'name' => 'gender',
+              'dbName' => 'gender_id',
               'title' => ts('Gender'),
               'headerPattern' => '/^gender$/i',
               'pseudoconstant' => $contactFields['gender_id']['pseudoconstant'],
@@ -330,6 +331,7 @@ class CRM_Core_OptionValue {
              ),
             'individual_prefix' => array(
               'name' => 'individual_prefix',
+              'dbName' => 'prefix_id',
               'title' => ts('Individual Prefix'),
               'headerPattern' => '/^(prefix|title)/i',
               'pseudoconstant' => $contactFields['prefix_id']['pseudoconstant'],
@@ -337,6 +339,7 @@ class CRM_Core_OptionValue {
             ),
             'individual_suffix' => array(
               'name' => 'individual_suffix',
+              'dbName' => 'suffix_id',
               'title' => ts('Individual Suffix'),
               'headerPattern' => '/^suffix$/i',
               'pseudoconstant' => $contactFields['suffix_id']['pseudoconstant'],
