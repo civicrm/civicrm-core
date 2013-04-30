@@ -31,7 +31,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   protected $session_id;
   protected $nocms_contact_id;
 
-  protected function assertAPIEquals($apiResult, $cmpvar, $prefix = '') {
+  protected function assertAPIErrorCode($apiResult, $cmpvar, $prefix = '') {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
@@ -54,7 +54,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     list($status, $data) = $client->post($this->url, $params);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $result = json_decode($data, TRUE);
-    $this->assertAPIEquals($result, 0);
+    $this->assertAPIErrorCode($result, 0);
     $this->api_key = $result["api_key"];
     $this->session_id = $result["PHPSESSID"];
     if(!isset($this->api_key)){
@@ -88,7 +88,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
-      $this->assertAPIEquals($result, 0);
+      $this->assertAPIErrorCode($result, 0);
     }
   }
 
@@ -107,7 +107,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
-      $this->assertAPIEquals($result, 1);
+      $this->assertAPIErrorCode($result, 1);
     }
   }
 
@@ -125,7 +125,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
-      $this->assertAPIEquals($result, 0);
+      $this->assertAPIErrorCode($result, 0);
     }
   }
 
@@ -143,7 +143,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
-      $this->assertAPIEquals($result, 0);
+      $this->assertAPIErrorCode($result, 0);
 
     }
   }
@@ -162,7 +162,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
-      $this->assertAPIEquals($result, 1);
+      $this->assertAPIErrorCode($result, 1);
     }
   }
 
@@ -190,7 +190,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
-      $this->assertAPIEquals($result, 1);
+      $this->assertAPIErrorCode($result, 1);
     }
   }
 
