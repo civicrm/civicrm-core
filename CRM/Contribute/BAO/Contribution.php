@@ -1236,7 +1236,7 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   }
 
   /**
-   *  Function to retrieve soft contributon for contribution record.
+   *  Function to retrieve soft contribution for contribution record.
    *  @param array $params an associated array
    *
    *  @return soft contribution id
@@ -1255,7 +1255,8 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
       }
       $softContribution['soft_credit_to'] = $cs->contact_id;
       $softContribution['soft_credit_id'] = $cs->id;
-
+      $softContribution['soft_credit_amount'] = $cs->amount;
+      
     }
     return $softContribution;
   }
