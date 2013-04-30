@@ -587,7 +587,7 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
-      if ($field['pseudoconstant']) {
+      if (CRM_Utils_Array::value('pseudoconstant', $field)) {
         continue;
       }
 
@@ -1729,7 +1729,7 @@ class CRM_Contact_BAO_Query {
     elseif ($field['pseudoconstant']) {
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
-        CRM_Core_PseudoConstant::{$field['pseudoconstant']['name']}(),
+        CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $field['dbName']),
         $field,
         $field['title'],
         'String',
