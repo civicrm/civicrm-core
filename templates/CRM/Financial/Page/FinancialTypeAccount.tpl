@@ -71,7 +71,7 @@
     </div>
   </div>
   {else}
-      <div class="messages status">
+      <div class="messages status no-popup">
           <div class="icon inform-icon"></div>
           {capture assign=crmURL}{crmURL q="action=add&reset=1&aid=$aid"}{/capture}
           {ts 1=$crmURL}There are no financial accounts assigned to this financial type. You can <a href='%1'>assign one</a>.{/ts}
