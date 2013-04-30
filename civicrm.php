@@ -731,14 +731,14 @@ class CiviCRM_For_WordPress {
 
 			if (
 				$arg1 == 'contribute' &&
-				in_array($arg2, array('transact', 'campaign', 'pcp'))
+				in_array( $arg2, array('transact', 'campaign', 'pcp') )
 			) {
 				return true;
 			}
 
 			if (
 				$arg1 == 'pcp' &&
-				in_array( $arg2, array('info') )
+				( !$arg2 || in_array( $arg2, array('info') ) )
 			) {
 				return true;
 			}
@@ -766,7 +766,7 @@ class CiviCRM_For_WordPress {
 
 			if (
 				$arg1 == 'pcp' &&
-				in_array( $arg2, array('info') )
+				( !$arg2 || in_array( $arg2, array('info') ) )
 			) {
 				return true;
 			}
