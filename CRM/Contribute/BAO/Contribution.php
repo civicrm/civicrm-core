@@ -1236,10 +1236,11 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   }
 
   /**
-   *  Function to retrieve soft contribution for contribution record.
+   *  Function to retrieve soft contributions for contribution record.
    *  @param array $params an associated array
+   *  @param boolean $all include PCP data
    *
-   *  @return soft contribution id
+   *  @return array of soft contribution ids, amounts, and associated contact ids
    *  @static
    */
   static function getSoftContribution($params, $all = FALSE) {
