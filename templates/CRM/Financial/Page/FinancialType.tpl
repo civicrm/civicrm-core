@@ -27,7 +27,10 @@
    {include file="CRM/Financial/Form/FinancialType.tpl"}
 {else}
     <div id="help">
-        <p>{ts}Financial types are used to categorize contributions for reporting and accounting purposes. These are also referred to as <strong>Funds</strong>. You may set up as many types as needed. Each type can carry an accounting code which can be used to map contributions to codes in your accounting system. Commonly used financial types are: Donation, Campaign Contribution, Membership Dues...{/ts}</p>
+      {capture assign="premiumLink"}{crmURL p="civicrm/admin/contribute/managePremiums" q="reset=1"}{/capture}
+      <p>{ts 1=$premiumLink}Financial types are used to categorize contributions for reporting and accounting purposes. You may set up as many as needed, including commonly used types such as Donation, Campaign Contribution or Membership Dues.  Additionally, financial types can account for the inventory and expense of <a href="%1">premiums</a>.{/ts}</p>
+      {capture assign="acctLink"}{crmURL p="civicrm/admin/financial/financialAccount" q="reset=1&action=browse"}{/capture}
+      <p>{ts 1=$acctLink}Each financial type relates to a number of <a href="%1">financial accounts</a> to track income, accounts receivable, and fees.</p>{/ts}
     </div>
 
 {if $rows}
