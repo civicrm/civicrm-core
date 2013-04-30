@@ -37,7 +37,6 @@
       <type>int unsigned</type>
       <comment>Which Location does this phone belong to.</comment>
       <pseudoconstant>
-        <name>locationType</name>
         <table>civicrm_location_type</table>
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
@@ -136,8 +135,7 @@
       <type>int unsigned</type>
       <comment>Which type of phone does this number belongs.</comment>
       <pseudoconstant>
-        <name>phoneType</name>
-        <optionGroupName>phoneType</optionGroupName>
+        <optionGroupName>phone_type</optionGroupName>
       </pseudoconstant>
       <add>2.2</add>
   </field> 

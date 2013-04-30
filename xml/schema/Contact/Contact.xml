@@ -338,8 +338,7 @@
       <type>int unsigned</type>
       <comment>Prefix or Title for name (Ms, Mr...). FK to prefix ID</comment>
       <pseudoconstant>
-        <name>individualPrefix</name>
-        <optionGroupName>individualPrefix</optionGroupName>
+        <optionGroupName>individual_prefix</optionGroupName>
       </pseudoconstant>
       <headerPattern>/^(prefix|title)/i</headerPattern>
       <dataPattern>/^(mr|ms|mrs|sir|dr)\.?$/i</dataPattern>
@@ -355,8 +354,7 @@
       <title>Individual Suffix</title>
       <type>int unsigned</type>
       <pseudoconstant>
-        <name>individualSuffix</name>
-        <optionGroupName>individualSuffix</optionGroupName>
+        <optionGroupName>individual_suffix</optionGroupName>
       </pseudoconstant>
       <comment>Suffix for name (Jr, Sr...). FK to suffix ID</comment>
       <headerPattern>/^suffix$/i</headerPattern>
@@ -482,7 +480,6 @@
       <title>Gender</title>
       <type>int unsigned</type>
       <pseudoconstant>
-        <name>gender</name>
         <optionGroupName>gender</optionGroupName>
       </pseudoconstant>
       <headerPattern>/^gender$/i</headerPattern>

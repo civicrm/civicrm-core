@@ -43,14 +43,63 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  function testGender() {
-    $expected = array(
-      1 => 'Female',
-      2 => 'Male',
-      3 => 'Transgender',
+  function testOptionValues() {
+    // We'll test these daoName/field combinations.
+    // array[DAO Name] = properties, where properties can be:
+    // - fieldName: the SQL column name within the DAO table.
+    // - sample: Any one value which is expected in the list of option values.
+    // - max: integer (default = 10) maximum number of option values expected.
+    $fields = array(
+      'CRM_Contact_DAO_Contact' => array(
+        array(
+          'fieldName' => 'prefix_id',
+          'sample' => 'Mr.',
+        ),
+        array(
+          'fieldName' => 'suffix_id',
+          'sample' => 'Sr.',
+        ),
+        array(
+          'fieldName' => 'gender_id',
+          'sample' => 'Male',
+        ),
+      ),
+      'CRM_Core_DAO_Phone' => array(
+        array(
+          'fieldName' => 'phone_type_id',
+          'sample' => 'Phone',
+        ),
+        array(
+          'fieldName' => 'location_type_id',
+          'sample' => 'Home',
+        ),
+      ),
+      'CRM_Core_DAO_Email' => array(
+        array(
+          'fieldName' => 'location_type_id',
+          'sample' => 'Home',
+        ),
+      ),
+      'CRM_Core_DAO_Address' => array(
+        array(
+          'fieldName' => 'location_type_id',
+          'sample' => 'Home',
+        ),
+      ),
     );
-    
-    $actual = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-    $this->assertEquals($expected, $actual);
+
+    foreach ($fields as $daoName => $daoFields) {
+      foreach ($daoFields as $field) {
+        $message = "DAO name: '{$daoName}', field: '{$fieldName}'";
+
+        // Ensure sample value is contained in the returned optionValues.
+        $optionValues = CRM_Core_PseudoConstant::get($daoName, $field['fieldName']);
+        $this->assertContains($field['sample'], $optionValues, $message);
+
+        // Ensure count of optionValues is not extraordinarily high.
+        $max = CRM_Utils_Array::value('max', $field, 10);
+        $this->assertLessThanOrEqual($max, count($optionValues), $message);
+      }
+    }
   }
 }
