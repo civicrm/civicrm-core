@@ -48,7 +48,8 @@ class CRM_Contribute_Form_SoftCredit {
    */
   static function buildQuickForm(&$form) {
     $prefix = 'soft_credit_';
-    $form->_softCredit['item_count'] = 5;
+    // by default generate 5 blocks
+    $form->_softCredit['item_count'] = 6;
     for ($rowNumber = 1; $rowNumber <= $form->_softCredit['item_count']; $rowNumber++) {
       CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, $prefix);
       $form->addMoney("{$prefix}amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, TRUE,
