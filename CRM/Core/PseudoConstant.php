@@ -529,8 +529,8 @@ class CRM_Core_PseudoConstant {
    * @param boolean $name pseudoconstant to be flushed
    *
    */
-  public static function flush($name) {
-    if (isset(self::$$name)) {
+  public static function flush($name = 'cache') {
+    if (property_exists(self, $name)) {
       self::$$name = NULL;
     }
   }
