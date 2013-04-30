@@ -57,13 +57,6 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
-   * static cache for pseudoconstant arrays
-   * @var array
-   * @static
-   */
-  private static $cache;
-
-  /**
    * location type
    * @var array
    * @static
