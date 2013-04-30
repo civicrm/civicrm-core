@@ -618,7 +618,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
         if ($name == 'phone') {
           CRM_Utils_Array::lookupValue($values,
             'phone_type',
-            CRM_Core_PseudoConstant::phoneType(),
+            CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
             $reverse
           );
         }

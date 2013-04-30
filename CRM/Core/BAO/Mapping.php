@@ -565,7 +565,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     $sel3['']    = NULL;
     $sel5['']    = NULL;
-    $phoneTypes  = CRM_Core_PseudoConstant::phoneType();
+    $phoneTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::IMProvider();
     asort($phoneTypes);
 

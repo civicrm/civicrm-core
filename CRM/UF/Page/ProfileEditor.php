@@ -23,7 +23,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         return array(
           'PseudoConstant' => array(
             'locationType' => CRM_Core_PseudoConstant::locationType(),
-            'phoneType' => CRM_Core_PseudoConstant::phoneType(),
+            'phoneType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
           ),
           'initialProfileList' => civicrm_api('UFGroup', 'get', array(
             'version' => 3,
