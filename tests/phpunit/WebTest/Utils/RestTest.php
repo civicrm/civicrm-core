@@ -43,7 +43,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     //URL should eventually be adapted for multisite
     $this->url = "{$this->settings->sandboxURL}/{$this->sboxPath}sites/all/modules/civicrm/extern/rest.php";
 
-    if (!property_exists($this->settings, 'siteKey') || empty($this->settings->siteKey)){
+    if (!property_exists($this->settings, 'siteKey') || empty($this->settings->siteKey)) {
       $this->markTestSkipped('CiviSeleniumSettings is missing siteKey');
     }
 
@@ -61,14 +61,14 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $this->assertAPIErrorCode($result, 0);
     $this->api_key = $result["api_key"];
     $this->session_id = $result["PHPSESSID"];
-    if(!isset($this->api_key)){
+    if (!isset($this->api_key)) {
       $this->markTestSkipped('Admin does not have an associated API key');
     }
   }
 
   protected function tearDown() {
     parent::tearDown();
-    if(isset($this->nocms_contact_id)){
+    if (isset($this->nocms_contact_id)) {
       $deleteParams = array(
         "id" => $this->nocms_contact_id,
         "skip_undelete" => 1
@@ -79,110 +79,110 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   function testValidLoginCMSUser() {
-      $client = CRM_Utils_HttpClient::singleton();
-      $params = array(
-        "q" => "civicrm/login",
-        "key" => $this->settings->siteKey,
-        "json" => "1",
-        "name" => $this->settings->adminUsername,
-        "pass" => $this->settings->adminPassword
-      );
-      list($status, $data) = $client->post($this->url, $params);
-      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-      $result = json_decode($data, TRUE);
-      $this->assertNotNull($result);
-      $this->assertAPIErrorCode($result, 0);
+    $client = CRM_Utils_HttpClient::singleton();
+    $params = array(
+      "q" => "civicrm/login",
+      "key" => $this->settings->siteKey,
+      "json" => "1",
+      "name" => $this->settings->adminUsername,
+      "pass" => $this->settings->adminPassword
+    );
+    list($status, $data) = $client->post($this->url, $params);
+    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $result = json_decode($data, TRUE);
+    $this->assertNotNull($result);
+    $this->assertAPIErrorCode($result, 0);
   }
 
   function testInvalidPasswordLogin() {
-      $client = CRM_Utils_HttpClient::singleton();
-      $badPassword = $this->settings->adminPassword . "badpass";
-      $params = array(
-        "q" => "civicrm/login",
-        "key" => $this->settings->siteKey,
-        "json" => "1",
-        "name" => $this->settings->adminUsername,
-        "pass" => $badPassword 
-      );
-      list($status, $data) = $client->post($this->url, $params);
-      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-      $result = json_decode($data, TRUE);
-      $this->assertNotNull($result);
-      $this->assertAPIErrorCode($result, 1);
+    $client = CRM_Utils_HttpClient::singleton();
+    $badPassword = $this->settings->adminPassword . "badpass";
+    $params = array(
+      "q" => "civicrm/login",
+      "key" => $this->settings->siteKey,
+      "json" => "1",
+      "name" => $this->settings->adminUsername,
+      "pass" => $badPassword
+    );
+    list($status, $data) = $client->post($this->url, $params);
+    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $result = json_decode($data, TRUE);
+    $this->assertNotNull($result);
+    $this->assertAPIErrorCode($result, 1);
   }
 
   function testValidCallsiteKey() {
-      $client = CRM_Utils_HttpClient::singleton();
-      $params = array(
-        "entity" => "Contact",
-        "action" => "get",
-        "key" => $this->settings->siteKey,
-        "json" => "1",
-        "api_key" => $this->api_key
-      );
-      list($status, $data) = $client->post($this->url, $params);
-      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-      $result = json_decode($data, TRUE);
-      $this->assertNotNull($result);
-      $this->assertAPIErrorCode($result, 0);
+    $client = CRM_Utils_HttpClient::singleton();
+    $params = array(
+      "entity" => "Contact",
+      "action" => "get",
+      "key" => $this->settings->siteKey,
+      "json" => "1",
+      "api_key" => $this->api_key
+    );
+    list($status, $data) = $client->post($this->url, $params);
+    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $result = json_decode($data, TRUE);
+    $this->assertNotNull($result);
+    $this->assertAPIErrorCode($result, 0);
   }
 
   function testValidCallPHPSessionID() {
-      $client = CRM_Utils_HttpClient::singleton();
-      $params = array(
-        "entity" => "Contact",
-        "action" => "get",
-        "json" => "1",
-        "PHPSESSID" => $this->session_id,
-        "api_key" => $this->api_key,
-      );
-      list($status, $data) = $client->post($this->url, $params);
-      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-      $result = json_decode($data, TRUE);
-      $this->assertNotNull($result);
-      $this->assertAPIErrorCode($result, 0);
+    $client = CRM_Utils_HttpClient::singleton();
+    $params = array(
+      "entity" => "Contact",
+      "action" => "get",
+      "json" => "1",
+      "PHPSESSID" => $this->session_id,
+      "api_key" => $this->api_key,
+    );
+    list($status, $data) = $client->post($this->url, $params);
+    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $result = json_decode($data, TRUE);
+    $this->assertNotNull($result);
+    $this->assertAPIErrorCode($result, 0);
   }
 
   function testInvalidAPIKey() {
-      $client = CRM_Utils_HttpClient::singleton();
-      $params = array(
-        "entity" => "Contact",
-        "action" => "get",
-        "key" => $this->settings->siteKey,
-        "json" => "1",
-        "api_key" => "zzzzzzzzzzzzzzaaaaaaaaaaaaaaaaabadasdasd"
-      );
-      list($status, $data) = $client->post($this->url, $params);
-      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-      $result = json_decode($data, TRUE);
-      $this->assertNotNull($result);
-      $this->assertAPIErrorCode($result, 1);
+    $client = CRM_Utils_HttpClient::singleton();
+    $params = array(
+      "entity" => "Contact",
+      "action" => "get",
+      "key" => $this->settings->siteKey,
+      "json" => "1",
+      "api_key" => "zzzzzzzzzzzzzzaaaaaaaaaaaaaaaaabadasdasd"
+    );
+    list($status, $data) = $client->post($this->url, $params);
+    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $result = json_decode($data, TRUE);
+    $this->assertNotNull($result);
+    $this->assertAPIErrorCode($result, 1);
   }
 
   function testNotCMSUser() {
-      $client = CRM_Utils_HttpClient::singleton();
-      //Create contact with api_key
-      $test_key = "testing1234";
-      $contactParams = array(
-        "api_key" => $test_key,
-        "contact_type" => "Individual",
-        "first_name" => "RestTester1"
-      );
-      $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
-      $this->nocms_contact_id = $contact["id"];
+    $client = CRM_Utils_HttpClient::singleton();
+    //Create contact with api_key
+    $test_key = "testing1234";
+    $contactParams = array(
+      "api_key" => $test_key,
+      "contact_type" => "Individual",
+      "first_name" => "RestTester1"
+    );
+    $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
+    $this->nocms_contact_id = $contact["id"];
 
-      $params = array(
-        "entity" => "Contact",
-        "action" => "get",
-        "key" => $this->settings->siteKey,
-        "json" => "1",
-        "api_key" => $test_key
-      );
-      list($status, $data) = $client->post($this->url, $params);
-      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-      $result = json_decode($data, TRUE);
-      $this->assertNotNull($result);
-      $this->assertAPIErrorCode($result, 1);
+    $params = array(
+      "entity" => "Contact",
+      "action" => "get",
+      "key" => $this->settings->siteKey,
+      "json" => "1",
+      "api_key" => $test_key
+    );
+    list($status, $data) = $client->post($this->url, $params);
+    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $result = json_decode($data, TRUE);
+    $this->assertNotNull($result);
+    $this->assertAPIErrorCode($result, 1);
   }
 
 }
