@@ -48,7 +48,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
     $this->_contactID = $this->organizationCreate();
     $this->_locationType = $this->locationTypeCreate();
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
 
     $this->_params = array(
       'contact_id' => $this->_contactID,

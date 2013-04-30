@@ -1443,7 +1443,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $locationType->copyValues($params);
     $locationType->save();
     // clear getfields cache
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
     civicrm_api('phone', 'getfields', array('version' => 3, 'cache_clear' => 1));
     return $locationType;
   }
