@@ -477,6 +477,10 @@ class CRM_Core_PseudoConstant {
         while ($dao->fetch()) {
           self::$cache[$cacheKey][$dao->id] = $dao->label;
         }
+        if (CRM_Utils_Array::value('localize', $params)) {
+          $i18n = CRM_Core_I18n::singleton();
+          $i18n->localizeArray(self::$cache[$cacheKey]);
+        }
         return self::$cache[$cacheKey];
       }
     }
