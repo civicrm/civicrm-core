@@ -114,7 +114,7 @@ class CiviCRM_For_WordPress {
 	/**
 	 * @description: method that runs only when CiviCRM plugin is activated
 	 */
-	function activate() {
+	public function activate() {
 
 		// Assign minimum capabilities for all WordPress roles and create 'anonymous_user' role
 		$this->set_wp_user_capabilities();
@@ -277,7 +277,7 @@ class CiviCRM_For_WordPress {
 	 * Callback from WordPress 'init' and 'the_content' hooks
 	 * Also used by civicrm_wp_shortcode_includes() and _civicrm_update_user()
 	 */
-	function invoke() {
+	public function invoke() {
 
 		static $alreadyInvoked = false;
 		if ( $alreadyInvoked ) {
@@ -328,7 +328,7 @@ class CiviCRM_For_WordPress {
 	/**
 	 * @description: callback function for add_options_page() that runs the CiviCRM installer
 	 */
-	function run_installer() {
+	public function run_installer() {
 
 		// uses CIVICRM_PLUGIN_DIR instead of WP_PLUGIN_DIR
 		$installFile =
@@ -493,7 +493,7 @@ class CiviCRM_For_WordPress {
 	/**
 	 * @description: callback function for 'get_header' hook
 	 */
-	function add_shortcode_includes() {
+	public function add_shortcode_includes() {
 
 		global $post;
 		
@@ -626,7 +626,7 @@ class CiviCRM_For_WordPress {
 		} else {
 			
 			// see comments on set_post_blank()
-			add_filter('the_content', array( $this, 'invoke' ) );
+			add_filter( 'the_content', array( $this, 'invoke' ) );
 			
 		}
 
@@ -635,10 +635,10 @@ class CiviCRM_For_WordPress {
 
 
 	/**
-	 * @description: override WordPress post comment status attribute in civicrm_wp_frontend()
+	 * @description: override WordPress post comment status attribute in wp_frontend()
 	 * see comments on set_post_blank()
 	 */
-	function turn_comments_off() {
+	public function turn_comments_off() {
 
 		global $post;
 		
@@ -652,16 +652,15 @@ class CiviCRM_For_WordPress {
 
 
 	/**
-	 * @description: override WordPress post attributes in civicrm_wp_frontend()
+	 * @description: override WordPress post attributes in wp_frontend()
 	 *
 	 * CMW: the process of overriding WordPress post content should be done in a way
 	 * analogous to how BuddyPress injects its content into a theme. After I have
 	 * refactored the plugin, I will look into this more thoroughly.
 	 */
-	function set_post_blank() {
+	public function set_post_blank() {
 
 		global $post;
-		cividie( $post );
 		
 		// kick out when there's no post object, eg on 404 pages
 		if ( ! is_object( $post ) ) return;
@@ -678,6 +677,7 @@ class CiviCRM_For_WordPress {
 		// hide the edit link
 		add_action( 'edit_post_link', array( $this, 'set_blank' ) );
 
+		//cividie( $post );
 	}
 
 
@@ -686,7 +686,7 @@ class CiviCRM_For_WordPress {
 	 * @description: callback from 'edit_post_link' hook to remove edit link in civicrm_set_post_blank()
 	 * @return string always empty
 	 */
-	function set_blank() {
+	public function set_blank() {
 		return '';
 	}
 
@@ -696,7 +696,7 @@ class CiviCRM_For_WordPress {
 	 * @description: authentication function used by wp_frontend()
 	 * @return bool true if authenticated, false otherwise
 	 */
-	function check_permission( $args ) {
+	public function check_permission( $args ) {
 
 		if ( $args[0] != 'civicrm' ) {
 			return false;
@@ -805,10 +805,10 @@ class CiviCRM_For_WordPress {
 
 
 	/**
-	 * @description: called when authentication fails in civicrm_wp_frontend()
+	 * @description: called when authentication fails in wp_frontend()
 	 * @return string warning message
 	 */
-	function show_permission_denied() {
+	public function show_permission_denied() {
 		return ts( 'You do not have permission to execute this url.' );
 	}
 
@@ -817,7 +817,7 @@ class CiviCRM_For_WordPress {
 	/**
 	 * @description: only called by civicrm_wp_invoke() to undo WordPress default behaviour
 	 */
-	function remove_wp_magic_quotes() {
+	public function remove_wp_magic_quotes() {
 	
 		// reassign globals
 		$_GET     = stripslashes_deep($_GET);
@@ -866,7 +866,7 @@ class CiviCRM_For_WordPress {
 	 * 
 	 * The function in global scope is called on plugin activation and also from upgrade_4_3_alpha1()
 	 */
-	function set_wp_user_capabilities() {
+	public function set_wp_user_capabilities() {
 
 		global $wp_roles;
 		if ( ! isset( $wp_roles ) ) {
@@ -946,7 +946,7 @@ class CiviCRM_For_WordPress {
 	 * @param string $default contact type
 	 * @return string $ctype contact type
 	 */
-	function get_civicrm_contact_type( $default = NULL ) {
+	public function get_civicrm_contact_type( $default = NULL ) {
 
 		// here we are creating a new contact
 		// get the contact type from the POST variables if any
@@ -979,7 +979,7 @@ class CiviCRM_For_WordPress {
 	 * @description: handles CiviCRM-defined shortcodes
 	 * @return string HTML for output
 	 */
-	function shortcode_handler( $atts ) {
+	public function shortcode_handler( $atts ) {
 
 		extract( shortcode_atts( array(
 			'component' => 'contribution',
@@ -1059,7 +1059,7 @@ class CiviCRM_For_WordPress {
 			}
 		}
 		
-		// --<
+		// call wp_frontend with $shortcode param
 		return $this->wp_frontend( true );
 
 	}
