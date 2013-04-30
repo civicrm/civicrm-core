@@ -1843,13 +1843,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif ($fieldName === 'individual_prefix') {
       $form->add('select', $name, $title,
         array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::individualPrefix(), $required
+          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'), $required
       );
     }
     elseif ($fieldName === 'individual_suffix') {
       $form->add('select', $name, $title,
         array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::individualSuffix(), $required
+          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'), $required
       );
     }
     elseif ($fieldName === 'contact_sub_type') {

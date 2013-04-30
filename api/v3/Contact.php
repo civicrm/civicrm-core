@@ -86,11 +86,11 @@ function civicrm_api3_contact_create($params) {
   }
 
   if (isset($params['suffix_id']) && !(is_numeric($params['suffix_id']))) {
-    $params['suffix_id'] = array_search($params['suffix_id'], CRM_Core_PseudoConstant::individualSuffix());
+    $params['suffix_id'] = array_search($params['suffix_id'], CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'));
   }
 
   if (isset($params['prefix_id']) && !(is_numeric($params['prefix_id']))) {
-    $params['prefix_id'] = array_search($params['prefix_id'], CRM_Core_PseudoConstant::individualPrefix());
+    $params['prefix_id'] = array_search($params['prefix_id'], CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'));
   }
 
   if (isset($params['gender_id']) && !(is_numeric($params['gender_id']))) {
