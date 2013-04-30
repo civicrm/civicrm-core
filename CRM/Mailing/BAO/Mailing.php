@@ -2744,7 +2744,6 @@ AND        m.id = %1
     $params['rowCount'] = $params['rp'];
     $params['sort']     = CRM_Utils_Array::value('sortBy', $params);
     $params['caseId']   = NULL;
-    $context            = CRM_Utils_Array::value('context', $params);
 
     // get contact mailings
     $mailings = CRM_Mailing_BAO_Mailing::getContactMailings($params);
@@ -2803,12 +2802,10 @@ AND        m.id = %1
    * @access public
    */
   static public function getContactMailingsCount(&$params) {
-    //FIX ME: need to implement getcount api for MailingContact
     $params['version'] = 3;
-    unset($params['offset']);
-    unset($params['limit']);
-    $result = civicrm_api('MailingContact', 'get', $params);
-    return count($result['values']);
+
+    $result = civicrm_api('MailingContact', 'getcount', $params);
+    return $result['values']['count'];
   }
 }
 
