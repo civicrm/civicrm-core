@@ -376,15 +376,15 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       );
 
       $row['action'] = CRM_Core_Action::formLink(self::links($componentId,
-          $componentAction,
-          $qfKey,
-          $componentContext
-        ),
-        $mask, $actions
+                         $componentAction,
+                         $qfKey,
+                         $componentContext
+                       ),
+                       $mask, $actions
       );
 
       $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+                             $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       if (CRM_Utils_Array::value('amount_level', $row)) {
@@ -428,7 +428,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array('name' => ts('Type'),
-                                                'sort'      => 'financial_type_id',
+          'sort'      => 'financial_type_id',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
@@ -497,5 +497,4 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     return $this->_query->summaryContribution($this->_context);
   }
 }
-//end of class
 
