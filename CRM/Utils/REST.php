@@ -83,7 +83,7 @@ class CRM_Utils_REST {
    * @access public
    * @static
    */
-  public function authenticate($name, $pass) {
+  public static function authenticate($name, $pass) {
 
     $result = CRM_Utils_System::authenticate($name, $pass);
 
