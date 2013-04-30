@@ -125,6 +125,14 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
             'required' => TRUE,
           ),
         ),
+        'filters' =>
+        array(
+          'scheduled_date' =>
+          array(
+            'title' => ts('Next Payment Due'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+        ),
         'grouping' => 'pledge-fields',
       ),
       'civicrm_address' =>
