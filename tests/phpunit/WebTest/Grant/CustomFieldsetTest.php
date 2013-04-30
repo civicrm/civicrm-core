@@ -109,5 +109,20 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
      )
     );
   }
-}
 
+  function testAjaxCustomGroupLoad() {
+    $this->webtestLogin();
+
+    // Enable CiviGrant module if necessary
+    $this->enableComponents("CiviGrant");
+
+    $triggerElement = array('name' => 'grant_type_id', 'type' => 'select');
+    $customSets = array(
+      array('entity' => 'Grant', 'subEntity' => 'Emergency', 'triggerElement' => $triggerElement),
+      array('entity' => 'Grant', 'subEntity' => 'Family Support', 'triggerElement' => $triggerElement)
+    );
+
+    $pageUrl = array('url' => 'grant/add', 'args' => 'reset=1&action=add&context=standalone');
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+}
