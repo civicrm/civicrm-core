@@ -746,11 +746,6 @@ LEFT JOIN  civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.ac
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $notbulkActivityClause = '';
-    if ($bulkActivityTypeID) {
-      $notbulkActivityClause = " AND {$activityTempTable}.activity_type_id <> {$bulkActivityTypeID} ";
-    }
-
     // step 2: Get target and assignee contacts for above activities
     // create temp table for target contacts
     $activityContactTempTable = "civicrm_temp_activity_contact_{$randomNum}";
@@ -768,7 +763,7 @@ SELECT     ac.activity_id,
            ac.record_type_id,
            c.sort_name
 FROM       civicrm_activity_contact ac
-INNER JOIN {$activityTempTable} ON ( ac.activity_id = {$activityTempTable}.activity_id {$notbulkActivityClause} )
+INNER JOIN {$activityTempTable} ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
 WHERE      c.is_deleted = 0
 
