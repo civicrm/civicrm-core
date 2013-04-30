@@ -43,6 +43,10 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     //URL should eventually be adapted for multisite
     $this->url = "{$this->settings->sandboxURL}/{$this->sboxPath}sites/all/modules/civicrm/extern/rest.php";
 
+    if (!property_exists($this->settings, 'siteKey') || empty($this->settings->siteKey)){
+      $this->markTestSkipped('CiviSeleniumSettings is missing siteKey');
+    }
+
     $client = CRM_Utils_HttpClient::singleton();
     $params = array(
       "q" => "civicrm/login",
@@ -75,7 +79,6 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   function testValidLoginCMSUser() {
-    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $params = array(
         "q" => "civicrm/login",
@@ -89,11 +92,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
       $this->assertAPIErrorCode($result, 0);
-    }
   }
 
   function testInvalidPasswordLogin() {
-    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $badPassword = $this->settings->adminPassword . "badpass";
       $params = array(
@@ -108,11 +109,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
       $this->assertAPIErrorCode($result, 1);
-    }
   }
 
   function testValidCallsiteKey() {
-    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $params = array(
         "entity" => "Contact",
@@ -126,11 +125,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
       $this->assertAPIErrorCode($result, 0);
-    }
   }
 
   function testValidCallPHPSessionID() {
-    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $params = array(
         "entity" => "Contact",
@@ -144,12 +141,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
       $this->assertAPIErrorCode($result, 0);
-
-    }
   }
 
   function testInvalidAPIKey() {
-    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $params = array(
         "entity" => "Contact",
@@ -163,11 +157,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
       $this->assertAPIErrorCode($result, 1);
-    }
   }
 
   function testNotCMSUser() {
-    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       //Create contact with api_key
       $test_key = "testing1234";
@@ -191,7 +183,6 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $result = json_decode($data, TRUE);
       $this->assertNotNull($result);
       $this->assertAPIErrorCode($result, 1);
-    }
   }
 
 }
