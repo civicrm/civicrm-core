@@ -56,7 +56,7 @@
 {literal}
 <script type="text/javascript">
   var allowMultiClient = Boolean({/literal}{if !empty($multiClient)}1{else}0{/if}{literal});
-  var prePopulateData = {/literal}'{$prePopulateData}'{literal};
+  var prePopulateData = {/literal}{$prePopulateData}{literal};
 
   var existingTokens = '';
   cj( function( ) {
@@ -109,10 +109,6 @@
       {literal} var prePopulateData = cj.ajax({ url: contactUrl + "&cid={/literal}{$selectedContacts}{literal}", async: false }).responseText;{/literal}
     {/if}
     {literal}
-
-    if (prePopulateData) {
-      eval('prePopulateData = ' + prePopulateData);
-    }
 
     cj('#' + prefix + 'contact_' + blockNo).tokenInput( contactUrl, { prePopulate:prePopulateData, theme: 'facebook', hintText: hintText });
     cj('ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px');
