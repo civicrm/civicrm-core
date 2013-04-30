@@ -90,7 +90,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
     foreach ($fields as $daoName => $daoFields) {
       foreach ($daoFields as $field) {
-        $message = "DAO name: '{$daoName}', field: '{$fieldName}'";
+        $message = "DAO name: '{$daoName}', field: '{$field['fieldName']}'";
 
         // Ensure sample value is contained in the returned optionValues.
         $optionValues = CRM_Core_PseudoConstant::get($daoName, $field['fieldName']);
