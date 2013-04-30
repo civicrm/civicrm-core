@@ -192,36 +192,68 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       if ($this->_contactID) {
         //check whether contact has a current membership so we can alert user that they may want to do a renewal instead
-        $hasMembership = CRM_Member_BAO_Membership::getContactMembership($this->_contactID, NULL, 0);
-        if (!empty($hasMembership)) {
-          $hasMembership['membership_type'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-            $hasMembership['membership_type_id'],
-            'name', 'id'
-          );
-          $hasMembership['membership_status'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
-            $hasMembership['status_id'],
-            'label', 'id'
-          );
-          $membershipTab = CRM_Utils_System::url('civicrm/contact/view',
-            "reset=1&force=1&cid={$this->_contactID}&selectedChild=member"
-          );
-          if ($this->_mode) {
-            $renewUrl = CRM_Utils_System::url('civicrm/contact/view/membership',
-              "reset=1&action=renew&cid={$this->_contactID}&id={$hasMembership['id']}&context=membership&selectedChild=member&mode=live"
-            );
-          }
-          else {
-            $renewUrl = CRM_Utils_System::url('civicrm/contact/view/membership',
-              "reset=1&action=renew&cid={$this->_contactID}&id={$hasMembership['id']}&context=membership&selectedChild=member"
-            );
-          }
-          if (CRM_Utils_Array::value('membership_end_date', $hasMembership)) {
-            CRM_Core_Session::setStatus(ts('This contact has an existing %1 membership record with %2 status and end date of %3. <a href="%4">Click here if you want to renew this membership</a> (rather than creating a new membership record). <a href="%5">Click here to view all existing and / or expired memberships for this contact.</a>', array(1 => $hasMembership['membership_type'], 2 => $hasMembership['membership_status'], 3 => CRM_Utils_Date::customformat($hasMembership['membership_end_date']), 4 => $renewUrl, 5 => $membershipTab)), '', 'alert');
-          }
-          else {
-            CRM_Core_Session::setStatus(ts('This contact has an existing %1 membership record with %2 status. <a href="%3">Click here if you want to renew this membership</a> (rather than creating a new membership record). <a href="%4">Click here to view all existing and / or expired memberships for this contact.</a>', array(1 => $hasMembership['membership_type'], 2 => $hasMembership['membership_status'], 3 => $renewUrl, 4 => $membershipTab)), '', 'alert');
-          }
+        $contactMemberships = array();
+        $memParams = array('contact_id' => $this->_contactID);
+        CRM_Member_BAO_Membership::getValues($memParams, $contactMemberships, TRUE);
+        $cMemTypes = array();
+        foreach ($contactMemberships as $mem) {
+          $cMemTypes[] = $mem['membership_type_id'];
         }
+        if (count($cMemTypes) > 0) {
+          $memberorgs = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($cMemTypes);
+          $mems_by_org = array();
+          foreach ($contactMemberships as $memid => $mem) {
+            $mem['member_of_contact_id'] = CRM_Utils_Array::value($mem['membership_type_id'], $memberorgs);
+            if (CRM_Utils_Array::value('membership_end_date', $mem)) {
+              $mem['membership_end_date'] = CRM_Utils_Date::customformat($mem['membership_end_date']);
+            }
+            $mem['membership_type'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
+              $mem['membership_type_id'],
+              'name', 'id'
+            );
+            $mem['membership_status'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
+              $mem['status_id'],
+              'label', 'id'
+            );
+            if ($this->_mode) {
+              $mem['renewUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
+                "reset=1&action=renew&cid={$this->_contactID}&id={$mem['id']}&context=membership&selectedChild=member&mode=live"
+              );
+            }
+            else {
+              $mem['renewUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
+                "reset=1&action=renew&cid={$this->_contactID}&id={$mem['id']}&context=membership&selectedChild=member"
+              );
+            }
+            $mem['membershipTab'] = CRM_Utils_System::url('civicrm/contact/view',
+              "reset=1&force=1&cid={$this->_contactID}&selectedChild=member"
+            );
+            $mems_by_org[$mem['member_of_contact_id']] = $mem;
+          }
+          $resources = CRM_Core_Resources::singleton();
+          $resources->addSetting(array('existingMems' => array('memberorgs' => $mems_by_org)));
+          $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/Membership.js');
+        }
+      }
+      else { 
+        $resources = CRM_Core_Resources::singleton();
+        $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/MembershipStandalone.js');
+        $statuses = array();
+        $membershipStatus = new CRM_Member_DAO_MembershipStatus();
+        $membershipStatus->is_current_member = 1;
+        $membershipStatus->find();
+        $membershipStatus->selectAdd();
+        $membershipStatus->selectAdd('id');
+        while ($membershipStatus->fetch()) {
+          $statuses[$membershipStatus->id] = $membershipStatus->label;
+        }
+        $membershipStatus->free();
+        $passthru = array(
+          'typeorgs' => CRM_Member_BAO_MembershipType::getMembershipTypeOrganization(),
+          'memtypes' => CRM_Member_BAO_MembershipType::getMembershipTypes(false),
+          'statuses' => $statuses,
+        );
+        $resources->addSetting(array('existingMems' => $passthru));
       }
     }
 
