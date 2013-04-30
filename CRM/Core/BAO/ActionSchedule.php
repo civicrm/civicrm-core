@@ -844,7 +844,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $dateField = str_replace('membership_', 'e.', $actionSchedule->start_action_date);
         $notINClause = self::permissionedRelationships($contactField);
         
-        $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "is_current_member = 1 OR name = 'Expired'", 'id');
+        $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
         $mStatus = implode (',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
 
