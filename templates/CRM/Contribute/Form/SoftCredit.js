@@ -12,6 +12,13 @@ cj(function($) {
     return false;
   }
 
+  $('#addMoreSoftCredit').click(function(){
+    $('.crm-soft-credit-block tr.hiddenElement :first').show().removeClass('hiddenElement');
+    if ( $('.crm-soft-credit-block tr.hiddenElement').length < 1 ) {
+      $('#addMoreSoftCredit').hide();
+    }
+    return false;
+  });
 });
 /*
  var url = "{/literal}{$dataUrl}{literal}";
