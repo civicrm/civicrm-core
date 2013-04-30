@@ -275,7 +275,7 @@ class CiviCRM_For_WordPress {
 	 * @description: invoke CiviCRM in a WordPress context
 	 * Callback function from add_menu_page() 
 	 * Callback from WordPress 'init' and 'the_content' hooks
-	 * Also used by add_shortcode_includes() and _civicrm_update_user()
+	 * Also called by add_shortcode_includes() and _civicrm_update_user()
 	 */
 	public function invoke() {
 
@@ -840,7 +840,8 @@ class CiviCRM_For_WordPress {
 
 
 	/**
-	 * @description: only called by wp_invoke() to undo WordPress default behaviour
+	 * @description: only called by invoke() to undo WordPress default behaviour
+	 * CMW: Should probably be a private method
 	 */
 	public function remove_wp_magic_quotes() {
 	
@@ -889,7 +890,8 @@ class CiviCRM_For_WordPress {
 	 * @description: function to create 'anonymous_user' role, if 'anonymous_user' role is not 
 	 * in the WordPress installation and assign minimum capabilities for all WordPress roles
 	 * 
-	 * The function in global scope is called on plugin activation and also from upgrade_4_3_alpha1()
+	 * The legacy global scope function civicrm_wp_set_capabilities() is called from 
+	 * upgrade_4_3_alpha1()
 	 */
 	public function set_wp_user_capabilities() {
 
@@ -938,8 +940,8 @@ class CiviCRM_For_WordPress {
 	 * @description: add CiviCRM access capabilities to WordPress roles
 	 * this is a callback for the 'init' hook in register_hooks()
 	 *
-	 * The global scope function is called by postProcess() in 
-	 * civicrm/CRM/ACL/Form/WordPress/Permissions.php
+	 * The legacy global scope function wp_civicrm_capability() is called by 
+	 * postProcess() in civicrm/CRM/ACL/Form/WordPress/Permissions.php
 	 */
 	public function set_access_capabilities() {
 		
@@ -1134,7 +1136,8 @@ class CiviCRM_For_WordPress {
 			'civicrm.js',
 			__FILE__
 		);
-
+		
+		// we now benefit from browser caching, concatenation, gzip compression, etc
 		wp_enqueue_script( 
 			'civicrm_form_button_js', // handle
 			$src, // src
@@ -1322,7 +1325,10 @@ global $civicrm_for_wordpress;
 // eventually, we'll stash it in an instance in the CiviCRM_For_WordPress class
 $civicrm_for_wordpress = new CiviCRM_For_WordPress;
 
-// tell WordPress to call plugin activation method
+// tell WordPress to call plugin activation method, although it's still directed
+// at the legacy callback, in case there are situations where the function is
+// called from elsewhere. Should be:
+// register_activation_hook( $civicrm_for_wordpress, 'civicrm_activate' );
 register_activation_hook( __FILE__, 'civicrm_activate' );
 
 
