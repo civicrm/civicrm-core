@@ -772,13 +772,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       $logDAO->entity_table = 'civicrm_contact';
       $logDAO->entity_id = $id;
       $logDAO->delete();
-      
+
       // delete contact participants CRM-12155
       CRM_Event_BAO_Participant::deleteContactParticipant($id);
 
       // delete contact contributions CRM-12155
       CRM_Contribute_BAO_Contribution::deleteContactContribution($id);
-      
+
       // do activity cleanup, CRM-5604
       CRM_Activity_BAO_Activity::cleanupActivity($id);
 
@@ -1073,8 +1073,7 @@ WHERE id={$id}; ";
    * combine all the importable fields from the lower levels object
    *
    * The ordering is important, since currently we do not have a weight
-   * scheme. Adding weight is super important and should be done in the
-   * next week or so, before this can be called complete.
+   * scheme. Adding weight is super important
    *
    * @param int     $contactType     contact Type
    * @param boolean $status          status is used to manipulate first title
@@ -1141,12 +1140,8 @@ WHERE id={$id}; ";
 
       $fields = array_merge($fields, $locationFields);
 
-      $fields = array_merge($fields,
-        CRM_Contact_DAO_Contact::import()
-      );
-      $fields = array_merge($fields,
-        CRM_Core_DAO_Note::import()
-      );
+      $fields = array_merge($fields, CRM_Contact_DAO_Contact::import());
+      $fields = array_merge($fields, CRM_Core_DAO_Note::import());
 
       //website fields
       $fields = array_merge($fields, CRM_Core_DAO_Website::import());
@@ -1268,8 +1263,12 @@ WHERE id={$id}; ";
         $fields = CRM_Contact_DAO_Contact::export();
 
         // the fields are meant for contact types
-        if (in_array($contactType, array(
-          'Individual', 'Household', 'Organization', 'All'))) {
+        if (
+          in_array(
+            $contactType,
+            array('Individual', 'Household', 'Organization', 'All')
+          )
+        ) {
           $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
         }
         // add current employer for individuals
@@ -2982,7 +2981,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     }
   }
 
-  
+
   /**
    * Delete a contact-related object that has an 'is_primary' field
    * Ensures that is_primary gets assigned to another object if available
