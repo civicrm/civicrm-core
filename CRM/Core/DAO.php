@@ -55,7 +55,10 @@ class CRM_Core_DAO extends DB_DataObject {
   // special value for mail bulk inserts to avoid
   // potential duplication, assuming a smaller number reduces number of queries
   // by some factor, so some tradeoff. CRM-8678
-  BULK_MAIL_INSERT_COUNT = 10;
+  BULK_MAIL_INSERT_COUNT = 10,
+  QUERY_FORMAT_WILDCARD = 1,
+  QUERY_FORMAT_NO_QUOTES = 2;
+
   /*
    * Define entities that shouldn't be created or deleted when creating/ deleting
    *  test objects - this prevents world regions, countries etc from being added / deleted
@@ -965,10 +968,17 @@ FROM   civicrm_domain
             $item[1] == 'Memo' ||
             $item[1] == 'Link'
           ) {
-            if (isset($item[2]) &&
-              $item[2]
-            ) {
-              $item[0] = "'%{$item[0]}%'";
+            // Support class constants stipulating wildcard characters and/or
+            // non-quoting of strings. Also support legacy code which may be
+            // passing in TRUE or 1 for $item[2], which used to indicate the
+            // use of wildcard characters.
+            if (!empty($item[2])) {
+              if ($item[2] & CRM_Core_DAO::QUERY_FORMAT_WILDCARD || $item[2] === TRUE) {
+                $item[0] = "'%{$item[0]}%'";
+              }
+              elseif (!($item[2] & CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)) {
+                $item[0] = "'{$item[0]}'";
+              }
             }
             else {
               $item[0] = "'{$item[0]}'";

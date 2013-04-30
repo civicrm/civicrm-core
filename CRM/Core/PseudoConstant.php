@@ -50,6 +50,13 @@
 class CRM_Core_PseudoConstant {
 
   /**
+   * static cache for pseudoconstant arrays
+   * @var array
+   * @static
+   */
+  private static $cache;
+
+  /**
    * location type
    * @var array
    * @static
@@ -398,6 +405,81 @@ class CRM_Core_PseudoConstant {
    * @static
    */
   private static $accountOptionValues;
+
+  /**
+   * Get options for a given field.
+   * @param String $daoName
+   * @param String $fieldName
+   * @param Array $params
+   *
+   * @return Array on success, FALSE on error.
+   * 
+   * @static
+   */
+  public static function get($daoName, $fieldName, $params = array()) {
+    $dao = new $daoName;
+    $fields = $dao->fields();
+    $fieldSpec = $fields[$fieldName];
+
+    // If the field is an enum, use explode the enum definition and return the array.
+    if (array_key_exists('enumValues', $fieldSpec)) {
+      // use of a space after the comma is inconsistent in xml
+      $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
+      return explode(',', $enumStr);
+    }
+    elseif (!empty($fieldSpec['pseudoconstant'])) {
+      $pseudoconstant = $fieldSpec['pseudoconstant'];
+      if(!empty($pseudoconstant['optionGroupName'])) {
+        // Translate $params array into function arguments;
+        // populate default function params if not supplied in the array.
+        $ret = CRM_Core_OptionGroup::values(
+          $pseudoconstant['optionGroupName'],
+          CRM_Utils_Array::value('flip', $params, FALSE),
+          CRM_Utils_Array::value('grouping', $params, FALSE),
+          CRM_Utils_Array::value('localize', $params, FALSE),
+          CRM_Utils_Array::value('condition', $params, NULL),
+          CRM_Utils_Array::value('labelColumnName', $params, 'label'),
+          CRM_Utils_Array::value('onlyActive', $params, TRUE),
+          CRM_Utils_Array::value('fresh', $params, FALSE)
+        );
+        return $ret;
+      }
+      if (!empty($pseudoconstant['table'])) {
+        // Sort params so the serialized string will be consistent.
+        ksort($params);
+        $cacheKey = "{$daoName}{$fieldName}" . serialize($params);
+
+        if (isset(self::$cache[$cacheKey])) {
+          return self::$cache[$cacheKey];
+        }
+
+        $query = "
+          SELECT
+            %1 AS id, %2 AS label
+          FROM
+            %3
+        ";
+        if (!empty($pseudoconstant['condition'])) {
+          $query .= " WHERE {$pseudoconstant['condition']}";
+        }
+        $query .= " ORDER BY %2";
+        $queryParams = array(
+           1 => array($pseudoconstant['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+           2 => array($pseudoconstant['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+           3 => array($pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+        );
+
+        self::$cache[$cacheKey] = array();
+        $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+        while ($dao->fetch()) {
+          self::$cache[$cacheKey][$dao->id] = $dao->label;
+        }
+        return self::$cache[$cacheKey];
+      }
+    }
+    // If we're still here, it's an error. Return FALSE.
+    return FALSE;
+  }
 
   /**
    * populate the object from the database. generic populate
