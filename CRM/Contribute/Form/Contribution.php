@@ -150,6 +150,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @access public
    */
   public function preProcess() {
+
+    $resources = CRM_Core_Resources::singleton();
+    $resources->addScriptFile('civicrm', 'templates/CRM/Contribute/Form/SoftCredit.js');
+
     //check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
