@@ -133,7 +133,7 @@ AND     a.postal_code    = %3
 
     // format phone params
     if (isset($person['phone'])) {
-      $phoneTypes = CRM_Core_PseudoConstant::phoneType();
+      $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
       foreach ($person['phone'] as $key => $value) {
         $person['phone'][$key]['phone'] = $person['phone'][$key]['phone_number'];
         unset($person['phone'][$key]['phone_number']);

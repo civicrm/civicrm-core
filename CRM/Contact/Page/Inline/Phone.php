@@ -53,7 +53,7 @@ class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
     $locationTypes = CRM_Core_PseudoConstant::locationDisplayName();
-    $phoneTypes = CRM_Core_PseudoConstant::phoneType();
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
 
     $entityBlock = array('contact_id' => $contactId);
     $phones = CRM_Core_BAO_Phone::getValues($entityBlock);

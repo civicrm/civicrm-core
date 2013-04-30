@@ -288,13 +288,6 @@ class CRM_Core_PseudoConstant {
   private static $mappingType;
 
   /**
-   * Phone Types
-   * @var array
-   * @static
-   */
-  private static $phoneType;
-
-  /**
    * Visibility
    * @var array
    * @static
@@ -713,26 +706,6 @@ class CRM_Core_PseudoConstant {
       self::populate(self::$component, 'CRM_Core_DAO_Component', TRUE, 'name');
     }
     return self::$component;
-  }
-
-  /**
-   * Get all phone type
-   * The static array phoneType is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All phone type - default is to get
-   * only active ones.
-   *
-   * @return array - array reference of all phone types.
-   *
-   */
-  public static function &phoneType() {
-    if (!self::$phoneType) {
-      self::$phoneType = CRM_Core_OptionGroup::values('phone_type');
-    }
-    return self::$phoneType;
   }
 
   /**

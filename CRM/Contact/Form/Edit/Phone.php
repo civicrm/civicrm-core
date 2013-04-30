@@ -61,7 +61,7 @@ class CRM_Contact_Form_Edit_Phone {
     $form->applyFilter('__ALL__', 'trim');
 
     //phone type select
-    $form->addElement('select', "phone[$blockId][phone_type_id]", ts('Phone'), CRM_Core_PseudoConstant::phoneType());
+    $form->addElement('select', "phone[$blockId][phone_type_id]", ts('Phone'), CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'));
 
     //main phone number with crm_phone class
     $form->addElement('text', "phone[$blockId][phone]", ts('Phone'), array_merge(CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'), array('class' => 'crm_phone twelve')));

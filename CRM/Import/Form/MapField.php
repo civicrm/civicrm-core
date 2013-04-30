@@ -353,7 +353,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
     $sel1 = $this->_mapperFields;
     $sel2[''] = NULL;
 
-    $phoneTypes   = CRM_Core_PseudoConstant::phoneType();
+    $phoneTypes   = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders  = CRM_Core_PseudoConstant::IMProvider();
     $websiteTypes = CRM_Core_PseudoConstant::websiteType();
 
@@ -761,7 +761,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
     $mapperKeys     = $this->controller->exportValue($this->_name, 'mapper');
     $mapperKeysMain = array();
 
-    $phoneTypes    = CRM_Core_PseudoConstant::phoneType();
+    $phoneTypes    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders   = CRM_Core_PseudoConstant::IMProvider();
     $websiteTypes  = CRM_Core_PseudoConstant::websiteType();
     $locationTypes = CRM_Core_PseudoConstant::locationType();
