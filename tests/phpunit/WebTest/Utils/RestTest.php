@@ -46,7 +46,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $client = CRM_Utils_HttpClient::singleton();
     $params = array(
       "q" => "civicrm/login",
-      "key" => $this->settings->sitekey,
+      "key" => $this->settings->siteKey,
       "json" => "1",
       "name" => $this->settings->adminUsername,
       "pass" => $this->settings->adminPassword
@@ -75,11 +75,11 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   function testValidLoginCMSUser() {
-    if (property_exists($this->settings, 'sitekey') && !empty($this->settings->sitekey)){
+    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $params = array(
         "q" => "civicrm/login",
-        "key" => $this->settings->sitekey,
+        "key" => $this->settings->siteKey,
         "json" => "1",
         "name" => $this->settings->adminUsername,
         "pass" => $this->settings->adminPassword
@@ -93,12 +93,12 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   function testInvalidPasswordLogin() {
-    if (property_exists($this->settings, 'sitekey') && !empty($this->settings->sitekey)){
+    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $badPassword = $this->settings->adminPassword . "badpass";
       $params = array(
         "q" => "civicrm/login",
-        "key" => $this->settings->sitekey,
+        "key" => $this->settings->siteKey,
         "json" => "1",
         "name" => $this->settings->adminUsername,
         "pass" => $badPassword 
@@ -111,13 +111,13 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     }
   }
 
-  function testValidCallSiteKey() {
-    if (property_exists($this->settings, 'sitekey') && !empty($this->settings->sitekey)){
+  function testValidCallsiteKey() {
+    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $params = array(
         "entity" => "Contact",
         "action" => "get",
-        "key" => $this->settings->sitekey,
+        "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $this->api_key
       );
@@ -130,7 +130,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   function testValidCallPHPSessionID() {
-    if (property_exists($this->settings, 'sitekey') && !empty($this->settings->sitekey)){
+    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $params = array(
         "entity" => "Contact",
@@ -149,12 +149,12 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   function testInvalidAPIKey() {
-    if (property_exists($this->settings, 'sitekey') && !empty($this->settings->sitekey)){
+    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       $params = array(
         "entity" => "Contact",
         "action" => "get",
-        "key" => $this->settings->sitekey,
+        "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => "zzzzzzzzzzzzzzaaaaaaaaaaaaaaaaabadasdasd"
       );
@@ -167,7 +167,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   function testNotCMSUser() {
-    if (property_exists($this->settings, 'sitekey') && !empty($this->settings->sitekey)){
+    if (property_exists($this->settings, 'siteKey') && !empty($this->settings->siteKey)){
       $client = CRM_Utils_HttpClient::singleton();
       //Create contact with api_key
       $test_key = "testing1234";
@@ -182,7 +182,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $params = array(
         "entity" => "Contact",
         "action" => "get",
-        "key" => $this->settings->sitekey,
+        "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $test_key
       );

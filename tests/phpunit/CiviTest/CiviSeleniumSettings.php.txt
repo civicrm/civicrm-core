@@ -9,6 +9,7 @@ class CiviSeleniumSettings {
   var $sandboxURL = 'http://devel.drupal.tests.dev.civicrm.org';
 
   var $sandboxPATH = '';
+
   
   var $username = 'demo';
 
@@ -19,6 +20,11 @@ class CiviSeleniumSettings {
   var $adminPassword = 'PASSWORD';
 
   var $UFemail = 'noreply@civicrm.org';
+
+  /**
+   * @var string site API key
+   */
+  var $siteKey = NULL;
 
   /**
    * @var int seconds
