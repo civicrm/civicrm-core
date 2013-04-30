@@ -48,28 +48,15 @@ class CRM_Contribute_Form_SoftCredit {
    */
   static function buildQuickForm(&$form) {
     $prefix = 'soft_credit_';
-    $form->_softCredit['item_count'] = 10;
+    $form->_softCredit['item_count'] = 5;
     for ($rowNumber = 1; $rowNumber <= $form->_softCredit['item_count']; $rowNumber++) {
       CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, $prefix);
-      $form->add('text', "{$prefix}contact[{$rowNumber}][amount]");
+      $form->addMoney("{$prefix}amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, TRUE,
+        "{$prefix}currency[{$rowNumber}]", NULL, TRUE);
     }
-    
-    // If we have a contact for this contribution, pass cid= to the dataUrl to exclude current contact from autocomplete results
-    if ($form->_contactID) {
-      $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-        "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&reset=1&context=softcredit&cid={$form->_contactID}",
-        FALSE, NULL, FALSE
-      );
-    } 
-    else {
-      $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-        'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&reset=1&context=softcredit',
-        FALSE, NULL, FALSE
-      );
-    }
-    $form->assign('dataUrl', $dataUrl);
 
-    $form->addElement('text', 'soft_credit_to', ts('Soft Credit To'));
+    $form->assign('rowCount', $form->_softCredit['item_count']);
+
     // Tell tpl to hide Soft Credit field if contribution is linked directly to a PCP Page
     if (CRM_Utils_Array::value('pcp_made_through_id', $form->_values)) {
       $form->assign('pcpLinked', 1);
