@@ -215,6 +215,17 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       1, // is_error
     );
 
+    // q=civicrm/entity/action: valid apiKey, invalid entity+action
+    $cases[] = array(
+      array( // query
+        "q" => "civicrm/ping",
+        "key" => $this->settings->siteKey,
+        "json" => "1",
+        "api_key" => $this->settings->adminApiKey,
+      ),
+      0, // is_error
+    );
+
     return $cases;
   }
 
