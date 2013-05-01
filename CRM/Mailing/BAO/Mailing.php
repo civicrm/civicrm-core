@@ -2766,8 +2766,8 @@ AND        m.id = %1
     foreach ($mailings as $mailingId => $values) {
       $contactMailings[$mailingId]['subject'] = $values['subject'];
       $contactMailings[$mailingId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
-      $contactMailings[$mailingId]['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report',
-        "mid={$values['mailing_id']}&reset=1&cid={$values['creator_id']}&context=mailing");
+      $contactMailings[$mailingId]['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report/event',
+        "mid={$values['mailing_id']}&reset=1&cid={$values['creator_id']}&event=delivered&context=mailing");
       $contactMailings[$mailingId]['mailing_creator'] = CRM_Utils_System::href(
           $values['creator_name'],
           'civicrm/contact/view',
