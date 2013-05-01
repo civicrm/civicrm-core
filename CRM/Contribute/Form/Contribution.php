@@ -1019,6 +1019,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // get the submitted form values.
     $submittedValues = $this->controller->exportValues($this->_name);
+
     if (CRM_Utils_Array::value('price_set_id', $submittedValues) && $this->_action & CRM_Core_Action::UPDATE ) {
       $line  = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
       $lineID = key($line);
@@ -1101,9 +1102,28 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
-    if (CRM_Utils_Array::value('soft_credit_to', $submittedValues)) {
-      $submittedValues['soft_credit_to'] = $submittedValues['soft_contact_id'];
+    if (CRM_Utils_Array::value('pcp_made_through_id', $submittedValues)) {
+        
     }
+    else {
+        //build soft credit params
+      if (!empty($submittedValues['soft_credit_contact_select_id']))
+        $softParams = array();
+        foreach( $submittedValues['soft_credit_contact_select_id'] as $key => $val) {
+          if ($val && $submittedValues['soft_credit_amount'][$key]) {
+            $softParams[$key]['contact_id'] = $val;  
+            $softParams[$key]['amount'] = $submittedValues['soft_credit_amount'][$key];
+            $softCredit = TRUE;
+          }
+        }
+    }
+    if (!empty($softParams)) {
+      $params['soft_credit'] = $softParams;
+    }
+
+    /* if (CRM_Utils_Array::value('soft_credit_to', $submittedValues)) {
+      $submittedValues['soft_credit_to'] = $submittedValues['soft_contact_id'];
+      }*/
 
     // set the contact, when contact is selected
     if (CRM_Utils_Array::value('contact_select_id', $submittedValues)) {
@@ -1135,19 +1155,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'cancel_reason',
         'source',
         'check_number',
-        'soft_credit_to',
+        /*'soft_credit_to',
         'pcp_made_through_id',
         'pcp_display_in_roll',
         'pcp_roll_nickname',
-        'pcp_personal_note',
+        'pcp_personal_note',*/
       );
       foreach ($fields as $f) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
       }
-
-      if ($softID = CRM_Utils_Array::value('softID', $this->_values)) {
-        $params['softID'] = $softID;
+      if (!empty($softParams)) {
+          $params['soft_credit'] = $softParams;
       }
+      /*if ($softID = CRM_Utils_Array::value('softID', $this->_values)) {
+        $params['softID'] = $softID;
+        }*/
       //if priceset is used, no need to cleanup money
       //CRM-5740
       if ($priceSetId) {
@@ -1175,7 +1197,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
       }
       else {
-        $params['cancel_date'] = $params['cancel_reason'] = 'null';
+          $params['cancel_date'] = $params['cancel_reason'] = 'null';
       }
 
       // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
