@@ -39,59 +39,76 @@
 </div>
 {literal}
 <script type="text/javascript">
-  var oTable;
+  cj(function($) {
+    var oTable;
 
-  cj(function ( ) {
-    buildMailingContact( );
-  });
+    buildMailingContact();
 
-function buildMailingContact() {
+    function buildMailingContact() {
+      var columns = '';
+      var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/contactmailing" h=0 q="contact_id=$contactId"}'{literal};
 
-  var columns = '';
-  var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/contactmailing" h=0 q="contact_id=$contactId"}'{literal};
+      var ZeroRecordText = {/literal}'{ts escape="js"}No mailings found{/ts}.'{literal};
 
-  var ZeroRecordText = {/literal}'{ts escape="js"}No mailings found{/ts}.'{literal};
-
-  oTable = cj('#contact-mailing-selector').dataTable({
-    "bFilter"    : false,
-    "bAutoWidth" : false,
-    "aaSorting"  : [],
-    "aoColumns"  : [
-      {sClass:'crm-mailing-contact-subject'},
-      {sClass:'crm-mailing-contact_created'},
-      {sClass: 'crm-contact-activity_contact'},
-      {sClass: 'crm-mailing-contact-date'},
-      {sClass:'crm-mailing-contact-links', bSortable:false}
-    ],
-    "bProcessing": true,
-    "sPaginationType": "full_numbers",
-    "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
-    "bServerSide": true,
-    "bJQueryUI": true,
-    "sAjaxSource": sourceUrl,
-    "iDisplayLength": 25,
-    "oLanguage": {
-      "sZeroRecords":  ZeroRecordText,
-      "sProcessing":   {/literal}"{ts escape='js'}Processing...{/ts}"{literal},
-      "sLengthMenu":   {/literal}"{ts escape='js'}Show _MENU_ entries{/ts}"{literal},
-      "sInfo":         {/literal}"{ts escape='js'}Showing _START_ to _END_ of _TOTAL_ entries{/ts}"{literal},
-      "sInfoEmpty":    {/literal}"{ts escape='js'}Showing 0 to 0 of 0 entries{/ts}"{literal},
-      "sInfoFiltered": {/literal}"{ts escape='js'}(filtered from _MAX_ total entries){/ts}"{literal},
-      "sSearch":       {/literal}"{ts escape='js'}Search:{/ts}"{literal},
-      "oPaginate": {
-        "sFirst":    {/literal}"{ts escape='js'}First{/ts}"{literal},
-        "sPrevious": {/literal}"{ts escape='js'}Previous{/ts}"{literal},
-        "sNext":     {/literal}"{ts escape='js'}Next{/ts}"{literal},
-        "sLast":     {/literal}"{ts escape='js'}Last{/ts}"{literal}
-      }
+      oTable = $('#contact-mailing-selector').dataTable({
+        "bFilter": false,
+        "bAutoWidth": false,
+        "aaSorting": [],
+        "aoColumns": [
+          {sClass: 'crm-mailing-contact-subject'},
+          {sClass: 'crm-mailing-contact_created'},
+          {sClass: 'crm-contact-activity_contact'},
+          {sClass: 'crm-mailing-contact-date'},
+          {sClass: 'crm-mailing-contact-links', bSortable: false}
+        ],
+        "bProcessing": true,
+        "sPaginationType": "full_numbers",
+        "sDom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+        "bServerSide": true,
+        "bJQueryUI": true,
+        "sAjaxSource": sourceUrl,
+        "iDisplayLength": 25,
+        "oLanguage": {
+          "sZeroRecords": ZeroRecordText,
+          "sProcessing": {/literal}"{ts escape='js'}Processing...{/ts}"{literal},
+          "sLengthMenu": {/literal}"{ts escape='js'}Show _MENU_ entries{/ts}"{literal},
+          "sInfo": {/literal}"{ts escape='js'}Showing _START_ to _END_ of _TOTAL_ entries{/ts}"{literal},
+          "sInfoEmpty": {/literal}"{ts escape='js'}Showing 0 to 0 of 0 entries{/ts}"{literal},
+          "sInfoFiltered": {/literal}"{ts escape='js'}(filtered from _MAX_ total entries){/ts}"{literal},
+          "sSearch": {/literal}"{ts escape='js'}Search:{/ts}"{literal},
+          "oPaginate": {
+            "sFirst": {/literal}"{ts escape='js'}First{/ts}"{literal},
+            "sPrevious": {/literal}"{ts escape='js'}Previous{/ts}"{literal},
+            "sNext": {/literal}"{ts escape='js'}Next{/ts}"{literal},
+            "sLast": {/literal}"{ts escape='js'}Last{/ts}"{literal}
+          }
+        },
+        "fnDrawCallback": function () {
+          addMailingViewDialog()
+        }
+      });
     }
-  });
-}
 
-function setSelectorClass( ) {
-  cj('#contact-mailing-selector' + ' td:last-child').each( function( ) {
-    cj(this).parent().addClass(cj(this).text() );
+    function addMailingViewDialog() {
+      $('a.crm-mailing-view').click(function() {
+        var o = $('<div class="crm-container crm-mailing-view-dialog"></div>');
+        o.block({theme: true});
+        o.load($(this).attr('href'), function() {
+          o.unblock();
+        });
+
+        CRM.confirm( ''
+          ,{
+            title: ts('Change Activity Status'),
+            message: o,
+            width: 'auto'
+          }
+
+        );
+        return false;
+      });
+    }
+
   });
-}
 </script>
 {/literal}
