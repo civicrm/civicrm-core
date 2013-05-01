@@ -43,7 +43,17 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->quickCleanup(
+    $this->_apiversion = 3;
+    $this->_entity     = 'mailing';
+    $this->_contact_params     = array(
+      'first_name' => 'abc1',
+      'contact_type' => 'Individual',
+      'last_name' => 'xyz1',
+      'version' => $this->_apiversion,
+    );
+    $this->_contact = civicrm_api("contact", "create", $this->_contact_params);
+    
+    /*$this->quickCleanup(
       array(
         'civicrm_mailing',
         'civicrm_job',
@@ -51,19 +61,153 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         'civicrm_mailing_event_delivered',
         'civicrm_mailing_event_bounced',
       )
-    );
+    );*/
   }
 
   function tearDown() {
     parent::tearDown();
+    civicrm_api("contact", "delete", $this->_contact_id);
+    
   }
-
-  function testMailingContactDelivered( ) {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
-        dirname(__FILE__) . '/dataset/mailing_contact.xml'
-      )
+  
+  /*
+   * Test that the api responds correctly to null params
+   */
+  
+    public function testMailingNullParams() {
+        $result = civicrm_api('MailingContact', 'get', null);
+        $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
+    }
+  
+  /*
+   * Test that the api will return the proper error when you do not
+   * supply the contact_id
+   */
+  
+  public function testMailingNoContactID() {
+    $params = array(
+      'something' => 'This is not a real field',
+      'version' => $this->_apiversion,
     );
+    
+    $result = civicrm_api('MailingContact', 'get', $params);
+    $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
   }
+  
+  /*
+   * Test that invalid contact_id return with proper error messages
+   */
+    public function testMailingContactInvalidContactID() {
+        $params = array(
+            'contact_id' => 'This is not a number',
+            'version' => $this->_apiversion,
+        );
+
+        $result = civicrm_api('MailingContact', 'get', $params);
+        $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
+   }
+   
+   /*
+    * Test that invalid types are returned with appropriate errors
+    */
+    public function testMailingContactInvalidType() {
+        $params = array(
+            'contact_id' => 23,
+            'type' => 'invalid',
+            'version' => $this->_apiversion,
+        );
+
+        $result = civicrm_api('MailingContact', 'get', $params);
+        $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
+    }
+    
+    
+    /*
+    * Test that the API returns properly when there are no mailings
+    * for a the given contact
+    */
+    public function testMailingContactNoMailings() {
+        $params = array(
+            'contact_id' => $this->_contact['id'],
+            'version' => $this->_apiversion,
+        );
+
+        $result = civicrm_api('MailingContact', 'get', $params);
+        
+        $this->assertEquals($result['is_error'], 0, "In line " . __LINE__);
+        $this->assertEquals($result['count'], 0, "In line " . __LINE__);
+        $this->assertTrue(empty($result['values']), "In line " . __LINE__);
+    }
+    
+  /*
+   * Test that the API returns a mailing properly when there is only one
+   */
+    public function testMailingContactDelivered() {
+        $op = new PHPUnit_Extensions_Database_Operation_Insert();
+        //Create the User
+        $op->execute($this->_dbconn,
+          new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+            dirname(__FILE__) . '/dataset/mailing_contact.xml'
+          )
+        );
+        //~ Create the Mailing and connections to the user
+        $op->execute($this->_dbconn,
+          new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+            dirname(__FILE__) . '/dataset/mailing_delivered.xml'
+          )
+        );
+        
+        $params = array(
+            'contact_id' => 23,
+            'type' => 'Delivered',
+            'version' => $this->_apiversion,
+        );
+
+        $result = civicrm_api('MailingContact', 'get', $params);
+        $this->assertEquals($result['is_error'], 0, "In line " . __LINE__);
+        $this->assertEquals($result['count'], 1, "In line " . __LINE__);
+        $this->assertFalse(empty($result['values']), "In line " . __LINE__);
+        $this->assertEquals($result['values'][1]['mailing_id'], 1, "In line " . __LINE__);
+        $this->assertEquals($result['values'][1]['subject'], "Some Subject", "In line " . __LINE__);
+        $this->assertEquals($result['values'][1]['creator_id'], 1, "In line " . __LINE__);
+        $this->assertEquals($result['values'][1]['creator_name'], "xyz1, abc1", "In line " . __LINE__);
+    }
+    
+    
+    /*
+     * Test that the API returns only the "Bounced" mailings when instructed to do so
+     */
+    function testMailingContactBounced( ) {
+        $op = new PHPUnit_Extensions_Database_Operation_Insert();
+        //Create the User
+        $op->execute($this->_dbconn,
+          new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+            dirname(__FILE__) . '/dataset/mailing_contact.xml'
+          )
+        );
+        //~ Create the Mailing and connections to the user
+        $op->execute($this->_dbconn,
+          new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+            dirname(__FILE__) . '/dataset/mailing_bounced.xml'
+          )
+        );
+        
+        $params = array(
+            'contact_id' => 23,
+            'type' => 'Bounced',
+            'version' => $this->_apiversion,
+        );
+
+        $result = civicrm_api('MailingContact', 'get', $params);
+        $this->assertEquals($result['is_error'], 0, "In line " . __LINE__);
+        $this->assertEquals($result['count'], 1, "In line " . __LINE__);
+        $this->assertFalse(empty($result['values']), "In line " . __LINE__);
+        $this->assertEquals($result['values'][2]['mailing_id'], 2, "In line " . __LINE__);
+        $this->assertEquals($result['values'][2]['subject'], "Some Subject", "In line " . __LINE__);
+        $this->assertEquals($result['values'][2]['creator_id'], 1, "In line " . __LINE__);
+        $this->assertEquals($result['values'][2]['creator_name'], "xyz1, abc1", "In line " . __LINE__);
+    }
+    
+    
+    
 }
