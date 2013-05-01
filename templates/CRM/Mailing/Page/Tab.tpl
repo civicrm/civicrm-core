@@ -29,7 +29,8 @@
     <thead>
     <tr>
       <th class='crm-mailing-contact-subject'>{ts}Subject{/ts}</th>
-      <th class='crm-mailing-contact_created'>{ts}Created By{/ts}</th>
+      <th class='crm-mailing-contact_created'>{ts}Added By{/ts}</th>
+      <th class='crm-contact-activity_contact nosort'>{ts}With{/ts}</th>
       <th class='crm-mailing-contact-date'>{ts}Date{/ts}</th>
       <th class='crm-mailing-contact-links nosort'>&nbsp;</th>
     </tr>
@@ -58,7 +59,8 @@ function buildMailingContact() {
     "aoColumns"  : [
       {sClass:'crm-mailing-contact-subject'},
       {sClass:'crm-mailing-contact_created'},
-      {sClass:'crm-mailing-contact-date'},
+      {sClass: 'crm-contact-activity_contact'},
+      {sClass: 'crm-mailing-contact-date'},
       {sClass:'crm-mailing-contact-links', bSortable:false}
     ],
     "bProcessing": true,
