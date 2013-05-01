@@ -127,7 +127,7 @@ class CRM_Export_BAO_Export {
     }
     if ($fields) {
       //construct return properties
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $locationTypeFields = array(
         'street_address',
         'supplemental_address_1',

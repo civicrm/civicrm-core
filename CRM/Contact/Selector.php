@@ -363,7 +363,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           ),
         );
 
-        $locationTypes = CRM_Core_PseudoConstant::locationType();
+        $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
         foreach ($this->_fields as $name => $field) {
           if (CRM_Utils_Array::value('in_selector', $field) &&
@@ -518,7 +518,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
 
     if ($this->_ufGroupID) {
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
       $names = array();
       static $skipFields = array('group', 'tag');

@@ -69,7 +69,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     // add select for Location Type
     $this->addElement('select', 'location_type_id', ts('Select Location'),
       array(
-        '' => ts('Primary')) + CRM_Core_PseudoConstant::locationType(), TRUE
+        '' => ts('Primary')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'), TRUE
     );
 
     // checkbox for SKIP contacts with Do Not Mail privacy option
@@ -164,7 +164,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     //get the contacts information
     $params = array();
     if (CRM_Utils_Array::value('location_type_id', $fv)) {
-      $locType          = CRM_Core_PseudoConstant::locationType();
+      $locType          = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $locName          = $locType[$fv['location_type_id']];
       $location         = array('location' => array("{$locName}" => $address));
       $returnProperties = array_merge($returnProperties, $location);

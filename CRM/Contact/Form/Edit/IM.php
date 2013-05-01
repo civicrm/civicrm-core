@@ -62,7 +62,7 @@ class CRM_Contact_Form_Edit_IM {
     $form->addElement('select', "im[$blockId][provider_id]", '', CRM_Core_PseudoConstant::IMProvider());
 
     //Block type select
-    $form->addElement('select', "im[$blockId][location_type_id]", '', CRM_Core_PseudoConstant::locationType());
+    $form->addElement('select', "im[$blockId][location_type_id]", '', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
 
     //IM box
     $form->addElement('text', "im[$blockId][name]", ts('Instant Messenger'),
