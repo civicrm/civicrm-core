@@ -82,7 +82,7 @@ class CRM_Logging_Differ {
         $contactIdClause = "AND (contact_id_a = %3 OR contact_id_b = %3)";
         break;
       case 'civicrm_activity':
-        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -238,10 +238,10 @@ WHERE log_conn_id = %1 AND
           'location_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
           'payment_instrument_id' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           'phone_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
-          'preferred_communication_method' => CRM_Core_PseudoConstant::pcm(),
+          'preferred_communication_method' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method'),
           'preferred_language' => CRM_Core_PseudoConstant::languages(),
           'prefix_id' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'),
-          'provider_id' => CRM_Core_PseudoConstant::IMProvider(),
+          'provider_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'),
           'state_province_id' => CRM_Core_PseudoConstant::stateProvince(),
           'suffix_id' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'),
           'website_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),

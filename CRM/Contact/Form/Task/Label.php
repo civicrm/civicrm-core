@@ -329,7 +329,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     foreach ($rows as $id => $row) {
       if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
         $val  = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
-        $comm = CRM_Core_PseudoConstant::pcm();
+        $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
         $temp = array();
         foreach ($val as $vals) {
           $temp[] = $comm[$vals];

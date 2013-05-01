@@ -81,7 +81,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
     $eventType = CRM_Event_PseudoConstant::eventType();
     $eventTemplate = CRM_Event_PseudoConstant::eventTemplates();
-    $autoRenew = CRM_Core_PseudoConstant::autoRenew();
+    $autoRenew = CRM_Core_OptionGroup::values('auto_renew_options');
     $membershipType = CRM_Member_PseudoConstant::membershipType();
 
     asort($activityType);
@@ -155,15 +155,15 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
         switch ($entityRecipient) {
           case 'activity_contacts':
-            $activityContacts = CRM_Core_PseudoConstant::activityContacts();
+            $activityContacts = CRM_Core_OptionGroup::values('activity_contacts');
             $sel5[$entityRecipient] = $activityContacts + $options;
-            $recipientMapping += CRM_Core_PseudoConstant::activityContacts('name');
+            $recipientMapping += CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
             break;
 
           case 'event_contacts':
-            $eventContacts = CRM_Core_PseudoConstant::eventContacts();
+            $eventContacts = CRM_Core_OptionGroup::values('event_contacts');
             $sel5[$entityRecipient] = $eventContacts + $options;
-            $recipientMapping += CRM_Core_PseudoConstant::eventContacts('name');
+            $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
             break;
 
           case NULL:
@@ -247,15 +247,15 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
       switch ($entityRecipient) {
         case 'activity_contacts':
-          $activityContacts = CRM_Core_PseudoConstant::activityContacts();
+          $activityContacts = CRM_Core_OptionGroup::values('activity_contacts');
           $sel5[$id] = $activityContacts + $options;
-          $recipientMapping += CRM_Core_PseudoConstant::activityContacts('name');
+          $recipientMapping += CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
           break;
 
         case 'event_contacts':
-          $eventContacts = CRM_Core_PseudoConstant::eventContacts();
+          $eventContacts = CRM_Core_OptionGroup::values('event_contacts');
           $sel5[$id] = $eventContacts + $options;
-          $recipientMapping += CRM_Core_PseudoConstant::eventContacts('name');
+          $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
           break;
 
         case NULL:
@@ -289,7 +289,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $civicrm_participant_status_type = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event_template = CRM_Event_PseudoConstant::eventTemplates();
 
-    $auto_renew_options = CRM_Core_PseudoConstant::autoRenew();
+    $auto_renew_options = CRM_Core_OptionGroup::values('auto_renew_options');
     $civicrm_membership_type = CRM_Member_PseudoConstant::membershipType();
 
     asort($activity_type);
@@ -751,7 +751,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 
       if ($mapping->entity == 'civicrm_activity') {
         $contactField = 'r.contact_id';
-        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -1026,7 +1026,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
 
     switch ($mapping['entity']) {
       case 'civicrm_participant':
-        $eventContacts = CRM_Core_PseudoConstant::eventContacts('name');
+        $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         if (!CRM_Utils_Array::value($recipientType, $eventContacts)) {
           return $options;
         }

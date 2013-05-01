@@ -1338,7 +1338,7 @@ WHERE civicrm_event.is_active = 1
         }
       }
       $customVal     = '';
-      $imProviders   = CRM_Core_PseudoConstant::IMProvider();
+      $imProviders   = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
       //start of code to set the default values
       foreach ($fields as $name => $field) {
         $skip = FALSE;
@@ -1398,7 +1398,7 @@ WHERE civicrm_event.is_active = 1
           $values[$index]  = $greeting[$params[$name]];
         }
         elseif ($name === 'preferred_communication_method') {
-          $communicationFields = CRM_Core_PseudoConstant::pcm();
+          $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
           $compref             = array();
           $pref                = $params[$name];
           if (is_array($pref)) {

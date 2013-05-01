@@ -469,7 +469,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       }
 
       if (CRM_Utils_Array::value('activity_civireport', $this->_selectComponent)) {
-        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 

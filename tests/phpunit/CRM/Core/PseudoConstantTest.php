@@ -50,16 +50,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     // - sample: Any one value which is expected in the list of option values.
     // - max: integer (default = 10) maximum number of option values expected.
     $fields = array(
-      'CRM_Batch_DAO_Batch' => array(
-        array(
-          'fieldName' => 'type_id',
-          'sample' => 'Membership',
-        ),
-        array(
-          'fieldName' => 'status_id',
-          'sample' => 'Reopened',
-        ),
-      ),
       'CRM_Project_DAO_Task' => array(
         array(
           'fieldName' => 'priority_id',
@@ -97,32 +87,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'In Honor of',
         ),
       ),
-      'CRM_Core_DAO_Website' => array(
-        array(
-          'fieldName' => 'website_type_id',
-          'sample' => 'Facebook',
-        ),
-      ),
-      'CRM_Core_DAO_MappingField' => array(
-        array(
-          'fieldName' => 'website_type_id',
-          'sample' => 'Facebook',
-        ),
-      ),
-      'CRM_Contact_DAO_Contact' => array(
-        array(
-          'fieldName' => 'prefix_id',
-          'sample' => 'Mr.',
-        ),
-        array(
-          'fieldName' => 'suffix_id',
-          'sample' => 'Sr.',
-        ),
-        array(
-          'fieldName' => 'gender_id',
-          'sample' => 'Male',
-        ),
-      ),
       'CRM_Core_DAO_Phone' => array(
         array(
           'fieldName' => 'phone_type_id',
@@ -155,6 +119,48 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'website_type_id',
           'sample' => 'Facebook',
+        ),
+        array(
+          'fieldName' => 'im_provider_id',
+          'sample' => 'Yahoo',
+        ),
+      ),
+      'CRM_Contact_DAO_Contact' => array(
+        array(
+          'fieldName' => 'prefix_id',
+          'sample' => 'Mr.',
+        ),
+        array(
+          'fieldName' => 'suffix_id',
+          'sample' => 'Sr.',
+        ),
+        array(
+          'fieldName' => 'gender_id',
+          'sample' => 'Male',
+        ),
+        array(
+          'fieldName' => 'preferred_communication_method',
+          'sample' => 'Postal Mail',
+        ),
+      ),
+      'CRM_Batch_DAO_Batch' => array(
+        array(
+          'fieldName' => 'type_id',
+          'sample' => 'Membership',
+        ),
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'Reopened',
+        ),
+        array(
+          'fieldName' => 'mode_id',
+          'sample' => 'Automatic Batch',
+        ),
+      ),
+      'CRM_Core_DAO_IM' => array(
+        array(
+          'fieldName' => 'provider_id',
+          'sample' => 'Yahoo',
         ),
       ),
     );

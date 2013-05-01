@@ -1062,7 +1062,7 @@ class CRM_Utils_Token {
         if (CRM_Utils_Array::value('preferred_communication_method', $returnProperties) == 1
           && array_key_exists('preferred_communication_method', $contactDetails[$contactID])
         ) {
-          $pcm = CRM_Core_PseudoConstant::pcm();
+          $pcm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
           // communication Prefferance
           $contactPcm = explode(CRM_Core_DAO::VALUE_SEPARATOR,

@@ -91,7 +91,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $activity->copyValues($params);
 
     if ($activity->find(TRUE)) {
-      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
       $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -205,7 +205,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $logMsg          = 'Case Activity deleted for';
       $msgs            = array();
 
-      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
       $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -349,7 +349,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $activityId = $activity->id;
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -626,7 +626,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
     if (!$id) {
-      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
       $id = self::getActivityContact($activity->id. $sourceID);
     }
@@ -794,7 +794,7 @@ INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$a
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     $values = array();
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -1512,7 +1512,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
       return $sendResult;
     }
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
 
@@ -1567,7 +1567,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
       $toDisplayName = $toEmail;
     }
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     //$sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     //$assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -1669,7 +1669,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
    */
   static function getContactActivity($contactId) {
     $activities = array();
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -2182,7 +2182,7 @@ AND cl.modified_id  = c.id
     if (!$contactId) {
       return $result;
     }
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
     $transaction = new CRM_Core_Transaction();
@@ -2305,7 +2305,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
       $permission = CRM_Core_Permission::EDIT;
     }
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -2559,7 +2559,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   public static function getSourceContactID($activityId) {
     static $sourceID = NULL;
     if (!$sourceID) {
-      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     }
 

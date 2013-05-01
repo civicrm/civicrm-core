@@ -241,7 +241,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addRadio('privacy_toggle', ts('Privacy Options'), $options);
 
     // preferred communication method
-    $comm = CRM_Core_PseudoConstant::pcm();
+    $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
     $commPreff = array();
     foreach ($comm as $k => $v) {

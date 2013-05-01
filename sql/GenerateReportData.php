@@ -1116,7 +1116,7 @@ class CRM_GCD {
     $contactDAO->find();
 
     $count = 0;
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
 
     while ($contactDAO->fetch()) {
       if ($count++ > 2) {

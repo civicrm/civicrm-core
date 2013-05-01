@@ -2674,7 +2674,7 @@ WHERE  id IN ( $groupIDs )
       // search tag in activities
       $etActTable = "`civicrm_entity_act_tag-" . $value . "`";
       $tActTable = "`civicrm_act_tag-" . $value . "`";
-      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
       $this->_tables[$etActTable] =
@@ -2738,7 +2738,7 @@ WHERE  id IN ( $groupIDs )
 
       // search tag in cases
       $etCaseTable = "`civicrm_entity_case_tag-" . $value . "`";
-      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
       $this->_tables[$etCaseTable] =
@@ -3624,7 +3624,7 @@ WHERE  id IN ( $groupIDs )
       }
     }
 
-    $commPref = CRM_Core_PseudoConstant::pcm();
+    $commPref = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
     $sqlValue = array();
     $sql = "contact_a.preferred_communication_method";

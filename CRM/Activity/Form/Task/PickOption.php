@@ -150,7 +150,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     $params = $this->exportValues();
     $this->_contacts = array();
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     //get assignee contacts

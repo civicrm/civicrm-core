@@ -212,15 +212,18 @@
        <add>1.1</add>
   </field>
   <field>
-       <name>preferred_communication_method</name>
-       <title>Preferred Communication Method</title>
-       <type>varchar</type>
-       <length>255</length>
-       <import>true</import>
-       <headerPattern>/^p(ref\w*\s)?c(omm\w*)|( meth\w*)$/i</headerPattern>
-       <dataPattern>/^\w+$/</dataPattern>
-       <comment>What is the preferred mode of communication.</comment>
-       <add>1.1</add>
+      <name>preferred_communication_method</name>
+      <title>Preferred Communication Method</title>
+      <type>varchar</type>
+      <length>255</length>
+      <import>true</import>
+      <headerPattern>/^p(ref\w*\s)?c(omm\w*)|( meth\w*)$/i</headerPattern>
+      <dataPattern>/^\w+$/</dataPattern>
+      <comment>What is the preferred mode of communication.</comment>
+      <add>1.1</add>
+      <pseudoconstant>
+        <optionGroupName>preferred_communication_method</optionGroupName>
+      </pseudoconstant>
   </field>
   <index>
        <name>index_preferred_communication_method</name>

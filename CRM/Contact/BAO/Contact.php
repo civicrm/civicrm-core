@@ -610,7 +610,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
         if ($name == 'im') {
           CRM_Utils_Array::lookupValue($values,
             'provider',
-            CRM_Core_PseudoConstant::IMProvider(),
+            CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'),
             $reverse
           );
         }

@@ -881,7 +881,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
     $comm      = array();
     $preffComm = array();
     $pcm       = array();
-    $pcm       = array_change_key_case(array_flip(CRM_Core_PseudoConstant::pcm()), CASE_LOWER);
+    $pcm       = array_change_key_case(array_flip(CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method')), CASE_LOWER);
 
     $preffComm = explode(',', $values['preferred_communication_method']);
     foreach ($preffComm as $v) {
