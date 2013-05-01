@@ -1103,7 +1103,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
     if (CRM_Utils_Array::value('pcp_made_through_id', $submittedValues)) {
-        
+        $fields = array(
+        'pcp_made_through_id',                                                                                                                                                                                   'pcp_display_in_roll',                                                                                                                                                                                   'pcp_roll_nickname',                                                                                                                                                                                     'pcp_personal_note',
+       );
+      foreach ($fields as $f) {
+        $pcp[$f] = CRM_Utils_Array::value($f, $submittedValues);
+      }
     }
     else {
         //build soft credit params
@@ -1163,6 +1168,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
       foreach ($fields as $f) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
+      }
+
+      if (!empty($pcp)) {
+          $params['pcp'] = $pcp;
       }
       if (!empty($softParams)) {
           $params['soft_credit'] = $softParams;
