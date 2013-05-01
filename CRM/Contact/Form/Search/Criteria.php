@@ -477,7 +477,7 @@ class CRM_Contact_Form_Search_Criteria {
         array('id' => "civicrm_gender_{$var}_{$key}")
       );
     }
-    $form->addGroup($genderOptions, 'gender', ts('Gender'));
+    $form->addGroup($genderOptions, 'gender_id', ts('Gender'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'birth_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
 

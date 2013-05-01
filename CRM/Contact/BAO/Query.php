@@ -1726,13 +1726,13 @@ class CRM_Contact_BAO_Query {
     elseif ($field['pseudoconstant']) {
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
-        CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $field['dbName']),
+        CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $field['name']),
         $field,
         $field['title'],
         'String',
         TRUE
       );
-      if ($name == 'gender') {
+      if ($name == 'gender_id') {
         self::$_openedPanes[ts('Demographics')] = TRUE;
       }
     }
@@ -4866,7 +4866,15 @@ AND   displayRelType.is_active = 1
       // its a string, lets get the int value
       $value = array_search($value, $selectValues);
     }
-    $wc = self::caseImportant($op) && ! $useIDsOnly ? "LOWER({$field['where']})" : "{$field['where']}";
+    if ($useIDsOnly) {
+      list($tableName, $fieldName) = explode('.', $field['where'], 2);
+      if ($tableName == 'civicrm_contact') {
+        $wc = "contact_a.$fieldName";
+      }
+    }
+    else {
+      $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
+    }
     $this->_where[$grouping][] = self::buildClause($wc, $op, $value, $dataType);
     $this->_qill[$grouping][] = $label . " $op '$qill'";
   }
