@@ -127,7 +127,9 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
         $job->status = CRM_Core_DAO::getFieldValue(
           'CRM_Mailing_DAO_Job',
           $job->id,
-          'status'
+          'status',
+          'id',
+          TRUE
         );
 
         if (
@@ -325,9 +327,12 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
       // Re-fetch the job status in case things
       // changed between the first query and now
       // to avoid race conditions
-      $job->status = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Job',
+      $job->status = CRM_Core_DAO::getFieldValue(
+        'CRM_Mailing_DAO_Job',
         $job->id,
-        'status'
+        'status',
+        'id',
+        TRUE
       );
       if ($job->status != 'Scheduled') {
         $lock->release();
