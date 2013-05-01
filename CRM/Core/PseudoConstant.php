@@ -92,13 +92,6 @@ class CRM_Core_PseudoConstant {
   private static $component;
 
   /**
-   * im protocols
-   * @var array
-   * @static
-   */
-  private static $imProvider;
-
-  /**
    * states, provinces
    * @var array
    * @static
@@ -204,13 +197,6 @@ class CRM_Core_PseudoConstant {
   private static $tasks;
 
   /**
-   * preferred communication methods
-   * @var array
-   * @static
-   */
-  private static $pcm;
-
-  /**
    * payment processor
    * @var array
    * @static
@@ -265,34 +251,6 @@ class CRM_Core_PseudoConstant {
    * @static
    */
   private static $extensions;
-
-  /**
-   * activity contacts
-   * @var array
-   * @static
-   */
-  private static $activityContacts;
-
-  /**
-   * event contacts
-   * @var array
-   * @static
-   */
-  private static $eventContacts;
-
-  /**
-   * auto renew options
-   * @var array
-   * @static
-   */
-  private static $autoRenew;
-
-  /**
-   * batch mode options
-   * @var array
-   * @static
-   */
-  private static $batchModes;
 
   /**
    * contact Type
@@ -657,28 +615,6 @@ class CRM_Core_PseudoConstant {
       self::populate(self::$component, 'CRM_Core_DAO_Component', TRUE, 'name');
     }
     return self::$component;
-  }
-
-  /**
-   * Get all the IM Providers from database.
-   *
-   * The static array imProvider is returned, and if it's
-   * called the first time, the <b>IM DAO</b> is used
-   * to get all the IM Providers.
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all IM providers.
-   *
-   */
-  public static function &IMProvider($localize = FALSE) {
-    if (!self::$imProvider) {
-      self::$imProvider = CRM_Core_OptionGroup::values('instant_messenger_service', FALSE, FALSE, $localize);
-    }
-    return self::$imProvider;
   }
  
   /**
@@ -1477,29 +1413,6 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all the Preferred Communication Methods from database.
-   *
-   * @access public
-   * @static
-   *
-   * @return array self::pcm - array reference of all preferred communication methods.
-   *
-   */
-  public static function &pcm($localize = FALSE) {
-    if (!self::$pcm) {
-      self::$pcm = CRM_Core_OptionGroup::values('preferred_communication_method', FALSE, FALSE, $localize);
-    }
-    return self::$pcm;
-  }
-
-  /**
-   * Alias of pcm
-   */
-  public static function preferredCommunicationMethod($localize = FALSE) {
-    return self::pcm($localize);
-  }
-
-  /**
    * Get all active payment processors
    *
    * The static array paymentProcessor is returned
@@ -1904,46 +1817,6 @@ WHERE  id = %1
   }
 
   /**
-   * Get all Activity Contacts
-   *
-   * The static array activityContacts is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param string $column db column name/label.
-   *
-   * @return array - array reference of all  activity Contacts
-   *
-   */
-  public static function &activityContacts($column = 'label') {
-    if (!self::$activityContacts) {
-      self::$activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, $column);
-    }
-    return self::$activityContacts;
-  }
-
-  /**
-   * Get all Event Contacts
-   *
-   * The static array eventContacts is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param string $column db column name/label.
-   *
-   * @return array - array reference of all  event Contacts
-   *
-   */
-  public static function &eventContacts($column = 'label') {
-    if (!self::$eventContacts) {
-      self::$eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, $column);
-    }
-    return self::$eventContacts;
-  }
-
-  /**
    * Get all options values
    *
    * The static array option values is returned
@@ -1968,24 +1841,6 @@ WHERE  id = %1
     return self::$accountOptionValues[$cacheKey];
   }
 
-  /**
-   * Get all batch modes
-   *
-   * The static array batchModes
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all batch modes
-   */
-  public static function &getBatchMode($columnName = 'label') {
-    if (!self::$batchModes) {
-      self::$batchModes = CRM_Core_OptionGroup::values('batch_mode', false, false, false, null, $columnName);
-    }
-
-    return self::$batchModes;
-  }
-
   /*
   * The static array contactType is returned
   *
@@ -2002,22 +1857,6 @@ WHERE  id = %1
       self::$contactType = CRM_Contact_BAO_ContactType::basicTypePairs(TRUE);
     }
     return self::$contactType;
-  }
-
-  /**
-   * Get all the auto renew options
-   *
-   * @access public
-   * @static
-   *
-   * @return array self::autoRenew - array reference of all autoRenew
-   *
-   */
-  public static function &autoRenew() {
-      if (!self::$autoRenew) {
-          self::$autoRenew = CRM_Core_OptionGroup::values('auto_renew_options', FALSE, FALSE);
-      }
-      return self::$autoRenew;
   }
 }
 

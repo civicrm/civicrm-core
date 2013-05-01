@@ -132,6 +132,9 @@
     <type>int unsigned</type>
     <comment>fk to Batch mode options in civicrm_option_values</comment>
     <add>4.2</add>
+    <pseudoconstant>
+      <optionGroupName>batch_mode</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>total</name>

@@ -568,7 +568,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     // we need to determine of overlay profile should be shown
     $showProfileOverlay = CRM_Core_BAO_UFGroup::showOverlayProfile();
 
-    $imProviders  = CRM_Core_PseudoConstant::IMProvider();
+    $imProviders  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
     $languages    = CRM_Core_PseudoConstant::languages();
     while ($result->fetch()) {

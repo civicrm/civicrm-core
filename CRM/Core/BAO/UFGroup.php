@@ -914,7 +914,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $config = CRM_Core_Config::singleton();
 
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    $imProviders   = CRM_Core_PseudoConstant::IMProvider();
+    $imProviders   = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $websiteTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
     $multipleFields = array('url');
@@ -968,7 +968,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           $params[$index] = $details->$idx;
         }
         elseif ($name === 'preferred_communication_method') {
-          $communicationFields = CRM_Core_PseudoConstant::pcm();
+          $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
           $compref = array();
           $pref    = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details->$name);
 
@@ -1802,13 +1802,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           }
           $form->add('select', $providerName, NULL,
             array(
-              '' => ts('- select -')) + CRM_Core_PseudoConstant::IMProvider(), $required
+              '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
           );
         }
         else {
           $form->add('select', $name . '-provider_id', $title,
             array(
-              '' => ts('- select -')) + CRM_Core_PseudoConstant::IMProvider(), $required
+              '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
           );
         }
 
@@ -1916,7 +1916,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif ($fieldName === 'preferred_communication_method') {
-      $communicationFields = CRM_Core_PseudoConstant::pcm();
+      $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
       foreach ($communicationFields as $key => $var) {
         if ($key == '') {
           continue;

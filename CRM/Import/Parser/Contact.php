@@ -1373,7 +1373,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
             $preffComm = array();
             $preffComm = explode(',', $value);
             foreach ($preffComm as $v) {
-              if (!self::in_value(trim($v), CRM_Core_PseudoConstant::pcm())) {
+              if (!self::in_value(trim($v), CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method'))) {
                 self::addToErrorMsg(ts('Preferred Communication Method'), $errorMessage);
               }
             }
