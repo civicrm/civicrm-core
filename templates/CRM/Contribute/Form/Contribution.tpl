@@ -353,6 +353,8 @@
     {if $customDataSubType}
       CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
     {/if}
+
+	  {if $buildPriceSet}{literal}buildAmount( );{/literal}{/if}
     {literal}
     });
 

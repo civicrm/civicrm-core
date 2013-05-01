@@ -52,8 +52,7 @@ class CRM_Contribute_Form_SoftCredit {
     $form->_softCredit['item_count'] = 6;
     for ($rowNumber = 1; $rowNumber <= $form->_softCredit['item_count']; $rowNumber++) {
       CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, $prefix);
-      $form->addMoney("{$prefix}amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, TRUE,
-        "{$prefix}currency[{$rowNumber}]", NULL, TRUE);
+      $form->addMoney("{$prefix}amount[{$rowNumber}]", ts('Amount'));
     }
 
     $form->assign('rowCount', $form->_softCredit['item_count']);
