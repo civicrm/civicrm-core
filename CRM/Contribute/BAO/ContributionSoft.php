@@ -50,7 +50,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @access public
    *
    */
-  public static function create(&$params) {
+  public static function add(&$params) {
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
     $contributionSoft->copyValues($params);
     return $contributionSoft->save();
@@ -89,7 +89,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   static function del($contributionID) {
     //delete from contribution soft table
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
-    $contributionSoft->id = $contributionID;
+    $contributionSoft->contribution_id = $contributionID;
     $contributionSoft->delete();
   }
 }
