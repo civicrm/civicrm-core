@@ -102,6 +102,10 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
       );
       $backUrlTitle = ts('Back to Activity');
     }
+    elseif ($context == 'mailing') {
+      $backUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=mailing");
+      $backUrlTitle = ts('Back to Mailing');
+    }
     else {
       $backUrl = CRM_Utils_System::url('civicrm/mailing', 'reset=1');
       $backUrlTitle = ts('Back to CiviMail');

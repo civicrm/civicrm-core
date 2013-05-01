@@ -410,7 +410,7 @@ class CRM_Activity_Page_AJAX {
 
     $sortMapper = array(
       0 => 'activity_type', 1 => 'subject', 2 => 'source_contact_name',
-      3 => '', 4 => '', 5 => 'activity_date_time', 6 => 'status_id',
+      3 => '', 4 => 'activity_date_time', 5 => 'status_id',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -453,7 +453,7 @@ class CRM_Activity_Page_AJAX {
     $selectorElements = array(
       'activity_type', 'subject', 'source_contact',
       'target_contact', 'assignee_contact',
-      'activity_date', 'status', 'openstats','links', 'class',
+      'activity_date', 'status','links', 'class',
     );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);

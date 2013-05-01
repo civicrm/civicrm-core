@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
@@ -22,29 +23,45 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{literal}
-<script type="text/javascript">
-cj( function( ) {
-    var url       = "{/literal}{$customUrls.$element_name}{literal}";
-    var custom    = "{/literal}#{$element_name|replace:']':''|replace:'[':'_'}{literal}";
-    var custom_id = "{/literal}input[name=\"{$element_name|cat:'_id'|regex_replace:'/\]_id$/':'_id]'}\"]{literal}";
+ */
 
-    var customObj   = cj(custom);
-    var customIdObj = cj(custom_id);
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2013
+ * $Id$
+ *
+ */
 
-    if ( !customObj.hasClass('ac_input') ) {
-        customObj.autocomplete( url,
-            { width : 250, selectFirst : false, matchContains: true, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-            }).result(
-                function(event, data ) {
-                    customIdObj.val( data[1] );
-                }
-        );
-        customObj.click( function( ) {
-            customIdObj.val('');
-      });
-     }
-});
-</script>
-{/literal}
+/**
+ * This class build form elements for select exitsing or create new soft block
+ */
+class CRM_Contribute_Form_SoftCredit {
+
+  /**
+   * Function used to build form element for soft credit block
+   *
+   * @param object   $form form object
+   * @access public
+   *
+   * @return void
+   */
+  static function buildQuickForm(&$form) {
+    $prefix = 'soft_credit_';
+    // by default generate 5 blocks
+    $form->_softCredit['item_count'] = 6;
+    for ($rowNumber = 1; $rowNumber <= $form->_softCredit['item_count']; $rowNumber++) {
+      CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, $prefix);
+      $form->addMoney("{$prefix}amount[{$rowNumber}]", ts('Amount'));
+    }
+
+    $form->assign('rowCount', $form->_softCredit['item_count']);
+
+    // Tell tpl to hide Soft Credit field if contribution is linked directly to a PCP Page
+    if (CRM_Utils_Array::value('pcp_made_through_id', $form->_values)) {
+      $form->assign('pcpLinked', 1);
+    }
+    $form->addElement('hidden', 'soft_contact_id', '', array('id' => 'soft_contact_id'));
+  }
+}
+

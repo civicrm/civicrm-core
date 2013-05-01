@@ -150,6 +150,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @access public
    */
   public function preProcess() {
+
+    $resources = CRM_Core_Resources::singleton();
+    $resources->addScriptFile('civicrm', 'templates/CRM/Contribute/Form/SoftCredit.js');
+
     //check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
@@ -842,6 +846,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->addElement('textarea', 'pcp_personal_note', ts('Personal Note (for Honor Roll)'));
     }
 
+    CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
+    
+    /*
     // If we have a contact for this contribution, pass cid= to the dataUrl to exclude current contact from autocomplete results
     if ($this->_contactID) {
       $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
@@ -855,13 +862,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
     $this->assign('dataUrl', $dataUrl);
+
     $this->addElement('text', 'soft_credit_to', ts('Soft Credit To'));
     // Tell tpl to hide Soft Credit field if contribution is linked directly to a PCP Page
     if (CRM_Utils_Array::value('pcp_made_through_id', $this->_values)) {
       $this->assign('pcpLinked', 1);
     }
     $this->addElement('hidden', 'soft_contact_id', '', array('id' => 'soft_contact_id'));
-
+    */
     $js = NULL;
     if (!$this->_mode) {
       $js = array('onclick' => "return verify( );");

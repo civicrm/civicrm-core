@@ -1306,7 +1306,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * domain and mailing tokens
    *
    */
-  function tokenReplace(&$mailing) {
+  public static function tokenReplace(&$mailing) {
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     foreach (array(
@@ -2549,7 +2549,7 @@ SELECT  $mailing.id as mailing_id
    * @return $report array content/component.
    * @access public
    */
-  public function getMailingContent(&$report, &$form, $isSMS = FALSE) {
+  public static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
     $htmlHeader = $textHeader = NULL;
     $htmlFooter = $textFooter = NULL;
 
@@ -2744,7 +2744,6 @@ AND        m.id = %1
     $params['rowCount'] = $params['rp'];
     $params['sort']     = CRM_Utils_Array::value('sortBy', $params);
     $params['caseId']   = NULL;
-    $context            = CRM_Utils_Array::value('context', $params);
 
     // get contact mailings
     $mailings = CRM_Mailing_BAO_Mailing::getContactMailings($params);
@@ -2757,16 +2756,39 @@ AND        m.id = %1
     foreach ($mailings as $mailingId => $values) {
       $contactMailings[$mailingId]['subject'] = $values['subject'];
       $contactMailings[$mailingId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
-
+      $contactMailings[$mailingId]['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report',
+        "mid={$values['mailing_id']}&reset=1&cid={$values['creator_id']}&context=mailing");
       $contactMailings[$mailingId]['mailing_creator'] = CRM_Utils_System::href(
           $values['creator_name'],
           'civicrm/contact/view',
           "reset=1&cid={$values['creator_id']}");
 
-      $contactMailings[$mailingId]['links'] = CRM_Utils_System::href(
-        ts('View Mailing'),
-        'civicrm/mailing/view',
-        "reset=1&id={$values['mailing_id']}");
+      $contactMailings[$mailingId]['openstats'] = "Opens: ".
+        count(CRM_Mailing_Event_BAO_Opened::getRows(
+            $values['mailing_id'], NULL, FALSE, NULL, NULL, NULL, $values['creator_id']
+          )
+        )."<br />Clicks:" .
+        count(CRM_Mailing_Event_BAO_TrackableURLOpen::getRows(
+          $values['mailing_id'], NULL, FALSE, NULL, NULL, NULL, NULL, $values['creator_id']
+        ) );
+
+      $actionLinks = array(
+        CRM_Core_Action::VIEW => array(
+          'name'  => ts('View'),
+          'url'   => 'civicrm/mailing/view',
+          'qs'    => "reset=1&id={$values['mailing_id']}",
+          'title' => ts('View Mailing'),
+          'class' => 'crm-mailing-view',
+        ),
+        CRM_Core_Action::BROWSE => array(
+          'name' => ts('Mailing Report'),
+          'url' => 'civicrm/mailing/report',
+          'qs' => "mid={$values['mailing_id']}&reset=1&cid={$values['creator_id']}&context=mailing",
+          'title' => ts('View Mailing Report'),
+        )
+      );
+
+      $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink($actionLinks);
     }
 
     return $contactMailings;
@@ -2784,6 +2806,10 @@ AND        m.id = %1
    */
   static public function getContactMailings(&$params) {
     $params['version'] = 3;
+    $params['offset']  = ($params['page'] - 1) * $params['rp'];
+    $params['limit']   = $params['rp'];
+    $params['sort']    = CRM_Utils_Array::value('sortBy', $params);
+
     $result = civicrm_api('MailingContact', 'get', $params);
     return $result['values'];
   }
@@ -2799,10 +2825,10 @@ AND        m.id = %1
    * @access public
    */
   static public function getContactMailingsCount(&$params) {
-    //FIX ME: need to implement getcount api for MailingContact
     $params['version'] = 3;
-    $result = civicrm_api('MailingContact', 'get', $params);
-    return count($result['values']);
+
+    $result = civicrm_api('MailingContact', 'getcount', $params);
+    return $result['values']['count'];
   }
 }
 
