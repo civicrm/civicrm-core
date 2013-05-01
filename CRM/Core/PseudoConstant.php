@@ -99,20 +99,6 @@ class CRM_Core_PseudoConstant {
   private static $imProvider;
 
   /**
-   * website protocols
-   * @var array
-   * @static
-   */
-  private static $websiteType;
-
-  /**
-   * im protocols
-   * @var array
-   * @static
-   */
-  private static $fromEmailAddress;
-
-  /**
    * states, provinces
    * @var array
    * @static
@@ -246,13 +232,6 @@ class CRM_Core_PseudoConstant {
   private static $worldRegions;
 
   /**
-   * honorType
-   * @var array
-   * @static
-   */
-  private static $honorType;
-
-  /**
    * activity status
    * @var array
    * @static
@@ -260,39 +239,11 @@ class CRM_Core_PseudoConstant {
   private static $activityStatus;
 
   /**
-   * priority
-   * @var array
-   * @static
-   */
-  private static $priority;
-
-  /**
-   * wysiwyg Editor
-   * @var array
-   * @static
-   */
-  private static $wysiwygEditor;
-
-  /**
-   * Mapping Types
-   * @var array
-   * @static
-   */
-  private static $mappingType;
-
-  /**
    * Visibility
    * @var array
    * @static
    */
   private static $visibility;
-
-  /**
-   * Mail Protocols
-   * @var array
-   * @static
-   */
-  private static $mailProtocol;
 
   /**
    * Greetings
@@ -743,71 +694,7 @@ class CRM_Core_PseudoConstant {
     }
     return self::$imProvider;
   }
-
-  /**
-   * Get all the website types from database.
-   *
-   * The static array websiteType is returned, and if it's
-   * called the first time, the <b>Website DAO</b> is used
-   * to get all the Website Types.
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all Website types.
-   *
-   */
-  public static function &websiteType() {
-    if (!self::$websiteType) {
-      self::$websiteType = CRM_Core_OptionGroup::values('website_type');
-    }
-    return self::$websiteType;
-  }
-
-  /**
-   * Get the all From Email Address from database.
-   *
-   * The static array $fromEmailAddress is returned, and if it's
-   * called the first time, DAO is used
-   * to get all the From Email Address
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all From Email Address.
-   */
-  public static function &fromEmailAddress() {
-    if (!self::$fromEmailAddress) {
-      self::$fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address');
-    }
-    return self::$fromEmailAddress;
-  }
-
-  /**
-   * Get the all Mail Protocols from database.
-   *
-   * The static array mailProtocol is returned, and if it's
-   * called the first time, the DAO is used
-   * to get all the Mail Protocol.
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all Mail Protocols.
-   */
-  public static function &mailProtocol() {
-    if (!self::$mailProtocol) {
-      self::$mailProtocol = CRM_Core_OptionGroup::values('mail_protocol');
-    }
-    return self::$mailProtocol;
-  }
-
+ 
   /**
    * Get all the State/Province from database.
    *
@@ -1710,26 +1597,6 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all Honor Type.
-   *
-   * The static array honorType is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All Honor Type.
-   *
-   * @return array - array reference of all Honor Types.
-   *
-   */
-  public static function &honor() {
-    if (!self::$honorType) {
-      self::$honorType = CRM_Core_OptionGroup::values('honor_type');
-    }
-    return self::$honorType;
-  }
-
-  /**
    * Get all Activity Statuses.
    *
    * The static array activityStatus is returned
@@ -1753,41 +1620,6 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all Priorities
-   *
-   * The static array Priority is returned
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all Priority
-   */
-  public static function &priority() {
-    if (!self::$priority) {
-      self::$priority = CRM_Core_OptionGroup::values('priority');
-    }
-
-    return self::$priority;
-  }
-
-  /**
-   * Get all WYSIWYG Editors.
-   *
-   * The static array wysiwygEditor is returned
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all wysiwygEditors
-   */
-  public static function &wysiwygEditor() {
-    if (!self::$wysiwygEditor) {
-      self::$wysiwygEditor = CRM_Core_OptionGroup::values('wysiwyg_editor');
-    }
-    return self::$wysiwygEditor;
-  }
-
-  /**
    * Get all Visibility levels.
    *
    * The static array visibility is returned
@@ -1808,20 +1640,6 @@ WHERE  id = %1";
   }
 
     return self::$visibility[$column];
-  }
-
-  /**
-   * Get all mapping types
-   *
-   * @return array - array reference of all mapping types
-   * @access public
-   * @static
-   */
-  public static function &mappingTypes() {
-    if (!self::$mappingType) {
-      self::$mappingType = CRM_Core_OptionGroup::values('mapping_type');
-    }
-    return self::$mappingType;
   }
 
   public static function &stateProvinceForCountry($countryID, $field = 'name') {

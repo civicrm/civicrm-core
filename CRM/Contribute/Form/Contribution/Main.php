@@ -597,7 +597,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $extraOption = array('onclick' => "enableHonorType();");
     // radio button for Honor Type
     $honorOptions = array();
-    $honor = CRM_Core_PseudoConstant::honor();
+    $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
     foreach ($honor as $key => $var) {
       $honorTypes[$key] = $this->createElement('radio', NULL, NULL, $var, $key, $extraOption);
     }

@@ -915,7 +915,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $imProviders   = CRM_Core_PseudoConstant::IMProvider();
-    $websiteTypes  = CRM_Core_PseudoConstant::websiteType();
+    $websiteTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
     $multipleFields = array('url');
     $nullIndex = $nullValueIndex = ' ';
@@ -1974,10 +1974,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         if (substr($name, -1) == ']') {
           $websiteTypeName = substr($name, 0, -1) . '-website_type_id]';
         }
-        $form->addElement('select', $websiteTypeName, NULL, CRM_Core_PseudoConstant::websiteType());
+        $form->addElement('select', $websiteTypeName, NULL, CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'));
       }
       else {
-        $form->addElement('select', $name . '-website_type_id', NULL, CRM_Core_PseudoConstant::websiteType());
+        $form->addElement('select', $name . '-website_type_id', NULL, CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'));
       }
     }
     // Note should be rendered as textarea

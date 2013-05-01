@@ -355,7 +355,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
 
     $phoneTypes   = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders  = CRM_Core_PseudoConstant::IMProvider();
-    $websiteTypes = CRM_Core_PseudoConstant::websiteType();
+    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
     foreach ($this->_location_types as $key => $value) {
       $sel3['phone'][$key] = &$phoneTypes;
@@ -763,7 +763,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
 
     $phoneTypes    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders   = CRM_Core_PseudoConstant::IMProvider();
-    $websiteTypes  = CRM_Core_PseudoConstant::websiteType();
+    $websiteTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     //these mapper params need to set key as array and val as null.

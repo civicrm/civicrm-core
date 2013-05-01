@@ -548,7 +548,7 @@ GROUP BY  currency
     ) {
       $honor_block_is_active = TRUE;
       $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      $honor = CRM_Core_PseudoConstant::honor();
+      $honor = CRM_Core_PseudoConstant::get('CRM_Pledge_DAO_Pledge', 'honor_type_id');
       $form->assign('honor_type', $honor[$params['honor_type_id']]);
       $form->assign('honor_prefix', $prefix[$params['honor_prefix_id']]);
       $form->assign('honor_first_name', $params['honor_first_name']);

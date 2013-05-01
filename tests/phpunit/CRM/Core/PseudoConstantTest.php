@@ -50,6 +50,55 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     // - sample: Any one value which is expected in the list of option values.
     // - max: integer (default = 10) maximum number of option values expected.
     $fields = array(
+      'CRM_Project_DAO_Task' => array(
+        array(
+          'fieldName' => 'priority_id',
+          'sample' => 'Urgent',
+        ),
+      ),
+      'CRM_Activity_DAO_Activity' => array(
+        array(
+          'fieldName' => 'priority_id',
+          'sample' => 'Urgent',
+        ),
+      ),
+      'CRM_Core_DAO_MailSettings' => array(
+        array(
+          'fieldName' => 'protocol',
+          'sample' => 'Localdir',
+        ),
+      ),
+      'CRM_Core_DAO_Mapping' => array(
+        array(
+          'fieldName' => 'mapping_type_id',
+          'sample' => 'Search Builder',
+          'max' => 15,
+        ),
+      ),
+      'CRM_Pledge_DAO_Pledge' => array(
+        array(
+          'fieldName' => 'honor_type_id',
+          'sample' => 'In Honor of',
+        ),
+      ),
+      'CRM_Contribute_DAO_Contribution' => array(
+        array(
+          'fieldName' => 'honor_type_id',
+          'sample' => 'In Honor of',
+        ),
+      ),
+      'CRM_Core_DAO_Website' => array(
+        array(
+          'fieldName' => 'website_type_id',
+          'sample' => 'Facebook',
+        ),
+      ),
+      'CRM_Core_DAO_MappingField' => array(
+        array(
+          'fieldName' => 'website_type_id',
+          'sample' => 'Facebook',
+        ),
+      ),
       'CRM_Contact_DAO_Contact' => array(
         array(
           'fieldName' => 'prefix_id',
@@ -84,6 +133,18 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'location_type_id',
           'sample' => 'Home',
+        ),
+      ),
+      'CRM_Core_DAO_Website' => array(
+        array(
+          'fieldName' => 'website_type_id',
+          'sample' => 'Facebook',
+        ),
+      ),
+      'CRM_Core_DAO_MappingField' => array(
+        array(
+          'fieldName' => 'website_type_id',
+          'sample' => 'Facebook',
         ),
       ),
     );

@@ -766,7 +766,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       // causes a conflict in standalone mode so skip in standalone for now
       $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
       $this->add( 'select', 'honor_type_id', ts('Membership payment is : '),
-                        array( '' => ts( '-') ) + CRM_Core_PseudoConstant::honor() );
+                        array( '' => ts( '-') ) + CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id') );
       CRM_Contact_Form_NewContact::buildQuickForm($this,1, null, false,'contribution_');
     }
 

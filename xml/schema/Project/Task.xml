@@ -89,11 +89,14 @@
       <add>1.5</add> 
   </field>
   <field>
-       <name>priority_id</name>
-       <title>Priority</title>
-       <type>int unsigned</type>
-       <comment>Configurable priority value (e.g. Critical, High, Medium...). FK to civicrm_option_value.</comment>
+      <name>priority_id</name>
+      <title>Priority</title>
+      <type>int unsigned</type>
+      <comment>Configurable priority value (e.g. Critical, High, Medium...). FK to civicrm_option_value.</comment>
       <add>1.5</add>
+      <pseudoconstant>
+        <optionGroupName>priority</optionGroupName>
+      </pseudoconstant>
   </field>
   <field>   
       <name>task_class</name>

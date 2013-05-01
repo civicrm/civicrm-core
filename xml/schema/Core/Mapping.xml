@@ -45,6 +45,9 @@
       <type>int unsigned</type>
       <comment>Mapping Type</comment>
       <add>2.1</add>
+      <pseudoconstant>
+        <optionGroupName>mapping_type</optionGroupName>
+      </pseudoconstant>
   </field>
   <index>
     <name>UI_name</name>

@@ -168,7 +168,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'type' => 'select',
         'label' => ts('Priority'),
         'attributes' =>
-        CRM_Core_PseudoConstant::priority(),
+        CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
         'required' => TRUE
       ),
       'source_contact_id' => array(
@@ -597,7 +597,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       );
     }
     if (!CRM_Utils_Array::value('priority_id', $defaults)) {
-      $priority = CRM_Core_PseudoConstant::priority();
+      $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
       $defaults['priority_id'] = array_search('Normal', $priority);
     }
     if (!CRM_Utils_Array::value('status_id', $defaults)) {

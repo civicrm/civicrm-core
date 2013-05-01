@@ -376,7 +376,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
 
       $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      $honor = CRM_Core_PseudoConstant::honor();
+      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
       $this->assign('honor_type', CRM_Utils_Array::value($params['honor_type_id'], $honor));
       $this->assign('honor_prefix', CRM_Utils_Array::value($params['honor_prefix_id'], $prefix));
       $this->assign('honor_first_name', $params['honor_first_name']);
@@ -1551,7 +1551,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
 
     $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-    $honorType = CRM_Core_PseudoConstant::honor();
+    $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
     $this->assign('honor_type', CRM_Utils_Array::value(CRM_Utils_Array::value('honor_type_id', $params), $honorType));
     $this->assign('honor_prefix', CRM_Utils_Array::value(CRM_Utils_Array::value('honor_prefix_id', $params), $prefix));
     $this->assign('honor_first_name', CRM_Utils_Array::value('honor_first_name', $params));

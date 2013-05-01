@@ -146,7 +146,7 @@ class CRM_Import_ImportJob {
     $mapperFields  = array();
     $phoneTypes    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders   = CRM_Core_PseudoConstant::IMProvider();
-    $websiteTypes  = CRM_Core_PseudoConstant::websiteType();
+    $websiteTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     //initialize mapper perperty value.

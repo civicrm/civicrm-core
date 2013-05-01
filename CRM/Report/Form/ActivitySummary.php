@@ -150,7 +150,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           'priority_id' =>
           array('title' => ts('Priority'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::priority(),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
           ),
         ),
         'group_bys' =>

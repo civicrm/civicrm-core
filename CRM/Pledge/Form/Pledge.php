@@ -257,7 +257,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $honorDefault = array();
       $idParams = array('contact_id' => $this->_honorID);
       CRM_Contact_BAO_Contact::retrieve($idParams, $honorDefault);
-      $honorType = CRM_Core_PseudoConstant::honor();
+      $honorType = CRM_Core_PseudoConstant::get('CRM_Pledge_DAO_Pledge', 'honor_type_id');
       $defaults['honor_prefix_id'] = $honorDefault['prefix_id'];
       $defaults['honor_first_name'] = CRM_Utils_Array::value('first_name', $honorDefault);
       $defaults['honor_last_name'] = CRM_Utils_Array::value('last_name', $honorDefault);

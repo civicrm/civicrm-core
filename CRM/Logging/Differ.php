@@ -244,10 +244,10 @@ WHERE log_conn_id = %1 AND
           'provider_id' => CRM_Core_PseudoConstant::IMProvider(),
           'state_province_id' => CRM_Core_PseudoConstant::stateProvince(),
           'suffix_id' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'),
-          'website_type_id' => CRM_Core_PseudoConstant::websiteType(),
+          'website_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
           'activity_type_id' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           'case_type_id' => CRM_Case_PseudoConstant::caseType('label', FALSE),
-          'priority_id'  => CRM_Core_PseudoConstant::priority(),
+          'priority_id'  => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
         );
 
         // for columns that appear in more than 1 table
