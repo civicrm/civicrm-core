@@ -407,6 +407,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
 
+    // CRM_Core_Error::debug(array($sel1, $sel2, $sel3, $sel4));
     $sel->setOptions(array($sel1, $sel2, $sel3, $sel4));
 
     // proper interpretation of spec in CRM-8732

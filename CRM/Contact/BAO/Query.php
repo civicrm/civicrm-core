@@ -587,10 +587,6 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
-      if (CRM_Utils_Array::value('pseudoconstant', $field)) {
-        continue;
-      }
-
       // redirect to activity select clause
       if (substr($name, 0, 9) == 'activity_') {
         CRM_Activity_BAO_Query::select($this);

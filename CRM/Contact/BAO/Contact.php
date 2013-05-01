@@ -1383,14 +1383,14 @@ WHERE id={$id}; ";
               'legal_identifier', 'sic_code', 'home_URL', 'is_deceased',
               'deceased_date', 'current_employer', 'email_greeting_custom',
               'postal_greeting_custom', 'addressee_custom',
-              'individual_prefix', 'individual_suffix', 'gender',
+              'prefix_id', 'suffix_id'
             ),
             'Organization' => array(
               'first_name', 'middle_name', 'last_name', 'job_title',
               'gender_id', 'birth_date', 'household_name',
               'email_greeting_custom',
-              'postal_greeting_custom', 'individual_prefix',
-              'individual_suffix', 'gender', 'addressee_custom',
+              'postal_greeting_custom', 'prefix_id',
+              'suffix_id', 'gender_id', 'addressee_custom',
               'is_deceased', 'deceased_date', 'current_employer',
             ),
           );
