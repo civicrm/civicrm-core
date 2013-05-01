@@ -190,14 +190,29 @@
           <td>{$thankyou_date|crmDate}</td>
       </tr>
   {/if}
-
-  {if $softCreditToName and !$pcp_id} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
-    <tr>
-      <td class="label">{ts}Soft Credit To{/ts}</td>
-        <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$soft_credit_to`"}" id="view_contact" title="{ts}View contact record{/ts}">{$softCreditToName}</a></td>
-    </tr>
-    {/if}
 </table>
+
+  {if $softContributions and !$pcp_id} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
+    <div class="crm-accordion-wrapper ">
+      <div class="crm-accordion-header">
+          {ts}Soft Credit{/ts}
+      </div>
+      <div class="crm-accordion-body">
+        <table class="crm-info-panel">
+    {foreach from=$softContributions item="softCont"}
+      {if $softCont }
+          <tr>
+            <td class="label">{ts}Soft Credit To{/ts}</td>
+            <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.soft_credit_to`"}" id="view_contact" title="{ts}View contact record{/ts}">{$softCont.softCreditToName}</a></td>
+            <td class="label">{ts}Amount{/ts}</td>
+            <td>{$softCont.soft_credit_amount|crmMoney:$currency}</td>
+          </tr>
+      {/if}
+    {/foreach}
+        </table>
+      </div>
+    </div>
+  {/if}
 
 {if $premium}
     <div class="crm-accordion-wrapper ">

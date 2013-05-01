@@ -53,11 +53,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->assign('context', $context);
 
     CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
-
-    $softParams = array('contribution_id' => CRM_Utils_Array::value('contribution_id', $values));
-    if ($softContribution = CRM_Contribute_BAO_Contribution::getSoftContribution($softParams, TRUE)) {
-      $values = array_merge($values, $softContribution);
-    }
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
 
     if (CRM_Utils_Array::value('contribution_page_id', $values)) {
@@ -134,17 +129,21 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     //get soft credit record if exists.
-    if ($softContribution = CRM_Contribute_BAO_Contribution::getSoftContribution($softParams)) {
-
-      $softContribution['softCreditToName'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $softContribution['soft_credit_to'], 'display_name'
-      );
-      //hack to avoid dispalyName conflict
-      //for viewing softcredit record.
-      $softContribution['displayName'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $values['contact_id'], 'display_name'
-      );
-      $values = array_merge($values, $softContribution);
+    $softParams = array('contribution_id' => CRM_Utils_Array::value('contribution_id', $values));
+    $softContribution = CRM_Contribute_BAO_Contribution::getSoftContribution($softParams);
+    if (!empty($softContribution)) {
+      foreach($softContribution as &$individualSoftContribution) {
+        $individualSoftContribution['softCreditToName'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+          $individualSoftContribution['soft_credit_to'], 'display_name'
+        );
+        //hack to avoid displayName conflict
+        //for viewing softcredit record.
+        $individualSoftContribution['displayName'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+          $values['contact_id'], 'display_name'
+        );
+        
+      }
+      $values['softContributions'] = $softContribution;
     }
 
     $lineItems = array();
