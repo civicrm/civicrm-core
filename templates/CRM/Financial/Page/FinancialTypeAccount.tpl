@@ -40,8 +40,8 @@
  	  {include file="CRM/common/enableDisable.tpl"}
       <table cellpadding="0" cellspacing="0" border="0">
         <thead class="sticky">
-          <th>{ts}Financial Account{/ts}</th>
           <th>{ts}Relationship{/ts}</th>
+          <th>{ts}Financial Account{/ts}</th>
           <th>{ts}Accounting Code{/ts}</th>
           <th>{ts}Account Type (Code){/ts}</th>
           <th>{ts}Owned By{/ts}</th>
@@ -50,8 +50,8 @@
         </thead>
         {foreach from=$rows item=row}
         <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-	        <td>{$row.financial_account}</td>	
 	        <td>{$row.account_relationship}</td>
+	        <td>{$row.financial_account}</td>	
 		      <td>{$row.accounting_code}</td>	
 		      <td>{$row.financial_account_type}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>	
 	        <td>{$row.owned_by}</td>
