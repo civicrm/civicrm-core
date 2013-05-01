@@ -46,6 +46,9 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     if (!property_exists($this->settings, 'siteKey') || empty($this->settings->siteKey)) {
       $this->markTestSkipped('CiviSeleniumSettings is missing siteKey');
     }
+    if (!property_exists($this->settings, 'adminApiKey') || empty($this->settings->adminApiKey)) {
+      $this->markTestSkipped('CiviSeleniumSettings is missing adminApiKey');
+    }
   }
 
   protected function tearDown() {
@@ -60,8 +63,8 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     }
   }
 
+  /*
   function testValidLoginCMSUser() {
-    $this->_setUpAdminSessionIdAndApiKey();
     $client = CRM_Utils_HttpClient::singleton();
     $params = array(
       "q" => "civicrm/login",
@@ -78,7 +81,6 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   function testInvalidPasswordLogin() {
-    $this->_setUpAdminSessionIdAndApiKey();
     $client = CRM_Utils_HttpClient::singleton();
     $badPassword = $this->settings->adminPassword . "badpass";
     $params = array(
@@ -93,23 +95,6 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $result = json_decode($data, TRUE);
     $this->assertNotNull($result);
     $this->assertAPIErrorCode($result, 1);
-  }
-
-  function testValidCallsiteKey() {
-    $this->_setUpAdminSessionIdAndApiKey();
-    $client = CRM_Utils_HttpClient::singleton();
-    $params = array(
-      "entity" => "Contact",
-      "action" => "get",
-      "key" => $this->settings->siteKey,
-      "json" => "1",
-      "api_key" => $this->api_key
-    );
-    list($status, $data) = $client->post($this->url, $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    $this->assertNotNull($result);
-    $this->assertAPIErrorCode($result, 0);
   }
 
   function testValidCallPHPSessionID() {
@@ -128,16 +113,32 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $this->assertNotNull($result);
     $this->assertAPIErrorCode($result, 0);
   }
+  */
 
-  function testInvalidAPIKey() {
-    $this->_setUpAdminSessionIdAndApiKey();
+  function testValidCallAPIKey() {
     $client = CRM_Utils_HttpClient::singleton();
     $params = array(
       "entity" => "Contact",
       "action" => "get",
       "key" => $this->settings->siteKey,
       "json" => "1",
-      "api_key" => "zzzzzzzzzzzzzzaaaaaaaaaaaaaaaaabadasdasd"
+      "api_key" => $this->settings->adminApiKey,
+    );
+    list($status, $data) = $client->post($this->url, $params);
+    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $result = json_decode($data, TRUE);
+    $this->assertNotNull($result);
+    $this->assertAPIErrorCode($result, 0);
+  }
+
+  function testInvalidAPIKey() {
+    $client = CRM_Utils_HttpClient::singleton();
+    $params = array(
+      "entity" => "Contact",
+      "action" => "get",
+      "key" => $this->settings->siteKey,
+      "json" => "1",
+      "api_key" => 'garbage_' . $this->settings->adminApiKey,
     );
     list($status, $data) = $client->post($this->url, $params);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
@@ -147,7 +148,6 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   function testNotCMSUser() {
-    $this->_setUpAdminSessionIdAndApiKey();
     $client = CRM_Utils_HttpClient::singleton();
     //Create contact with api_key
     $test_key = "testing1234";
@@ -173,6 +173,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $this->assertAPIErrorCode($result, 1);
   }
 
+  /*
   protected function _setUpAdminSessionIdAndApiKey() {
     $client = CRM_Utils_HttpClient::singleton();
     $params = array(
@@ -188,8 +189,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $this->assertAPIErrorCode($result, 0);
     $this->api_key = $result["api_key"];
     $this->session_id = $result["PHPSESSID"];
-    $this->asserTrue(isset($this->api_key), 'Failed to find admin API key');
+    $this->assertTrue(isset($this->api_key), 'Failed to find admin API key');
     return $result;
-  }
-
+  } // */
 }

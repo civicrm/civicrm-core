@@ -10,7 +10,6 @@ class CiviSeleniumSettings {
 
   var $sandboxPATH = '';
 
-  
   var $username = 'demo';
 
   var $password = 'demo';
@@ -18,6 +17,8 @@ class CiviSeleniumSettings {
   var $adminUsername = 'USERNAME';
   
   var $adminPassword = 'PASSWORD';
+
+  var $adminApiKey = NULL; // civicrm_contact.api_key for admin
 
   var $UFemail = 'noreply@civicrm.org';
 
