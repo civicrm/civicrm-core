@@ -2763,6 +2763,15 @@ AND        m.id = %1
           'civicrm/contact/view',
           "reset=1&cid={$values['creator_id']}");
 
+      $contactMailings[$mailingId]['openstats'] = "Opens: ".
+        count(CRM_Mailing_Event_BAO_Opened::getRows(
+            $values['mailing_id'], NULL, FALSE, NULL, NULL, NULL, $values['creator_id']
+          )
+        )."<br />Clicks:" .
+        count(CRM_Mailing_Event_BAO_TrackableURLOpen::getRows(
+          $values['mailing_id'], NULL, FALSE, NULL, NULL, NULL, NULL, $values['creator_id']
+        ) );
+
       $actionLinks = array(
         CRM_Core_Action::VIEW => array(
           'name'  => ts('View'),

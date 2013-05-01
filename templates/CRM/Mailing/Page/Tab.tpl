@@ -32,6 +32,7 @@
       <th class='crm-mailing-contact_created'>{ts}Added By{/ts}</th>
       <th class='crm-contact-activity_contact nosort'>{ts}With{/ts}</th>
       <th class='crm-mailing-contact-date'>{ts}Date{/ts}</th>
+      <th class='crm-mailing_openstats'>{ts}Opens/ Clicks{/ts}</th>
       <th class='crm-mailing-contact-links nosort'>&nbsp;</th>
     </tr>
     </thead>
@@ -59,6 +60,7 @@
           {sClass: 'crm-mailing-contact_created'},
           {sClass: 'crm-contact-activity_contact'},
           {sClass: 'crm-mailing-contact-date'},
+          {sClass: 'crm-mailing_openstats', bSortable:false},
           {sClass: 'crm-mailing-contact-links', bSortable: false}
         ],
         "bProcessing": true,

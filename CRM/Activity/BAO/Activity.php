@@ -2438,18 +2438,6 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
             }
           }
         }
-        if ( $values['activity_type'] == 'Bulk Email'){
-          $contactActivities[$activityId]['openstats'] = "Opens: ".
-            count(CRM_Mailing_Event_BAO_Opened::getRows(
-               CRM_Utils_Array::value('source_record_id', $values), NULL, FALSE, NULL, NULL, NULL, $params['contact_id']
-            )
-          )."<br />Clicks:" .
-            count(CRM_Mailing_Event_BAO_TrackableURLOpen::getRows(
-               CRM_Utils_Array::value('source_record_id', $values), NULL, FALSE, NULL, NULL, NULL, NULL, $params['contact_id']
-          ) );
-        }else {
-          $contactActivities[$activityId]['openstats'] = '';
-        }
 
         $contactActivities[$activityId]['activity_date'] = CRM_Utils_Date::customFormat($values['activity_date_time']);
         $contactActivities[$activityId]['status'] = $activityStatus[$values['status_id']];
