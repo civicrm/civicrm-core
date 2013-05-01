@@ -192,7 +192,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
     $this->_contributionType = $values['financial_type_id'];
 
     $csParams = array('contribution_id' => $id);
-    $softCredit = CRM_Contribute_BAO_Contribution::getSoftContribution($csParams, TRUE);
+    $softCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($csParams, TRUE);
 
     if (CRM_Utils_Array::value('soft_credit_to', $softCredit)) {
       $softCredit['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
