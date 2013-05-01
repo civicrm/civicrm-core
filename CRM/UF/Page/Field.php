@@ -130,7 +130,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
     }
 
     $locationType = array();
-    $locationType = CRM_Core_PseudoConstant::locationType();
+    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     $fields = CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE);
     $fields = array_merge(CRM_Contribute_BAO_Contribution::getContributionFields(), $fields);

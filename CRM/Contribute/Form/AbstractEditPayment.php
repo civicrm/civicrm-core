@@ -377,7 +377,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @return void
    */
   public function assignBillingType() {
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $this->_bltID = array_search('Billing', $locationTypes);
     if (!$this->_bltID) {
       CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));

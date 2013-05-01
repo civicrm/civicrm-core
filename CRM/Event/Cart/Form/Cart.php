@@ -15,7 +15,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
 
     $this->checkWaitingList();
 
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $this->_bltID = array_search('Billing', $locationTypes);
     $this->assign('bltID', $this->_bltID);
 

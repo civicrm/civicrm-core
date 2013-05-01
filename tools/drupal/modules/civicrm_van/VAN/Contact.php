@@ -121,7 +121,7 @@ AND     a.postal_code    = %3
 
     // format address params
     if (isset($person['address'])) {
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       foreach ($person['address'] as $key => $value) {
         $person['address'][$key]['location_type_id'] = array_search($person['address'][$key]['location_type'], $locationTypes);
         unset($person['address'][$key]['location_type']);

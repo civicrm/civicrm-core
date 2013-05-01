@@ -70,7 +70,7 @@ class CRM_Contact_Form_Edit_Phone {
 
     if (isset($form->_contactType) || $blockEdit) {
       //Block type select
-      $form->addElement('select', "phone[$blockId][location_type_id]", '', CRM_Core_PseudoConstant::locationType());
+      $form->addElement('select', "phone[$blockId][location_type_id]", '', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
 
       //is_Primary radio
       $js = array('id' => 'Phone_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');

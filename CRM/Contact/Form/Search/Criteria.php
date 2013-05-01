@@ -259,7 +259,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     // Phone search
     $form->addElement('text', 'phone_numeric', ts('Phone Number'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
-    $locationType = CRM_Core_PseudoConstant::locationType();
+    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $phoneType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $form->add('select', 'phone_location_type_id', ts('Phone Location'), array('' => ts('- any -')) + $locationType);
     $form->add('select', 'phone_phone_type_id', ts('Phone Type'), array('' => ts('- any -')) + $phoneType);
@@ -381,7 +381,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     // checkboxes for location type
     $location_type = array();
-    $locationType = CRM_Core_PseudoConstant::locationType();
+    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     foreach ($locationType as $locationTypeID => $locationTypeName) {
       $location_type[] = $form->createElement('checkbox', $locationTypeID, NULL, $locationTypeName);
     }

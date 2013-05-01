@@ -64,7 +64,7 @@ function civicrm_NYSS_civicrm_buildForm($formName, &$form) {
       $values = $_POST;
     }
 
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $boardOfElectionId = CRM_Utils_Array::key('BOE', $locationTypes);
 
     $addressOptions = $form->get('addressOptions');

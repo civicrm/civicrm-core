@@ -533,7 +533,7 @@ LIMIT 1;";
 
   function getBillingID(&$ids) {
     // get the billing location type
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     // CRM-8108 remove the ts around the Billing locationtype
     //$ids['billing'] =  array_search( ts('Billing'),  $locationTypes );
     $ids['billing'] = array_search('Billing', $locationTypes);

@@ -335,7 +335,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
     $dataPatterns     = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
 
-    $this->_location_types = CRM_Core_PseudoConstant::locationType();
+    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
@@ -764,7 +764,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
     $phoneTypes    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders   = CRM_Core_PseudoConstant::IMProvider();
     $websiteTypes  = CRM_Core_PseudoConstant::websiteType();
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     //these mapper params need to set key as array and val as null.
     $mapperParams = array(
@@ -882,7 +882,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
     //Updating Mapping Records
     if (CRM_Utils_Array::value('updateMapping', $params)) {
 
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
       $mappingFields = new CRM_Core_DAO_MappingField();
       $mappingFields->mapping_id = $params['mappingId'];
@@ -961,7 +961,7 @@ class CRM_Import_Form_MapField extends CRM_Core_Form {
 
       $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
 
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $contactType = $this->get('contactType');
       switch ($contactType) {
         case CRM_Import_Parser::CONTACT_INDIVIDUAL:

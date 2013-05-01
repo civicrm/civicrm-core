@@ -411,7 +411,7 @@ class CRM_Import_Form_Preview extends CRM_Core_Form {
 
     $mapFields = $this->get('fields');
 
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
 
     foreach ($mapper as $key => $value) {
