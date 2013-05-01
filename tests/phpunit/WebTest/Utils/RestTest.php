@@ -115,36 +115,94 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
   */
 
-  function testValidCallAPIKey() {
-    $client = CRM_Utils_HttpClient::singleton();
-    $params = array(
-      "entity" => "Contact",
-      "action" => "get",
-      "key" => $this->settings->siteKey,
-      "json" => "1",
-      "api_key" => $this->settings->adminApiKey,
+  /**
+   * @return array; each item is a list of parameters for testAPICalls
+   */
+  function apiTestCases() {
+    $cases = array();
+
+    // entity,action: valid apiKey, valid entity+action
+    $cases[] = array(
+      /*'query'*/ array(
+        "entity" => "Contact",
+        "action" => "get",
+        "key" => $this->settings->siteKey,
+        "json" => "1",
+        "api_key" => $this->settings->adminApiKey,
+      ),
+      /*'$is_error'*/ 0,
     );
-    list($status, $data) = $client->post($this->url, $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    $this->assertNotNull($result);
-    $this->assertAPIErrorCode($result, 0);
+
+    // entity,action: bad apiKey, valid entity+action
+    $cases[] = array(
+      /*'query'*/ array(
+        "entity" => "Contact",
+        "action" => "get",
+        "key" => $this->settings->siteKey,
+        "json" => "1",
+        "api_key" => 'garbage_' . $this->settings->adminApiKey,
+      ),
+      /*'$is_error'*/ 1,
+    );
+
+    // entity,action: valid apiKey, invalid entity+action
+    $cases[] = array(
+      /*'query'*/ array(
+        "entity" => "Contactses",
+        "action" => "get",
+        "key" => $this->settings->siteKey,
+        "json" => "1",
+        "api_key" => $this->settings->adminApiKey,
+      ),
+      /*'$is_error'*/ 1,
+    );
+
+    // q=civicrm/entity/action: valid apiKey, valid entity+action
+    $cases[] = array(
+      /*'query'*/ array(
+        "q" => "civicrm/contact/get",
+        "key" => $this->settings->siteKey,
+        "json" => "1",
+        "api_key" => $this->settings->adminApiKey,
+      ),
+      /*'$is_error'*/ 0,
+    );
+
+    // q=civicrm/entity/action: invalid apiKey, valid entity+action
+    $cases[] = array(
+      /*'query'*/ array(
+        "q" => "civicrm/contact/get",
+        "key" => $this->settings->siteKey,
+        "json" => "1",
+        "api_key" => 'garbage_' . $this->settings->adminApiKey,
+      ),
+      /*'$is_error'*/ 1,
+    );
+
+    // q=civicrm/entity/action: valid apiKey, invalid entity+action
+    $cases[] = array(
+      /*'query'*/ array(
+        "q" => "civicrm/contactses/get",
+        "key" => $this->settings->siteKey,
+        "json" => "1",
+        "api_key" => $this->settings->adminApiKey,
+      ),
+      /*'$is_error'*/ 1,
+    );
+
+    return $cases;
   }
 
-  function testInvalidAPIKey() {
+  /**
+   * @dataProvider apiTestCases
+   */
+  function testAPICalls($query, $is_error) {
     $client = CRM_Utils_HttpClient::singleton();
-    $params = array(
-      "entity" => "Contact",
-      "action" => "get",
-      "key" => $this->settings->siteKey,
-      "json" => "1",
-      "api_key" => 'garbage_' . $this->settings->adminApiKey,
-    );
-    list($status, $data) = $client->post($this->url, $params);
+    list($status, $data) = $client->post($this->url, $query);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $result = json_decode($data, TRUE);
     $this->assertNotNull($result);
-    $this->assertAPIErrorCode($result, 1);
+    $this->assertAPIErrorCode($result, $is_error);
   }
 
   function testNotCMSUser() {
