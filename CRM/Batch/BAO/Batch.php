@@ -285,8 +285,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $links = self::links();
     }
 
-    $batchTypes = CRM_Core_PseudoConstant::getBatchType();
-    $batchStatus = CRM_Core_PseudoConstant::getBatchStatus();
+    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id');
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
     $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $results = array();
