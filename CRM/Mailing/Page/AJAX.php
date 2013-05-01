@@ -68,7 +68,7 @@ class CRM_Mailing_Page_AJAX {
     //$context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
 
     $sortMapper = array(
-      0 => 'subject', 1 => 'creator_name', 2 => 'recipients', 3 => 'start_date', 4 => 'links',
+      0 => 'subject', 1 => 'creator_name', 2 => '', 3 => 'start_date', 4 => '', 5 => 'links',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -94,7 +94,7 @@ class CRM_Mailing_Page_AJAX {
     $iFilteredTotal = $iTotal = $params['total'];
     $selectorElements = array(
       'subject', 'mailing_creator', 'recipients',
-      'start_date', 'links',
+      'start_date', 'openstats', 'links',
     );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($mailings, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);

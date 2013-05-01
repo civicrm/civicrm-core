@@ -50,7 +50,6 @@
       <th class='crm-contact-activity-assignee_contact nosort'>{ts}Assigned{/ts}</th>
       <th class='crm-contact-activity-activity_date'>{ts}Date{/ts}</th>
       <th class='crm-contact-activity-activity_status'>{ts}Status{/ts}</th>
-      <th class='crm-contact-activity-activity_openstats'>{ts}Opens/ Clicks{/ts}</th>
       <th class='crm-contact-activity-links nosort'>&nbsp;</th>
       <th class='hiddenElement'>&nbsp;</th>
     </tr>
@@ -109,7 +108,6 @@ function buildContactActivities{/literal}{$context}{literal}( filterSearch ) {
       {sClass:'crm-contact-activity-assignee_contact', bSortable:false},
       {sClass:'crm-contact-activity-activity_date'},
       {sClass:'crm-contact-activity-activity_status'},
-      {sClass:'crm-contact-activity-activity_openstats', bSortable:false},
       {sClass:'crm-contact-activity-links', bSortable:false},
       {sClass:'hiddenElement', bSortable:false}
     ],
