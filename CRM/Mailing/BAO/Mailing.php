@@ -1309,12 +1309,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   public static function tokenReplace(&$mailing) {
     $domain = CRM_Core_BAO_Domain::getDomain();
 
-    foreach (array(
-      'text', 'html') as $type) {
+    foreach (array('text', 'html') as $type) {
       $tokens = $mailing->getTokens();
       if (isset($mailing->templates[$type])) {
         $mailing->templates[$type] = CRM_Utils_Token::replaceSubscribeInviteTokens($mailing->templates[$type]);
-        $mailing->templates[$type] = CRM_Utils_Token::replaceDomainTokens($mailing->templates[$type],
+        $mailing->templates[$type] = CRM_Utils_Token::replaceDomainTokens(
+          $mailing->templates[$type],
           $domain,
           $type == 'html' ? TRUE : FALSE,
           $tokens[$type]
