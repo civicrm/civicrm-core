@@ -576,14 +576,16 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $groupID = CRM_Utils_Array::key('1', $this->_formValues['group']);
 
     $pseudoconstants = array();
-    // get all the pseudoconstant values
-    foreach ($this->_fields as $name => $values) {
-      if (isset($this->_fields[$name]['pseudoconstant'])) {
-        $pseudoconstants[$name] =
-          array(
-            'dbName' => $this->_fields[$name]['name'],
-            'values' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name),
-          );
+    if (!empty($this->_fields)) {
+      // get all the pseudoconstant values
+      foreach ($this->_fields as $name => $values) {
+        if (isset($this->_fields[$name]['pseudoconstant'])) {
+          $pseudoconstants[$name] =
+            array(
+              'dbName' => $this->_fields[$name]['name'],
+              'values' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name),
+            );
+        }
       }
     }
 
