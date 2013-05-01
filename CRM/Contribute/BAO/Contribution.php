@@ -1289,26 +1289,31 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   }
 
   /**
-   *  Function to retrieve soft contributon for contribution record.
+   *  Function to retrieve soft contributions for contribution record.
    *  @param array $params an associated array
+   *  @param boolean $all include PCP data
    *
-   *  @return soft contribution id
+   *  @return array of soft contribution ids, amounts, and associated contact ids
    *  @static
    */
   static function getSoftContribution($params, $all = FALSE) {
     $cs = new CRM_Contribute_DAO_ContributionSoft();
     $cs->copyValues($params);
     $softContribution = array();
-    if ($cs->find(TRUE)) {
-      if ($all) {
-        foreach (array(
-          'pcp_id', 'pcp_display_in_roll', 'pcp_roll_nickname', 'pcp_personal_note') as $key => $val) {
-          $softContribution[$val] = $cs->$val;
-        }
-      }
-      $softContribution['soft_credit_to'] = $cs->contact_id;
-      $softContribution['soft_credit_id'] = $cs->id;
+    $cs->find(); 
+    if ($cs->N > 0) {
+      while ($cs->fetch()) {
 
+        if ($all) {
+          foreach (array(
+            'pcp_id', 'pcp_display_in_roll', 'pcp_roll_nickname', 'pcp_personal_note') as $key => $val) {
+            $softContribution[$val] = $cs->$val;
+          }
+        }
+        $softContribution[$cs->id]['soft_credit_to'] = $cs->contact_id;
+        $softContribution[$cs->id]['soft_credit_id'] = $cs->id;
+        $softContribution[$cs->id]['soft_credit_amount'] = $cs->amount;
+      }
     }
     return $softContribution;
   }
