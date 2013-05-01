@@ -56,7 +56,13 @@
 {literal}
 <script type="text/javascript">
   var allowMultiClient = Boolean({/literal}{if !empty($multiClient)}1{else}0{/if}{literal});
-  var prePopulateData = {/literal}{$prePopulateData}{literal};
+
+  {/literal}
+  var prePopulateData = '';
+  {if $prePopulateData}
+      prePopulateData = {$prePopulateData};
+  {/if}
+  {literal}
 
   var existingTokens = '';
   cj( function( ) {
