@@ -62,7 +62,7 @@
 {/if}
 
 <div class="action-link">
-  <a href="{crmURL p='civicrm/mailing/report' q="mid=`$mailing_id`&reset=1"}">&raquo; {ts}Back to Report{/ts}</a>
+  <a href="{$backUrl}">&raquo; {$backUrlTitle}</a>
 </div>
 
 {include file="CRM/common/pager.tpl" location="bottom"}
