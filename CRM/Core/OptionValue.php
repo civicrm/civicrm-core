@@ -318,38 +318,7 @@ class CRM_Core_OptionValue {
           );
           $nameTitle = array_merge($nameTitle, $title);
         }
-
-        if ($contactType == 'Individual' || $contactType == 'All') {
-          $contactFields = CRM_Contact_DAO_Contact::fields();
-          $title = array(
-            'gender' => array(
-              'name' => 'gender',
-              'dbName' => 'gender_id',
-              'title' => ts('Gender'),
-              'headerPattern' => '/^gender$/i',
-              'pseudoconstant' => $contactFields['gender_id']['pseudoconstant'],
-              'where' => 'contact_a.gender_id',
-             ),
-            'individual_prefix' => array(
-              'name' => 'individual_prefix',
-              'dbName' => 'prefix_id',
-              'title' => ts('Individual Prefix'),
-              'headerPattern' => '/^(prefix|title)/i',
-              'pseudoconstant' => $contactFields['prefix_id']['pseudoconstant'],
-              'where' => 'contact_a.prefix_id',
-            ),
-            'individual_suffix' => array(
-              'name' => 'individual_suffix',
-              'dbName' => 'suffix_id',
-              'title' => ts('Individual Suffix'),
-              'headerPattern' => '/^suffix$/i',
-              'pseudoconstant' => $contactFields['suffix_id']['pseudoconstant'],
-              'where' => 'contact_a.suffix_id',
-             ),
-           );
-           $nameTitle = array_merge($nameTitle, $title);
-         }
-       }
+      }
 
       if (is_array($nameTitle)) {
         foreach ($nameTitle as $name => $attribs) {
@@ -376,7 +345,7 @@ class CRM_Core_OptionValue {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {
       $field = self::getFields();
       foreach ($field as $name => $values) {
-        if ($values['pseudoconstant']) {
+        if (CRM_Utils_Array::value('pseudoconstant', $values)) {
           continue;
         }
         list($tableName, $fieldName) = explode('.', $values['where']);

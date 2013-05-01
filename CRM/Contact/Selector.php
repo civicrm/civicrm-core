@@ -419,7 +419,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $headers = self::$_columnHeaders;
     }
     elseif (!empty($this->_returnProperties)) {
-
       self::$_columnHeaders = array(array('name' => ''),
         array(
           'name' => ts('Name'),
@@ -523,7 +522,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $names = array();
       static $skipFields = array('group', 'tag');
       foreach ($this->_fields as $key => $field) {
-        if (CRM_Utils_Array::value('in_selector', $field) &&
+        if (
+          CRM_Utils_Array::value('in_selector', $field) &&
           !in_array($key, $skipFields)
         ) {
           if (strpos($key, '-') !== FALSE) {
@@ -575,17 +575,38 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     //check explicitly added contact to a Smart Group.
     $groupID = CRM_Utils_Array::key('1', $this->_formValues['group']);
 
+    $pseudoconstants = array();
+    // get all the pseudoconstant values
+    foreach ($this->_fields as $name => $values) {
+      if (isset($this->_fields[$name]['pseudoconstant'])) {
+        $pseudoconstants[$name] =
+          array(
+            'dbName' => $this->_fields[$name]['name'],
+            'values' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name),
+          );
+      }
+    }
+
     // for CRM-3157 purposes
     if (in_array('country', $names)) {
-      $countries = CRM_Core_PseudoConstant::country();
+      $pseudoconstants['country'] = array(
+        'dbName' => 'country_id',
+        'values' => CRM_Core_PseudoConstant::country()
+      );
     }
 
     if (in_array('state_province', $names)) {
-      $provinces = CRM_Core_PseudoConstant::stateProvince();
+      $pseudoconstants['state_province'] = array(
+        'dbName' => 'state_province_id',
+        'values' => CRM_Core_PseudoConstant::stateProvince()
+      );
     }
 
     if (in_array('world_region', $names)) {
-      $regions = CRM_Core_PseudoConstant::worldRegion();
+      $pseudoconstants['world_region'] = array(
+        'dbName' => 'world_region_id',
+        'values' => CRM_Core_PseudoConstant::worldRegion()
+      );
     }
 
     $seenIDs = array();
@@ -598,29 +619,21 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           continue;
         }
         if ($cfID = CRM_Core_BAO_CustomField::getKeyID($property)) {
-          $row[$property] = CRM_Core_BAO_CustomField::getDisplayValue($result->$property,
+          $row[$property] = CRM_Core_BAO_CustomField::getDisplayValue(
+            $result->$property,
             $cfID,
             $this->_options,
             $result->contact_id
           );
         }
-        elseif ($multipleSelectFields &&
+        elseif (
+          $multipleSelectFields &&
           array_key_exists($property, $multipleSelectFields)
         ) {
-          //fix to display student checkboxes
           $key = $property;
           $paramsNew = array($key => $result->$property);
+          $name = array($key => array('newName' => $key, 'groupName' => $key));
 
-          if ($key == 'test_tutoring') {
-            $name = array($key => array('newName' => $key, 'groupName' => 'test'));
-            // for  readers group
-          }
-          elseif (substr($key, 0, 4) == 'cmr_') {
-            $name = array($key => array('newName' => $key, 'groupName' => substr($key, 0, -3)));
-          }
-          else {
-            $name = array($key => array('newName' => $key, 'groupName' => $key));
-          }
           CRM_Core_OptionGroup::lookupValues($paramsNew, $name, FALSE);
           $row[$key] = $paramsNew[$key];
         }
@@ -638,14 +651,11 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $greeting = $property . '_display';
           $row[$property] = $result->$greeting;
         }
-        elseif ($property == 'country') {
-          $row[$property] = CRM_Utils_Array::value($result->country_id, $countries);
-        }
-        elseif ($property == 'state_province') {
-          $row[$property] = CRM_Utils_Array::value($result->state_province_id, $provinces);
-        }
-        elseif ($property == 'world_region') {
-          $row[$property] = CRM_Utils_Array::value($result->worldregion_id, $regions);
+        elseif (isset($pseudoconstants[$property])) {
+          $row[$property] = CRM_Utils_Array::value(
+            $result->{$pseudoconstants[$property]['dbName']},
+            $pseudoconstants[$property]['values']
+          );
         }
         elseif (strpos($property, '-url') !== FALSE) {
           $websiteUrl = '';

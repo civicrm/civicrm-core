@@ -380,8 +380,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $formattedFields = array();
     foreach ($fieldArrs as $fieldArr) {
-      //$field = new CRM_Core_DAO_UFField();
-      //$field->copyValues($fieldArr); // no... converts string('') to string('null')
       $field = (object) $fieldArr;
       if (!self::filterUFField($field, $searchable, $showAll, $visibility)) {
         continue;
@@ -467,6 +465,15 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'add_captcha' => isset($group->add_captcha) ? $group->add_captcha : NULL,
       'field_type' => $field->field_type,
       'field_id' => $field->id,
+      'pseudoconstant' => CRM_Utils_Array::value(
+        'pseudoconstant',
+        CRM_Utils_Array::value($field->field_name, $importableFields)
+      ),
+      // obsolete this when we remove the name / dbName discrepancy with gender/suffix/prefix
+      'dbName' => CRM_Utils_Array::value(
+        'dbName',
+        CRM_Utils_Array::value($field->field_name, $importableFields)
+      ),
       'skipDisplay' => 0,
     );
 

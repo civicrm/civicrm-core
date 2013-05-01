@@ -342,6 +342,7 @@
       </pseudoconstant>
       <headerPattern>/^(prefix|title)/i</headerPattern>
       <dataPattern>/^(mr|ms|mrs|sir|dr)\.?$/i</dataPattern>
+      <import>true</import>
       <add>1.2</add>
   </field>
   <index>
@@ -356,6 +357,7 @@
       <pseudoconstant>
         <optionGroupName>individual_suffix</optionGroupName>
       </pseudoconstant>
+      <import>true</import>
       <comment>Suffix for name (Jr, Sr...). FK to suffix ID</comment>
       <headerPattern>/^suffix$/i</headerPattern>
       <dataPattern>/^(sr|jr)\.?|i{2,}$/</dataPattern>
@@ -484,6 +486,7 @@
       </pseudoconstant>
       <headerPattern>/^gender$/i</headerPattern>
       <comment>FK to gender ID</comment>
+      <import>true</import>
       <add>1.2</add>
   </field>
   <index>
