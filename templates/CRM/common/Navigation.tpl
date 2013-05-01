@@ -38,7 +38,7 @@
             </form>
           <ul>
             <li><label class="crm-quickSearchField"><input type="radio" checked="" data-tablename="cc" checked="checked" value="" name="quickSearchField">{ts}Name/Email{/ts}</label></li>
-            <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="id" name="quickSearchField">{ts}CiviCRM ID{/ts}</label></li>
+            <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="contact_id" name="quickSearchField">{ts}CiviCRM ID{/ts}</label></li>
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="external_identifier" name="quickSearchField">{ts}External ID{/ts}</label></li>
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="first_name" name="quickSearchField">{ts}First Name{/ts}</label></li>
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="last_name" name="quickSearchField">{ts}Last Name{/ts}</label></li>
@@ -141,7 +141,7 @@ cj(function( ) {
   else {
     cj("#menu-container").show().css({'padding-bottom': '10px'});
   }
-  
+
   cj('#civicrm-menu').ready(function() {
     cj('#root-menu-div .outerbox').css({ 'margin-top': '6px'});
     cj('#root-menu-div .outerbox').first().css({ 'margin-top': '20px'});
