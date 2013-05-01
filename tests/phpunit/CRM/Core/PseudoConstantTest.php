@@ -50,6 +50,16 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     // - sample: Any one value which is expected in the list of option values.
     // - max: integer (default = 10) maximum number of option values expected.
     $fields = array(
+      'CRM_Batch_DAO_Batch' => array(
+        array(
+          'fieldName' => 'type_id',
+          'sample' => 'Membership',
+        ),
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'Reopened',
+        ),
+      ),
       'CRM_Project_DAO_Task' => array(
         array(
           'fieldName' => 'priority_id',

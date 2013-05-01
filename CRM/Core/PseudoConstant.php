@@ -288,20 +288,6 @@ class CRM_Core_PseudoConstant {
   private static $batchModes;
 
   /**
-   * batch type options
-   * @var array
-   * @static
-   */
-  private static $batchTypes;
-
-  /**
-   * batch status options
-   * @var array
-   * @static
-   */
-  private static $batchStatues;
-
-  /**
    * contact Type
    * @var array
    * @static
@@ -1976,42 +1962,6 @@ WHERE  id = %1
     }
 
     return self::$batchModes;
-  }
-
-  /**
-   * Get all batch types
-   *
-   * The static array batchTypes
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all batch types
-   */
-  public static function &getBatchType() {
-    if (!self::$batchTypes) {
-      self::$batchTypes = CRM_Core_OptionGroup::values('batch_type');
-    }
-
-    return self::$batchTypes;
-  }
-
-  /**
-   * Get all batch statuses
-   *
-   * The static array batchStatues
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all batch statuses
-   */
-  public static function &getBatchStatus() {
-    if (!self::$batchStatues) {
-      self::$batchStatues = CRM_Core_OptionGroup::values('batch_status');
-    }
-
-    return self::$batchStatues;
   }
 
   /*

@@ -114,12 +114,18 @@
     <required>true</required>
     <comment>fk to Batch Status options in civicrm_option_values</comment>
     <add>4.2</add>
+    <pseudoconstant>
+      <optionGroupName>batch_status</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>type_id</name>
     <type>int unsigned</type>
     <comment>fk to Batch Type options in civicrm_option_values</comment>
     <add>4.2</add>
+    <pseudoconstant>
+      <optionGroupName>batch_type</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>mode_id</name>
