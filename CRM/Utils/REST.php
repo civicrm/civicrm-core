@@ -83,7 +83,7 @@ class CRM_Utils_REST {
    * @access public
    * @static
    */
-  public function authenticate($name, $pass) {
+  public static function authenticate($name, $pass) {
 
     $result = CRM_Utils_System::authenticate($name, $pass);
 
@@ -345,7 +345,7 @@ class CRM_Utils_REST {
     if (!$valid_user) {
       $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
       if (!$api_key || strtolower($api_key) == 'null') {
-        return ("FATAL:mandatory param 'api_key' (user key) missing");
+        return self::error("FATAL:mandatory param 'api_key' (user key) missing");
       }
       $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
     }
@@ -678,6 +678,11 @@ class CRM_Utils_REST {
 
     if ($uid) {
       CRM_Utils_System::loadBootStrap(array('uid' => $uid), TRUE, FALSE);
+    }
+    else {
+      $err = array('error_message' => 'no CMS user associated with given api-key', 'is_error' => 1);
+      echo self::output($err);
+      CRM_Utils_System::civiExit();
     }
   }
 }
