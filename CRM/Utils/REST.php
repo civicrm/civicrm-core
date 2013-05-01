@@ -345,7 +345,7 @@ class CRM_Utils_REST {
     if (!$valid_user) {
       $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
       if (!$api_key || strtolower($api_key) == 'null') {
-        return ("FATAL:mandatory param 'api_key' (user key) missing");
+        return self::error("FATAL:mandatory param 'api_key' (user key) missing");
       }
       $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
     }

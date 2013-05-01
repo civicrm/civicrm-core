@@ -36,6 +36,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       $prefix .= ': ';
     }
     $this->assertEquals($cmpvar, $apiResult['is_error'], $prefix . (empty($apiResult['error_message']) ? '' : $apiResult['error_message']));
+    //$this->assertEquals($cmpvar, $apiResult['is_error'], $prefix . print_r($apiResult, TRUE));
   }
 
   protected function setUp() {
@@ -116,90 +117,102 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   */
 
   /**
+   * Build a list of test cases. Each test case defines a set of REST query
+   * parameters and an expected outcome for the REST request (eg is_error=>1 or is_error=>0).
+   *
    * @return array; each item is a list of parameters for testAPICalls
    */
   function apiTestCases() {
     $cases = array();
 
+    // entity,action: omit apiKey, valid entity+action
+    $cases[] = array(
+      array( // query
+        "entity" => "Contact",
+        "action" => "get",
+        "key" => $this->settings->siteKey,
+        "json" => "1",
+      ),
+      1, // is_error
+    );
+
     // entity,action: valid apiKey, valid entity+action
     $cases[] = array(
-      /*'query'*/
-      array(
+      array( // query
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/
-      0,
+      0, // is_error
     );
 
     // entity,action: bad apiKey, valid entity+action
     $cases[] = array(
-      /*'query'*/
-      array(
+      array( // query
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => 'garbage_' . $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/
-      1,
+      1, // is_error
     );
 
     // entity,action: valid apiKey, invalid entity+action
     $cases[] = array(
-      /*'query'*/
-      array(
+      array( // query
         "entity" => "Contactses",
         "action" => "get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/
-      1,
+      1, // is_error
+    );
+
+    // q=civicrm/entity/action: omit apiKey, valid entity+action
+    $cases[] = array(
+      array( // query
+        "q" => "civicrm/contact/get",
+        "key" => $this->settings->siteKey,
+        "json" => "1",
+      ),
+      1, // is_error
     );
 
     // q=civicrm/entity/action: valid apiKey, valid entity+action
     $cases[] = array(
-      /*'query'*/
-      array(
+      array( // query
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/
-      0,
+      0, // is_error
     );
 
     // q=civicrm/entity/action: invalid apiKey, valid entity+action
     $cases[] = array(
-      /*'query'*/
-      array(
+      array( // query
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => 'garbage_' . $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/
-      1,
+      1, // is_error
     );
 
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     $cases[] = array(
-      /*'query'*/
-      array(
+      array( // query
         "q" => "civicrm/contactses/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/
-      1,
+      1, // is_error
     );
 
     return $cases;
