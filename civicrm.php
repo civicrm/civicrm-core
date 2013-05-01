@@ -44,6 +44,11 @@ License: AGPL3
 
 
 
+// this file must not accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+
+
 // set version here: when it changes, will force JS to reload
 define( 'CIVICRM_PLUGIN_VERSION', '4.3' );
 
@@ -70,17 +75,75 @@ class CiviCRM_For_WordPress {
 	 * declare our properties
 	 */
 	
+	// plugin instance
+	private static $instance;
+	
 	// plugin context
 	static $in_wordpress;
 	
 	
 	
-	/** 
-	 * @description: initialises this object
-	 * @return object
+	/**
+	 * @description: getter method which returns the CiviCRM instance and optionally
+	 * creates one if it does not already exist. Props to bbPress for the architecture.
+	 * @return CiviCRM plugin instance
 	 */
-	function __construct() {
-	
+	public static function instance() {
+		
+		// if it doesn't already exist...
+		if ( ! isset( self::$instance ) ) {
+		
+			// create it
+			self::$instance = new CiviCRM_For_WordPress;
+			self::$instance->setup_instance();
+			
+		}
+		
+		// return existing instance
+		return self::$instance;
+		
+	}
+
+
+
+	/** 
+	 * @description: dummy instance constructor
+	 */
+	function __construct() {}
+
+	/**
+	 * @description: dummy magic method to prevent CiviCRM_For_WordPress from being cloned
+	 */
+	public function __clone() { 
+		_doing_it_wrong( __FUNCTION__, __( 'Only one instance of CiviCRM_For_WordPress please' ), '4.3' );
+	}
+
+	/**
+	 * @description: dummy magic method to prevent CiviCRM_For_WordPress from being unserialized
+	 */
+	public function __wakeup() {
+		_doing_it_wrong( __FUNCTION__, __( 'Please do not serialize CiviCRM_For_WordPress', 'bbpress' ), '4.3' );
+	}
+
+
+
+	/**
+	 * @description: method that runs only when CiviCRM plugin is activated
+	 */
+	public function activate() {
+
+		// Assign minimum capabilities for all WordPress roles and create 'anonymous_user' role
+		$this->set_wp_user_capabilities();
+
+	}
+
+
+
+	/**
+	 * @description: set up the CiviCRM plugin instance
+	 */
+	public function setup_instance() {
+		
 		// kick out if another instance is being inited
 		if ( isset( $this->in_wordpress ) ) { 
 			wp_die( 'Only one instance of CiviCRM_For_WordPress please' );
@@ -104,21 +167,6 @@ class CiviCRM_For_WordPress {
 		// same procedure as civicrm_wp_main()
 		$this->register_hooks();
 		
-		// --<
-		return $this;
-
-	}
-
-
-
-	/**
-	 * @description: method that runs only when CiviCRM plugin is activated
-	 */
-	public function activate() {
-
-		// Assign minimum capabilities for all WordPress roles and create 'anonymous_user' role
-		$this->set_wp_user_capabilities();
-
 	}
 
 
@@ -570,8 +618,8 @@ class CiviCRM_For_WordPress {
 		// CMW: hacky procedure for overriding WordPress page/post:
 		// see comments on set_post_blank()
 		if ( $shortcode ) {
-			// CMW: fails, because a lot of the page (eg, title) has already been rendered
 			$this->turn_comments_off();
+			// CMW: this fails, because a lot of the page (eg, title) has already been rendered
 			$this->set_post_blank();
 		} else {
 			add_filter( 'get_header', array( $this, 'turn_comments_off' ) );
@@ -619,9 +667,14 @@ class CiviCRM_For_WordPress {
 		if ( $shortcode ) {
 			
 			// CMW: review in the light of proper shortcode research
+			// First question: I can add more than one shortcode to a page, but
+			// only the first one appears in the output, even though this runs twice
+			
 			ob_start(); // start buffering
 			$this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
 			$content = ob_get_clean(); // save the output and flush the buffer
+			//print_r( array( $content ) );
+			
 			return $content;
 			
 		} else {
@@ -1319,16 +1372,41 @@ Procedures start here
 */
 
 
-// stash our object in a global for now...
-global $civicrm_for_wordpress;
+/**
+ * The main function responsible for returning the CiviCRM_For_WordPress instance
+ * to functions everywhere.
+ *
+ * Use this function like you would a global variable, except without needing
+ * to declare the global.
+ *
+ * Example: $civi = civi_wp();
+ *
+ * @return the CiviCRM_For_WordPress instance
+ */
+function civi_wp() {
+	return CiviCRM_For_WordPress::instance();
+}
 
-// eventually, we'll stash it in an instance in the CiviCRM_For_WordPress class
-$civicrm_for_wordpress = new CiviCRM_For_WordPress;
+/**
+ * Hook CiviCRM_For_WordPress early onto the 'plugins_loaded' action.
+ *
+ * This gives all other plugins the chance to load before CiviCRM, to get their
+ * actions, filters, and overrides setup without CiviCRM being in the way.
+ */
+if ( defined( 'CIVICRM_LATE_LOAD' ) ) {
+	add_action( 'plugins_loaded', 'civi_wp', (int) CIVICRM_LATE_LOAD );
+
+// initialize
+} else {
+	civi_wp();
+}
+
+
 
 // tell WordPress to call plugin activation method, although it's still directed
 // at the legacy callback, in case there are situations where the function is
-// called from elsewhere. Should be:
-// register_activation_hook( $civicrm_for_wordpress, 'civicrm_activate' );
+// called from elsewhere. Should perhaps be:
+// register_activation_hook( 'CiviCRM_For_WordPress, 'civicrm_activate' );
 register_activation_hook( __FILE__, 'civicrm_activate' );
 
 
@@ -1345,8 +1423,7 @@ previous versions of the CiviCRM WordPress plugin.
  * register the plugin's WordPress hooks
  */
 function civicrm_wp_main() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->register_hooks();
+	civi_wp()->register_hooks();
 }
 
 /**
@@ -1355,8 +1432,7 @@ function civicrm_wp_main() {
  * Also a callback for the 'init' hook in civicrm_wp_main()
  */
 function wp_civicrm_capability() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->set_access_capabilities();
+	civi_wp()->set_access_capabilities();
 }
 
 /**
@@ -1364,32 +1440,28 @@ function wp_civicrm_capability() {
  * Adds menu items to WordPress admin menu
  */
 function civicrm_wp_add_menu_items() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->add_menu_items();
+	civi_wp()->add_menu_items();
 }
 
 /**
  * callback method for 'media_buttons_context' hook as set in civicrm_wp_main()
  */
 function civicrm_add_form_button( $context ) {
-	global $civicrm_for_wordpress;
-	return $civicrm_for_wordpress->add_form_button( $context );
+	return civi_wp()->add_form_button( $context );
 }
 
 /**
  * Callback method for 'admin_footer' hook as set in civicrm_wp_main()
  */
 function civicrm_add_form_button_html() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->add_form_button_html();
+	civi_wp()->add_form_button_html();
 }
 
 /**
  * Callback function for missing settings file in civicrm_wp_main()
  */
 function civicrm_setup_warning() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->show_setup_warning();
+	civi_wp()->show_setup_warning();
 }
 
 /**
@@ -1397,8 +1469,7 @@ function civicrm_setup_warning() {
  * Callback from WordPress 'admin_head' and 'wp_head' hooks
  */
 function civicrm_wp_head() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->wp_head();
+	civi_wp()->wp_head();
 }
 
 /**
@@ -1421,16 +1492,14 @@ function civicrm_profile_update( $userID ) {
  * first_name or last_name attributes
  */
 function _civicrm_update_user( $userID ) {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->update_user( $userID );
+	civi_wp()->update_user( $userID );
 }
 
 /**
  * Callback function for 'get_header' hook
  */
 function civicrm_wp_shortcode_includes() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->add_shortcode_includes();
+	civi_wp()->add_shortcode_includes();
 }
 
 /**
@@ -1439,24 +1508,21 @@ function civicrm_wp_shortcode_includes() {
  * Also called at the top of this plugin file to determine AJAX status
  */
 function civicrm_wp_in_civicrm() {
-	global $civicrm_for_wordpress;
-	return $civicrm_for_wordpress->civicrm_in_wordpress();
+	return civi_wp()->civicrm_in_wordpress();
 }
 
 /**
  * Start buffering, called in civicrm_wp_main()
  */
 function civicrm_buffer_start() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->buffer_start();
+	civi_wp()->buffer_start();
 }
 
 /**
  * Flush buffer, callback for 'wp_footer'
  */
 function civicrm_buffer_end() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->buffer_end();
+	civi_wp()->buffer_end();
 }
 
 /**
@@ -1471,8 +1537,7 @@ function civicrm_buffer_callback($buffer) {
  * Called by civicrm_wp_main() and civicrm_shortcode_handler()
  */
 function civicrm_wp_frontend( $shortcode = false ) {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->wp_frontend( $shortcode );
+	civi_wp()->wp_frontend( $shortcode );
 }
 
 /**
@@ -1488,48 +1553,42 @@ function civicrm_wp_initialize() {
  * they use the CiviCRM API.
  */
 function civicrm_initialize() {
-	global $civicrm_for_wordpress;
-	return $civicrm_for_wordpress->initialize();
+	return civi_wp()->initialize();
 }
 
 /**
  * Override WordPress post comment status attribute in civicrm_wp_frontend()
  */
 function civicrm_turn_comments_off() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->turn_comments_off();
+	civi_wp()->turn_comments_off();
 }
 
 /**
  * Override WordPress post attributes in civicrm_wp_frontend()
  */
 function civicrm_set_post_blank() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->set_post_blank();
+	civi_wp()->set_post_blank();
 }
 
 /**
  * Callback from 'edit_post_link' hook to remove edit link in civicrm_set_post_blank()
  */
 function civicrm_set_blank() {
-	global $civicrm_for_wordpress;
-	return $civicrm_for_wordpress->set_blank();
+	return civi_wp()->set_blank();
 }
 
 /**
  * Authentication function used by civicrm_wp_frontend()
  */
 function civicrm_check_permission( $args ) {
-	global $civicrm_for_wordpress;
-	return $civicrm_for_wordpress->check_permission( $args );
+	return civi_wp()->check_permission( $args );
 }
 
 /**
  * Called when authentication fails in civicrm_wp_frontend()
  */
 function civicrm_set_frontendmessage() {
-	global $civicrm_for_wordpress;
-	return $civicrm_for_wordpress->show_permission_denied();
+	return civi_wp()->show_permission_denied();
 }
 
 /**
@@ -1539,24 +1598,21 @@ function civicrm_set_frontendmessage() {
  * Also used by civicrm_wp_shortcode_includes() and _civicrm_update_user()
  */
 function civicrm_wp_invoke() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->invoke();
+	civi_wp()->invoke();
 }
 
 /**
  * Only called by civicrm_wp_invoke() to undo WordPress default behaviour
  */
 function civicrm_remove_wp_magic_quotes() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->remove_wp_magic_quotes();
+	civi_wp()->remove_wp_magic_quotes();
 }
 
 /**
  * Method that runs only when civicrm plugin is activated.
  */
 function civicrm_activate() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->activate();
+	civi_wp()->activate();
 }
 
 /**
@@ -1565,16 +1621,14 @@ function civicrm_activate() {
  * This function is called on plugin activation and also from upgrade_4_3_alpha1()
  */
 function civicrm_wp_set_capabilities() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->set_wp_user_capabilities();
+	civi_wp()->set_wp_user_capabilities();
 }
 
 /**
  * Callback function for add_options_page() that runs the CiviCRM installer
  */
 function civicrm_run_installer() {
-	global $civicrm_for_wordpress;
-	$civicrm_for_wordpress->run_installer();
+	civi_wp()->run_installer();
 }
 
 /**
@@ -1583,16 +1637,14 @@ function civicrm_run_installer() {
  * @return $ctype contact type
  */
 function civicrm_get_ctype( $default = NULL ) {
-	global $civicrm_for_wordpress;
-	return $civicrm_for_wordpress->get_civicrm_contact_type( $default );
+	return civi_wp()->get_civicrm_contact_type( $default );
 }
 
 /**
  * Handles CiviCRM-defined shortcodes, but probably never called directly
  */
 function civicrm_shortcode_handler( $atts ) {
-	global $civicrm_for_wordpress;
-	return $civicrm_for_wordpress->shortcode_handler( $atts );
+	return civi_wp()->shortcode_handler( $atts );
 }
 
 /**
@@ -1615,6 +1667,8 @@ function wp_set_breadcrumb( $breadCrumb ) {
   return $wp_set_breadCrumb;
 }
 
+
+
 /**
  * String replacement function similar to sprintf
  */
@@ -1631,7 +1685,6 @@ function t( $str, $sub = NULL ) {
 function cividie( $var ) {
 	print_r( $var ); die();
 }
-
 
 
 
