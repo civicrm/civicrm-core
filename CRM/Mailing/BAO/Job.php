@@ -124,12 +124,14 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
         // we've got the lock, but while we were waiting and processing
         // other emails, this job might have changed under us
         // lets get the job status again and check
-        $job->status = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Job',
+        $job->status = CRM_Core_DAO::getFieldValue(
+          'CRM_Mailing_DAO_Job',
           $job->id,
           'status'
         );
 
-        if ($job->status != 'Running' &&
+        if (
+          $job->status != 'Running' &&
           $job->status != 'Scheduled'
         ) {
           // this includes Cancelled and other statuses, CRM-4246
@@ -511,7 +513,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $fields = array();
 
     if (!empty($testParams)) {
-      $mailing->from_name = ts('CiviCRM Test Mailer (%1)',
+      $mailing->from_name = ts(
+        'CiviCRM Test Mailer (%1)',
         array(1 => $mailing->from_name)
       );
       $mailing->subject = ts('Test Mailing:') . ' ' . $mailing->subject;
@@ -577,9 +580,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   public function deliverGroup(&$fields, &$mailing, &$mailer, &$job_date, &$attachments) {
     static $smtpConnectionErrors = 0;
 
-    if (!is_object($mailer) ||
-      empty($fields)
-    ) {
+    if (!is_object($mailer) || empty($fields)) {
       CRM_Core_Error::fatal();
     }
 
@@ -607,15 +608,16 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       if (!array_key_exists($contactID, $details[0])) {
         $details[0][$contactID] = array();
       }
-      /* Compose the mailing */
 
+      /* Compose the mailing */
       $recipient = $replyToEmail = NULL;
       $replyValue = strcmp($mailing->replyto_email, $mailing->from_email);
       if ($replyValue) {
         $replyToEmail = $mailing->replyto_email;
       }
 
-      $message = &$mailing->compose($this->id, $field['id'], $field['hash'],
+      $message = &$mailing->compose(
+        $this->id, $field['id'], $field['hash'],
         $field['contact_id'], $field['email'],
         $recipient, FALSE, $details[0][$contactID], $attachments,
         FALSE, NULL, $replyToEmail
@@ -671,10 +673,10 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
             continue;
           }
 
-
           // seems like we have too many of them in a row, we should
           // write stuff to disk and abort the cron job
-          $this->writeToDB($deliveredParams,
+          $this->writeToDB(
+            $deliveredParams,
             $targetParams,
             $mailing,
             $job_date
@@ -698,13 +700,13 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       }
       else {
         /* Register the delivery event */
-
         $deliveredParams[] = $field['id'];
         $targetParams[] = $field['contact_id'];
 
         $count++;
         if ($count % CRM_Core_DAO::BULK_MAIL_INSERT_COUNT == 0) {
-          $this->writeToDB($deliveredParams,
+          $this->writeToDB(
+            $deliveredParams,
             $targetParams,
             $mailing,
             $job_date
@@ -714,10 +716,14 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           // hack to stop mailing job at run time, CRM-4246.
           // to avoid making too many DB calls for this rare case
           // lets do it when we snapshot
-          $status = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Job',
+          $status = CRM_Core_DAO::getFieldValue(
+            'CRM_Mailing_DAO_Job',
             $this->id,
-            'status'
+            'status',
+            'id',
+            TRUE
           );
+
           if ($status != 'Running') {
             return FALSE;
           }
@@ -738,7 +744,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       }
     }
 
-    $result = $this->writeToDB($deliveredParams,
+    $result = $this->writeToDB(
+      $deliveredParams,
       $targetParams,
       $mailing,
       $job_date
