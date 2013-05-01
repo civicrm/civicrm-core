@@ -847,29 +847,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
-    
-    /*
-    // If we have a contact for this contribution, pass cid= to the dataUrl to exclude current contact from autocomplete results
-    if ($this->_contactID) {
-      $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-        "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&reset=1&context=softcredit&cid={$this->_contactID}",
-        FALSE, NULL, FALSE
-      );
-    } else {
-      $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-        'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&reset=1&context=softcredit',
-        FALSE, NULL, FALSE
-      );
-    }
-    $this->assign('dataUrl', $dataUrl);
 
-    $this->addElement('text', 'soft_credit_to', ts('Soft Credit To'));
-    // Tell tpl to hide Soft Credit field if contribution is linked directly to a PCP Page
-    if (CRM_Utils_Array::value('pcp_made_through_id', $this->_values)) {
-      $this->assign('pcpLinked', 1);
-    }
-    $this->addElement('hidden', 'soft_contact_id', '', array('id' => 'soft_contact_id'));
-    */
     $js = NULL;
     if (!$this->_mode) {
       $js = array('onclick' => "return verify( );");
@@ -1111,7 +1089,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
     else {
-        //build soft credit params
+      //build soft credit params
       if (!empty($submittedValues['soft_credit_contact_select_id']))
         $softParams = array();
         foreach( $submittedValues['soft_credit_contact_select_id'] as $key => $val) {
@@ -1125,10 +1103,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($softParams)) {
       $params['soft_credit'] = $softParams;
     }
-
-    /* if (CRM_Utils_Array::value('soft_credit_to', $submittedValues)) {
-      $submittedValues['soft_credit_to'] = $submittedValues['soft_contact_id'];
-      }*/
 
     // set the contact, when contact is selected
     if (CRM_Utils_Array::value('contact_select_id', $submittedValues)) {
@@ -1160,25 +1134,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'cancel_reason',
         'source',
         'check_number',
-        /*'soft_credit_to',
-        'pcp_made_through_id',
-        'pcp_display_in_roll',
-        'pcp_roll_nickname',
-        'pcp_personal_note',*/
       );
       foreach ($fields as $f) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
       }
 
       if (!empty($pcp)) {
-          $params['pcp'] = $pcp;
+        $params['pcp'] = $pcp;
       }
       if (!empty($softParams)) {
-          $params['soft_credit'] = $softParams;
+        $params['soft_credit'] = $softParams;
       }
-      /*if ($softID = CRM_Utils_Array::value('softID', $this->_values)) {
-        $params['softID'] = $softID;
-        }*/
+
       //if priceset is used, no need to cleanup money
       //CRM-5740
       if ($priceSetId) {
