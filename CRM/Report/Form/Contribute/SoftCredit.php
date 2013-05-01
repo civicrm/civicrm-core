@@ -82,6 +82,14 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'required' => TRUE,
           ),
         ),
+        'filters' =>
+        array(
+          'sort_name' =>
+          array(
+            'name' => 'sort_name',
+            'title' => ts('Soft Credit Name')
+          ),
+        ),
         'grouping' => 'contact-fields',
       ),
       'civicrm_email' =>
