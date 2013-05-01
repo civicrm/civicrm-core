@@ -44,6 +44,26 @@ License: AGPL3
 
 
 
+/*
+--------------------------------------------------------------------------------
+WordPress resources for developers
+--------------------------------------------------------------------------------
+Not that they're ever adhered to anywhere other than core, but people do their 
+best to comply...
+
+WordPress core coding standards:
+http://make.wordpress.org/core/handbook/coding-standards/php/
+
+WordPress HTML standards:
+http://make.wordpress.org/core/handbook/coding-standards/html/
+
+WordPress JavaScript standards:
+http://make.wordpress.org/core/handbook/coding-standards/javascript/
+--------------------------------------------------------------------------------
+*/
+
+
+
 // this file must not accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -673,8 +693,6 @@ class CiviCRM_For_WordPress {
 			ob_start(); // start buffering
 			$this->invoke(); // now, instead of echoing, shortcode output ends up in buffer
 			$content = ob_get_clean(); // save the output and flush the buffer
-			//print_r( array( $content ) );
-			
 			return $content;
 			
 		} else {
