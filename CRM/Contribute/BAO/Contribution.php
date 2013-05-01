@@ -158,13 +158,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (CRM_Utils_Array::value('contribution', $ids)) {
       $contributionId['id'] = $ids['contribution'];
       $params['prevContribution'] = self::getValues($contributionId, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
-      if (CRM_Utils_Array::value('soft_credit_to', $params)) {
+      /*if (CRM_Utils_Array::value('soft_credit_to', $params)) {
         foreach (array('financial_type_id', 'total_amount') as $field) {
           if (!isset($contribution->$field)) {
             $contribution->$field = $params['prevContribution']->$field;
           }
         }
-      }
+      }*/
     }
 
     $result = $contribution->save();
@@ -178,7 +178,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     self::recordFinancialAccounts($params, $ids);
 
     // Add soft_contribution details as part of fix for CRM-8908
-    $contribution->soft_credit_to = CRM_Utils_Array::value('soft_credit_to', $params);
+    //$contribution->soft_credit_to = CRM_Utils_Array::value('soft_credit_to', $params);
 
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
@@ -241,18 +241,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
-    if (CRM_Utils_Array::value('contribution', $ids) &&
+    /*if (CRM_Utils_Array::value('contribution', $ids) &&
       !CRM_Utils_Array::value('softID', $params)
     ) {
       if ($softID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionSoft', $ids['contribution'], 'id', 'contribution_id')) {
         $params['softID'] = $softID;
       }
-    }
+      }*/
 
     $transaction = new CRM_Core_Transaction();
 
     // delete the soft credit record if no soft credit contact ID AND no PCP is set in the form
-    if (CRM_Utils_Array::value('contribution', $ids) &&
+    /*if (CRM_Utils_Array::value('contribution', $ids) &&
       (!CRM_Utils_Array::value('soft_credit_to', $params) &&
         !CRM_Utils_Array::value('pcp_made_through_id', $params)
       ) &&
@@ -261,10 +261,36 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $softCredit = new CRM_Contribute_DAO_ContributionSoft();
       $softCredit->id = $params['softID'];
       $softCredit->delete();
-    }
+      }*/
 
     $contribution = self::add($params, $ids);
 
+    /*    if (CRM_Utils_Array::value('deleteSoftCredit', $params, TRUE)) {
+      // first delete soft credits if any
+      CRM_Contribute_BAO_ContributionSoft::del($contribution->id);
+
+      if ($pcp = CRM_Utils_Array::value('pcp_made_through_id', $params)) {
+        $softParams = array();  
+        $softParams['contribution_id'] = $contribution->id;
+        $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
+        $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
+           $pcp['pcp_id'], 'contact_id'
+        );
+        $softParams['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcp);
+        $softParams['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcp);
+        $softParams['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcp);
+        CRM_Contribute_BAO_ContributionSoft::add($softParams);
+      }
+      elseif (CRM_Utils_Array::value('soft_credit', $params)) {
+        $softParams = $params['soft_credit'];  
+        foreach ($softParams as $softParam) {
+          $softParam['contribution_id'] = $contribution->id;
+          $softParam['currency'] = $contribution->currency;
+          CRM_Contribute_BAO_ContributionSoft::add($softParam);
+        } 
+      } 
+    }
+    */
     if (is_a($contribution, 'CRM_Core_Error')) {
       $transaction->rollback();
       return $contribution;
@@ -330,7 +356,34 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
     }
     // Handle soft credit and / or link to personal campaign page
-    if (CRM_Utils_Array::value('soft_credit_to', $params) ||
+    if (CRM_Utils_Array::value('deleteSoftCredit', $params, TRUE)) {
+        // first delete soft credits if any                                                                                                                                                            
+        CRM_Contribute_BAO_ContributionSoft::del($contribution->id);
+
+        if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
+            $softParams = array();
+            $softParams['contribution_id'] = $contribution->id;
+            $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
+            $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
+              $pcp['pcp_made_through_id'], 'contact_id'
+            );
+            $softParams['currency'] = $contribution->currency;
+            $softParams['amount'] = $contribution->total_amount;
+            $softParams['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcp);
+            $softParams['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcp);
+            $softParams['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcp);
+            CRM_Contribute_BAO_ContributionSoft::add($softParams);
+        }
+        elseif (CRM_Utils_Array::value('soft_credit', $params)) {
+          $softParams = $params['soft_credit'];
+          foreach ($softParams as $softParam) {
+            $softParam['contribution_id'] = $contribution->id;
+            $softParam['currency'] = $contribution->currency;
+            CRM_Contribute_BAO_ContributionSoft::add($softParam);
+          }
+        }
+    }
+    /*    if (CRM_Utils_Array::value('soft_credit_to', $params) ||
       CRM_Utils_Array::value('pcp_made_through_id', $params)
     ) {
       $csParams = array();
@@ -363,7 +416,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
       self::addSoftContribution($csParams);
     }
-
+    */
     $transaction->commit();
 
     // do not add to recent items for import, CRM-4399
