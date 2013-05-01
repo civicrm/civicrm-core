@@ -89,6 +89,9 @@
        <type>int unsigned</type>
        <comment>Which type of website does this site belong</comment>
        <add>3.2</add>
+       <pseudoconstant>
+         <optionGroupName>website_type</optionGroupName>
+       </pseudoconstant>
   </field> 
   <field>
        <name>relationship_type_id</name>

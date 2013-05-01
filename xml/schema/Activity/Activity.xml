@@ -235,7 +235,6 @@
       <comment>ID of the priority given to this activity. Foreign key to civicrm_option_value.</comment>
       <add>2.0</add>
       <pseudoconstant>
-        <name>priority</name>
         <optionGroupName>priority</optionGroupName>
       </pseudoconstant>
   </field>

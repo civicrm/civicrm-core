@@ -2255,7 +2255,7 @@ WHERE  contribution_id = %1 ";
       $honorIds['contribution'] = $this->id;
       $idParams = array('id' => $honorID, 'contact_id' => $honorID);
       CRM_Contact_BAO_Contact::retrieve($idParams, $honorDefault, $honorIds);
-      $honorType = CRM_Core_PseudoConstant::honor();
+      $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
 
       $template->assign('honor_block_is_active', 1);
       if (CRM_Utils_Array::value('prefix_id', $honorDefault)) {

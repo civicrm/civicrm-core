@@ -213,6 +213,9 @@
     <comment>Implicit FK to civicrm_option_value.</comment>
     <add>2.1</add>
     <onDelete>SET NULL</onDelete>
+    <pseudoconstant>
+      <optionGroupName>honor_type</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>max_reminders</name>

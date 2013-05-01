@@ -665,7 +665,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $propertyArray = explode('-', $property);
           $websiteFld = $websiteKey . '-' . array_pop($propertyArray);
           if (!empty($result->$websiteFld)) {
-            $websiteTypes = CRM_Core_PseudoConstant::websiteType();
+            $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
             $websiteType  = $websiteTypes[$result->{"$websiteKey-website_type_id"}];
             $websiteValue = $result->$websiteFld;
             $websiteUrl   = "<a href=\"{$websiteValue}\">{$websiteValue}  ({$websiteType})</a>";

@@ -49,7 +49,6 @@
       <comment>Which Website type does this website belong to.</comment>
       <add>3.2</add>
       <pseudoconstant>
-        <name>websiteType</name>
         <optionGroupName>website_type</optionGroupName>
       </pseudoconstant>
   </field>
