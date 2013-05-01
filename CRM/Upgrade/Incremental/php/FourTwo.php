@@ -485,6 +485,7 @@ WHERE     cpse.price_set_id IS NULL";
       $fieldParams['option_label'] = $optionValue['label'];
       $fieldParams['option_amount'] = $optionValue['value'];
       $fieldParams['option_weight'] = $optionValue['weight'];
+      $fieldParams['is_quick_config'] = $setParams['is_quick_config']; 
       if ($defaultAmount = CRM_Core_DAO::getFieldValue($daoName[$addTo[0]][0], $addTo[2], $defaultAmountColumn)) {
         $fieldParams['default_option'] = array_search($defaultAmount, $optionValue['amount_id']);
       }

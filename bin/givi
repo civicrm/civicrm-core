@@ -43,7 +43,7 @@ class PullRequest {
    */
   public static function get($url, $repos) {
     foreach ($repos as $repo => $relPath) {
-      if (preg_match("/^https:\/\/github.com\/(.*)\/(civicrm-{$repo})\/pull\/([0-9]+)$/", $url, $matches)) {
+      if (preg_match("/^https:\/\/github.com\/(.*)\/(civicrm-{$repo})\/pull\/([0-9]+)(|\/commits|\/files)$/", $url, $matches)) {
         list ($full, $githubUser, $githubRepo, $githubPr) = $matches;
 
         $pr = new PullRequest();

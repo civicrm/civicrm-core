@@ -27,7 +27,10 @@
    {include file="CRM/Financial/Form/FinancialAccount.tpl"}
 {else}
   <div id="help">
-    <p>{ts}Financial types are used to categorize contributions for reporting and accounting purposes. These are also referred to as <strong>Funds</strong>. You may set up as many types as needed. Each type can carry an accounting code which can be used to map contributions to codes in your accounting system. Commonly used financial types are: Donation, Campaign Contribution, Membership Dues...{/ts}</p>
+    {capture assign="typeLink"}{crmURL p="civicrm/admin/financial/financialType" q="reset=1"}{/capture}
+    {capture assign="paymentLink"}{crmURL p="civicrm/admin/options/payment_instrument" q="group=payment_instrument&reset=1"}{/capture}
+    {capture assign="premiumLink"}{crmURL p="civicrm/admin/contribute/managePremiums" q="reset=1"}{/capture}
+    <p>{ts 1=$typeLink 2=$paymentLink 3=$premiumLink}Financial accounts correspond to those in your accounting system.  <a href="%1">Financial types</a>, <a href="%2">payment instruments</a>, and <a href="%3">premiums</a> are associated with financial accounts so that they can result in the proper double-entry transactions to export to your accounting system.{/ts}</p>
   </div>
   {if $action ne 1 and $action ne 2}
     <div class="action-link">

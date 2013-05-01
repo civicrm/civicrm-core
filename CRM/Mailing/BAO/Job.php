@@ -653,7 +653,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         CRM_Core_Error::setCallback();
       }
 
-      if (is_a($result, 'PEAR_Error')) {
+      // FIXME: for now we skipping bounce handling for sms
+      if (is_a($result, 'PEAR_Error') && !$mailing->sms_provider_id) {
         // CRM-9191
         $message = $result->getMessage();
         if (strpos($message,

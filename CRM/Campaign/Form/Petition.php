@@ -37,10 +37,63 @@
  * This class generates form components for adding a petition
  *
  */
-class CRM_Campaign_Form_Petition extends CRM_Campaign_Form_Survey {
+class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
   public function preProcess() {
-    parent::preProcess();
+    if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+
+    $this->assign('context', $this->_context);
+
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
+
+    if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::DELETE)) {
+      $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+
+      if ($this->_action & CRM_Core_Action::UPDATE) {
+        CRM_Utils_System::setTitle(ts('Edit Survey'));
+      }
+      else {
+        CRM_Utils_System::setTitle(ts('Delete Survey'));
+      }
+    }
+
+    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
+    $this->assign('cdType', FALSE);
+    if ($this->_cdType) {
+      $this->assign('cdType', TRUE);
+      return CRM_Custom_Form_CustomData::preProcess($this);
+    }
+
+    // when custom data is included in this page
+    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+      CRM_Custom_Form_CustomData::preProcess($this);
+      CRM_Custom_Form_CustomData::buildQuickForm($this);
+    }
+
+    $session = CRM_Core_Session::singleton();
+    $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
+    $session->pushUserContext($url);
+
+    $this->_values = $this->get('values');
+    
+    if (!is_array($this->_values)) {
+      $this->_values = array();
+      if ($this->_surveyId) {
+        $params = array('id' => $this->_surveyId);
+        CRM_Campaign_BAO_Survey::retrieve($params, $this->_values);
+      }
+      $this->set('values', $this->_values);
+    }
+
+    $this->assign('action', $this->_action);
+    $this->assign('surveyId', $this->_surveyId);
+    // for custom data
+    $this->assign('entityID', $this->_surveyId);
+
     if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::DELETE)) {
       $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
@@ -69,7 +122,7 @@ class CRM_Campaign_Form_Petition extends CRM_Campaign_Form_Survey {
    * @access public
    */
   function setDefaultValues() {
-    $defaults = array();
+    $defaults = $this->_values;
 
     $ufJoinParams = array(
       'entity_table' => 'civicrm_survey',

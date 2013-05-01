@@ -603,9 +603,23 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     // Get the framework.
     require $joomlaBase . '/libraries/import.php';
     require $joomlaBase . '/libraries/joomla/event/dispatcher.php';
-    require $joomlaBase . '/libraries/joomla/environment/uri.php';
-    require $joomlaBase . '/libraries/joomla/application/component/helper.php';
     require $joomlaBase . '/configuration.php';
+
+    // Files may be in different places depending on Joomla version
+    if ( !defined('JVERSION') ) {
+      require $joomlaBase . '/libraries/cms/version/version.php';
+      $jversion = new JVersion;
+      define('JVERSION', $jversion->getShortVersion());
+    }
+
+    if( version_compare(JVERSION, '3.0', 'lt') ) {
+      require $joomlaBase . '/libraries/joomla/environment/uri.php';
+      require $joomlaBase . '/libraries/joomla/application/component/helper.php';
+    }
+    else {
+      require $joomlaBase . '/libraries/joomla/uri/uri.php';
+      require $joomlaBase . '/libraries/legacy/component/helper.php';
+    }
 
     jimport('joomla.application.cli');
 

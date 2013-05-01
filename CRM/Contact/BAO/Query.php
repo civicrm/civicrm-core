@@ -4853,7 +4853,6 @@ WHERE displayRelType.relationship_type_id = $relType
 AND   displayRelType.is_active = 1
 ";
       }
-
       $this->_qill[0][] = $qillMessage . "'" . $relationshipTypeLabel . "'";
     }
 
