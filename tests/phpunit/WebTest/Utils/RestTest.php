@@ -123,71 +123,83 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // entity,action: valid apiKey, valid entity+action
     $cases[] = array(
-      /*'query'*/ array(
+      /*'query'*/
+      array(
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/ 0,
+      /*'$is_error'*/
+      0,
     );
 
     // entity,action: bad apiKey, valid entity+action
     $cases[] = array(
-      /*'query'*/ array(
+      /*'query'*/
+      array(
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => 'garbage_' . $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/ 1,
+      /*'$is_error'*/
+      1,
     );
 
     // entity,action: valid apiKey, invalid entity+action
     $cases[] = array(
-      /*'query'*/ array(
+      /*'query'*/
+      array(
         "entity" => "Contactses",
         "action" => "get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/ 1,
+      /*'$is_error'*/
+      1,
     );
 
     // q=civicrm/entity/action: valid apiKey, valid entity+action
     $cases[] = array(
-      /*'query'*/ array(
+      /*'query'*/
+      array(
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/ 0,
+      /*'$is_error'*/
+      0,
     );
 
     // q=civicrm/entity/action: invalid apiKey, valid entity+action
     $cases[] = array(
-      /*'query'*/ array(
+      /*'query'*/
+      array(
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => 'garbage_' . $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/ 1,
+      /*'$is_error'*/
+      1,
     );
 
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     $cases[] = array(
-      /*'query'*/ array(
+      /*'query'*/
+      array(
         "q" => "civicrm/contactses/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
         "api_key" => $this->settings->adminApiKey,
       ),
-      /*'$is_error'*/ 1,
+      /*'$is_error'*/
+      1,
     );
 
     return $cases;
@@ -205,8 +217,13 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $this->assertAPIErrorCode($result, $is_error);
   }
 
-  function testNotCMSUser() {
+  /**
+   * Submit a request with an API key that exists but does not correspond to
+   * a real user. Submit in "?entity=X&action=X" notation
+   */
+  function testNotCMSUser_entityAction() {
     $client = CRM_Utils_HttpClient::singleton();
+
     //Create contact with api_key
     $test_key = "testing1234";
     $contactParams = array(
@@ -217,9 +234,41 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
     $this->nocms_contact_id = $contact["id"];
 
+    // Use the malformed key
     $params = array(
       "entity" => "Contact",
       "action" => "get",
+      "key" => $this->settings->siteKey,
+      "json" => "1",
+      "api_key" => $test_key
+    );
+    list($status, $data) = $client->post($this->url, $params);
+    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $result = json_decode($data, TRUE);
+    $this->assertNotNull($result);
+    $this->assertAPIErrorCode($result, 1);
+  }
+
+  /**
+   * Submit a request with an API key that exists but does not correspond to
+   * a real user. Submit in "?q=civicrm/$entity/$action" notation
+   */
+  function testNotCMSUser_q() {
+    $client = CRM_Utils_HttpClient::singleton();
+
+    //Create contact with api_key
+    $test_key = "testing1234";
+    $contactParams = array(
+      "api_key" => $test_key,
+      "contact_type" => "Individual",
+      "first_name" => "RestTester1"
+    );
+    $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
+    $this->nocms_contact_id = $contact["id"];
+
+    // Use the malformed key
+    $params = array(
+      "q" => "civicrm/contact/get",
       "key" => $this->settings->siteKey,
       "json" => "1",
       "api_key" => $test_key
