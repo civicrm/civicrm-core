@@ -35,7 +35,7 @@
       prefix="soft_credit_"}
     </td>
 	  <td>
-		  {$form.soft_credit_currency.$blockNo.html|crmAddClass:eight}&nbsp;{$form.soft_credit_amount.$blockNo.html|crmAddClass:eight}
+		  {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
 	  </td>
   </tr>
 {/section}
