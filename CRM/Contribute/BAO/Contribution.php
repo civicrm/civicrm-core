@@ -276,14 +276,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'currency',
         'financial_type_id',
       );
-      $retrieverequired = 0;
+      $retrieveRequired = 0;
       foreach ($titleFields as $titleField) {
         if(!isset($contribution->$titleField)){
-          $retrieverequired = 1;
+          $retrieveRequired = 1;
           break;
         }
       }
-      if ($retrieverequired == 1) {
+      if ($retrieveRequired == 1) {
         $contribution->find(true);
       }
     }
@@ -341,14 +341,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'currency',
         'financial_type_id',
       );
-      $retrieverequired = 0;
+      $retrieveRequired = 0;
       foreach ($titleFields as $titleField) {
         if(!isset($contribution->$titleField)){
-          $retrieverequired = 1;
+          $retrieveRequired = 1;
           break;
         }
       }
-      if($retrieverequired == 1){
+      if($retrieveRequired == 1){
         $contribution->find(true);
       }
       $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
@@ -1179,156 +1179,6 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   }
 
   /**
-   *  Function to create soft contributon with contribution record.
-   *  @param array $params an associated array
-   *
-   *  @return soft contribution id
-   *  @static
-   */
-  static function addSoftContribution($params) {
-    $softContribution = new CRM_Contribute_DAO_ContributionSoft();
-    $softContribution->copyValues($params);
-
-    // set currency for CRM-1496
-    if (!isset($softContribution->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $softContribution->currency = $config->defaultCurrency;
-    }
-
-    return $softContribution->save();
-  }
-
-  /**
-   *  Function to retrieve soft contributions for contribution record.
-   *  @param array $params an associated array
-   *  @param boolean $all include PCP data
-   *
-   *  @return array of soft contribution ids, amounts, and associated contact ids
-   *  @static
-   */
-  static function getSoftContribution($params, $all = FALSE) {
-    $cs = new CRM_Contribute_DAO_ContributionSoft();
-    $cs->copyValues($params);
-    $softContribution = array();
-    $cs->find(); 
-    if ($cs->N > 0) {
-      while ($cs->fetch()) {
-
-        if ($all) {
-          foreach (array(
-            'pcp_id', 'pcp_display_in_roll', 'pcp_roll_nickname', 'pcp_personal_note') as $key => $val) {
-            $softContribution[$val] = $cs->$val;
-          }
-        }
-        $softContribution[$cs->id]['soft_credit_to'] = $cs->contact_id;
-        $softContribution[$cs->id]['soft_credit_id'] = $cs->id;
-        $softContribution[$cs->id]['soft_credit_amount'] = $cs->amount;
-      }
-    }
-    return $softContribution;
-  }
-
-  /**
-   *  Function to retrieve the list of soft contributons for given contact.
-   *  @param int $contact_id contact id
-   *
-   *  @return array
-   *  @static
-   */
-  static function getSoftContributionList($contact_id, $isTest = 0) {
-    $query = "
-    SELECT ccs.id, ccs.amount as amount,
-                     ccs.contribution_id,
-                     ccs.pcp_id,
-                     ccs.pcp_display_in_roll,
-                     ccs.pcp_roll_nickname,
-                     ccs.pcp_personal_note,
-                     cc.receive_date,
-                     cc.contact_id as contributor_id,
-                     cc.contribution_status_id as contribution_status_id,
-                     cp.title as pcp_title,
-                     cc.currency,
-                     contact.display_name,
-                     cct.name as contributionType
-              FROM civicrm_contribution_soft ccs
-                   LEFT JOIN civicrm_contribution cc
-                          ON ccs.contribution_id = cc.id
-                   LEFT JOIN civicrm_pcp cp
-                          ON ccs.pcp_id = cp.id
-                   LEFT JOIN civicrm_contact contact
-                          ON ccs.contribution_id = cc.id AND
-                             cc.contact_id = contact.id
-                       LEFT JOIN civicrm_financial_type cct
-                              ON cc.financial_type_id = cct.id
-         WHERE cc.is_test = %2 AND ccs.contact_id = %1
-         ORDER BY cc.receive_date DESC";
-
-    $params             = array(1 => array($contact_id, 'Integer'),
-                                2 => array($isTest, 'Integer'));
-    $cs                 = CRM_Core_DAO::executeQuery($query, $params);
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-    $result             = array();
-    while ($cs->fetch()) {
-      $result[$cs->id]['amount'] = $cs->amount;
-      $result[$cs->id]['currency'] = $cs->currency;
-      $result[$cs->id]['contributor_id'] = $cs->contributor_id;
-      $result[$cs->id]['contribution_id'] = $cs->contribution_id;
-      $result[$cs->id]['contributor_name'] = $cs->display_name;
-      $result[$cs->id]['financial_type'] = $cs->contributionType;
-      $result[$cs->id]['receive_date'] = $cs->receive_date;
-      $result[$cs->id]['pcp_id'] = $cs->pcp_id;
-      $result[$cs->id]['pcp_title'] = $cs->pcp_title;
-      $result[$cs->id]['pcp_display_in_roll'] = $cs->pcp_display_in_roll;
-      $result[$cs->id]['pcp_roll_nickname'] = $cs->pcp_roll_nickname;
-      $result[$cs->id]['pcp_personal_note'] = $cs->pcp_personal_note;
-      $result[$cs->id]['contribution_status'] = CRM_Utils_Array::value($cs->contribution_status_id, $contributionStatus);
-
-      if ($isTest) {
-        $result[$cs->id]['contribution_status'] = $result[$cs->id]['contribution_status'] . '<br /> (test)';
-      }
-    }
-    return $result;
-  }
-
-  static function getSoftContributionTotals($contact_id, $isTest = 0) {
-    $query = "
-    SELECT SUM(amount) as amount,
-                         AVG(total_amount) as average,
-                         cc.currency
-                  FROM civicrm_contribution_soft  ccs
-                       LEFT JOIN civicrm_contribution cc
-                              ON ccs.contribution_id = cc.id
-    WHERE cc.is_test = %2 AND
-          ccs.contact_id = %1
-                  GROUP BY currency ";
-
-    $params = array(1 => array($contact_id, 'Integer'),
-                    2 => array($isTest, 'Integer'));
-
-    $cs = CRM_Core_DAO::executeQuery($query, $params);
-
-    $count = 0;
-    $amount = $average = array();
-
-    while ($cs->fetch()) {
-      if ($cs->amount > 0) {
-        $count++;
-        $amount[]   = $cs->amount;
-        $average[]  = $cs->average;
-        $currency[] = $cs->currency;
-      }
-    }
-
-    if ($count > 0) {
-      return array(implode(',&nbsp;', $amount),
-        implode(',&nbsp;', $average),
-        implode(',&nbsp;', $currency),
-      );
-    }
-    return array(0, 0);
-  }
-
-  /**
    * Delete billing address record related contribution
    *
    * @param int $contact_id contact id
@@ -1523,7 +1373,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
       $pledgeID = $pledgePayment[0]->pledge_id;
     }
-
 
     $membershipStatuses = CRM_Member_PseudoConstant::membershipStatus();
 
@@ -2611,27 +2460,27 @@ WHERE  contribution_id = %1 ";
    */
   static function recordFinancialAccounts(&$params, $ids) {
     $skipRecords = $update = FALSE;
-    $additionalPaticipantId = array();
+    $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     if (CRM_Utils_Array::value('contribution_mode', $params) == 'participant') {
       $entityId = $params['participant_id'];
       $entityTable = 'civicrm_participant';
-      $additionalPaticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
+      $additionalParticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
     }
     else {
       $entityId = $params['contribution']->id;
       $entityTable = 'civicrm_contribution';
     }
     $entityID[] = $entityId;
-    if (!empty($additionalPaticipantId)) {
-      $entityID += $additionalPaticipantId;
+    if (!empty($additionalParticipantId)) {
+      $entityID += $additionalParticipantId;
     }
     if (!CRM_Utils_Array::value('prevContribution', $params)) {
       $entityID = NULL;
     }
     // build line item array if its not set in $params
-    if (!CRM_Utils_Array::value('line_item', $params) || $additionalPaticipantId) {
+    if (!CRM_Utils_Array::value('line_item', $params) || $additionalParticipantId) {
       CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
     }
 
