@@ -49,19 +49,63 @@ class CRM_Contribute_Form_SoftCredit {
   static function buildQuickForm(&$form) {
     $prefix = 'soft_credit_';
     // by default generate 5 blocks
-    $form->_softCredit['item_count'] = 6;
-    for ($rowNumber = 1; $rowNumber <= $form->_softCredit['item_count']; $rowNumber++) {
-      CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, $prefix);
-      $form->addMoney("{$prefix}amount[{$rowNumber}]", ts('Amount'));
+    $item_count = 6;
+
+    $showSoftCreditRow = 2;
+    $showCreateNew = true;
+    if ($form->_action & CRM_Core_Action::UPDATE) {
+      $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($form->_id, TRUE);
+      if (!empty($form->_softCreditInfo['soft_credit'])) {
+        $showSoftCreditRow = count($form->_softCreditInfo['soft_credit']);
+        $showSoftCreditRow++;
+        $showCreateNew = false;
+      }
     }
 
-    $form->assign('rowCount', $form->_softCredit['item_count']);
+    for ($rowNumber = 1; $rowNumber <= $item_count; $rowNumber++) {
+      CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, $prefix);
 
-    // Tell tpl to hide Soft Credit field if contribution is linked directly to a PCP Page
+      $form->addMoney("{$prefix}amount[{$rowNumber}]", ts('Amount'));
+      if (!empty($form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id'])) {
+        $form->add('hidden', "{$prefix}id[{$rowNumber}]",
+          $form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id']);
+      }
+    }
+
+    $form->assign('showSoftCreditRow', $showSoftCreditRow);
+    $form->assign('rowCount', $item_count);
+    $form->assign('showCreateNew', $showCreateNew);
+
+    // Tell tpl to hide soft credit field if contribution is linked directly to a PCP Page
     if (CRM_Utils_Array::value('pcp_made_through_id', $form->_values)) {
       $form->assign('pcpLinked', 1);
     }
     $form->addElement('hidden', 'soft_contact_id', '', array('id' => 'soft_contact_id'));
+  }
+
+  /**
+   * Function used to set defaults for soft credit block
+   */
+  static function setDefaultValues(&$defaults, &$form) {
+    if (!empty($form->_softCreditInfo['soft_credit'])) {
+      foreach($form->_softCreditInfo['soft_credit'] as $key => $value) {
+        $defaults["soft_credit_amount[$key]"] = $value['amount'];
+        $defaults["soft_credit_contact_select_id[$key]"] = $value['contact_id'];
+      }
+    }
+
+    if (CRM_Utils_Array::value('pcp_id', $form->_softCreditInfo['pcp'])) {
+      $pcpInfo = $form->_softCreditInfo['pcp'];
+      $pcpId = CRM_Utils_Array::value('pcp_id', $pcpInfo);
+      $pcpTitle = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcpId, 'title');
+      $contributionPageTitle = CRM_PCP_BAO_PCP::getPcpPageTitle($pcpId, 'contribute');
+      $defaults['pcp_made_through'] = CRM_Utils_Array::value('sort_name', $pcpInfo) . " :: " . $pcpTitle . " :: " . $contributionPageTitle;
+      $defaults['pcp_made_through_id'] = CRM_Utils_Array::value('pcp_id', $pcpInfo);
+      $defaults['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcpInfo);
+      $defaults['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcpInfo);
+      $defaults['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcpInfo);
+    }
+
   }
 }
 

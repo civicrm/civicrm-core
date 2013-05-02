@@ -200,7 +200,7 @@ function civicrm_api3_contribution_get($params) {
     //CRM-8662
     $contribution_details = $query->store ( $dao );
     $soft_params = array('contribution_id' => $dao->contribution_id);
-    $soft_contribution = CRM_Contribute_BAO_Contribution::getSoftContribution ( $soft_params , true);
+    $soft_contribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution ( $soft_params , true);
     $contribution [$dao->contribution_id] = array_merge($contribution_details, $soft_contribution);
   }
   return civicrm_api3_create_success($contribution, $params, 'contribution', 'get', $dao);

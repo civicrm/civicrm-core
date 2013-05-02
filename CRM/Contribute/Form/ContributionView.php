@@ -129,22 +129,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     //get soft credit record if exists.
-    $softParams = array('contribution_id' => CRM_Utils_Array::value('contribution_id', $values));
-    $softContribution = CRM_Contribute_BAO_Contribution::getSoftContribution($softParams);
-    if (!empty($softContribution)) {
-      foreach($softContribution as &$individualSoftContribution) {
-        $individualSoftContribution['softCreditToName'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $individualSoftContribution['soft_credit_to'], 'display_name'
-        );
-        //hack to avoid displayName conflict
-        //for viewing softcredit record.
-        $individualSoftContribution['displayName'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $values['contact_id'], 'display_name'
-        );
-        
-      }
-      $values['softContributions'] = $softContribution;
-    }
+    $values['softContributions'] = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($values['contribution_id']);
 
     $lineItems = array();
     if ($id) {
