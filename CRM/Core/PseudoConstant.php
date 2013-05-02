@@ -256,7 +256,8 @@ class CRM_Core_PseudoConstant {
    * - grouping   boolean if true, return the value in 'grouping' column (currently unsupported for tables other than option_value)
    * - localize   boolean if true, localize the results before returning
    * - condition  string  add another condition to the sql query
-   * - labelColumnName string the column to use for 'label'
+   * - keyColumn  string the column to use for 'id'
+   * - labelColumn string the column to use for 'label'
    * - onlyActive boolean return only the action option values
    * - fresh      boolean ignore cache entries and go back to DB
    *
@@ -265,27 +266,17 @@ class CRM_Core_PseudoConstant {
    * @static
    */
   public static function get($daoName, $fieldName, $params = array()) {
-    // Merge defaults
-    $params += array(
-      'flip' => FALSE,
-      'grouping' => FALSE,
-      'localize' => FALSE,
-      'condition' => NULL,
-      'labelColumnName' => NULL,
-      'onlyActive' => TRUE,
-      'fresh' => FALSE,
-    );
-    $flip = $params['flip'];
-
     $dao = new $daoName;
     $fields = $dao->fields();
+    $dao->free();
     if (empty($fields[$fieldName])) {
       return FALSE;
     }
     $fieldSpec = $fields[$fieldName];
+    $flip = !empty($params['flip']);
 
     // If the field is an enum, explode the enum definition and return the array.
-    if (array_key_exists('enumValues', $fieldSpec)) {
+    if (isset($fieldSpec['enumValues'])) {
       // use of a space after the comma is inconsistent in xml
       $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
       $values = explode(',', $enumStr);
@@ -294,6 +285,18 @@ class CRM_Core_PseudoConstant {
 
     elseif (!empty($fieldSpec['pseudoconstant'])) {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
+      // Merge params with defaults
+      $params += array(
+        'grouping' => FALSE,
+        'localize' => FALSE,
+        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant),
+        'keyColumn' => CRM_Utils_Array::value('keyColumn', $pseudoconstant),
+        'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
+        'onlyActive' => TRUE,
+        'fresh' => FALSE,
+      );
+
+      // Fetch option group from option_value table
       if(!empty($pseudoconstant['optionGroupName'])) {
         // Call our generic fn for retrieving from the option_value table
         return CRM_Core_OptionGroup::values(
@@ -301,12 +304,14 @@ class CRM_Core_PseudoConstant {
           $flip,
           $params['grouping'],
           $params['localize'],
-          $params['condition'],
-          $params['labelColumnName'] ? $params['labelColumnName'] : 'label',
+          $params['condition'] ? $params['condition'] : $pseudoconstant['condition'],
+          $params['labelColumn'] ? $params['labelColumn'] : 'label',
           $params['onlyActive'],
           $params['fresh']
         );
       }
+
+      // Fetch options from other tables
       if (!empty($pseudoconstant['table'])) {
         // Normalize params so the serialized cache string will be consistent.
         CRM_Utils_Array::remove($params, 'flip', 'fresh');
@@ -315,7 +320,7 @@ class CRM_Core_PseudoConstant {
 
         // Return cached options
         if (isset(self::$cache[$cacheKey]) && empty($params['fresh'])) {
-          return self::$cache[$cacheKey];
+          return $flip ? array_flip(self::$cache[$cacheKey]) : self::$cache[$cacheKey];
         }
 
         $select = "SELECT %1 AS id, %2 AS label";
@@ -335,11 +340,9 @@ class CRM_Core_PseudoConstant {
           }
           $dao->free();
         }
-        // Support labelColumnName param
-        $labelColumnName = $params['labelColumnName'] ? $params['labelColumnName'] : $pseudoconstant['labelColumn'];
         $queryParams = array(
-           1 => array($pseudoconstant['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
-           2 => array($labelColumnName, 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+           1 => array($params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+           2 => array($params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
            3 => array($pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
         );
 
@@ -1661,13 +1664,9 @@ WHERE  id = %1
   public static function &greetingDefaults() {
     if (!self::$greetingDefaults) {
       $defaultGreetings = array();
-      $contactTypes = array(
-        'Individual' => 1,
-        'Household' => 2,
-        'Organization' => 3,
-      );
+      $contactTypes = self::get('CRM_Contact_DAO_Contact', 'contact_type', array('keyColumn' => 'id', 'labelColumn' => 'name'));
 
-      foreach ($contactTypes as $contactType => $filter) {
+      foreach ($contactTypes as $filter => $contactType) {
         $filterCondition = " AND (v.filter = 0 OR v.filter = $filter) AND v.is_default = 1 ";
 
         foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
@@ -1768,24 +1767,6 @@ WHERE  id = %1
     }
 
     return self::$accountOptionValues[$cacheKey];
-  }
-
-  /*
-  * The static array contactType is returned
-  *
-  * @access public
-  * @static
-  * @param string $column db column name/label.
-  *
-  * @return array - array reference of all Types
-  *
-     */
-
-  public static function &contactType($column = 'label') {
-    if (!self::$contactType) {
-      self::$contactType = CRM_Contact_BAO_ContactType::basicTypePairs(TRUE);
-    }
-    return self::$contactType;
   }
 }
 

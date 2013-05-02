@@ -29,10 +29,10 @@
        <comment>Type of Contact.</comment>
        <export>true</export>
        <pseudoconstant>
-        <name>contactType</name>
-        <table>civicrm_location_type</table>
+        <table>civicrm_contact_type</table>
         <keyColumn>name</keyColumn>
         <labelColumn>label</labelColumn>
+        <condition>parent_id IS NULL</condition>
       </pseudoconstant>
        <add>1.1</add>
        <change>3.1</change>
@@ -51,6 +51,12 @@
        <import>true</import>
        <headerPattern>/C(ontact )?(subtype|sub-type|sub type)/i</headerPattern>
        <comment>May be used to over-ride contact view and edit templates.</comment>
+       <pseudoconstant>
+        <table>civicrm_contact_type</table>
+        <keyColumn>name</keyColumn>
+        <labelColumn>label</labelColumn>
+        <condition>parent_id IS NOT NULL</condition>
+      </pseudoconstant>
        <add>1.5</add>
   </field>
   <index>

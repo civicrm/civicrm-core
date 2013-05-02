@@ -225,7 +225,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      $batchMode = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'mode_id', array('labelColumnName' => 'name'));
+      $batchMode = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'mode_id', array('labelColumn' => 'name'));
       $params['mode_id'] = CRM_Utils_Array::key('Manual Batch', $batchMode);
       $params['status_id'] = CRM_Utils_Array::key('Open', $batchStatus);
       $params['created_date'] = date('YmdHis');
