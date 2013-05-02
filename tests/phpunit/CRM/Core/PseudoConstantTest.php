@@ -48,13 +48,15 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
   function testOptionValues() {
-    $custom_group_name = 'Test custom group';
+
+    $custom_group_name = md5(microtime());
     $api_params = array(
-        'version' => 3,
-        'title' => $custom_group_name,
-        'extends' => 'Individual',
+      'version' => 3,
+      'title' => $custom_group_name,
+      'extends' => 'Individual',
+      'is_active' => TRUE,
     );
-    civicrm_api('customGroup', 'create', $api_params);
+    $result = civicrm_api('customGroup', 'create', $api_params);
 
     /**
      * daoName/field combinations to test
@@ -66,6 +68,118 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
      * - max: integer (default = 10) maximum number of option values expected.
      */
     $fields = array(
+      'CRM_Event_DAO_Participant' => array(
+        array(
+          'fieldName' => 'fee_currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Core_DAO_UFField' => array(
+        array(
+          'fieldName' => 'uf_group_id',
+          'sample' => 'Name and Address',
+          'max' => 15,
+        ),
+      ),
+      'CRM_Core_DAO_UFJoin' => array(
+        array(
+          'fieldName' => 'uf_group_id',
+          'sample' => 'Name and Address',
+          'max' => 15,
+        ),
+      ),
+      'CRM_Contribute_DAO_ContributionSoft' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Contribute_DAO_Contribution' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Contribute_DAO_Product' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Contribute_DAO_ContributionPage' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Contribute_DAO_ContributionRecur' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Event_DAO_Event' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Financial_DAO_FinancialItem' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Financial_DAO_OfficialReceipt' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Financial_DAO_FinancialTrxn' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Grant_DAO_Grant' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Pledge_DAO_PledgePayment' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Pledge_DAO_Pledge' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_PCP_DAO_PCP' => array(
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
       'CRM_Core_DAO_CustomField' => array(
         array(
           'fieldName' => 'custom_group_id',

@@ -71,7 +71,12 @@
       <type>int unsigned</type> 
       <required>true</required> 
       <comment>Which form does this field belong to.</comment> 
-      <add>1.3</add> 
+      <add>1.3</add>
+      <pseudoconstant>
+        <table>civicrm_uf_group</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>title</labelColumn>
+      </pseudoconstant>
   </field> 
   <foreignKey> 
        <name>uf_group_id</name> 

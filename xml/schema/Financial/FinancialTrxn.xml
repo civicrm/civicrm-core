@@ -112,6 +112,11 @@
     <dataPattern>/^[A-Z]{3}$/</dataPattern>
     <comment>3 character string, value from config setting or input via user.</comment>
     <add>1.3</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>symbol</labelColumn>
+    </pseudoconstant>
   </field>
   <field>       
     <name>payment_processor</name>    

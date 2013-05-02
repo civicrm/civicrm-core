@@ -128,6 +128,11 @@
     <required>true</required>
     <comment>3 character string, value from config setting or input via user.</comment>
     <add>3.2</add>
+      <pseudoconstant>
+        <table>civicrm_currency</table>
+        <keyColumn>name</keyColumn>
+        <labelColumn>symbol</labelColumn>
+      </pseudoconstant>
   </field>
   <field>
     <name>currency</name>
