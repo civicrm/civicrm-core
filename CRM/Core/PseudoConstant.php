@@ -237,6 +237,7 @@ class CRM_Core_PseudoConstant {
    * - condition  string  add another condition to the sql query
    * - keyColumn  string the column to use for 'id'
    * - labelColumn string the column to use for 'label'
+   * - orderColumn string the column to use for sorting, defaults to 'weight'
    * - onlyActive boolean return only the action option values
    * - fresh      boolean ignore cache entries and go back to DB
    *
@@ -258,8 +259,8 @@ class CRM_Core_PseudoConstant {
     if (isset($fieldSpec['enumValues'])) {
       // use of a space after the comma is inconsistent in xml
       $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
-      $values = explode(',', $enumStr);
-      return $flip ? array_flip($values) : $values;
+      $output = explode(',', $enumStr);
+      return $flip ? array_flip($output) : $output;
     }
 
     elseif (!empty($fieldSpec['pseudoconstant'])) {
@@ -283,7 +284,7 @@ class CRM_Core_PseudoConstant {
           $flip,
           $params['grouping'],
           $params['localize'],
-          $params['condition'] ? $params['condition'] : $pseudoconstant['condition'],
+          $params['condition'],
           $params['labelColumn'] ? $params['labelColumn'] : 'label',
           $params['onlyActive'],
           $params['fresh']
@@ -295,53 +296,74 @@ class CRM_Core_PseudoConstant {
         // Normalize params so the serialized cache string will be consistent.
         CRM_Utils_Array::remove($params, 'flip', 'fresh');
         ksort($params);
-        $cacheKey = "{$daoName}{$fieldName}" . serialize($params);
+        $cacheKey = $daoName . $fieldName . serialize($params);
 
-        // Return cached options
+        // Retrieve cached options
         if (isset(self::$cache[$cacheKey]) && empty($params['fresh'])) {
-          return $flip ? array_flip(self::$cache[$cacheKey]) : self::$cache[$cacheKey];
+          $output = self::$cache[$cacheKey];
         }
-
-        $select = "SELECT %1 AS id, %2 AS label";
-        $from = "FROM %3";
-        $wheres = array();
-        $order = "ORDER BY %2";
-        // Condition param can be passed as an sql string
-        if (!empty($params['condition'])) {
-          $wheres[] = $params['condition'];
-        }
-        // Support for onlyActive param if option table contains is_active field
-        if (!empty($params['onlyActive'])) {
+        else {
+          // Get list of fields for the option table
           $daoName = CRM_Core_AllCoreTables::getClassForTable($pseudoconstant['table']);
           $dao = new $daoName;
-          if (in_array('is_active', $dao->fields())) {
-            $wheres[] = 'is_active = 1';
+          $availableFields = $dao->fields();
+          $dao->free();
+
+          $select = "SELECT %1 AS id, %2 AS label";
+          $from = "FROM %3";
+          $wheres = array();
+          $order = "ORDER BY %2";
+          // Condition param can be passed as an sql string
+          if (!empty($params['condition'])) {
+            $wheres[] = $params['condition'];
+          }
+          // Support for onlyActive param if option table contains is_active field
+          if (!empty($params['onlyActive'])) {
+            if (in_array('is_active', $availableFields)) {
+              $wheres[] = 'is_active = 1';
+            }
+          }
+          $queryParams = array(
+             1 => array($params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+             2 => array($params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+             3 => array($pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+          );
+          // Add orderColumn param
+          if (!empty($params['orderColumn'])) {
+            $queryParams[4] = array($params['orderColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES);
+            $order = "ORDER BY %4";
+          }
+          // Support no sorting if $params[orderColumn] is FALSE
+          elseif (isset($params['orderColumn']) && $params['orderColumn'] === FALSE) {
+            $order = '';
+          }
+          // Default to 'weight' if that column exists
+          elseif (in_array('weight', $availableFields)) {
+            $order = "ORDER BY weight";
+          }
+
+          $output = array();
+          $query = "$select $from";
+          if ($wheres) {
+            $query .= " WHERE " . implode($wheres, ' AND ');
+          }
+          $query .= ' ' . $order;
+          $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+          while ($dao->fetch()) {
+            $output[$dao->id] = $dao->label;
           }
           $dao->free();
+          if (!empty($params['localize'])) {
+            $i18n = CRM_Core_I18n::singleton();
+            $i18n->localizeArray($output);
+            // Maintain sort by label
+            if ($order == "ORDER BY %2") {
+              CRM_Utils_Array::asort($output);
+            }
+          }
+          self::$cache[$cacheKey] = $output;
         }
-        $queryParams = array(
-           1 => array($params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
-           2 => array($params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
-           3 => array($pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
-        );
-
-        self::$cache[$cacheKey] = array();
-        $query = "$select $from";
-        if ($wheres) {
-          $query .= " WHERE " . implode($wheres, ' AND ');
-        }
-        $query .= ' ' . $order;
-        $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
-        while ($dao->fetch()) {
-          self::$cache[$cacheKey][$dao->id] = $dao->label;
-        }
-        $dao->free();
-        if (!empty($params['localize'])) {
-          $i18n = CRM_Core_I18n::singleton();
-          $i18n->localizeArray(self::$cache[$cacheKey]);
-        }
-
-        return $flip ? array_flip(self::$cache[$cacheKey]) : self::$cache[$cacheKey];
+        return $flip ? array_flip($output) : $output;
       }
     }
     // If we're still here, it's an error. Return FALSE.
