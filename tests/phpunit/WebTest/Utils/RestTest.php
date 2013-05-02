@@ -216,6 +216,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     );
 
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
+    // XXX Actually Ping is valid, no?
     $cases[] = array(
       array( // query
         "q" => "civicrm/ping",
