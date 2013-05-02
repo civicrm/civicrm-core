@@ -1008,7 +1008,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         }
         elseif ($name == 'tag') {
           $entityTags = CRM_Core_BAO_EntityTag::getTag($cid);
-          $allTags    = CRM_Core_PseudoConstant::tag();
+          $allTags    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
           $title      = array();
           foreach ($entityTags as $tagId) {
             $title[] = $allTags[$tagId];

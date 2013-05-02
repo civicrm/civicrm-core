@@ -43,16 +43,41 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
+  /**
+   * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
+   * DAO fields having a <pseudoconstant> tag in the XML schema.
+   */
   function testOptionValues() {
-    /*
+    $custom_group_name = 'Test custom group';
+    $api_params = array(
+        'version' => 3,
+        'title' => $custom_group_name,
+        'extends' => 'Individual',
+    );
+    civicrm_api('customGroup', 'create', $api_params);
+
+    /**
      * daoName/field combinations to test
-     * array[DAO Name] = properties, where properties can be:
+     * Format: array[DAO Name] = $properties, where properties is an array whose
+     * named members can be:
      * - fieldName: the SQL column name within the DAO table.
      * - sample: Any one value which is expected in the list of option values.
      * - exclude: Any one value which should not be in the list.
      * - max: integer (default = 10) maximum number of option values expected.
      */
     $fields = array(
+      'CRM_Core_DAO_CustomField' => array(
+        array(
+          'fieldName' => 'custom_group_id',
+          'sample' => $custom_group_name,
+        ),
+      ),
+      'CRM_Core_DAO_EntityTag' => array(
+        array(
+          'fieldName' => 'tag_id',
+          'sample' => 'Government Entity',
+        ),
+      ),
       'CRM_Core_DAO_OptionValue' => array(
         array(
           'fieldName' => 'component_id',

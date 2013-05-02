@@ -1441,7 +1441,7 @@ WHERE civicrm_event.is_active = 1
         }
         elseif ($name == 'tag') {
           $entityTags = $params[$name];
-          $allTags    = CRM_Core_PseudoConstant::tag();
+          $allTags    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
           $title      = array();
           if (is_array($entityTags)) {
             foreach ($entityTags as $tagId => $dontCare) {

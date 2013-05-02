@@ -259,7 +259,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     // Get all custom groups
-    $allGroups = CRM_Core_PseudoConstant::customGroup();
+    $allGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
 
     // Get the custom groupIds for which the user have VIEW permission
     require_once 'CRM/ACL/API.php';
