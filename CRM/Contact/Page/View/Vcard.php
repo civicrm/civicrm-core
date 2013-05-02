@@ -60,7 +60,7 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
 
     // now that we have the contact's data - let's build the vCard
     // TODO: non-US-ASCII support (requires changes to the Contact_Vcard_Build class)
-    $vcardNames = CRM_Core_PseudoConstant::locationVcardName();
+    $vcardNames = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'vcard_name'));
     $vcard = new Contact_Vcard_Build('2.1');
 
     if ($defaults['contact_type'] == 'Individual') {

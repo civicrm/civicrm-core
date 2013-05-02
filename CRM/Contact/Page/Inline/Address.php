@@ -56,7 +56,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
 
     $address = array();
     if ( $addressId > 0 ) {
-      $locationTypes = CRM_Core_PseudoConstant::locationDisplayName();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name'));
 
       $entityBlock = array('id' => $addressId);
       $address = CRM_Core_BAO_Address::getValues($entityBlock, FALSE, 'id');
