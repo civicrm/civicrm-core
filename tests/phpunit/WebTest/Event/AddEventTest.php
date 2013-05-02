@@ -310,6 +310,18 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->assertNotChecked('is_pay_later');
   }
 
+  function testAjaxCustomGroupLoad() {
+    $this->webtestLogin();
+
+    $triggerElement = array('name' => 'event_type_id', 'type' => 'select');
+    $customSets = array(
+      array('entity' => 'Event', 'subEntity' => 'Conference', 'triggerElement' => $triggerElement),
+    );
+
+    $pageUrl = array('url' => 'event/add', 'args' => "reset=1&action=add");
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
