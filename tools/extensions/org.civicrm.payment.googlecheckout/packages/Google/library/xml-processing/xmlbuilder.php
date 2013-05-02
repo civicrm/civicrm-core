@@ -80,9 +80,7 @@ class XmlBuilder {
   }
 
   function GetXML() {
-    if (count($this->stack) != 0)die('XML Error: No matching closing tag found for " ' . array_pop($this->stack) { . '"'
-      );
-    }
+    if (count($this->stack) != 0)die('XML Error: No matching closing tag found for " ' . array_pop($this->stack) . '"');
     else return $this->xml;
   }
 }

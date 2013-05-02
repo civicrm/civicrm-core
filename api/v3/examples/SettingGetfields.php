@@ -688,7 +688,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'title' => 'Enable Debugging',
           'is_domain' => 1,
           'is_contact' => 0,
-          'description' => 'Set this value to Yes if you want to use one of CiviCRM's debugging tools. This feature should NOT be enabled for production sites',
+          'description' => 'Set this value to Yes if you want to use one of CiviCRMs debugging tools. This feature should NOT be enabled for production sites',
           'prefetch' => 1,
           'help_text' => 'Do not turn this on on production sites',
         ),
@@ -706,8 +706,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'is_contact' => 0,
           'description' => 'Set this value to Yes if you want CiviCRM error/debugging messages to also appear in Drupal error logs',
           'prefetch' => 1,
-          'help_text' => 'Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS' error log.
-In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)',
+          'help_text' => 'Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS\' error log.
+In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal\'s watchdog enabled)',
         ),
       'backtrace' => array( 
           'group_name' => 'Developer Preferences',
