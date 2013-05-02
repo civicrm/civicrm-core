@@ -344,6 +344,7 @@ class CRM_Utils_REST {
     // If the user does not have a valid session (most likely to be used by people using
     // an ajax interface), we need to check to see if they are carring a valid user's
     // secret key.
+    // XXX this is the new way of doing it, which should be the only way of doing it.
     if (!$valid_user) {
       $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
       if (!$api_key || strtolower($api_key) == 'null') {
