@@ -221,67 +221,66 @@
     {/if}
 
   </table>
-	  <!-- start of soft credit -->
-	  <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="softCredit">
-		  <div class="crm-accordion-header">
-			  {ts}Soft Credit{/ts}&nbsp;{help id="id-soft_credit"}
-		  </div>
-		  <div class="crm-accordion-body">
-			  <table class="form-layout-compressed">
-				  {if $siteHasPCPs}
-					  <tr class="crm-contribution-pcp-block-link">
-						  <td colspan="2">
-							  <div id="showPCP"><a
-									  href='#'>{ts}credit this contribution to a personal campaign page{/ts}</a>{help id="id-link_pcp"}
-							  </div>
-						  </td>
-					  </tr>
-					  <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id">
-						  <td class="label">{$form.pcp_made_through.label}</td>
-						  <td>
-							  {$form.pcp_made_through.html} &nbsp;
-								<span class="showSoftCreditLink">
-									<a href="#" id="showSoftCredit">{ts}unlink from personal campaign page{/ts}</a>
-								</span><br/>
-								<span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or
-								 email address.{/ts}</span>
-
-							  <div class="spacer"></div>
-							  <div class="crm-contribution-form-block-pcp_details">
-								  <table class="crm-contribution-form-table-credit_to_pcp">
-									  <tr id="pcpDisplayRollID" class="crm-contribution-form-block-pcp_display_in_roll">
-										  <td class="label">{$form.pcp_display_in_roll.label}</td>
-										  <td>{$form.pcp_display_in_roll.html}</td>
-									  </tr>
-									  <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
-										  <td class="label">{$form.pcp_roll_nickname.label}</td>
-										  <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
-												<span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor
-											Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
-										  </td>
-									  </tr>
-									  <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
-										  <td class="label" style="vertical-align: top">{$form.pcp_personal_note.label}</td>
-										  <td>
-											  {$form.pcp_personal_note.html}
-											  <span
-												  class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</span>
-										  </td>
-									  </tr>
-								  </table>
-							  </div>
-						  </td>
-					  </tr>
-				  {/if}
-				  <tr class="crm-contribution-form-block-soft_credit_to">
-					  <td colspan="2">
-						  {include file="CRM/Contribute/Form/SoftCredit.tpl"}
-					  </td>
-				  </tr>
-			  </table>
-		  </div>
-	  </div>
-	  <!-- end of soft credit -->
+    <!-- start of soft credit -->
+    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="softCredit">
+      <div class="crm-accordion-header">
+        {ts}Soft Credit{/ts}&nbsp;{help id="id-soft_credit"}
+      </div>
+      <div class="crm-accordion-body">
+        <table class="form-layout-compressed">
+          {if $siteHasPCPs}
+            <tr class="crm-contribution-pcp-block-link">
+              <td colspan="2">
+                <div id="showPCP">
+                  <a href='#'>{ts}credit this contribution to a personal campaign page{/ts}</a>
+                </div>
+              </td>
+            </tr>
+            <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id">
+              <td class="label">{$form.pcp_made_through.label}</td>
+              <td>
+                {$form.pcp_made_through.html} &nbsp;
+                <span class="showSoftCreditLink">
+                  <a href="#" id="showSoftCredit">{ts}unlink from personal campaign page{/ts}</a>
+                </span><br/>
+                <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or
+                email address.{/ts}</span>
+                <div class="spacer"></div>
+                <div class="crm-contribution-form-block-pcp_details">
+                  <table class="crm-contribution-form-table-credit_to_pcp">
+                    <tr id="pcpDisplayRollID" class="crm-contribution-form-block-pcp_display_in_roll">
+                      <td class="label">{$form.pcp_display_in_roll.label}</td>
+                      <td>{$form.pcp_display_in_roll.html}</td>
+                    </tr>
+                    <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
+                      <td class="label">{$form.pcp_roll_nickname.label}</td>
+                      <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
+                        <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor
+                        Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
+                      </td>
+                    </tr>
+                    <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
+                      <td class="label" style="vertical-align: top">{$form.pcp_personal_note.label}</td>
+                      <td>
+                        {$form.pcp_personal_note.html}
+                        <span
+                          class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</span>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          {/if}
+          <tr class="crm-contribution-form-block-soft_credit_to">
+            <td colspan="2">
+              {include file="CRM/Contribute/Form/SoftCredit.tpl"}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <!-- end of soft credit -->
     {if !$contributionMode}
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
       <div class="crm-accordion-header">
