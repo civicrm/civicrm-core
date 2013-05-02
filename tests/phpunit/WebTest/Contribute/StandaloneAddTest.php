@@ -177,5 +177,16 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
     }
   }
-}
 
+  function testAjaxCustomGroupLoad() {
+    $this->webtestLogin();
+    $triggerElement = array('name' => 'financial_type_id', 'type' => 'select');
+    $customSets = array(
+      array('entity' => 'Contribution', 'subEntity' => 'Donation', 'triggerElement' => $triggerElement),
+      array('entity' => 'Contribution', 'subEntity' => 'Member Dues', 'triggerElement' => $triggerElement)
+    );
+
+    $pageUrl = array('url' => 'contribute/add', 'args' => 'reset=1&action=add&context=standalone');
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+}
