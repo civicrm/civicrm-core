@@ -3000,19 +3000,22 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     else {
       return FALSE;
     }
-    $dao = new $daoName();
-    $dao->contact_id = $contactId;
-    $dao->is_primary = 1;
-    // Pick another record to be primary (if one isn't already)
-    if (!$dao->find(TRUE)) {
-      $dao->is_primary = 0;
-      $dao->find();
-      if ($dao->fetch()) {
-        $dao->is_primary = 1;
-        $dao->save();
+    // is_primary is only relavent if this field belongs to a contact
+    if ($contactId) {
+      $dao = new $daoName();
+      $dao->contact_id = $contactId;
+      $dao->is_primary = 1;
+      // Pick another record to be primary (if one isn't already)
+      if (!$dao->find(TRUE)) {
+        $dao->is_primary = 0;
+        $dao->find();
+        if ($dao->fetch()) {
+          $dao->is_primary = 1;
+          $dao->save();
+        }
       }
+      $dao->free();
     }
-    $dao->free();
     CRM_Utils_Hook::post('delete', $type, $id, $obj);
     $obj->free();
     return TRUE;
