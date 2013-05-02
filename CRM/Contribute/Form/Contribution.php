@@ -151,9 +151,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function preProcess() {
 
-    $resources = CRM_Core_Resources::singleton();
-    $resources->addScriptFile('civicrm', 'templates/CRM/Contribute/Form/SoftCredit.js');
-
     //check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
@@ -167,6 +164,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Custom_Form_CustomData::preProcess($this);
       return;
     }
+
+    $resources = CRM_Core_Resources::singleton();
+    $resources->addScriptFile('civicrm', 'templates/CRM/Contribute/Form/SoftCredit.js');
 
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
@@ -271,7 +271,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
       CRM_Utils_System::setTitle(ts('Contribution from') . ' ' . $displayName);
     }
-
   }
 
   function setDefaultValues() {
@@ -295,6 +294,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_action & CRM_Core_Action::DELETE) {
       return $defaults;
     }
+
+    // set soft credit defaults
+    CRM_Contribute_Form_SoftCredit::setDefaultValues($defaults);
 
     if ($this->_mode) {
       $config = CRM_Core_Config::singleton();
@@ -497,7 +499,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'invoice_id',
       'non_deductible_amount',
       'fee_amount',
-      'net_amount'
+      'net_amount',
     );
     foreach ($additionalDetailFields as $key) {
       if (!empty($defaults[$key])) {

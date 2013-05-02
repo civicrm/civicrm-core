@@ -190,29 +190,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
       $values['note'] = $daoNote->note;
     }
     $this->_contributionType = $values['financial_type_id'];
-
-    $csParams = array('contribution_id' => $id);
-    $softCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($csParams, TRUE);
-
-    if (CRM_Utils_Array::value('soft_credit_to', $softCredit)) {
-      $softCredit['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $softCredit['soft_credit_to'], 'sort_name'
-      );
-    }
-    $values['soft_credit_to'] = CRM_Utils_Array::value('sort_name', $softCredit);
-    $values['softID'] = CRM_Utils_Array::value('soft_credit_id', $softCredit);
-    $values['soft_contact_id'] = CRM_Utils_Array::value('soft_credit_to', $softCredit);
-
-    if (CRM_Utils_Array::value('pcp_id', $softCredit)) {
-      $pcpId = CRM_Utils_Array::value('pcp_id', $softCredit);
-      $pcpTitle = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcpId, 'title');
-      $contributionPageTitle = CRM_PCP_BAO_PCP::getPcpPageTitle($pcpId, 'contribute');
-      $values['pcp_made_through'] = CRM_Utils_Array::value('sort_name', $softCredit) . " :: " . $pcpTitle . " :: " . $contributionPageTitle;
-      $values['pcp_made_through_id'] = CRM_Utils_Array::value('pcp_id', $softCredit);
-      $values['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $softCredit);
-      $values['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $softCredit);
-      $values['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $softCredit);
-    }
   }
 
   /**
