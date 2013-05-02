@@ -704,8 +704,9 @@ CRM.validate = CRM.validate || {
    * @param options {object|void} Override defaults, keys include 'title', 'message',
    *  see jQuery.dialog for full list of available params
    */
-  CRM.confirm = function (buttons, options) {
+  CRM.confirm = function (buttons, options, cancelLabel) {
     var dialog, callbacks = {};
+    cancelLabel = cancelLabel || ts('Cancel');
     var settings = {
       title: ts('Confirm Action'),
       message: ts('Are you sure you want to continue?'),
@@ -716,7 +717,8 @@ CRM.validate = CRM.validate || {
       },
       buttons: {}
     };
-    settings.buttons[ts('Cancel')] = function () {
+
+    settings.buttons[cancelLabel] = function () {
       dialog.dialog('close');
     };
     options = options || {};
