@@ -242,7 +242,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       2 => 'Household',
       3 => 'Organization',
     );
-    // By default this should return by name
+    // By default this should return an array keyed by name
     $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type');
     $this->assertEquals($byName, $result);
     // But we can also fetch by ID
