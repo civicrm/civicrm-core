@@ -1,6 +1,5 @@
 // http://civicrm.org/licensing
 cj(function($) {
-  $('.crm-contribution-pcp-block').hide();
   $('#showPCP, #showSoftCredit').click(function(){
     return showHideSoftCreditAndPCP();
   });

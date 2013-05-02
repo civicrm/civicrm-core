@@ -231,12 +231,12 @@
 				  {if $siteHasPCPs}
 					  <tr class="crm-contribution-pcp-block-link">
 						  <td colspan="2">
-							  <div id="showPCP"><a
-									  href='#'>{ts}credit this contribution to a personal campaign page{/ts}</a>{help id="id-link_pcp"}
+							  <div id="showPCP">
+                  <a href='#'>{ts}credit this contribution to a personal campaign page{/ts}</a>
 							  </div>
 						  </td>
 					  </tr>
-					  <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id">
+					  <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id hiddenElement">
 						  <td class="label">{$form.pcp_made_through.label}</td>
 						  <td>
 							  {$form.pcp_made_through.html} &nbsp;

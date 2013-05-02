@@ -28,7 +28,7 @@
 <table class="form-layout-compressed crm-soft-credit-block">
 {section name='i' start=1 loop=$rowCount}
 {assign var='rowNumber' value=$smarty.section.i.index}
-  <tr id="soft-credit-row-{$rowNumber}" class="crm-contribution-form-block-soft_credit_to {if $rowNumber gt 1}hiddenElement{/if}">
+  <tr id="soft-credit-row-{$rowNumber}" class="crm-contribution-form-block-soft_credit_to {if $rowNumber gte $showSoftCreditRow}hiddenElement{/if}">
     <td class="label">{ts}Soft Credit To{/ts}</td>
     <td>
       {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true blockNo=$rowNumber
