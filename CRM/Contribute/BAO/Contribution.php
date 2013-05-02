@@ -276,14 +276,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'currency',
         'financial_type_id',
       );
-      $retrieverequired = 0;
+      $retrieveRequired = 0;
       foreach ($titleFields as $titleField) {
         if(!isset($contribution->$titleField)){
-          $retrieverequired = 1;
+          $retrieveRequired = 1;
           break;
         }
       }
-      if ($retrieverequired == 1) {
+      if ($retrieveRequired == 1) {
         $contribution->find(true);
       }
     }
@@ -341,14 +341,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'currency',
         'financial_type_id',
       );
-      $retrieverequired = 0;
+      $retrieveRequired = 0;
       foreach ($titleFields as $titleField) {
         if(!isset($contribution->$titleField)){
-          $retrieverequired = 1;
+          $retrieveRequired = 1;
           break;
         }
       }
-      if($retrieverequired == 1){
+      if($retrieveRequired == 1){
         $contribution->find(true);
       }
       $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
@@ -1373,7 +1373,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
       $pledgeID = $pledgePayment[0]->pledge_id;
     }
-
 
     $membershipStatuses = CRM_Member_PseudoConstant::membershipStatus();
 
@@ -2461,27 +2460,27 @@ WHERE  contribution_id = %1 ";
    */
   static function recordFinancialAccounts(&$params, $ids) {
     $skipRecords = $update = FALSE;
-    $additionalPaticipantId = array();
+    $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     if (CRM_Utils_Array::value('contribution_mode', $params) == 'participant') {
       $entityId = $params['participant_id'];
       $entityTable = 'civicrm_participant';
-      $additionalPaticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
+      $additionalParticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
     }
     else {
       $entityId = $params['contribution']->id;
       $entityTable = 'civicrm_contribution';
     }
     $entityID[] = $entityId;
-    if (!empty($additionalPaticipantId)) {
-      $entityID += $additionalPaticipantId;
+    if (!empty($additionalParticipantId)) {
+      $entityID += $additionalParticipantId;
     }
     if (!CRM_Utils_Array::value('prevContribution', $params)) {
       $entityID = NULL;
     }
     // build line item array if its not set in $params
-    if (!CRM_Utils_Array::value('line_item', $params) || $additionalPaticipantId) {
+    if (!CRM_Utils_Array::value('line_item', $params) || $additionalParticipantId) {
       CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
     }
 
