@@ -225,13 +225,6 @@ class CRM_Core_PseudoConstant {
   private static $extensions;
 
   /**
-   * contact Type
-   * @var array
-   * @static
-   */
-  private static $contactType;
-
-  /**
    * Financial Account Type
    * @var array
    * @static
