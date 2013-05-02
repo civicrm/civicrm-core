@@ -446,7 +446,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
 
   function fixFormValues() {
     if (!$this->_force) {
-//     print_r($this->_formValues); die();
       return;
     }
     $status = CRM_Utils_Request::retrieve('status', 'String', $this);
