@@ -548,7 +548,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       return;
     }
 
-    $currencies = CRM_Core_PseudoConstant::currencySymbols('symbol', 'name');
+    $currencies = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'currency');
     $currency = $currencies[$values['civicrm_grant_currency']];
 
     if (!$customData) {

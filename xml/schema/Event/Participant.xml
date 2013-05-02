@@ -216,6 +216,11 @@
       <dataPattern>/^[A-Z]{3}$/i</dataPattern>
       <comment>3 character string, value derived from config setting.</comment>
       <add>3.0</add>
+      <pseudoconstant>
+        <table>civicrm_currency</table>
+        <keyColumn>name</keyColumn>
+        <labelColumn>symbol</labelColumn>
+      </pseudoconstant>
   </field>
   <field> 
       <name>campaign_id</name> 

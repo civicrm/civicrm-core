@@ -220,7 +220,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $fields = $subset;
     }
     else {
-      $ufGroups = CRM_Core_PseudoConstant::ufGroup();
+      $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFGroup', 'uf_group_id');
 
       $fields = array();
       foreach ($ufGroups as $id => $title) {
@@ -2446,7 +2446,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   static function getProfiles($types, $onlyPure = FALSE) {
     $profiles = array();
-    $ufGroups = CRM_Core_PseudoConstant::ufgroup();
+    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFGroup', 'uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
 
@@ -2479,7 +2479,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     $profiles = array();
-    $ufGroups = CRM_Core_PseudoConstant::ufgroup();
+    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFGroup', 'uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
 

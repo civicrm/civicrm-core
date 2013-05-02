@@ -74,6 +74,11 @@
     <length>3</length>
     <comment>Currency for the amount</comment>
     <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>symbol</labelColumn>
+    </pseudoconstant>
   </field>
   <field>
     <name>financial_account_id</name>

@@ -382,7 +382,12 @@
     <headerPattern>/cur(rency)?/i</headerPattern>
     <dataPattern>/^[A-Z]{3}$/i</dataPattern>
     <comment>3 character string, value from config setting or input via user.</comment>
-    <add>3.3</add>   
+    <add>3.3</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>symbol</labelColumn>
+    </pseudoconstant>
   </field> 
   <field> 
     <name>campaign_id</name> 

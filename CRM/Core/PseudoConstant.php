@@ -134,25 +134,11 @@ class CRM_Core_PseudoConstant {
   private static $staticGroup;
 
   /**
-   * user framework groups
-   * @var array
-   * @static
-   */
-  private static $ufGroup;
-
-  /**
    * currency codes
    * @var array
    * @static
    */
   private static $currencyCode;
-
-  /**
-   * currency Symbols
-   * @var array
-   * @static
-   */
-  private static $currencySymbols;
 
   /**
    * payment processor
@@ -241,11 +227,13 @@ class CRM_Core_PseudoConstant {
   public static function get($daoName, $fieldName, $params = array()) {
     $dao = new $daoName;
     $fields = $dao->fields();
+    $fieldKeys = $dao->fieldKeys();
+    $fieldKey = $fieldKeys[$fieldName];
     $dao->free();
-    if (empty($fields[$fieldName])) {
+    if (empty($fields[$fieldKey])) {
       return FALSE;
     }
-    $fieldSpec = $fields[$fieldName];
+    $fieldSpec = $fields[$fieldKey];
     $flip = !empty($params['flip']);
 
     // If the field is an enum, explode the enum definition and return the array.
@@ -299,7 +287,10 @@ class CRM_Core_PseudoConstant {
           // Get list of fields for the option table
           $daoName = CRM_Core_AllCoreTables::getClassForTable($pseudoconstant['table']);
           $dao = new $daoName;
-          $availableFields = $dao->fields();
+          $availableFields = array_keys($dao->fieldKeys());
+          if (in_array('is_active', $availableFields)) {
+            $wheres[] = 'is_active = 1';
+          }
           $dao->free();
 
           $select = "SELECT %1 AS id, %2 AS label";
@@ -883,21 +874,6 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all the user framework groups
-   *
-   * @access public
-   *
-   * @return array - array reference of all groups.
-   * @static
-   */
-  public static function &ufGroup() {
-    if (!self::$ufGroup) {
-      self::populate(self::$ufGroup, 'CRM_Core_DAO_UFGroup', FALSE, 'title', 'is_active', NULL, 'title');
-    }
-    return self::$ufGroup;
-  }
-
-  /**
    * Get all Relationship Types  from database.
    *
    * The static array group is returned, and if it's
@@ -941,25 +917,6 @@ WHERE  id = %1";
     }
 
     return self::$relationshipType[$valueColumnName];
-  }
-
-  /**
-   * Get all the Currency Symbols from Database
-   *
-   * @access public
-   *
-   * @return array - array reference of all Currency Symbols
-   * @static
-   *
-   * FIXME: this is not stored as an optionValue, and it's not tied to a single DB column;
-   * FIXME: It's used for a setting stored in option group 'currencies_enabled'. What to do?
-   */
-  public static function &currencySymbols($name = 'symbol', $key = 'id') {
-    $cacheKey = "{$name}_{$key}";
-    if (!isset(self::$currencySymbols[$cacheKey])) {
-      self::populate(self::$currencySymbols[$cacheKey], 'CRM_Financial_DAO_Currency', TRUE, $name, NULL, NULL, 'name', $key);
-    }
-    return self::$currencySymbols[$cacheKey];
   }
 
   /**
