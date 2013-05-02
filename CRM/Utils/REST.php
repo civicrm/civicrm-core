@@ -84,12 +84,14 @@ class CRM_Utils_REST {
    * @static
    */
   public static function authenticate($name, $pass) {
+	  
+	// I'm pretty sure this whole function goes
 
-    $result = CRM_Utils_System::authenticate($name, $pass);
+    // $result = CRM_Utils_System::authenticate($name, $pass); We want to get rid of this
 
-    if (empty($result)) {
-      return self::error('Could not authenticate user, invalid name or password.');
-    }
+    //if (empty($result)) {
+    //  return self::error('Could not authenticate user, invalid name or password.');
+    //}
 
     $session = CRM_Core_Session::singleton();
     $api_key = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $result[0], 'api_key');
@@ -284,32 +286,23 @@ class CRM_Utils_REST {
       }
 
       // If the query string is malformed, reject the request.
-      if ((count($args) != 3) && ($args[1] != 'login') && ($args[1] != 'ping')) {
+      // Does this mean it will reject it
+      if ((count($args) != 3) && ($args[1] != 'ping')) {
         return self::error('Unknown function invocation.');
       }
       $store = NULL;
-      if ($args[1] == 'login') {
-        $name = CRM_Utils_Request::retrieve('name', 'String', $store, FALSE, NULL, 'REQUEST');
-        $pass = CRM_Utils_Request::retrieve('pass', 'String', $store, FALSE, NULL, 'REQUEST');
-        if (empty($name) ||
-          empty($pass)
-        ) {
-          return self::error('Invalid name / password.');
-        }
-        return self::authenticate($name, $pass);
-      }
-      elseif ($args[1] == 'ping') {
+      
+      if ($args[1] == 'ping') {
         return self::ping();
       }
     }
-    else {
-      // or the new format (entity+action)
-      $args[1] = CRM_Utils_array::value('entity', $_REQUEST);
-      $args[2] = CRM_Utils_array::value('action', $_REQUEST);
-    }
+ 
+    // or the new format (entity+action)
+    $args[1] = CRM_Utils_array::value('entity', $_REQUEST);
+    $args[2] = CRM_Utils_array::value('action', $_REQUEST);
+      
     // Everyone should be required to provide the server key, so the whole
     //  interface can be disabled in more change to the configuration file.
-    //  This used to be done in the authenticate function, but that was bad...trust me
     // first check for civicrm site key
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
       $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", TRUE, NULL, NULL, NULL, "wiki");
@@ -321,42 +314,22 @@ class CRM_Utils_REST {
     }
 
 
-    // At this point we know we are not calling either login or ping (neither of which
-    //  require authentication prior to being called.  Therefore, at this point we need
-    //  to make sure we're working with a trusted user.
-
-    // There are two ways to check for a trusted user:
-    //  First: they can be someone that has a valid session currently
-    //  Second: they can be someone that has provided an API_Key
+    // At this point we know we are not calling ping which does not require authentication.
+    //  Therefore, at this point we need to make sure we're working with a trusted user.
+    //  Valid users are those who provide a valid server key and API key
 
     $valid_user = FALSE;
 
-    // Check for valid session.  Session ID's only appear here if you have
-    // run the rest_api login function.  That might be a problem for the
-    // AJAX methods.
-
-	// XXX This is the old way of doing it. We're going to want to get rid of this
-    $session = CRM_Core_Session::singleton();
-    if ($session->get('PHPSESSID')) {
-      $valid_user = TRUE;
+    // Check and see if a valid secret API key is provided.
+    $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+    if (!$api_key || strtolower($api_key) == 'null') {
+      return self::error("FATAL:mandatory param 'api_key' (user key) missing");
     }
+    $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
 
-    // If the user does not have a valid session (most likely to be used by people using
-    // an ajax interface), we need to check to see if they are carring a valid user's
-    // secret key.
-    // XXX this is the new way of doing it, which should be the only way of doing it.
-    if (!$valid_user) {
-      $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
-      if (!$api_key || strtolower($api_key) == 'null') {
-        return self::error("FATAL:mandatory param 'api_key' (user key) missing");
-      }
-      $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
-    }
-
-    // If we didn't find a valid user either way, then die.
+    // If we didn't find a valid user, die
     if (empty($valid_user)) {
-	// XXX correct error so only reflects api_key
-      return self::error("Invalid session or user api_key invalid");
+      return self::error("User API key invalid");
     }
 
     return self::process($args);
