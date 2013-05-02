@@ -68,7 +68,12 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
     //assign backurl
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
-    if ($context == 'mailing') {
+    if ($context == 'activitySelector') {
+      $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+      $backUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=activity");
+      $backUrlTitle = ts('Back to Activities');
+    }
+    elseif ($context == 'mailing') {
       $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
       $backUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=mailing");
       $backUrlTitle = ts('Back to Mailing');
