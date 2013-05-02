@@ -135,14 +135,14 @@ class CiviCRM_For_WordPress {
 	 * @description: dummy magic method to prevent CiviCRM_For_WordPress from being cloned
 	 */
 	public function __clone() { 
-		_doing_it_wrong( __FUNCTION__, __( 'Only one instance of CiviCRM_For_WordPress please' ), '4.3' );
+		_doing_it_wrong( __FUNCTION__, __( 'Only one instance of CiviCRM_For_WordPress please', 'civicrm-wordpress' ), '4.3' );
 	}
 
 	/**
 	 * @description: dummy magic method to prevent CiviCRM_For_WordPress from being unserialized
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Please do not serialize CiviCRM_For_WordPress', 'bbpress' ), '4.3' );
+		_doing_it_wrong( __FUNCTION__, __( 'Please do not serialize CiviCRM_For_WordPress', 'civicrm-wordpress' ), '4.3' );
 	}
 
 
@@ -166,7 +166,7 @@ class CiviCRM_For_WordPress {
 		
 		// kick out if another instance is being inited
 		if ( isset( $this->in_wordpress ) ) { 
-			wp_die( 'Only one instance of CiviCRM_For_WordPress please' );
+			wp_die( __( 'Only one instance of CiviCRM_For_WordPress please', 'civicrm-wordpress' ) );
 		}
 	
 		// store context
@@ -205,11 +205,37 @@ class CiviCRM_For_WordPress {
 
 
 	/** 
+	 * @description: load translation files
+	 */
+	public function translation() {
+		
+		// not used, as there are no translations as yet
+		load_plugin_textdomain(
+		
+			// unique name
+			'civicrm-wordpress', 
+			
+			// deprecated argument
+			false,
+			
+			// relative path to directory containing translation files
+			dirname( plugin_basename( __FILE__ ) ) . '/languages/'
+
+		);
+		
+	}
+	
+	
+	
+	/** 
 	 * @description: register hooks (same procedure as civicrm_wp_main() )
 	 */
 	public function register_hooks() {
 	
 		// always add the following hooks
+		
+		// use translation files
+		add_action( 'plugins_loaded', array( $this, 'translation' ) );
 		
 		// add CiviCRM access capabilities to WordPress roles
 		add_action( 'init', array( $this, 'set_access_capabilities' ) );
@@ -314,8 +340,8 @@ class CiviCRM_For_WordPress {
 			
 			// add top level menu item
 			add_menu_page( 
-				'CiviCRM', 
-				'CiviCRM', 
+				__( 'CiviCRM', 'civicrm-wordpress' ), 
+				__( 'CiviCRM', 'civicrm-wordpress' ), 
 				'access_civicrm', 
 				'CiviCRM', 
 				array( $this, 'invoke' ), 
@@ -326,8 +352,8 @@ class CiviCRM_For_WordPress {
 			
 			// add menu item to options menu
 			add_options_page( 
-				'CiviCRM Installer', 
-				'CiviCRM Installer', 
+				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
+				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
 				'manage_options', 
 				'civicrm-install', 
 				array( $this, 'run_installer' )
@@ -421,11 +447,11 @@ class CiviCRM_For_WordPress {
 		$installLink = admin_url() . "options-general.php?page=civicrm-install";
 		echo '<div id="civicrm-warning" class="updated fade">' . 
 			 '<p><strong>' . 
-			 t('CiviCRM is almost ready.') . 
+			 __( 'CiviCRM is almost ready.', 'civicrm-wordpress' ) . 
 			 '</strong> ' . 
-			 t(
-			 	'You must <a href="!1">configure CiviCRM</a> for it to work.', 
-			 	array( '!1' => $installLink )
+			 sprintf( 
+			 	__( 'You must <a href="%s">configure CiviCRM</a> for it to work.', 'civicrm-wordpress' ), 
+			 	$installLink
 			 ) .
 			 '</p></div>';
 
@@ -451,7 +477,13 @@ class CiviCRM_For_WordPress {
 			// Check for php version and ensure its greater than minPhpVersion
 			$minPhpVersion = '5.3.3';
 			if ( version_compare( PHP_VERSION, $minPhpVersion ) < 0 ) {
-				echo "CiviCRM requires PHP Version $minPhpVersion or greater. You are running PHP Version " . PHP_VERSION . "<p>";
+				echo '<p>' . 
+					 sprintf(
+						__( 'CiviCRM requires PHP Version %s or greater. You are running PHP Version %s', 'civicrm-wordpress' ),
+						$minPhpVersion,
+						PHP_VERSION
+					 ) . 
+					 '<p>';
 				exit();
 			}
 
@@ -471,14 +503,19 @@ class CiviCRM_For_WordPress {
 			$docLinkTrouble = "http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Configuration+Trouble-shooting";
 			$forumLink      = "http://forum.civicrm.org/index.php/board,6.0.html";
 
-			$errorMsgAdd = t(
-				"Please review the <a href='!1'>WordPress Installation Guide</a> and the <a href='!2'>Trouble-shooting page</a> for assistance. If you still need help installing, you can often find solutions to your issue by searching for the error message in the <a href='!3'>installation support section of the community forum</a>.</strong></p>",
-				array('!1' => $docLinkInstall, '!2' => $docLinkTrouble, '!3' => $forumLink)
+			$errorMsgAdd = sprintf( 
+				__( 'Please review the <a href="%s">WordPress Installation Guide</a> and the <a href="%s">Trouble-shooting page</a> for assistance. If you still need help installing, you can often find solutions to your issue by searching for the error message in the <a href="%s">installation support section of the community forum</a>.', 'civicrm-wordpress' ),
+				$docLinkInstall,
+				$docLinkTrouble,
+				$forumLink
 			);
+			
+			// close tags (where were these opened?)
+			$errorMsgAdd .= '</strong></p>';
 
-			$installMessage = t(
-				"Click <a href='!1'>here</a> for fresh install.", 
-				array('!1' => $installLink)
+			$installMessage = sprintf(
+				__( 'Click <a href="%s">here</a> for fresh install.', 'civicrm-wordpress' ), 
+				$installLink
 			);
 
 			if ($error == false) {
@@ -498,14 +535,14 @@ class CiviCRM_For_WordPress {
 				//FIX ME
 				wp_die(			
 					"<strong><p class='error'>" .
-					t(
-						"Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (!1).",
-						array('!1' => CIVICRM_SETTINGS_PATH)
+					sprintf(
+						__( 'Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (%s).', 'civicrm-wordpress' ),
+						CIVICRM_SETTINGS_PATH
 					) .
 					"</p><p class='error'> &raquo; " .
-					t(
-						"civicrm_root is currently set to: <em>!1</em>.", 
-						array('!1' => $civicrm_root)
+					sprintf(
+						__( 'civicrm_root is currently set to: <em>%s</em>.', 'civicrm-wordpress' ), 
+						$civicrm_root
 					) .
 					"</p><p class='error'>" . $errorMsgAdd . "</p></strong>"
 				);
@@ -998,7 +1035,7 @@ class CiviCRM_For_WordPress {
 		if ( ! in_array( 'anonymous_user' , $wp_roles->roles ) ) {
 			add_role(
 				'anonymous_user',
-				'Anonymous User',
+				__( 'Anonymous User', 'civicrm-wordpress' ),
 				$min_capabilities
 			);
 		}
@@ -1121,7 +1158,7 @@ class CiviCRM_For_WordPress {
 						break;
 
 					default:
-						echo '<p>Do not know how to handle this shortcode</p>';
+						echo '<p>' . __( 'Do not know how to handle this shortcode', 'civicrm-wordpress' ) . '</p>';
 						return;
 				}
 				break;
@@ -1146,7 +1183,7 @@ class CiviCRM_For_WordPress {
 
 			default:
 
-				echo '<p>Do not know how to handle this shortcode</p>';
+				echo '<p>' . __( 'Do not know how to handle this shortcode', 'civicrm-wordpress' ) . '</p>';
 				return;
 
 		}
@@ -1176,7 +1213,7 @@ class CiviCRM_For_WordPress {
 
 		$config      = CRM_Core_Config::singleton();
 		$imageBtnURL = $config->resourceBase . 'i/logo16px.png';
-		$out         = '<a href="#TB_inline?width=480&inlineId=civicrm_frontend_pages" class="button thickbox" id="add_civi" style="padding-left: 4px;" title="' . __("Add CiviCRM Public Pages", 'CiviCRM') . '"><img src="' . $imageBtnURL . '" height="15" width="15" alt="' . __("Add CiviCRM Public Pages", 'CiviCRM') . '" />CiviCRM</a>';
+		$out         = '<a href="#TB_inline?width=480&inlineId=civicrm_frontend_pages" class="button thickbox" id="add_civi" style="padding-left: 4px;" title="' . __( 'Add CiviCRM Public Pages', 'civicrm-wordpress' ) . '"><img src="' . $imageBtnURL . '" height="15" width="15" alt="' . __( 'Add CiviCRM Public Pages', 'civicrm-wordpress' ) . '" />'. __( 'CiviCRM', 'civicrm-wordpress' ) .'</a>';
 		return $context . $out;
 
 	}
@@ -1300,11 +1337,11 @@ class CiviCRM_For_WordPress {
 					</div>
 					<div style="padding:15px 15px 0 15px;">
 						<select id="add_civicomponent_id">
-							<option value="">  <?php echo ts("Select a frontend element."); ?>  </option>
-							<option value="contribution">Contribution Page</option>
-							<option value="event">Event Page</option>
-							<option value="profile">Profile</option>
-							<option value="user-dashboard">User Dashboard</option>
+							<option value=""><?php _e( 'Select a frontend element.', 'civicrm-wordpress' ); ?></option>
+							<option value="contribution"><?php _e( 'Contribution Page', 'civicrm-wordpress' ); ?></option>
+							<option value="event"><?php _e( 'Event Page', 'civicrm-wordpress' ); ?></option>
+							<option value="profile"><?php _e( 'Profile', 'civicrm-wordpress' ); ?></option>
+							<option value="user-dashboard"><?php _e( 'User Dashboard', 'civicrm-wordpress' ); ?></option>
 						</select>
 
 						 <span id="contribution-section" style="display:none;">
@@ -1331,15 +1368,15 @@ class CiviCRM_For_WordPress {
 						<br>
 						<span id="action-section-event" style="display:none;">
 						   <div style="padding:15px 15px 0 15px;">
-							<input type="radio" name="event_action" value="info" checked="checked" /> Event Info Page
-							<input type="radio" name="event_action" value="register" /> Event Registration Page
+							<input type="radio" name="event_action" value="info" checked="checked" /> <?php _e( 'Event Info Page', 'civicrm-wordpress' ); ?>
+							<input type="radio" name="event_action" value="register" /> <?php _e( 'Event Registration Page', 'civicrm-wordpress' ); ?>
 						   </div>
 						</span>
 						<br/>
 						<span id="component-section" style="display:none;">
 						   <div style="padding:15px 15px 0 15px;">
-							<input type="radio" name="component_mode" value="live" checked="checked"/> Live Page
-							<input type="radio" name="component_mode" value="test" /> Test Drive
+							<input type="radio" name="component_mode" value="live" checked="checked"/> <?php _e( 'Live Page', 'civicrm-wordpress' ); ?>
+							<input type="radio" name="component_mode" value="test" /> <?php _e( 'Test Drive', 'civicrm-wordpress' ); ?>
 						   </div>
 						</span>
 						<br/>
@@ -1358,17 +1395,17 @@ class CiviCRM_For_WordPress {
 
 						<span id="profile-mode-section" style="display:none;">
 						   <div style="padding:15px 15px 0 15px;">
-							<input type="radio" name="profile_mode" value="create" checked="checked"/> Create
-							<input type="radio" name="profile_mode" value="edit" /> Edit
-							<input type="radio" name="profile_mode" value="edit" /> View
+							<input type="radio" name="profile_mode" value="create" checked="checked"/> <?php _e( 'Create', 'civicrm-wordpress' ); ?>
+							<input type="radio" name="profile_mode" value="edit" /> <?php _e( 'Edit', 'civicrm-wordpress' ); ?>
+							<input type="radio" name="profile_mode" value="edit" /> <?php _e( 'View', 'civicrm-wordpress' ); ?>
 						   </div>
 						</span>
 
-						<div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php echo ts("Can't find your form? Make sure it is active."); ?></div>
+						<div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php _e( "Can't find your form? Make sure it is active.", 'civicrm-wordpress' ); ?></div>
 					</div>
 					<div style="padding:15px;">
 					  <input type="button" class="button-primary" value="Insert Form" id="crm-wp-insert-shortcode"/>&nbsp;&nbsp;&nbsp;
-					  <a class="button" style="color:#bbb;" href="#" onclick="tb_remove(); return false;"><?php echo ts("Cancel"); ?></a>
+					  <a class="button" style="color:#bbb;" href="#" onclick="tb_remove(); return false;"><?php _e( 'Cancel', 'civicrm-wordpress' ); ?></a>
 					</div>
 				</div>
 			</div>
