@@ -140,6 +140,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public $_lineItems;
 
+  /**
+   * @var soft credit info
+   */
+  public $_softCreditInfo;
+
   protected $_formType;
   protected $_cdType;
 
@@ -296,7 +301,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     // set soft credit defaults
-    CRM_Contribute_Form_SoftCredit::setDefaultValues($defaults);
+    CRM_Contribute_Form_SoftCredit::setDefaultValues($defaults, $this);
 
     if ($this->_mode) {
       $config = CRM_Core_Config::singleton();
@@ -490,7 +495,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('buildPriceSet', $buildPriceSet);
 
     $showAdditionalInfo = FALSE;
-
 
     $defaults = $this->_values;
     $additionalDetailFields = array(
