@@ -160,15 +160,20 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $cs->find();
 
     if ($cs->N > 0) {
+      $count = 1;
       while ($cs->fetch()) {
         if ($all) {
           foreach ($pcpFields as $val) {
             $softContribution['pcp'][$val] = $cs->$val;
           }
         }
-        $softContribution['soft_credit'][$cs->id]['soft_credit_to'] = $cs->contact_id;
-        $softContribution['soft_credit'][$cs->id]['soft_credit_id'] = $cs->id;
-        $softContribution['soft_credit'][$cs->id]['soft_credit_amount'] = $cs->amount;
+
+        $softContribution['soft_credit'][$count] = array(
+          'soft_credit_to' => $cs->contact_id,
+          'soft_credit_id' => $cs->id,
+          'soft_credit_amount' => $cs->amount,
+        );
+        $count++;
       }
     }
     return $softContribution;
