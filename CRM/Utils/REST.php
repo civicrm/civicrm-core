@@ -334,6 +334,8 @@ class CRM_Utils_REST {
     // Check for valid session.  Session ID's only appear here if you have
     // run the rest_api login function.  That might be a problem for the
     // AJAX methods.
+
+	// XXX This is the old way of doing it. We're going to want to get rid of this
     $session = CRM_Core_Session::singleton();
     if ($session->get('PHPSESSID')) {
       $valid_user = TRUE;
@@ -352,6 +354,7 @@ class CRM_Utils_REST {
 
     // If we didn't find a valid user either way, then die.
     if (empty($valid_user)) {
+	// XXX correct error so only reflects api_key
       return self::error("Invalid session or user api_key invalid");
     }
 
