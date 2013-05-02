@@ -83,7 +83,7 @@ define( 'CIVICRM_UF_HEAD', true );
 
 /*
 --------------------------------------------------------------------------------
-CiviCrmForWordPress Class
+CiviCRM_For_WordPress Class
 --------------------------------------------------------------------------------
 */
 
@@ -170,7 +170,7 @@ class CiviCRM_For_WordPress {
 		}
 	
 		// store context
-		$this->in_wordpress = ( isset( $_GET['page'] ) && $_GET['page'] == 'CiviCRM' ) ? true : false;
+		self::$in_wordpress = ( isset( $_GET['page'] ) && $_GET['page'] == 'CiviCRM' ) ? true : false;
 		
 		// there is no session handling in WP hence we start it for CiviCRM pages
 		if (!session_id()) {
@@ -198,7 +198,7 @@ class CiviCRM_For_WordPress {
 	public function civicrm_in_wordpress() {
 		
 		// already stored
-		return $this->in_wordpress;
+		return self::$in_wordpress;
 
 	}
 
@@ -1379,7 +1379,7 @@ class CiviCRM_For_WordPress {
 
 
 
-} // class ends
+} // class CiviCRM_For_WordPress ends
 
 
 
@@ -1701,7 +1701,9 @@ function t( $str, $sub = NULL ) {
  * utility for debugging
  */
 function cividie( $var ) {
-	print_r( $var ); die();
+	print_r( "\n\n" );
+	print_r( $var ); 
+	die();
 }
 
 
