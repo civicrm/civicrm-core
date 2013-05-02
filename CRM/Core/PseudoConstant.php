@@ -106,13 +106,6 @@ class CRM_Core_PseudoConstant {
   private static $countryIsoCode;
 
   /**
-   * tag
-   * @var array
-   * @static
-   */
-  private static $tag;
-
-  /**
    * group
    * @var array
    * @static
@@ -146,13 +139,6 @@ class CRM_Core_PseudoConstant {
    * @static
    */
   private static $ufGroup;
-
-  /**
-   * custom groups
-   * @var array
-   * @static
-   */
-  private static $customGroup;
 
   /**
    * currency codes
@@ -758,28 +744,6 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all the categories from database.
-   *
-   * The static array tag is returned, and if it's
-   * called the first time, the <b>Tag DAO</b> is used
-   * to get all the categories.
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all categories.
-   *
-   */
-  public static function &tag() {
-    if (!self::$tag) {
-      self::populate(self::$tag, 'CRM_Core_DAO_Tag', TRUE);
-    }
-    return self::$tag;
-  }
-
-  /**
    * Get all groups from database
    *
    * The static array group is returned, and if it's
@@ -894,21 +858,6 @@ WHERE  id = %1";
     }
 
     return self::$staticGroup;
-  }
-
-  /**
-   * Get all the custom groups
-   *
-   * @access public
-   *
-   * @return array - array reference of all groups.
-   * @static
-   */
-  public static function &customGroup($reset = FALSE) {
-    if (!self::$customGroup || $reset) {
-      self::populate(self::$customGroup, 'CRM_Core_DAO_CustomGroup', FALSE, 'title', 'is_active', NULL, 'title');
-    }
-    return self::$customGroup;
   }
 
   /**

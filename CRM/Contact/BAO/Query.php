@@ -2710,7 +2710,7 @@ WHERE  id IN ( $groupIDs )
   function tag(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    $tagNames = CRM_Core_PseudoConstant::tag();
+    $tagNames = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     if (is_array($value)) {
       if (count($value) > 1) {
         $this->_useDistinct = TRUE;

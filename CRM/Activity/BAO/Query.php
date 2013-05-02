@@ -342,7 +342,7 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_tags':
         $value = array_keys($value);
-        $activityTags = CRM_Core_PseudoConstant::tag();
+        $activityTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
 
         $names = array();
         $val = array();

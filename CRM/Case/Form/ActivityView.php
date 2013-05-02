@@ -84,7 +84,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $tags = CRM_Core_BAO_EntityTag::getTag($activityID, 'civicrm_activity');
     if (!empty($tags)) {
-      $allTag = CRM_Core_PseudoConstant::tag();
+      $allTag = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
       foreach ($tags as $tid) {
         $tags[$tid] = $allTag[$tid];
       }
