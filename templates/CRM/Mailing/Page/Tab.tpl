@@ -46,7 +46,6 @@
     buildMailingContact();
 
     function buildMailingContact() {
-      var columns = '';
       var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/contactmailing" h=0 q="contact_id=$contactId"}'{literal};
 
       var ZeroRecordText = {/literal}'{ts escape="js"}No mailings found{/ts}.'{literal};
@@ -58,7 +57,7 @@
         "aoColumns": [
           {sClass: 'crm-mailing-contact-subject'},
           {sClass: 'crm-mailing-contact_created'},
-          {sClass: 'crm-contact-activity_contact'},
+          {sClass: 'crm-contact-activity_contact', bSortable:false},
           {sClass: 'crm-mailing-contact-date'},
           {sClass: 'crm-mailing_openstats', bSortable:false},
           {sClass: 'crm-mailing-contact-links', bSortable: false}
@@ -101,7 +100,7 @@
 
         CRM.confirm( ''
           ,{
-            title: ts('Change Activity Status'),
+            title: ts('Email Message'),
             message: o,
             width : "680px", // don't remove px
             height: "560"
