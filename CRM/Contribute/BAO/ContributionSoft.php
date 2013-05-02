@@ -34,9 +34,9 @@
  */
 class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
 
-  /* 
+  /**
    * construct method
-  */
+   */
   function __construct() {
     parent::__construct();
   }
@@ -87,7 +87,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Function to delete soft credits 
+   * Function to delete soft credits
    *
    * @param int $contributionTypeId
    * @static
@@ -99,18 +99,13 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $contributionSoft->delete();
   }
 
-
   static function getSoftContributionTotals($contact_id, $isTest = 0) {
-    $query = "
-    SELECT SUM(amount) as amount,
-                         AVG(total_amount) as average,
-                         cc.currency
-                  FROM civicrm_contribution_soft  ccs
-                       LEFT JOIN civicrm_contribution cc
-                              ON ccs.contribution_id = cc.id
-    WHERE cc.is_test = %2 AND
-          ccs.contact_id = %1
-                  GROUP BY currency ";
+    $query = '
+    SELECT SUM(amount) as amount, AVG(total_amount) as average, cc.currency
+    FROM civicrm_contribution_soft  ccs
+      LEFT JOIN civicrm_contribution cc ON ccs.contribution_id = cc.id
+    WHERE cc.is_test = %2 AND ccs.contact_id = %1
+    GROUP BY currency';
 
     $params = array(1 => array($contact_id, 'Integer'),
       2 => array($isTest, 'Integer'));
@@ -187,38 +182,38 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *  @static
    */
   static function getSoftContributionList($contact_id, $isTest = 0) {
-    $query = "
+    $query = '
     SELECT ccs.id, ccs.amount as amount,
-                     ccs.contribution_id,
-                     ccs.pcp_id,
-                     ccs.pcp_display_in_roll,
-                     ccs.pcp_roll_nickname,
-                     ccs.pcp_personal_note,
-                     cc.receive_date,
-                     cc.contact_id as contributor_id,
-                     cc.contribution_status_id as contribution_status_id,
-                     cp.title as pcp_title,
-                     cc.currency,
-                     contact.display_name,
-                     cct.name as contributionType
-              FROM civicrm_contribution_soft ccs
-                   LEFT JOIN civicrm_contribution cc
-                          ON ccs.contribution_id = cc.id
-                   LEFT JOIN civicrm_pcp cp
-                          ON ccs.pcp_id = cp.id
-                   LEFT JOIN civicrm_contact contact
-                          ON ccs.contribution_id = cc.id AND
-                             cc.contact_id = contact.id
-                       LEFT JOIN civicrm_financial_type cct
-                              ON cc.financial_type_id = cct.id
-         WHERE cc.is_test = %2 AND ccs.contact_id = %1
-         ORDER BY cc.receive_date DESC";
+           ccs.contribution_id,
+           ccs.pcp_id,
+           ccs.pcp_display_in_roll,
+           ccs.pcp_roll_nickname,
+           ccs.pcp_personal_note,
+           cc.receive_date,
+           cc.contact_id as contributor_id,
+           cc.contribution_status_id as contribution_status_id,
+           cp.title as pcp_title,
+           cc.currency,
+           contact.display_name,
+           cct.name as contributionType
+    FROM civicrm_contribution_soft ccs
+      LEFT JOIN civicrm_contribution cc
+            ON ccs.contribution_id = cc.id
+      LEFT JOIN civicrm_pcp cp
+            ON ccs.pcp_id = cp.id
+      LEFT JOIN civicrm_contact contact ON
+      ccs.contribution_id = cc.id AND cc.contact_id = contact.id
+      LEFT JOIN civicrm_financial_type cct ON cc.financial_type_id = cct.id
+    WHERE cc.is_test = %2 AND ccs.contact_id = %1
+    ORDER BY cc.receive_date DESC';
 
-    $params             = array(1 => array($contact_id, 'Integer'),
-      2 => array($isTest, 'Integer'));
-    $cs                 = CRM_Core_DAO::executeQuery($query, $params);
+    $params = array(
+      1 => array($contact_id, 'Integer'),
+      2 => array($isTest, 'Integer')
+    );
+    $cs = CRM_Core_DAO::executeQuery($query, $params);
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-    $result             = array();
+    $result = array();
     while ($cs->fetch()) {
       $result[$cs->id]['amount'] = $cs->amount;
       $result[$cs->id]['currency'] = $cs->currency;
@@ -240,7 +235,5 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     }
     return $result;
   }
-
-
 }
 
