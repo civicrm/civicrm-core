@@ -39,13 +39,13 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   /**
    * static holder for the default LT
    */
-  static $_defaultContributionType = null;
+  static $_defaultContributionType = NULL;
 
   /**
    * class constructor
    */
-  function __construct( ) {
-    parent::__construct( );
+  function __construct() {
+    parent::__construct();
   }
     
   /**
@@ -63,13 +63,13 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @static
    */
   static function retrieve(&$params, &$defaults) {
-    $financialAccount = new CRM_Financial_DAO_FinancialAccount( );
-    $financialAccount->copyValues( $params );
-    if ($financialAccount->find(true)) {
+    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
+    $financialAccount->copyValues($params);
+    if ($financialAccount->find(TRUE)) {
       CRM_Core_DAO::storeValues($financialAccount, $defaults);
       return $financialAccount;
     }
-    return null;
+    return NULL;
   }
 
   /**
@@ -96,21 +96,22 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @return object
    */
   static function add(&$params, &$ids) {
-    $params['is_active'] =  CRM_Utils_Array::value( 'is_active', $params, false );
-    $params['is_deductible'] =  CRM_Utils_Array::value( 'is_deductible', $params, false );
-    $params['is_tax'] =  CRM_Utils_Array::value( 'is_tax', $params, false );
-    $params['is_header_account'] =  CRM_Utils_Array::value( 'is_header_account', $params, false );
-    $params['is_default'] =  CRM_Utils_Array::value( 'is_default', $params, false );
+    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
+    $params['is_tax'] = CRM_Utils_Array::value('is_tax', $params, FALSE);
+    $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
+    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
     if (CRM_Utils_Array::value('is_default', $params)) {
-      $query = 'UPDATE civicrm_financial_account SET is_default = 0';
-      CRM_Core_DAO::executeQuery( $query );
+      $query = 'UPDATE civicrm_financial_account SET is_default = 0 WHERE financial_account_type_id = %1';
+      $queryParams = array(1 => array($params['financial_account_type_id'], 'Integer'));
+      CRM_Core_DAO::executeQuery($query, $queryParams);
     }   
     
     // action is taken depending upon the mode
-    $financialAccount = new CRM_Financial_DAO_FinancialAccount( );
+    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->copyValues($params);
-    $financialAccount->id = CRM_Utils_Array::value( 'contributionType', $ids );
-    $financialAccount->save( );
+    $financialAccount->id = CRM_Utils_Array::value('contributionType', $ids);
+    $financialAccount->save();
     return $financialAccount;
   }
   
@@ -120,52 +121,31 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @param int $financialAccountId
    * @static
    */
-  static function financialAccountValidation($fields,&$errors) {
-    $financialAccount = array( );
-    if (CRM_Utils_Array::value('financial_type_id', $fields)) {
-      CRM_Core_PseudoConstant::populate( $financialAccount,
-        'CRM_Financial_DAO_EntityFinancialAccount',
-        $all = True, 
-        $retrieve = 'financial_account_id', 
-        $filter = null, 
-        " account_relationship = 6 AND entity_id = {$fields['financial_type_id']} " );
-      if ( !current( $financialAccount ) ) {
-        $errors['financial_type_id'] = "Financial Account of account relationship of 'Asset Account is' is not configured for this Financial Type";
-      }
-    }
-  }
-    
-  /**
-   * Function to delete financial Types 
-   * 
-   * @param int $financialAccountId
-   * @static
-   */
   static function del($financialAccountId) {
     //checking if financial type is present  
-    $check = false;
+    $check = FALSE;
     
     //check dependencies
     $dependancy = array( 
       array('Core', 'FinancialTrxn', 'to_financial_account_id'), 
-      array('Financial', 'FinancialTypeAccount', 'financial_account_id' ), 
+      array('Financial', 'FinancialTypeAccount', 'financial_account_id'), 
       );
     foreach ($dependancy as $name) {
       require_once (str_replace('_', DIRECTORY_SEPARATOR, "CRM_" . $name[0] . "_BAO_" . $name[1]) . ".php");
       eval('$bao = new CRM_' . $name[0] . '_BAO_' . $name[1] . '();');
       $bao->$name[2] = $financialAccountId;
-      if ($bao->find(true)) {
-        $check = true;
+      if ($bao->find(TRUE)) {
+        $check = TRUE;
       }
     }
     
     if ($check) {
-      CRM_Core_Session::setStatus( ts('This financial account cannot be deleted since it is being used as a header account. Please remove it from being a header account before trying to delete it again.') );
-      return CRM_Utils_System::redirect( CRM_Utils_System::url( 'civicrm/admin/financial/financialAccount', "reset=1&action=browse" ));
+      CRM_Core_Session::setStatus(ts('This financial account cannot be deleted since it is being used as a header account. Please remove it from being a header account before trying to delete it again.'));
+      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialAccount', "reset=1&action=browse"));
     }
       
     //delete from financial Type table
-    $financialAccount = new CRM_Financial_DAO_FinancialAccount( );
+    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->id = $financialAccountId;
     $financialAccount->delete();
   }
