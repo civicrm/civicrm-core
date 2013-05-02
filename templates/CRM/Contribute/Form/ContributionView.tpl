@@ -208,7 +208,7 @@
     </div>
     <div class="crm-accordion-body">
       <table class="crm-info-panel">
-        {foreach from=$softContributions item="softCont"}
+        {foreach from=$softContributions.soft_credit item="softCont"}
           {if $softCont }
             <tr>
               <td class="label">{ts}Soft Credit To{/ts}</td>
