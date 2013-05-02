@@ -73,48 +73,6 @@ class CRM_Utils_REST {
     return self::simple(array('message' => "PONG: $key"));
   }
 
-  /**
-   * Authentication wrapper to the UF Class
-   *
-   * @param string $name      Login name
-   * @param string $pass      Password
-   *
-   * @return string           The REST Client key
-   * @access public
-   * @static
-   */
-  public static function authenticate($name, $pass) {
-	  
-	// I'm pretty sure this whole function goes
-
-    // $result = CRM_Utils_System::authenticate($name, $pass); We want to get rid of this
-
-    //if (empty($result)) {
-    //  return self::error('Could not authenticate user, invalid name or password.');
-    //}
-
-    $session = CRM_Core_Session::singleton();
-    $api_key = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $result[0], 'api_key');
-
-    if (empty($api_key)) {
-      // These two lines can be used to set the initial value of the key.  A better means is needed.
-      //CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $result[0], 'api_key', sha1($result[2]) );
-      //$api_key = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $result[0], 'api_key');
-      return self::error("This user does not have a valid API key in the database, and therefore cannot authenticate through this interface");
-    }
-
-    // Test to see if I can pull the data I need, since I know I have a good value.
-    $user = &CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', $api_key);
-
-    $session->set('api_key', $api_key);
-    $session->set('key', $result[2]);
-    $session->set('rest_time', time());
-    $session->set('PHPSESSID', session_id());
-    $session->set('cms_user_id', $result[1]);
-
-    return self::simple(array('api_key' => $api_key, 'PHPSESSID' => session_id(), 'key' => sha1($result[2])));
-  }
-
   // Generates values needed for error messages
   static function error($message = 'Unknown Error') {
     $values = array(
@@ -323,7 +281,7 @@ class CRM_Utils_REST {
     // Check and see if a valid secret API key is provided.
     $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
     if (!$api_key || strtolower($api_key) == 'null') {
-      return self::error("FATAL:mandatory param 'api_key' (user key) missing");
+      return self::error("FATAL: mandatory param 'api_key' (user key) missing");
     }
     $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
 
