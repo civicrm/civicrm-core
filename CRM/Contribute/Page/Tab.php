@@ -237,7 +237,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     }
     $this->assign('isTest', $isTest);
 
-    $softCreditList = CRM_Contribute_BAO_Contribution::getSoftContributionList($this->_contactId, $isTest);
+    $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $isTest);
 
     if (!empty($softCreditList)) {
       $softCreditTotals = array();
@@ -245,7 +245,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       list($softCreditTotals['amount'],
         $softCreditTotals['avg'],
         $softCreditTotals['currency']
-      ) = CRM_Contribute_BAO_Contribution::getSoftContributionTotals($this->_contactId, $isTest);
+      ) = CRM_Contribute_BAO_ContributionSoft::getSoftContributionTotals($this->_contactId, $isTest);
 
       $this->assign('softCredit', TRUE);
       $this->assign('softCreditRows', $softCreditList);
