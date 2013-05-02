@@ -31,8 +31,12 @@
   <tr id="soft-credit-row-{$rowNumber}" class="crm-contribution-form-block-soft_credit_to {if $rowNumber gte $showSoftCreditRow}hiddenElement{/if}">
     <td class="label">{ts}Soft Credit To{/ts}</td>
     <td>
+      {assign var='createNewStatus' value=true}
+      {if !$showCreateNew and $rowNumber lt $showSoftCreditRow}
+        {assign var='createNewStatus' value=false}
+      {/if}
       {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true blockNo=$rowNumber
-      prefix="soft_credit_"}
+      prefix="soft_credit_" showNewSelect=$createNewStatus}
     </td>
 	  <td>
 		  {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}

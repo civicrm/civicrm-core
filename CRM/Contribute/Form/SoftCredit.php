@@ -51,14 +51,16 @@ class CRM_Contribute_Form_SoftCredit {
     // by default generate 5 blocks
     $item_count = 6;
 
+    $showSoftCreditRow = 2;
+    $showCreateNew = true;
     if ($form->_action & CRM_Core_Action::UPDATE) {
       $csParams = array('contribution_id' => $form->_id);
       $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($csParams, TRUE);
-      $showSoftCreditRow = count($form->_softCreditInfo['soft_credit']);
-      $showSoftCreditRow++;
-    }
-    else {
-      $showSoftCreditRow = 2;
+      if (!empty($form->_softCreditInfo['soft_credit'])) {
+        $showSoftCreditRow = count($form->_softCreditInfo['soft_credit']);
+        $showSoftCreditRow++;
+        $showCreateNew = false;
+      }
     }
 
     for ($rowNumber = 1; $rowNumber <= $item_count; $rowNumber++) {
@@ -68,6 +70,7 @@ class CRM_Contribute_Form_SoftCredit {
 
     $form->assign('showSoftCreditRow', $showSoftCreditRow);
     $form->assign('rowCount', $item_count);
+    $form->assign('showCreateNew', $showCreateNew);
 
     // Tell tpl to hide soft credit field if contribution is linked directly to a PCP Page
     if (CRM_Utils_Array::value('pcp_made_through_id', $form->_values)) {
@@ -81,8 +84,14 @@ class CRM_Contribute_Form_SoftCredit {
    */
   static function setDefaultValues(&$defaults, &$form) {
 
-    //crm_core_error::debug('$form->_softCreditInfo', $form->_softCreditInfo);
-    //exit;
+//    crm_core_error::debug('$form->_softCreditInfo', $form->_softCreditInfo);
+//    exit;
+
+    if (!empty($form->_softCreditInfo['soft_credit'])) {
+      foreach($form->_softCreditInfo['soft_credit'] as $key => $value) {
+        $defaults["soft_credit_amount[$key]"] = $value['soft_credit_amount'];
+      }
+    }
 
     /*
     if (CRM_Utils_Array::value('soft_credit_to', $softCredit)) {
