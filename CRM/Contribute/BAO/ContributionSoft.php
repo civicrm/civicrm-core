@@ -141,7 +141,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *  @return array of soft contribution ids, amounts, and associated contact ids
    *  @static
    */
-  static function getSoftContribution($params, $all = FALSE) {
+  static function getSoftContribution($contributionID, $all = FALSE) {
     $pcpFields = array(
       'pcp_id',
       'pcp_display_in_roll',
@@ -149,6 +149,36 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       'pcp_personal_note',
     );
 
+    $query = '
+    SELECT ccs.id, pcp_id, pcp_display_in_roll, pcp_roll_nickname, pcp_personal_note, amount, contact_id, c.display_name
+    FROM civicrm_contribution_soft ccs INNER JOIN civicrm_contact c on c.id = ccs.contact_id
+    WHERE contribution_id = %1;
+    ';
+
+    $params = array(1 => array($contributionID, 'Integer'));
+
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+
+    $softContribution = array();
+    $count = 1;
+    while ($dao->fetch()) {
+      if ($all) {
+        foreach ($pcpFields as $val) {
+          $softContribution['pcp'][$val] = $dao->$val;
+        }
+      }
+
+      $softContribution['soft_credit'][$count] = array(
+        'contact_id' => $dao->contact_id,
+        'soft_credit_id' => $dao->id,
+        'amount' => $dao->amount,
+        'contact_name' => $dao->display_name
+      );
+      $count++;
+    }
+
+    /*
+     * FIX API before deleting this
     $cs = new CRM_Contribute_DAO_ContributionSoft();
     $cs->copyValues($params);
     $softContribution = array();
@@ -171,6 +201,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         $count++;
       }
     }
+    */
+
     return $softContribution;
   }
 

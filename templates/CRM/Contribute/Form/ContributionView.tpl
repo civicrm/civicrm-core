@@ -209,15 +209,14 @@
     <div class="crm-accordion-body">
       <table class="crm-info-panel">
         {foreach from=$softContributions.soft_credit item="softCont"}
-          {if $softCont }
-            <tr>
-              <td class="label">{ts}Soft Credit To{/ts}</td>
-              <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.soft_credit_to`"}"
-                     id="view_contact" title="{ts}View contact record{/ts}">{$softCont.softCreditToName}</a></td>
-              <td class="label">{ts}Amount{/ts}</td>
-              <td>{$softCont.soft_credit_amount|crmMoney:$currency}</td>
-            </tr>
-          {/if}
+          <tr>
+            <td>
+              <a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.contact_id`"}"
+                 id="view_contact" title="{ts}View contact record{/ts}">{$softCont.contact_name}
+              </a>
+            </td>
+            <td>{$softCont.amount|crmMoney:$currency}</td>
+          </tr>
         {/foreach}
       </table>
     </div>

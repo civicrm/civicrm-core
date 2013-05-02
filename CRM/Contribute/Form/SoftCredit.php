@@ -54,8 +54,7 @@ class CRM_Contribute_Form_SoftCredit {
     $showSoftCreditRow = 2;
     $showCreateNew = true;
     if ($form->_action & CRM_Core_Action::UPDATE) {
-      $csParams = array('contribution_id' => $form->_id);
-      $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($csParams, TRUE);
+      $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($form->_id, TRUE);
       if (!empty($form->_softCreditInfo['soft_credit'])) {
         $showSoftCreditRow = count($form->_softCreditInfo['soft_credit']);
         $showSoftCreditRow++;
