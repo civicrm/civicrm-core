@@ -37,7 +37,7 @@
         {/if}
       {else}
         {$form.$fldName.$blockNo.html}
-        {if $form.$profSelect}
+        {if $form.$profSelect and $showNewSelect}
           &nbsp;&nbsp;{ts}OR{/ts}&nbsp;&nbsp;{$form.$profSelect.$blockNo.html}<div id="contact-dialog-{$prefix}{$blockNo}" class="hiddenElement"></div>
         {/if}
       {/if}
