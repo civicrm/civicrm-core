@@ -2544,22 +2544,20 @@ AND       civicrm_openid.is_primary = 1";
    * @return array  $locBlockIds  loc block ids which fulfill condition.
    * @static
    */
-  static function getLocBlockIds($contactId, $criteria = array(
-    ), $condOperator = 'AND') {
+  static function getLocBlockIds($contactId, $criteria = array(), $condOperator = 'AND') {
     $locBlockIds = array();
     if (!$contactId) {
       return $locBlockIds;
     }
 
-    foreach (array(
-      'Email', 'OpenID', 'Phone', 'Address', 'IM') as $block) {
+    foreach (array('Email', 'OpenID', 'Phone', 'Address', 'IM') as $block) {
       $name = strtolower($block);
-      eval("\$blockDAO = new CRM_Core_DAO_$block();");
+      $className = "CRM_Core_DAO_$block";
+      $blockDAO = new $className();
 
       // build the condition.
       if (is_array($criteria)) {
-        eval('$object = new CRM_Core_DAO_' . $block . '( );');
-        $fields = $object->fields();
+        $fields = $blockDAO->fields();
         $conditions = array();
         foreach ($criteria as $field => $value) {
           if (array_key_exists($field, $fields)) {
