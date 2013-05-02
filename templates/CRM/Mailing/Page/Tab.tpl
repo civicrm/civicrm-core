@@ -103,9 +103,10 @@
           ,{
             title: ts('Change Activity Status'),
             message: o,
-            width: 'auto'
-          }
-
+            width : "680px", // don't remove px
+            height: "560"
+          },
+          ts('Done')
         );
         return false;
       });
