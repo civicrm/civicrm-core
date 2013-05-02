@@ -545,7 +545,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
         if ($name == 'address') {
           // FIXME: lookupValue doesn't work for vcard_name
           if (CRM_Utils_Array::value('location_type_id', $values)) {
-            $vcardNames = CRM_Core_PseudoConstant::locationVcardName();
+            $vcardNames = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'vcard_name'));
             $values['vcard_name'] = $vcardNames[$values['location_type_id']];
           }
 

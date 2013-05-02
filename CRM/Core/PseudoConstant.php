@@ -57,20 +57,6 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
-   * location vCard name
-   * @var array
-   * @static
-   */
-  private static $locationVcardName;
-
-  /**
-   * location display name
-   * @var array
-   * @static
-   */
-  private static $locationDisplayName;
-
-  /**
    * activity type
    * @var array
    * @static
@@ -83,13 +69,6 @@ class CRM_Core_PseudoConstant {
    * @static
    */
   private static $billingMode;
-
-  /**
-   * component
-   * @var array
-   * @static
-   */
-  private static $component;
 
   /**
    * states, provinces
@@ -463,46 +442,6 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all location vCard names.
-   *
-   * The static array locationVcardName is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All location vCard names - default is to get only active ones.
-   *
-   * @return array - array reference of all location vCard names.
-   *
-   */
-  public static function &locationVcardName($all = FALSE) {
-    if (!self::$locationVcardName) {
-      self::populate(self::$locationVcardName, 'CRM_Core_DAO_LocationType', $all, 'vcard_name');
-    }
-    return self::$locationVcardName;
-  }
-
-  /**
-   * Get all location Display names.
-   *
-   * The static array locationDisplayName is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All location display names - default is to get only active ones.
-   *
-   * @return array - array reference of all location display names.
-   *
-   */
-  public static function &locationDisplayName($all = FALSE) {
-    if (!self::$locationDisplayName) {
-      self::populate(self::$locationDisplayName, 'CRM_Core_DAO_LocationType', $all, 'display_name');
-    }
-    return self::$locationDisplayName;
-  }
-
-  /**
    * Get all Activty types.
    *
    * The static array activityType is returned
@@ -592,22 +531,6 @@ class CRM_Core_PseudoConstant {
       );
     }
     return self::$billingMode;
-  }
-
-  /**
-   * Get all component names
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all location display names.
-   *
-   */
-  public static function &component() {
-    if (!self::$component) {
-      self::populate(self::$component, 'CRM_Core_DAO_Component', TRUE, 'name');
-    }
-    return self::$component;
   }
  
   /**
@@ -1060,13 +983,15 @@ WHERE  id = %1";
    *
    * @return array - array reference of all Currency Symbols
    * @static
+   *
+   * FIXME: this is not stored as an optionValue, and it's not tied to a single DB column;
+   * FIXME: It's used for a setting stored in option group 'currencies_enabled'. What to do?
    */
   public static function &currencySymbols($name = 'symbol', $key = 'id') {
     $cacheKey = "{$name}_{$key}";
     if (!isset(self::$currencySymbols[$cacheKey])) {
       self::populate(self::$currencySymbols[$cacheKey], 'CRM_Financial_DAO_Currency', TRUE, $name, NULL, NULL, 'name', $key);
     }
-
     return self::$currencySymbols[$cacheKey];
   }
 
