@@ -366,8 +366,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $this->_priceSet = current(CRM_Price_BAO_Set::getSetDetail($priceSetId));
     $fieldID = key($this->_priceSet['fields']);
 
-    $assetRelation = key(CRM_CORE_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
-
     if (isset($params['field'])) {
       foreach ($params['field'] as $key => $value) {
         // if contact is not selected we should skip the row

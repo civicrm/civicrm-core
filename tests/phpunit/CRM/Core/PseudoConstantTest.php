@@ -68,6 +68,46 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
      * - max: integer (default = 10) maximum number of option values expected.
      */
     $fields = array(
+      'CRM_Financial_DAO_EntityFinancialAccount' => array(
+        array(
+          'fieldName' => 'financial_account_id',
+          'sample' => 'Member Dues',
+          'max' => 15,
+        ),
+        array(
+          'fieldName' => 'account_relationship',
+          'sample' => 'Income Account is',
+        ),
+      ),
+      'CRM_Financial_DAO_FinancialItem' => array(
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'Partially paid',
+        ),
+        array(
+          'fieldName' => 'financial_account_id',
+          'sample' => 'Accounts Receivable',
+          'max' => 15,
+        ),
+      ),
+      'CRM_Financial_DAO_FinancialTrxn' => array(
+        array(
+          'fieldName' => 'from_financial_account_id',
+          'sample' => 'Accounts Receivable',
+          'max' => 15,
+        ),
+        array(
+          'fieldName' => 'to_financial_account_id',
+          'sample' => 'Accounts Receivable',
+          'max' => 15,
+        ),
+      ),
+      'CRM_Financial_DAO_FinancialAccount' => array(
+        array(
+          'fieldName' => 'financial_account_type_id',
+          'sample' => 'Cost of Sales',
+        ),
+      ),
       'CRM_Event_DAO_Participant' => array(
         array(
           'fieldName' => 'fee_currency',
