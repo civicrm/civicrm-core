@@ -43,4 +43,10 @@ cj(function($) {
     }
   });
 
+  $('.crm-soft-credit-block tr span').each(function () {
+    if ($(this).hasClass('crm-error')) {
+      $(this).parents('tr').show();
+    }
+  });
+
 });
