@@ -127,6 +127,11 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
           }
         }
         $providerInfo[$providerID]['api_params'] = $inputVals;
+
+        // Replace the api_type ID with the string value
+        $apiTypes = CRM_Core_OptionGroup::values('sms_api_type');
+        $apiTypeId = $providerInfo[$providerID]['api_type'];
+        $providerInfo[$providerID]['api_type'] = CRM_Utils_Array::value($apiTypeId, $apiTypes, $apiTypeId);
       }
     }
 
