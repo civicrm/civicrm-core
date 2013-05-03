@@ -435,19 +435,17 @@ class CRM_Core_BAO_Block {
         $table = 'civicrm_address';
         break;
     }
-    // if id is set & we don't have contact_id we need to retrieve it
-    $contactId = null;
-    if (!empty($params['id']) && empty($params['contact_id'])) {
+    // contact_id in params might be empty or the string 'null' so cast to integer
+    $contactId = (int) CRM_Utils_Array::value('contact_id', $params);
+    // If id is set & we haven't been passed a contact_id, retrieve it
+    if (!empty($params['id']) && !isset($params['contact_id'])) {
       $entity = new $class();
       $entity->id = $params['id'];
       $entity->find(TRUE);
       $contactId = $entity->contact_id;
     }
-    elseif (CRM_Utils_Array::value('contact_id', $params)) {
-      $contactId = $params['contact_id'];
-    }
-    if ( !$contactId ) {
-      // entity not associated with contact so concept of is_primary not relevant
+    // If entity is not associated with contact, concept of is_primary not relevant
+    if (!$contactId) {
       return;
     }
 
