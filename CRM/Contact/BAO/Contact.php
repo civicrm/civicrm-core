@@ -2544,22 +2544,20 @@ AND       civicrm_openid.is_primary = 1";
    * @return array  $locBlockIds  loc block ids which fulfill condition.
    * @static
    */
-  static function getLocBlockIds($contactId, $criteria = array(
-    ), $condOperator = 'AND') {
+  static function getLocBlockIds($contactId, $criteria = array(), $condOperator = 'AND') {
     $locBlockIds = array();
     if (!$contactId) {
       return $locBlockIds;
     }
 
-    foreach (array(
-      'Email', 'OpenID', 'Phone', 'Address', 'IM') as $block) {
+    foreach (array('Email', 'OpenID', 'Phone', 'Address', 'IM') as $block) {
       $name = strtolower($block);
-      eval("\$blockDAO = new CRM_Core_DAO_$block();");
+      $className = "CRM_Core_DAO_$block";
+      $blockDAO = new $className();
 
       // build the condition.
       if (is_array($criteria)) {
-        eval('$object = new CRM_Core_DAO_' . $block . '( );');
-        $fields = $object->fields();
+        $fields = $blockDAO->fields();
         $conditions = array();
         foreach ($criteria as $field => $value) {
           if (array_key_exists($field, $fields)) {
@@ -2981,6 +2979,29 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     }
   }
 
+  /**
+   * Get options for a given contact field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
+   * TODO: In context of chainselect, what to return if e.g. a country has no states?
+   *
+   * @param String $fieldName
+   * @param String $context: e.g. "search" "edit" "create" "view"
+   * @param Array  $props: whatever is known about this dao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+    // Special logic for fields whose options depend on context or properties
+    switch ($fieldName) {
+      case 'contact_sub_type':
+        if (!empty($props['contact_type'])) {
+          $params['condition'] = "parent_id = (SELECT id FROM civicrm_contact_type WHERE name='{$props['contact_type']}')";
+        }
+        break;
+    }
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params);
+  }
 
   /**
    * Delete a contact-related object that has an 'is_primary' field
