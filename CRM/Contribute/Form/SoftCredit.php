@@ -52,13 +52,13 @@ class CRM_Contribute_Form_SoftCredit {
     $item_count = 6;
 
     $showSoftCreditRow = 2;
-    $showCreateNew = true;
+    $showCreateNew = TRUE;
     if ($form->_action & CRM_Core_Action::UPDATE) {
       $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($form->_id, TRUE);
       if (!empty($form->_softCreditInfo['soft_credit'])) {
         $showSoftCreditRow = count($form->_softCreditInfo['soft_credit']);
         $showSoftCreditRow++;
-        $showCreateNew = false;
+        $showCreateNew = FALSE;
       }
     }
 
@@ -80,7 +80,6 @@ class CRM_Contribute_Form_SoftCredit {
     if (CRM_Utils_Array::value('pcp_made_through_id', $form->_values)) {
       $form->assign('pcpLinked', 1);
     }
-    $form->addElement('hidden', 'soft_contact_id', '', array('id' => 'soft_contact_id'));
   }
 
   /**
@@ -88,7 +87,7 @@ class CRM_Contribute_Form_SoftCredit {
    */
   static function setDefaultValues(&$defaults, &$form) {
     if (!empty($form->_softCreditInfo['soft_credit'])) {
-      foreach($form->_softCreditInfo['soft_credit'] as $key => $value) {
+      foreach ($form->_softCreditInfo['soft_credit'] as $key => $value) {
         $defaults["soft_credit_amount[$key]"] = $value['amount'];
         $defaults["soft_credit_contact_select_id[$key]"] = $value['contact_id'];
       }
@@ -105,7 +104,6 @@ class CRM_Contribute_Form_SoftCredit {
       $defaults['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcpInfo);
       $defaults['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcpInfo);
     }
-
   }
 }
 
