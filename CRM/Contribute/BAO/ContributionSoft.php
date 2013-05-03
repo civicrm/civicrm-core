@@ -164,7 +164,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     while ($dao->fetch()) {
       if ($all) {
         foreach ($pcpFields as $val) {
-          $softContribution['pcp'][$val] = $dao->$val;
+          $softContribution[$val] = $dao->$val;
         }
       }
 
