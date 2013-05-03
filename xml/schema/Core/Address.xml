@@ -190,7 +190,12 @@
       <name>county_id</name>
       <type>int unsigned</type>
       <comment>Which County does this address belong to.</comment>
-       <add>1.1</add>
+      <pseudoconstant>
+        <table>civicrm_county</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
+      <add>1.1</add>
   </field>
   <foreignKey>
        <name>county_id</name>
@@ -207,6 +212,11 @@
       <title>State</title>
       <type>int unsigned</type>
       <comment>Which State_Province does this address belong to.</comment>
+      <pseudoconstant>
+        <table>civicrm_state_province</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
       <add>1.1</add>
   </field>
   <foreignKey>
@@ -253,7 +263,12 @@
       <title>Country</title>
       <type>int unsigned</type>
       <comment>Which Country does this address belong to.</comment>
-       <add>1.1</add>
+      <pseudoconstant>
+        <table>civicrm_country</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
+      <add>1.1</add>
   </field>
   <foreignKey>
        <name>country_id</name>
