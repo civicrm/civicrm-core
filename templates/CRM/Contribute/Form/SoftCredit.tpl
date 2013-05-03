@@ -23,28 +23,30 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{literal}
-<script type="text/javascript">
-cj( function( ) {
-    var url       = "{/literal}{$customUrls.$element_name}{literal}";
-    var custom    = "{/literal}#{$element_name|replace:']':''|replace:'[':'_'}{literal}";
-    var custom_id = "{/literal}input[name=\"{$element_name|cat:'_id'|regex_replace:'/\]_id$/':'_id]'}\"]{literal}";
+{* template for adding form elements for soft credit form*}
 
-    var customObj   = cj(custom);
-    var customIdObj = cj(custom_id);
-
-    if ( !customObj.hasClass('ac_input') ) {
-        customObj.autocomplete( url,
-            { width : 250, selectFirst : false, matchContains: true, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-            }).result(
-                function(event, data ) {
-                    customIdObj.val( data[1] );
-                }
-        );
-        customObj.click( function( ) {
-            customIdObj.val('');
-      });
-     }
-});
-</script>
-{/literal}
+<table class="form-layout-compressed crm-soft-credit-block">
+{section name='i' start=1 loop=$rowCount}
+{assign var='rowNumber' value=$smarty.section.i.index}
+  <tr id="soft-credit-row-{$rowNumber}" class="crm-contribution-form-block-soft_credit_to {if $rowNumber gte $showSoftCreditRow}hiddenElement{/if}">
+    <td class="label">{ts}Select Contact{/ts}</td>
+    <td>
+      {assign var='createNewStatus' value=true}
+      {if !$showCreateNew and $rowNumber lt $showSoftCreditRow}
+        {assign var='createNewStatus' value=false}
+      {/if}
+      {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true blockNo=$rowNumber
+      prefix="soft_credit_" showNewSelect=$createNewStatus}
+    </td>
+	  <td>
+		  {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
+	  </td>
+  </tr>
+{/section}
+	<tr>
+		<td></td>
+		<td>
+			<a href="#" id="addMoreSoftCredit">{ts}add another soft credit{/ts}</a>
+		</td>
+	</tr>
+</table>

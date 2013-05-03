@@ -37,7 +37,7 @@
         {/if}
       {else}
         {$form.$fldName.$blockNo.html}
-        {if $form.$profSelect}
+        {if $form.$profSelect and $showNewSelect}
           &nbsp;&nbsp;{ts}OR{/ts}&nbsp;&nbsp;{$form.$profSelect.$blockNo.html}<div id="contact-dialog-{$prefix}{$blockNo}" class="hiddenElement"></div>
         {/if}
       {/if}
@@ -56,7 +56,13 @@
 {literal}
 <script type="text/javascript">
   var allowMultiClient = Boolean({/literal}{if !empty($multiClient)}1{else}0{/if}{literal});
-  var prePopulateData = {/literal}'{$prePopulateData}'{literal};
+
+  {/literal}
+  var prePopulateData = '';
+  {if $prePopulateData}
+      prePopulateData = {$prePopulateData};
+  {/if}
+  {literal}
 
   var existingTokens = '';
   cj( function( ) {
@@ -110,10 +116,6 @@
     {/if}
     {literal}
 
-    if (prePopulateData) {
-      eval('prePopulateData = ' + prePopulateData);
-    }
-
     cj('#' + prefix + 'contact_' + blockNo).tokenInput( contactUrl, { prePopulate:prePopulateData, theme: 'facebook', hintText: hintText });
     cj('ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px');
   }
@@ -127,7 +129,7 @@
     var contactElement = '#' + prefix + 'contact_' + blockNo;
     var contactHiddenElement = 'input[name="{/literal}{$prefix}{literal}contact_select_id[' + blockNo +']"]';
     cj( contactElement ).autocomplete( contactUrl, {
-      selectFirst : false, matchContains: true, minChars: 1
+      selectFirst : false, matchContains: true, minChars: 1, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
     }).result( function(event, data, formatted) {
       cj( contactHiddenElement ).val(data[1]);
       {/literal}

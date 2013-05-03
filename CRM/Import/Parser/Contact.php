@@ -72,7 +72,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
   protected $_parseStreetAddress;
 
   /**
-   * Array of succesfully imported contact id's
+   * Array of successfully imported contact id's
    *
    * @array
    */
@@ -86,7 +86,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
   protected $_lineCount;
 
   /**
-   * Array of succesfully imported related contact id's
+   * Array of successfully imported related contact id's
    *
    * @array
    */
@@ -1084,7 +1084,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Get the array of succesfully imported contact id's
+   * Get the array of successfully imported contact id's
    *
    * @return array
    * @access public
@@ -1094,7 +1094,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * Get the array of succesfully imported related contact id's
+   * Get the array of successfully imported related contact id's
    *
    * @return array
    * @access public

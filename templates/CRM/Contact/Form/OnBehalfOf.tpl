@@ -247,7 +247,7 @@
 {* Javascript method to populate the location fields when a different existing related contact is selected *}
 {literal}
     var dataUrl   = "{/literal}{$employerDataURL}{literal}";
-    cj('#organization_id').autocomplete( dataUrl, { width : 180, selectFirst : false, matchContains: true
+    cj('#organization_id').autocomplete( dataUrl, { width : 180, selectFirst : false, matchContains: true, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
     }).result( function(event, data, formatted) {
         cj('#organization_name').val( data[0] );
         cj('#onbehalfof_id').val( data[1] );

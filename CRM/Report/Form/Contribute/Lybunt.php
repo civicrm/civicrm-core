@@ -139,7 +139,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'options' => $optionYear,
             'default' => date('Y'),
           ),
-          'financial_type_id' => array( 
+          'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
@@ -226,13 +226,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
     $this->_from = "
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
-              INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']} 
+              INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
               {$this->_aclFrom}
-              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']} 
+              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                         {$this->_aliases['civicrm_email']}.is_primary = 1 
-              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']} 
+                         {$this->_aliases['civicrm_email']}.is_primary = 1
+              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                          {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
   }
@@ -249,8 +249,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           $clause = NULL;
           if ($fieldName == 'yid') {
             $clause = "contribution_civireport.contact_id NOT IN
-(SELECT distinct contri.contact_id FROM civicrm_contribution contri 
- WHERE contri.is_test = 0 AND " . self::fiscalYearOffset('contri.receive_date') . " = $current_year) AND contribution_civireport.contact_id IN (SELECT distinct contri.contact_id FROM civicrm_contribution contri 
+(SELECT distinct contri.contact_id FROM civicrm_contribution contri
+ WHERE contri.is_test = 0 AND " . self::fiscalYearOffset('contri.receive_date') . " = $current_year) AND contribution_civireport.contact_id IN (SELECT distinct contri.contact_id FROM civicrm_contribution contri
  WHERE " . self::fiscalYearOffset('contri.receive_date') . " = $previous_year AND contri.is_test = 0)";
           }
           elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
@@ -300,7 +300,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
     if (!empty($rows)) {
       $select = "
-                      SELECT 
+                      SELECT
                             SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
 
       $sql = "{$select} {$this->_from} {$this->_where}";

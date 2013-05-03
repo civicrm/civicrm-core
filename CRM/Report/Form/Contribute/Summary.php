@@ -352,24 +352,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $ignoreFields = array('total_amount', 'sort_name');
     $errors = $self->customDataFormRule($fields, $ignoreFields);
 
-    if (CRM_Utils_Array::value('receive_date', $fields['group_bys'])) {
-      foreach ($self->_columns as $tableName => $table) {
-        if (array_key_exists('fields', $table)) {
-          foreach ($table['fields'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value($field['name'], $fields['fields']) &&
-              $fields['fields'][$field['name']] &&
-                in_array( $field['name'], array('sort_name', 'postal_greeting_display', 'contribution_source', 'financial_type'))) {
-              $grouping[] = $field['title'];
-            }
-          }
-        }
-      }
-      if (!empty($grouping)) {
-        $temp = 'and ' . implode(', ', $grouping);
-        $errors['fields'] = ts("Please do not use combination of Receive Date %1", array(1 => $temp));
-      }
-    }
-
     if (!CRM_Utils_Array::value('receive_date', $fields['group_bys'])) {
       if (CRM_Utils_Array::value('receive_date_relative', $fields) ||
         CRM_Utils_Date::isDate($fields['receive_date_from']) ||

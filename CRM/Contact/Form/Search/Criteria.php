@@ -114,7 +114,7 @@ class CRM_Contact_Form_Search_Criteria {
 
 
     //added internal ID
-    $form->addElement('text', 'id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id'));
+    $form->addElement('text', 'contact_id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id'));
 
     //added external ID
     $form->addElement('text', 'external_identifier', ts('External ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'));
@@ -368,7 +368,7 @@ class CRM_Contact_Form_Search_Criteria {
     }
 
     CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-    
+
     // extend addresses with proximity search
     $form->addElement('text', 'prox_distance', ts('Find contacts within'));
     $form->addElement('select', 'prox_distance_unit', NULL, array('miles' => ts('Miles'), 'kilos' => ts('Kilometers')));

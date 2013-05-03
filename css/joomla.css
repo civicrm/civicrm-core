@@ -245,76 +245,6 @@ tr.light .form-item, tr.dark .form-item {
   text-align: right;
 }
 
-
-/* Stylesheet elements ported from Drupal Bluemarine them */
-/*
-** HTML elements
-*/
-body {
-  padding: 0;
-  color: #000;
-  background-color: #fff;
-}
-tr.dark td, tr.light td {
-  padding: 0.3em;
-}
-h1, h2, h3, h4, h5, h6 {
-  margin-bottom: 0.5em;
-}
-h1 {
-  font-size: 1.3em;
-}
-h2 {
-  font-size: 1.2em;
-}
-h3, h4, h5, h6 {
-  font-size: 1.1em;
-}
-p {
-  margin-top: 0.5em;
-  margin-bottom: 0.9em;
-}
-a {
-  text-decoration: none;
-}
-a:link {
-  color: #39c;
-}
-a:visited {
-  color: #369;
-}
-a:hover {
-  color: #39c;
-  text-decoration: underline;
-}
-fieldset {
-  border: 1px solid #ccc;
-}
-pre {
-  background-color: #eee;
-  padding: 0.75em 1.5em;
-  font-size: 12px;
-  border: 1px solid #ddd;
-}
-table {
-  /* make <td> sizes relative to body size! */
-  font-size: 1em;
-}
-.form-item label {
-  font-size: 1em;
-  color: #222;
-}
-.item-list .title {
-  font-size: 1em;
-  color: #222;
-}
-.links {
-  margin-bottom: 0em;
-}
-.comment .links {
-  margin-bottom: 0em;
-}
-
 /*
 ** Page layout blocks / IDs
 */
@@ -529,7 +459,7 @@ ul#civicrm-menu li#crm-qsearch {
 }
 #crm-container textarea,
 #crm-container input {
-  height: 16px;
+  height: auto;
 }
 #crm-container input[type=submit] {
   height: auto;

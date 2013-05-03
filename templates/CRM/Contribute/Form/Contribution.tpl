@@ -106,7 +106,7 @@
       <td>{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}</td>
     </tr>
     {else}
-    <tr class="crm-contribution-form-block-total_amount">
+    <tr  class="crm-contribution-form-block-total_amount">
       <td class="label">{$form.total_amount.label}</td>
       <td {$valueStyle}>
         <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>
@@ -219,66 +219,69 @@
         </td>
       </tr>
     {/if}
-    {if $siteHasPCPs}{* Credit contribution to PCP. *}
-    <tr id="pcpID" class="crm-contribution-form-block-pcp_made_through_id">
-      <td class="label">{$form.pcp_made_through.label}</td>
-      <td>
-        {$form.pcp_made_through.html} &nbsp;
-        <span class="showSoftCreditLink">{ts}<a href="#" onclick='showSoftCredit(); return false;'>unlink from personal campaign page</a>{/ts}</span><br />
-        <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or email address.{/ts}</span>
-        <div class="spacer"></div>
-        <div class="crm-contribution-form-block-pcp_details">
-          <table class="crm-contribution-form-table-credit_to_pcp">
-            <tr id="pcpDisplayRollID" class="crm-contribution-form-block-pcp_display_in_roll"><td class="label">{$form.pcp_display_in_roll.label}</td>
-              <td>{$form.pcp_display_in_roll.html}</td>
-            </tr>
-            <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
-              <td class="label">{$form.pcp_roll_nickname.label}</td>
-              <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br />
-                <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span></td>
-            </tr>
-            <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
-              <td class="label" style="vertical-align: top">{$form.pcp_personal_note.label}</td>
-              <td>{$form.pcp_personal_note.html}
-                <span class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</span>
-              </td>
-            </tr>
-          </table>
-        </div>
-      </td>
-    </tr>
-    {/if}
+
   </table>
-    {if !$contributionMode}
-    <div class="crm-accordion-wrapper" id="softCredit_Accordion">
-      <div class="crm-accordion-header">
-        {ts}Soft Credit{/ts}
-      </div>
-      <div class="crm-accordion-body">
-        <table class="form-layout-compressed" >
-          <tr>
-            <td>
-            </td>
-            <td colspan=2>
-              {if $siteHasPCPs}
-                <div id="showPCPLink"><a href='#' onclick='showPCP(); return false;'>{ts}credit this contribution to a personal campaign page{/ts}</a> {help id="id-link_pcp"}</div>
-              {/if}
-            </td>
-          </tr>
-          <tr id="softCreditID" class="crm-contribution-form-block-soft_credit">
-            <td class="label">{$form.soft_credit_to.label}</td>
-            <td {$valueStyle}>
-              {$form.soft_credit_to.html} {help id="id-soft_credit"}
-            </td>
-            <td class="label">{$form.total_amount.label}</td>
-            <td {$valueStyle}>
-              <span id='softCreditAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    {/if}
+	  <!-- start of soft credit -->
+	  <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="softCredit">
+		  <div class="crm-accordion-header">
+			  {ts}Soft Credit{/ts}&nbsp;{help id="id-soft_credit"}
+		  </div>
+		  <div class="crm-accordion-body">
+			  <table class="form-layout-compressed">
+				  {if $siteHasPCPs}
+					  <tr class="crm-contribution-pcp-block-link">
+						  <td colspan="2">
+							  <div id="showPCP">
+                  <a href='#'>{ts}credit this contribution to a personal campaign page{/ts}</a>
+							  </div>
+						  </td>
+					  </tr>
+					  <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id hiddenElement">
+						  <td class="label">{$form.pcp_made_through.label}</td>
+						  <td>
+							  {$form.pcp_made_through.html} &nbsp;
+								<span class="showSoftCreditLink">
+									<a href="#" id="showSoftCredit">{ts}unlink from personal campaign page{/ts}</a>
+								</span><br/>
+								<span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or
+								 email address.{/ts}</span>
+
+							  <div class="spacer"></div>
+							  <div class="crm-contribution-form-block-pcp_details">
+								  <table class="crm-contribution-form-table-credit_to_pcp">
+									  <tr id="pcpDisplayRollID" class="crm-contribution-form-block-pcp_display_in_roll">
+										  <td class="label">{$form.pcp_display_in_roll.label}</td>
+										  <td>{$form.pcp_display_in_roll.html}</td>
+									  </tr>
+									  <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
+										  <td class="label">{$form.pcp_roll_nickname.label}</td>
+										  <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
+												<span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor
+											Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
+										  </td>
+									  </tr>
+									  <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
+										  <td class="label" style="vertical-align: top">{$form.pcp_personal_note.label}</td>
+										  <td>
+											  {$form.pcp_personal_note.html}
+											  <span
+												  class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</span>
+										  </td>
+									  </tr>
+								  </table>
+							  </div>
+						  </td>
+					  </tr>
+				  {/if}
+				  <tr class="crm-contribution-form-block-soft_credit_to">
+					  <td colspan="2">
+						  {include file="CRM/Contribute/Form/SoftCredit.tpl"}
+					  </td>
+				  </tr>
+			  </table>
+		  </div>
+	  </div>
+	  <!-- end of soft credit -->
     {if !$contributionMode}
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
       <div class="crm-accordion-header">
@@ -350,6 +353,8 @@
     {if $customDataSubType}
       CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
     {/if}
+
+	  {if $buildPriceSet}{literal}buildAmount( );{/literal}{/if}
     {literal}
     });
 
@@ -387,10 +392,6 @@
 
   var url = "{/literal}{$dataUrl}{literal}";
 
-  cj('#soft_credit_to').autocomplete( url, { width : 180, selectFirst : false, matchContains: true
-  }).result( function(event, data, formatted) {
-      cj( "#soft_contact_id" ).val( data[1] );
-  });
   {/literal}
     {if $context eq 'standalone' and $outBound_option != 2 }
       {literal}
@@ -545,42 +546,6 @@ cj(function() {
 
 // load form during form rule.
 {if $buildPriceSet}{literal}buildAmount( );{/literal}{/if}
-
-{if $siteHasPCPs}
-  {literal}
-  var pcpUrl = "{/literal}{$pcpDataUrl}{literal}";
-
-  cj('#pcp_made_through').autocomplete( pcpUrl, { width : 360, selectFirst : false, matchContains: true
-  }).result( function(event, data, formatted) {
-      cj( "#pcp_made_through_id" ).val( data[1] );
-  });
-{/literal}
-
-  {if $pcpLinked}
-    {literal}hideSoftCredit( );{/literal}{* hide soft credit on load if we have PCP linkage *}
-  {else}
-    {literal}cj('#pcpID').hide();{/literal}{* hide PCP section *}
-  {/if}
-
-  {literal}
-  function hideSoftCredit ( ){
-    cj("#softCredit_Accordion").hide();
-  }
-  function showPCP( ) {
-    cj('#pcpID').show();
-    cj("#softCredit_Accordion").hide();
-  }
-  function showSoftCredit( ) {
-    cj('#pcp_made_through_id').val('');
-    cj('#pcp_made_through').val('');
-    cj('#pcp_roll_nickname').val('');
-    cj('#pcp_personal_note').val('');
-    cj('#pcp_display_in_roll').attr('checked', false);
-    cj("#pcpID").hide();
-    cj('#softCredit_Accordion').show();
-  }
-  {/literal}
-{/if}
 
 {literal}
 function buildAmount( priceSetId ) {

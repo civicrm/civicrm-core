@@ -1697,7 +1697,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // add pcp id
       $contribSoftParams['pcp_id'] = $params['pcp_made_through_id'];
 
-      $softContribution = CRM_Contribute_BAO_Contribution::addSoftContribution($contribSoftParams);
+      $softContribution = CRM_Contribute_BAO_ContributionSoft::add($contribSoftParams);
     }
   }
 

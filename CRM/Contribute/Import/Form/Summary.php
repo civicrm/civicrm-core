@@ -98,7 +98,7 @@ class CRM_Contribute_Import_Form_Summary extends CRM_Core_Form {
 
       $this->assign('dupeError', TRUE);
 
-      /* only subtract dupes from succesful import if we're skipping */
+      /* only subtract dupes from successfyul import if we're skipping */
 
       $this->set('validRowCount', $totalRowCount - $invalidRowCount -
         $conflictRowCount - $duplicateRowCount - $mismatchCount - $invalidSoftCreditRowCount - $invalidPledgePaymentRowCount

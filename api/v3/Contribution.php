@@ -198,12 +198,26 @@ function civicrm_api3_contribution_get($params) {
   $contribution = array();
   while ($dao->fetch()) {
     //CRM-8662
-    $contribution_details = $query->store ( $dao );
-    $soft_params = array('contribution_id' => $dao->contribution_id);
-    $soft_contribution = CRM_Contribute_BAO_Contribution::getSoftContribution ( $soft_params , true);
-    $contribution [$dao->contribution_id] = array_merge($contribution_details, $soft_contribution);
+    $contribution_details = $query->store($dao);
+    $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dao->contribution_id , TRUE);
+    $contribution[$dao->contribution_id] = array_merge($contribution_details, $softContribution);
+
+    // format soft credit for backward compatibility
+    _civicrm_api3_format_soft_credit($contribution[$dao->contribution_id]);
   }
   return civicrm_api3_create_success($contribution, $params, 'contribution', 'get', $dao);
+}
+
+/**
+ * This function is used to format the soft credit for backward compatibility
+ * as of v4.4 we support multiple soft credit, so now contribution returns array with 'soft_credit' as key
+ * but we still return first soft credit as a part of contribution array
+ */
+function _civicrm_api3_format_soft_credit(&$contribution) {
+  if (!empty($contribution['soft_credit'])) {
+    $contribution['soft_credit_to'] = $contribution['soft_credit'][1]['contact_id'];
+    $contribution['soft_credit_id'] = $contribution['soft_credit'][1]['soft_credit_id'];
+  }
 }
 
 /**
@@ -355,12 +369,12 @@ function civicrm_api3_contribution_transact($params) {
 function civicrm_api3_contribution_sendconfirmation($params) {
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
-  if (! $contribution->find(true)) {
+  if (! $contribution->find(TRUE)) {
     throw new Exception('Contribution does not exist');
 }
   $input = $ids = $cvalues = array('receipt_from_email' => $params['receipt_from_email']);
-  $contribution->loadRelatedObjects($input, $ids, FALSE, true);
-  $contribution->composeMessageArray($input, $ids, $cvalues, false, false);
+  $contribution->loadRelatedObjects($input, $ids, FALSE, TRUE);
+  $contribution->composeMessageArray($input, $ids, $cvalues, FALSE, FALSE);
 }
 
 /**

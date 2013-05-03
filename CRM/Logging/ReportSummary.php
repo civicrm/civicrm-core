@@ -160,19 +160,22 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   function postProcess() {
     $this->beginPostProcess();
     $rows = array();
+    
+    $tempColumns = "id int(10)";
+    if (CRM_Utils_Array::value('log_action', $this->_params['fields'])) {
+      $tempColumns .= ", log_action varchar(64)";
+    }
+    $tempColumns .= ", log_type varchar(64), log_user_id int(10), log_date timestamp";
+    if (CRM_Utils_Array::value('altered_contact', $this->_params['fields'])) {
+      $tempColumns .= ", altered_contact varchar(128)";
+    }
+    $tempColumns .= ", altered_contact_id int(10), log_conn_id int(11), is_deleted tinyint(4)";
+    if (CRM_Utils_Array::value('display_name', $this->_params['fields'])) {
+      $tempColumns .= ", display_name varchar(128)";
+    }
+
     // temp table to hold all altered contact-ids
-    $sql = "
-CREATE TEMPORARY TABLE
-       civicrm_temp_civireport_logsummary ( id int(10), 
-                                            log_action varchar(64), 
-                                            log_type varchar(64), 
-                                            log_user_id int(10), 
-                                            log_date timestamp, 
-                                            altered_contact varchar(128), 
-                                            altered_contact_id int(10), 
-                                            log_conn_id int(11), 
-                                            is_deleted tinyint(4), 
-                                            display_name varchar(128) ) ENGINE=HEAP";
+    $sql = "CREATE TEMPORARY TABLE civicrm_temp_civireport_logsummary ( {$tempColumns} ) ENGINE=HEAP";
     CRM_Core_DAO::executeQuery($sql);
 
     $logDateClause = $this->dateClause('log_date',
