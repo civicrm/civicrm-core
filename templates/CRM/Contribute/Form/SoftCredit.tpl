@@ -29,7 +29,7 @@
 {section name='i' start=1 loop=$rowCount}
 {assign var='rowNumber' value=$smarty.section.i.index}
   <tr id="soft-credit-row-{$rowNumber}" class="crm-contribution-form-block-soft_credit_to {if $rowNumber gte $showSoftCreditRow}hiddenElement{/if}">
-    <td class="label">{ts}Soft Credit To{/ts}</td>
+    <td class="label">{ts}Select Contact{/ts}</td>
     <td>
       {assign var='createNewStatus' value=true}
       {if !$showCreateNew and $rowNumber lt $showSoftCreditRow}
