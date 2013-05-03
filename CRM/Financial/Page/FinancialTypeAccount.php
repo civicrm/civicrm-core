@@ -137,8 +137,8 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
       CRM_Utils_System::setTitle($this->_title .' - '.ts( 'Assigned Financial Accounts'));
-      $financialAccountType = CRM_Core_OptionGroup::values('financial_account_type');
-      $accountRelationship = CRM_Core_OptionGroup::values('account_relationship');
+      $financialAccountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
+      $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
       $dao->copyValues($params);
       $dao->find();
       while ($dao->fetch()) {

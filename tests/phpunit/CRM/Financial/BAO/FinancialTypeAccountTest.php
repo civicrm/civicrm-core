@@ -58,7 +58,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
     $params['name'] = 'test_financialType1';
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
-    $relationTypeId = key(CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND v.name LIKE 'Income Account is' "));
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
     $financialParams = array(
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $financialType->id,
@@ -93,7 +93,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
     $params['name'] = 'test_financialType2';
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
-    $relationTypeId = key(CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND v.name LIKE 'Expense Account is' "));
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
     $financialParams = array(
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $financialType->id,
@@ -121,7 +121,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
     $params['name'] = 'test_financialType3';
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
-    $relationTypeId = key(CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND v.name LIKE 'Asset Account is' "));
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
     $financialParams = array(
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $financialType->id,
@@ -182,7 +182,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
       'value' => $paymentInstrumentValue,
     );
     $optionValue = CRM_Core_BAO_OptionValue::retrieve($optionParams, $defaults);
-    $relationTypeId = key(CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND v.name LIKE 'Asset Account is' "));
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
     $financialParams = array(
       'entity_table' => 'civicrm_option_value',
       'entity_id' => $optionValue->id,

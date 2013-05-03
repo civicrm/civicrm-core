@@ -1525,7 +1525,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'id' => $trxn['financial_trxn_id'],
    );
    if ($context == 'payLater') {
-     $relationTypeId = key(CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND v.name LIKE 'Accounts Receivable Account is' "));
+     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
      $compareParams = array(
        'status_id' => 1,
        'from_financial_account_id' => CRM_Contribute_PseudoConstant::financialAccountType($contribution['financial_type_id'], $relationTypeId),
@@ -1589,7 +1589,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'version' => 3,
 );
    $optionValue = civicrm_api('option_value', 'create', $optionParams);
-   $relationTypeId = key(CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND v.name LIKE 'Asset Account is' "));
+   $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
    $financialParams = array(
      'entity_table' => 'civicrm_option_value',
      'entity_id' => $optionValue['id'],
