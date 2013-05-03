@@ -3959,3 +3959,38 @@ span.crm-status-icon {
   border: 1px solid #000;
   text-align: center;
 }
+
+/* Styles for credit card payment logos (FIXME: replace with sprite?) */
+#crm-container .credit_card_type-section .crm-credit_card_type-logos .crm-credit_card_type-logo-visa {
+  background: url(../i/cc-visa.gif) no-repeat 0 0 transparent;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-logos .crm-credit_card_type-logo-mastercard {
+  background: url(../i/cc-mastercard.gif) no-repeat 0 0 transparent;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-logos .crm-credit_card_type-logo-amex {
+  background: url(../i/cc-amex.gif) no-repeat 0 0 transparent;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-logos .crm-credit_card_type-logo-discover {
+  background: url(../i/cc-discover.gif) no-repeat 0 0 transparent;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-logos a {
+  display: block;
+  float: left;
+  width: 50px;
+  height: 22px;
+  text-indent: -20000px;
+}
+
+/* Avoid weird border around the images */
+#crm-container .credit_card_type-section .crm-credit_card_type-logos a,
+#crm-container .credit_card_type-section .crm-credit_card_type-logos a:link,
+#crm-container .credit_card_type-section .crm-credit_card_type-logos a:hover,
+#crm-container .credit_card_type-section .crm-credit_card_type-logos a:focus,
+#crm-container .credit_card_type-section .crm-credit_card_type-logos a:active {
+  color: #fff;
+}
+
