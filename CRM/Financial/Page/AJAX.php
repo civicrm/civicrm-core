@@ -92,7 +92,7 @@ class CRM_Financial_Page_AJAX {
     }
 
     if ($_GET['_value'] == 'select') {
-      $result = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
+      $result = CRM_Core_OptionGroup::values('account_relationship');
     }
     else {
       $financialAccountType = array(
@@ -102,7 +102,7 @@ class CRM_Financial_Page_AJAX {
         '4' => array(7), //cost of sales
       );
       $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $_GET['_value'], 'financial_account_type_id');
-      $result = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
+      $result = CRM_Core_OptionGroup::values('account_relationship');
     }
 
     $elements = array(
@@ -210,7 +210,7 @@ class CRM_Financial_Page_AJAX {
           case 'reopen':
             $status = $op == 'close' ? 'Closed' : 'Open';
             $ids['batchID'] = $recordID;
-            $batchStatus = CRM_Core_PseudoConstant::accountOptionValues('batch_status');
+            $batchStatus = CRM_Core_OptionGroup::values('batch_status');
             $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
             $session = CRM_Core_Session::singleton();
             $params['modified_date'] = date('YmdHis');

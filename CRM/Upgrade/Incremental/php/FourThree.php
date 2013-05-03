@@ -383,7 +383,7 @@ AND       ceft.entity_table = 'civicrm_contribution'
       3 => array($cancelledStatus, 'Integer')
     );
 
-    $accountType = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' "));
+    $accountType = key(CRM_Core_OptionGroup::values('financial_account_type', false, false, false, " AND v.name = 'Asset' "));
     $query = "
 SELECT id
 FROM   civicrm_financial_account
@@ -392,14 +392,14 @@ AND    financial_account_type_id = {$accountType}
 ";
     $financialAccountId = CRM_Core_DAO::singleValueQuery($query);
 
-    $accountRelationsips = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL);
+    $accountRelationsips = CRM_Core_OptionGroup::values('account_relationship');
 
     $accountsReceivableAccount = array_search('Accounts Receivable Account is', $accountRelationsips);
     $incomeAccountIs = array_search('Income Account is', $accountRelationsips);
     $assetAccountIs = array_search('Asset Account is', $accountRelationsips);
     $expenseAccountIs = array_search('Expense Account is', $accountRelationsips);
 
-    $financialItemStatus = CRM_Core_PseudoConstant::accountOptionValues('financial_item_status');
+    $financialItemStatus = CRM_Core_OptionGroup::values('financial_item_status');
     $unpaidStatus = array_search('Unpaid', $financialItemStatus);
     $paidStatus = array_search('Paid', $financialItemStatus);
 
