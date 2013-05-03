@@ -954,7 +954,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         CRM_Price_BAO_Field::priceSetValidation($priceSetId, $fields, $errors);
       }
     }
-    //CRM_CORE_ERROR::DEBUG($fields['soft_credit_amount']);
 
     // if honor roll fields are populated but no PCP is selected
     if (!CRM_Utils_Array::value('pcp_made_through_id', $fields)) {
@@ -1026,7 +1025,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // get the submitted form values.
     $submittedValues = $this->controller->exportValues($this->_name);
-
     if (CRM_Utils_Array::value('price_set_id', $submittedValues) && $this->_action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
       $lineID = key($line);
@@ -1112,6 +1110,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
     if (CRM_Utils_Array::value('pcp_made_through_id', $submittedValues)) {
+      $pcp = array();
       $fields = array(
         'pcp_made_through_id',
         'pcp_display_in_roll',
@@ -1130,6 +1129,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           if ($val && $submittedValues['soft_credit_amount'][$key]) {
             $softParams[$key]['contact_id'] = $val;
             $softParams[$key]['amount'] = $submittedValues['soft_credit_amount'][$key];
+            if ($submittedValues['soft_credit_id'][$key]) {
+              $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
+            }
           }
         }
       }

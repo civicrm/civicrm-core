@@ -302,7 +302,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // Handle soft credit and / or link to personal campaign page
     if (CRM_Utils_Array::value('deleteSoftCredit', $params, TRUE)) {
         // first delete soft credits if any                                                                                                                                                            
-        CRM_Contribute_BAO_ContributionSoft::del($contribution->id);
+        //CRM_Contribute_BAO_ContributionSoft::del($contribution->id);
 
       if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
         $softParams = array();
