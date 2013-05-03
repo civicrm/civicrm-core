@@ -85,6 +85,11 @@
     <type>int unsigned</type>
     <comment>FK to civicrm_financial_account</comment>
     <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_account</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>financial_account_id</name>
@@ -98,6 +103,9 @@
     <type>int unsigned</type>
     <comment>Payment status: test, paid, part_paid, unpaid (if empty assume unpaid)</comment>
     <add>4.3</add>
+    <pseudoconstant>
+      <optionGroupName>financial_item_status</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>entity_table</name>

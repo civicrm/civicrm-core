@@ -49,6 +49,11 @@
     <type>int unsigned</type>   
     <comment>FK to financial_account table.</comment>   
     <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_account</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field> 
   <foreignKey> 
     <name>from_financial_account_id</name> 
@@ -61,6 +66,11 @@
     <type>int unsigned</type>  
     <comment>FK to financial_financial_account table.</comment>   
     <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_account</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field> 
   <foreignKey> 
     <name>to_financial_account_id</name> 
