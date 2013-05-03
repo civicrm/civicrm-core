@@ -966,8 +966,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (!empty($fields['soft_credit_amount'])) {
+      $repeat = array_count_values($fields['soft_credit_contact_select_id']);
       foreach ($fields['soft_credit_amount'] as $key => $val) {
         if (!empty($fields['soft_credit_contact_select_id'][$key])) {
+          if ($repeat[$fields['soft_credit_contact_select_id'][$key]] > 1) {
+            $errors["soft_credit_contact_select_id[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');  
+          }
           if ($fields['soft_credit_amount'][$key] && ($fields['soft_credit_amount'][$key] > $fields['total_amount'])) {
             $errors["soft_credit_amount[$key]"] = ts('Soft credit amount cannot be more than the total amount.');
           }
