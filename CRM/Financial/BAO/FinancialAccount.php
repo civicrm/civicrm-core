@@ -179,7 +179,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @static
    */
   static function getAccountingCode($financialTypeId) {
-    $relationTypeId = key(CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND v.name LIKE 'Income Account is' "));
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
     $query = "SELECT cfa.accounting_code
 FROM civicrm_financial_type cft
 LEFT JOIN civicrm_entity_financial_account cefa ON cefa.entity_id = cft.id AND cefa.entity_table = 'civicrm_financial_type'

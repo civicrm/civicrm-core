@@ -143,7 +143,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       //hidden field to catch the field id in profile
       $this->add('hidden', 'account_type_id', $this->_id);
     }
-    $AccountTypeRelationship = CRM_Core_OptionGroup::values('account_relationship');
+    $AccountTypeRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
     if (!empty($AccountTypeRelationship)) {
       $this->add('select', 
         'account_relationship', 
@@ -232,7 +232,8 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     $errorMsg = array();
     $errorFlag = FALSE;
     if ($self->_action == CRM_Core_Action::DELETE) {
-      $relationValues = CRM_Core_OptionGroup::values('account_relationship');
+      $groupName = 'account_relationship';
+      $relationValues = CRM_Core_PseudoConstant::accountOptionValues($groupName);
       if (CRM_Utils_Array::value('financial_account_id', $values) != 'select') {
         if ($relationValues[$values['account_relationship']] == 'Premiums Inventory Account is' || $relationValues[$values['account_relationship']] == 'Cost of Sales Account is') {
           $premiumsProduct = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_PremiumsProduct', $values['financial_type_id'], 'product_id', 'financial_type_id');

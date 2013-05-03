@@ -204,6 +204,13 @@ class CRM_Core_PseudoConstant {
   private static $extensions;
 
   /**
+   * Financial Account Type
+   * @var array
+   * @static
+   */
+  private static $accountOptionValues;
+
+  /**
    * Get options for a given field.
    * @param String $daoName
    * @param String $fieldName
@@ -1656,6 +1663,31 @@ WHERE  id = %1
    */
   public static function getModuleExtensions($fresh = FALSE) {
     return CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles($fresh);
+  }
+
+  /**
+   * Get all options values
+   *
+   * The static array option values is returned
+   *
+   * @access public
+   * @static
+   *
+   * @param boolean $optionGroupName - get All  Option Group values- default is to get only active ones.
+   *
+   * @return array - array reference of all Option Group Name
+   *
+   */
+  public static function accountOptionValues($optionGroupName, $id = null, $condition = null) {
+    $cacheKey = $optionGroupName . '_' . $condition;
+    if (empty(self::$accountOptionValues[$cacheKey])) {
+      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, false, false, false, $condition);
+    }
+    if ($id) {
+      return CRM_Utils_Array::value($id, self::$accountOptionValues[$cacheKey]);
+    }
+
+    return self::$accountOptionValues[$cacheKey];
   }
 }
 

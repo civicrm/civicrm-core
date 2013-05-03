@@ -113,7 +113,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   static function del($financialTypeAccountId, $accountId = null) {
     //checking if financial type is present  
     $check = false;
-    $relationValues = CRM_Core_OptionGroup::values('account_relationship');
+    $relationValues = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
     
     $financialTypeId = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id' );
     //check dependencies
