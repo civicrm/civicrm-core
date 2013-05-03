@@ -93,8 +93,8 @@ class CRM_Contribute_Form_SoftCredit {
       }
     }
 
-    if (CRM_Utils_Array::value('pcp_id', $form->_softCreditInfo['pcp'])) {
-      $pcpInfo = $form->_softCreditInfo['pcp'];
+    if (CRM_Utils_Array::value('pcp_id', $form->_softCreditInfo)) {
+      $pcpInfo = $form->_softCreditInfo;
       $pcpId = CRM_Utils_Array::value('pcp_id', $pcpInfo);
       $pcpTitle = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcpId, 'title');
       $contributionPageTitle = CRM_PCP_BAO_PCP::getPcpPageTitle($pcpId, 'contribute');
