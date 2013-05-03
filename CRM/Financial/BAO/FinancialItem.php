@@ -78,7 +78,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    */
   static function add($lineItem, $contribution) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $financialItemStatus = CRM_Core_PseudoConstant::accountOptionValues('financial_item_status');
+    $financialItemStatus = CRM_Core_OptionGroup::values('financial_item_status');
     if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)) {
       $itemStatus = array_search('Paid', $financialItemStatus);
     }

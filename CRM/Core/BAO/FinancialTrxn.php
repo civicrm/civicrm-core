@@ -286,7 +286,7 @@ WHERE ceft.entity_id = %1";
     if (CRM_Utils_Array::value('cost', $params)) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $financialAccountType = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id']);
-      $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND label IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
+      $accountRelationship = CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND label IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
       $toFinancialAccount = CRM_Utils_Array::value('isDeleted', $params) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
       $fromFinancialAccount = CRM_Utils_Array::value('isDeleted', $params) ? 'Cost of Sales Account is': 'Premiums Inventory Account is';
       $accountRelationship = array_flip($accountRelationship);
@@ -329,7 +329,7 @@ WHERE ceft.entity_id = %1";
    */
 
   static function recordFees($params) {
-    $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
+    $expenseTypeId = key(CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND v.name LIKE 'Expense Account is' "));
     $domainId = CRM_Core_Config::domainID();
     $amount = 0;
     if (CRM_Utils_Array::value('prevContribution', $params)) {

@@ -162,7 +162,7 @@ class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
 
     // CRM-11516
     if ($this->_gName == 'payment_instrument') {
-      $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
+      $accountType = CRM_Core_OptionGroup::values('financial_account_type', false, false, false, " AND v.name = 'Asset' ");
       $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
       
       $this->add('select', 'financial_account_id', ts('Financial Account'), 
@@ -272,7 +272,7 @@ class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
       $optionValue = CRM_Core_BAO_OptionValue::add($params, $ids);
       // CRM-11516
       if (CRM_Utils_Array::value('financial_account_id', $params)) {
-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
+        $relationTypeId = key(CRM_Core_OptionGroup::values('account_relationship', false, false, false, " AND v.name LIKE 'Asset Account is' "));
         $params = array(
           'entity_table' => 'civicrm_option_value',
           'entity_id' => $optionValue->id,
