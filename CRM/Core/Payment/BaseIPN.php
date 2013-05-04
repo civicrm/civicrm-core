@@ -494,7 +494,8 @@ LIMIT 1;";
       if (CRM_Utils_Array::value('participant', $contribution->_relatedObjects)) {
         $input['contribution_mode'] = 'participant';
         $input['participant_id'] = $contribution->_relatedObjects['participant']->id;
-      }
+        $input['skipLineItem'] = 1;
+       }
 
       CRM_Contribute_BAO_Contribution::recordFinancialAccounts($input, NULL);
     }
