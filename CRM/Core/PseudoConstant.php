@@ -351,8 +351,38 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * populate the object from the database. generic populate
-   * method
+   * Fetch the label (or other value) for a field given its key
+   *
+   * @param String $daoName
+   * @param String $fieldName
+   * @param String|Int $key
+   * @param Array $params will be passed into self::get
+   *
+   * @return string
+   */
+   function getValue($daoName, $fieldName, $key, $params = array()) {
+     $values = self::get($daoName, $fieldName, $params);
+     return CRM_Utils_Array::value($key, $values);
+   }
+
+  /**
+   * Fetch the key for a field option given its label/name
+   *
+   * @param String $daoName
+   * @param String $fieldName
+   * @param String|Int $value
+   * @param Array $params will be passed into self::get
+   *
+   * @return string
+   */
+   function getKey($daoName, $fieldName, $value, $params = array()) {
+     $values = self::get($daoName, $fieldName, $params);
+     return CRM_Utils_Array::key($value, $values);
+   }
+
+  /**
+   * DEPRECATED generic populate method
+   * All pseudoconstant functions that use this method are also deprecated.
    *
    * The static array $var is populated from the db
    * using the <b>$name DAO</b>.
