@@ -3961,44 +3961,46 @@ span.crm-status-icon {
 }
 
 /* Styles for credit card payment logos (FIXME: replace with sprite?) */
-#crm-container .credit_card_type-section .crm-credit_card_type-logos .crm-credit_card_type-logo-visa {
-  background: url(../i/cc-visa.png) no-repeat 0 0 transparent;
-}
-
-#crm-container .credit_card_type-section .crm-credit_card_type-logos .crm-credit_card_type-logo-mastercard {
-  background: url(../i/cc-mastercard.png) no-repeat 0 0 transparent;
-}
-
-#crm-container .credit_card_type-section .crm-credit_card_type-logos .crm-credit_card_type-logo-amex {
-  background: url(../i/cc-amex.png) no-repeat 0 0 transparent;
-}
-
-#crm-container .credit_card_type-section .crm-credit_card_type-logos .crm-credit_card_type-logo-discover {
-  background: url(../i/cc-discover.png) no-repeat 0 0 transparent;
-}
-
-#crm-container .credit_card_type-section .crm-credit_card_type-logos .crm-credit_card_type-logo-jcb {
-  background: url(../i/cc-jcb.png) no-repeat 0 0 transparent;
-}
-
-#crm-container .credit_card_type-section .crm-credit_card_type-logos a {
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a {
   display: block;
   float: left;
   width: 50px;
   height: 30px;
+  background: url(../i/creditcard-icons.png) no-repeat 0 0 transparent;
   text-indent: -20000px;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-logos a.crm-credit_card_type-logo-visa {
-  width: 90px;
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-visa {
+  background-position: 0 0;
+  width: 75px;
 }
 
-/* Avoid weird border around the images */
-#crm-container .credit_card_type-section .crm-credit_card_type-logos a,
-#crm-container .credit_card_type-section .crm-credit_card_type-logos a:link,
-#crm-container .credit_card_type-section .crm-credit_card_type-logos a:hover,
-#crm-container .credit_card_type-section .crm-credit_card_type-logos a:focus,
-#crm-container .credit_card_type-section .crm-credit_card_type-logos a:active {
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-mastercard {
+  background-position: -75px 0;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-amex {
+  background-position: -125px 0;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-discover {
+  background-position: -175px 0;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-jcb {
+  background-position: -225px 0;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-unionpay {
+  background-position: -275px 0;
+}
+
+/* Avoid weird border around the images (some themes will add a border around images) */
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a,
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a:link,
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a:hover,
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a:focus,
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a:active {
   color: #fff;
 }
 

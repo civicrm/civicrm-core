@@ -83,7 +83,7 @@
                              <div class="label">{$form.credit_card_type.label} {$reqMark}</div>
                              <div class="content">
                                  {$form.credit_card_type.html}
-                                 <div class="crm-credit_card_type-logos"></div>
+                                 <div class="crm-credit_card_type-icons"></div>
                              </div>
                              <div class="clear"></div>
                         </div>

@@ -2,25 +2,25 @@
 (function($) {
   civicrm_billingblock_creditcard_helper();
 
-  $('#crm-container').on('crmFormLoad', '*', function() {
+  $('#crm-container .credit_card_type-section').on('crmFormLoad', '*', function() {
     civicrm_billingblock_creditcard_helper();
   });
 
   /**
-   * Adds the logos of enabled credit cards
-   * Handles clicking on a logo.
-   * Changes the logo depending on the credit card number.
+   * Adds the icons of enabled credit cards
+   * Handles clicking on a icon.
+   * Changes the icon depending on the credit card number.
    * Removes spaces and dashes from credit card numbers.
    */
   function civicrm_billingblock_creditcard_helper() {
     $.each(CRM.config.creditCardTypes, function(key, val) {
-      var html = '<a href="#" title="' + val + '" class="crm-credit_card_type-logo-' + key + '"><span>' + val + '</span></a>';
-      $('.crm-credit_card_type-logos').append(html);
+      var html = '<a href="#" title="' + val + '" class="crm-credit_card_type-icon-' + key + '"><span>' + val + '</span></a>';
+      $('.crm-credit_card_type-icons').append(html);
 
-      $('.crm-credit_card_type-logo-' + key).click(function() {
+      $('.crm-credit_card_type-icon-' + key).click(function() {
         $('#crm-container .credit_card_type-section #credit_card_type').val(val);
         $('#crm-container .credit_card_type-section a').css('opacity', 0.25);
-        $('#crm-container .credit_card_type-section .crm-credit_card_type-logo-' + key).css('opacity', 1);
+        $('#crm-container .credit_card_type-section .crm-credit_card_type-icon-' + key).css('opacity', 1);
         return false;
       });
     });
@@ -73,7 +73,7 @@
     $.each(card_types, function(key, pattern) {
       if (ccnumber.match('^' + pattern + '$')) {
         var value = card_values[key];
-        $('#crm-container .credit_card_type-section .crm-credit_card_type-logo-' + key).css('opacity', 1);
+        $('#crm-container .credit_card_type-section .crm-credit_card_type-icon-' + key).css('opacity', 1);
         $('select#credit_card_type').val(value);
         return false;
       }
