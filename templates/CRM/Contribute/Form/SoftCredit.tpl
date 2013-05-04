@@ -26,27 +26,29 @@
 {* template for adding form elements for soft credit form*}
 
 <table class="form-layout-compressed crm-soft-credit-block">
-{section name='i' start=1 loop=$rowCount}
-{assign var='rowNumber' value=$smarty.section.i.index}
-  <tr id="soft-credit-row-{$rowNumber}" class="crm-contribution-form-block-soft_credit_to {if $rowNumber gte $showSoftCreditRow}hiddenElement{/if}">
-    <td class="label">{ts}Select Contact{/ts}</td>
+  {section name='i' start=1 loop=$rowCount}
+    {assign var='rowNumber' value=$smarty.section.i.index}
+    <tr id="soft-credit-row-{$rowNumber}"
+        class="crm-contribution-form-block-soft_credit_to {if $rowNumber gte $showSoftCreditRow}hiddenElement{/if}">
+      <td class="label">{ts}Select Contact{/ts}</td>
+      <td>
+        {assign var='createNewStatus' value=true}
+        {if !$showCreateNew and $rowNumber lt $showSoftCreditRow}
+          {assign var='createNewStatus' value=false}
+        {/if}
+        {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true blockNo=$rowNumber
+        prefix="soft_credit_" showNewSelect=$createNewStatus}
+      </td>
+      <td>
+        {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
+        &nbsp;<a class="delete-link" row-no={$rowNumber} href="#">{ts}delete{/ts}</a>
+      </td>
+    </tr>
+  {/section}
+  <tr>
+    <td></td>
     <td>
-      {assign var='createNewStatus' value=true}
-      {if !$showCreateNew and $rowNumber lt $showSoftCreditRow}
-        {assign var='createNewStatus' value=false}
-      {/if}
-      {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true blockNo=$rowNumber
-      prefix="soft_credit_" showNewSelect=$createNewStatus}
+      <a href="#" id="addMoreSoftCredit">{ts}add another soft credit{/ts}</a>
     </td>
-	  <td>
-		  {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
-	  </td>
   </tr>
-{/section}
-	<tr>
-		<td></td>
-		<td>
-			<a href="#" id="addMoreSoftCredit">{ts}add another soft credit{/ts}</a>
-		</td>
-	</tr>
 </table>
