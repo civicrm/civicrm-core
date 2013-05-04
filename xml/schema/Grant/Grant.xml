@@ -92,6 +92,9 @@
   <index>
     <name>index_grant_type_id</name>
     <fieldName>grant_type_id</fieldName>
+    <pseudoconstant>
+      <optionGroupName>grant_type</optionGroupName>
+    </pseudoconstant>
     <add>1.8</add>
   </index>
   <field>     
@@ -163,6 +166,9 @@
     <import>true</import> 
     <export>false</export>
     <comment>Id of Grant status.</comment>
+    <pseudoconstant>
+      <optionGroupName>grant_status</optionGroupName>
+    </pseudoconstant>
     <add>1.8</add>
   </field>
   <index> 
