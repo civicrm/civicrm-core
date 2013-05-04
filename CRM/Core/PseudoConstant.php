@@ -57,6 +57,8 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * activity type
    * @var array
    * @static
@@ -106,6 +108,8 @@ class CRM_Core_PseudoConstant {
   private static $countryIsoCode;
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * group
    * @var array
    * @static
@@ -162,6 +166,8 @@ class CRM_Core_PseudoConstant {
   private static $worldRegions;
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * activity status
    * @var array
    * @static
@@ -785,6 +791,8 @@ WHERE  id = %1";
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all groups from database
    *
    * The static array group is returned, and if it's
@@ -1351,6 +1359,8 @@ WHERE  id = %1";
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all Activity Statuses.
    *
    * The static array activityStatus is returned

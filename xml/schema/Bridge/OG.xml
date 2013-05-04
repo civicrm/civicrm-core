@@ -34,6 +34,11 @@
       <required>true</required>
       <comment>FK to civicrm group.</comment>
       <add>2.0</add>
+      <pseudoconstant>
+        <table>civicrm_group</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>title</labelColumn>
+      </pseudoconstant>
   </field>
   <foreignKey>
        <name>group_id</name>
@@ -60,6 +65,11 @@
       <required>true</required>
       <comment>FK to admin civicrm group.</comment>
       <add>2.0</add> 
+      <pseudoconstant>
+        <table>civicrm_group</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>title</labelColumn>
+      </pseudoconstant>
   </field>
   <foreignKey>
        <name>admin_group_id</name>
