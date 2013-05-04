@@ -520,9 +520,9 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       }
 
       // Convert campaign_id to campaign title
-      if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
-        if ($value = $row['civicrm_contribution_campaign_id']) {
-          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
+      if (array_key_exists('civicrm_membership_campaign_id', $row)) {
+        if ($value = $row['civicrm_membership_campaign_id']) {
+          $rows[$rowNum]['civicrm_membership_campaign_id'] = $this->activeCampaigns[$value];
           $entryFound = TRUE;
         }
       }
