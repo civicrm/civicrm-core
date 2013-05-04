@@ -419,6 +419,16 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Approved',
         ),
       ),
+      'CRM_Member_DAO_Membership' => array(
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'New',
+        ),
+        array(
+          'fieldName' => 'membership_type_id',
+          'sample' => 'Lifetime',
+        ),
+      ),
     );
 
     foreach ($fields as $daoName => $daoFields) {
