@@ -955,32 +955,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    // if honor roll fields are populated but no PCP is selected
-    if (!CRM_Utils_Array::value('pcp_made_through_id', $fields)) {
-      if (CRM_Utils_Array::value('pcp_display_in_roll', $fields) ||
-        CRM_Utils_Array::value('pcp_roll_nickname', $fields) ||
-        CRM_Utils_Array::value('pcp_personal_note', $fields)
-      ) {
-        $errors['pcp_made_through'] = ts('Please select a Personal Campaign Page, OR uncheck Display in Honor Roll and clear both the Honor Roll Name and the Personal Note field.');
-      }
-    }
-
-    if (!empty($fields['soft_credit_amount'])) {
-      $repeat = array_count_values($fields['soft_credit_contact_select_id']);
-      foreach ($fields['soft_credit_amount'] as $key => $val) {
-        if (!empty($fields['soft_credit_contact_select_id'][$key])) {
-          if ($repeat[$fields['soft_credit_contact_select_id'][$key]] > 1) {
-            $errors["soft_credit_contact_select_id[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');  
-          }
-          if ($fields['soft_credit_amount'][$key] && ($fields['soft_credit_amount'][$key] > $fields['total_amount'])) {
-            $errors["soft_credit_amount[$key]"] = ts('Soft credit amount cannot be more than the total amount.');
-          }
-          if (empty($fields['soft_credit_amount'][$key])) {
-            $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
-          }
-        }
-      }
-    }
+    $softErrors = CRM_Contribute_Form_SoftCredit::formRule($fields);
 
     if (CRM_Utils_Array::value('total_amount', $fields) && (CRM_Utils_Array::value('net_amount', $fields) || CRM_Utils_Array::value('fee_amount', $fields))) {
       $sum = CRM_Utils_Rule::cleanMoney($fields['net_amount']) + CRM_Utils_Rule::cleanMoney($fields['fee_amount']);
@@ -1007,6 +982,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
+    $errors = array_merge($errors, $softErrors);
     return $errors;
   }
 
