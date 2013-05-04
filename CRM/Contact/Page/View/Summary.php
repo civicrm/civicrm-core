@@ -153,14 +153,20 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       'phone' => array(
         'type' => 'phoneType',
         'id' => 'phone_type',
+        'daoName' => 'CRM_Core_DAO_Phone',
+        'fieldName' => 'phone_type_id',
       ),
       'im' => array(
         'type' => 'IMProvider',
         'id' => 'provider',
+        'daoName' => 'CRM_Core_DAO_IM',
+        'fieldName' => 'provider_id',
       ),
       'website' => array(
         'type' => 'websiteType',
         'id' => 'website_type',
+        'daoName' => 'CRM_Core_DAO_Website',
+        'fieldName' => 'website_type_id',
       ),
       'address' => array('skip' => TRUE, 'customData' => 1),
       'email' => array('skip' => TRUE),
@@ -172,7 +178,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         foreach ($defaults[$key] as & $val) {
           CRM_Utils_Array::lookupValue($val, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name')), FALSE);
           if (!CRM_Utils_Array::value('skip', $value)) {
-            eval('$pseudoConst = CRM_Core_PseudoConstant::' . $value['type'] . '();');
+            $daoName = $value['daoName'];
+            $pseudoConst = $daoName::buildOptions($value['fieldName'], 'view');
             CRM_Utils_Array::lookupValue($val, $value['id'], $pseudoConst, FALSE);
           }
         }
