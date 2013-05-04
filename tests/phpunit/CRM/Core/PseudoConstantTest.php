@@ -68,6 +68,42 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
      * - max: integer (default = 10) maximum number of option values expected.
      */
     $fields = array(
+      'CRM_Activity_DAO_Activity' => array(
+        array(
+          'fieldName' => 'activity_type_id',
+          'sample' => 'Text Message (SMS)',
+          'max' => 50,
+        ),
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'Scheduled',
+        ),
+      ),
+      'CRM_Campaign_DAO_Survey' => array(
+        array(
+          'fieldName' => 'activity_type_id',
+          'sample' => 'Text Message (SMS)',
+          'max' => 50,
+        ),
+      ),
+      'CRM_Event_DAO_ParticipantStatusType' => array(
+        array(
+          'fieldName' => 'visibility_id',
+          'sample' => 'Public',
+        ),
+      ),
+      'CRM_Member_DAO_MembershipType' => array(
+        array(
+          'fieldName' => 'visibility',
+          'sample' => 'Public',
+        ),
+      ),
+      'CRM_Price_DAO_Field' => array(
+        array(
+          'fieldName' => 'visibility_id',
+          'sample' => 'Public',
+        ),
+      ),
       'CRM_Financial_DAO_EntityFinancialAccount' => array(
         array(
           'fieldName' => 'financial_account_id',

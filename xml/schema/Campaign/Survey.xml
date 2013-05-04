@@ -52,6 +52,9 @@
     <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment> 
     <import>true</import>
     <add>3.3</add>
+    <pseudoconstant>
+      <optionGroupName>activity_type</optionGroupName>
+    </pseudoconstant>
   </field>
   <index>
     <name>UI_activity_type_id</name>
