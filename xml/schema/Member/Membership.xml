@@ -54,7 +54,7 @@
       <pseudoconstant>
         <table>civicrm_membership_type</table>
         <keyColumn>id</keyColumn>
-        <labelColumn>label</labelColumn>
+        <labelColumn>name</labelColumn>
       </pseudoconstant>
       <add>1.5</add>
   </field>
