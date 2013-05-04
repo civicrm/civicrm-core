@@ -168,6 +168,10 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'list_contri_id' => array(
+            'name' => 'id',
+            'title' => ts('Contribution ID'),
+          ),
           'contribution_or_soft' => 
           array('title' => ts('Contribution OR Soft Credit?'),
             'dbAlias' => "'Contribution'"
@@ -343,6 +347,19 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     }
 
     $this->_currencyColumn = 'civicrm_contribution_currency';
+
+    $this->_options = array(
+      'include_set' =>
+      array('title' => ts('Include'),
+        'type' => 'select',
+        'options' => array(
+          '' => '-select-',
+          1 => ts('Contributions Only'),
+          2 => ts('Soft Credits Only'),
+          3 => ts('Both'),
+        ),
+      ),
+    );
     parent::__construct();
   }
 
