@@ -94,7 +94,7 @@
   {include file="CRM/common/TrackingFields.tpl"}
 
   {capture assign='reqMark'}<span class="marker" title="{ts}This field is required.{/ts}">*</span>{/capture}
-  <div class="crm-block crm-contribution-main-form-block">
+  <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
   <div id="intro_text" class="crm-section intro_text-section">
     {$intro_text}
   </div>
