@@ -352,6 +352,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['campaign_id'] = $this->_params['contribution_campaign_id'];
     }
 
+    // assign contribution page id to the template so we can add css class for it
+    $this->assign('contributionPageID', $this->_id);
+
     $this->set('params', $this->_params);
   }
 
