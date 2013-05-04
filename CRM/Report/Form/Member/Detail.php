@@ -433,11 +433,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
   }
 
-// This function overrides the default Form.php orderBy and breaks dynamic order
-// function orderBy() {
-//    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-//  }
-
   function postProcess() {
 
     $this->beginPostProcess();
