@@ -235,6 +235,9 @@
       <type>int unsigned</type>
       <title>Approval Status</title>
       <comment>The status of this mailing. Values: none, approved, rejected</comment>
+      <pseudoconstant>
+        <optionGroupName>mail_approval_status</optionGroupName>
+      </pseudoconstant>
       <add>3.3</add>
   </field>
   <field>

@@ -465,6 +465,18 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Approved',
         ),
       ),
+      'CRM_Member_DAO_Membership' => array(
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'New',
+        ),
+      ),
+      'CRM_Mailing_DAO_Mailing' => array(
+        array(
+          'fieldName' => 'approval_status_id',
+          'sample' => 'Approved',
+        ),
+      ),
     );
 
     foreach ($fields as $daoName => $daoFields) {
@@ -477,7 +489,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         // Ensure sample value is contained in the returned optionValues.
         $this->assertContains($field['sample'], $optionValues, $message);
 
-        // Exclude test
+        // Ensure exclude value is not contained in the optionValues
         if (!empty($field['exclude'])) {
           $this->assertNotContains($field['exclude'], $optionValues, $message);
         }

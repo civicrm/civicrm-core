@@ -455,8 +455,7 @@ class CRM_Utils_Token {
         break;
 
       case 'approvalStatus':
-        $mailApprovalStatus = CRM_Mailing_PseudoConstant::approvalStatus();
-        $value = $mailApprovalStatus[$mailing->approval_status_id];
+        $value = CRM_Core_PseudoConstant::getValue('CRM_Mailing_DAO_Mailing', 'approval_status_id', $mailing->approval_status_id);
         break;
 
       case 'approvalNote':

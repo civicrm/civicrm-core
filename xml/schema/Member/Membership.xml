@@ -51,6 +51,11 @@
       <export>false</export>
       <required>true</required>
       <comment>FK to Membership Type</comment>
+      <pseudoconstant>
+        <table>civicrm_membership_type</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
       <add>1.5</add>
   </field>
   <foreignKey> 
@@ -111,6 +116,11 @@
       <export>false</export>
       <required>true</required>
       <comment>FK to Membership Status</comment>
+      <pseudoconstant>
+        <table>civicrm_membership_status</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>label</labelColumn>
+      </pseudoconstant>
       <add>1.5</add>
   </field>
   <foreignKey> 
