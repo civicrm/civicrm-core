@@ -444,10 +444,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
-    print_r("!!!! I'm about to build my query\n");
     $sql = $this->buildQuery(TRUE);
-    
-    print_r("My SQL is currently " . $sql);
 
     $rows = array();
     $this->buildRows($sql, $rows);
