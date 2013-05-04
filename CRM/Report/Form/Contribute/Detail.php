@@ -48,6 +48,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     'Contribution');
 
   function __construct() {
+	  
+  	// Check if CiviCampaign is a) enabled and b) has active campaigns	
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {
@@ -330,6 +332,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       );
     }
 
+	// If we have active campaigns add those elements to both the fields and filters
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
         'title' => ts('Campaign'),
