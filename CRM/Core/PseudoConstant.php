@@ -433,6 +433,8 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all Activty types.
    *
    * The static array activityType is returned
@@ -1342,6 +1344,8 @@ WHERE  id = %1";
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all Visibility levels.
    *
    * The static array visibility is returned
