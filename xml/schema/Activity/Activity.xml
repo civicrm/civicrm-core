@@ -58,16 +58,19 @@
        <add>3.2</add>
   </index>
   <field>
-       <name>activity_type_id</name>
-       <title>Activity Type ID</title>
-       <import>true</import>
-       <type>int unsigned</type>
-       <required>true</required>
-       <export>false</export>
-       <default>1</default>
-       <headerPattern>/(activity.)?type(.id$)/i</headerPattern>
-       <comment>FK to civicrm_option_value.id, that has to be valid, registered activity type.</comment>
-       <add>1.1</add>
+      <name>activity_type_id</name>
+      <title>Activity Type ID</title>
+      <import>true</import>
+      <type>int unsigned</type>
+      <required>true</required>
+      <export>false</export>
+      <default>1</default>
+      <headerPattern>/(activity.)?type(.id$)/i</headerPattern>
+      <comment>FK to civicrm_option_value.id, that has to be valid, registered activity type.</comment>
+      <add>1.1</add>
+      <pseudoconstant>
+        <optionGroupName>activity_type</optionGroupName>
+      </pseudoconstant>
   </field>
   <index>
        <name>UI_activity_type_id</name>
@@ -227,6 +230,9 @@
       <type>int unsigned</type>
       <comment>ID of the status this activity is currently in. Foreign key to civicrm_option_value.</comment>
       <add>2.0</add>
+      <pseudoconstant>
+        <optionGroupName>activity_status</optionGroupName>
+      </pseudoconstant>
   </field>
   <field>
       <name>priority_id</name>
