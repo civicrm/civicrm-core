@@ -470,9 +470,11 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'status_id',
           'sample' => 'New',
         ),
+      ),
+      'CRM_Mailing_DAO_Mailing' => array(
         array(
-          'fieldName' => 'membership_type_id',
-          'sample' => 'Lifetime',
+          'fieldName' => 'approval_status_id',
+          'sample' => 'Approved',
         ),
       ),
     );
@@ -487,7 +489,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         // Ensure sample value is contained in the returned optionValues.
         $this->assertContains($field['sample'], $optionValues, $message);
 
-        // Exclude test
+        // Ensure exclude value is not contained in the optionValues
         if (!empty($field['exclude'])) {
           $this->assertNotContains($field['exclude'], $optionValues, $message);
         }
