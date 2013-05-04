@@ -458,7 +458,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @access public
    * @static
    */
-  static function &importableFields($contacType = 'Individual', $status = TRUE) {
+  static function &importableFields($contactType = 'Individual', $status = TRUE) {
     if (!self::$_importableFields) {
       if (!self::$_importableFields) {
         self::$_importableFields = array();
@@ -475,15 +475,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $tmpFields = CRM_Contribute_DAO_Contribution::import();
       unset($tmpFields['option_value']);
       $optionFields = CRM_Core_OptionValue::getFields($mode = 'contribute');
-      $contactFields = CRM_Contact_BAO_Contact::importableFields($contacType, NULL);
+      $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
 
       // Using new Dedupe rule.
       $ruleParams = array(
-        'contact_type' => $contacType,
+        'contact_type' => $contactType,
         'used'         => 'Unsupervised',
       );
       $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
-      $tmpConatctField = array();
+      $tmpContactField = array();
       if (is_array($fieldsArray)) {
         foreach ($fieldsArray as $value) {
           //skip if there is no dupe rule
@@ -496,21 +496,21 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
             'column_name'
           );
           $value = $customFieldId ? 'custom_' . $customFieldId : $value;
-          $tmpConatctField[trim($value)] = $contactFields[trim($value)];
+          $tmpContactField[trim($value)] = $contactFields[trim($value)];
           if (!$status) {
-            $title = $tmpConatctField[trim($value)]['title'] . ' ' . ts('(match to contact)');
+            $title = $tmpContactField[trim($value)]['title'] . ' ' . ts('(match to contact)');
           }
           else {
-            $title = $tmpConatctField[trim($value)]['title'];
+            $title = $tmpContactField[trim($value)]['title'];
           }
-          $tmpConatctField[trim($value)]['title'] = $title;
+          $tmpContactField[trim($value)]['title'] = $title;
         }
       }
 
-      $tmpConatctField['external_identifier'] = $contactFields['external_identifier'];
-      $tmpConatctField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
+      $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
+      $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
       $tmpFields['contribution_contact_id']['title'] = $tmpFields['contribution_contact_id']['title'] . ' ' . ts('(match to contact)');
-      $fields = array_merge($fields, $tmpConatctField);
+      $fields = array_merge($fields, $tmpContactField);
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, $note);
       $fields = array_merge($fields, $optionFields);
@@ -1517,7 +1517,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               $dates['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
             }
             else {
-              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id, null, null, null, $numterms);
+              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id, NULL, NULL, NULL, $numterms);
             }
 
             //get the status for membership.
@@ -1528,7 +1528,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               TRUE
             );
 
-            $formatedParams = array(
+            $formattedParams = array(
               'status_id' => CRM_Utils_Array::value('id', $calcStatus,
                 array_search('Current', $membershipStatuses)
               ),
@@ -1537,16 +1537,16 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               'end_date' => CRM_Utils_Date::customFormat($dates['end_date'], $format),
             );
 
-            CRM_Utils_Hook::pre('edit', 'Membership', $membership->id, $formatedParams);
+            CRM_Utils_Hook::pre('edit', 'Membership', $membership->id, $formattedParams);
 
-            $membership->copyValues($formatedParams);
+            $membership->copyValues($formattedParams);
             $membership->save();
 
             //updating the membership log
             $membershipLog = array();
-            $membershipLog = $formatedParams;
+            $membershipLog = $formattedParams;
             $logStartDate  = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('log_start_date', $dates), $format);
-            $logStartDate  = ($logStartDate) ? CRM_Utils_Date::isoToMysql($logStartDate) : $formatedParams['start_date'];
+            $logStartDate  = ($logStartDate) ? CRM_Utils_Date::isoToMysql($logStartDate) : $formattedParams['start_date'];
 
             $membershipLog['start_date'] = $logStartDate;
             $membershipLog['membership_id'] = $membership->id;
@@ -1557,7 +1557,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             CRM_Member_BAO_MembershipLog::add($membershipLog, CRM_Core_DAO::$_nullArray);
 
             //update related Memberships.
-            CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $formatedParams);
+            CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $formattedParams);
 
             $updateResult['membership_end_date'] = CRM_Utils_Date::customFormat($dates['end_date'],
               '%B %E%f, %Y'
@@ -1699,7 +1699,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * Function to get individual id for onbehalf contribution
    *
    * @param int $contributionId contribution id
-   * @param int $contributorId  contributer id
+   * @param int $contributorId  contributor id
    *
    * @return array $ids containing organization id and individual id
    * @access public
