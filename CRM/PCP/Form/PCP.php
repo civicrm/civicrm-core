@@ -163,8 +163,12 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
     }
     else {
 
-      $status       = array('' => ts('- select -')) + CRM_PCP_PseudoConstant::pcpStatus();
-      $types        = array('' => ts('- select -')) + CRM_PCP_PseudoConstant::pcpType();
+      $status = array('' => ts('- select -')) + CRM_Core_OptionGroup::values("pcp_status");
+      $types = array(
+        '' => ts('- select -'),
+        'contribute' => ts('Contribution'),
+        'event' => ts('Event'),
+      );
       $contribPages = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::contributionPage();
       $eventPages   = array('' => ts('- select -')) + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
 
