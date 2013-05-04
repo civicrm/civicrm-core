@@ -49,6 +49,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
    */
   function testOptionValues() {
 
+    // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
     $api_params = array(
       'version' => 3,
@@ -57,6 +58,15 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'is_active' => TRUE,
     );
     $result = civicrm_api('customGroup', 'create', $api_params);
+
+    // Create a Group for testing.
+    $group_name = md5(microtime());
+    $api_params = array(
+      'version' => 3,
+      'title' => $group_name,
+      'is_active' => TRUE,
+    );
+    $result = civicrm_api('group', 'create', $api_params);
 
     /**
      * daoName/field combinations to test
@@ -68,6 +78,42 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
      * - max: integer (default = 10) maximum number of option values expected.
      */
     $fields = array(
+      'CRM_Contact_DAO_GroupContact' => array(
+        array(
+          'fieldName' => 'group_id',
+          'sample' => $group_name,
+        ),
+      ),
+      'CRM_Contact_DAO_GroupContactCache' => array(
+        array(
+          'fieldName' => 'group_id',
+          'sample' => $group_name,
+        ),
+      ),
+      'CRM_Contact_DAO_GroupOrganization' => array(
+        array(
+          'fieldName' => 'group_id',
+          'sample' => $group_name,
+        ),
+      ),
+      'CRM_Contact_DAO_SubscriptionHistory' => array(
+        array(
+          'fieldName' => 'group_id',
+          'sample' => $group_name,
+        ),
+      ),
+      'CRM_Core_DAO_ActionSchedule' => array(
+        array(
+          'fieldName' => 'group_id',
+          'sample' => $group_name,
+        ),
+      ),
+      'CRM_Mailing_Event_DAO_Subscribe' => array(
+        array(
+          'fieldName' => 'group_id',
+          'sample' => $group_name,
+        ),
+      ),
       'CRM_Activity_DAO_Activity' => array(
         array(
           'fieldName' => 'activity_type_id',

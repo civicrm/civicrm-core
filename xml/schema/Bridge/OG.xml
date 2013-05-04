@@ -29,11 +29,16 @@
        <add>2.0</add> 
   </index>
   <field> 
-      <name>group_id</name> 
-      <type>int unsigned</type> 
-      <required>true</required> 
-      <comment>FK to civicrm group.</comment> 
-      <add>2.0</add> 
+    <name>group_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm group.</comment>
+    <add>2.0</add>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
   </field> 
   <foreignKey> 
        <name>group_id</name> 
@@ -55,11 +60,16 @@
        <add>2.0</add> 
   </foreignKey> 
   <field> 
-      <name>admin_group_id</name> 
-      <type>int unsigned</type> 
-      <required>true</required> 
-      <comment>FK to admin civicrm group.</comment> 
-      <add>2.0</add> 
+    <name>admin_group_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to admin civicrm group.</comment>
+    <add>2.0</add>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
   </field> 
   <foreignKey> 
        <name>admin_group_id</name> 
