@@ -66,13 +66,6 @@ class CRM_Core_PseudoConstant {
   private static $activityType;
 
   /**
-   * payment processor billing modes
-   * @var array
-   * @static
-   */
-  private static $billingMode;
-
-  /**
    * states, provinces
    * @var array
    * @static
@@ -542,25 +535,6 @@ class CRM_Core_PseudoConstant {
     }
     return self::$activityType[$index];
   }
-
-  /**
-   * Get all payment-processor billing modes
-   *
-   * @access public
-   * @static
-   *
-   * @return array ($id => $name)
-   */
-  public static function billingMode() {
-    if (!self::$billingMode) {
-      self::$billingMode = array(
-        CRM_Core_Payment::BILLING_MODE_FORM => 'form',
-        CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
-        CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
-      );
-    }
-    return self::$billingMode;
-  }
  
   /**
    * Get all the State/Province from database.
@@ -852,6 +826,8 @@ WHERE  id = %1";
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all permissioned groups from database
    *
    * The static array group is returned, and if it's

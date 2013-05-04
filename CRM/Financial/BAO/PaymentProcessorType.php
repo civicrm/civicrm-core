@@ -151,12 +151,12 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
     if (isset($paymentProcessorType->billing_mode)) {
       // ugh unidirectional manipulation
       if (!is_numeric($paymentProcessorType->billing_mode)) {
-        $billingModes = array_flip(CRM_Core_PseudoConstant::billingMode());
+        $billingModes = array_flip(CRM_Core_Payment::getBillingModes());
         if (array_key_exists($paymentProcessorType->billing_mode, $billingModes)) {
           $paymentProcessorType->billing_mode = $billingModes[$paymentProcessorType->billing_mode];
         }
       }
-      if (!array_key_exists($paymentProcessorType->billing_mode, CRM_Core_PseudoConstant::billingMode())) {
+      if (!array_key_exists($paymentProcessorType->billing_mode, CRM_Core_Payment::getBillingModes())) {
         throw new Exception("Unrecognized billing_mode");
       }
     }
