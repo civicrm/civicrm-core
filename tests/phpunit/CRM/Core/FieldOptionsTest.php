@@ -28,7 +28,7 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
- * Tests for linking to resource files
+ * Tests for field options
  */
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
   function get_info() {

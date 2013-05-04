@@ -60,9 +60,7 @@
     <title>Event Type ID</title>
     <default>0</default>
     <pseudoconstant>
-      <name>eventType</name>
       <optionGroupName>event_type</optionGroupName>
-      <class>CRM_Event_PseudoConstant</class>
     </pseudoconstant>
     <comment>Event Type ID.Implicit FK to civicrm_option_value where option_group = event_type.</comment> 
     <add>1.7</add> 

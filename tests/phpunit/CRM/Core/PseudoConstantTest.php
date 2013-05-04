@@ -28,7 +28,7 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
- * Tests for linking to resource files
+ * Tests for pseudoconstant retrieval
  */
 class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
   function get_info() {
@@ -395,6 +395,28 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'provider_id',
           'sample' => 'Yahoo',
+        ),
+      ),
+      'CRM_Event_DAO_Participant' => array(
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'Registered',
+        ),
+        array(
+          'fieldName' => 'role_id',
+          'sample' => 'Speaker',
+        ),
+      ),
+      'CRM_Event_DAO_Event' => array(
+        array(
+          'fieldName' => 'event_type_id',
+          'sample' => 'Fundraiser',
+        ),
+      ),
+      'CRM_PCP_DAO_PCP' => array(
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'Approved',
         ),
       ),
     );

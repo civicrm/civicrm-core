@@ -1771,13 +1771,14 @@ EOS;
   /**
    * Get options for the called BAO object's field.
    * This function can be overridden by each BAO to add more logic related to context.
+   * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
    *
    * @param String $fieldName
    * @param String $context: e.g. "search" "edit" "create" "view"
    * @param Array  $props: whatever is known about this bao object
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
-    // If a given bao does not override this function, it can still be called on that bao
+    // If a given bao does not override this function
     $baoName = get_called_class();
     return CRM_Core_PseudoConstant::get($baoName, $fieldName);
   }

@@ -284,8 +284,11 @@ class CRM_Core_PseudoConstant {
           $output = self::$cache[$cacheKey];
         }
         else {
-          // Get list of fields for the option table
           $daoName = CRM_Core_AllCoreTables::getClassForTable($pseudoconstant['table']);
+          if (!class_exists($daoName)) {
+            return FALSE;
+          }
+          // Get list of fields for the option table
           $dao = new $daoName;
           $availableFields = array_keys($dao->fieldKeys());
           if (in_array('is_active', $availableFields)) {
