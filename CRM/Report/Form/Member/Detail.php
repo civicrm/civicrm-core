@@ -105,6 +105,15 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'id' =>
           array('no_display' => TRUE),
         ),
+        'order_bys' =>
+        array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'ASC'
+          ),
+        ),
         'grouping' => 'contact-fields',
       ),
       'civicrm_membership' =>
@@ -278,6 +287,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         'options' => $this->activeCampaigns,
       );
       $this->_columns['civicrm_membership']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
+
     }
 
     $this->_currencyColumn = 'civicrm_contribution_currency';
@@ -423,9 +433,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
   }
 
-  function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  }
+// This function overrides the default Form.php orderBy and breaks dynamic order
+// function orderBy() {
+//    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
+//  }
 
   function postProcess() {
 
@@ -433,7 +444,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
+    print_r("!!!! I'm about to build my query\n");
     $sql = $this->buildQuery(TRUE);
+    
+    print_r("My SQL is currently " . $sql);
 
     $rows = array();
     $this->buildRows($sql, $rows);
