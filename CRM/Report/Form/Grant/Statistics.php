@@ -115,14 +115,14 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Grant_PseudoConstant::grantType(),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id'),
           ),
           'status_id' =>
           array(
             'name' => 'status_id',
             'title' => ts('Grant Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Grant_PseudoConstant::grantStatus(),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id'),
           ),
           'amount_requested' =>
           array(
@@ -286,7 +286,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
   }
 
   function where() {
-    $approved = array_search( 'Approved', CRM_Grant_PseudoConstant::grantStatus( ) );
+    $approved = CRM_Core_PseudoConstant::getKey('CRM_Grant_DAO_Grant', 'status_id', 'Approved', array('labelColumn' => 'name'));
     $whereClause = "
 WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
   AND {$this->_aliases['civicrm_grant']}.amount_total > 0";
@@ -382,7 +382,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
     $awardedGrantsAmount = $grantsReceived = $totalAmount = $awardedGrants = $grantReportsReceived = 0;
     $grantStatistics     = array();
 
-    $grantTypes = CRM_Grant_PseudoConstant::grantType();
+    $grantTypes = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
     $countries  = CRM_Core_PseudoConstant::country();
     $gender     = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
 
