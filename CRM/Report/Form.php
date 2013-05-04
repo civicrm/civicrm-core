@@ -803,16 +803,16 @@ class CRM_Report_Form extends CRM_Core_Form {
         if ($field['type'] == 'select') {
           $this->addElement('select', "{$fieldName}", $field['title'], $field['options']);
         }
-        else {
+        else if ($field['type'] == 'checkbox') {
           $options[$field['title']] = $fieldName;
+          $this->addCheckBox($fieldName, NULL,
+            $options, NULL,
+            NULL, NULL, NULL, $this->_fourColumnAttribute
+          );
         }
       }
-
-      $this->addCheckBox("options", $field['title'],
-        $options, NULL,
-        NULL, NULL, NULL, $this->_fourColumnAttribute
-      );
     }
+    $this->assign('otherOptions', $this->_options);
   }
 
   function addChartOptions() {
