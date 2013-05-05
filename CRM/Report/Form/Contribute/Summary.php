@@ -600,6 +600,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         }
         $entryFound = TRUE;
       }
+
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s) for this ') ? TRUE : $entryFound;
 
       // skip looking further in rows, if first row itself doesn't
