@@ -49,4 +49,11 @@ cj(function($) {
     }
   });
 
+  $('.delete-link').click(function(){
+    var row = $(this).attr('row-no');
+    $('#soft-credit-row-' + row).hide().find('input').val('');
+    $('input[name="soft_credit_contact_select_id['+row+']"]').val('');
+    return false;
+  });
+
 });
