@@ -357,8 +357,11 @@ function civicrm_wp_frontend($shortcode = FALSE) {
   $config = CRM_Core_Config::singleton();
   $config->userFrameworkFrontend = TRUE;
 
+  $argString = NULL;
+  $args = array();
   if (isset($_GET['q'])) {
-    $args = explode('/', trim($_GET['q']));
+    $argString = trim($_GET['q']);
+    $args = explode('/', $argString);
   }
 
   if ($shortcode) {
@@ -383,24 +386,25 @@ function civicrm_wp_frontend($shortcode = FALSE) {
 
   require_once ABSPATH . WPINC . '/pluggable.php';
 
-  // if snippet is set, which means ajax call, we just
-  // output civicrm html and skip the header
+  // output civicrm html only in  a few cases and skip the WP header
   if (
+    // snippet is set - i.e. ajax call
     CRM_Utils_Array::value('snippet', $_GET) ||
-    (
-      CRM_Utils_Array::value(0, $args) == 'civicrm' &&
-      CRM_Utils_Array::value(1, $args) == 'ajax'
-    )  ||
-    // we also follow this pattern where civicrm controls the
-    // entire page like an ical feed
-    (
-      CRM_Utils_Array::value(0, $args) == 'civicrm' &&
-      CRM_Utils_Array::value(1, $args) == 'event' &&
-      CRM_Utils_Array::value(2, $args) == 'ical' &&
-      // skip the html page since that is rendered in the CMS theme
-      CRM_Utils_Array::value('html', $_GET) != 1
+    // ical feed
+    ($argString == 'civicrm/event/ical' &&
+      // skip the html page since it is rendered in the CMS theme
+      CRM_Utils_Array::value('html', $_GET) != 1) ||
+    in_array(
+      $argString,
+      // ajax and file download urls
+      array(
+        'civicrm/ajax',
+        'civicrm/file'
+      )
     )
   ) {
+    // from my limited understanding, putting this in the init hook, allows civi to
+    // echo all output and exit before the theme code outputs anything
     add_filter('init', 'civicrm_wp_invoke');
     return;
   }
