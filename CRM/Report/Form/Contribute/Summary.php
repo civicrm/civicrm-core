@@ -48,13 +48,16 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   function __construct() {
-    $config = CRM_Core_Config::singleton();
+	  
+	// Check if CiviCampaign is a) enabled and b) has active campaigns
+	$config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
     }
+    
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -215,6 +218,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       ),
     ) + $this->addAddressFields();
 
+    // If we have a campaign, build out the relevant elements
     $this->_tagFilter = TRUE;
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
@@ -589,15 +593,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
-      // convert campaign_id to campaign title
+      // If using campaigns, convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_campaign_id']) {
           $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
         }
         $entryFound = TRUE;
       }
-      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s) for this ') ? TRUE : $entryFound;
 
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s) for this ') ? TRUE : $entryFound;
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need

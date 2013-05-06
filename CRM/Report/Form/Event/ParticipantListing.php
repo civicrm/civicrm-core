@@ -42,7 +42,17 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
     'Participant'); 
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
-  function __construct() {
+  function __construct() {  
+	  
+  	// Check if CiviCampaign is a) enabled and b) has active campaigns
+	$config = CRM_Core_Config::singleton();
+    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    if ($campaignEnabled) {
+      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
+      $this->activeCampaigns = $getCampaigns['campaigns'];
+      asort($this->activeCampaigns);
+    }
+    
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -69,17 +79,21 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
         ),
         'grouping' => 'contact-fields',
+        'order_bys' =>
+        array(
+          'sort_name' =>
+          array('title' => ts('Last Name, First Name'), 
+			'default' => '1', 
+			'default_weight' => '0', 
+			'default_order' => 'ASC',
+          ),
+        ),
         'filters' =>
         array(
           'sort_name' =>
           array('title' => ts('Participant Name'),
             'operator' => 'like',
           ),
-        ),
-        'order_bys' =>
-        array(
-          'sort_name' =>
-          array('title' => ts('Last Name, First Name'), 'default' => '1', 'default_weight' => '0', 'default_order' => 'ASC'),
         ),
       ),
       'civicrm_email' =>
@@ -235,9 +249,25 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         ),
       ),
     );
+    
+    // If we have active campaigns add those elements to both the fields and filters
+    if ($campaignEnabled && !empty($this->activeCampaigns)) {
+      $this->_columns['civicrm_participant']['fields']['campaign_id'] = array(
+        'title' => ts('Campaign'),
+        'default' => 'false',
+      );
+      $this->_columns['civicrm_participant']['filters']['campaign_id'] = array('title' => ts('Campaign'),
+        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'options' => $this->activeCampaigns,
+      );
+      $this->_columns['civicrm_participant']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
+
+    }
+    
     $this->_currencyColumn = 'civicrm_participant_fee_currency';
     parent::__construct();
   }
+  
 
   function preProcess() {
     parent::preProcess();
@@ -495,6 +525,14 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           );
           $rows[$rowNum]['civicrm_contact_employer_id_link'] = $url;
           $rows[$rowNum]['civicrm_contact_employer_id_hover'] = ts('View Contact Summary for this Contact.');
+        }
+      }
+
+      // Convert campaign_id to campaign title
+      if (array_key_exists('civicrm_participant_campaign_id', $row)) {
+        if ($value = $row['civicrm_participant_campaign_id']) {
+          $rows[$rowNum]['civicrm_participant_campaign_id'] = $this->activeCampaigns[$value];
+          $entryFound = TRUE;
         }
       }
 

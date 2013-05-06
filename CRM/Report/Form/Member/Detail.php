@@ -49,7 +49,17 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
   protected $_customGroupExtends = array('Membership', 'Contribution');
   protected $_customGroupGroupBy = FALSE; 
   
-  function __construct() {
+  function __construct() {  
+	  
+  	// Check if CiviCampaign is a) enabled and b) has active campaigns
+	$config = CRM_Core_Config::singleton();
+    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    if ($campaignEnabled) {
+      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
+      $this->activeCampaigns = $getCampaigns['campaigns'];
+      asort($this->activeCampaigns);
+    }
+    
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -94,6 +104,15 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           ),
           'id' =>
           array('no_display' => TRUE),
+        ),
+        'order_bys' =>
+        array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'ASC'
+          ),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -257,6 +276,20 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
+	// If we have active campaigns add those elements to both the fields and filters
+    if ($campaignEnabled && !empty($this->activeCampaigns)) {
+      $this->_columns['civicrm_membership']['fields']['campaign_id'] = array(
+        'title' => ts('Campaign'),
+        'default' => 'false',
+      );
+      $this->_columns['civicrm_membership']['filters']['campaign_id'] = array('title' => ts('Campaign'),
+        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'options' => $this->activeCampaigns,
+      );
+      $this->_columns['civicrm_membership']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
+
+    }
+
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
   }
@@ -400,10 +433,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
   }
 
-  function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  }
-
   function postProcess() {
 
     $this->beginPostProcess();
@@ -494,6 +523,14 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       if ($value = CRM_Utils_Array::value('civicrm_contribution_payment_instrument_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_payment_instrument_id'] = $paymentInstruments[$value];
         $entryFound = TRUE;
+      }
+
+      // Convert campaign_id to campaign title
+      if (array_key_exists('civicrm_membership_campaign_id', $row)) {
+        if ($value = $row['civicrm_membership_campaign_id']) {
+          $rows[$rowNum]['civicrm_membership_campaign_id'] = $this->activeCampaigns[$value];
+          $entryFound = TRUE;
+        }
       }
 
       if (!$entryFound) {

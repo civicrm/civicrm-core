@@ -27,6 +27,17 @@
  +--------------------------------------------------------------------+
 */
 
+ 
+ /*
+  *   !!!!!!!!!!!!!!!!!!!!
+  *     NB: this is named detail but behaves like a summary report.
+  * 	It is also accessed through the Pledge Summary link in the UI
+  * 	This should presumably be changed.
+  * 	~ Doten
+  *   !!!!!!!!!!!!!!!!!!!!
+  *
+  */
+
 /**
  *
  * @package CRM
@@ -43,6 +54,16 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     'Individual'
   );
   function __construct() {
+	  
+	// Check if CiviCampaign is a) enabled and b) has active campaigns
+	$config = CRM_Core_Config::singleton();
+    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    if ($campaignEnabled) {
+      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
+      $this->activeCampaigns = $getCampaigns['campaigns'];
+      asort($this->activeCampaigns);
+    }
+
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -146,6 +167,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('contribution_status'),
           ),
+          
         ),
       ),
       'civicrm_pledge_payment' =>
@@ -164,6 +186,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
               'default' => TRUE,
               'type' => CRM_Utils_Type::T_MONEY,
             ),
+            
         ),
       ),
       'civicrm_group' =>
@@ -183,6 +206,21 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
         ),
       ),
     ) + $this->addAddressFields(FALSE, FALSE);
+    
+    // If we have a campaign, build out the relevant elements
+    $this->_tagFilter = TRUE;
+    if ($campaignEnabled && !empty($this->activeCampaigns)) {
+		$this->_columns['civicrm_pledge']['fields']['campaign_id'] = array(
+          'title' => 'Campaign',
+          'default' => 'false',
+		);
+		$this->_columns['civicrm_pledge']['filters']['campaign_id'] = array('title' => ts('Campaign'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => $this->activeCampaigns,
+		);
+		$this->_columns['civicrm_pledge']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
+
+    }
 
     $this->_tagFilter = TRUE;
     $this->_currencyColumn = 'civicrm_pledge_currency';
@@ -551,6 +589,14 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       if (array_key_exists('civicrm_pledge_status_id', $row)) {
         if ($value = $row['civicrm_pledge_status_id']) {
           $rows[$rowNum]['civicrm_pledge_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($value);
+        }
+        $entryFound = TRUE;
+      }
+
+      // If using campaigns, convert campaign_id to campaign title
+      if (array_key_exists('civicrm_pledge_campaign_id', $row)) {
+        if ($value = $row['civicrm_pledge_campaign_id']) {
+          $rows[$rowNum]['civicrm_pledge_campaign_id'] = $this->activeCampaigns[$value];
         }
         $entryFound = TRUE;
       }
