@@ -1480,7 +1480,16 @@ class CRM_Utils_Date {
     return $format;
   }
 
-  static function getUTCTime($format = 'YmdHis', $offset = 0) {
+  /**
+   * Get the time in UTC for the current time. You can optionally send an offset from the current time if needed
+   *
+   * @param $offset int the offset from the current time in seconds
+   *
+   * @return the time in UTC
+   * @static
+   * @public
+   */
+  static function getUTCTime($offset = 0) {
     $originalTimezone = date_default_timezone_get();
     date_default_timezone_set('UTC');
     $time = time() + $offset;
