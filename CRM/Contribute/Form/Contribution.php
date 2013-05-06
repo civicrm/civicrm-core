@@ -844,22 +844,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     //CRM-7362 --add campaigns.
     CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
 
-    // CRM-7368 allow user to set or edit PCP link for contributions
-    $siteHasPCPs = CRM_Contribute_PseudoConstant::pcPage();
-    if (!CRM_Utils_Array::crmIsEmptyArray($siteHasPCPs)) {
-      $this->assign('siteHasPCPs', 1);
-      $pcpDataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-        'className=CRM_Contact_Page_AJAX&fnName=getPCPList&json=1&context=contact&reset=1',
-        FALSE, NULL, FALSE
-      );
-      $this->assign('pcpDataUrl', $pcpDataUrl);
-      $this->addElement('text', 'pcp_made_through', ts('Credit to a Personal Campaign Page'));
-      $this->addElement('hidden', 'pcp_made_through_id', '', array('id' => 'pcp_made_through_id'));
-      $this->addElement('checkbox', 'pcp_display_in_roll', ts('Display in Honor Roll?'), NULL);
-      $this->addElement('text', 'pcp_roll_nickname', ts('Name (for Honor Roll)'));
-      $this->addElement('textarea', 'pcp_personal_note', ts('Personal Note (for Honor Roll)'));
-    }
-
     CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
 
     $js = NULL;
