@@ -132,12 +132,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   static function create(&$params) {
     if (!isset($params['id']) && !isset($params['column_name'])) {
       // if add mode & column_name not present, calculate it.
-      $params['column_name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 32));
+      $columnName = strtolower(CRM_Utils_String::munge($params['label'], '_', 32));
 
       $params['name'] = CRM_Utils_String::munge($params['label'], '_', 64);
     }
     elseif (isset($params['id'])) {
-      $params['column_name'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
+      $columnName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
         $params['id'],
         'column_name'
       );
@@ -192,7 +192,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       if ($params['option_type'] == 1) {
         // first create an option group for this custom group
         $optionGroup = new CRM_Core_DAO_OptionGroup();
-        $optionGroup->name = "{$params['column_name']}_" . date('YmdHis');
+        $optionGroup->name = "{$columnName}_" . date('YmdHis');
         $optionGroup->title = $params['label'];
         $optionGroup->is_active = 1;
         $optionGroup->save();
@@ -275,7 +275,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       self::createField($customField, 'modify', $indexExist);
     }
     else {
-      $customField->column_name .= "_{$customField->id}";
+      if (!isset($params['column_name'])) {
+        $columnName .= "_{$customField->id}";
+      }
+      $customField->column_name = $columnName;
       $customField->save();
       // make sure all values are present in the object
       $customField->find(TRUE);
