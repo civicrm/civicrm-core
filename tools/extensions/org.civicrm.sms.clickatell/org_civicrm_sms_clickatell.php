@@ -223,7 +223,7 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
    * @access public
    */
   function send($recipients, $header, $message, $jobID = NULL) {
-    if ($this->_apiType = 'http') {
+    if ($this->_apiType == 'http') {
       $postDataArray = array( );
       $url = $this->formURLPostData("/http/sendmsg", $postDataArray);
 
