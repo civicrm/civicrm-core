@@ -300,8 +300,7 @@ function _civicrm_api3_get_DAO($name) {
     return 'CRM_Core_BAO_IM';
   }
 
-
-  return CRM_Core_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
+  return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
 }
 
 /**
