@@ -274,9 +274,12 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     $template->assign( 'startDate', $startDate->format('Y-m-d') );
-    // for open ended subscription totalOccurrences has to be 9999
+
     $installments = $this->_getParam('installments');
-    $template->assign('totalOccurrences', $installments ? $installments : 9999);
+
+    // for open ended subscription totalOccurrences has to be 9999
+    $installments = empty($installments) ? 9999 : $installments;
+    $template->assign('totalOccurrences', $installments);
 
     $template->assign('amount', $this->_getParam('amount'));
 
@@ -554,8 +557,9 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    */
   function _getParam($field, $xmlSafe = FALSE) {
     $value = CRM_Utils_Array::value($field, $this->_params, '');
-    if ($xmlSafe)
+    if ($xmlSafe) {
       $value = str_replace(array( '&', '"', "'", '<', '>' ), '', $value);
+    }
     return $value;
   }
 
