@@ -66,7 +66,7 @@ class CRM_Utils_REST {
    * @return string       $var
    * @access public
    */
-  public function ping($var = NULL) {
+  public static function ping($var = NULL) {
     $session = CRM_Core_Session::singleton();
     $key = $session->get('key');
     //$session->set( 'key', $var );
