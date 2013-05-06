@@ -21,5 +21,5 @@ cpfv.financial_type_id = cmt.financial_type_id,
     cpfv.description_{$locale} = cmt.description_{$locale},
   {/foreach}
 {/if}
-cpfv.amount = cmt.minimum_fee	
+cpfv.amount = IFNULL(cmt.minimum_fee, 0.00)	
 WHERE cps.is_quick_config = 1 AND cpfv.membership_type_id IS NOT NULL;
