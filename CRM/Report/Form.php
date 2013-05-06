@@ -2817,8 +2817,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         foreach (array(
             'value', 'min', 'max', 'relative', 'from', 'to') as $attach) {
           if (isset($this->_params[$fieldAlias . '_' . $attach]) &&
-            (!empty($this->_params[$fieldAlias . '_' . $attach]) || $this->_params[$fieldAlias . '_' . $attach] == '0')
-          ) {
+            (!empty($this->_params[$fieldAlias . '_' . $attach])
+              || ($attach != 'relative' && $this->_params[$fieldAlias . '_' . $attach] == '0')
+            )
+          ){
             return TRUE;
           }
         }
