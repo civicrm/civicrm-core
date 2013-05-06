@@ -152,6 +152,9 @@
     <name>payment_instrument_id</name>
     <type>int unsigned</type>
     <comment>fk to Payment Instrument options in civicrm_option_values</comment>
+    <pseudoconstant>
+      <optionGroupName>payment_instrument</optionGroupName>
+    </pseudoconstant>
     <add>4.3</add>
   </field>
   <field>

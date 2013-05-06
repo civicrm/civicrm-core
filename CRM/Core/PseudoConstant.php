@@ -196,7 +196,9 @@ class CRM_Core_PseudoConstant {
   private static $extensions;
 
   /**
-   * Get options for a given field.
+   * Low-level option getter, rarely accessed directly.
+   * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
+   *
    * @param String $daoName
    * @param String $fieldName
    * @param Array $params
@@ -205,10 +207,10 @@ class CRM_Core_PseudoConstant {
    *                            if true, the results are reversed
    * - grouping   boolean if true, return the value in 'grouping' column (currently unsupported for tables other than option_value)
    * - localize   boolean if true, localize the results before returning
-   * - condition  string  add another condition to the sql query
+   * - condition  string|array add condition(s) to the sql query
    * - keyColumn  string the column to use for 'id'
    * - labelColumn string the column to use for 'label'
-   * - orderColumn string the column to use for sorting, defaults to 'weight'
+   * - orderColumn string the column to use for sorting, defaults to 'weight' column if one exists, else defaults to labelColumn
    * - onlyActive boolean return only the action option values
    * - fresh      boolean ignore cache entries and go back to DB
    *
@@ -293,15 +295,21 @@ class CRM_Core_PseudoConstant {
           $from = "FROM %3";
           $wheres = array();
           $order = "ORDER BY %2";
-          // Condition param can be passed as an sql string
+          // Condition param can be passed as an sql clause string or an array of clauses
           if (!empty($params['condition'])) {
-            $wheres[] = $params['condition'];
+            $wheres[] = implode(' AND ', (array) $params['condition']);
           }
-          // Support for onlyActive param if option table contains is_active field
+          // onlyActive param will automatically filter on common flags
           if (!empty($params['onlyActive'])) {
-            if (in_array('is_active', $availableFields)) {
-              $wheres[] = 'is_active = 1';
+            foreach (array('is_active' => 1, 'is_deleted' => 0, 'is_test' => 0) as $flag => $val) {
+              if (in_array($flag, $availableFields)) {
+                $wheres[] = "$flag = $val";
+              }
             }
+          }
+          // Filter domain specific options
+          if (in_array('domain_id', $availableFields)) {
+            $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID();
           }
           $queryParams = array(
              1 => array($params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),

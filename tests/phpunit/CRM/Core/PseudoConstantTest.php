@@ -58,6 +58,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'is_active' => TRUE,
     );
     $result = civicrm_api('customGroup', 'create', $api_params);
+    $this->assertAPISuccess($result);
 
     // Create a Group for testing.
     $group_name = md5(microtime());
@@ -67,6 +68,23 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'is_active' => TRUE,
     );
     $result = civicrm_api('group', 'create', $api_params);
+    $this->assertAPISuccess($result);
+
+    // Create a PaymentProcessor for testing.
+    $pp_name = md5(microtime());
+    $api_params = array(
+      'version' => 3,
+      'domain_id' => 1,
+      'payment_processor_type_id' => 10,
+      'name' => $pp_name,
+      'user_name' => $pp_name,
+      'class_name' => 'Payment_Dummy',
+      'url_site' => 'https://test.com/',
+      'url_recur' => 'https://test.com/',
+      'is_active' => 1,
+    );
+    $result = civicrm_api('payment_processor', 'create', $api_params);
+    $this->assertAPISuccess($result);
 
     /**
      * daoName/field combinations to test
@@ -124,6 +142,10 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'status_id',
           'sample' => 'Scheduled',
         ),
+        array(
+          'fieldName' => 'priority_id',
+          'sample' => 'Urgent',
+        ),
       ),
       'CRM_Campaign_DAO_Survey' => array(
         array(
@@ -171,6 +193,11 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Accounts Receivable',
           'max' => 15,
         ),
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
       ),
       'CRM_Financial_DAO_FinancialTrxn' => array(
         array(
@@ -183,18 +210,16 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Accounts Receivable',
           'max' => 15,
         ),
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
       ),
       'CRM_Financial_DAO_FinancialAccount' => array(
         array(
           'fieldName' => 'financial_account_type_id',
           'sample' => 'Cost of Sales',
-        ),
-      ),
-      'CRM_Event_DAO_Participant' => array(
-        array(
-          'fieldName' => 'fee_currency',
-          'sample' => '$',
-          'max' => 200,
         ),
       ),
       'CRM_Core_DAO_UFField' => array(
@@ -218,21 +243,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'max' => 200,
         ),
       ),
-      'CRM_Contribute_DAO_Contribution' => array(
-        array(
-          'fieldName' => 'currency',
-          'sample' => '$',
-          'max' => 200,
-        ),
-      ),
       'CRM_Contribute_DAO_Product' => array(
-        array(
-          'fieldName' => 'currency',
-          'sample' => '$',
-          'max' => 200,
-        ),
-      ),
-      'CRM_Contribute_DAO_ContributionPage' => array(
         array(
           'fieldName' => 'currency',
           'sample' => '$',
@@ -246,35 +257,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'max' => 200,
         ),
       ),
-      'CRM_Event_DAO_Event' => array(
-        array(
-          'fieldName' => 'currency',
-          'sample' => '$',
-          'max' => 200,
-        ),
-      ),
-      'CRM_Financial_DAO_FinancialItem' => array(
-        array(
-          'fieldName' => 'currency',
-          'sample' => '$',
-          'max' => 200,
-        ),
-      ),
       'CRM_Financial_DAO_OfficialReceipt' => array(
-        array(
-          'fieldName' => 'currency',
-          'sample' => '$',
-          'max' => 200,
-        ),
-      ),
-      'CRM_Financial_DAO_FinancialTrxn' => array(
-        array(
-          'fieldName' => 'currency',
-          'sample' => '$',
-          'max' => 200,
-        ),
-      ),
-      'CRM_Grant_DAO_Grant' => array(
         array(
           'fieldName' => 'currency',
           'sample' => '$',
@@ -301,6 +284,10 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => '$',
           'max' => 200,
         ),
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'Approved',
+        ),
       ),
       'CRM_Core_DAO_CustomField' => array(
         array(
@@ -326,12 +313,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Urgent',
         ),
       ),
-      'CRM_Activity_DAO_Activity' => array(
-        array(
-          'fieldName' => 'priority_id',
-          'sample' => 'Urgent',
-        ),
-      ),
       'CRM_Core_DAO_MailSettings' => array(
         array(
           'fieldName' => 'protocol',
@@ -346,12 +327,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ),
       ),
       'CRM_Pledge_DAO_Pledge' => array(
-        array(
-          'fieldName' => 'honor_type_id',
-          'sample' => 'In Honor of',
-        ),
-      ),
-      'CRM_Contribute_DAO_Contribution' => array(
         array(
           'fieldName' => 'honor_type_id',
           'sample' => 'In Honor of',
@@ -457,17 +432,29 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'role_id',
           'sample' => 'Speaker',
         ),
+        array(
+          'fieldName' => 'fee_currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
       ),
       'CRM_Event_DAO_Event' => array(
         array(
           'fieldName' => 'event_type_id',
           'sample' => 'Fundraiser',
         ),
-      ),
-      'CRM_PCP_DAO_PCP' => array(
         array(
-          'fieldName' => 'status_id',
-          'sample' => 'Approved',
+          'fieldName' => 'payment_processor',
+          'sample' => $pp_name,
+        ),
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
         ),
       ),
       'CRM_Member_DAO_Membership' => array(
@@ -491,6 +478,49 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'grant_type_id',
           'sample' => 'Emergency',
         ),
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+      ),
+      'CRM_Contribute_DAO_Contribution' => array(
+        array(
+          'fieldName' => 'payment_instrument_id',
+          'sample' => 'Credit Card',
+        ),
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
+        array(
+          'fieldName' => 'contribution_status_id',
+          'sample' => 'Completed',
+        ),
+        array(
+          'fieldName' => 'honor_type_id',
+          'sample' => 'In Honor of',
+        ),
+      ),
+      'CRM_Contribute_DAO_ContributionPage' => array(
+        array(
+          'fieldName' => 'payment_processor',
+          'sample' => $pp_name,
+        ),
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
+        array(
+          'fieldName' => 'currency',
+          'sample' => '$',
+          'max' => 200,
+        ),
       ),
     );
 
@@ -498,7 +528,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       foreach ($daoFields as $field) {
         $message = "DAO name: '{$daoName}', field: '{$field['fieldName']}'";
 
-        $optionValues = CRM_Core_PseudoConstant::get($daoName, $field['fieldName']);
+        $optionValues = $daoName::buildOptions($field['fieldName']);
         $this->assertNotEmpty($optionValues, $message);
 
         // Ensure sample value is contained in the returned optionValues.

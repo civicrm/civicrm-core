@@ -181,7 +181,12 @@
     <type>int unsigned</type> 
     <title>Financial Type ID</title>
     <default>NULL</default>
-    <comment>Financial type assigned to paid event registrations for this event. Required if is_monetary is true.</comment> 
+    <comment>Financial type assigned to paid event registrations for this event. Required if is_monetary is true.</comment>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <add>4.3</add> 
   </field>
   <field>
@@ -189,6 +194,11 @@
     <type>varchar</type>
     <length>128</length>
     <comment>Payment Processors configured for this Event (if is_monetary is true)</comment>
+    <pseudoconstant>
+      <table>civicrm_payment_processor</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <add>1.8</add>
   </field>
   <field> 
