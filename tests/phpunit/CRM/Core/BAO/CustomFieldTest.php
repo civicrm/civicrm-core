@@ -132,8 +132,8 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   function testDeleteCustomfield() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
+      'groupId' => $customGroup->id,
       'label' => 'Throwaway Field',
-      'custom_group_id' => $customGroup->id,
       'data_type' => 'Memo',
       'html_type' => 'TextArea',
     );
