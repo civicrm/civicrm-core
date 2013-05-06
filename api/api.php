@@ -534,9 +534,8 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
  */
 function _civicrm_api_get_entity_name_from_dao($bao){
   $daoName = str_replace("BAO", "DAO", get_class($bao));
-  return _civicrm_api_get_entity_name_from_camel(CRM_Core_AllCoreTables::getFullName($daoName));
+  return _civicrm_api_get_entity_name_from_camel(CRM_Core_DAO_AllCoreTables::getFullName($daoName));
 }
-
 
 /**
  * Sets the tsLocale and dbLocale for multi-lingual sites.
