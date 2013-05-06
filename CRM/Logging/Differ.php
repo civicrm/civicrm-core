@@ -229,6 +229,7 @@ WHERE log_conn_id = %1 AND
       if (in_array($table, array_keys($daos))) {
         // FIXME: these should be populated with pseudo constants as they
         // were at the time of logging rather than their current values
+        // FIXME: Use *_BAO:buildOptions() method rather than pseudoconstants & fetch programmatically
         $values[$table] = array(
           'contribution_page_id' => CRM_Contribute_PseudoConstant::contributionPage(),
           'contribution_status_id' => CRM_Contribute_PseudoConstant::contributionStatus(),
@@ -238,12 +239,12 @@ WHERE log_conn_id = %1 AND
           'location_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
           'payment_instrument_id' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           'phone_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
-          'preferred_communication_method' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method'),
-          'preferred_language' => CRM_Core_PseudoConstant::languages(),
-          'prefix_id' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'),
+          'preferred_communication_method' => CRM_Contact_BAO_Contact::buildOptions('preferred_communication_method'),
+          'preferred_language' => CRM_Contact_BAO_Contact::buildOptions('preferred_language'),
+          'prefix_id' => CRM_Contact_BAO_Contact::buildOptions('prefix_id'),
           'provider_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'),
           'state_province_id' => CRM_Core_PseudoConstant::stateProvince(),
-          'suffix_id' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'),
+          'suffix_id' => CRM_Contact_BAO_Contact::buildOptions('suffix_id'),
           'website_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
           'activity_type_id' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           'case_type_id' => CRM_Case_PseudoConstant::caseType('label', FALSE),

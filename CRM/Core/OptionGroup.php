@@ -100,22 +100,25 @@ class CRM_Core_OptionGroup {
   static function &values(
     $name, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $condition = NULL,
-    $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE
+    $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE, $keyColumnName = 'value'
   ) {
-    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive);
+    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
 
-    if (array_key_exists($cacheKey, self::$_cache) && !$fresh) {
-      return self::$_cache[$cacheKey];
-    }
-
-    $cache = CRM_Utils_Cache::singleton();
-    $var = $cache->get($cacheKey);
-    if ($var && !$fresh) {
-      return $var;
+    if (!$fresh) {
+      // Fetch from static var
+      if (array_key_exists($cacheKey, self::$_cache)) {
+        return self::$_cache[$cacheKey];
+      }
+      // Fetch from main cache
+      $cache = CRM_Utils_Cache::singleton();
+      $var = $cache->get($cacheKey);
+      if ($var) {
+        return $var;
+      }
     }
 
     $query = "
-SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.value as value, v.grouping as grouping
+SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.{$keyColumnName} as value, v.grouping as grouping
 FROM   civicrm_option_value v,
        civicrm_option_group g
 WHERE  v.option_group_id = g.id
@@ -133,7 +136,7 @@ WHERE  v.option_group_id = g.id
       $query .= $condition;
     }
 
-    $query .= "  ORDER BY v.weight";
+    $query .= " ORDER BY v.weight";
 
     $p = array(1 => array($name, 'String'));
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -160,15 +163,15 @@ WHERE  v.option_group_id = g.id
    * @param $labelColumnName
    * @param $onlyActive
    */
-  protected static function flushValues($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive) {
-    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive);
+  protected static function flushValues($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName = 'value') {
+    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
     $cache = CRM_Utils_Cache::singleton();
     $cache->delete($cacheKey);
     unset(self::$_cache[$cacheKey]);
   }
 
-  protected static function createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive) {
-    $cacheKey = "CRM_OG_{$name}_{$flip}_{$grouping}_{$localize}_{$condition}_{$labelColumnName}_{$onlyActive}";
+  protected static function createCacheKey() {
+    $cacheKey = "CRM_OG_" . serialize(func_get_args());
     return $cacheKey;
   }
 
