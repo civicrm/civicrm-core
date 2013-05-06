@@ -373,17 +373,17 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal', $paymentProcessorType)
     ) {
       if (empty($this->_paymentProcessor['user_name'])) {
-        $error[] = ts('User Name is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
+        $error[] = ts('User Name is not set in the Administer &raquo; System Settings &raquo; Payment Processors.');
       }
     }
 
     if ($this->_paymentProcessor['payment_processor_type_id'] != CRM_Utils_Array::key('PayPal_Standard', $paymentProcessorType)) {
       if (empty($this->_paymentProcessor['signature'])) {
-        $error[] = ts('Signature is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
+        $error[] = ts('Signature is not set in the Administer &raquo; System Settings &raquo; Payment Processors.');
       }
 
       if (empty($this->_paymentProcessor['password'])) {
-        $error[] = ts('Password is not set in the Administer CiviCRM &raquo; System Settings &raquo; Payment Processors.');
+        $error[] = ts('Password is not set in the Administer &raquo; System Settings &raquo; Payment Processors.');
       }
     }
 
@@ -537,7 +537,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     // ensure that the returnURL is absolute.
     if (substr($returnURL, 0, 4) != 'http') {
       $fixUrl = CRM_Utils_System::url("civicrm/admin/setting/url", '&reset=1');
-      CRM_Core_Error::fatal(ts('Sending a relative URL to PayPalIPN is erroneous. Please make your resource URL (in <a href="%1">Administer CiviCRM &raquo; System Settings &raquo; Resource URLs</a> ) complete.', array(1 => $fixUrl)));
+      CRM_Core_Error::fatal(ts('Sending a relative URL to PayPalIPN is erroneous. Please make your resource URL (in <a href="%1">Administer &raquo; System Settings &raquo; Resource URLs</a> ) complete.', array(1 => $fixUrl)));
     }
 
     $paypalParams = array(
