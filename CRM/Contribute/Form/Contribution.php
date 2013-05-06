@@ -1133,7 +1133,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           if ($val && $submittedValues['soft_credit_amount'][$key]) {
             $softParams[$key]['contact_id'] = $val;
             $softParams[$key]['amount'] = $submittedValues['soft_credit_amount'][$key];
-            if ($submittedValues['soft_credit_id'][$key]) {
+            if (!empty($submittedValues['soft_credit_id'][$key])) {
               $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
             }
           }
