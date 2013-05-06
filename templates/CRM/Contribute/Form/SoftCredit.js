@@ -34,6 +34,7 @@ cj(function($) {
         'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&id=' + $(this).val());
       $.ajax({
         url     : dataUrl,
+       async   : false,
         success : function(html){
           htmlText = html.split( '|' , 2);
           $('#soft_credit_contact_' + rowCnt).val(htmlText[0]);
@@ -51,8 +52,15 @@ cj(function($) {
 
   $('.delete-link').click(function(){
     var row = $(this).attr('row-no');
+    var softCreditID = $('input[name ="soft_credit_id['+row+']"]').attr('value');
     $('#soft-credit-row-' + row).hide().find('input').val('');
     $('input[name="soft_credit_contact_select_id['+row+']"]').val('');
+    var dataUrl = CRM.url('civicrm/ajax/rest',
+                         'className=CRM_Contribute_Page_AJAX&fnName=deleteSoftCredit&id=' + softCreditID);
+    $.ajax({
+        url     : dataUrl,
+        success : function(html){}
+      });
     return false;
   });
 
