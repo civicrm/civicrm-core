@@ -422,6 +422,11 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Team',
           'exclude' => 'Individual',
         ),
+        array(
+          'fieldName' => 'preferred_language',
+          'sample' => array('en_US' => 'English (United States)'),
+          'max' => 250,
+        ),
       ),
       'CRM_Batch_DAO_Batch' => array(
         array(
@@ -497,7 +502,16 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         $this->assertNotEmpty($optionValues, $message);
 
         // Ensure sample value is contained in the returned optionValues.
-        $this->assertContains($field['sample'], $optionValues, $message);
+        if (!is_array($field['sample'])) {
+          $this->assertContains($field['sample'], $optionValues, $message);
+        }
+        // If sample is an array, we check keys and values
+        else {
+          foreach ($field['sample'] as $key => $value) {
+            $this->assertArrayHasKey($key, $optionValues, $message);
+            $this->assertEquals(CRM_Utils_Array::value($key, $optionValues), $value, $message);
+          }
+        }
 
         // Ensure exclude value is not contained in the optionValues
         if (!empty($field['exclude'])) {
@@ -523,7 +537,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       3 => 'Organization',
     );
     // By default this should return an array keyed by name
-    $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type');
+    $result = CRM_Contact_DAO_Contact::buildOptions('contact_type');
     $this->assertEquals($byName, $result);
     // But we can also fetch by ID
     $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type', array('keyColumn' => 'id', 'labelColumn' => 'name'));

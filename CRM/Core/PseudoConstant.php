@@ -260,7 +260,8 @@ class CRM_Core_PseudoConstant {
           $params['condition'],
           $params['labelColumn'] ? $params['labelColumn'] : 'label',
           $params['onlyActive'],
-          $params['fresh']
+          $params['fresh'],
+          $params['keyColumn'] ? $params['keyColumn'] : 'value'
         );
       }
 
@@ -1590,26 +1591,6 @@ WHERE  id = %1
     }
 
     return self::$greetingDefaults;
-  }
-
-  /**
-   * Get all the Languages from database.
-   *
-   * @access public
-   * @static
-   *
-   * @return array self::languages - array reference of all languages
-   *
-   */
-  public static function &languages() {
-    return CRM_Core_I18n_PseudoConstant::languages();
-  }
-
-  /**
-   * Alias of above
-   */
-  public static function &preferredLanguage() {
-    return CRM_Core_I18n_PseudoConstant::languages();
   }
 
   /**

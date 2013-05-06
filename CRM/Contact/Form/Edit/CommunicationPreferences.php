@@ -83,7 +83,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
       ts('Preferred Language'),
       array(
         '' => ts('- select -')) +
-      CRM_Core_PseudoConstant::languages()
+      CRM_Contact_BAO_Contact::buildOptions('preferred_language')
     );
 
     if (!empty($privacyOptions)) {
@@ -162,8 +162,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   static function setDefaultValues(&$form, &$defaults) {
 
     if (!empty($defaults['preferred_language'])) {
-      $languages = array_flip(CRM_Core_PseudoConstant::languages());
-      $defaults['preferred_language'] = $languages[$defaults['preferred_language']];
+      $defaults['preferred_language'] = CRM_Core_PseudoConstant::getKey('CRM_Contact_DAO_Contact', 'preferred_language', $defaults['preferred_language']);
     }
 
     // CRM-7119: set preferred_language to default if unset
