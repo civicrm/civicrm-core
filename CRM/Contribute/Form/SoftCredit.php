@@ -108,7 +108,7 @@ class CRM_Contribute_Form_SoftCredit {
       }
     }
 
-    if (CRM_Utils_Array::value('pcp_id', $form->_softCreditInfo)) {
+    elseif (CRM_Utils_Array::value('pcp_id', $form->_softCreditInfo)) {
       $pcpInfo = $form->_softCreditInfo;
       $pcpId = CRM_Utils_Array::value('pcp_id', $pcpInfo);
       $pcpTitle = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcpId, 'title');
