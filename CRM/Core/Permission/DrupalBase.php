@@ -120,14 +120,24 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
     return $this->_viewPermissionedGroups[$groupKey];
   }
+
   /**
-   * Get group clause for this user
+   * Get group clause for this user. The group Clause filters the
+   * list of groups that the user is permitted to see in a group listing.
+   * For example it will filter both the list on the 'Manage Groups' page
+   * and on the contact 'Groups' tab
+   *
+   * the aclGroup hook & configured ACLs contribute to this data.
+   * If the contact is allowed to see all contacts the function will return  ( 1 )
+   *
+   * @todo the history of this function is that there was some confusion as to
+   * whether it was filtering contacts or groups & some cruft may remain
    *
    * @param int $type the type of permission needed
-   * @param  array $tables (reference ) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
+   * @param  array $tables (reference) add the tables that are needed for the select clause
+   * @param  array $whereTables (reference) add the tables that are needed for the where clause
    *
-   * @return string the group where clause for this user
+   * @return string the clause to add to the query retrieving viewable groups
    * @access public
    */
   public function groupClause($type, &$tables, &$whereTables) {
@@ -178,9 +188,9 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
       else {
         $clauses = array();
         $groups = implode(', ', $this->_viewPermissionedGroups[$groupKey]);
-        $clauses[] = ' ( civicrm_group_contact.group_id IN (' . implode(', ', array_keys($this->_viewPermissionedGroups[$groupKey])) . " ) AND civicrm_group_contact.status = 'Added' ) ";
-        $tables['civicrm_group_contact'] = 1;
-        $whereTables['civicrm_group_contact'] = 1;
+        $clauses[] = ' civicrm_group.id IN (' . implode(', ', array_keys($this->_viewPermissionedGroups[$groupKey])) . " )  ";
+        $tables['civicrm_group'] = 1;
+        $whereTables['civicrm_group'] = 1;
         $clause = ' ( ' . implode(' OR ', $clauses) . ' ) ';
       }
     }
