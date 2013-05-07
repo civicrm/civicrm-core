@@ -88,7 +88,7 @@ class CRM_Core_Session {
   /**
    * singleton function used to manage this object
    *
-   * @return object
+   * @return CRM_CoreSession
    * @static
    */
   static function &singleton() {
