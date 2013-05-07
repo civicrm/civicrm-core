@@ -288,7 +288,7 @@ class CRM_Core_Payment_Form {
 
       CRM_Core_Resources::singleton()
         ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)))
-        ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js');
+        ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10, 'billing-block');
     }
 
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
