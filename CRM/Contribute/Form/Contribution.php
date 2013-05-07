@@ -1094,7 +1094,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
             $softParams[$key]['contact_id'] = $val;
             $softParams[$key]['amount'] = $submittedValues['soft_credit_amount'][$key];
             if (!empty($submittedValues['soft_credit_id'][$key])) {
-              $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
+              $softIDs[] = $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
             }
           }
         }
@@ -1141,6 +1141,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       if (!empty($softParams)) {
         $params['soft_credit'] = $softParams;
+        $params['soft_credit_ids'] = $softIDs;
       }
 
       //if priceset is used, no need to cleanup money
