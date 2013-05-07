@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Verify that the REST API bindings correctly parse and authenticate requests.
+ */
 class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   protected $url;
   protected $api_key;
@@ -210,7 +214,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
     $this->nocms_contact_id = $contact["id"];
 
-    // Use the malformed key
+    // The key associates with a real contact but not a real user
     $params = array(
       "entity" => "Contact",
       "action" => "get",
@@ -242,7 +246,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
     $this->nocms_contact_id = $contact["id"];
 
-    // Use the malformed key
+    // The key associates with a real contact but not a real user
     $params = array(
       "q" => "civicrm/contact/get",
       "key" => $this->settings->siteKey,
