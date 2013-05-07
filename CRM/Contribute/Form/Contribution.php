@@ -1138,9 +1138,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       if (!empty($pcp)) {
         $params['pcp'] = $pcp;
+        $params['soft_credit_id'] = $submittedValues['soft_credit_id'];
       }
       if (!empty($softParams)) {
         $params['soft_credit'] = $softParams;
+        $params['soft_credit_id'] = $submittedValues['soft_credit_id'];
       }
 
       //if priceset is used, no need to cleanup money
