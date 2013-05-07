@@ -94,6 +94,11 @@ class CRM_Utils_REST {
     return self::output($result);
   }
 
+  function bootAndRun() {
+    $this->loadCMSBootstrap();
+    return $this->run();
+  }
+
   static function output(&$result) {
     $hier = FALSE;
     if (is_scalar($result)) {
