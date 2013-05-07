@@ -95,7 +95,10 @@ class CRM_Utils_REST {
   }
 
   function bootAndRun() {
-    $this->loadCMSBootstrap();
+    $response = $this->loadCMSBootstrap();
+    if (is_array($response)) {
+      return self::output($response);
+    }
     return $this->run();
   }
 
@@ -578,38 +581,41 @@ class CRM_Utils_REST {
     CRM_Utils_System::civiExit();
   }
 
+  /**
+   * @return array|NULL NULL if execution should proceed; array if the response is already known
+   */
   function loadCMSBootstrap() {
     $q = CRM_Utils_array::value('q', $_REQUEST);
     $args = explode('/', $q);
 
-    // If the function isn't in the civicrm namespace or request
-    // is for login or ping
-    if (empty($args) || $args[0] != 'civicrm' ||
-      ((count($args) != 3) && ($args[1] != 'login') && ($args[1] != 'ping')) ||
-      $args[1] == 'ping'
-    ) {
-      return;
+    // Proceed with bootstrap for "?entity=X&action=Y"
+    // Proceed with bootstrap for "?q=civicrm/X/Y" but not "?q=civicrm/ping"
+    if (!empty($q)) {
+      if (count($args) == 2 && $args[1] == 'ping') {
+        return NULL; // this is pretty wonky but maybe there's some reason I can't see
+      }
+      if (count($args) != 3) {
+        return self::error('ERROR: Malformed REST path');
+      }
+      if ($args[0] != 'civicrm') {
+        return self::error('ERROR: Malformed REST path');
+      }
     }
 
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
-      return;
-    }
-
-    if ($args[1] == 'login') {
-      CRM_Utils_System::loadBootStrap(CRM_Core_DAO::$_nullArray, TRUE, FALSE);
-      return;
+      // FIXME: At time of writing, this doesn't actually do anything because
+      // authenticateKey abends, but that's a bad behavior which sends a
+      // malformed response.
+      return self::error('Failed to authenticate key');
     }
 
     $uid = NULL;
-    $session = CRM_Core_Session::singleton();
-
-    if ($session->get('PHPSESSID') && $session->get('cms_user_id')) {
-      $uid = $session->get('cms_user_id');
-    }
-
     if (!$uid) {
       $store      = NULL;
       $api_key    = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+      if (empty($api_key)) {
+        return self::error("FATAL: mandatory param 'api_key' (user key) missing");
+      }
       $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
       if ($contact_id) {
         $uid = CRM_Core_BAO_UFMatch::getUFId($contact_id);
@@ -618,11 +624,10 @@ class CRM_Utils_REST {
 
     if ($uid) {
       CRM_Utils_System::loadBootStrap(array('uid' => $uid), TRUE, FALSE);
+      return NULL;
     }
     else {
-      $err = array('error_message' => 'no CMS user associated with given api-key', 'is_error' => 1);
-      echo self::output($err);
-      CRM_Utils_System::civiExit();
+      return self::error('ERROR: No CMS user associated with given api-key');
     }
   }
 }
