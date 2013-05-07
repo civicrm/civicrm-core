@@ -92,10 +92,10 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param int $contributionTypeId
    * @static
    */
-  static function del($contributionID) {
+  static function del($contributionSoftID) {
     //delete from contribution soft table
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
-    $contributionSoft->contribution_id = $contributionID;
+    $contributionSoft->id = $contributionSoftID;
     $contributionSoft->delete();
   }
 
@@ -168,7 +168,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         }
       }
 
-      $softContribution['soft_credit'][$count] = array(
+      $softContribution['soft_credit'][$dao->id] = array(
         'contact_id' => $dao->contact_id,
         'soft_credit_id' => $dao->id,
         'amount' => $dao->amount,

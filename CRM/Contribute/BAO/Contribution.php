@@ -303,6 +303,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (CRM_Utils_Array::value('deleteSoftCredit', $params, TRUE)) {
         // first delete soft credits if any                                                                                                                                                            
         //CRM_Contribute_BAO_ContributionSoft::del($contribution->id);
+      $softCredits = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contribution->id);
+      $softIDs = array_keys($softCredits['soft_credit']);
+      if (!empty($softIDs)) {
+        foreach ($softIDs as $softID) {
+          if (!in_array($softID, $params['soft_credit_id'])) {
+            CRM_Contribute_BAO_ContributionSoft::del($softID);
+          }
+        }
+      }
 
       if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
         $softParams = array();
