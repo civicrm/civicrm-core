@@ -261,12 +261,15 @@ class CRM_Utils_REST {
       if ($args[1] == 'ping') {
         return self::ping();
       }
+    } else {
+      // or the new format (entity+action)
+      $args = array();
+      $args[0] = 'civicrm';
+      $args[1] = CRM_Utils_array::value('entity', $_REQUEST);
+      $args[2] = CRM_Utils_array::value('action', $_REQUEST);
     }
  
-    // or the new format (entity+action)
-    $args[1] = CRM_Utils_array::value('entity', $_REQUEST);
-    $args[2] = CRM_Utils_array::value('action', $_REQUEST);
-      
+
     // Everyone should be required to provide the server key, so the whole
     //  interface can be disabled in more change to the configuration file.
     // first check for civicrm site key
@@ -600,6 +603,7 @@ class CRM_Utils_REST {
       if ($args[0] != 'civicrm') {
         return self::error('ERROR: Malformed REST path');
       }
+      // Therefore we have reasonably well-formed "?q=civicrm/X/Y"
     }
 
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
