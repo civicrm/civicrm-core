@@ -244,9 +244,9 @@ class CRM_Contribute_BAO_Query {
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    $fields = array();
     $fields = self::getFields();
-    if (!empty($value)) {
+
+    if (!empty($value) && !is_array($value)) {
       $quoteValue = "\"$value\"";
     }
 
