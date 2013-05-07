@@ -64,58 +64,6 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     }
   }
 
-  /*
-  function testValidLoginCMSUser() {
-    $client = CRM_Utils_HttpClient::singleton();
-    $params = array(
-      "q" => "civicrm/login",
-      "key" => $this->settings->siteKey,
-      "json" => "1",
-      "name" => $this->settings->adminUsername,
-      "pass" => $this->settings->adminPassword
-    );
-    list($status, $data) = $client->post($this->url, $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    $this->assertNotNull($result);
-    $this->assertAPIErrorCode($result, 0);
-  }
-
-  function testInvalidPasswordLogin() {
-    $client = CRM_Utils_HttpClient::singleton();
-    $badPassword = $this->settings->adminPassword . "badpass";
-    $params = array(
-      "q" => "civicrm/login",
-      "key" => $this->settings->siteKey,
-      "json" => "1",
-      "name" => $this->settings->adminUsername,
-      "pass" => $badPassword
-    );
-    list($status, $data) = $client->post($this->url, $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    $this->assertNotNull($result);
-    $this->assertAPIErrorCode($result, 1);
-  }
-
-  function testValidCallPHPSessionID() {
-    $this->_setUpAdminSessionIdAndApiKey();
-    $client = CRM_Utils_HttpClient::singleton();
-    $params = array(
-      "entity" => "Contact",
-      "action" => "get",
-      "json" => "1",
-      "PHPSESSID" => $this->session_id,
-      "api_key" => $this->api_key,
-    );
-    list($status, $data) = $client->post($this->url, $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    $this->assertNotNull($result);
-    $this->assertAPIErrorCode($result, 0);
-  }
-  */
-
   /**
    * Build a list of test cases. Each test case defines a set of REST query
    * parameters and an expected outcome for the REST request (eg is_error=>1 or is_error=>0).
@@ -238,7 +186,10 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     list($status, $data) = $client->post($this->url, $query);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $result = json_decode($data, TRUE);
-    $this->assertNotNull($result);
+    if ($result === NULL) {
+      $msg = print_r(array('query' => $query, 'response data' => $data), TRUE);
+      $this->assertNotNull($result, $msg);
+    }
     $this->assertAPIErrorCode($result, $is_error);
   }
 
@@ -305,23 +256,4 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $this->assertAPIErrorCode($result, 1);
   }
 
-  /*
-  protected function _setUpAdminSessionIdAndApiKey() {
-    $client = CRM_Utils_HttpClient::singleton();
-    $params = array(
-      "q" => "civicrm/login",
-      "key" => $this->settings->siteKey,
-      "json" => "1",
-      "name" => $this->settings->adminUsername,
-      "pass" => $this->settings->adminPassword
-    );
-    list($status, $data) = $client->post($this->url, $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    $this->assertAPIErrorCode($result, 0);
-    $this->api_key = $result["api_key"];
-    $this->session_id = $result["PHPSESSID"];
-    $this->assertTrue(isset($this->api_key), 'Failed to find admin API key');
-    return $result;
-  } // */
 }
