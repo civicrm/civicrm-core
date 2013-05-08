@@ -539,7 +539,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
     }
     else {
       if ($unique) {
-        $dao->$allfields[$field]['name'] = $params[$field];
+        $allfields[$field]['name'] = $params[$field];
       }
       else {
         $dao->$field = $params[$field];
