@@ -228,6 +228,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_columnHeaders = array();
   public $_orderBy = NULL;
   public $_groupBy = NULL;
+  public $_whereClauses = array();
+  public $_havingClauses = array();
 
   /**
    * Variable to hold the currency alias
@@ -1804,10 +1806,41 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   function where() {
-    $whereClauses = $havingClauses = array();
+    $this->storeWhereHavingClauseArray();
+
+    if (empty($this->_whereClauses)) {
+      $this->_where = "WHERE ( 1 ) ";
+      $this->_having = "";
+    }
+    else {
+      $this->_where = "WHERE " . implode(' AND ', $this->_whereClauses);
+    }
+
+    if ($this->_aclWhere) {
+      $this->_where .= " AND {$this->_aclWhere} ";
+    }
+
+    if (!empty($this->_havingClauses)) {
+      // use this clause to construct group by clause.
+      $this->_having = "HAVING " . implode(' AND ', $this->_havingClauses);
+    }
+  }
+
+  /**
+   * Store Where clauses into an array - breaking out this step makes
+   * over-riding more flexible as the clauses can be used in constructing a
+   * temp table that may not be part of the final where clause or added
+   * in other functions
+   */
+  function storeWhereHavingClauseArray(){
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
+          // respect pseudofield to filter spec so fields can be marked as
+          // not to be handled here
+          if(!empty($field['pseudofield'])){
+            continue;
+          }
           $clause = NULL;
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
             if (CRM_Utils_Array::value('operatorType', $field) == CRM_Report_Form::OP_MONTH) {
@@ -1830,44 +1863,27 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             if ($op) {
               $clause = $this->whereClause($field,
-                        $op,
-                        CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                        CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                        CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $op,
+                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
               );
             }
           }
 
           if (!empty($clause)) {
             if (CRM_Utils_Array::value('having', $field)) {
-              $havingClauses[] = $clause;
+              $this->_havingClauses[] = $clause;
             }
             else {
-              $whereClauses[] = $clause;
+              $this->_whereClauses[] = $clause;
             }
           }
         }
       }
     }
 
-    if (empty($whereClauses)) {
-      $this->_where = "WHERE ( 1 ) ";
-      $this->_having = "";
-    }
-    else {
-      $this->_where = "WHERE " . implode(' AND ', $whereClauses);
-    }
-
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
-    }
-
-    if (!empty($havingClauses)) {
-      // use this clause to construct group by clause.
-      $this->_having = "HAVING " . implode(' AND ', $havingClauses);
-    }
   }
-
   function processReportMode() {
     $buttonName = $this->controller->getButtonName();
 
