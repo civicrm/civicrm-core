@@ -766,13 +766,13 @@ class CRM_Report_Form extends CRM_Core_Form {
 
           case CRM_Report_FORM::OP_DATE:
             // build datetime fields
-            CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count);
+            CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count, '_from','_to', 'From:', FALSE, $operations);
             $count++;
             break;
 
           case CRM_Report_FORM::OP_DATETIME:
             // build datetime fields
-            CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count, '_from', '_to', 'From:', FALSE, TRUE, 'searchDate', true);
+            CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count, '_from', '_to', 'From:', FALSE, $operations, 'searchDate', true);
             $count++;
             break;
 
@@ -997,11 +997,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   function getOperationPair($type = "string", $fieldName = NULL) {
     // FIXME: At some point we should move these key-val pairs
     // to option_group and option_value table.
-
     switch ($type) {
       case CRM_Report_FORM::OP_INT:
       case CRM_Report_FORM::OP_FLOAT:
-        return array('lte' => ts('Is less than or equal to'),
+        return array(
+          'lte' => ts('Is less than or equal to'),
           'gte' => ts('Is greater than or equal to'),
           'bw' => ts('Is between'),
           'eq' => ts('Is equal to'),
@@ -1015,17 +1015,21 @@ class CRM_Report_Form extends CRM_Core_Form {
         break;
 
       case CRM_Report_FORM::OP_SELECT:
-        return array('eq' => ts('Is equal to'));
+        return array(
+          'eq' => ts('Is equal to'),
+        );
 
       case CRM_Report_FORM::OP_MONTH:
       case CRM_Report_FORM::OP_MULTISELECT:
-        return array('in' => ts('Is one of'),
+        return array(
+          'in' => ts('Is one of'),
           'notin' => ts('Is not one of'),
         );
         break;
 
       case CRM_Report_FORM::OP_DATE:
-        return array('nll' => ts('Is empty (Null)'),
+        return array(
+          'nll' => ts('Is empty (Null)'),
           'nnll' => ts('Is not empty (Null)'),
         );
         break;
@@ -1033,11 +1037,14 @@ class CRM_Report_Form extends CRM_Core_Form {
       case CRM_Report_FORM::OP_MULTISELECT_SEPARATOR:
         // use this operator for the values, concatenated with separator. For e.g if
         // multiple options for a column is stored as ^A{val1}^A{val2}^A
-        return array('mhas' => ts('Is one of'));
+        return array(
+          'mhas' => ts('Is one of'),
+        );
 
       default:
         // type is string
-        return array('has' => ts('Contains'),
+        return array(
+          'has' => ts('Contains'),
           'sw' => ts('Starts with'),
           'ew' => ts('Ends with'),
           'nhas' => ts('Does not contain'),

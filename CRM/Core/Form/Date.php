@@ -69,18 +69,29 @@ Class CRM_Core_Form_Date {
     $form->setDefaults(array('dateFormats' => self::DATE_yyyy_mm_dd));
   }
 
+
   /**
    * This function is to retrieve the date range - relative or absolute
    * and assign it to the form
+   * @param object $form - the form the dates should be added to
+   * @param string $fieldName
+   * @param integer $count
+   * @param string $from
+   * @param string $to
+   * @param string $fromLabel
+   * @param boolean $required
+   * @param array $operators Additional value pairs to add
+   * @param string $dateFormat
+   * @param string $displayTime
    *
-   * @param Object  $form   the form object that we are operating on
    *
    * @static
    * @access public
    */
-  static function buildDateRange(&$form, $fieldName, $count = 1, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $addReportFilters = TRUE, $dateFormat = 'searchDate', $displayTime = FALSE) {
-    $selector = CRM_Core_Form_Date::returnDateRangeSelector(&$form, $fieldName, $count = 1, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $addReportFilters = TRUE, $dateFormat = 'searchDate', $displayTime = FALSE);
-    CRM_Core_Form_Date::addDateRangeToForm($form, $fieldName, $selector,  $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE);
+
+  static function buildDateRange(&$form, $fieldName, $count = 1, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $operators = array(), $dateFormat = 'searchDate', $displayTime = FALSE) {
+    $selector = CRM_Core_Form_Date::returnDateRangeSelector(&$form, $fieldName, $count, $from, $to, $fromLabel, $required, $operators, $dateFormat, $displayTime);
+    CRM_Core_Form_Date::addDateRangeToForm($form, $fieldName, $selector,  $from, $to, $fromLabel, $required , $dateFormat, $displayTime);
   }
 
   /**
@@ -94,12 +105,12 @@ Class CRM_Core_Form_Date {
    * @param String $to
    * @param String $fromLabel
    * @param Boolean $required
-   * @param String $addReportFilters (this seems to be a bit of a hack for report class)
+   * @param Array $operators Additional Operator Selections to add
    * @param String $dateFormat
    * @param Boolean $displayTime
    * @return array Values for Selector
    */
-  static function returnDateRangeSelector(&$form, $fieldName, $count = 1, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $addReportFilters = TRUE, $dateFormat = 'searchDate', $displayTime = FALSE) {
+  static function returnDateRangeSelector(&$form, $fieldName, $count = 1, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $operators = array(), $dateFormat = 'searchDate', $displayTime = FALSE) {
     $selector = array('' => ts('- any -'),
       0 => ts('Choose Date Range'),
       'this.year' => ts('This Year'),
@@ -139,10 +150,8 @@ Class CRM_Core_Form_Date {
       'ending.month' => ts('From 1 Month Ago'),
       'ending.week' => ts('From 1 Week Ago'),
     );
-    //@todo if method exists would be better
-    if ($addReportFilters) {
-      $selector += $form->getOperationPair(CRM_Report_FORM::OP_DATE);
-    }
+    $selector += $operators;
+
     $config = CRM_Core_Config::singleton();
     //if fiscal year start on 1 jan then remove fiscal year task
     //form list
