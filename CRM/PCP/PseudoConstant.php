@@ -101,7 +101,9 @@ class CRM_PCP_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    */
   public static function flush($name) {
-    self::$$name = NULL;
+   if (isset(self::$$name)) {
+      self::$$name = NULL;
+    }
   }
 }
 
