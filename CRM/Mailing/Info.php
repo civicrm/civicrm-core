@@ -78,7 +78,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
-  public function getPermissions() {
+  public function getPermissions($getAllUnconditionally = FALSE) {
     $permissions = array(
       'access CiviMail',
       'access CiviMail subscribe/unsubscribe pages',
@@ -86,7 +86,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'view public CiviMail content',
     );
 
-    if (self::workflowEnabled()) {
+    if (self::workflowEnabled() || $getAllUnconditionally) {
       $permissions[] = 'create mailings';
       $permissions[] = 'schedule mailings';
       $permissions[] = 'approve mailings';

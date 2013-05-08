@@ -131,11 +131,13 @@ abstract class CRM_Core_Component_Info {
    * Needs to be implemented in component's information
    * class.
    *
+   * NOTE: if using conditionally permission return,
+   * implementation of $getAllUnconditionally is required.
    * @return array|null collection of permissions, null if none
    * @access public
    *
    */
-  abstract public function getPermissions();
+  abstract public function getPermissions($getAllUnconditionally = FALSE);
 
   /**
    * Provides information about user dashboard element
