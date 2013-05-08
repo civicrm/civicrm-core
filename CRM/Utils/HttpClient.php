@@ -129,7 +129,7 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      return array(self::STATUS_DL_ERROR . $data);
+      return array(self::STATUS_DL_ERROR, $data);
     }
     else {
       curl_close($ch);
@@ -165,7 +165,7 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_POSTFIELDS,$params);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      return array(self::STATUS_DL_ERROR . $data);
+      return array(self::STATUS_DL_ERROR, $data);
     }
     else {
       curl_close($ch);
