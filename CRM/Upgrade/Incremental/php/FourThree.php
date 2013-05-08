@@ -769,8 +769,8 @@ AND TABLE_SCHEMA = %1
         $foreignKeyExists = CRM_Core_DAO::checkConstraintExists($value['tableName'], $value['fkey']);
         $fKey = $value['fkey'];
       } else {
-        $foreignKeyExists = CRM_Core_DAO::checkFKConstraintInFormat($value['tableName'], $columnName);
         $fKey = "`FK_{$value['tableName']}_{$columnName}`";
+        $foreignKeyExists = CRM_Core_DAO::checkConstraintExists($value['tableName'], $fKey);
       }
       if ($foreignKeyExists || $value['tableName'] == 'civicrm_financial_trxn') {
         if ($value['tableName'] != 'civicrm_contribution_recur' || ($value['tableName'] == 'civicrm_contribution_recur' && $dao->N)) {
