@@ -89,6 +89,8 @@ cat "$CIVI_ROOT/templates/CRM/common/civicrm.settings.php.tpl" \
   | sed "s;%%templateCompileDir%%;${DRUPAL_ROOT}/sites/${SITE_URL}/files/civicrm/templates_c;" \
   > "sites/$SITE_URL/civicrm.settings.php"
 
+echo  >> "sites/$SITE_URL/civicrm.settings.php"
+echo "define('CIVICRM_MAIL_LOG', '/dev/null');" >> "sites/$SITE_URL/civicrm.settings.php"
 popd
 
 ## Create CiviCRM config
