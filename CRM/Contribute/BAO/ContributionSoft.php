@@ -92,10 +92,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param int $contributionTypeId
    * @static
    */
-  static function del($contributionID) {
+  static function del($params) {
     //delete from contribution soft table
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
-    $contributionSoft->contribution_id = $contributionID;
+    foreach($params as $column => $value) {
+      $contributionSoft->$column = $value;
+    }
     $contributionSoft->delete();
   }
 
@@ -206,6 +208,27 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     return $softContribution;
   }
 
+  static function getSoftCreditType($contributionID) {
+  $query = "
+  SELECT id, pcp_id
+  FROM  civicrm_contribution_soft
+  WHERE contribution_id = %1
+  ";
+    $params = array(1 => array($contributionID, 'Integer'));
+
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $id = array();
+    while ($dao->fetch()) {
+      if ($dao->pcp_id) {
+        $type = 'pcp';
+      }
+      else {
+        $type = 'soft';
+      }
+      $id[] = $dao->id;
+    }
+    return array($type, $id);
+  }
   /**
    *  Function to retrieve the list of soft contributons for given contact.
    *  @param int $contact_id contact id
