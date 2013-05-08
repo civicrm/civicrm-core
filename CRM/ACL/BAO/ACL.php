@@ -837,7 +837,11 @@ SELECT g.*
       $aclKeys = array_keys($acls);
       $aclKeys = implode(',', $aclKeys);
 
-      $query = "
+      $cacheKey = "$tableName-$aclKeys";
+      $cache = CRM_Utils_Cache::singleton();
+      $ids = $cache->get($cacheKey);
+      if (!$ids) {
+        $query = "
 SELECT   a.operation, a.object_id
   FROM   civicrm_acl_cache c, civicrm_acl a
  WHERE   c.acl_id       =  a.id
@@ -847,24 +851,26 @@ SELECT   a.operation, a.object_id
 GROUP BY a.operation,a.object_id
 ORDER BY a.object_id
 ";
-      $params = array(1 => array($tableName, 'String'));
-      $dao = CRM_Core_DAO::executeQuery($query, $params);
-      while ($dao->fetch()) {
-        if ($dao->object_id) {
-          if (self::matchType($type, $dao->operation)) {
-            $ids[] = $dao->object_id;
-          }
-        }
-        else {
-          // this user has got the permission for all objects of this type
-          // check if the type matches
-          if (self::matchType($type, $dao->operation)) {
-            foreach ($allGroups as $id => $dontCare) {
-              $ids[] = $id;
+        $params = array(1 => array($tableName, 'String'));
+        $dao = CRM_Core_DAO::executeQuery($query, $params);
+        while ($dao->fetch()) {
+          if ($dao->object_id) {
+            if (self::matchType($type, $dao->operation)) {
+              $ids[] = $dao->object_id;
             }
           }
-          break;
+          else {
+            // this user has got the permission for all objects of this type
+            // check if the type matches
+            if (self::matchType($type, $dao->operation)) {
+              foreach ($allGroups as $id => $dontCare) {
+                $ids[] = $id;
+              }
+            }
+            break;
+          }
         }
+        $cache->set($cacheKey, $ids);
       }
     }
 
