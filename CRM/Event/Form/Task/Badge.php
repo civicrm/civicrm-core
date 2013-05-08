@@ -173,9 +173,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
       CRM_Core_Error::fatal('Event Badge code file: ' . $classFile . ' does not exist. Please verify your custom event badge settings in CiviCRM administrative panel.');
     }
 
-    eval("\$eventBadgeClass = new $className( );");
-
-
+    $eventBadgeClass = new $className();
     $eventBadgeClass->run($rows);
   }
 }

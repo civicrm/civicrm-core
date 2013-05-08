@@ -292,9 +292,7 @@ AND    entity_id    IS NULL
   }
 
   function fetch($groupName, $daoName, $sql = NULL, $map = NULL, $add = NULL) {
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . '.php');
-
-    eval("\$dao = new $daoName( );");
+    $dao = new $daoName();
     if ($sql) {
       $dao->query($sql);
     }

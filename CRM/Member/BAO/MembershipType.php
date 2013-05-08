@@ -141,8 +141,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     );
 
     foreach ($dependancy as $name => $field) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, "CRM_Member_DAO_" . $name) . ".php");
-      eval('$dao = new CRM_Member_DAO_' . $name . '();');
+      $baoString = 'CRM_Member_BAO_' . $name;
+      $dao = new $baoString();
       $dao->$field = $membershipTypeId;
       if ($dao->find(TRUE)) {
         $check = TRUE;

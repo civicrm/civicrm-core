@@ -99,7 +99,7 @@ class CRM_Contact_BAO_SearchCustom {
     }
 
     // instantiate the new class
-    eval('$customClass = new ' . $customSearchClass . '( $formValues );');
+    $customClass = new $customSearchClass( $formValues );
 
     return $customClass;
   }
