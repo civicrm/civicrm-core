@@ -685,8 +685,8 @@ case_relation_type.id = case_relationship.relationship_type_id )";
       $form->addElement('checkbox', "case_status_id[$id]", NULL, $name);
     }
 
-    CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE, FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'case_to',   1, '_end_date_low',   '_end_date_high',   ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'case_to',   1, '_end_date_low',   '_end_date_high',   ts('From'), FALSE);
 
     $form->assign('validCiviCase', TRUE);
 

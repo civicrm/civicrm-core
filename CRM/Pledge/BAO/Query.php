@@ -544,12 +544,12 @@ class CRM_Pledge_BAO_Query {
 
   static function buildSearchForm(&$form) {
     // pledge related dates
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_start_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_end_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_create_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'pledge_start_date', 1, '_low', '_high', ts('From'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'pledge_end_date', 1, '_low', '_high', ts('From'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'pledge_create_date', 1, '_low', '_high', ts('From'), FALSE);
 
     // pledge payment related dates
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_payment_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'pledge_payment_date', 1, '_low', '_high', ts('From'), FALSE);
 
     $form->addYesNo('pledge_test', ts('Pledge is a Test?'));
     $form->add('text', 'pledge_amount_low', ts('From'), array('size' => 8, 'maxlength' => 8));
