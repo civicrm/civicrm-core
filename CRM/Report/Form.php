@@ -391,7 +391,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->_chartButtonName = $this->getButtonName('submit', 'chart');
   }
 
-  static function addBreadCrumb() {
+  function addBreadCrumb() {
     $breadCrumbs =
       array(
         array(
@@ -407,7 +407,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->preProcessCommon();
 
     if (!$this->_id) {
-      self::addBreadCrumb();
+      $this->addBreadCrumb();
     }
 
     foreach ($this->_columns as $tableName => $table) {
@@ -708,10 +708,11 @@ class CRM_Report_Form extends CRM_Core_Form {
     foreach ($this->_filters as $table => $attributes) {
       foreach ($attributes as $fieldName => $field) {
         // get ready with option value pair
-        $operations = self::getOperationPair(
+        // @ todo being able to specific options for a field (e.g a date field) in the field spec as an array rather than an override
+        // would be useful
+        $operations = $this->getOperationPair(
           CRM_Utils_Array::value('operatorType', $field),
-          $fieldName
-        );
+          $fieldName);
 
         $filters[$table][$fieldName] = $field;
 
@@ -991,7 +992,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   // Note: $fieldName param allows inheriting class to build operationPairs
   // specific to a field.
-  static function getOperationPair($type = "string", $fieldName = NULL) {
+  function getOperationPair($type = "string", $fieldName = NULL) {
     // FIXME: At some point we should move these key-val pairs
     // to option_group and option_value table.
 
@@ -1088,7 +1089,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
-  static function getSQLOperator($operator = "like") {
+  function getSQLOperator($operator = "like") {
     switch ($operator) {
       case 'eq':
         return '=';
@@ -1184,7 +1185,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           else {
             $value = "'{$value}'";
           }
-          $sqlOP = self::getSQLOperator($op);
+          $sqlOP = $this->getSQLOperator($op);
           $clause = "( {$field['dbAlias']} $sqlOP $value )";
         }
         break;
@@ -1192,7 +1193,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       case 'in':
       case 'notin':
         if ($value !== NULL && is_array($value) && count($value) > 0) {
-          $sqlOP = self::getSQLOperator($op);
+          $sqlOP = $this->getSQLOperator($op);
           if (CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_STRING) {
             //cycle through selections and esacape values
             foreach ($value as $key => $selection) {
@@ -1216,7 +1217,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       case 'mhas':
         // mhas == multiple has
         if ($value !== NULL && count($value) > 0) {
-          $sqlOP = self::getSQLOperator($op);
+          $sqlOP = $this->getSQLOperator($op);
           $clause = "{$field['dbAlias']} REGEXP '[[:<:]]" . implode('|', $value) . "[[:>:]]'";
         }
         break;
@@ -1236,14 +1237,14 @@ class CRM_Report_Form extends CRM_Core_Form {
           else {
             $value = "'{$value}'";
           }
-          $sqlOP = self::getSQLOperator($op);
+          $sqlOP = $this->getSQLOperator($op);
           $clause = "( {$field['dbAlias']} $sqlOP $value )";
         }
         break;
 
       case 'nll':
       case 'nnll':
-        $sqlOP = self::getSQLOperator($op);
+        $sqlOP = $this->getSQLOperator($op);
         $clause = "( {$field['dbAlias']} $sqlOP )";
         break;
 
@@ -1256,7 +1257,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           }
           else {
             $value = CRM_Utils_Type::escape($value, $type);
-            $sqlOP = self::getSQLOperator($op);
+            $sqlOP = $this->getSQLOperator($op);
             if ($field['type'] == CRM_Utils_Type::T_STRING) {
               $value = "'{$value}'";
             }
@@ -1283,12 +1284,12 @@ class CRM_Report_Form extends CRM_Core_Form {
     $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
   ) {
     $clauses = array();
-    if (in_array($relative, array_keys(self::getOperationPair(CRM_Report_FORM::OP_DATE)))) {
-      $sqlOP = self::getSQLOperator($relative);
+    if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_FORM::OP_DATE)))) {
+      $sqlOP = $this->getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
     }
 
-    list($from, $to) = self::getFromTo($relative, $from, $to, $fromTime, $toTime);
+    list($from, $to) = $this->getFromTo($relative, $from, $to, $fromTime, $toTime);
 
     if ($from) {
       $from = ($type == CRM_Utils_Type::T_DATE) ? substr($from, 0, 8) : $from;
@@ -1306,9 +1307,15 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     return NULL;
   }
-
-  static function dateDisplay($relative, $from, $to) {
-    list($from, $to) = self::getFromTo($relative, $from, $to);
+ /**
+  * @todo - could not find any instances where this is called
+  * @param unknown_type $relative
+  * @param String $from
+  * @param String_type $to
+  * @return string|NULL
+  */
+  function dateDisplay($relative, $from, $to) {
+    list($from, $to) = $this->getFromTo($relative, $from, $to);
 
     if ($from) {
       $clauses[] = CRM_Utils_Date::customFormat($from, NULL, array('m', 'M'));
@@ -1331,7 +1338,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     return NULL;
   }
 
-  static function getFromTo($relative, $from, $to, $fromtime = NULL, $totime = NULL) {
+  function getFromTo($relative, $from, $to, $fromtime = NULL, $totime = NULL) {
     if (empty($totime)) {
       $totime = '235959';
     }
@@ -2261,9 +2268,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
               );
             }
             elseif (in_array($rel = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params),
-                array_keys(self::getOperationPair(CRM_Report_FORM::OP_DATE))
+                array_keys($this->getOperationPair(CRM_Report_FORM::OP_DATE))
               )) {
-              $pair = self::getOperationPair(CRM_Report_FORM::OP_DATE);
+              $pair = $this->getOperationPair(CRM_Report_FORM::OP_DATE);
               $statistics['filters'][] = array(
                 'title' => $field['title'],
                 'value' => $pair[$rel],
@@ -2274,7 +2281,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             $value = NULL;
             if ($op) {
-              $pair = self::getOperationPair(
+              $pair = $this->getOperationPair(
                 CRM_Utils_Array::value('operatorType', $field),
                 $fieldName
               );
@@ -2534,7 +2541,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                   WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
     }
 
-    $sqlOp = self::getSQLOperator($op);
+    $sqlOp = $this->getSQLOperator($op);
     if (!is_array($value)) {
       $value = array($value);
     }
@@ -2551,7 +2558,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     // not using left join in query because if any contact
     // belongs to more than one tag, results duplicate
     // entries.
-    $sqlOp = self::getSQLOperator($op);
+    $sqlOp = $this->getSQLOperator($op);
     if (!is_array($value)) {
       $value = array($value);
     }
