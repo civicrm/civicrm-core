@@ -592,26 +592,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     );
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
 
-
-    // create activity assignee records
-    $assigneeParams = array('activity_id' => $activity->id);
-
-    if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
-      //skip those assignee contacts which are already assigned
-      //while sending a copy.CRM-4509.
-      $activityAssigned = array_flip($params['assignee_contact_id']);
-      $activityId       = isset($this->_activityId) ? $this->_activityId : $activity->id;
-      $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityId);
-      $activityAssigned = array_diff_key($activityAssigned, $assigneeContacts);
-
-      foreach ($params['assignee_contact_id'] as $key => $id) {
-        $assigneeParams['assignee_contact_id'] = $id;
-        CRM_Activity_BAO_Activity::createActivityAssignment($assigneeParams);
-      }
-      //modify assigne_contact as per newly assigned contact before sending copy. CRM-4509.
-      $params['assignee_contact_id'] = $activityAssigned;
-    }
-
     // Insert civicrm_log record for the activity (e.g. store the
     // created / edited by contact id and date for the activity)
     // Note - civicrm_log is already created by CRM_Activity_BAO_Activity::create()
