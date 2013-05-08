@@ -218,6 +218,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $id = array();
+    $type = '';
     while ($dao->fetch()) {
       if ($dao->pcp_id) {
         $type = 'pcp';

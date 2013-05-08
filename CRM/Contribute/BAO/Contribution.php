@@ -303,7 +303,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // Handle soft credit and / or link to personal campaign page
     list($type, $softIDs) = CRM_Contribute_BAO_ContributionSoft::getSoftCreditType($contribution->id);
     if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
-      if ($type == 'soft') {
+      if (!empty($type) && $type == 'soft') {
         $deleteParams = array('contribution_id' => $contribution->id);
         CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
       }
@@ -322,19 +322,23 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
     elseif (CRM_Utils_Array::value('soft_credit', $params)) {
       $softParams = $params['soft_credit'];
-      foreach ( $softIDs as $softID) {
-        if (!in_array($softID, $params['soft_credit_ids'])) {
-          $deleteParams = array('id' => $softID);
-          CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+
+      if (!empty($softIDs)) {
+        foreach ( $softIDs as $softID) {
+          if (!in_array($softID, $params['soft_credit_ids'])) {
+            $deleteParams = array('id' => $softID);
+            CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+          }
         }
       }
 
       foreach ($softParams as $softParam) {
         $softParam['contribution_id'] = $contribution->id;
         $softParam['currency'] = $contribution->currency;
-        $softParam['pcp_display_in_roll'] = NULL;
-        $softParam['pcp_roll_nickname'] = NULL;
-        $softParam['pcp_personal_note'] = NULL;
+        $softParam['pcp_id'] = 'null';
+        $softParam['pcp_display_in_roll'] = 'null';
+        $softParam['pcp_roll_nickname'] = 'null';
+        $softParam['pcp_personal_note'] = 'NULL';
         CRM_Contribute_BAO_ContributionSoft::add($softParam);
       }
     }
