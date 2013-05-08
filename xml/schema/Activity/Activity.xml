@@ -9,7 +9,7 @@
   <field>
       <name>id</name>
       <uniqueName>activity_id</uniqueName>
-      <title>Activity ID</title> 
+      <title>Activity ID</title>
       <import>true</import>
       <type>int unsigned</type>
       <required>true</required>
@@ -23,7 +23,7 @@
   <field>
       <name>source_contact_id</name>
       <type>int unsigned</type>
-      <title>Source Contact</title> 
+      <title>Source Contact</title>
       <import>true</import>
       <headerPattern>/(activity.)?source(.contact(.id)?)?/i</headerPattern>
       <comment>Contact ID of the person scheduling or logging this Activity. Usually the authenticated user.</comment>
@@ -37,10 +37,10 @@
        <add>1.1</add>
        <drop>4.4</drop>
        <onDelete>SET NULL</onDelete>
-  </foreignKey>  
+  </foreignKey>
   <index>
        <name>UI_source_contact_id</name>
-       <fieldName>source_contact_id</fieldName>       
+       <fieldName>source_contact_id</fieldName>
        <add>2.0</add>
        <drop>3.2</drop>
   </index>
@@ -54,7 +54,7 @@
   </field>
   <index>
        <name>UI_source_record_id</name>
-       <fieldName>source_record_id</fieldName>       
+       <fieldName>source_record_id</fieldName>
        <add>3.2</add>
   </index>
   <field>
@@ -74,7 +74,7 @@
   </field>
   <index>
        <name>UI_activity_type_id</name>
-       <fieldName>activity_type_id</fieldName>       
+       <fieldName>activity_type_id</fieldName>
        <add>1.6</add>
   </index>
 
@@ -85,7 +85,7 @@
        <required>true</required>
        <comment>Name of table where item being referenced is stored.</comment>
        <add>1.1</add>
-       <drop>2.0</drop>       
+       <drop>2.0</drop>
   </field>
 
   <field>
@@ -94,7 +94,7 @@
        <required>true</required>
        <comment>Foreign key to the referenced item.</comment>
        <add>1.1</add>
-       <drop>2.0</drop>       
+       <drop>2.0</drop>
   </field>
 
   <field>
@@ -117,7 +117,7 @@
        <add>1.1</add>
        <drop>2.0</drop>
   </field>
-  
+
   <field>
        <name>activity_date_time</name>
        <import>true</import>
@@ -126,20 +126,20 @@
        <headerPattern>/(activity.)?date(.time$)?/i</headerPattern>
        <comment>Date and time this activity is scheduled to occur. Formerly named scheduled_date_time.</comment>
        <add>2.0</add>
-  </field> 
+  </field>
   <field>
        <name>due_date_time</name>
        <type>datetime</type>
        <comment>Date and time this activity is due.</comment>
        <add>2.0</add>
-       <drop>3.0</drop>     
-  </field>  
+       <drop>3.0</drop>
+  </field>
   <field>
        <name>duration_hours</name>
        <type>int unsigned</type>
        <comment>Planned or actual duration of meeting - hours.</comment>
        <add>1.1</add>
-       <drop>2.0</drop>       
+       <drop>2.0</drop>
   </field>
 
   <field>
@@ -147,13 +147,13 @@
       <type>int unsigned</type>
       <comment>Planned or actual duration of meeting - minutes.</comment>
       <add>1.1</add>
-      <drop>2.0</drop>             
+      <drop>2.0</drop>
   </field>
 
   <field>
       <name>duration</name>
       <uniqueName>activity_duration</uniqueName>
-      <title>Duration</title> 
+      <title>Duration</title>
       <import>true</import>
       <type>int unsigned</type>
       <headerPattern>/(activity.)?duration(s)?$/i</headerPattern>
@@ -201,7 +201,7 @@
       <name>details</name>
       <uniqueName>activity_details</uniqueName>
       <title>Details</title>
-      <import>true</import> 
+      <import>true</import>
       <type>text</type>
       <rows>8</rows>
       <cols>60</cols>
@@ -262,7 +262,7 @@
   <field>
        <name>is_test</name>
        <title>Test</title>
-       <uniqueName>activity_is_test</uniqueName> 
+       <uniqueName>activity_is_test</uniqueName>
        <type>boolean</type>
        <default>0</default>
        <import>true</import>
@@ -270,13 +270,16 @@
        <add>2.0</add>
   </field>
   <field>
-       <name>medium_id</name>
-       <uniqueName>activity_medium_id</uniqueName>
-       <title>Activity Medium</title>
-       <type>int unsigned</type>
-       <default>NULL</default>
-       <comment>Activity Medium, Implicit FK to civicrm_option_value where option_group = encounter_medium.</comment>
-       <add>2.2</add>
+      <name>medium_id</name>
+      <uniqueName>activity_medium_id</uniqueName>
+      <title>Activity Medium</title>
+      <type>int unsigned</type>
+      <default>NULL</default>
+      <comment>Activity Medium, Implicit FK to civicrm_option_value where option_group = encounter_medium.</comment>
+      <pseudoconstant>
+        <optionGroupName>encounter_medium</optionGroupName>
+      </pseudoconstant>
+      <add>2.2</add>
   </field>
   <index>
        <name>index_medium_id</name>
@@ -289,21 +292,21 @@
        <type>boolean</type>
        <default>0</default>
        <add>2.2</add>
-  </field>     
-  <field> 
+  </field>
+  <field>
        <name>relationship_id</name>
        <title>Relationship Id</title>
-       <type>int unsigned</type> 
+       <type>int unsigned</type>
        <default>NULL</default>
-       <comment>FK to Relationship ID</comment> 
-       <add>2.2</add> 
+       <comment>FK to Relationship ID</comment>
+       <add>2.2</add>
   </field>
-  <foreignKey> 
-       <name>relationship_id</name> 
-       <table>civicrm_relationship</table> 
-       <key>id</key> 
+  <foreignKey>
+       <name>relationship_id</name>
+       <table>civicrm_relationship</table>
+       <key>id</key>
        <onDelete>SET NULL</onDelete>
-  </foreignKey>               
+  </foreignKey>
   <field>
        <name>is_current_revision</name>
        <title>Is this activity a current revision in versioning chain?</title>
@@ -317,7 +320,7 @@
        <name>index_is_current_revision</name>
        <fieldName>is_current_revision</fieldName>
        <add>2.2</add>
-  </index> 
+  </index>
   <field>
       <name>original_id</name>
       <type>int unsigned</type>
@@ -337,7 +340,7 @@
        <fieldName>original_id</fieldName>
        <add>2.2</add>
        <drop>3.2</drop>
-  </index>    
+  </index>
   <field>
        <name>result</name>
        <uniqueName>activity_result</uniqueName>
@@ -362,32 +365,33 @@
        <fieldName>is_deleted</fieldName>
        <add>2.2</add>
   </index>
-  <field> 
+  <field>
        <name>campaign_id</name>
        <uniqueName>activity_campaign_id</uniqueName>
        <type>int unsigned</type>
        <title>Campaign ID</title>
-       <import>true</import> 
-       <comment>The campaign for which this activity has been triggered.</comment> 
-       <add>3.4</add> 
-  </field>
-  <field> 
-       <name>engagement_level</name>
-       <uniqueName>activity_engagement_level</uniqueName>
-       <type>int unsigned</type>
-       
-       
-       <title>Engagement Index</title>
        <import>true</import>
-       <comment>Assign a specific level of engagement to this activity. Used for tracking constituents in ladder of engagement.</comment> 
-       <add>3.4</add> 
+       <comment>The campaign for which this activity has been triggered.</comment>
+       <add>3.4</add>
   </field>
-  <foreignKey> 
-       <name>campaign_id</name> 
-       <table>civicrm_campaign</table> 
-       <key>id</key> 
+  <foreignKey>
+       <name>campaign_id</name>
+       <table>civicrm_campaign</table>
+       <key>id</key>
        <onDelete>SET NULL</onDelete>
   </foreignKey>
+  <field>
+      <name>engagement_level</name>
+      <uniqueName>activity_engagement_level</uniqueName>
+      <type>int unsigned</type>
+      <title>Engagement Index</title>
+      <import>true</import>
+      <comment>Assign a specific level of engagement to this activity. Used for tracking constituents in ladder of engagement.</comment>
+      <pseudoconstant>
+        <optionGroupName>engagement_index</optionGroupName>
+      </pseudoconstant>
+      <add>3.4</add>
+  </field>
   <field>
       <name>weight</name>
       <type>int</type>

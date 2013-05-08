@@ -146,6 +146,21 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'priority_id',
           'sample' => 'Urgent',
         ),
+        array(
+          'fieldName' => 'engagement_level',
+          'sample' => '1',
+        ),
+        array(
+          'fieldName' => 'medium_id',
+          'sample' => 'Phone',
+        ),
+      ),
+      'CRM_Campaign_DAO_Campaign' => array(
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'Completed',
+          'max' => 50,
+        ),
       ),
       'CRM_Campaign_DAO_Survey' => array(
         array(
@@ -520,6 +535,12 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'currency',
           'sample' => '$',
           'max' => 200,
+        ),
+      ),
+      'CRM_Case_DAO_Case' => array(
+        array(
+          'fieldName' => 'status_id',
+          'sample' => 'Ongoing',
         ),
       ),
     );

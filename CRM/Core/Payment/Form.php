@@ -186,7 +186,8 @@ class CRM_Core_Payment_Form {
     );
   }
 
-  /** create all fields needed for direct debit transaction
+  /**
+   * create all fields needed for direct debit transaction
    *
    * @return void
    * @access public
