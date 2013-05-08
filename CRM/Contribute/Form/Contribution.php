@@ -1088,7 +1088,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     else {
       //build soft credit params
       if (!empty($submittedValues['soft_credit_contact_select_id'])) {
-        $softParams = array();
+        $softParams = $softIDs =array();
         foreach ($submittedValues['soft_credit_contact_select_id'] as $key => $val) {
           if ($val && $submittedValues['soft_credit_amount'][$key]) {
             $softParams[$key]['contact_id'] = $val;
