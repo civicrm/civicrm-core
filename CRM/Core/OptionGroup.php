@@ -92,6 +92,7 @@ class CRM_Core_OptionGroup {
    * @param $labelColumnName string the column to use for 'label'
    * @param $onlyActive boolean return only the action option values
    * @param $fresh      boolean ignore cache entries and go back to DB
+   * @param $keyColumnName string the column to use for 'key'
    *
    * @return array      the values as specified by the above params
    * @static

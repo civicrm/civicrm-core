@@ -1261,6 +1261,7 @@ WHERE  id = %1";
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    * Get all active payment processors
    *
    * The static array paymentProcessor is returned
@@ -1295,7 +1296,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all active payment processors
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * The static array paymentProcessorType is returned
    *

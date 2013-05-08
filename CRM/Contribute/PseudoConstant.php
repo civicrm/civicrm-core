@@ -84,14 +84,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $paymentInstrument;
 
   /**
-   * credit card
-   *
-   * @var array
-   * @static
-   */
-  private static $creditCard;
-
-  /**
    * contribution status
    *
    * @var array
@@ -114,6 +106,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $pcpStatus;
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all the financial types
    *
    * @access public
@@ -142,6 +136,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all the financial Accounts
    *
    * @access public
@@ -191,6 +187,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all the contribution pages
    *
    * @param integer $id  id of the contribution page
@@ -223,6 +221,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all the payment instruments
    *
    * @access public
@@ -249,16 +249,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @static
    */
   public static function &creditCard() {
-    $acceptCreditCard = array();
-    $creditCard = CRM_Core_OptionGroup::values('accept_creditcard');
-
-    if (!$creditCard) {
-      $creditCard = array();
-    }
-    foreach ($creditCard as $key => $value) {
-      $acceptCreditCard[$value] = $value;
-    }
-    return $acceptCreditCard;
+    return CRM_Core_OptionGroup::values('accept_creditcard', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
   }
 
   /**
