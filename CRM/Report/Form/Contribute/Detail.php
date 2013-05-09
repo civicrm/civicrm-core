@@ -443,7 +443,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
-    if ($this->_params['include_set'] == 'soft_credits_only') {
+    if (CRM_Utils_Array::value('include_set', $this->_params) == 'soft_credits_only') {
       $this->_from .= "
                INNER JOIN civicrm_contribution_soft contribution_soft_civireport
                        ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
@@ -558,7 +558,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     );
 
     // Stats for soft credits
-    if ($this->_params['include_set'] != 'contributions_only') {
+    if (CRM_Utils_Array::value('include_set', $this->_params) != 'contributions_only') {
       $totalAmount = $average = array();
       $count  = 0;
       $select = "
@@ -617,7 +617,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $sql = "{$select} {$this->_from} {$this->_groupBy}";
     $tempQuery = 'CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 AS ' . $sql;
     CRM_Core_DAO::executeQuery($tempQuery);
-    if ($this->_params['include_set'] == 'soft_credits_only') {
+    if (CRM_Utils_Array::value('include_set', $this->_params) == 'soft_credits_only') {
       // revise pager : prev, next based on soft-credits only
       $this->setPager();
     }    
@@ -627,9 +627,9 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $this->from(); // simple reset of ->_from
 
     // 3. Decide where to populate temp3 table from
-    if ($this->_params['include_set'] == 'contributions_only') {
+    if (CRM_Utils_Array::value('include_set', $this->_params) == 'contributions_only') {
       $tempQuery = "(SELECT * FROM civireport_contribution_detail_temp1 WHERE civicrm_contribution_contribution_id=%1)";
-    } else if ($this->_params['include_set'] == 'soft_credits_only') {
+    } else if (CRM_Utils_Array::value('include_set', $this->_params) == 'soft_credits_only') {
       $tempQuery = "(SELECT * FROM civireport_contribution_detail_temp2 WHERE civicrm_contribution_contribution_id=%1)";
     } else {
       $tempQuery = "
