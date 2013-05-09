@@ -1303,6 +1303,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contribParams['line_item'] = $form->_lineItem;
       //add contribution record
       $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
+      if (is_a($contribution, 'CRM_Core_Error')) {
+        $message = CRM_Core_Error::getMessages($contribution);
+        CRM_Core_Error::fatal($message);
+      }
     }
 
     // process soft credit / pcp pages
@@ -1447,7 +1451,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // create an activity record
     if ($contribution) {
-    CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
+      CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
     }
 
     $transaction->commit();
