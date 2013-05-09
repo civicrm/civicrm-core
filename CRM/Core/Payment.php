@@ -113,7 +113,6 @@ abstract class CRM_Core_Payment {
       }
 
       //load the object.
-      //self::$_singleton[$cacheKey] = eval('return ' . $paymentClass . '::singleton( $mode, $paymentProcessor );');
       self::$_singleton[$cacheKey] = call_user_func($paymentClass . '::singleton', $mode, $paymentProcessor );
     }
 
