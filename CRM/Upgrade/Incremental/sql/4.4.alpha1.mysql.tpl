@@ -14,3 +14,7 @@ INSERT INTO civicrm_setting
   (domain_id, contact_id, is_domain, group_name, name, value)
 VALUES
   ({$domainID}, NULL, 1, 'Mailing Preferences', 'write_activity_record', '{serialize}1{/serialize}');
+
+-- CRM-12580
+ALTER TABLE civicrm_contact ADD  INDEX index_is_deleted_sort_name(is_deleted, sort_name, id);
+ALTER TABLE civicrm_contact DROP INDEX index_is_deleted;
