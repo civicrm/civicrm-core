@@ -1494,7 +1494,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
               'greeting_type' => 'email_greeting',
             );
             if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($emailGreetingFilter))) {
-              self::addToErrorMsg(ts('Email Greeting must be one of the configured format options. Check Administer >> Option Lists >> Email Greetings for valid values'), $errorMessage);
+              self::addToErrorMsg(ts('Email Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Email Greetings for valid values'), $errorMessage);
             }
             break;
 
@@ -1504,7 +1504,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
               'greeting_type' => 'postal_greeting',
             );
             if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($postalGreetingFilter))) {
-              self::addToErrorMsg(ts('Postal Greeting must be one of the configured format options. Check Administer >> Option Lists >> Postal Greetings for valid values'), $errorMessage);
+              self::addToErrorMsg(ts('Postal Greeting must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Postal Greetings for valid values'), $errorMessage);
             }
             break;
 
@@ -1514,7 +1514,7 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
               'greeting_type' => 'addressee',
             );
             if (!self::in_value($value, CRM_Core_PseudoConstant::greeting($addresseeFilter))) {
-              self::addToErrorMsg(ts('Addressee must be one of the configured format options. Check Administer >> Option Lists >> Addressee for valid values'), $errorMessage);
+              self::addToErrorMsg(ts('Addressee must be one of the configured format options. Check Administer >> System Settings >> Option Groups >> Addressee for valid values'), $errorMessage);
             }
             break;
 
