@@ -1309,12 +1309,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   public static function tokenReplace(&$mailing) {
     $domain = CRM_Core_BAO_Domain::getDomain();
 
-    foreach (array(
-      'text', 'html') as $type) {
+    foreach (array('text', 'html') as $type) {
       $tokens = $mailing->getTokens();
       if (isset($mailing->templates[$type])) {
         $mailing->templates[$type] = CRM_Utils_Token::replaceSubscribeInviteTokens($mailing->templates[$type]);
-        $mailing->templates[$type] = CRM_Utils_Token::replaceDomainTokens($mailing->templates[$type],
+        $mailing->templates[$type] = CRM_Utils_Token::replaceDomainTokens(
+          $mailing->templates[$type],
           $domain,
           $type == 'html' ? TRUE : FALSE,
           $tokens[$type]
@@ -1479,60 +1479,70 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @static
    */
   public static function create(&$params, $ids = array()) {
-    // Retrieve domain email and name for default sender
-    $domain = civicrm_api('Domain', 'getsingle', array(
-                'version' => 3,
-                'current_domain' => 1,
-                'sequential' => 1,
-              ));
-    if (isset($domain['from_email'])) {
-      $domain_email = $domain['from_email'];
-      $domain_name  = $domain['from_name'];
-    }
-    else {
-      $domain_email = 'info@EXAMPLE.ORG';
-      $domain_name  = 'EXAMPLE.ORG';
-    }
-    if (!isset($params['created_id'])) {
-      $session =& CRM_Core_Session::singleton();
-      $params['created_id'] = $session->get('userID');
-    }
-    $defaults = array(
-      // load the default config settings for each
-      // eg reply_id, unsubscribe_id need to use
-      // correct template IDs here
-      'override_verp'   => TRUE,
-      'forward_replies' => FALSE,
-      'open_tracking'   => TRUE,
-      'url_tracking'    => TRUE,
-      'visibility'      => 'User and User Admin Only',
-      'replyto_email'   => $domain_email,
-      'header_id'       => CRM_Mailing_PseudoConstant::defaultComponent('header_id', ''),
-      'footer_id'       => CRM_Mailing_PseudoConstant::defaultComponent('footer_id', ''),
-      'from_email'      => $domain_email,
-      'from_name'       => $domain_name,
-      'msg_template_id' => NULL,
-      'contact_id'      => $params['created_id'],
-      'created_id'      => $params['created_id'],
-      'approver_id'     => $params['created_id'],
-      'auto_responder'  => 0,
-      'created_date'    => date('YmdHis'),
-      'scheduled_date'  => date('YmdHis'),
-      'approval_date'   => date('YmdHis'),
-    );
 
-    // Get the default from email address, if not provided.
-    if (empty($defaults['from_email'])) {
-      $defaultAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
-      foreach ($defaultAddress as $id => $value) {
-        if (preg_match('/"(.*)" <(.*)>/', $value, $match)) {
-          $defaults['from_email'] = $match[2];
-          $defaults['from_name'] = $match[1];
+    // CRM-12430
+    // Do the below only for an insert
+    // for an update, we should not set the defaults
+    if (!isset($ids['id']) && !isset($ids['mailing_id'])) {
+      // Retrieve domain email and name for default sender
+      $domain = civicrm_api(
+        'Domain',
+        'getsingle',
+        array(
+          'version' => 3,
+          'current_domain' => 1,
+          'sequential' => 1,
+        )
+      );
+      if (isset($domain['from_email'])) {
+        $domain_email = $domain['from_email'];
+        $domain_name  = $domain['from_name'];
+      }
+      else {
+        $domain_email = 'info@EXAMPLE.ORG';
+        $domain_name  = 'EXAMPLE.ORG';
+      }
+      if (!isset($params['created_id'])) {
+        $session =& CRM_Core_Session::singleton();
+        $params['created_id'] = $session->get('userID');
+      }
+      $defaults = array(
+        // load the default config settings for each
+        // eg reply_id, unsubscribe_id need to use
+        // correct template IDs here
+        'override_verp'   => TRUE,
+        'forward_replies' => FALSE,
+        'open_tracking'   => TRUE,
+        'url_tracking'    => TRUE,
+        'visibility'      => 'User and User Admin Only',
+        'replyto_email'   => $domain_email,
+        'header_id'       => CRM_Mailing_PseudoConstant::defaultComponent('header_id', ''),
+        'footer_id'       => CRM_Mailing_PseudoConstant::defaultComponent('footer_id', ''),
+        'from_email'      => $domain_email,
+        'from_name'       => $domain_name,
+        'msg_template_id' => NULL,
+        'contact_id'      => $params['created_id'],
+        'created_id'      => $params['created_id'],
+        'approver_id'     => $params['created_id'],
+        'auto_responder'  => 0,
+        'created_date'    => date('YmdHis'),
+        'scheduled_date'  => date('YmdHis'),
+        'approval_date'   => date('YmdHis'),
+      );
+
+      // Get the default from email address, if not provided.
+      if (empty($defaults['from_email'])) {
+        $defaultAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
+        foreach ($defaultAddress as $id => $value) {
+          if (preg_match('/"(.*)" <(.*)>/', $value, $match)) {
+            $defaults['from_email'] = $match[2];
+            $defaults['from_name'] = $match[1];
+          }
         }
       }
-    }
 
-    $params = array_merge($defaults, $params);
+      $params = array_merge($defaults, $params);
+    }
 
     /**
      * Could check and warn for the following cases:
@@ -1559,7 +1569,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       foreach (array('include', 'exclude', 'base') as $type) {
         if (isset($params[$entity]) &&
           CRM_Utils_Array::value($type, $params[$entity]) &&
-            is_array($params[$entity][$type])) {
+          is_array($params[$entity][$type])) {
           foreach ($params[$entity][$type] as $entityId) {
             $mg->reset();
             $mg->mailing_id   = $mailing->id;
@@ -1744,7 +1754,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $row['id']   = $mailing->group_id;
         $row['name'] = $mailing->group_title;
         $row['link'] = CRM_Utils_System::url('civicrm/group/search',
-          "reset=1&force=1&context=smog&gid={$row['id']}"
+                       "reset=1&force=1&context=smog&gid={$row['id']}"
         );
       }
       else {
@@ -1752,7 +1762,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $row['name']    = $mailing->mailing_name;
         $row['mailing'] = TRUE;
         $row['link']    = CRM_Utils_System::url('civicrm/mailing/report',
-          "mid={$row['id']}"
+                          "mid={$row['id']}"
         );
       }
 
@@ -1891,7 +1901,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       );
 
       foreach (array(
-        'scheduled_date', 'start_date', 'end_date') as $key) {
+          'scheduled_date', 'start_date', 'end_date') as $key) {
         $row[$key] = CRM_Utils_Date::customFormat($row[$key]);
       }
       $report['jobs'][] = $row;
@@ -2756,8 +2766,8 @@ AND        m.id = %1
     foreach ($mailings as $mailingId => $values) {
       $contactMailings[$mailingId]['subject'] = $values['subject'];
       $contactMailings[$mailingId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
-      $contactMailings[$mailingId]['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report',
-        "mid={$values['mailing_id']}&reset=1&cid={$values['creator_id']}&context=mailing");
+      $contactMailings[$mailingId]['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report/event',
+        "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&event=queue&context=mailing");
       $contactMailings[$mailingId]['mailing_creator'] = CRM_Utils_System::href(
           $values['creator_name'],
           'civicrm/contact/view',
@@ -2783,7 +2793,7 @@ AND        m.id = %1
         CRM_Core_Action::BROWSE => array(
           'name' => ts('Mailing Report'),
           'url' => 'civicrm/mailing/report',
-          'qs' => "mid={$values['mailing_id']}&reset=1&cid={$values['creator_id']}&context=mailing",
+          'qs' => "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&context=mailing",
           'title' => ts('View Mailing Report'),
         )
       );

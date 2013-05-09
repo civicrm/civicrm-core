@@ -844,14 +844,12 @@ INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$a
       }
       else {
         $values[$activityID]['recipients'] = ts('(recipients)');
-        $values[$activityID]['mailingId'] = '';
+        $values[$activityID]['mailingId'] = false;
         if (
           $accessCiviMail &&
           ($mailingIDs === TRUE || in_array($dao->source_record_id, $mailingIDs))
         ) {
-          $values[$activityID]['mailingId'] = CRM_Utils_System::url('civicrm/mailing/report',
-            "mid={$dao->source_record_id}&reset=1&cid={$dao->source_contact_id}&context=activitySelector"
-          );
+          $values[$activityID]['mailingId'] = true;
         }
       }
     }
@@ -1402,7 +1400,8 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
     }
 
     $success = 0;
-    $escapeSmarty = $sent = FALSE;
+    $escapeSmarty = FALSE;
+    $errMsgs = array();
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
 
@@ -1428,17 +1427,31 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
         $smsParams['To'] = '';
       }
 
-      if (self::sendSMSMessage(
-          $contactId,
-          $tokenText,
-          $tokenHtml,
-          $smsParams,
-          $activityID
-        )) {
-        // even a single successful delivery should set this falg to true
-        $sent = TRUE;
+      $sendResult = self::sendSMSMessage(
+        $contactId,
+        $tokenText,
+        $tokenHtml,
+        $smsParams,
+        $activityID
+      );
+
+      if (PEAR::isError($sendResult)) {
+        // Collect all of the PEAR_Error objects
+        $errMsgs[] = $sendResult;
+      } else {
         $success++;
       }
+    }
+
+    // If at least one message was sent and no errors
+    // were generated then return a boolean value of TRUE.
+    // Otherwise, return FALSE (no messages sent) or
+    // and array of 1 or more PEAR_Error objects.
+    $sent = FALSE;
+    if ($success > 0 && count($errMsgs) == 0) {
+      $sent = TRUE;
+    } elseif (count($errMsgs) > 0) {
+      $sent = $errMsgs;
     }
 
     return array($sent, $activity->id, $success);
@@ -1451,7 +1464,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
    * @param int    $activityID        the activity ID that tracks the message
    * @param array  $smsParams         the params used for sending sms
    *
-   * @return boolean                  true if successfull else false.
+   * @return mixed                    true on success or PEAR_Error object
    * @access public
    * @static
    */
@@ -1482,7 +1495,11 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
     // make sure both phone are valid
     // and that the recipient wants to receive sms
     if (empty($toPhoneNumber) or $toDoNotSms) {
-      return FALSE;
+      return PEAR::raiseError(
+        'Recipient phone number is invalid or recipient does not want to receive SMS',
+        null,
+        PEAR_ERROR_RETURN
+      );
     }
 
     $message = $tokenHtml ? $tokenHtml : $tokenText;
@@ -1491,8 +1508,9 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
     $smsParams['parent_activity_id'] = $activityID;
 
     $providerObj = CRM_SMS_Provider::singleton(array('provider_id' => $smsParams['provider_id']));
-    if (!$providerObj->send($recipient, $smsParams, $message, NULL)) {
-      return FALSE;
+    $sendResult = $providerObj->send($recipient, $smsParams, $message, NULL);
+    if (PEAR::isError($sendResult)) {
+      return $sendResult;
     }
 
     $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
@@ -2383,14 +2401,17 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $contactActivities[$activityId]['source_contact'] = $values['source_contact_name'];
         }
         elseif ($values['source_contact_id']) {
-          $contactActivities[$activityId]['source_contact'] = CRM_Utils_System::href($values['source_contact_name'], 'civicrm/contact/view', "reset=1&cid={$values['source_contact_id']}");
+          $contactActivities[$activityId]['source_contact'] = CRM_Utils_System::href($values['source_contact_name'],
+            'civicrm/contact/view', "reset=1&cid={$values['source_contact_id']}");
         }
         else {
           $contactActivities[$activityId]['source_contact'] = '<em>n/a</em>';
         }
 
         if (isset($values['mailingId']) && !empty($values['mailingId'])) {
-          $contactActivities[$activityId]['target_contact'] = CRM_Utils_System::href($values['recipients'], 'civicrm/mailing/report', "mid={$values['source_record_id']}&reset=1&cid={$values['source_contact_id']}&context=activitySelector");
+          $contactActivities[$activityId]['target_contact'] = CRM_Utils_System::href($values['recipients'],
+            'civicrm/mailing/report/event',
+            "mid={$values['source_record_id']}&reset=1&event=queue&cid={$params['contact_id']}&context=activitySelector");
         }
         elseif (CRM_Utils_Array::value('recipients', $values)) {
           $contactActivities[$activityId]['target_contact'] = $values['recipients'];
@@ -2403,7 +2424,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $contactActivities[$activityId]['target_contact'] = '';
           foreach ($values['target_contact_name'] as $tcID => $tcName) {
             if ($tcID && $count < 5) {
-              $contactActivities[$activityId]['target_contact'] .= CRM_Utils_System::href($tcName, 'civicrm/contact/view', "reset=1&cid={$tcID}");
+              $contactActivities[$activityId]['target_contact'] .= CRM_Utils_System::href($tcName,
+                'civicrm/contact/view', "reset=1&cid={$tcID}");
               $count++;
               if ($count) {
                 $contactActivities[$activityId]['target_contact'] .= ";&nbsp;";

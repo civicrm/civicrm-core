@@ -51,7 +51,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   private $_eventTitleIndex;
 
   /**
-   * Array of succesfully imported participants id's
+   * Array of successfully imported participants id's
    *
    * @array
    */
@@ -486,7 +486,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   }
 
   /**
-   * Get the array of succesfully imported Participation ids
+   * Get the array of successfully imported Participation ids
    *
    * @return array
    * @access public

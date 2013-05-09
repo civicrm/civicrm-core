@@ -19,7 +19,10 @@ if [ -z "$RELPATH" -o  -z "$REMOTE" -o  -z "$MAINTBRANCH" -o  -z "$DEVBRANCH" ] 
 fi
 
 pushd "$RELPATH" >> /dev/null
-  TMPFILE=$(mktemp)
+  ## OS X: mktemp requires "-t prefix" argument
+  ## GNU: mktemp accepts optional -t pattern" argument
+  ## The string "merge-forward-XXXXXX" works as a prefix or pattern
+  TMPFILE=$(mktemp -t merge-forward-XXXXXX)
 
   set -x
   git fetch $REMOTE

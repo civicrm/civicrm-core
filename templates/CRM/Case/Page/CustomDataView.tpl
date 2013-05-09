@@ -127,15 +127,22 @@
       url: dataURL,
       success: function(content) {
         cj('#case_custom_edit').show( ).html(content).dialog({
-          title: "Update Custom Information",
+          title: "{/literal}{ts escape='js'}Update Case Information{/ts}{literal}",
           modal: true,
           width: 680,
           overlay: {
             opacity: 0.5,
             background: "black"
           },
+          open: function() {
+            var dialog = this;
+            cj('#_qf_CustomData_cancel').click(function() {
+              cj(dialog).dialog('close');
+              return false;
+            });
+          },
           close: function(event, ui) {
-            cj('#case_custom_edit').fadeOut(5000);
+            cj(this).dialog('destroy');
           }
         });
       }

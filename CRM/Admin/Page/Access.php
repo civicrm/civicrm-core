@@ -51,11 +51,23 @@ class CRM_Admin_Page_Access extends CRM_Core_Page {
         break;
 
       case 'Joomla':
-        JHTML::_('behavior.modal');
-        $url = $config->userFrameworkBaseURL . "index.php?option=com_config&view=component&component=com_civicrm&tmpl=component";
-        $jparams = 'rel="{handler: \'iframe\', size: {x: 875, y: 550}, onClose: function() {}}" class="modal"';
-        $this->assign('ufAccessURL', $url);
-        $this->assign('jAccessParams', $jparams);
+        //condition based on Joomla version; <= 2.5 uses modal window; >= 3.0 uses full page with return value
+        if( version_compare(JVERSION, '3.0', 'lt') ) {
+          JHTML::_('behavior.modal');
+          $url = $config->userFrameworkBaseURL . 'index.php?option=com_config&view=component&component=com_civicrm&tmpl=component';
+          $jparams = 'rel="{handler: \'iframe\', size: {x: 875, y: 550}, onClose: function() {}}" class="modal"';
+
+          $this->assign('ufAccessURL', $url);
+          $this->assign('jAccessParams', $jparams);
+        }
+        else {
+          $uri = (string) JUri::getInstance();
+          $return = urlencode(base64_encode($uri));
+          $url = $config->userFrameworkBaseURL . 'index.php?option=com_config&view=component&component=com_civicrm&return=' . $return;
+
+          $this->assign('ufAccessURL', $url);
+          $this->assign('jAccessParams', '');
+        }
         break;
 
       case 'WordPress':

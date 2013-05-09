@@ -82,7 +82,7 @@
   <div class="clear"></div>
 </div>
 {/if}
-<div class="vevent crm-block crm-event-info-form-block">
+<div class="vevent crm-event-id-{$event.id} crm-block crm-event-info-form-block">
   <div class="event-info">
   {if $event.summary}
       <div class="crm-section event_summary-section">

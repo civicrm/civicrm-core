@@ -69,15 +69,48 @@ Class CRM_Core_Form_Date {
     $form->setDefaults(array('dateFormats' => self::DATE_yyyy_mm_dd));
   }
 
+
   /**
-   * This function is to build the date range - relative or absolute
+   * This function is to retrieve the date range - relative or absolute
+   * and assign it to the form
+   * @param object $form - the form the dates should be added to
+   * @param string $fieldName
+   * @param integer $count
+   * @param string $from
+   * @param string $to
+   * @param string $fromLabel
+   * @param boolean $required
+   * @param array $operators Additional value pairs to add
+   * @param string $dateFormat
+   * @param string $displayTime
    *
-   * @param Object  $form   the form object that we are operating on
    *
    * @static
    * @access public
    */
-  static function buildDateRange(&$form, $fieldName, $count = 1, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $addReportFilters = TRUE, $dateFormat = 'searchDate', $displayTime = FALSE) {
+
+  static function buildDateRange(&$form, $fieldName, $count = 1, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $operators = array(), $dateFormat = 'searchDate', $displayTime = FALSE) {
+    $selector = CRM_Core_Form_Date::returnDateRangeSelector(&$form, $fieldName, $count, $from, $to, $fromLabel, $required, $operators, $dateFormat, $displayTime);
+    CRM_Core_Form_Date::addDateRangeToForm($form, $fieldName, $selector,  $from, $to, $fromLabel, $required , $dateFormat, $displayTime);
+  }
+
+  /**
+   * This function is to build the date range array that will provide the form option values
+   * It can be - relative or absolute
+   *
+   * @param Object  $form   the form object that we are operating on
+   * @param string $fieldName
+   * @param integer $count
+   * @param String $from
+   * @param String $to
+   * @param String $fromLabel
+   * @param Boolean $required
+   * @param Array $operators Additional Operator Selections to add
+   * @param String $dateFormat
+   * @param Boolean $displayTime
+   * @return array Values for Selector
+   */
+  static function returnDateRangeSelector(&$form, $fieldName, $count = 1, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $operators = array(), $dateFormat = 'searchDate', $displayTime = FALSE) {
     $selector = array('' => ts('- any -'),
       0 => ts('Choose Date Range'),
       'this.year' => ts('This Year'),
@@ -117,9 +150,8 @@ Class CRM_Core_Form_Date {
       'ending.month' => ts('From 1 Month Ago'),
       'ending.week' => ts('From 1 Week Ago'),
     );
-    if ($addReportFilters) {
-      $selector += CRM_Report_Form::getOperationPair(CRM_Report_FORM::OP_DATE);
-    }
+    $selector += $operators;
+
     $config = CRM_Core_Config::singleton();
     //if fiscal year start on 1 jan then remove fiscal year task
     //form list
@@ -127,15 +159,34 @@ Class CRM_Core_Form_Date {
       unset($selector['this.fiscal_year']);
       unset($selector['previous.fiscal_year']);
     }
+    return $selector;
+  }
 
+  /**
+   * This function is to build the date range - relative or absolute
+   *
+   * @param Object  $form   the form object that we are operating on
+   * @param string $fieldName
+   * @param Array $selector array of option values to add
+   * @param integer $count
+   * @param string $from
+   * @param stringe $to
+   * @param string $from Label
+   * @param boolean $required
+   * @param string $dateFormat
+   * @param boolean $displayTime
+   * @return null
+   */
+  static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {
     $form->add('select',
       "{$fieldName}_relative",
       ts('Relative Date Range'),
-      $selector,
-      $required
-    );
+        $selector,
+        $required
+      );
 
-    $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);
+      $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);
   }
+
 }
 

@@ -300,8 +300,7 @@ function _civicrm_api3_get_DAO($name) {
     return 'CRM_Core_BAO_IM';
   }
 
-
-  return CRM_Core_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
+  return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
 }
 
 /**
@@ -540,7 +539,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
     }
     else {
       if ($unique) {
-        $dao->$allfields[$field]['name'] = $params[$field];
+        $allfields[$field]['name'] = $params[$field];
       }
       else {
         $dao->$field = $params[$field];

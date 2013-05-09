@@ -56,6 +56,15 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $date['minYear']++;
     }
 
+    // Check if CiviCampaign is a) enabled and b) has active campaigns
+    $config = CRM_Core_Config::singleton();
+    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    if ($campaignEnabled) {
+      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
+      $this->activeCampaigns = $getCampaigns['campaigns'];
+      asort($this->activeCampaigns);
+    } 
+
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -139,7 +148,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'options' => $optionYear,
             'default' => date('Y'),
           ),
-          'financial_type_id' => array( 
+          'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
@@ -169,6 +178,18 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         ),
       ),
     );
+
+    // If we have a campaign, build out the relevant elements
+    if ($campaignEnabled && !empty($this->activeCampaigns)) {
+      $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
+        'title' => ts('Campaign'),
+        'default' => 'false',
+      );
+      $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array('title' => ts('Campaign'),
+        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'options' => $this->activeCampaigns,
+      );
+    }
 
     $this->_tagFilter = TRUE;
     parent::__construct();
@@ -226,13 +247,13 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
     $this->_from = "
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
-              INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']} 
+              INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
               {$this->_aclFrom}
-              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']} 
+              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                         {$this->_aliases['civicrm_email']}.is_primary = 1 
-              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']} 
+                         {$this->_aliases['civicrm_email']}.is_primary = 1
+              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                          {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
   }
@@ -249,8 +270,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           $clause = NULL;
           if ($fieldName == 'yid') {
             $clause = "contribution_civireport.contact_id NOT IN
-(SELECT distinct contri.contact_id FROM civicrm_contribution contri 
- WHERE contri.is_test = 0 AND " . self::fiscalYearOffset('contri.receive_date') . " = $current_year) AND contribution_civireport.contact_id IN (SELECT distinct contri.contact_id FROM civicrm_contribution contri 
+(SELECT distinct contri.contact_id FROM civicrm_contribution contri
+ WHERE contri.is_test = 0 AND " . self::fiscalYearOffset('contri.receive_date') . " = $current_year) AND contribution_civireport.contact_id IN (SELECT distinct contri.contact_id FROM civicrm_contribution contri
  WHERE " . self::fiscalYearOffset('contri.receive_date') . " = $previous_year AND contri.is_test = 0)";
           }
           elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
@@ -300,7 +321,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
     if (!empty($rows)) {
       $select = "
-                      SELECT 
+                      SELECT
                             SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
 
       $sql = "{$select} {$this->_from} {$this->_where}";
@@ -431,11 +452,19 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contribution Details for this Contact.");
       }
+
+      // convert campaign_id to campaign title
+      if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
+        if ($value = $row['civicrm_contribution_campaign_id']) {
+          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
+          $entryFound = TRUE;
+        }
+      }
     }
   }
 
   // Override "This Year" $op options
-  static function getOperationPair($type = "string", $fieldName = NULL) {
+  function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'yid') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
     }

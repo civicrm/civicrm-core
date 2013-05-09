@@ -146,16 +146,23 @@
       </div>
     {/if}
 
-    {if $form.options.html || $form.options.html}
+    {if $otherOptions}
         <div id="other-options" class="civireport-criteria" >
         <h3>Other Options</h3>
         <table class="report-layout">
-            <tr class="crm-report crm-report-criteria-groupby">
-          <td>{$form.options.html}</td>
-          {if $form.blank_column_end}
-              <td>{$form.blank_column_end.label}&nbsp;&nbsp;{$form.blank_column_end.html}</td>
-                {/if}
-            </tr>
+          {assign var="optionCount" value=0}
+          <tr class="crm-report crm-report-criteria-field">
+          {foreach from=$otherOptions item=optionField key=optionName}
+            {assign var="optionCount" value=`$optionCount+1`}
+            <td>{if $form.$optionName.label}{$form.$optionName.label}&nbsp;{/if}{$form.$optionName.html}</td>
+            {if $optionCount is div by 2}
+              </tr><tr class="crm-report crm-report-criteria-field">
+            {/if}
+          {/foreach}
+          {if $optionCount is not div by 2}
+            <td colspan="2 - ($count % 2)"></td>
+          {/if}
+          </tr>
         </table>
         </div>
     {/if}
@@ -248,8 +255,8 @@
         }
 
   function selectGroupByFields(id) {
-      var field = 'fields\['+ id+'\]';
-      var group = 'group_bys\['+ id+'\]';
+      var field = 'fields_'+ id;
+      var group = 'group_bys_'+ id;
       var groups = document.getElementById( group ).checked;
       if ( groups == 1 ) {
           document.getElementById( field ).checked = true;

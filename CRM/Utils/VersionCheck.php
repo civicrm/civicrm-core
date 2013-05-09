@@ -161,22 +161,12 @@ class CRM_Utils_VersionCheck {
    * Get the latest version number if it's newer than the local one
    *
    * @return string|null
-   * Returns the newer version's number or null if the versions are equal
+   * Returns the newer version's number, or null if the versions are equal
    */
   public function newerVersion() {
     if ($this->latestVersion) {
-      $local = array_pad(explode('.', $this->localVersion), 3, 0);
-      $latest = array_pad(explode('.', $this->latestVersion), 3, 0);
-
-      for ($i = 0; $i < 3; $i++) {
-        $loc = (int) $local[$i];
-        $lat = (int) $latest[$i];
-        if ($loc > $lat) {
-          return NULL;
-        }
-        elseif ($loc < $lat) {
-          return $this->latestVersion;
-        }
+      if (version_compare($this->localVersion, $this->latestVersion) < 0) {
+        return $this->latestVersion;
       }
     }
     return NULL;
@@ -303,6 +293,9 @@ class CRM_Utils_VersionCheck {
     $this->latestVersion = @file_get_contents(self::LATEST_VERSION_AT, FALSE, $ctx);
     if (!preg_match('/^\d+\.\d+\.\d+$/', $this->latestVersion)) {
       $this->latestVersion = NULL;
+    }
+    else {
+      $this->latestVersion = trim($this->latestVersion);
     }
     ini_restore('default_socket_timeout');
   }

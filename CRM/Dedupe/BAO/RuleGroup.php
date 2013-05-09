@@ -411,12 +411,11 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     $dao->find();
     $result = array();
     while ($dao->fetch()) {
-      if (!empty($dao->name)) {
-        $name = "{$dao->name} - {$dao->used}";
-      }
-      else {
-        $name = "{$dao->contact_type} - {$dao->used}";
-      }
+      $title =
+        !empty($dao->title) ? $dao->title :
+        (!empty($dao->name)  ? $dao->name : $dao->contact_type);
+
+      $name = "$title - {$dao->used}";
       $result[$dao->id] = $name;
     }
     return $result;

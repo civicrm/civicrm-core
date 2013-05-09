@@ -46,7 +46,7 @@
 {include file="CRM/common/TrackingFields.tpl"}
 
 {capture assign='reqMark'}<span class="marker"  title="{ts}This field is required.{/ts}">*</span>{/capture}
-<div class="crm-block crm-event-register-form-block">
+<div class="crm-event-id-{$event.id} crm-block crm-event-register-form-block">
 
 {* moved to tpl since need to show only for primary participant page *}
 {if $requireApprovalMsg || $waitlistMsg}

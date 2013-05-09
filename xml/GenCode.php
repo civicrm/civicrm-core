@@ -189,7 +189,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   function generateListAll($tables) {
     $this->smarty->clear_all_assign();
     $this->smarty->assign('tables', $tables);
-    file_put_contents($this->CoreDAOCodePath . "../AllCoreTables.php", $this->smarty->fetch('listAll.tpl'));
+    file_put_contents($this->CoreDAOCodePath . "AllCoreTables.php", $this->smarty->fetch('listAll.tpl'));
   }
 
   function generateCiviTestTruncate($tables) {

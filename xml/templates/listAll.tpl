@@ -34,15 +34,16 @@
  *
  */
 
-class CRM_Core_AllCoreTables {ldelim}
+class CRM_Core_DAO_AllCoreTables {ldelim}
 
-  static protected $tables = array(
+  static $tables = array(
 {foreach from=$tables key=tableName item=table}
-    '{$tableName}' => '{$table.className}',
+    '{$tableName}',
 {/foreach} {* tables *}
   );
 
-  static protected $daoToClass = array(
+  static $daoToClass = array(
+
 {foreach from=$tables item=table}
     '{$table.objectName}' => '{$table.className}',
 {/foreach} {* tables *}
@@ -54,14 +55,6 @@ class CRM_Core_AllCoreTables {ldelim}
 
   static public function isCoreTable($tableName) {ldelim}
     return FALSE !== array_search($tableName, self::$tables);
-  {rdelim}
-
-  static public function getClasses() {ldelim}
-    return array_values(self::$tables);
-  {rdelim}
-
-  static public function getClassForTable($tableName) {ldelim}
-    return CRM_Utils_Array::value($tableName, self::$tables);
   {rdelim}
 
   static public function getFullName($daoName) {ldelim}

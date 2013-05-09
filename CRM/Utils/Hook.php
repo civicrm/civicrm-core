@@ -97,7 +97,7 @@ abstract class CRM_Utils_Hook {
   ) {
 
     $this->commonBuildModuleList($fnPrefix);
-    
+
     return $this->runHooks($this->commonCiviModules, $fnSuffix,
       $numParams, $arg1, $arg2, $arg3, $arg4, $arg5
     );
@@ -131,43 +131,45 @@ abstract class CRM_Utils_Hook {
   ) {
     $result = $fResult = array();
 
-    foreach ($civiModules as $module) {
-      $fnName = "{$module}_{$fnSuffix}";
-      if (function_exists($fnName)) {
-        switch ($numParams) {
-          case 0:
-            $fResult = $fnName();
-            break;
+    if ($civiModules !== NULL) {
+      foreach ($civiModules as $module) {
+        $fnName = "{$module}_{$fnSuffix}";
+        if (function_exists($fnName)) {
+          switch ($numParams) {
+            case 0:
+              $fResult = $fnName();
+              break;
 
-          case 1:
-            $fResult = $fnName($arg1);
-            break;
+            case 1:
+              $fResult = $fnName($arg1);
+              break;
 
-          case 2:
-            $fResult = $fnName($arg1, $arg2);
-            break;
+            case 2:
+              $fResult = $fnName($arg1, $arg2);
+              break;
 
-          case 3:
-            $fResult = $fnName($arg1, $arg2, $arg3);
-            break;
+            case 3:
+              $fResult = $fnName($arg1, $arg2, $arg3);
+              break;
 
-          case 4:
-            $fResult = $fnName($arg1, $arg2, $arg3, $arg4);
-            break;
+            case 4:
+              $fResult = $fnName($arg1, $arg2, $arg3, $arg4);
+              break;
 
-          case 5:
-            $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5);
-            break;
+            case 5:
+              $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5);
+              break;
 
-          default:
-            CRM_Core_Error::fatal(ts('Invalid hook invocation'));
-            break;
+            default:
+              CRM_Core_Error::fatal(ts('Invalid hook invocation'));
+              break;
+          }
         }
-      }
 
-      if (!empty($fResult) &&
+        if (!empty($fResult) &&
           is_array($fResult)) {
-        $result = array_merge($result, $fResult);
+          $result = array_merge($result, $fResult);
+        }
       }
     }
 

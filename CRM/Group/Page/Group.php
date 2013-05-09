@@ -33,7 +33,9 @@
  *
  */
 class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
-  protected $_sortByCharacter; function getBAOName() {
+  protected $_sortByCharacter;
+
+  function getBAOName() {
     return 'CRM_Contact_BAO_Group';
   }
 
@@ -63,16 +65,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    */
   function editName() {
     return ts('Edit Group');
-  }
-
-  /**
-   * return class name of delete form
-   *
-   * @return string
-   * @access public
-   */
-  function deleteForm() {
-    return 'CRM_Group_Form_Delete';
   }
 
   /**
