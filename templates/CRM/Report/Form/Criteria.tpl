@@ -255,8 +255,8 @@
         }
 
   function selectGroupByFields(id) {
-      var field = 'fields\['+ id+'\]';
-      var group = 'group_bys\['+ id+'\]';
+      var field = 'fields_'+ id;
+      var group = 'group_bys_'+ id;
       var groups = document.getElementById( group ).checked;
       if ( groups == 1 ) {
           document.getElementById( field ).checked = true;
