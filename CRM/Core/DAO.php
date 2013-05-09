@@ -589,17 +589,18 @@ LIKE %1
     static $show = array();
 
     if (!array_key_exists($tableName, $show)) {
-      $query = "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = %1";
-      $params = array( 1 => array($tableName, 'String'));
-      $dao = CRM_Core_DAO::executeQuery($query, $params);
+      $query = "SHOW CREATE TABLE $tableName";
+      $dao = CRM_Core_DAO::executeQuery($query);
 
-      while ($dao->fetch()) {
-        $show[$tableName][] = $dao->CONSTRAINT_NAME;
+      if (!$dao->fetch()) {
+        CRM_Core_Error::fatal();
       }
+
       $dao->free();
+      $show[$tableName] = $dao->Create_Table;
     }
 
-    return in_array($constraint, $show[$tableName]) ? TRUE : FALSE;
+    return preg_match("/\b$constraint\b/i", $show[$tableName]) ? TRUE : FALSE;
   }
 
   /**
