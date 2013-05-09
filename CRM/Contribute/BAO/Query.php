@@ -754,7 +754,7 @@ class CRM_Contribute_BAO_Query {
     // Added contribution source
     $form->addElement('text', 'contribution_source', ts('Contribution Source'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'source'));
 
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE);
 
     $form->add('text', 'contribution_amount_low', ts('From'), array('size' => 8, 'maxlength' => 8));
     $form->addRule('contribution_amount_low', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('9.99', ' '))), 'money');

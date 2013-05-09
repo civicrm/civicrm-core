@@ -46,7 +46,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Mailing', 'title')
     );
 
-    CRM_Core_Form_Date::buildDateRange($this, 'mailing', 1, '_from', '_to', ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($this, 'mailing', 1, '_from', '_to', ts('From'), FALSE);
 
     $this->add('text', 'sort_name', ts('Created or Sent by'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
