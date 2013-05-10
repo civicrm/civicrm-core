@@ -90,7 +90,7 @@ Class CRM_Core_Form_Date {
    */
 
   static function buildDateRange(&$form, $fieldName, $count = 1, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $operators = array(), $dateFormat = 'searchDate', $displayTime = FALSE) {
-    $selector = CRM_Core_Form_Date::returnDateRangeSelector(&$form, $fieldName, $count, $from, $to, $fromLabel, $required, $operators, $dateFormat, $displayTime);
+    $selector = CRM_Core_Form_Date::returnDateRangeSelector($form, $fieldName, $count, $from, $to, $fromLabel, $required, $operators, $dateFormat, $displayTime);
     CRM_Core_Form_Date::addDateRangeToForm($form, $fieldName, $selector,  $from, $to, $fromLabel, $required , $dateFormat, $displayTime);
   }
 
