@@ -659,6 +659,20 @@ AND    u.status = 1
   */
 
   /**
+   * Determine the native ID of the CMS user
+   *
+   * @param $username
+   * @return int|NULL
+   */
+  function getUfId($username) {
+    $user = user_load_by_name($username);
+    if (empty($user->uid)) {
+      return NULL;
+    }
+    return $user->uid;
+  }
+
+  /**
    * Set a message in the UF to display to a user
    *
    * @param string $message the message to set

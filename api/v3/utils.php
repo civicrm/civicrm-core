@@ -1470,11 +1470,14 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest) {
  */
 function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $entity) {
   //if fieldname exists in params
-  if (CRM_Utils_Array::value($fieldName, $params)) {
-    //if value = 'user_contact_id' replace value with logged in user id
-    if ($params[$fieldName] == "user_contact_id") {
-      $session = &CRM_Core_Session::singleton();
-      $params[$fieldName] = $session->get('userID');
+  if (CRM_Utils_Array::value($fieldname, $params)) {
+    // if value = 'user_contact_id' (or similar), replace value with contact id
+    if (!is_integer($params[$fieldname])) {
+      $realContactId = _civicrm_api3_resolve_contactID($params[$fieldname]);
+      if (!is_numeric($realContactId)) {
+        throw new API_Exception("\"$fieldname\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldname,"type"=>"integer"));
+      }
+      $params[$fieldname] = $realContactId;
     }
     if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
       _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, $fieldInfo);
@@ -1496,6 +1499,37 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
         2100, array('field' => $fieldName, "max_length"=>$fieldInfo['maxlength'])
       );
     }
+  }
+}
+
+/**
+ * Determine a contact ID using a string expression
+ *
+ * @param string $contactIdExpr e.g. "user_contact_id" or "@user:username"
+ * @return int|NULL
+ */
+function  _civicrm_api3_resolve_contactID($contactIdExpr) {
+  //if value = 'user_contact_id' replace value with logged in user id
+  if ($contactIdExpr == "user_contact_id") {
+    $session = &CRM_Core_Session::singleton();
+    if (!is_numeric($session->get('userID'))) {
+      return NULL;
+    }
+    return $session->get('userID');
+  } elseif (preg_match('/^@user:(.*)$/', $contactIdExpr, $matches)) {
+    $config = CRM_Core_Config::singleton();
+
+    $ufID = $config->userSystem->getUfId($matches[1]);
+    if (!$ufID) {
+      return NULL;
+    }
+
+    $contactID = CRM_Core_BAO_UFMatch::getContactId($ufID);
+    if (!$ufID) {
+      return NULL;
+    }
+
+    return $contactID;
   }
 }
 
