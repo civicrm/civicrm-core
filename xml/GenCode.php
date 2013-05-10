@@ -1,6 +1,18 @@
 <?php
 ini_set('include_path', '.' . PATH_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'packages' . PATH_SEPARATOR . '..');
-ini_set('memory_limit', '512M');
+// make sure the memory_limit is at least 512 MB
+$memLimitString = trim(ini_get('memory_limit'));
+$memLimitUnit   = strtolower(substr($memLimitString, -1));
+$memLimit       = (int) $memLimitString;
+switch ($memLimitUnit) {
+    case 'g': $memLimit *= 1024;
+    case 'm': $memLimit *= 1024;
+    case 'k': $memLimit *= 1024;
+}
+
+if ($memLimit >= 0 and $memLimit < 536870912) {
+    ini_set('memory_limit', '512M');
+}
 date_default_timezone_set('UTC'); // avoid php warnings if timezone is not set - CRM-10844
 
 define('CIVICRM_UF', 'Drupal');
