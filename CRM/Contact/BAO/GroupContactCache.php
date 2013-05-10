@@ -93,11 +93,13 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
       $limitClause = " LIMIT 0, $limit";
       $orderClause = " ORDER BY g.cache_date, g.refresh_date";
     }
+    // We ignore hidden groups and disabled groups
     $query = "
 SELECT  g.id
 FROM    civicrm_group g
 WHERE   ( g.saved_search_id IS NOT NULL OR g.children IS NOT NULL )
 AND     ( g.is_hidden = 0 OR g.is_hidden IS NULL )
+AND     g.is_active = 1
 AND     ( g.cache_date IS NULL OR
           ( TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout ) OR
           ( $now >= g.refresh_date )
