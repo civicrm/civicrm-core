@@ -164,8 +164,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
       else {
         $name = ucfirst($key);
       }
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, 'CRM_Core_DAO_' . $name) . ".php");
-      eval('$object = new CRM_Core_DAO_' . $name . '( );');
+      $baoString = 'CRM_Core_BAO_' . $name;
+      $object = new $baoString();
       $object->location_type_id = $locationTypeId;
       $object->delete();
     }

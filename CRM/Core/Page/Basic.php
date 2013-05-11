@@ -213,8 +213,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     if ($action & CRM_Core_Action::ENABLE) {
       $action -= CRM_Core_Action::ENABLE;
     }
-
-    eval('$object = new ' . $this->getBAOName() . '( );');
+    $baoString = $this->getBAOName();
+    $object = new $baoString();
 
     $values = array();
 

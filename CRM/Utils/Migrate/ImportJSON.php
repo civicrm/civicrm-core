@@ -170,8 +170,7 @@ class CRM_Utils_Migrate_ImportJSON {
   }
 
   function restore(&$chunk, $daoName, $lookUpMapping = NULL) {
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-    eval('$object   = new ' . $daoName . '( );');
+    $object   = new $daoName();
     $tableName = $object->__table;
 
     if (is_array($lookUpMapping)) {
@@ -189,7 +188,7 @@ class CRM_Utils_Migrate_ImportJSON {
     $columns = $chunk[0];
     foreach ($chunk as $key => $value) {
       if ($key) {
-        eval('$object   = new ' . $daoName . '( );');
+        $object   = new $daoName();
         foreach ($columns as $k => $column) {
           if ($column == 'id') {
             $childID = $value[$k];

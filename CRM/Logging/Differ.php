@@ -260,8 +260,7 @@ WHERE log_conn_id = %1 AND
             break;
         }
 
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $daos[$table]) . '.php';
-        eval("\$dao = new $daos[$table];");
+        $dao = new $daos[$table];
         foreach ($dao->fields() as $field) {
           $titles[$table][$field['name']] = CRM_Utils_Array::value('title', $field);
 
