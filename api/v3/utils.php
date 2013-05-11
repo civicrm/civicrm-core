@@ -539,7 +539,11 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
     }
     else {
       if ($unique) {
-        $allfields[$field]['name'] = $params[$field];
+        $daoFieldName = $allfields[$field]['name'];
+        if (empty($daoFieldName)) {
+          throw new API_Exception("Failed to determine field name for \"$field\"");
+        }
+        $dao->{$daoFieldName} = $params[$field];
       }
       else {
         $dao->$field = $params[$field];
