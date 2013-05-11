@@ -234,7 +234,7 @@ SELECT  count( id ) as statusCount
   static function upgrade_2_2_alpha1($rev) {
     for ($stepID = 1; $stepID <= 4; $stepID++) {
       $formName = "CRM_Upgrade_TwoTwo_Form_Step{$stepID}";
-      eval("\$form = new $formName( );");
+      $form = new $formName();
 
       $error = NULL;
       if (!$form->verifyPreDBState($error)) {
@@ -277,7 +277,7 @@ SELECT  count( id ) as statusCount
    */
   static function upgrade_2_1_2($rev) {
     $formName = "CRM_Upgrade_TwoOne_Form_TwoOneTwo";
-    eval("\$form = new $formName( '$rev' );");
+    $form = new $formName($rev);
 
     $error = NULL;
     if (!$form->verifyPreDBState($error)) {

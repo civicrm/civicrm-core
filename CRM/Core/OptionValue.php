@@ -245,8 +245,7 @@ class CRM_Core_OptionValue {
    * @static
    */
   static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName = 'name') {
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-    eval('$object = new ' . $daoName . '( );');
+    $object = new $daoName();
     $object->$fieldName = $value;
     $object->option_group_id = $optionGroupID;
 
