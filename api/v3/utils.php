@@ -1472,10 +1472,10 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
   //if fieldname exists in params
   if (CRM_Utils_Array::value($fieldname, $params)) {
     // if value = 'user_contact_id' (or similar), replace value with contact id
-    if (!is_integer($params[$fieldname])) {
+    if (!is_numeric($params[$fieldname])) {
       $realContactId = _civicrm_api3_resolve_contactID($params[$fieldname]);
       if (!is_numeric($realContactId)) {
-        throw new API_Exception("\"$fieldname\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldname,"type"=>"integer"));
+        throw new API_Exception("\"$fieldname\" \"{$params[$fieldname]}\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldname,"type"=>"integer"));
       }
       $params[$fieldname] = $realContactId;
     }
@@ -1531,6 +1531,7 @@ function  _civicrm_api3_resolve_contactID($contactIdExpr) {
 
     return $contactID;
   }
+  return NULL;
 }
 
 function _civicrm_api3_validate_html(&$params, &$fieldName, &$fieldInfo) {
