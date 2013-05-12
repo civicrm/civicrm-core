@@ -219,6 +219,21 @@ class CRM_Core_PseudoConstant {
    * @static
    */
   public static function get($daoName, $fieldName, $params = array()) {
+    $flip = !empty($params['flip']);
+
+    // Custom fields are not in the schema
+    if (strpos($fieldName, 'custom') === 0) {
+      $dao = new CRM_Core_DAO_CustomField;
+      $dao->id = (int) substr($fieldName, 7);
+      $dao->find(TRUE);
+      $customField = (array) $dao;
+      $dao->free();
+      $output = array();
+      CRM_Core_BAO_CustomField::buildOption($customField, $output);
+      return $flip ? array_flip($output) : $output;
+    }
+
+    // Core field: load schema
     $dao = new $daoName;
     $fields = $dao->fields();
     $fieldKeys = $dao->fieldKeys();
@@ -228,7 +243,6 @@ class CRM_Core_PseudoConstant {
       return FALSE;
     }
     $fieldSpec = $fields[$fieldKey];
-    $flip = !empty($params['flip']);
 
     // If the field is an enum, explode the enum definition and return the array.
     if (isset($fieldSpec['enumValues'])) {
