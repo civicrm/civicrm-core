@@ -56,13 +56,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
   switch ($action) {
     case 'getfields':
       $values = _civicrm_api_get_fields($entity, false, $apiRequest['params']);
-      $results[$entity][$action] = civicrm_api3_create_success($values,
-        $apiRequest['params'], $entity, 'getfields'
-      );
-      return $results[$entity][$action];
-
-                case 'getfields':
-                  return civicrm_api3_create_success(_civicrm_api_get_fields($apiRequest['entity']));
+      return civicrm_api3_create_success($values, $apiRequest['params'], $entity, 'getfields');
     case 'create':
     case 'update':
     case 'replace':
@@ -85,7 +79,6 @@ function civicrm_api3_generic_getfields($apiRequest) {
         // inconsistency
         $metadata['id']['api.aliases'] = array($lcase_entity . '_id');
       }
-
       break;
 
     case 'delete':
