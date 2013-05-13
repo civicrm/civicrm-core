@@ -345,7 +345,12 @@ class CiviCRM_For_WordPress {
 			$docLinkInstall = "http://wiki.civicrm.org/confluence/display/CRMDOC/WordPress+Installation+Guide";
 			$docLinkTrouble = "http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Configuration+Trouble-shooting";
 			$forumLink      = "http://forum.civicrm.org/index.php/board,6.0.html";
-
+			
+			
+			// open tags (assume these were meanto be opened here)
+			$errorMsgAdd = '<p><strong>';
+			
+			// construct message
 			$errorMsgAdd = sprintf( 
 				__( 'Please review the <a href="%s">WordPress Installation Guide</a> and the <a href="%s">Trouble-shooting page</a> for assistance. If you still need help installing, you can often find solutions to your issue by searching for the error message in the <a href="%s">installation support section of the community forum</a>.', 'civicrm-wordpress' ),
 				$docLinkInstall,
@@ -372,10 +377,14 @@ class CiviCRM_For_WordPress {
 			} else {
 				$error = include_once ( 'CRM/Core/Config.php' );
 			}
-
+			
+			// have we got it?
 			if ( $error == false ) {
+
+				// set static flag
 				$failure = true;
-				//FIX ME
+				
+				// FIX ME - why?
 				wp_die(			
 					"<strong><p class='error'>" .
 					sprintf(
@@ -389,9 +398,13 @@ class CiviCRM_For_WordPress {
 					) .
 					"</p><p class='error'>" . $errorMsgAdd . "</p></strong>"
 				);
+				
+				// won't reach here!
 				return false;
+				
 			}
-
+			
+			// set static flag
 			$initialized = true;
 
 			// initialize the system by creating a config object
@@ -400,6 +413,8 @@ class CiviCRM_For_WordPress {
 			// sync the logged in user with WP
 			global $current_user;
 			if ( $current_user ) {
+				
+				// sync procedure
 				require_once 'CRM/Core/BAO/UFMatch.php';
 				CRM_Core_BAO_UFMatch::synchronize(
 					$current_user,
@@ -407,6 +422,7 @@ class CiviCRM_For_WordPress {
 					'WordPress',
 					$this->get_civicrm_contact_type('Individual')
 				);
+				
 			}
 
 		}
@@ -730,11 +746,12 @@ class CiviCRM_For_WordPress {
 	* Called by register_hooks() and shortcode_handler()
 	*/
 	public function wp_frontend( $shortcode = false ) {
-
-		if ( ! $this->initialize() ) {
-			return;
-		}
-
+		
+		// kick out if not CiviCRM
+		if ( ! $this->initialize() ) { return; }
+		
+		
+		// add CiviCRM core resources
 		CRM_Core_Resources::singleton()->addCoreResources();
 
 		// set the frontend part for civicrm code
@@ -903,7 +920,7 @@ class CiviCRM_For_WordPress {
 	 * @return bool true if authenticated, false otherwise
 	 */
 	public function check_permission( $args ) {
-
+		
 		if ( $args[0] != 'civicrm' ) {
 			return false;
 		}
@@ -1054,13 +1071,28 @@ class CiviCRM_For_WordPress {
 			}
 
 			require_once 'CRM/Core/BAO/UFMatch.php';
+			
+			// this does not return anything, so if we want to do anything further
+			// to the CiviCRM Contact, we have to search for it all over again...
 			CRM_Core_BAO_UFMatch::synchronize(
-				$user,
-				true,
-				'WordPress',
-				'Individual'
+				$user, // user object
+				true, // update = true
+				'WordPress', // CMS
+				'Individual' // contact type
 			);
 			
+			/*
+			// synchronizeUFMatch returns the contact object
+			$civi_contact = CRM_Core_BAO_UFMatch::synchronizeUFMatch(
+				$user, // user object
+				$user->ID, // ID
+				$user->user_mail, // unique identifier
+				null // unused
+				'WordPress' // CMS
+				'Individual' // contact type
+			);
+			*/
+
 		}
 
 	}
