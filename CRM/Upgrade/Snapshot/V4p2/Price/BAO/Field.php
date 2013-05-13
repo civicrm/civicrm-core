@@ -122,9 +122,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
 
     for ($index = 1; $index <= $maxIndex; $index++) {
 
-      if (array_key_exists('option_amount', $params) && 
-          array_key_exists($index, $params['option_amount']) && 
-          (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || 
+      if (array_key_exists('option_amount', $params) &&
+          array_key_exists($index, $params['option_amount']) &&
+          (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) ||
            CRM_Utils_Array::value('is_quick_config', $params)) &&
           !CRM_Utils_System::isNull($params['option_amount'][$index])
           ) {

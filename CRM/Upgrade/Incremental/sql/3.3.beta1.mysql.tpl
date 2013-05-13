@@ -7,10 +7,10 @@ SELECT @max_weight             := MAX(ROUND(weight)) from civicrm_option_value w
 INSERT INTO civicrm_option_value
         ( option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, {localize field='description'}description{/localize}, is_optgroup, is_reserved, is_active, component_id, domain_id, visibility_id )
 VALUES
-	( @option_group_id_editor, {localize}'Joomla Default Editor'{/localize}, @max_value+1, NULL, NULL, 0, NULL, @max_weight+1, {localize}NULL{/localize}, 0, 1, 1, NULL, @domainID, NULL );
+  ( @option_group_id_editor, {localize}'Joomla Default Editor'{/localize}, @max_value+1, NULL, NULL, 0, NULL, @max_weight+1, {localize}NULL{/localize}, 0, 1, 1, NULL, @domainID, NULL );
 
 -- CRM-6846
-CREATE TABLE `civicrm_price_field_value` 
+CREATE TABLE `civicrm_price_field_value`
   (`id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Price Field Value',
   `price_field_id` int(10) unsigned NOT NULL COMMENT 'FK to civicrm_price_field',
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Price field option name',
@@ -35,21 +35,21 @@ UPDATE civicrm_uf_field
 WHERE civicrm_uf_field.uf_group_id = @uf_group_id_sharedAddress AND civicrm_uf_field.field_name= 'country';
 
 --CRM-7031
-ALTER TABLE `civicrm_participant` 
+ALTER TABLE `civicrm_participant`
  CHANGE `fee_currency` `fee_currency` VARCHAR( 3 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '3 character string, value derived from config setting.';
 
-ALTER TABLE `civicrm_contribution` 
+ALTER TABLE `civicrm_contribution`
   CHANGE `currency` `currency` VARCHAR( 3 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.';
 
-ALTER TABLE `civicrm_grant` 
+ALTER TABLE `civicrm_grant`
  CHANGE `currency` `currency` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.';
 
-ALTER TABLE `civicrm_pcp` 
+ALTER TABLE `civicrm_pcp`
  CHANGE `currency` `currency` VARCHAR( 3 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.';
 
-ALTER TABLE `civicrm_pledge` 
+ALTER TABLE `civicrm_pledge`
  CHANGE `currency` `currency` VARCHAR( 3 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.';
- 
+
  -- insert civimail settings into nav menu
  SELECT @domainID               := MIN(id) FROM civicrm_domain;
  SELECT @nav_civimailadmin_id   := id FROM civicrm_navigation WHERE name = 'CiviMail';
@@ -59,12 +59,12 @@ ALTER TABLE `civicrm_pledge`
      ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
  VALUES
      ( @domainID, 'civicrm/admin/mail&reset=1', '{ts escape="sql"}Mailer Settings{/ts}', 'Mailer Settings', 'access CiviMail,administer CiviCRM', 'AND', @nav_civimailadmin_id, '1', NULL, @nav_civimailadmin_wt + 1 );
- 
+
  -- update petition system workflow message templates
  {include file='../CRM/Upgrade/3.3.beta1.msg_template/civicrm_msg_template.tpl'}
- 
+
 -- CRM-6231 -tweak permissions.
-UPDATE  civicrm_navigation 
+UPDATE  civicrm_navigation
    SET  permission = CONCAT( permission, ',manage campaign' ),
         permission_operator = 'OR'
  WHERE  name in ( 'Dashboard', 'Survey Dashboard', 'Petition Dashboard', 'Campaign Dashboard', 'New Campaign', 'New Survey',  'New Petition' )
@@ -81,11 +81,11 @@ SELECT  @campaignTypeOptGrpID := MAX(id) from civicrm_option_group where name = 
 
 UPDATE  civicrm_option_value
    SET  {localize field='label'}label = REPLACE(label, 'Voter', 'Constituent' ){/localize},
-	name = REPLACE(name, 'Voter', 'Constituent' )	
+  name = REPLACE(name, 'Voter', 'Constituent' )
  WHERE  name = 'Voter Engagement'
    AND  option_group_id = @campaignTypeOptGrpID;
 
-UPDATE  civicrm_navigation 
+UPDATE  civicrm_navigation
    SET  permission = CONCAT( permission, ',release campaign contacts' )
  WHERE  name like 'Voter Listing'
    AND  permission = 'administer CiviCampaign,manage campaign';

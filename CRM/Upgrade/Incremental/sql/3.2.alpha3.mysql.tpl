@@ -3,39 +3,39 @@
 {include file='../CRM/Upgrade/3.2.alpha3.msg_template/civicrm_msg_template.tpl'}
 
 -- CRM-6144
-   UPDATE civicrm_option_value 
+   UPDATE civicrm_option_value
 LEFT JOIN civicrm_option_group ON ( civicrm_option_value.option_group_id = civicrm_option_group.id )
-      SET civicrm_option_value.is_reserved = 1, civicrm_option_value.is_active = 0 
-    WHERE civicrm_option_group.name = 'activity_type' 
+      SET civicrm_option_value.is_reserved = 1, civicrm_option_value.is_active = 0
+    WHERE civicrm_option_group.name = 'activity_type'
       AND civicrm_option_value.name = 'Close Case';
 
 -- CRM-6102
-ALTER TABLE civicrm_preferences 
+ALTER TABLE civicrm_preferences
     ADD sort_name_format TEXT COMMENT 'Format to display contact sort name' AFTER mailing_format,
     ADD display_name_format TEXT COMMENT 'Format to display the contact display name' AFTER  mailing_format;
 
-UPDATE civicrm_preferences 
-    SET display_name_format = '{literal}{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}{/literal}', 
+UPDATE civicrm_preferences
+    SET display_name_format = '{literal}{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}{/literal}',
         sort_name_format    = '{literal}{contact.last_name}{, }{contact.first_name}{/literal}'
     WHERE is_domain = 1;
 
 -- CRM-1496
-   INSERT INTO 
-   `civicrm_option_group` (`name`, {localize field='description'}`description`{/localize}, `is_reserved`, `is_active`) 
-VALUES 			  
+   INSERT INTO
+   `civicrm_option_group` (`name`, {localize field='description'}`description`{/localize}, `is_reserved`, `is_active`)
+VALUES
     ('currencies_enabled',{localize}'{ts escape="sql"}List of currencies enabled for this site{/ts}'{/localize}, 0, 1);
-   
+
 -- INSERT Default currency
    SELECT @option_group_id_currency       := max(id) from civicrm_option_group where name = 'currencies_enabled';
-   INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`) 
+   INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
    VALUES
    (@option_group_id_currency, {localize}'{ts escape="sql"}USD ($){/ts}'{/localize}, 'USD', 'USD',  NULL, 0, 1, 1, {localize} NULL{/localize} , 0, 0, 1, NULL, NULL);
 
 
 -- CRM-1496
 
--- add currency field, set it to default value and modify it to not null 
+-- add currency field, set it to default value and modify it to not null
 -- civicrm_contribution_recur
    ALTER TABLE `civicrm_contribution_recur` ADD COLUMN `currency` varchar(3) NULL COMMENT '3 character string, value from config setting or input via user.';
    UPDATE `civicrm_contribution_recur` SET `currency` = '{$config->defaultCurrency}';
@@ -82,12 +82,12 @@ VALUES
 -- CRM-6138
 {include file='../CRM/Upgrade/3.2.alpha3.languages/languages.tpl'}
 
-ALTER TABLE `civicrm_contact` 
-	ADD COLUMN `preferred_language` varchar(5) DEFAULT NULL COMMENT 'Which language is preferred for communication. FK to languages in civicrm_option_value.';
+ALTER TABLE `civicrm_contact`
+  ADD COLUMN `preferred_language` varchar(5) DEFAULT NULL COMMENT 'Which language is preferred for communication. FK to languages in civicrm_option_value.';
 
 -- CRM-3854
-ALTER TABLE `civicrm_country` 
-	ADD COLUMN `address_format_id` int(10) unsigned DEFAULT NULL COMMENT 'Format to display the address, country specific';
+ALTER TABLE `civicrm_country`
+  ADD COLUMN `address_format_id` int(10) unsigned DEFAULT NULL COMMENT 'Format to display the address, country specific';
 
 CREATE TABLE `civicrm_address_format` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
@@ -97,7 +97,7 @@ CREATE TABLE `civicrm_address_format` (
 
 -- CRM-6154
    ALTER TABLE civicrm_domain
-   	 ADD `locale_custom_strings` text COLLATE utf8_unicode_ci COMMENT 'String Overrides';
+      ADD `locale_custom_strings` text COLLATE utf8_unicode_ci COMMENT 'String Overrides';
 
 -- CRM-6181
 UPDATE `civicrm_contact` SET `is_deleted` = 0 WHERE `is_deleted` IS NULL;
@@ -118,25 +118,25 @@ INSERT INTO civicrm_state_province
         ( 'Rum Cay','RC', 1212 ),
         ( 'San Salvador Island', 'SS', 1212 ),
         ( 'Kongo central', '01', 1050 ),
-	( 'Kwango', '02', 1050 ),
-	( 'Kwilu', '03', 1050 ),
-	( 'Mai-Ndombe', '04', 1050 ),
-	( 'Kasai', '05', 1050 ),
-	( 'Lulua', '06', 1050 ),
-	( 'Lomami', '07', 1050 ),
-	( 'Sankuru', '08', 1050 ),
-	( 'Ituri', '09', 1050 ),
-	( 'Haut-Uele', '10', 1050 ),
-	( 'Tshopo', '11', 1050 ),
-	( 'Bas-Uele', '12', 1050 ),
-	( 'Nord-Ubangi', '13', 1050 ),
-	( 'Mongala', '14', 1050 ),
-	( 'Sud-Ubangi', '15', 1050 ),
-	( 'Tshuapa', '16', 1050 ),	
-	( 'Haut-Lomami', '17', 1050 ),
-	( 'Lualaba', '18', 1050 ),
-	( 'Haut-Katanga', '19', 1050 ),
-	( 'Tanganyika', '20', 1050 );
+  ( 'Kwango', '02', 1050 ),
+  ( 'Kwilu', '03', 1050 ),
+  ( 'Mai-Ndombe', '04', 1050 ),
+  ( 'Kasai', '05', 1050 ),
+  ( 'Lulua', '06', 1050 ),
+  ( 'Lomami', '07', 1050 ),
+  ( 'Sankuru', '08', 1050 ),
+  ( 'Ituri', '09', 1050 ),
+  ( 'Haut-Uele', '10', 1050 ),
+  ( 'Tshopo', '11', 1050 ),
+  ( 'Bas-Uele', '12', 1050 ),
+  ( 'Nord-Ubangi', '13', 1050 ),
+  ( 'Mongala', '14', 1050 ),
+  ( 'Sud-Ubangi', '15', 1050 ),
+  ( 'Tshuapa', '16', 1050 ),
+  ( 'Haut-Lomami', '17', 1050 ),
+  ( 'Lualaba', '18', 1050 ),
+  ( 'Haut-Katanga', '19', 1050 ),
+  ( 'Tanganyika', '20', 1050 );
 
 -- CRM-6159
 UPDATE civicrm_mailing_bounce_pattern SET pattern = 'over\\s?quota' WHERE pattern = 'overs?quota';

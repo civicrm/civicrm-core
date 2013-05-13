@@ -56,8 +56,8 @@ class CRM_Upgrade_Incremental_Legacy {
       )
     ) {
       $query = "
-SELECT  id 
-  FROM  civicrm_mailing_job 
+SELECT  id
+  FROM  civicrm_mailing_job
  WHERE  status NOT IN ( 'Complete', 'Canceled' ) AND is_test = 0 LIMIT 1";
       $mjId = CRM_Core_DAO::singleValueQuery($query);
       if ($mjId) {
@@ -206,8 +206,8 @@ SELECT  id
     if ($rev == '3.2.beta4') {
       $statuses = array('New', 'Current', 'Grace', 'Expired', 'Pending', 'Cancelled', 'Deceased');
       $sql = "
-SELECT  count( id ) as statusCount 
-  FROM  civicrm_membership_status 
+SELECT  count( id ) as statusCount
+  FROM  civicrm_membership_status
  WHERE  name IN ( '" . implode("' , '", $statuses) . "' ) ";
       $count = CRM_Core_DAO::singleValueQuery($sql);
       if ($count < count($statuses)) {
@@ -409,7 +409,7 @@ SELECT  count( id ) as statusCount
   static function upgrade_2_2_7($rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
-    $sql = "UPDATE civicrm_report_instance 
+    $sql = "UPDATE civicrm_report_instance
                        SET form_values = REPLACE(form_values,'#',';') ";
     CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
 

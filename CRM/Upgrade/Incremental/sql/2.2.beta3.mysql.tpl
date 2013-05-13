@@ -7,7 +7,7 @@ ALTER TABLE `civicrm_event`
 
 -- CRM-4166
 
-INSERT INTO  `civicrm_payment_processor_type` 
+INSERT INTO  `civicrm_payment_processor_type`
   (name, title, description, is_active, is_default, user_name_label, password_label, signature_label, subject_label, class_name, url_site_default, url_api_default, url_recur_default, url_button_default, url_site_test_default, url_api_test_default, url_recur_test_default, url_button_test_default, billing_mode, is_recur ) VALUES
   ('Elavon','{ts escape="sql"}Elavon Payment Processor{/ts}','{ts escape="sql"}Elavon / Nova Virtual Merchant{/ts}',1,0,'{ts escape="sql"}SSL Merchant ID {/ts}','{ts escape="sql"}SSL User ID{/ts}','{ts escape="sql"}SSL PIN{/ts}',NULL,'Payment_Elavon','https://www.myvirtualmerchant.com/VirtualMerchant/processxml.do',NULL,NULL,NULL,'https://www.myvirtualmerchant.com/VirtualMerchant/processxml.do',NULL,NULL,NULL,1,0)
   ON DUPLICATE KEY UPDATE civicrm_payment_processor_type.name='Elavon';
@@ -32,7 +32,7 @@ SELECT @mem_comp_id := id from civicrm_component where name = 'CiviMember';
 -- CRM-3546
 {if $customDataType }
     {if $multilingual}
-    INSERT INTO civicrm_option_group (name, {foreach from=$locales item=locale}description_{$locale},{/foreach} is_reserved, is_active) VALUES 
+    INSERT INTO civicrm_option_group (name, {foreach from=$locales item=locale}description_{$locale},{/foreach} is_reserved, is_active) VALUES
     ('custom_data_type', {foreach from=$locales item=locale}'Custom Data Type',{/foreach} 0, 1 );
 
     SELECT @option_group_id_cdt := id from civicrm_option_group where name = 'custom_data_type';
@@ -41,14 +41,14 @@ SELECT @mem_comp_id := id from civicrm_component where name = 'CiviMember';
         (@option_group_id_cdt, {foreach from=$locales item=locale}'Participant Role', {/foreach} 1, 'ParticipantRole', 1),
         (@option_group_id_cdt, {foreach from=$locales item=locale}'Participant Event Name',{/foreach} 2, 'ParticipantEventName', 2);
     {else}
-    INSERT INTO `civicrm_option_group` 
-        (`name`, `description`, `is_reserved`, `is_active`) VALUES 
+    INSERT INTO `civicrm_option_group`
+        (`name`, `description`, `is_reserved`, `is_active`) VALUES
         ('custom_data_type' , 'Custom Data Type', 0, 1);
 
     SELECT @option_group_id_cdt := id from civicrm_option_group where name = 'custom_data_type';
 
-    INSERT INTO 
-       `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`) 
+    INSERT INTO
+       `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
     VALUES
        (@option_group_id_cdt, 'Participant Role', '1', 'ParticipantRole', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL ),
        (@option_group_id_cdt, 'Participant Event Name', '2', 'ParticipantEventName', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL );
