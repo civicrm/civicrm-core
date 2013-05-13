@@ -32,7 +32,7 @@
   <thead class="sticky">
   <tr class="columnheader">
   {if ! $single and $context eq 'Search' }
-     <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th> 
+     <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
   {/if}
   {foreach from=$columnHeaders item=header}
     <th scope="col">
@@ -48,16 +48,16 @@
   </thead>
 
   {counter start=0 skip=1 print=false}
-  {foreach from=$rows item=row}  
+  {foreach from=$rows item=row}
   <tr id='crm-grant_{$row.grant_id}' class="{cycle values="odd-row,even-row"} crm-grant crm-grant_status-{$row.grant_status_id}">
 
-  {if !$single }  
-     {if $context eq 'Search' }       
+  {if !$single }
+     {if $context eq 'Search' }
         {assign var=cbName value=$row.checkbox}
-        <td>{$form.$cbName.html}</td> 
-     {/if} 
-    <td>{$row.contact_type}</td>	
-    <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td> 
+        <td>{$form.$cbName.html}</td>
+     {/if}
+    <td>{$row.contact_type}</td>
+    <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
   {/if}
     <td class="crm-grant-grant_status">{$row.grant_status}</td>
     <td class="crm-grant-grant_type">{$row.grant_type}</td>
@@ -81,7 +81,7 @@
 {if $context EQ 'Search'}
  <script type="text/javascript">
  {* this function is called to change the color of selected row(s) *}
-    var fname = "{$form.formName}";	
+    var fname = "{$form.formName}";
     on_load_init_checkboxes(fname);
  </script>
 {/if}
