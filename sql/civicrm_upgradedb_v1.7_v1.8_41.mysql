@@ -26,7 +26,7 @@
 -- * Select DomainID
 -- *
 -- *******************************************************/
-	SELECT @domain_id := id from civicrm_domain;
+  SELECT @domain_id := id from civicrm_domain;
 
 -- /*******************************************************
 -- *
@@ -75,9 +75,9 @@ CREATE TABLE civicrm_dedupe_rule (
 -- * civicrm_participant
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_participant
-	    ADD INDEX index_status_id (status_id),
-	    ADD INDEX index_role_id (role_id);
+  ALTER TABLE civicrm_participant
+      ADD INDEX index_status_id (status_id),
+      ADD INDEX index_role_id (role_id);
 
 -- /*******************************************************
 -- *
@@ -320,8 +320,8 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_activity_history
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_activity_history 
-	    ADD is_test tinyint(4) NULL DEFAULT '0';
+  ALTER TABLE civicrm_activity_history 
+      ADD is_test tinyint(4) NULL DEFAULT '0';
 
 
 -- /*******************************************************
@@ -329,11 +329,11 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_contribution_page
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_contribution_page
-	    ADD `start_date` datetime NULL DEFAULT NULL,
-	    ADD `end_date` datetime NULL DEFAULT NULL,
-	    ADD payment_processor_id int(10) unsigned NULL DEFAULT NULL,
-	    ADD CONSTRAINT FK_civicrm_contribution_page_payment_processor_id FOREIGN KEY (payment_processor_id) REFERENCES civicrm_payment_processor(id);
+  ALTER TABLE civicrm_contribution_page
+      ADD `start_date` datetime NULL DEFAULT NULL,
+      ADD `end_date` datetime NULL DEFAULT NULL,
+      ADD payment_processor_id int(10) unsigned NULL DEFAULT NULL,
+      ADD CONSTRAINT FK_civicrm_contribution_page_payment_processor_id FOREIGN KEY (payment_processor_id) REFERENCES civicrm_payment_processor(id);
 
 
 -- /*******************************************************
@@ -341,9 +341,9 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_custom_field
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_custom_field
-	    MODIFY data_type enum('String','Int','Float','Money','Memo','Date','Boolean','StateProvince','Country','File','Link') NULL DEFAULT NULL,
-    	    MODIFY html_type enum('Text','TextArea','Select','Multi-Select','Radio','CheckBox','Select Date','Select State/Province','Select Country','File','Link') NULL DEFAULT NULL;
+  ALTER TABLE civicrm_custom_field
+      MODIFY data_type enum('String','Int','Float','Money','Memo','Date','Boolean','StateProvince','Country','File','Link') NULL DEFAULT NULL,
+          MODIFY html_type enum('Text','TextArea','Select','Multi-Select','Radio','CheckBox','Select Date','Select State/Province','Select Country','File','Link') NULL DEFAULT NULL;
 
 
 -- /*******************************************************
@@ -351,14 +351,14 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_event
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_event
-	    ADD registration_start_date datetime NULL DEFAULT NULL,
-	    ADD registration_end_date datetime NULL DEFAULT NULL,
-	    ADD fee_label varchar(255) NULL DEFAULT NULL,
-	    ADD is_show_location tinyint(4) NULL DEFAULT '1',
-	    ADD payment_processor_id int(10) unsigned NULL DEFAULT NULL AFTER contribution_type_id,
-	    ADD CONSTRAINT FK_civicrm_event_payment_processor_id FOREIGN KEY (payment_processor_id) REFERENCES civicrm_payment_processor(id),
-    	    ADD INDEX index_event_type_id (event_type_id);
+  ALTER TABLE civicrm_event
+      ADD registration_start_date datetime NULL DEFAULT NULL,
+      ADD registration_end_date datetime NULL DEFAULT NULL,
+      ADD fee_label varchar(255) NULL DEFAULT NULL,
+      ADD is_show_location tinyint(4) NULL DEFAULT '1',
+      ADD payment_processor_id int(10) unsigned NULL DEFAULT NULL AFTER contribution_type_id,
+      ADD CONSTRAINT FK_civicrm_event_payment_processor_id FOREIGN KEY (payment_processor_id) REFERENCES civicrm_payment_processor(id),
+          ADD INDEX index_event_type_id (event_type_id);
 
 
 -- /*******************************************************
@@ -366,25 +366,25 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_household
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_household
-	    ADD INDEX index_household_name (household_name);
+  ALTER TABLE civicrm_household
+      ADD INDEX index_household_name (household_name);
 
 -- /*******************************************************
 -- *
 -- * civicrm_individual
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_individual
-	    ADD INDEX index_first_name (first_name),
-	    ADD INDEX index_last_name (last_name);
+  ALTER TABLE civicrm_individual
+      ADD INDEX index_first_name (first_name),
+      ADD INDEX index_last_name (last_name);
 
 -- /*******************************************************
 -- *
 -- * civicrm_line_item
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_line_item
-	    ADD INDEX index_entity (entity_table, entity_id);
+  ALTER TABLE civicrm_line_item
+      ADD INDEX index_entity (entity_table, entity_id);
 
 
 
@@ -393,8 +393,8 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_location
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_location
-	    MODIFY location_type_id int(10) unsigned NULL DEFAULT NULL;
+  ALTER TABLE civicrm_location
+      MODIFY location_type_id int(10) unsigned NULL DEFAULT NULL;
    
 
 -- /*******************************************************
@@ -402,8 +402,8 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_membership
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_membership
-	    ADD is_test tinyint(4) NULL DEFAULT '0';
+  ALTER TABLE civicrm_membership
+      ADD is_test tinyint(4) NULL DEFAULT '0';
 
 
 -- /*******************************************************
@@ -411,8 +411,8 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_membership_type
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_membership_type ALTER fixed_period_start_day    DROP DEFAULT;
-	ALTER TABLE civicrm_membership_type ALTER fixed_period_rollover_day DROP DEFAULT;
+  ALTER TABLE civicrm_membership_type ALTER fixed_period_start_day    DROP DEFAULT;
+  ALTER TABLE civicrm_membership_type ALTER fixed_period_rollover_day DROP DEFAULT;
 
 
 -- /*******************************************************
@@ -420,15 +420,15 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_option_group
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_option_group
-    	    ADD label varchar(255) NULL DEFAULT NULL;
+  ALTER TABLE civicrm_option_group
+          ADD label varchar(255) NULL DEFAULT NULL;
 
 -- /*******************************************************
 -- *
 -- * civicrm_option_value
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_option_value
+  ALTER TABLE civicrm_option_value
              MODIFY filter int(10) unsigned DEFAULT NULL;
 
 -- /*******************************************************
@@ -436,8 +436,8 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_organization
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_organization
-	    ADD INDEX index_organization_name (organization_name);
+  ALTER TABLE civicrm_organization
+      ADD INDEX index_organization_name (organization_name);
 
 
 
@@ -447,16 +447,16 @@ CREATE TABLE civicrm_line_item (
 -- *
 -- *******************************************************/
 
-	INSERT INTO civicrm_payment_processor_type 
-	    (domain_id, name, title, description, is_active, is_default, user_name_label, password_label, signature_label, subject_label, class_name, url_site_default, url_recur_default, url_button_default, url_site_test_default, url_recur_test_default, url_button_test_default, billing_mode, is_recur )
-	VALUES 
-	    (@domain_id,'Dummy','Dummy Payment Processor',NULL,1,1,'User Name',NULL,NULL,NULL,'Payment_Dummy',NULL,NULL,NULL,NULL,NULL,NULL,1,NULL),
-	    (@domain_id,'PayPal_Standard','PayPal - Website Payments Standard',NULL,1,0,'Merchant Account Email',NULL,NULL,NULL,'Payment_PayPalImpl','https://www.paypal.com/','https://www.paypal.com/',NULL,'https://www.sandbox.paypal.com/','https://www.sandbox.paypal.com/',NULL,4,1),
-	    (@domain_id,'PayPal','PayPal - Website Payments Pro',NULL,1,0,'User Name','Password','Signature',NULL,'Payment_PayPalImpl','https://www.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',3,NULL),
-	    (@domain_id,'PayPal_Express','PayPal - Express',NULL,1,0,'User Name','Password','Signature',NULL,'Payment_PayPalImpl','https://www.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',3,NULL),
-	    (@domain_id,'Google_Checkout','Google Checkout',NULL,1,0,'Merchant ID','Key',NULL,NULL,'Payment_Google','https://checkout.google.com/',NULL,'http://checkout.google.com/buttons/checkout.gif','https://sandbox.google.com/checkout',NULL,'http://sandbox.google.com/checkout/buttons/checkout.gif',4,NULL),
-	    (@domain_id,'Moneris','Moneris',NULL,1,0,'User Name','Password','Store ID',NULL,'Payment_Moneris','https://www3.moneris.com/',NULL,NULL,'https://esqa.moneris.com/',NULL,NULL,1,1),
-	    (@domain_id,'AuthNet_AIM','Authorize.Net - AIM',NULL,1,0,'API Login','Payment Key','MD5 Hash',NULL,'Payment_AuthorizeNet','https://secure.authorize.net/gateway/transact.dll','https://api.authorize.net/xml/v1/request.api',NULL,'https://secure.authorize.net/gateway/transact.dll','https://apitest.authorize.net/xml/v1/request.api',NULL,1,1);
+  INSERT INTO civicrm_payment_processor_type 
+      (domain_id, name, title, description, is_active, is_default, user_name_label, password_label, signature_label, subject_label, class_name, url_site_default, url_recur_default, url_button_default, url_site_test_default, url_recur_test_default, url_button_test_default, billing_mode, is_recur )
+  VALUES 
+      (@domain_id,'Dummy','Dummy Payment Processor',NULL,1,1,'User Name',NULL,NULL,NULL,'Payment_Dummy',NULL,NULL,NULL,NULL,NULL,NULL,1,NULL),
+      (@domain_id,'PayPal_Standard','PayPal - Website Payments Standard',NULL,1,0,'Merchant Account Email',NULL,NULL,NULL,'Payment_PayPalImpl','https://www.paypal.com/','https://www.paypal.com/',NULL,'https://www.sandbox.paypal.com/','https://www.sandbox.paypal.com/',NULL,4,1),
+      (@domain_id,'PayPal','PayPal - Website Payments Pro',NULL,1,0,'User Name','Password','Signature',NULL,'Payment_PayPalImpl','https://www.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',3,NULL),
+      (@domain_id,'PayPal_Express','PayPal - Express',NULL,1,0,'User Name','Password','Signature',NULL,'Payment_PayPalImpl','https://www.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',3,NULL),
+      (@domain_id,'Google_Checkout','Google Checkout',NULL,1,0,'Merchant ID','Key',NULL,NULL,'Payment_Google','https://checkout.google.com/',NULL,'http://checkout.google.com/buttons/checkout.gif','https://sandbox.google.com/checkout',NULL,'http://sandbox.google.com/checkout/buttons/checkout.gif',4,NULL),
+      (@domain_id,'Moneris','Moneris',NULL,1,0,'User Name','Password','Store ID',NULL,'Payment_Moneris','https://www3.moneris.com/',NULL,NULL,'https://esqa.moneris.com/',NULL,NULL,1,1),
+      (@domain_id,'AuthNet_AIM','Authorize.Net - AIM',NULL,1,0,'API Login','Payment Key','MD5 Hash',NULL,'Payment_AuthorizeNet','https://secure.authorize.net/gateway/transact.dll','https://api.authorize.net/xml/v1/request.api',NULL,'https://secure.authorize.net/gateway/transact.dll','https://apitest.authorize.net/xml/v1/request.api',NULL,1,1);
 
 
 -- /*******************************************************
@@ -464,9 +464,9 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_uf_group
 -- *
 -- *******************************************************/
-	ALTER TABLE civicrm_uf_group 
-  	    ADD is_cms_user tinyint(4) NULL DEFAULT '0',
-	    ADD notify varchar(255) NULL DEFAULT NULL COMMENT 'If you want member(s) of your organization to receive a notification email whenever this Profile form is used to enter or update contact information, enter one or more email addresses here separated by a comma';
+  ALTER TABLE civicrm_uf_group 
+        ADD is_cms_user tinyint(4) NULL DEFAULT '0',
+      ADD notify varchar(255) NULL DEFAULT NULL COMMENT 'If you want member(s) of your organization to receive a notification email whenever this Profile form is used to enter or update contact information, enter one or more email addresses here separated by a comma';
 
 
 -- /*******************************************************
@@ -475,66 +475,66 @@ CREATE TABLE civicrm_line_item (
 -- *
 -- *******************************************************/
 
-	INSERT INTO 
-	  civicrm_option_group (domain_id, name, description, is_reserved, is_active) 
-	VALUES 
-	  (@domain_id, 'contact_view_options', 'Contact View Options', 0, 1),
-	  (@domain_id, 'contact_edit_options', 'Contact Edit Options', 0, 1),
- 	  (@domain_id, 'advanced_search_options', 'Advanced Search Options', 0, 1),
-	  (@domain_id, 'user_dashboard_options', 'User Dashboard Options', 0, 1),
-	  (@domain_id, 'address_options', 'Addressing Options', 0, 1);
+  INSERT INTO 
+    civicrm_option_group (domain_id, name, description, is_reserved, is_active) 
+  VALUES 
+    (@domain_id, 'contact_view_options', 'Contact View Options', 0, 1),
+    (@domain_id, 'contact_edit_options', 'Contact Edit Options', 0, 1),
+     (@domain_id, 'advanced_search_options', 'Advanced Search Options', 0, 1),
+    (@domain_id, 'user_dashboard_options', 'User Dashboard Options', 0, 1),
+    (@domain_id, 'address_options', 'Addressing Options', 0, 1);
    
-	SELECT @option_group_id_cvOpt := max(id) from civicrm_option_group where name = 'contact_view_options';
-	SELECT @option_group_id_ceOpt := max(id) from civicrm_option_group where name = 'contact_edit_options';
-	SELECT @option_group_id_asOpt := max(id) from civicrm_option_group where name = 'advanced_search_options';
-	SELECT @option_group_id_udOpt := max(id) from civicrm_option_group where name = 'user_dashboard_options';
-	SELECT @option_group_id_adOpt := max(id) from civicrm_option_group where name = 'address_options';
+  SELECT @option_group_id_cvOpt := max(id) from civicrm_option_group where name = 'contact_view_options';
+  SELECT @option_group_id_ceOpt := max(id) from civicrm_option_group where name = 'contact_edit_options';
+  SELECT @option_group_id_asOpt := max(id) from civicrm_option_group where name = 'advanced_search_options';
+  SELECT @option_group_id_udOpt := max(id) from civicrm_option_group where name = 'user_dashboard_options';
+  SELECT @option_group_id_adOpt := max(id) from civicrm_option_group where name = 'address_options';
 
-	INSERT INTO 
-	   civicrm_option_value (option_group_id, label, value, name, grouping, filter, is_default, weight, description, is_optgroup, is_reserved, is_active) 
-	VALUES	
-	  (@option_group_id_cvOpt, 'Activities'   ,   1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
-	  (@option_group_id_cvOpt, 'Relationships',   2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
-	  (@option_group_id_cvOpt, 'Groups'       ,   3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
-	  (@option_group_id_cvOpt, 'Notes'        ,   4, NULL, NULL, 0, NULL,  4, NULL, 0, 0, 1 ),
-	  (@option_group_id_cvOpt, 'Tags'         ,   5, NULL, NULL, 0, NULL,  5, NULL, 0, 0, 1 ),
-	  (@option_group_id_cvOpt, 'Change Log'   ,   6, NULL, NULL, 0, NULL,  6, NULL, 0, 0, 1 ),
-	  (@option_group_id_cvOpt, 'Contributions',   7, NULL, NULL, 0, NULL,  7, NULL, 0, 0, 1 ),
-	  (@option_group_id_cvOpt, 'Memberships'  ,   8, NULL, NULL, 0, NULL,  8, NULL, 0, 0, 1 ),
-	  (@option_group_id_cvOpt, 'Events'       ,   9, NULL, NULL, 0, NULL,  9, NULL, 0, 0, 1 ),
+  INSERT INTO 
+     civicrm_option_value (option_group_id, label, value, name, grouping, filter, is_default, weight, description, is_optgroup, is_reserved, is_active) 
+  VALUES  
+    (@option_group_id_cvOpt, 'Activities'   ,   1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
+    (@option_group_id_cvOpt, 'Relationships',   2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
+    (@option_group_id_cvOpt, 'Groups'       ,   3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
+    (@option_group_id_cvOpt, 'Notes'        ,   4, NULL, NULL, 0, NULL,  4, NULL, 0, 0, 1 ),
+    (@option_group_id_cvOpt, 'Tags'         ,   5, NULL, NULL, 0, NULL,  5, NULL, 0, 0, 1 ),
+    (@option_group_id_cvOpt, 'Change Log'   ,   6, NULL, NULL, 0, NULL,  6, NULL, 0, 0, 1 ),
+    (@option_group_id_cvOpt, 'Contributions',   7, NULL, NULL, 0, NULL,  7, NULL, 0, 0, 1 ),
+    (@option_group_id_cvOpt, 'Memberships'  ,   8, NULL, NULL, 0, NULL,  8, NULL, 0, 0, 1 ),
+    (@option_group_id_cvOpt, 'Events'       ,   9, NULL, NULL, 0, NULL,  9, NULL, 0, 0, 1 ),
 
-	  (@option_group_id_ceOpt, 'Communication Preferences',   1, NULL, NULL, 0, NULL, 1, NULL, 0, 0, 1 ),
-	  (@option_group_id_ceOpt, 'Demographics'             ,   2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
-	  (@option_group_id_ceOpt, 'Tags and Groups'          ,   3, NULL, NULL, 0, NULL, 3, NULL, 0, 0, 1 ),
-	  (@option_group_id_ceOpt, 'Notes'                    ,   4, NULL, NULL, 0, NULL, 4, NULL, 0, 0, 1 ),
-	
-	  (@option_group_id_asOpt, 'Address Fields'      ,   1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
-	  (@option_group_id_asOpt, 'Custom Fields'       ,   2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
-	  (@option_group_id_asOpt, 'Activity History'    ,   3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
-	  (@option_group_id_asOpt, 'Scheduled Activities',   4, NULL, NULL, 0, NULL,  4, NULL, 0, 0, 1 ),
-	  (@option_group_id_asOpt, 'Relationships'       ,   5, NULL, NULL, 0, NULL,  5, NULL, 0, 0, 1 ),
-	  (@option_group_id_asOpt, 'Notes'               ,   6, NULL, NULL, 0, NULL,  6, NULL, 0, 0, 1 ),
-	  (@option_group_id_asOpt, 'Change Log'          ,   7, NULL, NULL, 0, NULL,  7, NULL, 0, 0, 1 ),
-	  (@option_group_id_asOpt, 'Contributions'       ,   8, NULL, NULL, 0, NULL,  8, NULL, 0, 0, 1 ),
-	  (@option_group_id_asOpt, 'Memberships'         ,   9, NULL, NULL, 0, NULL,  9, NULL, 0, 0, 1 ),
-	  (@option_group_id_asOpt, 'Events'              ,  10, NULL, NULL, 0, NULL, 10, NULL, 0, 0, 1 ),
+    (@option_group_id_ceOpt, 'Communication Preferences',   1, NULL, NULL, 0, NULL, 1, NULL, 0, 0, 1 ),
+    (@option_group_id_ceOpt, 'Demographics'             ,   2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
+    (@option_group_id_ceOpt, 'Tags and Groups'          ,   3, NULL, NULL, 0, NULL, 3, NULL, 0, 0, 1 ),
+    (@option_group_id_ceOpt, 'Notes'                    ,   4, NULL, NULL, 0, NULL, 4, NULL, 0, 0, 1 ),
+  
+    (@option_group_id_asOpt, 'Address Fields'      ,   1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
+    (@option_group_id_asOpt, 'Custom Fields'       ,   2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
+    (@option_group_id_asOpt, 'Activity History'    ,   3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
+    (@option_group_id_asOpt, 'Scheduled Activities',   4, NULL, NULL, 0, NULL,  4, NULL, 0, 0, 1 ),
+    (@option_group_id_asOpt, 'Relationships'       ,   5, NULL, NULL, 0, NULL,  5, NULL, 0, 0, 1 ),
+    (@option_group_id_asOpt, 'Notes'               ,   6, NULL, NULL, 0, NULL,  6, NULL, 0, 0, 1 ),
+    (@option_group_id_asOpt, 'Change Log'          ,   7, NULL, NULL, 0, NULL,  7, NULL, 0, 0, 1 ),
+    (@option_group_id_asOpt, 'Contributions'       ,   8, NULL, NULL, 0, NULL,  8, NULL, 0, 0, 1 ),
+    (@option_group_id_asOpt, 'Memberships'         ,   9, NULL, NULL, 0, NULL,  9, NULL, 0, 0, 1 ),
+    (@option_group_id_asOpt, 'Events'              ,  10, NULL, NULL, 0, NULL, 10, NULL, 0, 0, 1 ),
 
-	  (@option_group_id_udOpt, 'Groups'       , 1, NULL, NULL, 0, NULL, 1, NULL, 0, 0, 1 ),
-	  (@option_group_id_udOpt, 'Contributions', 2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
-	  (@option_group_id_udOpt, 'Memberships'  , 3, NULL, NULL, 0, NULL, 3, NULL, 0, 0, 1 ),
-	  (@option_group_id_udOpt, 'Events'       , 4, NULL, NULL, 0, NULL, 4, NULL, 0, 0, 1 ),
+    (@option_group_id_udOpt, 'Groups'       , 1, NULL, NULL, 0, NULL, 1, NULL, 0, 0, 1 ),
+    (@option_group_id_udOpt, 'Contributions', 2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
+    (@option_group_id_udOpt, 'Memberships'  , 3, NULL, NULL, 0, NULL, 3, NULL, 0, 0, 1 ),
+    (@option_group_id_udOpt, 'Events'       , 4, NULL, NULL, 0, NULL, 4, NULL, 0, 0, 1 ),
 
-	  (@option_group_id_adOpt, 'Street Address'   ,  1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'Addt\'l Address 1' , 2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'Addt\'l Address 2' , 3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'City'             ,  4, NULL, NULL, 0, NULL,  4, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'Zip / Postal Code',  5, NULL, NULL, 0, NULL,  5, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'Postal Code Suffix', 6, NULL, NULL, 0, NULL,  6, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'County'           ,  7, NULL, NULL, 0, NULL,  7, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'State / Province' ,  8, NULL, NULL, 0, NULL,  8, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'Country'          ,  9, NULL, NULL, 0, NULL,  9, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'Latitude'         , 10, NULL, NULL, 0, NULL, 10, NULL, 0, 0, 1 ),
-	  (@option_group_id_adOpt, 'Longitude'        , 11, NULL, NULL, 0, NULL, 11, NULL, 0, 0, 1 );
+    (@option_group_id_adOpt, 'Street Address'   ,  1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'Addt\'l Address 1' , 2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'Addt\'l Address 2' , 3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'City'             ,  4, NULL, NULL, 0, NULL,  4, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'Zip / Postal Code',  5, NULL, NULL, 0, NULL,  5, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'Postal Code Suffix', 6, NULL, NULL, 0, NULL,  6, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'County'           ,  7, NULL, NULL, 0, NULL,  7, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'State / Province' ,  8, NULL, NULL, 0, NULL,  8, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'Country'          ,  9, NULL, NULL, 0, NULL,  9, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'Latitude'         , 10, NULL, NULL, 0, NULL, 10, NULL, 0, 0, 1 ),
+    (@option_group_id_adOpt, 'Longitude'        , 11, NULL, NULL, 0, NULL, 11, NULL, 0, 0, 1 );
 
 
 -- /*******************************************************
