@@ -297,13 +297,15 @@ class CRM_Core_OptionValue {
         if (in_array($contactType, array(
           'Individual', 'Household', 'Organization', 'All'))) {
           $nameTitle = array(
-            'addressee' => array('name' => 'addressee',
+            'addressee' => array(
+              'name' => 'addressee',
               'title' => ts('Addressee'),
               'headerPattern' => '/^addressee$/i',
             ),
           );
           $title = array(
-            'email_greeting' => array('name' => 'email_greeting',
+            'email_greeting' => array(
+              'name' => 'email_greeting',
               'title' => ts('Email Greeting'),
               'headerPattern' => '/^email_greeting$/i',
             ),
@@ -315,35 +317,12 @@ class CRM_Core_OptionValue {
           );
           $nameTitle = array_merge($nameTitle, $title);
         }
-
-        if ($contactType == 'Individual' || $contactType == 'All') {
-          $title = array(
-            'gender' => array('name' => 'gender',
-              'title' => ts('Gender'),
-              'headerPattern' => '/^gender$/i',
-            ),
-            'individual_prefix' => array(
-              'name' => 'individual_prefix',
-              'title' => ts('Individual Prefix'),
-              'headerPattern' => '/^(prefix|title)/i',
-            ),
-            'individual_suffix' => array(
-              'name' => 'individual_suffix',
-              'title' => ts('Individual Suffix'),
-              'headerPattern' => '/^suffix$/i',
-            ),
-          );
-          $nameTitle = array_merge($nameTitle, $title);
-        }
       }
 
       if (is_array($nameTitle)) {
         foreach ($nameTitle as $name => $attribs) {
           self::$_fields[$key][$name] = $optionName;
           list($tableName, $fieldName) = explode('.', $optionName['where']);
-          // not sure of this fix, so keeping it commented for now
-          // this is from CRM-1541
-          // self::$_fields[$mode][$name]['where'] = $name . '.' . $fieldName;
           self::$_fields[$key][$name]['where'] = "{$name}.label";
           foreach ($attribs as $k => $val) {
             self::$_fields[$key][$name][$k] = $val;
@@ -364,8 +343,11 @@ class CRM_Core_OptionValue {
   static function select(&$query) {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {
       $field = self::getFields();
-      foreach ($field as $name => $title) {
-        list($tableName, $fieldName) = explode('.', $title['where']);
+      foreach ($field as $name => $values) {
+        if (CRM_Utils_Array::value('pseudoconstant', $values)) {
+          continue;
+        }
+        list($tableName, $fieldName) = explode('.', $values['where']);
         if (CRM_Utils_Array::value($name, $query->_returnProperties)) {
           $query->_select["{$name}_id"] = "{$name}.value as {$name}_id";
           $query->_element["{$name}_id"] = 1;

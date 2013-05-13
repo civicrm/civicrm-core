@@ -40,13 +40,6 @@
 class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * mailing approval status
-   * @var array
-   * @static
-   */
-  private static $approvalStatus;
-
-  /**
    * mailing templates
    * @var array
    * @static
@@ -181,24 +174,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all mail approval status.
-   *
-   * The static array approvalStatus is returned
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all mail approval statuses
-   *
-   */
-  public static function &approvalStatus() {
-    if (!self::$approvalStatus) {
-      self::$approvalStatus = CRM_Core_OptionGroup::values('mail_approval_status');
-    }
-    return self::$approvalStatus;
-  }
-
-  /**
    * Labels for advanced search against mailing summary.
    *
    * @param $field
@@ -239,7 +214,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param boolean $name pseudoconstant to be flushed
    *
    */
-  public static function flush($name) {
+  public static function flush($name = 'template') {
     self::$$name = NULL;
   }
 }

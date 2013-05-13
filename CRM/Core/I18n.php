@@ -106,7 +106,7 @@ class CRM_Core_I18n {
     static $enabled = NULL;
 
     if (!$all) {
-      $all = CRM_Core_I18n_PseudoConstant::languages();
+      $all = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
 
       // check which ones are available; add them to $all if not there already
       $config = CRM_Core_Config::singleton();

@@ -72,7 +72,7 @@ class CRM_Import_Form_Preview extends CRM_Core_Form {
     $groups = CRM_Core_PseudoConstant::group();
     $this->set('groups', $groups);
 
-    $tag = CRM_Core_PseudoConstant::tag();
+    $tag = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     if ($tag) {
       $this->set('tag', $tag);
     }
@@ -411,8 +411,8 @@ class CRM_Import_Form_Preview extends CRM_Core_Form {
 
     $mapFields = $this->get('fields');
 
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
-    $phoneTypes = CRM_Core_PseudoConstant::phoneType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
 
     foreach ($mapper as $key => $value) {
       $header = array();

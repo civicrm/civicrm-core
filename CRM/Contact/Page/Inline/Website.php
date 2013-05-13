@@ -52,7 +52,7 @@ class CRM_Contact_Page_Inline_Website extends CRM_Core_Page {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
-    $websiteTypes = CRM_Core_PseudoConstant::websiteType();
+    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
     $params   = array('contact_id' => $contactId);
     $websites = CRM_Core_BAO_Website::getValues($params, CRM_Core_DAO::$_nullArray);

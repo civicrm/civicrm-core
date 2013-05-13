@@ -64,7 +64,7 @@ class CRM_Contact_Form_Edit_OpenID {
     $form->addRule("openid[$blockId][openid]", ts('OpenID is not a valid URL.'), 'url');
 
     //Block type
-    $form->addElement('select', "openid[$blockId][location_type_id]", '', CRM_Core_PseudoConstant::locationType());
+    $form->addElement('select', "openid[$blockId][location_type_id]", '', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
 
     //is_Primary radio
     $js = array('id' => "OpenID_" . $blockId . "_IsPrimary");

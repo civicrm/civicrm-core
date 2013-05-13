@@ -332,7 +332,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       //handle gender
       if (array_key_exists('civicrm_contact_gender_id', $row)) {
         if ($value = $row['civicrm_contact_gender_id']) {
-          $gender = CRM_Core_PseudoConstant::gender();
+          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
           $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
         }
         $entryFound = TRUE;

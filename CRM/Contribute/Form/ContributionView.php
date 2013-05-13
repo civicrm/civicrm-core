@@ -78,7 +78,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$values[honor_contact_id]");
         $values['honor_display'] = "<A href = $url>" . $dao->display_name . "</A>";
       }
-      $honor = CRM_Core_PseudoConstant::honor();
+      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
       $values['honor_type'] = CRM_Utils_Array::value(CRM_Utils_Array::value('honor_type_id', $values), $honor);
     }
 

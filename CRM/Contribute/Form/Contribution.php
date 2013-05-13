@@ -380,7 +380,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (isset($defaults['honor_contact_id'])) {
       $honorDefault = $ids = array();
       $this->_honorID = $defaults['honor_contact_id'];
-      $honorType = CRM_Core_PseudoConstant::honor();
+      $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
       $idParams = array(
         'id' => $defaults['honor_contact_id'],
         'contact_id' => $defaults['honor_contact_id'],

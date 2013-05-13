@@ -70,7 +70,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
 
     $this->add('select', 'protocol',
       ts('Protocol'),
-      array('' => ts('- select -')) + CRM_Core_PseudoConstant::mailProtocol(),
+      array('' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol'),
       TRUE
     );
 

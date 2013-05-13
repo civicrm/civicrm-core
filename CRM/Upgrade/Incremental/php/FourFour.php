@@ -79,7 +79,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
   static function activityContacts(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $ovValue[] = $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $ovValue[] = $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $ovValue[] = $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);

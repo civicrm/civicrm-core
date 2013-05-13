@@ -67,11 +67,9 @@
       <comment>Participant status ID. FK to civicrm_participant_status_type. Default of 1 should map to status = Registered.</comment>
       <add>1.7</add> 
       <pseudoconstant>
-        <name>participantStatus</name>
-        <table>civicrm_participant_status</table>
+        <table>civicrm_participant_status_type</table>
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
-        <class>CRM_Event_PseudoConstant</class>
       </pseudoconstant>
   </field>
   <foreignKey>
@@ -90,9 +88,7 @@
       <uniqueName>participant_role_id</uniqueName>
       <title>Participant Role Id</title>
       <pseudoconstant>
-        <name>participantRole</name>
         <optionGroupName>participant_role</optionGroupName>
-        <class>CRM_Event_PseudoConstant</class>
       </pseudoconstant>
       <headerPattern>/(participant.)?(role)$/i</headerPattern>
       <import>true</import>
@@ -216,6 +212,11 @@
       <dataPattern>/^[A-Z]{3}$/i</dataPattern>
       <comment>3 character string, value derived from config setting.</comment>
       <add>3.0</add>
+      <pseudoconstant>
+        <table>civicrm_currency</table>
+        <keyColumn>name</keyColumn>
+        <labelColumn>symbol</labelColumn>
+      </pseudoconstant>
   </field>
   <field> 
       <name>campaign_id</name> 

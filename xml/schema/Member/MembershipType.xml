@@ -170,7 +170,11 @@
     <title>Visible</title>
     <type>varchar</type>
     <length>64</length>
-    <add>1.5</add>  
+    <add>1.5</add>
+    <pseudoconstant>
+      <optionGroupName>visibility</optionGroupName>
+      <labelColumn>label</labelColumn>
+    </pseudoconstant>
   </field>
   <field>  
     <name>weight</name>     

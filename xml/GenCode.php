@@ -705,7 +705,16 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     if(!empty($fieldXML->pseudoconstant)){
       //ok this is a bit long-winded but it gets there & is consistent with above approach
       $field['pseudoconstant'] = array();
-      $validOptions = array('name', 'optionGroupName', 'table', 'keyColumn', 'labelColumn','class');
+      $validOptions = array(
+        // Fields can specify EITHER optionGroupName OR table, not both
+        // (since declaring optionGroupName means we are using the civicrm_option_value table)
+        'optionGroupName',
+        'table',
+        // Optional additional params will be passed into CRM_Core_PseudoConstant::get()
+        'keyColumn',
+        'labelColumn',
+        'condition',
+      );
       foreach ($validOptions as $pseudoOption){
         if(!empty($fieldXML->pseudoconstant->$pseudoOption)){
           $field['pseudoconstant'][$pseudoOption] = $this->value($pseudoOption, $fieldXML->pseudoconstant);

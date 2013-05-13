@@ -242,7 +242,7 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_role':
         CRM_Contact_BAO_Query::$_activityRole = $values[2];
-        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -350,7 +350,7 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_tags':
         $value = array_keys($value);
-        $activityTags = CRM_Core_PseudoConstant::tag();
+        $activityTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
 
         $names = array();
         $val = array();

@@ -455,8 +455,7 @@ class CRM_Utils_Token {
         break;
 
       case 'approvalStatus':
-        $mailApprovalStatus = CRM_Mailing_PseudoConstant::approvalStatus();
-        $value = $mailApprovalStatus[$mailing->approval_status_id];
+        $value = CRM_Core_PseudoConstant::getValue('CRM_Mailing_DAO_Mailing', 'approval_status_id', $mailing->approval_status_id);
         break;
 
       case 'approvalNote':
@@ -1050,7 +1049,7 @@ class CRM_Utils_Token {
         if (CRM_Utils_Array::value('preferred_communication_method', $returnProperties) == 1
           && array_key_exists('preferred_communication_method', $contactDetails[$contactID])
         ) {
-          $pcm = CRM_Core_PseudoConstant::pcm();
+          $pcm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
           // communication Prefferance
           $contactPcm = explode(CRM_Core_DAO::VALUE_SEPARATOR,

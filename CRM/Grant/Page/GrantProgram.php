@@ -100,9 +100,8 @@ class CRM_Grant_Page_GrantProgram extends CRM_Core_Page
             $grantProgram[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action, 
                                                                           array('id' => $dao->id));
         }
-        require_once 'CRM/Grant/PseudoConstant.php';
-        $grantType   = CRM_Grant_PseudoConstant::grantType( );
-        $grantStatus = CRM_Grant_PseudoConstant::grantProgramStatus( );
+        $grantType   = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
+        $grantStatus = CRM_Core_OptionGroup::values('grant_program_status');
         foreach ( $grantProgram as $key => $value ) {
             $grantProgram[$key]['grant_type_id'] = $grantType[CRM_Grant_BAO_GrantProgram::getOptionValue($grantProgram[$key]['grant_type_id'])];
             $grantProgram[$key]['status_id'] = $grantStatus[CRM_Grant_BAO_GrantProgram::getOptionValue($grantProgram[$key]['status_id'])];

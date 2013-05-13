@@ -1748,7 +1748,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    AND     civicrm_activity_contact.record_type_id = %3
 ";
 
-      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
       $params = array(
@@ -2257,11 +2257,11 @@ WHERE  contribution_id = %1 ";
       $honorIds['contribution'] = $this->id;
       $idParams = array('id' => $honorID, 'contact_id' => $honorID);
       CRM_Contact_BAO_Contact::retrieve($idParams, $honorDefault, $honorIds);
-      $honorType = CRM_Core_PseudoConstant::honor();
+      $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
 
       $template->assign('honor_block_is_active', 1);
       if (CRM_Utils_Array::value('prefix_id', $honorDefault)) {
-        $prefix = CRM_Core_PseudoConstant::individualPrefix();
+        $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
         $template->assign('honor_prefix', $prefix[$honorDefault['prefix_id']]);
       }
       $template->assign('honor_first_name', CRM_Utils_Array::value('first_name', $honorDefault));
@@ -2504,7 +2504,7 @@ WHERE  contribution_id = %1 ";
       !(CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', $contributionStatuses) && !$params['contribution']->is_pay_later)) {
       $skipRecords = TRUE;
       if (CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', $contributionStatuses)) {
-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+        $relationTypeId = key(CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', array('condition' => " AND v.name LIKE 'Accounts Receivable Account is' ")));
         $params['to_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $relationTypeId);
       }
       elseif (CRM_Utils_Array::value('payment_processor', $params)) {
@@ -2594,7 +2594,7 @@ WHERE  contribution_id = %1 ";
         //if financial type is changed
         if (CRM_Utils_Array::value('financial_type_id', $params) &&
           $params['contribution']->financial_type_id != $params['prevContribution']->financial_type_id) {
-          $incomeTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
+          $incomeTypeId = key(CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', array('condition' => " AND v.name LIKE 'Income Account is' ")));
           $oldFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($params['prevContribution']->financial_type_id, $incomeTypeId);
           $newFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $incomeTypeId);
           if ($oldFinancialAccount != $newFinancialAccount) {
@@ -2688,8 +2688,7 @@ WHERE  contribution_id = %1 ";
           $params['trxnParams']['to_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = - $params['total_amount'];
         }
-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL,
-          " AND v.name LIKE 'Accounts Receivable Account is' "));
+        $relationTypeId = key(CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', array('condition' => " AND v.name LIKE 'Accounts Receivable Account is' ")));
         $params['trxnParams']['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
           $financialTypeID, $relationTypeId);
       }
@@ -2699,7 +2698,7 @@ WHERE  contribution_id = %1 ";
       if ($params['prevContribution']->payment_instrument_id != null
         && $params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
         && $params['contribution']->contribution_status_id == array_search('Pending', $contributionStatus)) {
-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+        $relationTypeId = key(CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', array('condition' => " AND v.name LIKE 'Accounts Receivable Account is' ")));
         $params['trxnParams']['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $relationTypeId);
       }
       elseif ($params['prevContribution']->payment_instrument_id != null) {

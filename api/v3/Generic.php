@@ -56,13 +56,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
   switch ($action) {
     case 'getfields':
       $values = _civicrm_api_get_fields($entity, false, $apiRequest['params']);
-      $results[$entity][$action] = civicrm_api3_create_success($values,
-        $apiRequest['params'], $entity, 'getfields'
-      );
-      return $results[$entity][$action];
-
-                case 'getfields':
-                  return civicrm_api3_create_success(_civicrm_api_get_fields($apiRequest['entity']));
+      return civicrm_api3_create_success($values, $apiRequest['params'], $entity, 'getfields');
     case 'create':
     case 'update':
     case 'replace':
@@ -85,7 +79,6 @@ function civicrm_api3_generic_getfields($apiRequest) {
         // inconsistency
         $metadata['id']['api.aliases'] = array($lcase_entity . '_id');
       }
-
       break;
 
     case 'delete':
@@ -205,43 +198,17 @@ function civicrm_api3_generic_replace($apiRequest) {
 /**
  * API wrapper for getoptions function
  *
- * @param array $apiRequest api request as an array. Keys are
+ * @param array $apiRequest api request as an array.
  *
  * @return array of results
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
-  $field = $apiRequest['params']['field'];
-  $getFieldsArray = array(
-    'version' => 3,
-    'action' => 'create',
-    'options' => array('get_options' => $field),
-  );
-  // First try to retrieve the options from getfields
-  $result = civicrm_api($apiRequest['entity'], 'getfields', $getFieldsArray);
-  if (!isset($result['values'][$field]) && isset($result['values'][$field . '_id'])) {
-    $field = $field . '_id';
+  $daoName = _civicrm_api3_get_DAO($apiRequest['entity']);
+  $options = $daoName::buildOptions($apiRequest['params']['field']);
+  if ($options === FALSE) {
+    return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' either doesn't exist or has no associated option list.");
   }
-  if (!empty($result['values'][$field]['options'])) {
-    return civicrm_api3_create_success($result['values'][$field]['options']);
-  }
-  // If that didn't work, try the constant api
-  if (substr($field, -3) == '_id') {
-    // Convert foo_id to just plain foo
-    $field = substr($field, 0, -3);
-  }
-  $params = array('name' => _civicrm_api_get_camel_name($field));
-  $entity = strtolower($apiRequest['entity']);
-  if ($entity == 'contribution') {
-    $params['class'] = 'CRM_Contribute_PseudoConstant';
-  }
-  elseif ($entity == 'event' || $entity == 'participant') {
-    $params['class'] = 'CRM_Event_PseudoConstant';
-  }
-  elseif (strpos($entity, 'membership') === 0) {
-    $params['class'] = 'CRM_Member_PseudoConstant';
-  }
-  require_once 'api/v3/Constant.php';
-  return civicrm_api3_constant_get($params);
+  return civicrm_api3_create_success($options);
 }
 
 /**

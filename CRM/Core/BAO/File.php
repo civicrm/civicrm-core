@@ -284,7 +284,7 @@
      }
 
      //fix tag names
-     $tags = CRM_Core_PseudoConstant::tag();
+     $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
 
      foreach($results as &$values) {
        if (!empty($values['tag'])) {

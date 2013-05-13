@@ -121,7 +121,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
    */
   public function testLocationTypeGet() {
     // needed to get rid of cached values from previous tests
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
 
 
 

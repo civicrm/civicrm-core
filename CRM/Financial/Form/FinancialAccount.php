@@ -73,7 +73,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $this->add('checkbox', 'is_tax', ts('Is Tax?'));
     $this->add('checkbox', 'is_default', ts('Default?'));
     
-    $financialAccountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
+    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
     if (!empty($financialAccountType)) {
       $this->add('select', 'financial_account_type_id', ts('Financial Account Type'),
         array('' => '- select -') + $financialAccountType, true);

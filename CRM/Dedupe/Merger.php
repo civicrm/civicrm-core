@@ -641,7 +641,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'old_migration_info' => $migrationInfo,
       'mode' => $mode,
     );
-    $allLocationTypes = CRM_Core_PseudoConstant::locationType();
+    $allLocationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     foreach ($migrationInfo as $key => $val) {
       if ($val === "null") {
@@ -893,7 +893,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
     }
 
-    $allLocationTypes = CRM_Core_PseudoConstant::locationType();
+    $allLocationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     $mainLocBlock = $locBlockIds = array();
     $locBlockIds['main'] = $locBlockIds['other'] = array();

@@ -273,7 +273,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param boolean $name pseudoconstant to be flushed
    *
    */
-  public static function flush($name) {
+  public static function flush($name = 'cache') {
     self::$$name = NULL;
   }
 }

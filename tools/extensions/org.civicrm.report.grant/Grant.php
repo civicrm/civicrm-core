@@ -34,7 +34,6 @@
  */
 
 require_once 'CRM/Report/Form.php';
-require_once 'CRM/Grant/PseudoConstant.php';
 class org_civicrm_report_grant extends CRM_Report_Form {
 
   protected $_addressField = FALSE; function __construct() {
@@ -57,7 +56,7 @@ class org_civicrm_report_grant extends CRM_Report_Form {
           'gender_id' =>
           array('title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::gender(),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
           ),
         ),
       ),
@@ -136,14 +135,14 @@ class org_civicrm_report_grant extends CRM_Report_Form {
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Grant_PseudoConstant::grantType(),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id'),
           ),
           'status_id' =>
           array(
             'name' => 'status_id',
             'title' => ts('Grant Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Grant_PseudoConstant::grantStatus(),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id'),
           ),
           'amount_granted' =>
           array(
@@ -308,13 +307,13 @@ class org_civicrm_report_grant extends CRM_Report_Form {
     foreach ($rows as $rowNum => $row) {
       if (array_key_exists('civicrm_grant_grant_type_id', $row)) {
         if ($value = $row['civicrm_grant_grant_type_id']) {
-          $rows[$rowNum]['civicrm_grant_grant_type_id'] = CRM_Grant_PseudoConstant::grantType($value);
+          $rows[$rowNum]['civicrm_grant_grant_type_id'] = CRM_Core_PseudoConstant::getValue('CRM_Grant_DAO_Grant', 'grant_type_id', $value);
         }
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_grant_status_id', $row)) {
         if ($value = $row['civicrm_grant_status_id']) {
-          $rows[$rowNum]['civicrm_grant_status_id'] = CRM_Grant_PseudoConstant::grantStatus($value);
+          $rows[$rowNum]['civicrm_grant_status_id'] = CRM_Core_PseudoConstant::getValue('CRM_Grant_DAO_Grant', 'status_id', $value);
         }
         $entryFound = TRUE;
       }

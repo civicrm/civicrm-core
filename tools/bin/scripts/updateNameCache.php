@@ -71,8 +71,8 @@ class CRM_UpdateNameCache {
     $query = "SELECT * FROM civicrm_contact WHERE contact_type = 'Individual';";
     $dao = CRM_Core_DAO::executeQuery($query);
 
-    $prefixes = CRM_Core_PseudoConstant::individualPrefix();
-    $suffixes = CRM_Core_PseudoConstant::individualSuffix();
+    $prefixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+    $suffixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
 
     $tokens = array();
     CRM_Utils_Hook::tokens($tokens);
