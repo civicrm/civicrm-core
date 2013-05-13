@@ -1821,9 +1821,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
                                      which uses the entity info as its selection value
    * @param array  $pageUrl          the url which on which the ajax custom group load takes place
+   * @param $beforeTriggering        code to execute before actual element triggering
    * @return void
    */
-  function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl) {
+  function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
     //add the custom set
     $return = $this->addCustomGroupField($customSets);
 
@@ -1835,6 +1836,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         list($entity, $entityData) = explode('_', $entityType);
         $elementType = CRM_Utils_Array::value('type', $customData['triggerElement'], 'select');
         $elementName = CRM_Utils_Array::value('name', $customData['triggerElement']);
+        if ($beforeTriggering) {
+          eval($beforeTriggering);
+        }
         if ($elementType == 'select') {
           //reset the select box, so triggering of ajax only happens
           //WRT input of value in this function

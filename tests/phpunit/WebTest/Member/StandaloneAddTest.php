@@ -171,6 +171,10 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     );
 
     $pageUrl = array('url' => 'member/add', 'args' => 'reset=1&action=add&context=standalone');
-    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+
+    //case where we should fire certain
+    //ui actions which helps triggering possible
+    $beforeTriggering = "\$this->select('membership_type_id_0', 'value=1');";
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering);
   }
 }
