@@ -64,5 +64,29 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
   public function selectorName() {
     return $this->get('selectorName');
   }
+
+  public function invalidKey() {
+    $message = ts('Because your session is timed out, we have reset the search page.');
+    CRM_Core_Session::setStatus($message);
+
+    // see if we can figure out the url and redirect to the right search form
+    // note that this happens really early on, so we cant use any of the form or controller
+    // variables
+    $config  = CRM_Core_Config::singleton();
+    $qString = $_GET[$config->userFrameworkURLVar];
+    if (strpos($qString, 'basic') !== FALSE) {
+      $path = 'civicrm/contact/search/basic';
+    }
+    else if (strpos($qString, 'builder') !== FALSE) {
+      $path = 'civicrm/contact/search/builder';
+    }
+    else {
+      $path = 'civicrm/contact/search/advanced';
+    }
+
+    $url = CRM_Utils_System::url($path, 'reset=1');
+    CRM_Utils_System::redirect($url);
+  }
+
 }
 
