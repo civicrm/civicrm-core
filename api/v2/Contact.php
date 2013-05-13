@@ -472,7 +472,7 @@ function _civicrm_contact_get_deprecated(&$params) {
 /**
  * Delete a contact with given contact id
  *
- * @param  array   	  $params (reference ) input parameters, contact_id element required
+ * @param  array       $params (reference ) input parameters, contact_id element required
  *
  * @return boolean        true if success, else false
  * @static void

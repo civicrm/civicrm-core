@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -63,9 +62,9 @@ function civicrm_api3_uf_join_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * @param array $params array or parameters determined by getfields
- * @todo - suspect module, weight don't need to be required - need to test 
+ * @todo - suspect module, weight don't need to be required - need to test
  */
 function _civicrm_api3_uf_join_create_spec(&$params) {
   $params['module']['api.required'] = 1;
