@@ -40,7 +40,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     $cases[] = array('class', 'CRM_Contact_Page_Inline_Phone', TRUE);
     $cases[] = array('', 'CRM_Foo_Bar', FALSE);
     $cases[] = array('', 'CRM_Contact_Page_Inline_Demographics', TRUE);
-    
+
     // invalid type
     $cases[] = array('invalidtype', 'CRM_Foo_Page_Inline_Bar', FALSE);
     $cases[] = array('invalidtype', 'CRM_Foo_Page_AJAX::method', FALSE);

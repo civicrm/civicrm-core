@@ -67,9 +67,9 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
 
     //should possibly insert variable rather than '3' in below
     $this->_regexForGettingAPIStdFunctions = '/^civicrm_api3_  #starts with civicrm_api_3 (ignore internal functions)
-        																					.*_              #any number of characters up to the last _
+                                                  .*_              #any number of characters up to the last _
     # negative look ahead on string getfields
-        																					(?:(?!getfields))/x';
+                                                  (?:(?!getfields))/x';
     // functions to skip from utils.php mainly since they get sucked in via
     // a require chain in the include files
     $this->_skipFunctionList = array(

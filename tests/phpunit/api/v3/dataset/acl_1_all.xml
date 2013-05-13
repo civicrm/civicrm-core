@@ -25,7 +25,7 @@
       <null />  <!--  acl_table  -->
       <null />  <!--  acl_id  -->
       <value>1</value>  <!--  is_active  -->
-    </row> 
+    </row>
     <row>
       <value>3</value>  <!--  id  -->
       <value>Core ACL</value>  <!--  name  -->

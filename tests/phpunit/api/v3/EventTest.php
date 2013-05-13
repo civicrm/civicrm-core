@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -173,7 +172,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
   }
   function testGetEventByIdSort() {
-  	$params = array(
+    $params = array(
       'return.sort' => 'id ASC',
       'return.max_results' => 1,
       'version' => $this->_apiversion,
