@@ -3,6 +3,6 @@
   <name>test_extension_manager_searchtest</name>
   <typeInfo>
     <searchUrl>test/extension/manager/searchtest</searchUrl>
-    <component>CiviContribute</component>    
+    <component>CiviContribute</component>
   </typeInfo>
 </extension>

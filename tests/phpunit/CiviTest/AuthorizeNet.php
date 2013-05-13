@@ -29,12 +29,12 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
   }
 
   /*
-     * Helper function to delete a PayPal Pro 
+     * Helper function to delete a PayPal Pro
      * payment processor
      * @param  int $id - id of the PayPal Pro payment processor
      * to be deleted
      * @return boolean true if payment processor deleted, false otherwise
-     * 
+     *
      */
   function delete($id) {
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();

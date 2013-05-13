@@ -6,6 +6,6 @@
   <downloadUrl>http://example.com/test.crm.extension.browsertest.a-0.1.zip</downloadUrl>
   <typeInfo>
     <reportUrl>test/extension/browsertest/a</reportUrl>
-    <component>CiviContribute</component>    
+    <component>CiviContribute</component>
   </typeInfo>
 </extension>

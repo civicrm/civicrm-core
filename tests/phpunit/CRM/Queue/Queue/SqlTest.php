@@ -104,7 +104,7 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
     $this->queue->createItem(
       array(
         'test-key' => 'start',
-      ), 
+      ),
       array(
         'weight' => -1,
       )
@@ -112,7 +112,7 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
     $this->queue->createItem(
       array(
         'test-key' => 'end',
-      ), 
+      ),
       array(
         'weight' => 1,
       )
