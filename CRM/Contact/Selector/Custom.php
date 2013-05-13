@@ -145,7 +145,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     }
     else {
       $customSearchFile = $ext->keyToPath($customSearchClass, 'search');
-      $this->_search = new $ext->keyToClass($customSearchClass, 'search')( $formValues );
+      $className = $ext->keyToClass($customSearchClass, 'search');
+      $this->_search = new $className($formValues);
     }
   }
   //end of constructor
