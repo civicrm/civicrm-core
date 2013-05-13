@@ -101,13 +101,13 @@
                <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='pay_later_receipt' id=$id}{/if}{$form.pay_later_receipt.html|crmAddClass:big}
                </td>
             </tr>
-	    <tr>
+      <tr>
                 <td>&nbsp;</td>
                 <td class="description">{ts}Instructions added to Confirmation and Thank-you pages when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}
                 </td>
             </tr>
-	   
-  	    </table>
+
+        </table>
 
         <table id="contributionType" class="form-layout">
             <tr class="crm-event-manage-fee-form-block-fee_label">
