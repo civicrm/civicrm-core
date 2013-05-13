@@ -257,8 +257,8 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       NULL, NULL, NULL, NULL,
       array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
     );
-    
-    // financial type 
+
+    // financial type
     $financialType = CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
     $this->add('select', 'financial_type_id', ts('Financial Type'),
       array('' => ts('- select -')) + $financialType
@@ -476,7 +476,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         }
       }
     }
-    if ($values['is_monetary']) { 
+    if ($values['is_monetary']) {
       //check if financial type is selected
       if (!$values['financial_type_id']) {
         $errors['financial_type_id'] = ts("Please select financial type.");

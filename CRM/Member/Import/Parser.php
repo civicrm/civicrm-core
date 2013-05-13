@@ -447,7 +447,7 @@ abstract class CRM_Member_Import_Parser {
             $this->_activeFields[$i]->_hasLocationType = $elements[$i];
         }
     }
-    
+
     function setActiveFieldPhoneTypes( $elements ) {
         for ($i = 0; $i < count( $elements ); $i++) {
             $this->_activeFields[$i]->_phoneType = $elements[$i];

@@ -41,13 +41,13 @@ class CRM_UF_Page_AJAX {
   /**
    * Function the check whether the field belongs
    * to multi-record custom set
-   */  
+   */
   function checkIsMultiRecord() {
     $customId = $_GET['customId'];
-    
+
     $isMultiple = CRM_Core_BAO_CustomField::isMultiRecordField($customId);
     $isMultiple = array('is_multi' => $isMultiple);
     echo json_encode($isMultiple);
     CRM_Utils_System::civiExit();
-  }  
+  }
 }

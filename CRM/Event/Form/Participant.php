@@ -1173,10 +1173,10 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
       // set source if not set
       if (empty($params['source'])) {
-      	$this->_params['participant_source'] = ts('Offline Registration for Event: %2 by: %1', array(1 => $userName, 2 => $eventTitle));
+        $this->_params['participant_source'] = ts('Offline Registration for Event: %2 by: %1', array(1 => $userName, 2 => $eventTitle));
       }
       else {
-      	$this->_params['participant_source'] = $params['source'];
+        $this->_params['participant_source'] = $params['source'];
       }
       $this->_params['description'] = $this->_params['participant_source'];
 
@@ -1253,7 +1253,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
       if (($this->_lineItem || !isset($params['proceSetId'])) && !$this->_paymentId && $this->_id) {
       CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_participant');
     }
-    
+
     if ($this->_mode) {
       // add all the additioanl payment params we need
       $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);

@@ -385,7 +385,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $autoRenew = array();
         if (!empty($membershipType)) {
           $sql = '
-SELECT  id, 
+SELECT  id,
         auto_renew,
         duration_unit,
         duration_interval
@@ -427,7 +427,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     $this->addDate('renewal_date', ts('Date Renewal Entered'), FALSE, array('formatType' => 'activityDate'));
 
-    $this->add('select', 'financial_type_id', ts('Financial Type'), 
+    $this->add('select', 'financial_type_id', ts('Financial Type'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
     );
     if (CRM_Core_Permission::access('CiviContribute') && !$this->_mode) {
@@ -590,7 +590,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($formValues['payment_processor_id'],
         $this->_mode
       );
-      
+
       $fields = array();
 
       // set email for primary location.
@@ -742,7 +742,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if (CRM_Utils_Array::value('record_contribution', $formValues) || $this->_mode) {
       // set the source
       $formValues['contribution_source'] = "{$memType} Membership: Offline membership renewal (by {$userName})";
-      
+
       //create line items
       $lineItem = array();
       $priceSetId = null;
@@ -750,8 +750,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       CRM_Price_BAO_Set::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetId]
       );
-      //CRM-11529 for quick config backoffice transactions 
-      //when financial_type_id is passed in form, update the 
+      //CRM-11529 for quick config backoffice transactions
+      //when financial_type_id is passed in form, update the
       //lineitems with the financial type selected in form
       if ($submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues)) {
         foreach ($lineItem[$priceSetId] as &$li) {
@@ -772,7 +772,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         }
       }
       $formValues['contact_id'] = $this->_contactID;
-      
+
       CRM_Member_BAO_Membership::recordMembershipContribution( $formValues,
         CRM_Core_DAO::$_nullArray,
         $renewMembership->id );

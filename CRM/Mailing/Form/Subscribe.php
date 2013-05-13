@@ -56,7 +56,7 @@ class CRM_Mailing_Form_Subscribe extends CRM_Core_Form {
       $query = "
 SELECT   title, description
   FROM   civicrm_group
- WHERE   id={$this->_groupID}  
+ WHERE   id={$this->_groupID}
    AND   visibility != 'User and User Admin Only'
    AND   $groupTypeCondition";
 
