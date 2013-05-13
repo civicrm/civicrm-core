@@ -183,7 +183,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   function getUFLocale() {
     return NULL;
   }
-  
+
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *

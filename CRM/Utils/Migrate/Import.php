@@ -307,7 +307,7 @@ AND        v.name = %1
         $triggerRebuild = FALSE;
         if($count == $total) {
           $triggerRebuild = TRUE;
-        } 
+        }
         $indexExist = FALSE;
         CRM_Core_BAO_CustomField::createField($customField, 'add', $indexExist, $triggerRebuild);
       }
