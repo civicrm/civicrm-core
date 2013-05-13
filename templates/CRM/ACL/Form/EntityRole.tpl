@@ -43,7 +43,7 @@
       <tr class="crm-acl-entityrole-form-block-entity_id">
          <td class="label">{$form.entity_id.label}</td>
          <td>{$form.entity_id.html}<br />
-            <span class="description">{ts}Select a group of contacts who should have this role when logged in to your site. Groups must be assigned the 'Access Control' type (Manage Groups &raquo; Settings) to be included in this list.{/ts}</span>
+            <span class="description">{ts}Select a group of contacts who should have this role when logged in to your site. Groups must be assigned the 'Access Control' type (Contacts &raquo; Manage Groups &raquo; Settings) to be included in this list.{/ts}</span>
          </td>
       <tr class="crm-acl-entityrole-form-block-is_active">
          <td class="label">{$form.is_active.label}</td>
