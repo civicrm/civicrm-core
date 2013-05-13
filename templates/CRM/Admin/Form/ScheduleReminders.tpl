@@ -98,11 +98,11 @@
         <table class="form-layout-compressed">
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
             <td class="label">{$form.repetition_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.repetition_frequency_interval.html}</td>
-    	    <td>{$form.repetition_frequency_unit.html}</td>
+          <td>{$form.repetition_frequency_unit.html}</td>
           </tr>
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
              <td class="label">{$form.end_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.end_frequency_interval.html}
-    	     <td>{$form.end_frequency_unit.html}&nbsp;&nbsp;&nbsp;{$form.end_action.html}&nbsp;&nbsp;&nbsp;{$form.end_date.html}</td>
+           <td>{$form.end_frequency_unit.html}&nbsp;&nbsp;&nbsp;{$form.end_action.html}&nbsp;&nbsp;&nbsp;{$form.end_date.html}</td>
           </tr>
         </table>
      </td>
