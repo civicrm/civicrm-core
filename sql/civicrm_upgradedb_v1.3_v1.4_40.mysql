@@ -268,7 +268,7 @@ CREATE TABLE civicrm_sms_history (
 
    ALTER TABLE `civicrm_location` ADD  name varchar(255);
 
-	
+  
 -- /*******************************************************
 -- *
 -- * Modify the civicrm_uf_field  Table Structure
@@ -290,9 +290,9 @@ CREATE TABLE civicrm_sms_history (
    
    ALTER TABLE `civicrm_uf_group` ADD limit_listings_group_id int unsigned    COMMENT 'Group id, foriegn key from civicrm_group';
 
-   ALTER TABLE `civicrm_uf_group` ADD INDEX (`limit_listings_group_id`);		
+   ALTER TABLE `civicrm_uf_group` ADD INDEX (`limit_listings_group_id`);    
 
-   ALTER TABLE `civicrm_uf_group` ADD FOREIGN KEY (limit_listings_group_id) REFERENCES civicrm_group(id);	
+   ALTER TABLE `civicrm_uf_group` ADD FOREIGN KEY (limit_listings_group_id) REFERENCES civicrm_group(id);  
 
    ALTER TABLE `civicrm_uf_group` ADD post_URL varchar(255)    COMMENT 'Redirect to URL.';
 
@@ -340,5 +340,5 @@ CREATE TABLE civicrm_sms_history (
 -- * update the custom fields set options per line if it is null
 -- *
 -- *******************************************************/
-	
+
    UPDATE civicrm_custom_field SET  options_per_line=0  WHERE options_per_line IS NULL;
