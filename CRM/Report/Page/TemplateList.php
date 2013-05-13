@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -48,21 +47,21 @@ class CRM_Report_Page_TemplateList extends CRM_Core_Page {
     $compClause = '';
     if ($compID) {
       if ($compID == 99) {
-        $compClause = " AND v.component_id IS NULL ";        
+        $compClause = " AND v.component_id IS NULL ";
       } else {
-        $compClause = " AND v.component_id = {$compID} ";        
+        $compClause = " AND v.component_id = {$compID} ";
       }
     }
 
     $sql = "
-SELECT  v.id, v.value, v.label, v.description, v.component_id, 
-        inst.id as instance_id, ifnull( SUBSTRING(comp.name, 5), 'Contact' ) as component_name 
+SELECT  v.id, v.value, v.label, v.description, v.component_id,
+        inst.id as instance_id, ifnull( SUBSTRING(comp.name, 5), 'Contact' ) as component_name
 FROM    civicrm_option_value v
-INNER JOIN civicrm_option_group g 
+INNER JOIN civicrm_option_group g
         ON (v.option_group_id = g.id AND g.name = 'report_template')
-LEFT  JOIN civicrm_report_instance inst 
+LEFT  JOIN civicrm_report_instance inst
         ON v.value = inst.report_id
-LEFT  JOIN civicrm_component comp 
+LEFT  JOIN civicrm_component comp
         ON v.component_id = comp.id
 ";
 

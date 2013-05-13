@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -183,20 +182,20 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
     $this->_from = "
 FROM civicrm_pcp {$this->_aliases['civicrm_pcp']}
 
-LEFT JOIN civicrm_contribution_soft {$this->_aliases['civicrm_contribution_soft']} 
-          ON {$this->_aliases['civicrm_pcp']}.id = 
+LEFT JOIN civicrm_contribution_soft {$this->_aliases['civicrm_contribution_soft']}
+          ON {$this->_aliases['civicrm_pcp']}.id =
              {$this->_aliases['civicrm_contribution_soft']}.pcp_id
 
-LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} 
-          ON {$this->_aliases['civicrm_contribution_soft']}.contribution_id = 
+LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+          ON {$this->_aliases['civicrm_contribution_soft']}.contribution_id =
              {$this->_aliases['civicrm_contribution']}.id
 
-LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']} 
-          ON {$this->_aliases['civicrm_pcp']}.contact_id = 
-             {$this->_aliases['civicrm_contact']}.id 
+LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+          ON {$this->_aliases['civicrm_pcp']}.contact_id =
+             {$this->_aliases['civicrm_contact']}.id
 
 LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page']}
-          ON {$this->_aliases['civicrm_pcp']}.page_id = 
+          ON {$this->_aliases['civicrm_pcp']}.page_id =
              {$this->_aliases['civicrm_contribution_page']}.id";
   }
 

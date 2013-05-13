@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -212,16 +211,16 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
 
     $this->_from = "
         FROM civicrm_activity {$this->_aliases['civicrm_activity']}
-        
+
              LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                    ON {$this->_aliases['civicrm_activity']}.source_contact_id = {$this->_aliases['civicrm_contact']}.id 
+                    ON {$this->_aliases['civicrm_activity']}.source_contact_id = {$this->_aliases['civicrm_contact']}.id
              LEFT JOIN civicrm_case_activity {$this->_aliases['civicrm_case_activity']}
                     ON {$this->_aliases['civicrm_case_activity']}.activity_id = {$this->_aliases['civicrm_activity']}.id
 ";
   }
 
   function where() {
-    $this->_where = " WHERE {$this->_aliases['civicrm_activity']}.is_current_revision = 1 AND 
+    $this->_where = " WHERE {$this->_aliases['civicrm_activity']}.is_current_revision = 1 AND
                                 {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_test = 0";
     $clauses = array();

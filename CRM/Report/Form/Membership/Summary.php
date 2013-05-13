@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -43,7 +42,7 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
     'barChart' => 'Bar Chart',
     'pieChart' => 'Pie Chart',
   );
-  
+
   function __construct() {
     // UI for selecting columns to appear in the report list
     // array conatining the columns, group_bys and filters build and provided to Form
@@ -205,11 +204,11 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
 
     $this->_from = "
 FROM       civicrm_contact    {$this->_aliases['civicrm_contact']}
-INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']} 
+INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
        ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_membership']}.contact_id
-LEFT  JOIN civicrm_membership_type  {$this->_aliases['civicrm_membership_type']} 
+LEFT  JOIN civicrm_membership_type  {$this->_aliases['civicrm_membership_type']}
        ON {$this->_aliases['civicrm_membership']}.membership_type_id = {$this->_aliases['civicrm_membership_type']}.id
-LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']} 
+LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
        ON {$this->_aliases['civicrm_membership']}.contact_id = {$this->_aliases['civicrm_contribution']}.contact_id
 ";
     //  include address field if address column is to be included
