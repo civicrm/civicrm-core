@@ -151,7 +151,7 @@
      }
 
      cj.post( dataUrl, {mtype: memType}, function( data ) {
-         cj('#field_' + rowID + '_financial_type').val( data.financial_type_id );            
+         cj('#field_' + rowID + '_financial_type').val( data.financial_type_id );
          cj('#field_' + rowID + '_total_amount').val( data.total_amount ).change();
      }, 'json');
    }
