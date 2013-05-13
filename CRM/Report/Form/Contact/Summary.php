@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -43,7 +42,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   protected $_phoneField = FALSE;
 
   protected $_customGroupExtends = array(
-    'Contact', 'Individual', 'Household', 'Organization'); 
+    'Contact', 'Individual', 'Household', 'Organization');
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
@@ -60,9 +59,9 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
-		  'first_name' => array('title' => ts('First Name'),
+      'first_name' => array('title' => ts('First Name'),
           ),
-		  'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Last Name'),
           ),
           'id' =>
           array(
@@ -232,21 +231,21 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   function from() {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-                   ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND 
+            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                   ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
                       {$this->_aliases['civicrm_address']}.is_primary = 1 ) ";
 
     if ($this->isTableSelected('civicrm_email')) {
       $this->_from .= "
-            LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']} 
+            LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
                    ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                       {$this->_aliases['civicrm_email']}.is_primary = 1) ";
     }
 
     if ($this->_phoneField) {
       $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']} 
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND 
+            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                       {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
     }
 
