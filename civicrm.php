@@ -187,6 +187,9 @@ class CiviCRM_For_WordPress {
 		// same procedure as civicrm_wp_main()
 		$this->register_hooks();
 		
+		// notify plugins
+		do_action( 'civicrm_instance_loaded' );
+		
 	}
 
 
@@ -205,29 +208,6 @@ class CiviCRM_For_WordPress {
 
 
 	/** 
-	 * @description: load translation files
-	 */
-	public function translation() {
-		
-		// not used, as there are no translations as yet
-		load_plugin_textdomain(
-		
-			// unique name
-			'civicrm-wordpress', 
-			
-			// deprecated argument
-			false,
-			
-			// relative path to directory containing translation files
-			dirname( plugin_basename( __FILE__ ) ) . '/languages/'
-
-		);
-		
-	}
-	
-	
-	
-	/** 
 	 * @description: register hooks (same procedure as civicrm_wp_main() )
 	 */
 	public function register_hooks() {
@@ -235,7 +215,7 @@ class CiviCRM_For_WordPress {
 		// always add the following hooks
 		
 		// use translation files
-		add_action( 'plugins_loaded', array( $this, 'translation' ) );
+		add_action( 'plugins_loaded', array( $this, 'enable_translation' ) );
 		
 		// add CiviCRM access capabilities to WordPress roles
 		add_action( 'init', array( $this, 'set_access_capabilities' ) );
@@ -246,6 +226,9 @@ class CiviCRM_For_WordPress {
 		
 		// register the CiviCRM shortcode
 		add_shortcode( 'civicrm', array( $this, 'shortcode_handler' ) );
+		
+		// allow plugins to register php and template directories
+		add_action( 'civicrm_config', array( $this, 'register_directories' ) );
 		
 		
 		
@@ -322,44 +305,136 @@ class CiviCRM_For_WordPress {
 
 
 	/**
-	 * @description: Adds menu items to WordPress admin menu
-	 * Callback method for 'admin_menu' hook as set in register_hooks()
+	 * @description: initialize CiviCRM
+	 * @return bool $success
 	 */
-	public function add_menu_items() {
-		
-		// check for settings file
-		if ( file_exists( CIVICRM_SETTINGS_PATH ) ) {
+	public function initialize() {
 
-			// use plugins_url( 'path/to/file.png', __FILE__ )
-			// see http://codex.wordpress.org/Function_Reference/plugins_url
-			// NB: given that URLs always use /, I see no need for DIR_SEP
-			$civilogo = plugins_url(
-				'civicrm/i/logo16px.png',
-				__FILE__
+		static $initialized = false;
+		static $failure = false;
+
+		if ( $failure ) {
+			return false;
+		}
+
+		if ( ! $initialized ) {
+
+			// Check for php version and ensure its greater than minPhpVersion
+			$minPhpVersion = '5.3.3';
+			if ( version_compare( PHP_VERSION, $minPhpVersion ) < 0 ) {
+				echo '<p>' . 
+					 sprintf(
+						__( 'CiviCRM requires PHP Version %s or greater. You are running PHP Version %s', 'civicrm-wordpress' ),
+						$minPhpVersion,
+						PHP_VERSION
+					 ) . 
+					 '<p>';
+				exit();
+			}
+			
+			// check for settings
+			if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
+				$error = false;
+			} else {
+				$error = include_once ( CIVICRM_SETTINGS_PATH );
+			}
+
+			// autoload
+			require_once 'CRM/Core/ClassLoader.php';
+			CRM_Core_ClassLoader::singleton()->register();
+
+			// get ready for problems
+			$installLink    = admin_url() . "options-general.php?page=civicrm-install";
+			$docLinkInstall = "http://wiki.civicrm.org/confluence/display/CRMDOC/WordPress+Installation+Guide";
+			$docLinkTrouble = "http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Configuration+Trouble-shooting";
+			$forumLink      = "http://forum.civicrm.org/index.php/board,6.0.html";
+			
+			
+			// open tags (assume these were meanto be opened here)
+			$errorMsgAdd = '<p><strong>';
+			
+			// construct message
+			$errorMsgAdd = sprintf( 
+				__( 'Please review the <a href="%s">WordPress Installation Guide</a> and the <a href="%s">Trouble-shooting page</a> for assistance. If you still need help installing, you can often find solutions to your issue by searching for the error message in the <a href="%s">installation support section of the community forum</a>.', 'civicrm-wordpress' ),
+				$docLinkInstall,
+				$docLinkTrouble,
+				$forumLink
 			);
 			
-			// add top level menu item
-			add_menu_page( 
-				__( 'CiviCRM', 'civicrm-wordpress' ), 
-				__( 'CiviCRM', 'civicrm-wordpress' ), 
-				'access_civicrm', 
-				'CiviCRM', 
-				array( $this, 'invoke' ), 
-				$civilogo 
+			// close tags (where were these opened?)
+			$errorMsgAdd .= '</strong></p>';
+
+			$installMessage = sprintf(
+				__( 'Click <a href="%s">here</a> for fresh install.', 'civicrm-wordpress' ), 
+				$installLink
 			);
-		
-		} else {
+
+			if ($error == false) {
+				header( 'Location: ' . admin_url() . 'options-general.php?page=civicrm-install' );
+				return false;
+			}
+
+			// this does pretty much all of the civicrm initialization
+			if ( ! file_exists( $civicrm_root . 'CRM/Core/Config.php' ) ) {
+				$error = false;
+			} else {
+				$error = include_once ( 'CRM/Core/Config.php' );
+			}
 			
-			// add menu item to options menu
-			add_options_page( 
-				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
-				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
-				'manage_options', 
-				'civicrm-install', 
-				array( $this, 'run_installer' )
-			);
+			// have we got it?
+			if ( $error == false ) {
+
+				// set static flag
+				$failure = true;
+				
+				// FIX ME - why?
+				wp_die(			
+					"<strong><p class='error'>" .
+					sprintf(
+						__( 'Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (%s).', 'civicrm-wordpress' ),
+						CIVICRM_SETTINGS_PATH
+					) .
+					"</p><p class='error'> &raquo; " .
+					sprintf(
+						__( 'civicrm_root is currently set to: <em>%s</em>.', 'civicrm-wordpress' ), 
+						$civicrm_root
+					) .
+					"</p><p class='error'>" . $errorMsgAdd . "</p></strong>"
+				);
+				
+				// won't reach here!
+				return false;
+				
+			}
+			
+			// set static flag
+			$initialized = true;
+
+			// initialize the system by creating a config object
+			$config = CRM_Core_Config::singleton();
+
+			// sync the logged in user with WP
+			global $current_user;
+			if ( $current_user ) {
+				
+				// sync procedure
+				require_once 'CRM/Core/BAO/UFMatch.php';
+				CRM_Core_BAO_UFMatch::synchronize(
+					$current_user,
+					false,
+					'WordPress',
+					$this->get_civicrm_contact_type('Individual')
+				);
+				
+			}
 
 		}
+		
+		// notify plugins
+		do_action( 'civicrm_initialized' );
+		
+		// success!
+		return true;
 
 	}
 
@@ -412,8 +487,140 @@ class CiviCRM_For_WordPress {
 			require_once 'CRM/Core/BAO/UFMatch.php';
 			CRM_Core_BAO_UFMatch::synchronize( $current_user, false, 'WordPress', 'Individual', true );
 		}
-
+		
+		// do the business
 		CRM_Core_Invoke::invoke($args);
+
+		// notify plugins
+		do_action( 'civicrm_invoked' );
+		
+	}
+
+
+
+	/**
+	 * @description: register directories that CiviCRM searches for php and template files
+	 */
+	public function register_directories( &$config ) {
+	
+		// kick out if no CiviCRM
+		if (!$this->initialize()) { return; }
+		
+
+
+		// init with additions from plugins
+		$template_directories = apply_filters( 'civicrm_register_template_path', array() );
+		
+		// did we get any?
+		if ( count( $template_directories ) > 0 ) {
+
+			// get template instance
+			$template =& CRM_Core_Smarty::singleton();
+			
+			// loop through them
+			foreach( $template_directories AS $dir ) {
+				
+				// add them
+				$template->addTemplateDir( $dir );
+				
+			}
+			
+			// register template directories
+			$template_include_path = implode( PATH_SEPARATOR, $template_directories ) . PATH_SEPARATOR . get_include_path();
+			set_include_path( $template_include_path );
+		
+		}
+		
+		
+		
+		// init with additions from plugins
+		$php_directories = apply_filters( 'civicrm_register_php_path', array() );
+		
+		/**
+		 * Unfortunately, CiviCRM only registers one custom PHP directory. 
+		 * It would have been nice to allow plugins to override core CiviCRM files 
+		 * with their own PHP files. Ah well.
+		 * However, where a plugin *adds* otherwise non-existent files, this will work.
+		 * Summary: you can add PHP but not override PHP.
+		 */
+		
+		// did we get any?
+		if ( count( $php_directories ) > 0 ) {
+
+			// register php directories in include_path
+			$php_include_path = implode( PATH_SEPARATOR, $php_directories ) . PATH_SEPARATOR . get_include_path();
+			set_include_path( $php_include_path );
+		
+		}
+		
+	}
+
+
+
+	/** 
+	 * @description: load translation files
+	 * A good reference on how to implement translation in WordPress:
+	 * http://ottopress.com/2012/internationalization-youre-probably-doing-it-wrong/
+	 */
+	public function enable_translation() {
+		
+		// not used, as there are no translations as yet
+		load_plugin_textdomain(
+		
+			// unique name
+			'civicrm-wordpress', 
+			
+			// deprecated argument
+			false,
+			
+			// relative path to directory containing translation files
+			dirname( plugin_basename( __FILE__ ) ) . '/languages/'
+
+		);
+		
+	}
+	
+	
+	
+	/**
+	 * @description: Adds menu items to WordPress admin menu
+	 * Callback method for 'admin_menu' hook as set in register_hooks()
+	 */
+	public function add_menu_items() {
+		
+		// check for settings file
+		if ( file_exists( CIVICRM_SETTINGS_PATH ) ) {
+
+			// use plugins_url( 'path/to/file.png', __FILE__ )
+			// see http://codex.wordpress.org/Function_Reference/plugins_url
+			// NB: given that URLs always use /, I see no need for DIR_SEP
+			$civilogo = plugins_url(
+				'civicrm/i/logo16px.png',
+				__FILE__
+			);
+			
+			// add top level menu item
+			add_menu_page( 
+				__( 'CiviCRM', 'civicrm-wordpress' ), 
+				__( 'CiviCRM', 'civicrm-wordpress' ), 
+				'access_civicrm', 
+				'CiviCRM', 
+				array( $this, 'invoke' ), 
+				$civilogo 
+			);
+		
+		} else {
+			
+			// add menu item to options menu
+			add_options_page( 
+				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
+				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
+				'manage_options', 
+				'civicrm-install', 
+				array( $this, 'run_installer' )
+			);
+
+		}
 
 	}
 
@@ -454,121 +661,6 @@ class CiviCRM_For_WordPress {
 			 	$installLink
 			 ) .
 			 '</p></div>';
-
-	}
-
-
-
-	/**
-	 * @description: initialize CiviCRM
-	 * @return bool $success
-	 */
-	public function initialize() {
-
-		static $initialized = false;
-		static $failure = false;
-
-		if ( $failure ) {
-			return false;
-		}
-
-		if ( ! $initialized ) {
-
-			// Check for php version and ensure its greater than minPhpVersion
-			$minPhpVersion = '5.3.3';
-			if ( version_compare( PHP_VERSION, $minPhpVersion ) < 0 ) {
-				echo '<p>' . 
-					 sprintf(
-						__( 'CiviCRM requires PHP Version %s or greater. You are running PHP Version %s', 'civicrm-wordpress' ),
-						$minPhpVersion,
-						PHP_VERSION
-					 ) . 
-					 '<p>';
-				exit();
-			}
-
-			if ( ! file_exists(CIVICRM_SETTINGS_PATH ) ) {
-				$error = false;
-			} else {
-				$error = include_once ( CIVICRM_SETTINGS_PATH );
-			}
-
-			// autoload
-			require_once 'CRM/Core/ClassLoader.php';
-			CRM_Core_ClassLoader::singleton()->register();
-
-			// get ready for problems
-			$installLink    = admin_url() . "options-general.php?page=civicrm-install";
-			$docLinkInstall = "http://wiki.civicrm.org/confluence/display/CRMDOC/WordPress+Installation+Guide";
-			$docLinkTrouble = "http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Configuration+Trouble-shooting";
-			$forumLink      = "http://forum.civicrm.org/index.php/board,6.0.html";
-
-			$errorMsgAdd = sprintf( 
-				__( 'Please review the <a href="%s">WordPress Installation Guide</a> and the <a href="%s">Trouble-shooting page</a> for assistance. If you still need help installing, you can often find solutions to your issue by searching for the error message in the <a href="%s">installation support section of the community forum</a>.', 'civicrm-wordpress' ),
-				$docLinkInstall,
-				$docLinkTrouble,
-				$forumLink
-			);
-			
-			// close tags (where were these opened?)
-			$errorMsgAdd .= '</strong></p>';
-
-			$installMessage = sprintf(
-				__( 'Click <a href="%s">here</a> for fresh install.', 'civicrm-wordpress' ), 
-				$installLink
-			);
-
-			if ($error == false) {
-				header( 'Location: ' . admin_url() . 'options-general.php?page=civicrm-install' );
-				return false;
-			}
-
-			// this does pretty much all of the civicrm initialization
-			if ( ! file_exists( $civicrm_root . 'CRM/Core/Config.php' ) ) {
-				$error = false;
-			} else {
-				$error = include_once ( 'CRM/Core/Config.php' );
-			}
-
-			if ( $error == false ) {
-				$failure = true;
-				//FIX ME
-				wp_die(			
-					"<strong><p class='error'>" .
-					sprintf(
-						__( 'Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (%s).', 'civicrm-wordpress' ),
-						CIVICRM_SETTINGS_PATH
-					) .
-					"</p><p class='error'> &raquo; " .
-					sprintf(
-						__( 'civicrm_root is currently set to: <em>%s</em>.', 'civicrm-wordpress' ), 
-						$civicrm_root
-					) .
-					"</p><p class='error'>" . $errorMsgAdd . "</p></strong>"
-				);
-				return false;
-			}
-
-			$initialized = true;
-
-			// initialize the system by creating a config object
-			$config = CRM_Core_Config::singleton();
-
-			// sync the logged in user with WP
-			global $current_user;
-			if ( $current_user ) {
-				require_once 'CRM/Core/BAO/UFMatch.php';
-				CRM_Core_BAO_UFMatch::synchronize(
-					$current_user,
-					false,
-					'WordPress',
-					$this->get_civicrm_contact_type('Individual')
-				);
-			}
-
-		}
-
-		return true;
 
 	}
 
@@ -657,11 +749,12 @@ class CiviCRM_For_WordPress {
 	* Called by register_hooks() and shortcode_handler()
 	*/
 	public function wp_frontend( $shortcode = false ) {
-
-		if ( ! $this->initialize() ) {
-			return;
-		}
-
+		
+		// kick out if not CiviCRM
+		if ( ! $this->initialize() ) { return; }
+		
+		
+		// add CiviCRM core resources
 		CRM_Core_Resources::singleton()->addCoreResources();
 
 		// set the frontend part for civicrm code
@@ -830,7 +923,7 @@ class CiviCRM_For_WordPress {
 	 * @return bool true if authenticated, false otherwise
 	 */
 	public function check_permission( $args ) {
-
+		
 		if ( $args[0] != 'civicrm' ) {
 			return false;
 		}
@@ -981,13 +1074,16 @@ class CiviCRM_For_WordPress {
 			}
 
 			require_once 'CRM/Core/BAO/UFMatch.php';
+			
+			// this does not return anything, so if we want to do anything further
+			// to the CiviCRM Contact, we have to search for it all over again...
 			CRM_Core_BAO_UFMatch::synchronize(
-				$user,
-				true,
-				'WordPress',
-				'Individual'
+				$user, // user object
+				true, // update = true
+				'WordPress', // CMS
+				'Individual' // contact type
 			);
-
+			
 		}
 
 	}
