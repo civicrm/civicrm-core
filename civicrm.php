@@ -495,65 +495,6 @@ class CiviCRM_For_WordPress {
 
 
 
-	/**
-	 * @description: register directories that CiviCRM searches for php and template files
-	 */
-	public function register_directories( &$config ) {
-	
-		// kick out if no CiviCRM
-		if (!$this->initialize()) { return; }
-		
-
-
-		// init with additions from plugins
-		$template_directories = apply_filters( 'civicrm_register_template_path', array() );
-		
-		// did we get any?
-		if ( count( $template_directories ) > 0 ) {
-
-			// get template instance
-			$template =& CRM_Core_Smarty::singleton();
-			
-			// loop through them
-			foreach( $template_directories AS $dir ) {
-				
-				// add them
-				$template->addTemplateDir( $dir );
-				
-			}
-			
-			// register template directories
-			$template_include_path = implode( PATH_SEPARATOR, $template_directories ) . PATH_SEPARATOR . get_include_path();
-			set_include_path( $template_include_path );
-		
-		}
-		
-		
-		
-		// init with additions from plugins
-		$php_directories = apply_filters( 'civicrm_register_php_path', array() );
-		
-		/**
-		 * Unfortunately, CiviCRM only registers one custom PHP directory. 
-		 * It would have been nice to allow plugins to override core CiviCRM files 
-		 * with their own PHP files. Ah well.
-		 * However, where a plugin *adds* otherwise non-existent files, this will work.
-		 * Summary: you can add PHP but not override PHP.
-		 */
-		
-		// did we get any?
-		if ( count( $php_directories ) > 0 ) {
-
-			// register php directories in include_path
-			$php_include_path = implode( PATH_SEPARATOR, $php_directories ) . PATH_SEPARATOR . get_include_path();
-			set_include_path( $php_include_path );
-		
-		}
-		
-	}
-
-
-
 	/** 
 	 * @description: load translation files
 	 * A good reference on how to implement translation in WordPress:
