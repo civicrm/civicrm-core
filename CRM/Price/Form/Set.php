@@ -186,10 +186,10 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     $this->addGroup($extends, 'extends', ts('Used For'), '&nbsp;', TRUE);
 
     $this->addRule('extends', ts('%1 is a required field.', array(1 => ts('Used For'))), 'required');
-    
+
     // financial type
     $financialType = CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-    
+
     $this->add('select', 'financial_type_id',
       ts('Default Financial Type'),
           array('' => ts('- select -')) + $financialType, 'required'
