@@ -170,7 +170,7 @@ class CRM_Utils_Geocode_Yahoo {
                 1 => $ret['postal'],
                 2 => $current_pc_suffix ? "$current_pc-$current_pc_suffix" : $current_pc
               ));
-            
+
               CRM_Core_Session::setStatus($msg, ts('Postal Code Mismatch'), 'error');
             }
             $skip_postal = TRUE;

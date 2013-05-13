@@ -353,7 +353,7 @@ class CRM_Utils_Weight {
       'url' => $returnURL,
       'filter' => $filter,
     );
-    
+
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$SIGNABLE_FIELDS);
     $queryParams['_sgn'] = $signer->sign($queryParams);
     $baseURL = CRM_Utils_System::url('civicrm/admin/weight', $queryParams);

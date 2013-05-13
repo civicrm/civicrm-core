@@ -237,7 +237,7 @@ class CRM_Utils_Type {
    * @param mixed   $data         The variable
    * @param string  $type         The type
    * @param boolean $abort        Should we abort if invalid
-   * @name string   $name	    The name of the attribute
+   * @name string   $name    The name of the attribute
    *
    * @return mixed                The data, escaped if necessary
    * @access public
