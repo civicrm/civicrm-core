@@ -102,6 +102,17 @@ class CRM_Utils_JSON {
     return $json;
   }
 
+  /**
+   * This function is used to encode data for dataTable plugin
+   *
+   * @param array $params associated array of row elements
+   * @param int $sEcho datatable needs this to make it more secure
+   * @param int $iTotal total records
+   * @param int $iFilteredTotal total records on a page
+   * @param array $selectorElements selector elements
+   * @return string
+   *
+   */
   static function encodeDataTableSelector($params, $sEcho, $iTotal, $iFilteredTotal, $selectorElements) {
     $sOutput = '{';
     $sOutput .= '"sEcho": ' . intval($sEcho) . ', ';
@@ -115,13 +126,14 @@ class CRM_Utils_JSON {
         if ($addcomma) {
           $sOutput .= ",";
         }
-        //$sOutput .= '"'.addslashes($value[$element]).'"';
 
         //CRM-7130 --lets addslashes to only double quotes,
         //since we are using it to quote the field value.
         //str_replace helps to provide a break for new-line
         $sOutput .= '"' . addcslashes(str_replace(array("\r\n", "\n", "\r"), '<br />', $value[$element]), '"\\') . '"';
 
+        //remove extra spaces and tab character that breaks dataTable CRM-12551
+        $sOutput  = preg_replace("/\s+/", " ", $sOutput);
         $addcomma = TRUE;
       }
       $sOutput .= "],";
