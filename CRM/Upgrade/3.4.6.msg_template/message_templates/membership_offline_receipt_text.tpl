@@ -53,7 +53,7 @@
 {if $formValues.paidBy}
 {ts}Paid By{/ts}: {$formValues.paidBy}
 {if $formValues.check_number}
-{ts}Check Number{/ts}: {$formValues.check_number} 
+{ts}Check Number{/ts}: {$formValues.check_number}
 {/if}
 {/if}
 {/if}

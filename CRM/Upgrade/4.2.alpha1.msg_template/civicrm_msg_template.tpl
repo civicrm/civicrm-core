@@ -1,11 +1,11 @@
 {php}
   $dir = SMARTY_DIR . '/../../CRM/Upgrade/4.2.alpha1.msg_template/message_templates';
-   
+
   $ovNames = array(
     'contribution' => array(
       'contribution_recurring_cancelled' => ts('Contributions - Recurring Cancellation Notification',         array('escape' => 'sql')),
       'contribution_recurring_billing' => ts('Contributions - Recurring Billing Updates',                     array('escape' => 'sql')),
-      'contribution_recurring_edit'    => ts('Contributions - Recurring Updates',                     	      array('escape' => 'sql')),
+      'contribution_recurring_edit'    => ts('Contributions - Recurring Updates',                             array('escape' => 'sql')),
     ),
     'membership' => array(
       'membership_autorenew_cancelled' => ts('Memberships - Auto-renew Cancellation Notification', array('escape' => 'sql')),
@@ -13,8 +13,8 @@
     ),
   );
 
-  $ignoreTemplate = array_merge(array_keys($ovNames['contribution']), array_keys($ovNames['membership'])); 
-    
+  $ignoreTemplate = array_merge(array_keys($ovNames['contribution']), array_keys($ovNames['membership']));
+
   $this->assign('ovNames', $ovNames);
   $this->assign('dir', $dir);
   $templates = array();

@@ -27,7 +27,7 @@
     {if $recur_txnType eq 'START'}
      {if $auto_renew_membership}
      <p>{ts}Thanks for your auto renew membership sign-up.{/ts}</p>
-     <p>{ts 1=$recur_frequency_interval 2=$recur_frequency_unit}This membership will be automatically renewed 
+     <p>{ts 1=$recur_frequency_interval 2=$recur_frequency_unit}This membership will be automatically renewed
       every %1 %2(s). {/ts}</p>
      {else}
 
@@ -41,7 +41,7 @@
     {elseif $recur_txnType eq 'END'}
 
      {if $auto_renew_membership}
-     <p>{ts}Your auto renew membership sign-up has ended and your membership will not be automatically renewed.{/ts}</p>   
+     <p>{ts}Your auto renew membership sign-up has ended and your membership will not be automatically renewed.{/ts}</p>
      {else}
      <p>{ts}Your recurring contribution term has ended.{/ts}</p>
      <p>{ts 1=$recur_installments}You have successfully completed %1 recurring contributions. Thank you for your support.{/ts}</p>

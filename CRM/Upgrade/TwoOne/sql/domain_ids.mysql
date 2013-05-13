@@ -1,6 +1,6 @@
 -- /************************************************************************
 -- *
--- * Upgrade script MySQL Script 2.0 -> 2.1 - Remove Domain Id Column from all tables 
+-- * Upgrade script MySQL Script 2.0 -> 2.1 - Remove Domain Id Column from all tables
 -- *
 -- *************************************************************************/
 
@@ -28,7 +28,7 @@ ALTER TABLE `civicrm_acl_entity_role` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_contact` 
+ALTER TABLE `civicrm_contact`
     DROP FOREIGN KEY `FK_civicrm_contact_domain_id`;
 ALTER TABLE `civicrm_contact` DROP domain_id;
 
@@ -47,7 +47,7 @@ ALTER TABLE `civicrm_contribution_page` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_contribution` 
+ALTER TABLE `civicrm_contribution`
     DROP FOREIGN KEY `FK_civicrm_contribution_domain_id`,
     DROP INDEX UI_contrib_trxn_id_domain_id,
     DROP INDEX UI_contrib_invoice_id_domain_id;
@@ -60,7 +60,7 @@ ALTER TABLE `civicrm_contribution` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_contribution_recur` 
+ALTER TABLE `civicrm_contribution_recur`
     DROP FOREIGN KEY `FK_civicrm_contribution_recur_domain_id`,
     DROP INDEX UI_contrib_trxn_id_domain_id,
     DROP INDEX UI_contrib_invoice_id_domain_id;
@@ -73,7 +73,7 @@ ALTER TABLE `civicrm_contribution_recur` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_contribution_type` 
+ALTER TABLE `civicrm_contribution_type`
     DROP FOREIGN KEY `FK_civicrm_contribution_type_domain_id`,
     DROP INDEX UI_name_domain_id;
 
@@ -111,7 +111,7 @@ ALTER TABLE `civicrm_event` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_financial_trxn` 
+ALTER TABLE `civicrm_financial_trxn`
     DROP FOREIGN KEY `FK_civicrm_financial_trxn_domain_id`,
     DROP INDEX UI_ft_trxn_id_domain_id;
 ALTER TABLE `civicrm_financial_trxn` DROP domain_id;
@@ -122,7 +122,7 @@ ALTER TABLE `civicrm_financial_trxn` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_group` 
+ALTER TABLE `civicrm_group`
     DROP FOREIGN KEY `FK_civicrm_group_domain_id`,
     DROP INDEX UI_title_domain_id,
     DROP INDEX UI_name_domain_id;
@@ -134,7 +134,7 @@ ALTER TABLE `civicrm_group` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_location_type` 
+ALTER TABLE `civicrm_location_type`
     DROP FOREIGN KEY `FK_civicrm_location_type_domain_id`,
     DROP INDEX UI_name_domain_id;
 ALTER TABLE `civicrm_location_type` DROP domain_id;
@@ -208,7 +208,7 @@ ALTER TABLE `civicrm_msg_template` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_option_group` 
+ALTER TABLE `civicrm_option_group`
     DROP FOREIGN KEY `FK_civicrm_option_group_domain_id`,
     DROP INDEX option_group_name_domain_id;
 ALTER TABLE `civicrm_option_group` DROP domain_id;
@@ -228,7 +228,7 @@ ALTER TABLE `civicrm_payment_processor` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_payment_processor_type` 
+ALTER TABLE `civicrm_payment_processor_type`
     DROP FOREIGN KEY `FK_civicrm_payment_processor_type_domain_id`,
     DROP INDEX UI_name_domain_id;
 ALTER TABLE `civicrm_payment_processor_type` DROP domain_id;
@@ -284,7 +284,7 @@ ALTER TABLE `civicrm_project` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_relationship_type` 
+ALTER TABLE `civicrm_relationship_type`
     DROP FOREIGN KEY `FK_civicrm_relationship_type_domain_id`,
     DROP INDEX UI_name_a_b_domain_id,
     DROP INDEX UI_name_b_a_domain_id;
@@ -296,7 +296,7 @@ ALTER TABLE `civicrm_relationship_type` DROP domain_id;
 -- *
 -- *******************************************************/
 
-ALTER TABLE `civicrm_tag` 
+ALTER TABLE `civicrm_tag`
     DROP FOREIGN KEY `FK_civicrm_tag_domain_id`,
     DROP INDEX UI_name_domain_id;
 ALTER TABLE `civicrm_tag` DROP domain_id;
