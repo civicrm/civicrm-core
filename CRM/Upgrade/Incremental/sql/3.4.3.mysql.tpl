@@ -9,7 +9,7 @@ INSERT INTO civicrm_uf_group
 
 VALUES
     ( 'on_behalf_organization', 'Contact,Organization,Contribution,Membership',  {localize}'{ts escape="sql"}On Behalf Of Organization{/ts}'{/localize}, 1 );
-    
+
 SELECT @uf_group_id_onBehalfOrganization := max(id) from civicrm_uf_group where name = 'on_behalf_organization';
 
 INSERT INTO civicrm_uf_join
@@ -19,26 +19,26 @@ VALUES
    ( 1, 'Profile', NULL, NULL, 7, @uf_group_id_onBehalfOrganization );
 
 SELECT @maxId := id FROM civicrm_location_type WHERE name = 'Main';
-   
+
 INSERT INTO civicrm_uf_field
    ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, {localize field='label'}label{/localize}, field_type, {localize field='help_post'}help_post{/localize}, phone_type_id )
 
 VALUES
-   ( @uf_group_id_onBehalfOrganization,   'organization_name',  1, 0, 1, 'User and User Admin Only',  0, 0, NULL, 
+   ( @uf_group_id_onBehalfOrganization,   'organization_name',  1, 0, 1, 'User and User Admin Only',  0, 0, NULL,
             {localize}'Organization Name'{/localize}, 'Organization', {localize}NULL{/localize},  NULL ),
-   ( @uf_group_id_onBehalfOrganization,   'phone',              1, 0, 2, 'User and User Admin Only',  0, 0, @maxId, 
+   ( @uf_group_id_onBehalfOrganization,   'phone',              1, 0, 2, 'User and User Admin Only',  0, 0, @maxId,
             {localize}'Phone (Main) '{/localize},     'Contact',      {localize}NULL{/localize},  1 ),
-   ( @uf_group_id_onBehalfOrganization,   'email',              1, 0, 3, 'User and User Admin Only',  0, 0, @maxId,  
+   ( @uf_group_id_onBehalfOrganization,   'email',              1, 0, 3, 'User and User Admin Only',  0, 0, @maxId,
             {localize}'Email (Main) '{/localize},     'Contact',      {localize}NULL{/localize},  NULL ),
-   ( @uf_group_id_onBehalfOrganization,   'street_address',     1, 0, 4, 'User and User Admin Only',  0, 0, @maxId,  
+   ( @uf_group_id_onBehalfOrganization,   'street_address',     1, 0, 4, 'User and User Admin Only',  0, 0, @maxId,
             {localize}'Street Address'{/localize},    'Contact',      {localize}NULL{/localize},  NULL ),
-   ( @uf_group_id_onBehalfOrganization,   'city',               1, 0, 5, 'User and User Admin Only',  0, 0, @maxId,  
+   ( @uf_group_id_onBehalfOrganization,   'city',               1, 0, 5, 'User and User Admin Only',  0, 0, @maxId,
             {localize}'City'{/localize},              'Contact',      {localize}NULL{/localize},  NULL ),
    ( @uf_group_id_onBehalfOrganization,   'postal_code',        1, 0, 6, 'User and User Admin Only',  0, 0, @maxId,
             {localize}'Postal Code'{/localize},       'Contact',      {localize}NULL{/localize},  NULL ),
    ( @uf_group_id_onBehalfOrganization,   'country',            1, 0, 7, 'User and User Admin Only',  0, 0, @maxId,
             {localize}'Country'{/localize},           'Contact',      {localize}NULL{/localize},  NULL ),
-   ( @uf_group_id_onBehalfOrganization,   'state_province',     1, 0, 8, 'User and User Admin Only',  0, 0, @maxId,    
+   ( @uf_group_id_onBehalfOrganization,   'state_province',     1, 0, 8, 'User and User Admin Only',  0, 0, @maxId,
             {localize}'State / Province'{/localize},  'Contact',      {localize}NULL{/localize},  NULL );
 
 -- CRM-8150
@@ -56,10 +56,10 @@ CREATE TABLE IF NOT EXISTS `civicrm_action_mapping` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-INSERT INTO civicrm_action_mapping 
-        (entity, entity_value, entity_value_label, entity_status, entity_status_label, entity_date_start, entity_date_end, entity_recipient) 
+INSERT INTO civicrm_action_mapping
+        (entity, entity_value, entity_value_label, entity_status, entity_status_label, entity_date_start, entity_date_end, entity_recipient)
 VALUES
-	('civicrm_activity', 'activity_type', 'Type', 'activity_status', 'Status', 'activity_date_time', NULL, 'activity_contacts');
+  ('civicrm_activity', 'activity_type', 'Type', 'activity_status', 'Status', 'activity_date_time', NULL, 'activity_contacts');
 
 CREATE TABLE IF NOT EXISTS `civicrm_action_schedule` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -108,8 +108,8 @@ SELECT @act_weight          := MAX(weight) FROM civicrm_option_value WHERE optio
 -- CRM-8209
 SELECT @option_group_id_adv_search_opts := max(id) from civicrm_option_group where name = 'advanced_search_options';
 
-INSERT INTO civicrm_option_value 
-   (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, {localize field='description'}description{/localize}, is_optgroup, is_reserved, is_active, component_id, visibility_id) 
+INSERT INTO civicrm_option_value
+   (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, {localize field='description'}description{/localize}, is_optgroup, is_reserved, is_active, component_id, visibility_id)
 VALUES
    (@option_group_id_aco, {localize}'{ts escape="sql"}Activity Assignees{/ts}'{/localize}, 1, 'Activity Assignees', NULL, 0, NULL, 1, {localize}NULL{/localize}, 0, 0, 1, NULL, NULL),
    (@option_group_id_aco, {localize}'{ts escape="sql"}Activity Source{/ts}'{/localize}, 2, 'Activity Source', NULL, 0, NULL, 2, {localize}NULL{/localize}, 0, 0, 1, NULL, NULL),

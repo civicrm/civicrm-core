@@ -192,7 +192,7 @@
         <name>group_id</name>
         <type>int unsigned</type>
         <comment>FK to Group</comment>
-	<add>3.4</add>
+  <add>3.4</add>
     </field>
     <foreignKey>
         <name>group_id</name>
@@ -202,14 +202,14 @@
     </foreignKey>
     <field>
           <name>msg_template_id</name>
-	  <type>int unsigned</type>
-	  <comment>FK to the message template.</comment>
+    <type>int unsigned</type>
+    <comment>FK to the message template.</comment>
     </field>
     <foreignKey>
           <name>msg_template_id</name>
-	  <table>civicrm_msg_template</table>
-	  <key>id</key>
-	  <onDelete>SET NULL</onDelete>
+    <table>civicrm_msg_template</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
     </foreignKey>
     <field>
        <name>absolute_date</name>

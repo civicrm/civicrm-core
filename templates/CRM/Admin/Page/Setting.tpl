@@ -27,7 +27,7 @@
 <div id="help">
     {ts 1=$docLink}Use the links below to configure or modify the global settings for CiviCRM for this site. Refer to the %1 for details on settings and options.{/ts}
 </div>
-<table class="report"> 
+<table class="report">
 <tr>
     <td class="nowrap"><a href="{crmURL p='civicrm/admin/setting/component' q='reset=1'}" id="idComponents">&raquo; {ts}Enable Components{/ts}</a></td>
     <td>{ts}Enable CiviContribute, CiviPledge, CiviEvent, CiviMember, CiviMail, CiviCase, CiviReport and/or CiviGrant components.{/ts}</td>

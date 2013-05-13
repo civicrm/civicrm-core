@@ -73,15 +73,15 @@ class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
         $privacy[$name] = $contact->$name;
       }
     }
-   
+
     $this->assign('contactId', $contactId);
     $this->assign('phone', $phones);
     $this->assign('privacy', $privacy);
 
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);
-    
-    // finally call parent 
+
+    // finally call parent
     parent::run();
   }
 }

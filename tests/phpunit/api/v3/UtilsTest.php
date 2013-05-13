@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -175,8 +174,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
 
   /*
-	 * Test GET DAO function returns DAO
-	 */
+   * Test GET DAO function returns DAO
+   */
   function testGetDAO() {
     $DAO = _civicrm_api3_get_DAO('civicrm_api3_custom_group_get');
     $this->assertEquals('CRM_Core_DAO_CustomGroup', $DAO);
@@ -196,8 +195,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Member_DAO_Membership', $DAO);
   }
   /*
-	 * Test GET DAO function returns DAO
-	 */
+   * Test GET DAO function returns DAO
+   */
   function testGetBAO() {
     $BAO = _civicrm_api3_get_BAO('civicrm_api3_website_get');
     $this->assertEquals('CRM_Core_BAO_Website', $BAO);

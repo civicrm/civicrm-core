@@ -1,5 +1,4 @@
 <?php
-
 /*
   +--------------------------------------------------------------------+
   | CiviCRM version 4.3                                                |
@@ -147,7 +146,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       $defaults = $financialAccountId = array();
       $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
       $financialAccountIds = array();
-     
+
       $params['entity_id'] = $dao->id;
       $params['entity_table'] = 'civicrm_financial_type';
       CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, CRM_Core_DAO::$_nullArray, $financialAccountIds);

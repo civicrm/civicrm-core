@@ -485,8 +485,8 @@
             }
           }
         );
-	}
-	else {
+  }
+  else {
         cj("#email-receipt").hide( );
         cj("#notice").hide( );
       }
@@ -617,7 +617,7 @@
 
     function buildAmount( priceSetId ) {
   if ( !priceSetId ) {
-	  priceSetId = cj("#price_set_id").val( );
+    priceSetId = cj("#price_set_id").val( );
   }
         var fname = '#priceset';
         if ( !priceSetId ) {

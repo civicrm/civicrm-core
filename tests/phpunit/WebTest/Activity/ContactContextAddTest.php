@@ -211,7 +211,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
     $subject = "This is subject of test activity for creating a separate activity for contacts {$firstName1},{$firstName2} and {$firstName3}.";
     $this->type("subject", $subject);
-  
+
     $this->webtestFillDateTime('activity_date_time', '+1 month 11:10PM');
     $this->select("status_id", "value=1");
 
@@ -223,9 +223,9 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
     //activity search page
     $this->openCiviPage('activity/search', 'reset=1');
-    
+
     $this->type('activity_subject', $subject);
-    
+
     $this->clickLink('_qf_Search_refresh');
 
     $targetContacts = array("Summerson, ". $firstName1, "Andersonnn, ". $firstName2, "Anderson, ". $firstName3 );

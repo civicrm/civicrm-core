@@ -96,7 +96,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'is_active', $isActive);
   }
 
-  /**   
+  /**
    * Calculate the default price set id
    * assigned to the contribution/membership etc
    *
@@ -208,7 +208,7 @@ LEFT JOIN  civicrm_option_value ON
 LEFT JOIN  civicrm_option_group ON
            ( civicrm_option_group.id = civicrm_option_value.option_group_id )
 WHERE
-	       civicrm_option_group.name = 'event_type' AND
+         civicrm_option_group.name = 'event_type' AND
            ( ce.is_template IS NULL OR ce.is_template = 0) AND
            ce.id IN ($ids) AND
            ce.is_active = 1;";
@@ -1066,7 +1066,7 @@ return 0;
    * @return array associate array of frequency interval and unit
    * @static
    * @access public
-   */ 
+   */
    public static function getRecurDetails($priceSetId) {
      $query = 'SELECT mt.duration_interval, mt.duration_unit
             FROM civicrm_price_field_value pfv
@@ -1079,14 +1079,14 @@ return 0;
      $dao->fetch();
      return array($dao->duration_interval, $dao->duration_unit);
    }
-   
+
   static function eventPriceSetDomainID() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
            'event_price_set_domain_id',
            NULL, FALSE
            );
   }
-   
+
   /**
    * update the is_quick_config flag in the db
    *

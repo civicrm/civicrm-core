@@ -53,7 +53,7 @@ class CRM_Event_Form_Task_SearchTaskHookSample extends CRM_Event_Form_Task {
     $query = "
      SELECT p.fee_amount as amount,
             p.register_date as register_date,
-            p.source as source,   
+            p.source as source,
             ct.display_name as display_name
        FROM civicrm_participant p
  INNER JOIN civicrm_contact ct ON ( p.contact_id = ct.id )

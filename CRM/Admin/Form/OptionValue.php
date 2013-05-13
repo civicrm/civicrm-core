@@ -95,7 +95,7 @@ class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
       $dao->fetch();
       $defaults['weight'] = ($dao->weight + 1);
     }
-    
+
     // CRM-11516
     if ($this->_gName == 'payment_instrument' && $this->_id) {
       $defaults['financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($this->_id, 'civicrm_option_value', 'financial_account_id');
@@ -164,8 +164,8 @@ class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
     if ($this->_gName == 'payment_instrument') {
       $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
       $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
-      
-      $this->add('select', 'financial_account_id', ts('Financial Account'), 
+
+      $this->add('select', 'financial_account_id', ts('Financial Account'),
         array('' => ts('- select -')) + $financialAccount
       );
     }

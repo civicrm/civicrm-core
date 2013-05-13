@@ -260,10 +260,10 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
     //build the search form.
     CRM_Campaign_BAO_Query::buildSearchForm($this);
 
-    /* 
-         * add form checkboxes for each row. This is needed out here to conform to QF protocol 
-         * of all elements being declared in builQuickForm 
-         */
+    /*
+     * add form checkboxes for each row. This is needed out here to conform to QF protocol
+     * of all elements being declared in builQuickForm
+     */
 
 
     $rows = $this->get('rows');

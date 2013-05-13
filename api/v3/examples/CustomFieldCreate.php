@@ -1,10 +1,9 @@
 <?php
-// $Id$
 
 
 
 /*
- 
+
  */
 function custom_field_create_example() {
   $params = array(
@@ -79,8 +78,8 @@ function custom_field_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite. The test that created it is called
-* custom_field_create 
-* You can see the outcome of the API tests at 
+* custom_field_create
+* You can see the outcome of the API tests at
 * http://tests.dev.civicrm.org/trunk/results-api_v3
 * and review the wiki at
 * http://wiki.civicrm.org/confluence/display/CRMDOC40/CiviCRM+Public+APIs

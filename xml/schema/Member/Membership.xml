@@ -132,7 +132,7 @@
   <field>
       <name>owner_membership_id</name>
       <type>int unsigned</type>
-	  <title>Primary Member ID</title>
+    <title>Primary Member ID</title>
       <comment>Optional FK to Parent Membership.</comment>
       <export>true</export>
       <add>1.7</add>

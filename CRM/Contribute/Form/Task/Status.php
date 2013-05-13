@@ -53,7 +53,7 @@ class CRM_Contribute_Form_Task_Status extends CRM_Contribute_Form_Task {
    *
    * @return void
    * @access public
-   */ 
+   */
   function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE

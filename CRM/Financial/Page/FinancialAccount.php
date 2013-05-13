@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -116,7 +115,7 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
       $this->edit($action, $id) ;
     }
 
-    // parent run 
+    // parent run
     return parent::run();
   }
 

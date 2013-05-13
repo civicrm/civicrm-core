@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -56,14 +55,14 @@ class CRM_Grant_Controller_PaymentSearch extends CRM_Core_Controller
     function __construct( $title = null, $action = CRM_Core_Action::NONE, $modal = true )
     {
         require_once 'CRM/Grant/StateMachine/PaymentSearch.php';
-        
+
         parent::__construct( $title, $modal );
-        
+
         $this->_stateMachine = new CRM_Grant_StateMachine_PaymentSearch( $this, $action );
-        
+
         // create and instantiate the pages
         $this->addPages( $this->_stateMachine, $action );
-        
+
         // add all the actions
         $config = CRM_Core_Config::singleton( );
         $this->addActions( );

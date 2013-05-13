@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -244,8 +243,8 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
     //disable all status those are customs.
     if ($insertedNewRecord) {
       $sql = '
-UPDATE  civicrm_membership_status 
-   SET  is_active = 0 
+UPDATE  civicrm_membership_status
+   SET  is_active = 0
  WHERE  id NOT IN ( ' . implode(',', $statusIds) . ' )';
       CRM_Core_DAO::executeQuery($sql);
     }

@@ -23,7 +23,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $actual = CRM_Utils_System::url('civicrm/foo/bar', 'foo=ab&bar=cd%26ef', false, null, false);
     $this->assertEquals($expected, $actual);
   }
-  
+
   function testUrlQueryArray() {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);

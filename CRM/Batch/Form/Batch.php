@@ -123,9 +123,9 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
       $params['created_id'] = $session->get('userID');
       $params['created_date'] = CRM_Utils_Date::processDate( date( "Y-m-d" ), date( "H:i:s" ) );
     }
-    
+
     // always create with data entry status
-    $params['status_id'] = 3; 
+    $params['status_id'] = 3;
     $batch = CRM_Batch_BAO_Batch::create($params);
 
     // redirect to batch entry page.

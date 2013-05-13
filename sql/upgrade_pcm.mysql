@@ -23,15 +23,15 @@
 -- +--------------------------------------------------------------------+
 -- Inserts values for Preferred Communication Method which are missing in some upgraded 1.5 sites
 
-INSERT INTO 
-   `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`) 
-VALUES 
+INSERT INTO
+   `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`)
+VALUES
    (1, 'preferred_communication_method', 'Preferred Communication Method'     , 0, 1);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
 VALUES
    (@option_group_id_pcm, 'Phone', 1, NULL, NULL, 0, NULL, 1, NULL, 0, 0, 1),
    (@option_group_id_pcm, 'Email', 2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1),

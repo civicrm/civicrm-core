@@ -238,10 +238,10 @@ function civicrm_case_get(&$params) {
     }
 
     $sql = "
-SELECT DISTINCT case_id 
-  FROM civicrm_relationship 
- WHERE (contact_id_a = $contact 
-    OR contact_id_b = $contact) 
+SELECT DISTINCT case_id
+  FROM civicrm_relationship
+ WHERE (contact_id_a = $contact
+    OR contact_id_b = $contact)
    AND case_id IS NOT NULL";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
@@ -470,7 +470,7 @@ function _civicrm_case_format_params(&$params, $mode) {
       if (!$params['case_type_id']) {
         $sql = "
 SELECT  ov.value
-  FROM  civicrm_option_value ov 
+  FROM  civicrm_option_value ov
   JOIN  civicrm_option_group og ON og.id = ov.option_group_id
  WHERE  ov.label = %1 AND og.name = 'case_type'";
 

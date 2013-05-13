@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -112,7 +111,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/financial/financialbatches',
       "reset=1&batchStatus=5"));
   }
-  
+
   /**
    * Build the form
    *
@@ -152,7 +151,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       )
     );
   }
-  
+
   /**
    * process the form after the input has been submitted and validated
    *

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -304,7 +303,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
               $this->_relField = TRUE;
             }
             if ($fieldName == 'sort_name') {
-              $select[] = "GROUP_CONCAT({$field['dbAlias']}  ORDER BY {$field['dbAlias']} ) 
+              $select[] = "GROUP_CONCAT({$field['dbAlias']}  ORDER BY {$field['dbAlias']} )
                                          as {$tableName}_{$fieldName}";
             }
             if ($tableName == 'civicrm_activity_last_completed') {
@@ -346,20 +345,20 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
     if ($this->_addressField) {
       $this->_from .= "
-             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-                    ON {$conact}.id = {$this->_aliases['civicrm_address']}.contact_id AND 
+             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                    ON {$conact}.id = {$this->_aliases['civicrm_address']}.contact_id AND
                        {$this->_aliases['civicrm_address']}.is_primary = 1 ";
     }
     if ($this->_emailField) {
-      $this->_from .= " 
-             LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} 
-                   ON {$conact}.id = {$this->_aliases['civicrm_email']}.contact_id AND 
+      $this->_from .= "
+             LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
+                   ON {$conact}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                        {$this->_aliases['civicrm_email']}.is_primary = 1 ";
     }
     if ($this->_phoneField) {
       $this->_from .= "
-             LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']} 
-                       ON ( {$conact}.id = {$this->_aliases['civicrm_phone']}.contact_id AND 
+             LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']}
+                       ON ( {$conact}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                           {$this->_aliases['civicrm_phone']}.is_primary = 1) ";
     }
     if ($this->_worldRegionField) {
@@ -491,7 +490,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     if ($activityType = CRM_Utils_Array::value('case_activity_all_dates', $this->_params['case_detail_extra'])) {
       $select[] = "GROUP_CONCAT(DISTINCT(civireport_activity_all_{$activityType}.{$this->_caseDetailExtra['case_activity_all_dates']['name']}) ORDER BY civireport_activity_all_{$activityType}.{$this->_caseDetailExtra['case_activity_all_dates']['name']}) as case_activity_all_dates";
 
-      $from[] = " LEFT JOIN civicrm_case_activity civireport_case_activity_all_{$activityType} ON ( civireport_case_activity_all_{$activityType}.case_id = {$case}.id) 
+      $from[] = " LEFT JOIN civicrm_case_activity civireport_case_activity_all_{$activityType} ON ( civireport_case_activity_all_{$activityType}.case_id = {$case}.id)
                         LEFT JOIN civicrm_activity civireport_activity_all_{$activityType} ON ( civireport_activity_all_{$activityType}.id = civireport_case_activity_all_{$activityType}.activity_id AND civireport_activity_all_{$activityType}.activity_type_id = {$activityType})";
 
       $this->_columnHeaders['case_activity_all_dates'] = array(

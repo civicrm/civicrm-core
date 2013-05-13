@@ -68,7 +68,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    *
    * @return void
    * @access public
-   */ 
+   */
   function preProcess() {
    /*
     * initialize the task and row fields

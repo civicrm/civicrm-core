@@ -194,7 +194,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id');
     $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
-      
+
     Contact::delete($contactId);
   }
 
@@ -335,7 +335,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id');
     $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
-      
+
     Contact::delete($contactId);
   }
 }

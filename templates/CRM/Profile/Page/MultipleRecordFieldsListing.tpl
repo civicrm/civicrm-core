@@ -28,12 +28,12 @@
 
     {if $records and $headers}
     {include file="CRM/common/jsortable.tpl"}
-   
+
       <div id="browseValues">
         <div>
         {strip}
           <table id="records" class="display">
-	   <thead>
+     <thead>
                <tr>
           {foreach from=$headers key=recId item=head}
              <th>{ts}{$head}{/ts}</th>
@@ -41,8 +41,8 @@
              <th></th>
              </tr>
            </thead>
-     {foreach from=$records key=recId item=rows}   
-       <tr class="{cycle values="odd-row,even-row"}">     
+     {foreach from=$records key=recId item=rows}
+       <tr class="{cycle values="odd-row,even-row"}">
          {foreach from=$rows item=row}
             {foreach from=$row item=val key=ids}
               <td>{$val}</td>
@@ -63,7 +63,7 @@ function formDialog(dataURL, dialogTitle){
       cj.ajax({
          url: dataURL,
          success: function( content ) {
-	       cj('#profile-dialog').show( ).html( content ).dialog({
+         cj('#profile-dialog').show( ).html( content ).dialog({
                  title: dialogTitle,
                  modal: true,
                  width: 680,
@@ -71,14 +71,14 @@ function formDialog(dataURL, dialogTitle){
                    opacity: 0.5,
                    background: "black"
                  },
-		 
+
                  close: function(event, ui) {
-	           cj('#profile-dialog').html('');
+             cj('#profile-dialog').html('');
                  }
              });
-	     cj('.action-link').hide();
+       cj('.action-link').hide();
              cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
-	 }});
+   }});
 }
 
 cj('.action-item').each(function(){
@@ -88,7 +88,7 @@ cj('.action-item').each(function(){
 
  cj(".action-item").click(function(){
     dataURL = cj(this).attr('jshref');
-    dialogTitle = cj(this).attr('title');       
+    dialogTitle = cj(this).attr('title');
     formDialog(dataURL, dialogTitle);
  });
 });

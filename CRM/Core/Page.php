@@ -195,7 +195,7 @@ class CRM_Core_Page {
     if (empty($_GET['snippet'])) {
       // Version check and intermittent alert to admins
       CRM_Utils_VersionCheck::singleton()->versionAlert();
-  
+
       // Debug msg once per hour
       if ($config->debug && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('debug_alert', 3600)) {
         $msg = ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1')));

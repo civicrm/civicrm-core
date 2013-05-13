@@ -25,7 +25,7 @@
 *}
 <div class="crm-block crm-form-block crm-localization-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"} </div>
-    <h3>{ts}Language and Currency{/ts}</h3>    
+    <h3>{ts}Language and Currency{/ts}</h3>
         <table class="form-layout-compressed">
             <tr class="crm-localization-form-block-lcMessages">
                 <td class="label">{$form.lcMessages.label}</td>
@@ -33,7 +33,7 @@
                 <span class="description">{ts}Default language used for this installation.{/ts}</span></td>
             </tr>
            {if $form.languageLimit}
-             <tr class="crm-localization-form-block-languageLimit"> 
+             <tr class="crm-localization-form-block-languageLimit">
                  <td class="label">{$form.languageLimit.label}</td>
                  <td>{$form.languageLimit.html}<br />
                  <span class="description">{ts}Languages available to users of this installation.{/ts}</span></td>
@@ -99,7 +99,7 @@
                 <td>{$form.defaultContactCountry.html}<br />
                 <span class="description">{ts}This value is selected by default when adding a new contact address.{/ts}</span></td>
             </tr>
-	         <tr class="crm-localization-form-block-defaultContactStateProvince">
+           <tr class="crm-localization-form-block-defaultContactStateProvince">
                 <td class="label">{$form.defaultContactStateProvince.label}</td>
                 <td>{$form.defaultContactStateProvince.html}<br />
                 <span class="description">{ts}This value is selected by default when adding a new contact address.{/ts}</span></td>
@@ -115,7 +115,7 @@
                 <span class="description">{ts}State/province listings are populated dynamically based on the selected Country for all standard contact address editing forms, as well as for <strong>Profile forms which include both a Country and a State/Province field</strong>.  This setting controls which countries' states and/or provinces are available in the State / Province selection field <strong>for Custom Fields</strong> or for Profile forms which do NOT include a Country field.{/ts}</span></td>
             </tr>
         </table>
-    <h3>{ts}Multiple Languages Support{/ts}</h3>    
+    <h3>{ts}Multiple Languages Support{/ts}</h3>
       <table class="form-layout-compressed">
         {if $form.languageLimit}
           <tr class="crm-localization-form-block-makeSinglelingual_description">
@@ -124,7 +124,7 @@
           </tr>
           <tr class="crm-localization-form-block-makeSinglelingual">
               <td class="label">{$form.makeSinglelingual.label}</td>
-              <td>{$form.makeSinglelingual.html}<br />          
+              <td>{$form.makeSinglelingual.html}<br />
               <span class="description">{ts}Check this box and click 'Save' to switch this installation from multi- to single-language.{/ts}</span><br /><br />
               <span class="description" style="color:red">{$warning}</span></td>
           </tr>
@@ -138,7 +138,7 @@
           <tr class="crm-localization-form-block-description">
               <td>
               <span class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts} {ts}(Multilingual support currenly cannot be enabled on installations with enabled logging.){/ts}</span><br /><br />
-              <span class="description" style="color:red">{$warning}</span></td>   
+              <span class="description" style="color:red">{$warning}</span></td>
           </tr>
         {/if}
       </table>

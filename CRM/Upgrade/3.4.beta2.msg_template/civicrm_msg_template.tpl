@@ -1,15 +1,15 @@
 -- CRM-7817
 {if $addPetitionOptionGroup}
 
-INSERT INTO `civicrm_option_group` 
-    ( `name`, {localize field='label'}label{/localize}, {localize field='description'}description{/localize}, `is_reserved`, `is_active` ) 
-VALUES 
+INSERT INTO `civicrm_option_group`
+    ( `name`, {localize field='label'}label{/localize}, {localize field='description'}description{/localize}, `is_reserved`, `is_active` )
+VALUES
      ( 'msg_tpl_workflow_petition', {localize}'{ts escape="sql"}Message Template Workflow for Petition{/ts}'{/localize},{localize}'{ts escape="sql"}Message Template Workflow for Petition{/ts}'{/localize}, 0, 1 );
 
 SELECT @option_group_id := MAX(id) from civicrm_option_group WHERE name = 'msg_tpl_workflow_petition';
 
-INSERT INTO `civicrm_option_value` 
- ( `option_group_id`, {localize field='label'}label{/localize}, `name`, `value`, `weight`, `is_active` ) 
+INSERT INTO `civicrm_option_value`
+ ( `option_group_id`, {localize field='label'}label{/localize}, `name`, `value`, `weight`, `is_active` )
 VALUES
  ( @option_group_id, {localize}'{ts escape="sql"}Petition - signature added{/ts}'{/localize}, 'petition_sign', 1, 1, 1 ),
  ( @option_group_id, {localize}'{ts escape="sql"}Petition - need verification{/ts}'{/localize}, 'petition_confirmation_needed', 2, 2, 1 );
@@ -27,8 +27,8 @@ SELECT @tpl_ovid_petition_confirmation_needed := MAX(id) FROM civicrm_option_val
 {fetch assign=text_petition_confirmation_needed  file="`$smarty.const.SMARTY_DIR`/../../CRM/Upgrade/3.4.beta2.msg_template/message_templates/petition_confirmation_needed_text.tpl"}
 {fetch assign=html_petition_confirmation_needed  file="`$smarty.const.SMARTY_DIR`/../../CRM/Upgrade/3.4.beta2.msg_template/message_templates/petition_confirmation_needed_html.tpl"}
 
-INSERT INTO civicrm_msg_template 
-    (msg_title, msg_subject, msg_text, msg_html, workflow_id, is_default, is_reserved) 
+INSERT INTO civicrm_msg_template
+    (msg_title, msg_subject, msg_text, msg_html, workflow_id, is_default, is_reserved)
     VALUES
     ( '{ts escape="sql"}Petition - signature added{/ts}', '{$subject_petition_sign|escape:"quotes"}', '{$text_petition_sign|escape:"quotes"}', '{$html_petition_sign|escape:"quotes"}', @tpl_ovid_petition_sign, 1, 0),
 

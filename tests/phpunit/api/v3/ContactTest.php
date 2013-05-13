@@ -1311,7 +1311,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
                         'email'            => 'man2@yahoo.com',
                         'contact_type'     => 'Individual',
                         'location_type_id' => 1,
-                        'version' 				=> $this->_apiversion,
+                        'version'         => $this->_apiversion,
                         'api.contribution.create'    => array(
 
                              'receive_date'           => '2010-01-01',

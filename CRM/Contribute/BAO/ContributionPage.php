@@ -73,7 +73,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     );
 
     CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage', $params, $values);
-    
+
     // get the profile ids
     $ufJoinParams = array(
       'module' => 'CiviContribute',
@@ -210,7 +210,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         0,
       );
     }
-    
+
     if (!$returnMessageText && !empty($gIds)) {
       //send notification email if field values are set (CRM-1941)
       foreach ($gIds as $key => $gId) {
@@ -391,7 +391,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
     }
   }
-  
+
   /*
      * Construct the message to be sent by the send function
      *
@@ -709,7 +709,7 @@ WHERE entity_table = 'civicrm_contribution_page'
     );
     $query = "
    SELECT  civicrm_contribution_page.id as id,
-           civicrm_contribution_page.financial_type_id as settings, 
+           civicrm_contribution_page.financial_type_id as settings,
            amount_block_is_active as amount,
            civicrm_membership_block.id as membership,
            civicrm_uf_join.id as custom,

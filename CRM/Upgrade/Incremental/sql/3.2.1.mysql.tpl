@@ -17,7 +17,7 @@ SELECT @nav_fmdc  := id FROM civicrm_navigation WHERE name = 'Find and Merge Dup
 SELECT @nav_c     := id FROM civicrm_navigation WHERE name = 'Contacts';
 SELECT @nav_c_wt  := max(weight) from civicrm_navigation WHERE parent_id = @nav_c;
 
-DELETE FROM	civicrm_navigation WHERE id = @nav_fmdc;
+DELETE FROM  civicrm_navigation WHERE id = @nav_fmdc;
 
 UPDATE civicrm_navigation SET has_separator = '1' where id = @nav_mt;
 
