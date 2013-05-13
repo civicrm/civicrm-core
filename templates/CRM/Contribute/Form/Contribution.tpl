@@ -117,7 +117,7 @@
         {/if}
 
         {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
-        <br /><span class="description">{ts}Actual amount given by contributor.{/ts}</span>
+        <br /><span class="description">{ts}Actual amount given by contributor.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
       </td>
     </tr>
 
@@ -572,6 +572,8 @@ function buildAmount( priceSetId ) {
     // show/hide price set amount and total amount.
     cj("#totalAmountORPriceSet").show( );
     cj("#totalAmount").show( );
+    var choose = "{/literal}{ts}Choose price set{/ts}{literal}";
+    cj("#price_set_id option[value='']").html( choose );
 
     //we might want to build recur block.
     if (cj("#is_recur")) buildRecurBlock( null );
@@ -600,6 +602,8 @@ function buildAmount( priceSetId ) {
 
   cj( "#totalAmountORPriceSet" ).hide( );
   cj( "#totalAmount").hide( );
+  var manual = "{/literal}{ts}Manual contribution amount{/ts}{literal}";
+  cj("#price_set_id option[value='']").html( manual );
 }
 
 function adjustPayment( ) {

@@ -106,7 +106,7 @@
               {/if}
             {/if}
             {if $member_is_test} {ts}(test){/ts}{/if}<br />
-            <span class="description">{ts}Select Membership Organization and then Membership Type.{/ts}</span>
+            <span class="description">{ts}Select Membership Organization and then Membership Type.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
           </td>
         </tr>
         <tr id="maxRelated" class="crm-membership-form-block-max_related">
@@ -629,6 +629,8 @@
 
         // show/hide price set amount and total amount.
         cj( "#mem_type_id").show( );
+        var choose = "{/literal}{ts}Choose price set{/ts}{literal}";
+        cj("#price_set_id option[value='']").html( choose );
         cj( "#totalAmountORPriceSet" ).show( );
         cj('#total_amount').removeAttr("readonly");
         cj( "#num_terms_row").show( );
@@ -658,6 +660,8 @@
 
       cj( "#totalAmountORPriceSet" ).hide( );
       cj( "#mem_type_id" ).hide( );
+      var manual = "{/literal}{ts}Manual membership and price{/ts}{literal}";
+      cj("#price_set_id option[value='']").html( manual );
       cj( "#num_terms_row" ).hide( );
       cj(".crm-membership-form-block-financial_type_id-mode").hide();
     }
