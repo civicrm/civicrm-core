@@ -208,29 +208,6 @@ class CiviCRM_For_WordPress {
 
 
 	/** 
-	 * @description: load translation files
-	 */
-	public function translation() {
-		
-		// not used, as there are no translations as yet
-		load_plugin_textdomain(
-		
-			// unique name
-			'civicrm-wordpress', 
-			
-			// deprecated argument
-			false,
-			
-			// relative path to directory containing translation files
-			dirname( plugin_basename( __FILE__ ) ) . '/languages/'
-
-		);
-		
-	}
-	
-	
-	
-	/** 
 	 * @description: register hooks (same procedure as civicrm_wp_main() )
 	 */
 	public function register_hooks() {
@@ -238,7 +215,7 @@ class CiviCRM_For_WordPress {
 		// always add the following hooks
 		
 		// use translation files
-		add_action( 'plugins_loaded', array( $this, 'translation' ) );
+		add_action( 'plugins_loaded', array( $this, 'enable_translation' ) );
 		
 		// add CiviCRM access capabilities to WordPress roles
 		add_action( 'init', array( $this, 'set_access_capabilities' ) );
@@ -325,144 +302,6 @@ class CiviCRM_For_WordPress {
 
 
 	/**
-	 * @description: Adds menu items to WordPress admin menu
-	 * Callback method for 'admin_menu' hook as set in register_hooks()
-	 */
-	public function add_menu_items() {
-		
-		// check for settings file
-		if ( file_exists( CIVICRM_SETTINGS_PATH ) ) {
-
-			// use plugins_url( 'path/to/file.png', __FILE__ )
-			// see http://codex.wordpress.org/Function_Reference/plugins_url
-			// NB: given that URLs always use /, I see no need for DIR_SEP
-			$civilogo = plugins_url(
-				'civicrm/i/logo16px.png',
-				__FILE__
-			);
-			
-			// add top level menu item
-			add_menu_page( 
-				__( 'CiviCRM', 'civicrm-wordpress' ), 
-				__( 'CiviCRM', 'civicrm-wordpress' ), 
-				'access_civicrm', 
-				'CiviCRM', 
-				array( $this, 'invoke' ), 
-				$civilogo 
-			);
-		
-		} else {
-			
-			// add menu item to options menu
-			add_options_page( 
-				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
-				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
-				'manage_options', 
-				'civicrm-install', 
-				array( $this, 'run_installer' )
-			);
-
-		}
-
-	}
-
-
-
-	/**
-	 * @description: invoke CiviCRM in a WordPress context
-	 * Callback function from add_menu_page() 
-	 * Callback from WordPress 'init' and 'the_content' hooks
-	 * Also called by add_shortcode_includes() and _civicrm_update_user()
-	 */
-	public function invoke() {
-
-		static $alreadyInvoked = false;
-		if ( $alreadyInvoked ) {
-			return;
-		}
-
-		$alreadyInvoked = true;
-		if ( ! $this->initialize() ) {
-			return '';
-		}
-
-		// Add our standard css & js
-		CRM_Core_Resources::singleton()->addCoreResources();
-
-		// CRM-95XX
-		// At this point we are calling a civicrm function
-		// Since WP messes up and always quotes the request, we need to reverse
-		// what it just did
-		$this->remove_wp_magic_quotes();
-
-		if ( isset( $_GET['q'] ) ) {
-			$args = explode('/', trim($_GET['q']));
-		} else {
-			$_GET['q']     = 'civicrm/dashboard';
-			$_GET['reset'] = 1;
-			$args          = array('civicrm', 'dashboard');
-		}
-
-		global $current_user;
-		get_currentuserinfo();
-
-		/* 
-		 * bypass synchronize if running upgrade
-		 * to avoid any serious non-recoverable error
-		 * which might hinder the upgrade process.
-		 */
-		if ( CRM_Utils_Array::value('q', $_GET) != 'civicrm/upgrade' ) {
-			require_once 'CRM/Core/BAO/UFMatch.php';
-			CRM_Core_BAO_UFMatch::synchronize( $current_user, false, 'WordPress', 'Individual', true );
-		}
-
-		CRM_Core_Invoke::invoke($args);
-
-	}
-
-
-
-	/**
-	 * @description: callback function for add_options_page() that runs the CiviCRM installer
-	 */
-	public function run_installer() {
-
-		// uses CIVICRM_PLUGIN_DIR instead of WP_PLUGIN_DIR
-		$installFile =
-			CIVICRM_PLUGIN_DIR .
-			'civicrm' . DIRECTORY_SEPARATOR .
-			'install' . DIRECTORY_SEPARATOR .
-			'index.php';
-		
-		// Notice: Undefined variable: siteDir in:
-		// wp-content/plugins/civicrm/civicrm/install/index.php on line 456
-		include ( $installFile );
-
-	}
-
-
-
-	/**
-	 * @description: callback function for missing settings file in register_hooks()
-	 */
-	public function show_setup_warning() {
-
-		$installLink = admin_url() . "options-general.php?page=civicrm-install";
-		echo '<div id="civicrm-warning" class="updated fade">' . 
-			 '<p><strong>' . 
-			 __( 'CiviCRM is almost ready.', 'civicrm-wordpress' ) . 
-			 '</strong> ' . 
-			 sprintf( 
-			 	__( 'You must <a href="%s">configure CiviCRM</a> for it to work.', 'civicrm-wordpress' ), 
-			 	$installLink
-			 ) .
-			 '</p></div>';
-
-	}
-
-
-
-	/**
 	 * @description: initialize CiviCRM
 	 * @return bool $success
 	 */
@@ -489,8 +328,9 @@ class CiviCRM_For_WordPress {
 					 '<p>';
 				exit();
 			}
-
-			if ( ! file_exists(CIVICRM_SETTINGS_PATH ) ) {
+			
+			// check for settings
+			if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
 				$error = false;
 			} else {
 				$error = include_once ( CIVICRM_SETTINGS_PATH );
@@ -576,6 +416,232 @@ class CiviCRM_For_WordPress {
 		
 		// success!
 		return true;
+
+	}
+
+
+
+	/**
+	 * @description: invoke CiviCRM in a WordPress context
+	 * Callback function from add_menu_page() 
+	 * Callback from WordPress 'init' and 'the_content' hooks
+	 * Also called by add_shortcode_includes() and _civicrm_update_user()
+	 */
+	public function invoke() {
+
+		static $alreadyInvoked = false;
+		if ( $alreadyInvoked ) {
+			return;
+		}
+
+		$alreadyInvoked = true;
+		if ( ! $this->initialize() ) {
+			return '';
+		}
+
+		// Add our standard css & js
+		CRM_Core_Resources::singleton()->addCoreResources();
+
+		// CRM-95XX
+		// At this point we are calling a civicrm function
+		// Since WP messes up and always quotes the request, we need to reverse
+		// what it just did
+		$this->remove_wp_magic_quotes();
+
+		if ( isset( $_GET['q'] ) ) {
+			$args = explode('/', trim($_GET['q']));
+		} else {
+			$_GET['q']     = 'civicrm/dashboard';
+			$_GET['reset'] = 1;
+			$args          = array('civicrm', 'dashboard');
+		}
+
+		global $current_user;
+		get_currentuserinfo();
+
+		/* 
+		 * bypass synchronize if running upgrade
+		 * to avoid any serious non-recoverable error
+		 * which might hinder the upgrade process.
+		 */
+		if ( CRM_Utils_Array::value('q', $_GET) != 'civicrm/upgrade' ) {
+			require_once 'CRM/Core/BAO/UFMatch.php';
+			CRM_Core_BAO_UFMatch::synchronize( $current_user, false, 'WordPress', 'Individual', true );
+		}
+		
+		// do the business
+		CRM_Core_Invoke::invoke($args);
+
+		// notify plugins
+		do_action( 'civicrm_invoked' );
+		
+	}
+
+
+
+	/**
+	 * @description: register directories that CiviCRM searches for php and template files
+	 */
+	public function register_directories( &$config ) {
+	
+		// kick out if no CiviCRM
+		if (!$this->initialize()) { return; }
+		
+
+
+		// init with additions from plugins
+		$template_directories = apply_filters( 'civicrm_register_template_path', array() );
+		
+		// did we get any?
+		if ( count( $template_directories ) > 0 ) {
+
+			// get template instance
+			$template =& CRM_Core_Smarty::singleton();
+			
+			// loop through them
+			foreach( $template_directories AS $dir ) {
+				
+				// add them
+				$template->addTemplateDir( $dir );
+				
+			}
+			
+			// register template directories
+			$template_include_path = implode( PATH_SEPARATOR, $template_directories ) . PATH_SEPARATOR . get_include_path();
+			set_include_path( $template_include_path );
+		
+		}
+		
+		
+		
+		// init with additions from plugins
+		$php_directories = apply_filters( 'civicrm_register_php_path', array() );
+		
+		/**
+		 * Unfortunately, CiviCRM only registers one custom PHP directory. 
+		 * It would have been nice to allow plugins to override core CiviCRM files 
+		 * with their own PHP files. Ah well.
+		 * However, where a plugin *adds* otherwise non-existent files, this will work.
+		 * Summary: you can add PHP but not override PHP.
+		 */
+		
+		// did we get any?
+		if ( count( $php_directories ) > 0 ) {
+
+			// register php directories in include_path
+			$php_include_path = implode( PATH_SEPARATOR, $php_directories ) . PATH_SEPARATOR . get_include_path();
+			set_include_path( $php_include_path );
+		
+		}
+		
+	}
+
+
+
+	/** 
+	 * @description: load translation files
+	 * A good reference on how to implement translation in WordPress:
+	 * http://ottopress.com/2012/internationalization-youre-probably-doing-it-wrong/
+	 */
+	public function enable_translation() {
+		
+		// not used, as there are no translations as yet
+		load_plugin_textdomain(
+		
+			// unique name
+			'civicrm-wordpress', 
+			
+			// deprecated argument
+			false,
+			
+			// relative path to directory containing translation files
+			dirname( plugin_basename( __FILE__ ) ) . '/languages/'
+
+		);
+		
+	}
+	
+	
+	
+	/**
+	 * @description: Adds menu items to WordPress admin menu
+	 * Callback method for 'admin_menu' hook as set in register_hooks()
+	 */
+	public function add_menu_items() {
+		
+		// check for settings file
+		if ( file_exists( CIVICRM_SETTINGS_PATH ) ) {
+
+			// use plugins_url( 'path/to/file.png', __FILE__ )
+			// see http://codex.wordpress.org/Function_Reference/plugins_url
+			// NB: given that URLs always use /, I see no need for DIR_SEP
+			$civilogo = plugins_url(
+				'civicrm/i/logo16px.png',
+				__FILE__
+			);
+			
+			// add top level menu item
+			add_menu_page( 
+				__( 'CiviCRM', 'civicrm-wordpress' ), 
+				__( 'CiviCRM', 'civicrm-wordpress' ), 
+				'access_civicrm', 
+				'CiviCRM', 
+				array( $this, 'invoke' ), 
+				$civilogo 
+			);
+		
+		} else {
+			
+			// add menu item to options menu
+			add_options_page( 
+				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
+				__( 'CiviCRM Installer', 'civicrm-wordpress' ), 
+				'manage_options', 
+				'civicrm-install', 
+				array( $this, 'run_installer' )
+			);
+
+		}
+
+	}
+
+
+
+	/**
+	 * @description: callback function for add_options_page() that runs the CiviCRM installer
+	 */
+	public function run_installer() {
+
+		// uses CIVICRM_PLUGIN_DIR instead of WP_PLUGIN_DIR
+		$installFile =
+			CIVICRM_PLUGIN_DIR .
+			'civicrm' . DIRECTORY_SEPARATOR .
+			'install' . DIRECTORY_SEPARATOR .
+			'index.php';
+		
+		// Notice: Undefined variable: siteDir in:
+		// wp-content/plugins/civicrm/civicrm/install/index.php on line 456
+		include ( $installFile );
+
+	}
+
+
+
+	/**
+	 * @description: callback function for missing settings file in register_hooks()
+	 */
+	public function show_setup_warning() {
+
+		$installLink = admin_url() . "options-general.php?page=civicrm-install";
+		echo '<div id="civicrm-warning" class="updated fade">' . 
+			 '<p><strong>' . 
+			 __( 'CiviCRM is almost ready.', 'civicrm-wordpress' ) . 
+			 '</strong> ' . 
+			 sprintf( 
+			 	__( 'You must <a href="%s">configure CiviCRM</a> for it to work.', 'civicrm-wordpress' ), 
+			 	$installLink
+			 ) .
+			 '</p></div>';
 
 	}
 
@@ -994,7 +1060,7 @@ class CiviCRM_For_WordPress {
 				'WordPress',
 				'Individual'
 			);
-
+			
 		}
 
 	}
