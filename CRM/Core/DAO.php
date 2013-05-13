@@ -1695,7 +1695,7 @@ EOS;
     AND {$refSpec->getTypeColumn()} = %2
 EOS;
       }
-      $daoName = CRM_Core_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
+      $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
       $result = self::executeQuery($sql, $params, TRUE, $daoName);
       while ($result->fetch()) {
         $obj = new $daoName();
@@ -1723,7 +1723,7 @@ EOS;
    */
   static function getReferencesToTable($tableName) {
     $refsFound = array();
-    foreach (CRM_Core_AllCoreTables::getClasses() as $daoClassName) {
+    foreach (CRM_Core_DAO_AllCoreTables::getClasses() as $daoClassName) {
       $links = $daoClassName::getReferenceColumns();
       $daoTableName = $daoClassName::getTableName();
 
