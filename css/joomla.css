@@ -55,6 +55,10 @@ td.active {
   background-color: #ddd;
 }
 
+td.label {
+  background: none;
+}
+
 /*
 ** Menu styles
 */
