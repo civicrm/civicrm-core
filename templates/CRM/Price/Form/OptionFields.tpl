@@ -104,23 +104,23 @@
             r.style.display = 'none';
         }
     }
-    
+
     cj('#optionField input').blur( function(){
       var currentId = cj(this).attr('id');
       var arrayID = currentId.split('_');
       if ((arrayID[1] == 'label' || arrayID[1] == 'amount') && arrayID[2] > 1) {
-        var value = cj("#"+currentId).val(); 
-	if (value.length != 0  && cj("#option_financial_type_id_"+arrayID[2]).val() =='') {
-	  var currentFtid = "#option_financial_type_id_"+arrayID[2];
-	  var previousFtid = "#option_financial_type_id_"+ (arrayID[2]-1);
-	  var financial_type = cj(previousFtid).val(); 
-	  cj(currentFtid).val(financial_type); 
-	}
-	if (cj("#option_label_"+arrayID[2]).val().length == 0 && cj("#option_amount_"+arrayID[2]).val().length == 0) {
+        var value = cj("#"+currentId).val();
+  if (value.length != 0  && cj("#option_financial_type_id_"+arrayID[2]).val() =='') {
+    var currentFtid = "#option_financial_type_id_"+arrayID[2];
+    var previousFtid = "#option_financial_type_id_"+ (arrayID[2]-1);
+    var financial_type = cj(previousFtid).val();
+    cj(currentFtid).val(financial_type);
+  }
+  if (cj("#option_label_"+arrayID[2]).val().length == 0 && cj("#option_amount_"+arrayID[2]).val().length == 0) {
           cj("#option_financial_type_id_"+arrayID[2]).val('');
-	}		
+  }
       }
-		
+
     });
 
     {/literal}
