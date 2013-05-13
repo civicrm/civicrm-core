@@ -447,8 +447,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $this->addDate('acknowledge_date', ts('Acknowledgment Date'));
 
-        $this->add('select', 'financial_type_id', 
-                   ts( 'Financial Type' ), 
+        $this->add('select', 'financial_type_id',
+                   ts( 'Financial Type' ),
                    array(''=>ts( '- select -' )) + CRM_Contribute_PseudoConstant::financialType( ),
       TRUE
     );
