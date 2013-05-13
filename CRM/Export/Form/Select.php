@@ -149,7 +149,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
         CRM_Case_Form_Task::preProcessCommon($this, TRUE);
         $this->_exportMode = self::CASE_EXPORT;
         $componentName = array('', 'Case');
-        break;  
+        break;
     }
 
     $this->_task = $values['task'];

@@ -120,7 +120,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     if (!isset($defaults['address'][1]['country_id'])) {
       $defaults['address'][1]['country_id'] = $config->defaultContactCountry;
     }
-    
+
     if (!isset($defaults['address'][1]['state_province_id'])) {
       $defaults['address'][1]['state_province_id'] = $config->defaultContactStateProvince;
     }
@@ -197,7 +197,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     }
 
     // get the list of location blocks being used by other events
-        
+
     $locationEvents = CRM_Event_BAO_Event::getLocationEvents();
     // remove duplicates and make sure that the duplicate entry with key as
     // loc_block_id of this event (this->_id) is preserved

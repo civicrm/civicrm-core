@@ -104,7 +104,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    * @access public
    */
   public function buildQuickForm() {
-    $field = 'civicrm_event';  
+    $field = 'civicrm_event';
     if ($this->_isTemplate) {
       $field = 'event_template';
     }

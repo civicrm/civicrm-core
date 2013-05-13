@@ -1,5 +1,4 @@
 <?php
-
 /*
   +--------------------------------------------------------------------+
   | CiviCRM version 4.3                                                |
@@ -81,9 +80,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     if ($this->_batchStatusId == 2) {
-      $this->add('submit', 'export_batch', ts('Export Batch'));      
+      $this->add('submit', 'export_batch', ts('Export Batch'));
     }
-    
+
     // do not build rest of form unless it is open batch
     if ($this->_batchStatusId != 1 ) {
       return;
@@ -103,7 +102,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     );
 
     $this->_group = CRM_Core_PseudoConstant::group();
-    
+
     // multiselect for groups
     if ($this->_group) {
       $this->add('select', 'group', ts('Groups'), $this->_group, FALSE,
@@ -111,7 +110,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
       );
     }
     $contactTags = CRM_Core_BAO_Tag::getTags();
-    
+
     if ($contactTags) {
       $this->add('select', 'contact_tags', ts('Tags'), $contactTags, FALSE,
         array('id' => 'contact_tags', 'multiple' => 'multiple', 'title' => ts('- select -'))
@@ -141,7 +140,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
         )
       )
     );
-       
+
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL);
     $this->add( 'select',
       'trans_assign',

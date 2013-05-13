@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -44,53 +43,53 @@ require_once 'CRM/Grant/BAO/GrantProgram.php';
 class CRM_Grant_Page_Payment extends CRM_Core_Page
 {
 
-    
-    function run( ) 
+
+    function run( )
     {
         $action = CRM_Utils_Request::retrieve('action', 'String',
                                               $this, false, 0 );
-        if ( $action & CRM_Core_Action::VIEW ) { 
-            $this->view( $action ); 
+        if ( $action & CRM_Core_Action::VIEW ) {
+            $this->view( $action );
         } elseif ( $action & ( CRM_Core_Action::STOP) ) {
             $this->stop( $action );
         } elseif ( $action & ( CRM_Core_Action::REPRINT ) ) {
-            $this->reprint( $action ); 
+            $this->reprint( $action );
         } else {
-            $this->withdraw( $action ); 
+            $this->withdraw( $action );
         }
         $this->assign('action', $action);
         return parent::run( );
     }
 
 
-    function view( $action ) 
-    {   
+    function view( $action )
+    {
         $controller = new CRM_Core_Controller_Simple( 'CRM_Grant_Form_Payment_View', ts(''), $action );
-        $controller->setEmbedded( true );  
+        $controller->setEmbedded( true );
         $result = $controller->process();
         $result = $controller->run();
     }
 
-    function stop( $action ) 
-    {   
+    function stop( $action )
+    {
         $controller = new CRM_Core_Controller_Simple( 'CRM_Grant_Form_Payment_View', ts(''), $action );
-        $controller->setEmbedded( true );  
+        $controller->setEmbedded( true );
         $result = $controller->process();
         $result = $controller->run();
     }
 
-    function reprint( $action ) 
-    {   
+    function reprint( $action )
+    {
         $controller = new CRM_Core_Controller_Simple( 'CRM_Grant_Form_Payment_View', ts(''), $action );
-        $controller->setEmbedded( true );  
+        $controller->setEmbedded( true );
         $result = $controller->process();
         $result = $controller->run();
     }
 
-    function withdraw( $action ) 
-    {   
+    function withdraw( $action )
+    {
         $controller = new CRM_Core_Controller_Simple( 'CRM_Grant_Form_Payment_View', ts(''), $action );
-        $controller->setEmbedded( true );  
+        $controller->setEmbedded( true );
         $result = $controller->process();
         $result = $controller->run();
     }

@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -123,7 +122,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
     if ($this->_action & CRM_Core_Action::UPDATE && $this->_id) {
       $batchStatus = CRM_Core_PseudoConstant::accountOptionValues('batch_status');
-      
+
       //unset exported status
       $exportedStatusId = CRM_Utils_Array::key('Exported', $batchStatus );
       unset($batchStatus[$exportedStatusId]);
@@ -231,7 +230,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       $params['created_date'] = date('YmdHis');
       $params['created_id'] = $session->get('userID');
       $details = "{$params['title']} batch has been created by this contact.";
-      $activityTypeName = 'Create Batch';      
+      $activityTypeName = 'Create Batch';
     }
     elseif ($this->_action & CRM_Core_Action::UPDATE && $this->_id) {
       $details = "{$params['title']} batch has been edited by this contact.";

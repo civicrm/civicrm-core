@@ -51,7 +51,7 @@ class CRM_Member_Form extends CRM_Core_Form {
    *
    * @var string
    */
-  protected $_BAOName; 
+  protected $_BAOName;
 
   function preProcess() {
     $this->_id = $this->get('id');

@@ -72,8 +72,8 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $mailings = CRM_Mailing_BAO_Mailing::getTableName();
     $jobs = CRM_Mailing_BAO_Job::getTableName();
     $mailing->query(
-      "SELECT * FROM  $mailings 
-            INNER JOIN      $jobs 
+      "SELECT * FROM  $mailings
+            INNER JOIN      $jobs
                 ON          $jobs.mailing_id = $mailings.id
             WHERE           $jobs.id = {$q->job_id}"
     );
