@@ -46,6 +46,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public $_contactID;
 
+
+  /**
+   * The id of the contribution object that is created when the form is submitted
+   *
+   * @var int
+   * @public
+   */
+  public $_contributionID;
+
   /**
    * Function to set variables up before form is built
    *
@@ -1084,7 +1093,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return CRM_Contribute_DAO_Contribution
    * @access public
    */
-  static function processContribution(&$form,
+  static function processContribution(
+    &$form,
     $params,
     $result,
     $contactID,
@@ -1253,7 +1263,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $ids = array();
     if (isset($contribParams['invoice_id'])) {
-      $contribID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
+      $contribID = CRM_Core_DAO::getFieldValue(
+        'CRM_Contribute_DAO_Contribution',
         $contribParams['invoice_id'],
         'id',
         'invoice_id'
@@ -1266,9 +1277,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
 
     //create an contribution address
-    if ($form->_contributeMode != 'notify'
-      && !CRM_Utils_Array::value('is_pay_later', $params)
-      && CRM_Utils_Array::value('is_monetary', $form->_values)
+    if (
+      $form->_contributeMode != 'notify' &&
+      !CRM_Utils_Array::value('is_pay_later', $params) &&
+      CRM_Utils_Array::value('is_monetary', $form->_values)
     ) {
       $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
     }
@@ -1307,6 +1319,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $message = CRM_Core_Error::getMessages($contribution);
         CRM_Core_Error::fatal($message);
       }
+
+      // lets store it in the form variable so postProcess hook can get to this and use it
+      $form->_contributionID = $contribution->id;
     }
 
     // process soft credit / pcp pages
