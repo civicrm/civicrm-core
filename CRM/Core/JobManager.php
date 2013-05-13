@@ -53,10 +53,10 @@ class CRM_Core_JobManager {
 
   /*
    * Class constructor
-   * 
+   *
    * @param void
    * @access public
-   * 
+   *
    */
   public function __construct() {
     $config = CRM_Core_Config::singleton();
@@ -66,10 +66,10 @@ class CRM_Core_JobManager {
   }
 
   /*
-   * 
+   *
    * @param void
    * @access private
-   * 
+   *
    */
   public function execute($auth = TRUE) {
 
@@ -94,10 +94,10 @@ class CRM_Core_JobManager {
 
   /*
    * Class destructor
-   * 
+   *
    * @param void
    * @access public
-   * 
+   *
    */
   public function __destruct() {}
 
@@ -141,11 +141,11 @@ class CRM_Core_JobManager {
   /*
    * Retrieves the list of jobs from the database,
    * populates class param.
-   * 
+   *
    * @param void
    * @return array ($id => CRM_Core_ScheduledJob)
    * @access private
-   * 
+   *
    */
   private function _getJobs() {
     $jobs = array();
@@ -163,10 +163,10 @@ class CRM_Core_JobManager {
   /*
    * Retrieves specific job from the database by id
    * and creates ScheduledJob object.
-   * 
+   *
    * @param void
    * @access private
-   * 
+   *
    */
   private function _getJob($id = NULL, $entity = NULL, $action = NULL) {
     if (is_null($id) && is_null($action)) {
@@ -190,7 +190,7 @@ class CRM_Core_JobManager {
     $this->singleRunParams[$key] = $params;
     $this->singleRunParams[$key]['version'] = 3;
   }
-  
+
   /*
    *
    * @return array|null collection of permissions, null if none

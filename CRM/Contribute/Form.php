@@ -95,7 +95,7 @@ class CRM_Contribute_Form extends CRM_Core_Form {
       if ($parentId = CRM_Utils_Array::value('parent_id', $defaults)) {
         $this->assign('parentId', $parentId);
       }
-    }   
+    }
     return $defaults;
   }
 

@@ -141,7 +141,7 @@ SELECT id
       CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'pay_later_receipt'),
       FALSE
     );
-    
+
     //add partial payment options
 
     // add price set fields
@@ -308,7 +308,7 @@ SELECT id
         $errors['min_amount'] = ts('Minimum Amount should be less than Maximum Amount');
       }
     }
- 
+
     if (isset($fields['is_pay_later'])) {
       if (empty($fields['pay_later_text'])) {
         $errors['pay_later_text'] = ts('Please enter the text for the \'pay later\' checkbox displayed on the contribution form.');
@@ -317,7 +317,7 @@ SELECT id
         $errors['pay_later_receipt'] = ts('Please enter the instructions to be sent to the contributor when they choose to \'pay later\'.');
       }
     }
-    
+
     // don't allow price set w/ membership signup, CRM-5095
     if ($priceSetId = CRM_Utils_Array::value('price_set_id', $fields)) {
       // don't allow price set w/ membership.
@@ -378,7 +378,7 @@ SELECT id
         }
       }
     }
-    
+
     return $errors;
   }
 
@@ -520,7 +520,7 @@ SELECT id
               $setParams['title'] = $this->_values['title'];
               if (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_Set', $pageTitle, 'id', 'name')) {
                 $setParams['name'] = $pageTitle;
-              }    
+              }
               elseif (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_Set', $pageTitle . '_' . $this->_id, 'id', 'name')) {
                 $setParams['name'] = $pageTitle . '_' . $this->_id;
               }
@@ -603,7 +603,7 @@ SELECT id
               CRM_Price_BAO_Field::retrieve($editedFieldParams, $editedResults);
 
               if (!$priceFieldID = CRM_Utils_Array::value('id', $editedResults)) {
-                $fieldParams = array( 
+                $fieldParams = array(
                   'name' => 'other_amount',
                   'label' => 'Other Amount',
                   'price_set_id' => $priceSetId,
@@ -616,7 +616,7 @@ SELECT id
                 $fieldParams['option_amount'][1] = 1;
                 if (!$noContriAmount) {
                   $fieldParams['is_required'] = 1;
-                  $fieldParams['option_label'][1] = 'Contribution Amount'; 
+                  $fieldParams['option_label'][1] = 'Contribution Amount';
                 } else {
                   $fieldParams['is_required'] = 0;
                   $fieldParams['option_label'][1] = 'Other Amount';
@@ -693,8 +693,8 @@ SELECT id
       if ($deletePriceSet) {
         CRM_Price_BAO_Set::removeFrom('civicrm_contribution_page', $contributionPageID);
       }
-      
-      if ($deleteAmountBlk ) {   
+
+      if ($deleteAmountBlk ) {
         $priceField = CRM_Utils_Array::value('price_field_id', $params)?$params['price_field_id']:CRM_Utils_Array::value('price_field_other', $params);
         if ($priceField) {
           $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $priceField, 'price_set_id');

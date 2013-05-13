@@ -109,7 +109,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
       if ( $form->get( CRM_Utils_Sort::SORT_ORDER  ) ) {
         $sortOrder = $form->get( CRM_Utils_Sort::SORT_ORDER );
       }
-      
+
       $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_CONTRIBUTE
       );

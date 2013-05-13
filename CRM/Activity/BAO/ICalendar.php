@@ -55,7 +55,7 @@ class CRM_Activity_BAO_ICalendar {
   function __construct( &$act ) {
     $this->activity = $act;
   }
-  
+
   /**
    * Add an ics attachment to the input array
    *
@@ -74,18 +74,18 @@ class CRM_Activity_BAO_ICalendar {
         rename( $this->icsfile, $this->icsfile . '.ics' );
         $this->icsfile .= '.ics';
         $icsFileName = basename( $this->icsfile );
-        
+
         // get logged in user's primary email
         // TODO: Is there a better way to do this?
         $organizer = $this->getPrimaryEmail();
-        
+
         $template = CRM_Core_Smarty::singleton();
         $template->assign('activity', $this->activity);
         $template->assign('organizer', $organizer);
         $template->assign('contacts', $contacts);
         $template->assign('timezone', date_default_timezone_get());
         $calendar = $template->fetch('CRM/Activity/Calendar/ICal.tpl');
-        if ( file_put_contents( $this->icsfile, $calendar ) !== FALSE ) { 
+        if ( file_put_contents( $this->icsfile, $calendar ) !== FALSE ) {
           if ( empty( $attachments ) ) {
             $attachments = array();
           }
@@ -101,13 +101,13 @@ class CRM_Activity_BAO_ICalendar {
     }
     return null;
   }
-  
+
   function cleanup() {
     if ( !empty ( $this->icsfile ) ) {
       @unlink( $this->icsfile );
     }
   }
-  
+
   // TODO: Is there a better way to do this?
   private function getPrimaryEmail() {
     $session = &CRM_Core_Session::singleton();
@@ -121,7 +121,7 @@ class CRM_Activity_BAO_ICalendar {
           break;
         }
       }
-      
+
       if ( count($emails) == 1 ) {
         $primary = $e['email'];
         break;

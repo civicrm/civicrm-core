@@ -211,7 +211,7 @@ class CRM_Admin_Page_AJAX {
             $status .= '<br /><br /><strong>' . ts('This recurring contribution is linked to an auto-renew membership. If you cancel it, the associated membership will no longer renew automatically. However, the current membership status will not be affected.') . '</strong>';
           }
           break;
-          
+
         case 'CRM_Batch_BAO_Batch':
           if ($op == 'close') {
             $status = ts('Are you sure you want to close this batch?');
@@ -232,7 +232,7 @@ class CRM_Admin_Page_AJAX {
             $status = ts('Are you sure you want to assign this financial transaction to the batch?');
           }
           break;
-          
+
         default:
           $status = ts('Are you sure you want to disable this record?');
           break;
@@ -303,11 +303,11 @@ class CRM_Admin_Page_AJAX {
     // query to list mergable tags
     $query = "
 SELECT t1.name, t1.id, t1.used_for, t2.name as parent
-FROM   civicrm_tag t1 
+FROM   civicrm_tag t1
 LEFT JOIN civicrm_tag t2 ON t1.parent_id = t2.id
-WHERE  t1.id <> {$fromId} AND 
+WHERE  t1.id <> {$fromId} AND
        t1.name LIKE '%{$name}%' AND
-       ({$usedForClause}) 
+       ({$usedForClause})
 LIMIT $limit";
     $dao = CRM_Core_DAO::executeQuery($query);
 
