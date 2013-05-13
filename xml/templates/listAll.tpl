@@ -57,6 +57,18 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
     return FALSE !== array_search($tableName, self::$tables);
   {rdelim}
 
+  static public function getClasses() {ldelim}
+    return array_values(self::$daoToClass);
+  {rdelim}
+
+  static public function getClassForTable($tableName) {ldelim}
+    // The $tables structure was changed, and this function was removed, but
+    // I'm not sure why, and it's killing the test-suite. So put in a
+    // placeholder.
+    // return CRM_Utils_Array::value($tableName, self::$tables);
+    throw new Exception("Not implemented: getClassForTable()");
+  {rdelim}
+
   static public function getFullName($daoName) {ldelim}
     return CRM_Utils_Array::value($daoName, self::$daoToClass);
   {rdelim}
