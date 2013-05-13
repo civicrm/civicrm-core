@@ -23,12 +23,12 @@
  +--------------------------------------------------------------------+
 */
 
-/** 
- * Import records from a csv file passed as an argument. 
+/**
+ * Import records from a csv file passed as an argument.
  *
  * Usage:
  * php bin/csv/import.php -e <entity> --file /path/to/csv/file [ -s site.org ]
- * e.g.: php bin/csv/import.php -e Contact --file /tmp/import.csv 
+ * e.g.: php bin/csv/import.php -e Contact --file /tmp/import.csv
  *
  **/
 require_once (dirname(__DIR__) . '/cli.class.php');
