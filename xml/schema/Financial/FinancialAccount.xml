@@ -116,7 +116,7 @@
   <field>
     <name>tax_rate</name>
     <type>decimal</type>
-    <length>9,8</length>
+    <length>10,8</length>
     <comment>The percentage of the total_amount that is due for this tax.</comment>
     <add>4.3</add>
   </field>

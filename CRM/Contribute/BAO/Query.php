@@ -244,9 +244,9 @@ class CRM_Contribute_BAO_Query {
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    $fields = array();
     $fields = self::getFields();
-    if (!empty($value)) {
+
+    if (!empty($value) && !is_array($value)) {
       $quoteValue = "\"$value\"";
     }
 
@@ -547,6 +547,15 @@ class CRM_Contribute_BAO_Query {
       default:
         //all other elements are handle in this case
         $fldName    = substr($name, 13);
+        if (!isset($fields[$fldName])) {
+          // CRM-12597
+          CRM_Core_Session::setStatus(ts(
+              'We did not recognize the search field: %1. Please check and fix your contribution related smart groups.',
+              array(1 => $fldName)
+            )
+          );
+          return;
+        }
         $whereTable = $fields[$fldName];
         $value      = trim($value);
 

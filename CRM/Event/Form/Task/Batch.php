@@ -201,7 +201,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           }
         }
         else {
-          if ($field['name'] == 'participant_role_id') {
+          if ($field['name'] == 'participant_role') {
             $field['is_multiple'] = TRUE;
           }
           // handle non custom fields

@@ -29,7 +29,7 @@
 
 {include file="CRM/common/TrackingFields.tpl"}
 
-<div class="crm-block crm-event-thankyou-form-block">
+<div class="crm-event-id-{$event.id} crm-block crm-event-thankyou-form-block">
     {* Don't use "normal" thank-you message for Waitlist and Approval Required registrations - since it will probably not make sense for those situations. dgg *}
     {if $event.thankyou_text AND (not $isOnWaitlist AND not $isRequireApproval)}
         <div id="intro_text" class="crm-section event_thankyou_text-section">

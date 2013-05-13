@@ -51,7 +51,7 @@ require_once 'api/v3/utils.php';
  * @param array  $values       The reformatted properties that we can use internally
  *
  * @param array  $create       Is the formatted Values array going to
- *                             be used for CRM_Event_BAO_Participant:create()
+ *                             be used for CRM_vent_BAO_Participant:create()
  *
  * @return array|CRM_Error
  * @access public
@@ -774,8 +774,6 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
 
 
   /* Cache the various object fields */
-
-
   static $fields = NULL;
 
   if ($fields == NULL) {
@@ -1488,7 +1486,12 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
   }
 }
 
-function _civicrm_api3_deprecated_contact_check_params(&$params, $dupeCheck = TRUE, $dupeErrorArray = FALSE, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
+function _civicrm_api3_deprecated_contact_check_params(
+  &$params,
+  $dupeCheck = TRUE,
+  $dupeErrorArray = FALSE,
+  $requiredCheck = TRUE,
+  $dedupeRuleGroupID = NULL) {
   if (isset($params['id']) && is_numeric($params['id'])) {
     $requiredCheck = FALSE;
   }
@@ -1609,4 +1612,41 @@ function _civicrm_api3_deprecated_contact_check_params(&$params, $dupeCheck = TR
   return NULL;
 }
 
-// @codeCoverageIgnoreEnd
+/**
+ *
+ * @param <type> $result
+ * @param <type> $activityTypeID
+ *
+ * @return <type> $params
+ */
+function _civicrm_api3_deprecated_activity_buildmailparams($result, $activityTypeID) {
+  // get ready for collecting data about activity to be created
+  $params = array();
+
+  $params['activity_type_id'] = $activityTypeID;
+
+  $params['status_id'] = 2;
+  $params['source_contact_id'] = $params['assignee_contact_id'] = $result['from']['id'];
+  $params['target_contact_id'] = array();
+  $keys = array('to', 'cc', 'bcc');
+  foreach ($keys as $key) {
+    if (is_array($result[$key])) {
+      foreach ($result[$key] as $key => $keyValue) {
+        if (!empty($keyValue['id'])) {
+          $params['target_contact_id'][] = $keyValue['id'];
+        }
+      }
+    }
+  }
+  $params['subject'] = $result['subject'];
+  $params['activity_date_time'] = $result['date'];
+  $params['details'] = $result['body'];
+
+  for ($i = 1; $i <= 5; $i++) {
+    if (isset($result["attachFile_$i"])) {
+      $params["attachFile_$i"] = $result["attachFile_$i"];
+    }
+  }
+
+  return $params;
+}

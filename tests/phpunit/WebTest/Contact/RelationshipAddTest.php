@@ -352,5 +352,22 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     );
     $this->assertTrue($this->isTextPresent($params['label_a_b']));
   }
-}
 
+  function testAjaxCustomGroupLoad() {
+    $this->webtestLogin();
+
+    //create a New Individual
+    $firstName = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, "Anderson", "$firstName@anderson.name");
+    $contactId = explode('cid=', $this->getLocation());
+
+    $triggerElement = array('name' => 'relationship_type_id', 'type' => 'select');
+    $customSets = array(
+      array('entity' => 'Relationship', 'subEntity' => 'Partner of', 'triggerElement' => $triggerElement),
+      array('entity' => 'Relationship', 'subEntity' => 'Spouse of', 'triggerElement' => $triggerElement)
+    );
+
+    $pageUrl = array('url' => 'contact/view/rel', 'args' => "cid={$contactId[1]}&action=add&reset=1");
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+}

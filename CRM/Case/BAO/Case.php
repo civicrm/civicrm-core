@@ -2446,6 +2446,12 @@ SELECT  id
           $mainAssigneeActivity->free();
         }
         $otherAssigneeActivity->free();
+
+        // copy custom fields and attachments
+        $aparams = array('activityID'     => $otherActivityId,
+                         'mainActivityId' => $mainActivityId,
+                        );
+        CRM_Activity_BAO_Activity::copyExtendedActivityData($aparams);
       }
 
       //copy case relationship.

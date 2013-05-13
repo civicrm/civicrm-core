@@ -89,6 +89,8 @@ cat "$CIVI_ROOT/templates/CRM/common/civicrm.settings.php.tpl" \
   | sed "s;%%templateCompileDir%%;${DRUPAL_ROOT}/sites/${SITE_URL}/files/civicrm/templates_c;" \
   > "sites/$SITE_URL/civicrm.settings.php"
 
+echo  >> "sites/$SITE_URL/civicrm.settings.php"
+echo "define('CIVICRM_MAIL_LOG', '/dev/null');" >> "sites/$SITE_URL/civicrm.settings.php"
 popd
 
 ## Create CiviCRM config
@@ -122,6 +124,8 @@ class CiviSeleniumSettings {
 	var \$password = 'demo';
 	var \$adminUsername = '${ADMIN_USER}';
 	var \$adminPassword = '${ADMIN_PASS}';
+	var \$adminApiKey = 'apikey${ADMIN_PASS}';
+	var \$siteKey = '${SITE_KEY}';
         var \$UFemail = 'noreply@civicrm.org';
 	function __construct() {
 		\$this->fullSandboxPath = \$this->sandboxURL . \$this->sandboxPATH;
@@ -139,4 +143,5 @@ drush -l "${SITE_URL}" -y pm-enable civicrm
 drush -l "${SITE_URL}" -y pm-enable civicrm_webtest
 drush -l "${SITE_URL}" -y user-create --password=demo --mail='demo@example.com' demo
 drush -l "${SITE_URL}" -y user-add-role civicrm_webtest_user demo
+drush -l "${SITE_URL}" -y -u "$ADMIN_USER" civicrm-api contact.create id=user_contact_id api_key="apikey$ADMIN_PASS"
 popd

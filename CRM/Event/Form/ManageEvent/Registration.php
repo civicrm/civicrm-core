@@ -350,7 +350,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $form->add('select', 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $mainProfiles);
 
     $form->add('select', 'additional_custom_pre_id', ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $addtProfiles);
-    $form->add('select', 'additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $addtProfiles);
+    // Allow user to NOT provide a bottom profile for Additional Participant registration 
+    $form->add('select', 'additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), array('none' => ts('- no profile -')) + $addtProfiles);
   }
 
   function buildMultipleProfileBottom(&$form, $count, $prefix = '', $name = 'Include Profile') {
@@ -362,7 +363,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     if ($prefix == 'additional_') {
       $mainProfiles = array(
-        '' => ts('- same as for main contact -')) + $profiles;
+        '' => ts('- same as for main contact -'), 'none' => ts('- no profile -')) + $profiles;
     }
     else {
       $mainProfiles = array(

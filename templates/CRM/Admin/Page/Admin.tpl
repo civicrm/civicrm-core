@@ -42,7 +42,7 @@
 {strip}
 <div class="crm-content-block">
 {foreach from=$adminPanel key=groupName item=group name=adminLoop}
- <div id="id_{$groupName}_show" class="section-hidden label{if $smarty.foreach.adminLoop.last eq false} section-hidden-border{/if}">
+ <div id="id_{$groupName}_show" class="section-hidden{if $smarty.foreach.adminLoop.last eq false} section-hidden-border{/if}">
     <table class="form-layout">
     <tr>
         <td width="20%" class="font-size11pt" style="vertical-align: top;">{$group.show} {$group.title}</td>

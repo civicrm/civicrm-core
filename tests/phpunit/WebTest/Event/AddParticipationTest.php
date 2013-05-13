@@ -372,6 +372,18 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 }
   }
 
+  function testAjaxCustomGroupLoad() {
+    $this->webtestLogin();
+
+    $customSets = array(
+      array('entity' => 'ParticipantEventName', 'subEntity' => 'Fall Fundraiser Dinner',
+        'triggerElement' => array('name' => "event_id", 'type' => "select")),
+      array('entity' => 'ParticipantRole', 'subEntity' => 'Attendee','triggerElement' => array('type' => "checkbox"))
+    );
+    $pageUrl = array('url' => "participant/add", 'args' => "reset=1&action=add&context=standalone");
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+
   function _fillParticipantDetails($firstName, $lastName, $processorId) {
     $this->select("id=profiles_1", "label=New Individual");
     $this->waitForElementPresent('_qf_Edit_next');
@@ -386,4 +398,3 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->webtestAddBillingDetails();
   }
 }
-

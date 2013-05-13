@@ -768,7 +768,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     //adding group field, email field should be present in the group
     //fixed for  issue CRM-2861 & CRM-4153
     if (CRM_Core_BAO_UFGroup::isProfileDoubleOptin()) {
-      if ($fields['field_name'][1] == 'group') {
+      if (CRM_Utils_Array::value(1, $fields['field_name']) == 'group') {
         $dao = new CRM_Core_BAO_UFField();
         $dao->uf_group_id = $fields['group_id'];
         $dao->find();
@@ -930,9 +930,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
             }
           }
         }
-        elseif ($fields['field_name'][1] == 'contact_sub_type' &&
-          !in_array($profileType, array(
-            'Individual', 'Household', 'Organization')) &&
+        elseif (
+          CRM_Utils_Array::value(1, $fields['field_name']) == 'contact_sub_type' &&
+          !in_array($profileType, array('Individual', 'Household', 'Organization')) &&
           !in_array($profileType, CRM_Contact_BAO_ContactType::subTypes())
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field Contact Subtype as profile type is not one of Individual, Household or Organization.');
