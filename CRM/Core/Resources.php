@@ -466,7 +466,7 @@ class CRM_Core_Resources {
       $this->addSetting(array('config' => $settings));
 
       // Give control of jQuery back to the CMS - this loads last
-      $this->addScriptFile('civicrm', 'js/noconflict.js', 9999, $region, FALSE);
+      $this->addScriptFile('civicrm', 'js/noconflict.js', 9999, 'page-footer', FALSE);
 
       $this->addCoreStyles($region);
     }
