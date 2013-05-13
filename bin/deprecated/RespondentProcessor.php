@@ -28,7 +28,7 @@
 
 /*
  * This file check and update the survey respondents.
- * 
+ *
  */
 
 require_once '../civicrm.config.php';
@@ -59,14 +59,14 @@ class CRM_RespondentProcessor {
     $releasedCount = 0;
     if ($reserveStatusId && !empty($surveyActivityTypesIds)) {
       $query = '
-    SELECT  activity.id as id, 
+    SELECT  activity.id as id,
             activity.activity_date_time as activity_date_time,
             survey.id as surveyId,
             survey.release_frequency as release_frequency
       FROM  civicrm_activity activity
-INNER JOIN  civicrm_survey survey ON ( survey.id = activity.source_record_id ) 
-     WHERE  activity.is_deleted = 0 
-       AND  activity.status_id = %1 
+INNER JOIN  civicrm_survey survey ON ( survey.id = activity.source_record_id )
+     WHERE  activity.is_deleted = 0
+       AND  activity.status_id = %1
        AND  activity.activity_type_id IN ( ' . implode(', ', $surveyActivityTypesIds) . ' )';
       $activity = CRM_Core_DAO::executeQuery($query, array(1 => array($reserveStatusId, 'Positive')));
       $releasedIds = array();
