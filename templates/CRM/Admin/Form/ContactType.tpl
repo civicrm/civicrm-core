@@ -41,7 +41,7 @@
         {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contact_type' field='label' id= $cid }
       {/if}
       </td>
-           
+
       <td>{$form.label.html}</td>
    </tr>
    <tr class="crm-contact-type-form-block-parent_id">
@@ -55,14 +55,14 @@
    <tr class="crm-contact-type-form-block-image_URL">
       <td class="label">{$form.image_URL.label}</td>
       <td>{$form.image_URL.html|crmAddClass:'huge40'}{help id="id-image_URL"}</td>
-   </tr> 
+   </tr>
    <tr class="crm-contact-type-form-block-description">
      <td class="label">{$form.description.label}
      {if $action eq 2}
        {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contact_type' field='description' id= $cid}
      {/if}
      </td>
-          
+
      <td>{$form.description.html}</td>
    </tr>
    <tr class="crm-contact-type-form-block-is_active">

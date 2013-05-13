@@ -34,18 +34,18 @@
             <tr class="crm-preferences-date-form-block-description">
                 <td class="label">{$form.description.label}</td><td>{$form.description.html}</td>
             </tr>
-            <tr class="crm-preferences-date-form-block-date_format">    
+            <tr class="crm-preferences-date-form-block-date_format">
                 <td class="label">{$form.date_format.label}</td><td>{$form.date_format.html}</td>
             </tr>
             {if $form.time_format.label}
-            <tr class="crm-preferences-date-form-block-time_format">    
+            <tr class="crm-preferences-date-form-block-time_format">
                 <td class="label">{$form.time_format.label}</td><td>{$form.time_format.html}</td>
             </tr>
             {/if}
-            <tr class="crm-preferences-date-form-block-start">    
+            <tr class="crm-preferences-date-form-block-start">
                 <td class="label">{$form.start.label}</td><td>{$form.start.html}</td>
             </tr>
-            <tr class="crm-preferences-date-form-block-end">    
+            <tr class="crm-preferences-date-form-block-end">
                 <td class="label">{$form.end.label}</td><td>{$form.end.html}</td>
             </tr>
         </table>
