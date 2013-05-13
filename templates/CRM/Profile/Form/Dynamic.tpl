@@ -269,7 +269,7 @@ function proccessMultiRecordForm(formData, jqForm, options) {
 
     {if ($action eq 1 and $mode eq 4 ) or ($action eq 2) or ($action eq 8192)}
       {if $action eq 2 and $multiRecordFieldListing}
-      {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl"	showListing=true}
+      {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}
         {assign var=floatStyle value='float:right'}
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
