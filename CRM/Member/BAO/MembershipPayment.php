@@ -32,7 +32,9 @@
  * $Id$
  *
  */
-class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
+class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment {
+
+
   /**
    * class constructor
    */
@@ -40,7 +42,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
     parent::__construct();
   }
   /**
-   * function to add the membership Blocks
+   * function to add the membership Payments
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -51,22 +53,22 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
    */
   static function create(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'MembershipBlock', CRM_Utils_Array::value('id', $params), $params);
-    $dao = new CRM_Member_DAO_MembershipBlock();
+    CRM_Utils_Hook::pre($hook, 'MembershipPayment', CRM_Utils_Array::value('id', $params), $params);
+    $dao = new CRM_Member_DAO_MembershipPayment();
     $dao->copyValues($params);
     $dao->id = CRM_Utils_Array::value('id', $params);
-    CRM_Utils_Hook::post($hook, 'MembershipBlock', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'MembershipPayment', $dao->id, $dao);
     return $dao;
   }
 
   /**
-   * Function to delete membership Blocks
+   * Function to delete membership Payments
    *
    * @param int $id
    * @static
    */
   static function del($id) {
-    $dao = new CRM_Member_DAO_MembershipType();
+    $dao = new CRM_Member_DAO_MembershipPayment();
     $dao->id = $id;
     $result = FALSE;
     if ($dao->find(TRUE)) {
@@ -76,4 +78,6 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
     return $result;
   }
 
+
 }
+
