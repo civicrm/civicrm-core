@@ -19,7 +19,7 @@
     <ActivityType>
       <name>Follow up</name>
     </ActivityType>
-	<ActivityType>
+  <ActivityType>
       <name>Change Case Type</name>
     </ActivityType>
     <ActivityType>
@@ -79,6 +79,6 @@
     </RelationshipType>
     <RelationshipType>
         <name>Benefits Specialist</name>
-    </RelationshipType>	  
+    </RelationshipType>
  </CaseRoles>
 </CaseType>
