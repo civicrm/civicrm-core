@@ -99,11 +99,11 @@
       </creditCard>
     </payment>
    {if $invoiceNumber}
-   <order>  
+   <order>
      <invoiceNumber>{$invoiceNumber}</invoiceNumber>
      {if $name}<description>{$name}</description>{/if}
    </order>
-   {/if}  
+   {/if}
     <customer>
       <id>{$contactID}</id>
       <email>{$email}</email>
