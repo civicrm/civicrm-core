@@ -374,6 +374,7 @@
      // add attachments
      for ($i = 1; $i <= $numAttachments; $i++) {
        $form->addElement('file', "attachFile_$i", ts('Attach File'), 'size=30 maxlength=60');
+       $form->addUploadElement("attachFile_$i");
        $form->setMaxFileSize($maxFileSize * 1024 * 1024);
        $form->addRule("attachFile_$i",
          ts('File size should be less than %1 MByte(s)',
