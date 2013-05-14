@@ -426,14 +426,14 @@ abstract class CRM_Activity_Import_Parser {
     }
   }
 
-  /*function setActiveFieldLocationTypes( $elements ) 
+  /*function setActiveFieldLocationTypes( $elements )
     {
         for ($i = 0; $i < count( $elements ); $i++) {
             $this->_activeFields[$i]->_hasLocationType = $elements[$i];
         }
     }
-    
-    function setActiveFieldPhoneTypes( $elements ) 
+
+    function setActiveFieldPhoneTypes( $elements )
     {
         for ($i = 0; $i < count( $elements ); $i++) {
             $this->_activeFields[$i]->_phoneType = $elements[$i];
@@ -634,7 +634,7 @@ abstract class CRM_Activity_Import_Parser {
     }
 
     foreach ($values as $k => $v) {
-      $values[$k] = preg_replace("/^$enclosure(.*) $enclosure$/", '$1', $v);
+      $values[$k] = preg_replace("/^$enclosure(.*)$enclosure$/", '$1', $v);
     }
   }
 
