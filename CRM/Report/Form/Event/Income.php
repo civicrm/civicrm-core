@@ -221,17 +221,19 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     //e.g. Credit Card, Check,Cash etc
     $paymentInstrument = "
             SELECT c.payment_instrument_id               as INSTRUMENT,
-                   COUNT( c.id )                         as participant,
-                   SUM(civicrm_participant.fee_amount)   as amount,
+                   COUNT( civicrm_participant.id )       as participant,
+                   SUM( civicrm_participant.fee_amount ) as amount,
                    civicrm_participant.event_id          as event_id
 
-            FROM      civicrm_participant
-            LEFT JOIN civicrm_participant_payment pp ON(pp.participant_id = civicrm_participant.id )
+            FROM      civicrm_participant,
+            civicrm_participant_payment pp
             LEFT JOIN civicrm_contribution c ON ( pp.contribution_id = c.id)
 
-            WHERE     civicrm_participant.event_id IN ( {$eventID}) AND
-                      civicrm_participant.is_test  = 0
+            WHERE     civicrm_participant.event_id IN ( {$eventID} )
+                      AND civicrm_participant.is_test  = 0
                       {$activeParticipantClause}
+                      AND ((pp.participant_id = civicrm_participant.id )
+                           OR (pp.participant_id = civicrm_participant.registered_by_id ))
             GROUP BY  c.payment_instrument_id, civicrm_participant.event_id
             ";
 
@@ -242,7 +244,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       if ($instrumentDAO->INSTRUMENT) {
         $instrumentRows[$instrumentDAO->event_id][$paymentInstruments[$instrumentDAO->INSTRUMENT]]['total'] = $instrumentDAO->participant;
         $instrumentRows[$instrumentDAO->event_id][$paymentInstruments[$instrumentDAO->INSTRUMENT]]['round'] = round(($instrumentDAO->participant / $count[$instrumentDAO->event_id]) * 100, 2);
-        $instrumentRows[$instrumentDAO->event_id][$paymentInstruments[$instrumentDAO->INSTRUMENT]]['amount'] = $instrumentDAO->amount;
+        $instrumentRows[$instrumentDAO->event_id][$paymentInstruments[$instrumentDAO->INSTRUMENT]]['amount'] = CRM_Utils_Money::format($instrumentDAO->amount, $currency[$instrumentDAO->event_id]);
       }
     }
     $rows['Payment Method'] = $instrumentRows;
