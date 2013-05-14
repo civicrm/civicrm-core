@@ -809,7 +809,7 @@ pppp   * @return void
     }
 
     foreach ($values as $k => $v) {
-      $values[$k] = preg_replace("/^$enclosure(.*) $enclosure$/", '$1', $v);
+      $values[$k] = preg_replace("/^$enclosure(.*)$enclosure$/", '$1', $v);
     }
   }
 
