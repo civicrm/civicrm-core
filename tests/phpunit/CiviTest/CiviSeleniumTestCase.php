@@ -1837,7 +1837,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $elementType = CRM_Utils_Array::value('type', $customData['triggerElement'], 'select');
         $elementName = CRM_Utils_Array::value('name', $customData['triggerElement']);
         if ($beforeTriggering) {
-          eval($beforeTriggering);
+          call_user_func($beforeTriggering);
         }
         if ($elementType == 'select') {
           //reset the select box, so triggering of ajax only happens
