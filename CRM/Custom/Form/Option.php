@@ -242,8 +242,8 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    * @access public
    */
   static function formRule($fields, $files, $form) {
-    $optionLabel   = CRM_Utils_Type::escape($fields['label'], 'String');
-    $optionValue   = CRM_Utils_Type::escape($fields['value'], 'String');
+    $optionLabel   = $fields['label'];
+    $optionValue   = $fields['value'];
     $fieldId       = $form->_fid;
     $optionGroupId = $form->_optionGroupID;
 
@@ -254,7 +254,8 @@ SELECT count(*)
   FROM civicrm_option_value
  WHERE option_group_id = %1
    AND label = %2";
-      $params = array(1 => array($optionGroupId, 'Integer'),
+      $params = array(
+        1 => array($optionGroupId, 'Integer'),
         2 => array($optionLabel, 'String'),
       );
       if (CRM_Core_DAO::singleValueQuery($query, $params) > 0) {
@@ -266,7 +267,8 @@ SELECT count(*)
   FROM civicrm_option_value
  WHERE option_group_id = %1
    AND value = %2";
-      $params = array(1 => array($optionGroupId, 'Integer'),
+      $params = array(
+        1 => array($optionGroupId, 'Integer'),
         2 => array($optionValue, 'String'),
       );
       if (CRM_Core_DAO::singleValueQuery($query, $params) > 0) {
@@ -284,7 +286,8 @@ SELECT count(*)
  WHERE option_group_id = %1
    AND id != %2
    AND label = %3";
-      $params = array(1 => array($optionGroupId, 'Integer'),
+      $params = array(
+        1 => array($optionGroupId, 'Integer'),
         2 => array($optionId, 'Integer'),
         3 => array($optionLabel, 'String'),
       );
@@ -299,7 +302,8 @@ SELECT count(*)
  WHERE option_group_id = %1
    AND id != %2
    AND value = %3";
-      $params = array(1 => array($optionGroupId, 'Integer'),
+      $params = array(
+        1 => array($optionGroupId, 'Integer'),
         2 => array($optionId, 'Integer'),
         3 => array($optionValue, 'String'),
       );
