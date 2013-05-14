@@ -66,7 +66,7 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
   }
 
   public function invalidKey() {
-    $message = ts('Because your session is timed out, we have reset the search page.');
+    $message = ts('Because your session timed out, we have reset the search page.');
     CRM_Core_Session::setStatus($message);
 
     // see if we can figure out the url and redirect to the right search form
@@ -74,17 +74,23 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
     // variables
     $config  = CRM_Core_Config::singleton();
     $qString = $_GET[$config->userFrameworkURLVar];
+    $args = "reset=1";
+    $path = 'civicrm/contact/search/advanced';
     if (strpos($qString, 'basic') !== FALSE) {
       $path = 'civicrm/contact/search/basic';
     }
     else if (strpos($qString, 'builder') !== FALSE) {
       $path = 'civicrm/contact/search/builder';
     }
-    else {
-      $path = 'civicrm/contact/search/advanced';
+    else if (
+      strpos($qString, 'custom') !== FALSE &&
+      isset($_REQUEST['csid'])
+    ) {
+      $path = 'civicrm/contact/search/custom';
+      $args = "reset=1&csid={$_REQUEST['csid']}";
     }
 
-    $url = CRM_Utils_System::url($path, 'reset=1');
+    $url = CRM_Utils_System::url($path, $args);
     CRM_Utils_System::redirect($url);
   }
 
