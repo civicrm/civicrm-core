@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-Class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
+class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   function __construct() {
     parent::__construct();
     // expire cookie in one day
@@ -328,7 +328,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
 
-  public function getSurveyInfo($surveyId = NULL) {
+  public static function getSurveyInfo($surveyId = NULL) {
     $surveyInfo = array();
 
     $sql = "
