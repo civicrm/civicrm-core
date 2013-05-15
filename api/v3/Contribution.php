@@ -175,8 +175,6 @@ function civicrm_api3_contribution_get($params) {
   $smartGroupCache  = CRM_Utils_Array::value('smartGroupCache', $params);
   $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
   $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
-  require_once 'CRM/Contribute/BAO/Query.php';
-  require_once 'CRM/Contact/BAO/Query.php';
   if (empty($returnProperties)) {
     $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
   }
@@ -327,13 +325,11 @@ function civicrm_api3_contribution_transact($params) {
     $params['invoiceID'] = $params['invoice_id'];
   }
 
-  require_once 'CRM/Financial/BAO/PaymentProcessor.php';
   $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor_id'], $params['payment_processor_mode']);
   if (civicrm_error($paymentProcessor)) {
     return $paymentProcessor;
   }
 
-  require_once 'CRM/Core/Payment.php';
   $payment = &CRM_Core_Payment::singleton($params['payment_processor_mode'], $paymentProcessor);
   if (civicrm_error($payment)) {
     return $payment;

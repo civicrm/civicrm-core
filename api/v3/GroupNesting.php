@@ -38,8 +38,6 @@
  *
  */
 
-require_once 'CRM/Contact/BAO/GroupNesting.php';
-
 /**
  * Provides group nesting record(s) given parent and/or child id.
  *

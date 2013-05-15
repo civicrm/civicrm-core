@@ -42,11 +42,6 @@
  */
 
 /**
- * Include common API util functions
- */
-require_once 'CRM/Core/OptionGroup.php';
-
-/**
  * Function to retrieve activity types
  *
  * @return array $activityTypes activity types keyed by id
@@ -87,7 +82,6 @@ function civicrm_api3_activity_type_create($params) {
     $action = 2;
   }
 
-  require_once 'CRM/Core/OptionValue.php';
   $activityObject = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $action, $optionValueID);
   $activityType = array();
   _civicrm_api3_object_to_array($activityObject, $activityType[$activityObject->id]);
@@ -122,7 +116,6 @@ function civicrm_api3_activity_type_delete($params) {
   civicrm_api3_verify_mandatory($params, NULL, array('activity_type_id'));
 
   $activityTypeId = $params['activity_type_id'];
-  require_once 'CRM/Core/BAO/OptionValue.php';
 
   return CRM_Core_BAO_OptionValue::del($activityTypeId);
 }

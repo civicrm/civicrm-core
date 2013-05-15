@@ -112,7 +112,6 @@ function civicrm_api3_custom_group_delete($params) {
   $values->id = $params['id'];
   $values->find(TRUE);
 
-  require_once 'CRM/Core/BAO/CustomGroup.php';
   $result = CRM_Core_BAO_CustomGroup::deleteGroup($values, TRUE);
   return $result ? civicrm_api3_create_success() : civicrm_api3_create_error('Error while deleting custom group');
 }

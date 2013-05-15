@@ -39,8 +39,6 @@
  */
 
 
-require_once 'CRM/Contact/BAO/GroupOrganization.php';
-
 /**
  * This API will give list of the groups for particular contact
  * Particualr status can be sent in params array

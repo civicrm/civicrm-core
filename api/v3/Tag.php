@@ -38,11 +38,6 @@
  */
 
 /**
- * Include utility functions
- */
-require_once 'CRM/Core/BAO/Tag.php';
-
-/**
  *  Add a Tag. Tags are used to classify CRM entities (including Contacts, Groups and Actions).
  *
  * Allowed @params array keys are:

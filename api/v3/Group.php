@@ -37,11 +37,6 @@
  */
 
 /**
- * Include utility functions
- */
-require_once 'CRM/Contact/BAO/Group.php';
-
-/**
  * create/update group
  *
  * This API is used to create new group or update any of the existing

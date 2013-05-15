@@ -38,11 +38,6 @@
  */
 
 /**
- * Files required for this package
- */
-require_once 'CRM/Core/BAO/CustomField.php';
-
-/**
  * Most API functions take in associative arrays ( name => value pairs
  * as parameters. Some of the most commonly used parameters are
  * described below
@@ -255,7 +250,6 @@ SELECT count(*)
     'Select', 'Multi-Select', 'CheckBox', 'Radio', 'AdvMulti-Select')) &&
     !isset($errors[$fieldName])
   ) {
-    require_once 'CRM/Core/OptionGroup.php';
     $options = CRM_Core_OptionGroup::valuesByID($fieldDetails['option_group_id']);
     if (!is_array($value)) {
       $value = array($value);

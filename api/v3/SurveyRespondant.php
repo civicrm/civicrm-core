@@ -38,8 +38,6 @@
  * Include utility functions
  */
 require_once 'api/v3/utils.php';
-require_once 'CRM/Utils/Rule.php';
-require_once 'CRM/Campaign/BAO/Petition.php';
 
 /**
  * Get the list of signatories

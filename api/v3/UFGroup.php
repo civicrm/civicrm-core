@@ -42,8 +42,6 @@
  * Files required for this package
  */
 
-require_once 'CRM/Core/BAO/UFGroup.php';
-
 function _civicrm_api3_uf_group_create_spec(&$params) {
   $session = CRM_Core_Session::singleton();
   $params['title']['api.required'] = 1;

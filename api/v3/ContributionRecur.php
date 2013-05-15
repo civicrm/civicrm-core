@@ -33,8 +33,6 @@
  * @copyright CiviCRM LLC (c) 2004-2013
  */
 
-require_once 'CRM/Contribute/BAO/ContributionRecur.php';
-
 /**
  * Create or update a contribution_recur
  *
