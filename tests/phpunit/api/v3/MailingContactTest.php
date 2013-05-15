@@ -142,8 +142,8 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         );
 
         $result = civicrm_api('MailingContact', 'get', $params);
+        $this->assertAPISuccess($result, "In line " . __LINE__);
 
-        $this->assertEquals($result['is_error'], 0, "In line " . __LINE__);
         $this->assertEquals($result['count'], 0, "In line " . __LINE__);
         $this->assertTrue(empty($result['values']), "In line " . __LINE__);
     }
@@ -173,8 +173,10 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         );
 
         $result = civicrm_api('MailingContact', 'get', $params);
-        $this->assertEquals($result['is_error'], 0, "In line " . __LINE__);
+        $count = civicrm_api('MailingContact', 'getcount', $params);
+        $this->assertAPISuccess($result, "In line " . __LINE__);
         $this->assertEquals($result['count'], 1, "In line " . __LINE__);
+        $this->assertEquals($count, 1, "In line " . __LINE__);
         $this->assertFalse(empty($result['values']), "In line " . __LINE__);
         $this->assertEquals($result['values'][1]['mailing_id'], 1, "In line " . __LINE__);
         $this->assertEquals($result['values'][1]['subject'], "Some Subject", "In line " . __LINE__);
@@ -208,7 +210,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         );
 
         $result = civicrm_api('MailingContact', 'get', $params);
-        $this->assertEquals($result['is_error'], 0, "In line " . __LINE__);
+        $this->assertAPISuccess($result, "In line " . __LINE__);
         $this->assertEquals($result['count'], 1, "In line " . __LINE__);
         $this->assertFalse(empty($result['values']), "In line " . __LINE__);
         $this->assertEquals($result['values'][2]['mailing_id'], 2, "In line " . __LINE__);
