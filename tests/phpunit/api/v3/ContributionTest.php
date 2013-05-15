@@ -97,6 +97,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->contributionTypeDelete();
     $this->quickCleanup(array(
       'civicrm_contribution',
+      'civicrm_contribution_soft',
       'civicrm_event',
       'civicrm_contribution_page',
       'civicrm_participant',
@@ -720,6 +721,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contact2    = civicrm_api('Contact', 'create', array('version' => 3, 'display_name' => 'superman', 'version' => 3, 'contact_type' => 'Individual'));
     $params      = $this->_params + array(
       'soft_credit_to' => $contact2['id'],
+
     );
 
     $contribution = civicrm_api('contribution', 'create', $params);
