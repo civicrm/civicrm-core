@@ -52,7 +52,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
     $this->_contact = civicrm_api("contact", "create", $this->_contact_params);
-    
+
     /*$this->quickCleanup(
       array(
         'civicrm_mailing',
@@ -67,33 +67,42 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
   function tearDown() {
     parent::tearDown();
     civicrm_api("contact", "delete", $this->_contact_id);
-    
+
   }
-  
+
   /*
    * Test that the api responds correctly to null params
    */
-  
+
     public function testMailingNullParams() {
         $result = civicrm_api('MailingContact', 'get', null);
         $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
     }
-  
+    public function testMailingContactGetFields() {
+      $result = civicrm_api('MailingContact', 'getfields', array(
+        'version' => 3,
+        'action' => 'get',
+        )
+      );
+      $this->assertAPISuccess($result);
+      $this->assertEquals('Delivered', $result['values']['type']['api.default']);
+    }
+
   /*
    * Test that the api will return the proper error when you do not
    * supply the contact_id
    */
-  
+
   public function testMailingNoContactID() {
     $params = array(
       'something' => 'This is not a real field',
       'version' => $this->_apiversion,
     );
-    
+
     $result = civicrm_api('MailingContact', 'get', $params);
     $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
   }
-  
+
   /*
    * Test that invalid contact_id return with proper error messages
    */
@@ -106,7 +115,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         $result = civicrm_api('MailingContact', 'get', $params);
         $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
    }
-   
+
    /*
     * Test that invalid types are returned with appropriate errors
     */
@@ -120,8 +129,8 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         $result = civicrm_api('MailingContact', 'get', $params);
         $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
     }
-    
-    
+
+
     /*
     * Test that the API returns properly when there are no mailings
     * for a the given contact
@@ -133,12 +142,12 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         );
 
         $result = civicrm_api('MailingContact', 'get', $params);
-        
+
         $this->assertEquals($result['is_error'], 0, "In line " . __LINE__);
         $this->assertEquals($result['count'], 0, "In line " . __LINE__);
         $this->assertTrue(empty($result['values']), "In line " . __LINE__);
     }
-    
+
   /*
    * Test that the API returns a mailing properly when there is only one
    */
@@ -156,7 +165,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
             dirname(__FILE__) . '/dataset/mailing_delivered.xml'
           )
         );
-        
+
         $params = array(
             'contact_id' => 23,
             'type' => 'Delivered',
@@ -172,8 +181,8 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         $this->assertEquals($result['values'][1]['creator_id'], 1, "In line " . __LINE__);
         $this->assertEquals($result['values'][1]['creator_name'], "xyz1, abc1", "In line " . __LINE__);
     }
-    
-    
+
+
     /*
      * Test that the API returns only the "Bounced" mailings when instructed to do so
      */
@@ -191,7 +200,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
             dirname(__FILE__) . '/dataset/mailing_bounced.xml'
           )
         );
-        
+
         $params = array(
             'contact_id' => 23,
             'type' => 'Bounced',
@@ -207,7 +216,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         $this->assertEquals($result['values'][2]['creator_id'], 1, "In line " . __LINE__);
         $this->assertEquals($result['values'][2]['creator_name'], "xyz1, abc1", "In line " . __LINE__);
     }
-    
-    
-    
+
+
+
 }
