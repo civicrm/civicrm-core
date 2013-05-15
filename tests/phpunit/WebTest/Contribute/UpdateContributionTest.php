@@ -197,7 +197,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->clickLink("_qf_FinancialTypeAccount_next_new-botttom");
    $this->select("account_relationship", "label=Premiums Inventory Account is");
    $this->select("financial_account_id", "label=$to");
-   $this->click("_qf_FinancialTypeAccount_next-botttom");
+   $this->clickLink("_qf_FinancialTypeAccount_next-botttom");
    $premiumName = 'Premium'.substr(sha1(rand()), 0, 7);
    $amount = 500;
    $sku = 'SKU';
