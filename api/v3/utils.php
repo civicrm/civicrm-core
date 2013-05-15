@@ -293,17 +293,6 @@ function _civicrm_api3_get_DAO($name) {
   if(strtolower($name) == 'im'){
     return 'CRM_Core_BAO_IM';
   }
-  if(strtolower($name) == 'group'){
-    //    CRM-12628
-    //@todo we have to do this because the naming convention of MailingGroup is
-    // wrong & it clobbers group
-    return 'CRM_Contact_BAO_Group';
-  }
-
-  if(strtolower($name) == 'mailing_group' || $name == 'MailingGroup'){
-    //    CRM-12628
-    return 'CRM_Mailing_BAO_Group';
-  }
   return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
 }
 
