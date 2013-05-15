@@ -41,8 +41,9 @@ class CRM_Core_Report_Excel {
    * @return  mixed    empty if output is printed, else output
    *
    * @access  public
+   * @static
    */
-  function makeCSVTable(&$header, &$rows, $titleHeader = NULL, $print = TRUE, $outputHeader = TRUE) {
+  static function makeCSVTable(&$header, &$rows, $titleHeader = NULL, $print = TRUE, $outputHeader = TRUE) {
     if ($titleHeader) {
       echo $titleHeader;
     }
@@ -186,7 +187,7 @@ class CRM_Core_Report_Excel {
    * @public
    * @static
    */
-  function writeCSVFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE, $saveFile = NULL) {
+  static function writeCSVFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE, $saveFile = NULL) {
     if ($outputHeader && !$saveFile) {
       CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
         'text/x-csv',
