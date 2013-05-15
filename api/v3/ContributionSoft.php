@@ -77,7 +77,9 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_contribution_soft_delete($params) {
-  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  // non standard BAO - we have to write custom code to cope
+  CRM_Contribute_BAO_ContributionSoft::del(array('id' => $params['id']));
+
 }
 
 /**

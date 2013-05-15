@@ -154,7 +154,6 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Organization',
       "custom_{$this->IndividualField['id']}" => 'Test String',
       'version' => $this->_apiversion,
-      'debug' => 1,
     );
 
     $contact = civicrm_api('contact', 'create', $params);
@@ -206,7 +205,6 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Organization',
       "custom_{$this->IndiStudentField['id']}" => 'Test String',
       'version' => $this->_apiversion,
-      'debug' => 1,
     );
 
     $contact = civicrm_api('contact', 'create', $params);
@@ -246,7 +244,6 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       "custom_{$this->IndiStudentField['id']}" => 'Test String',
       'version' => $this->_apiversion,
-      'debug' => 1,
     );
     $contact = civicrm_api('contact', 'create', $params);
     $this->assertTrue(is_array($contact['undefined_fields']), __LINE__);
