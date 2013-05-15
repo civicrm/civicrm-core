@@ -37,7 +37,14 @@
  * This class generates form components for adding a petition
  *
  */
+
 class CRM_Campaign_Form_Petition extends CRM_Core_Form {
+
+  /**
+   * @var int
+   * @protected
+   */
+  protected $_surveyId;
 
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
