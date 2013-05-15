@@ -187,14 +187,23 @@ function _civicrm_api3_activity_create_spec(&$params) {
     'name' => 'assignee_id',
     'title' => 'assigned to',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityAssignment',
+    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
   );
   $params['target_contact_id'] = array(
     'name' => 'target_id',
     'title' => 'Activity Target',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityTarget',
+    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
   );
+
+  $params['source_contact_id'] = array(
+      'name' => 'source_contact_id',
+      'title' => 'Activity Source Contact',
+      'type' => 1,
+      'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
+      'api.default' => 'user_contact_id',
+  );
+
   $params['activity_status_id'] = array(
     'name' => 'status_id',
     'title' => 'Status Id',
@@ -240,7 +249,7 @@ function civicrm_api3_activity_get($params) {
       $returns[$returnkey] = $v;
     }
   }
-
+  $returns['source_contact_id'] = 1;
   foreach ($returns as $n => $v) {
     switch ($n) {
       case 'assignee_contact_id':
@@ -272,6 +281,8 @@ function civicrm_api3_activity_get($params) {
   //legacy custom data get - so previous formatted response is still returned too
   return civicrm_api3_create_success($activities, $params, 'activity', 'get');
 }
+
+
 
 /**
  * Delete a specified Activity.
