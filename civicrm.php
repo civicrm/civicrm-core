@@ -479,9 +479,7 @@ function civicrm_check_permission($args) {
   $arg3 = CRM_Utils_Array::value(3, $args);
 
   // allow editing of related contacts
-  if ($arg1 == 'contact' &&
-    $arg2 == 'relatedcontact'
-  ) {
+  if ($arg1 == 'contact' && $arg2 == 'relatedcontact') {
     return TRUE;
   }
 
@@ -520,7 +518,8 @@ function civicrm_check_permission($args) {
       return TRUE;
     }
 
-    if ($arg1 == 'pcp' &&
+    if (
+      $arg1 == 'pcp' &&
       (!$arg2 || in_array($arg2, array('info')))
     ) {
       return TRUE;
@@ -528,21 +527,23 @@ function civicrm_check_permission($args) {
   }
 
   // allow mailing urls to be processed
-  if ($arg1 == 'mailing' &&
+  if (
+    $arg1 == 'mailing' &&
     in_array('CiviMail', $config->enableComponents)
   ) {
-    if (in_array($arg2,
+    if (
+      in_array(
+        $arg2,
         array('forward', 'unsubscribe', 'resubscribe', 'optout', 'subscribe', 'confirm', 'view')
-      )) {
+      )
+    ) {
       return TRUE;
     }
   }
 
   // allow petition sign in, CRM-7401
   if (in_array('CiviCampaign', $config->enableComponents)) {
-    if ($arg1 == 'petition' &&
-      $arg2 == 'sign'
-    ) {
+    if ($arg1 == 'petition' && $arg2 == 'sign') {
       return TRUE;
     }
   }
@@ -564,7 +565,7 @@ function wp_civicrm_capability() {
     if (
       is_object($roleObj) &&
       is_array($roleObj->capabilities) &&
-      ! array_key_exists('access_civicrm', $wp_roles->get_role($role)->capabilities )
+      !array_key_exists('access_civicrm', $wp_roles->get_role($role)->capabilities )
     ) {
       $wp_roles->add_cap($role, 'access_civicrm');
     }
@@ -605,7 +606,7 @@ function civicrm_wp_main() {
 
   add_shortcode('civicrm', 'civicrm_shortcode_handler');
 
-  if (! $isAdmin) {
+  if (!$isAdmin) {
     add_action('wp_head', 'civicrm_wp_head');
     add_filter('get_header', 'civicrm_wp_shortcode_includes');
   }
