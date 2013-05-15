@@ -69,4 +69,8 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
     return CRM_Utils_Array::value($daoName, self::$daoToClass);
   {rdelim}
 
+  static public function getBriefName($className) {ldelim}
+    return CRM_Utils_Array::value($className, array_flip(self::$daoToClass));
+  {rdelim}
+
 {rdelim}
