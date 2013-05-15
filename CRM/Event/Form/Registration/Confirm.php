@@ -688,7 +688,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date']));
         $this->set('trxnId', CRM_Utils_Array::value('trxn_id', $value));
       }
-
+      
+      $value['fee_amount'] = CRM_Utils_Array::value('amount', $value);
       $this->set('value', $value);
 
       // handle register date CRM-4320
