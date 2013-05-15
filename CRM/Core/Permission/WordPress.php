@@ -56,8 +56,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
     }
 
     // Make string lowercase and convert spaces into underscore
-    $str = strtolower($str);
-    $str = str_replace(" ","_",$str);
+    $str = CRM_Utils_String::munge(strtolower($str));
 
     if ( is_user_logged_in() ) {
       // Check whether the logged in user has the capabilitity
