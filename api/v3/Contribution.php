@@ -57,12 +57,16 @@ function civicrm_api3_contribution_create(&$params) {
   _civicrm_api3_custom_format_params($params, $values, 'Contribution');
   $values["contact_id"] = CRM_Utils_Array::value('contact_id', $params);
   $values["source"] = CRM_Utils_Array::value('source', $params);
-
+  //legacy soft credit handling
+  if(!empty($params['soft_credit_to'])){
+    $values['soft_credit'] = array(array(
+      'contact_id' => $params['soft_credit_to'],
+      'amount' => $params['total_amount']));
+  }
   $ids = array();
   if (CRM_Utils_Array::value('id', $params)) {
     $ids['contribution'] = $params['id'];
   }
-
   $contribution = CRM_Contribute_BAO_Contribution::create($values, $ids);
 
   if (is_a($contribution, 'CRM_Core_Error')) {
@@ -269,13 +273,6 @@ function _civicrm_api3_contribute_format_params($params, &$values, $create = FAL
         else {
           throw new Exception("Invalid Financial Type");
         }
-        break;
-
-      case 'soft_credit_to':// should be dealt with by validate integer
-        if (!CRM_Utils_Rule::integer($value)) {
-          return civicrm_api3_create_error("$key not a valid Id: $value");
-        }
-        $values['soft_credit_to'] = $value;
         break;
 
       default:
