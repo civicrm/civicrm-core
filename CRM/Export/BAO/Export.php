@@ -1093,7 +1093,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv', $mode = CRM_Export_Form_Select::CONTACT_EXPORT) {
+  static function getExportFileName($output = 'csv', $mode = CRM_Export_Form_Select::CONTACT_EXPORT) {
     switch ($mode) {
       case CRM_Export_Form_Select::CONTACT_EXPORT:
         return ts('CiviCRM Contact Search');
