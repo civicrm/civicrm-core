@@ -738,10 +738,5 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   static function searchAction(&$row, $id) {}
-
-  static function addShowHide(&$showHide) {
-    $showHide->addHide('caseForm');
-    $showHide->addShow('caseForm_show');
-  }
 }
 

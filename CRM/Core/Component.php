@@ -279,17 +279,6 @@ class CRM_Core_Component {
     }
   }
 
-  static function &addShowHide(&$showHide) {
-    $info = self::_info();
-
-    foreach ($info as $name => $comp) {
-      if ($comp->usesSearch()) {
-        $bqr = $comp->getBAOQueryObject();
-        $bqr->addShowHide($showHide);
-      }
-    }
-  }
-
   static function searchAction(&$row, $id) {
     $info = self::_info();
 

@@ -924,11 +924,6 @@ class CRM_Contribute_BAO_Query {
     $form->setDefaults(array('contribution_test' => 0));
   }
 
-  static function addShowHide(&$showHide) {
-    $showHide->addHide('contributeForm');
-    $showHide->addShow('contributeForm_show');
-  }
-
   static function searchAction(&$row, $id) {
   }
 
