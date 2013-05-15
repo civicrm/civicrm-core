@@ -69,7 +69,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     $transaction = new CRM_Core_Transaction();
 
     $do = new CRM_Core_DAO();
-    $mg = CRM_Mailing_DAO_Group::getTableName();
+    $mg = CRM_Mailing_DAO_MailingGroup::getTableName();
     $job = CRM_Mailing_BAO_Job::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
