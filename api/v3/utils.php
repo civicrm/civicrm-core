@@ -1516,7 +1516,15 @@ function _civicrm_api3_validate_html(&$params, &$fieldname, &$fieldInfo) {
  */
 function _civicrm_api3_validate_string(&$params, &$fieldname, &$fieldInfo) {
   // If fieldname exists in params
-  $value = (string) CRM_Utils_Array::value($fieldname, $params,'');
+  $value = CRM_Utils_Array::value($fieldname, $params, '');
+  if(!is_array($value)){
+    $value = (string) $value;
+  }
+  else{
+    //@todo what do we do about passed in arrays. For many of these fields
+    // the missing piece of functionality is separating them to a separated string
+    // & many save incorrectly. But can we change them wholesale?
+  }
   if ($value ) {
     if (!CRM_Utils_Rule::xssString($value)) {
       throw new Exception('Illegal characters in input (potential scripting attack)');
@@ -1532,7 +1540,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldname, &$fieldInfo) {
       $lowerCaseOptions = array_map("strtolower", $options);
       // If value passed is not a key, it may be a label
       // Try to lookup key from label - if it can't be found throw error
-      if (!isset($options[strtolower($value)]) && !isset($options[$value]) ) {
+      if (!is_array($value) && !isset($options[strtolower($value)]) && !isset($options[$value]) ) {
         if (!in_array(strtolower($value), $lowerCaseOptions)) {
           throw new Exception("$fieldname `$value` is not valid.");
         }
