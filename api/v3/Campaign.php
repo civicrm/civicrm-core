@@ -35,8 +35,6 @@
  * @copyright CiviCRM LLC (c) 2004-2013
  */
 
-require_once 'CRM/Campaign/BAO/Campaign.php';
-
 /**
  * create/update campaign
  *

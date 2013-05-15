@@ -42,9 +42,10 @@
  * Initialize CiviCRM - should be run at the start of each API function
  */
 function _civicrm_api3_initialize() {
-  require_once 'CRM/Core/Config.php';
-  $config = CRM_Core_Config::singleton();
-  }
+  require_once 'CRM/Core/ClassLoader.php';
+  CRM_Core_ClassLoader::singleton()->register();
+  CRM_Core_Config::singleton();
+}
 
 /**
  * Wrapper Function for civicrm_verify_mandatory to make it simple to pass either / or fields for checking
@@ -189,14 +190,6 @@ function civicrm_api3_create_success($values = 1, $params = array(
   }
   //if ( array_key_exists ('debug',$params) && is_object ($dao)) {
   if (is_array($params) && array_key_exists('debug', $params)) {
-    if (!is_object($dao)) {
-      $d = _civicrm_api3_get_DAO(CRM_Utils_Array::value('entity', $params));
-      if (!empty($d)) {
-        $file = str_replace('_', '/', $d) . ".php";
-        require_once ($file);
-        $dao = new $d();
-      }
-    }
     if (is_string($action) && $action != 'getfields') {
       $apiFields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => $action) + $params);
     }
@@ -259,8 +252,6 @@ function _civicrm_api3_load_DAO($entity) {
   if (empty($dao)) {
     return FALSE;
   }
-  $file = str_replace('_', '/', $dao) . ".php";
-  require_once ($file);
   $d = new $dao();
   return $d;
 }
@@ -915,8 +906,6 @@ function _civicrm_api3_api_check_permission($entity, $action, &$params, $throw =
     return TRUE;
   }
 
-  require_once 'CRM/Core/Permission.php';
-
   require_once 'CRM/Core/DAO/permissions.php';
   $permissions = _civicrm_api3_permissions($entity, $action, $params);
 
@@ -1033,8 +1022,6 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  *
  */
 function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
-  require_once 'CRM/Core/BAO/CustomGroup.php';
-  require_once 'CRM/Core/BAO/CustomField.php';
   $groupTree = &CRM_Core_BAO_CustomGroup::getTree($entity,
     CRM_Core_DAO::$_nullObject,
     $entity_id,
@@ -1166,8 +1153,6 @@ function _civicrm_api3_validate_date(&$params, &$fieldname, &$fieldInfo) {
  * @param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_constraint(&$params, &$fieldname, &$fieldInfo) {
-  $file = str_replace('_', '/', $fieldInfo['FKClassName']) . ".php";
-  require_once ($file);
   $dao = new $fieldInfo['FKClassName'];
   $dao->id = $params[$fieldname];
   $dao->selectAdd();
@@ -1212,7 +1197,6 @@ function _civicrm_api3_validate_uniquekey(&$params, &$fieldname, &$fieldInfo) {
  */
 function _civicrm_api3_generic_replace($entity, $params) {
 
-  require_once 'CRM/Core/Transaction.php';
   $transaction = new CRM_Core_Transaction();
   try {
     if (!is_array($params['values'])) {
@@ -1287,8 +1271,6 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array(
   if (empty($dao)) {
     return array();
   }
-  $file = str_replace('_', '/', $dao) . ".php";
-  require_once ($file);
   $d = new $dao();
   $fields = $d->fields();
   // replace uniqueNames by the normal names as the key
@@ -1322,7 +1304,6 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array(
  * fields are prefixed with 'custom_' to represent api params
  */
 function _civicrm_api_get_custom_fields($entity, &$params) {
-  require_once 'CRM/Core/BAO/CustomField.php';
   $customfields = array();
   $entity = _civicrm_api_get_camel_name($entity);
   if (strtolower($entity) == 'contact') {

@@ -39,11 +39,6 @@
  */
 
 /**
- * Files required for this package
- */
-require_once 'CRM/Core/BAO/UFJoin.php';
-
-/**
  * takes an associative array and creates a uf join in the database
  *
  * @param array $params assoc array of name/value pairs

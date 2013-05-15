@@ -39,11 +39,6 @@
  */
 
 /**
- * Include utility functions
- */
-require_once 'CRM/Pledge/BAO/PledgePayment.php';
-
-/**
  * Add or update a plege payment. Pledge Payment API doesn't actually add a pledge
  *  if the request is to 'create' and 'id' is not passed in
  * the oldest pledge with no associated contribution is updated

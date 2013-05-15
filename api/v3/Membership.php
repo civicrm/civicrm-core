@@ -39,13 +39,6 @@
  */
 
 /**
- * Files required for this package
- */
-
-require_once 'CRM/Utils/Rule.php';
-require_once 'CRM/Utils/Array.php';
-
-/**
  * Deletes an existing contact membership
  *
  * This API is used for deleting a contact membership
@@ -331,7 +324,6 @@ function _civicrm_api3_membership_format_params($params, &$values, $create = FAL
  */
 function _civicrm_api3_membership_get_customv2behaviour(&$params, $contactID, $membershipTypeId, $activeOnly ){
     // get the membership for the given contact ID
-    require_once 'CRM/Member/BAO/Membership.php';
     $membershipParams = array( 'contact_id' => $contactID );
     if ( $membershipTypeId ) {
       $membershipParams['membership_type_id'] = $membershipTypeId;

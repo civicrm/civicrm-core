@@ -39,13 +39,6 @@
  */
 
 /**
- * Include common API util functions
- */
-
-require_once 'CRM/Core/BAO/UFField.php';
-require_once 'CRM/Core/BAO/UFGroup.php';
-
-/**
  * Defines 'uf field' within a group.
  *
  * @param $groupId int Valid uf_group id

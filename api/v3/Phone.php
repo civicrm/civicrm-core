@@ -38,11 +38,6 @@
  */
 
 /**
- * Include utility functions
- */
-require_once 'CRM/Core/BAO/Phone.php';
-
-/**
  *  Add an Phone for a contact
  *
  * Allowed @params array keys are:
