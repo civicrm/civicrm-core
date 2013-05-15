@@ -347,9 +347,6 @@ class CiviCRM_For_WordPress {
 			$forumLink      = "http://forum.civicrm.org/index.php/board,6.0.html";
 			
 			
-			// open tags (assume these were meanto be opened here)
-			$errorMsgAdd = '<p><strong>';
-			
 			// construct message
 			$errorMsgAdd = sprintf( 
 				__( 'Please review the <a href="%s">WordPress Installation Guide</a> and the <a href="%s">Trouble-shooting page</a> for assistance. If you still need help installing, you can often find solutions to your issue by searching for the error message in the <a href="%s">installation support section of the community forum</a>.', 'civicrm-wordpress' ),
@@ -358,9 +355,7 @@ class CiviCRM_For_WordPress {
 				$forumLink
 			);
 			
-			// close tags (where were these opened?)
-			$errorMsgAdd .= '</strong></p>';
-
+			// does install message get used?
 			$installMessage = sprintf(
 				__( 'Click <a href="%s">here</a> for fresh install.', 'civicrm-wordpress' ), 
 				$installLink
@@ -414,12 +409,12 @@ class CiviCRM_For_WordPress {
 			global $current_user;
 			if ( $current_user ) {
 				
-				// sync procedure
+				// sync procedure sets session values for logged in users
 				require_once 'CRM/Core/BAO/UFMatch.php';
 				CRM_Core_BAO_UFMatch::synchronize(
-					$current_user,
-					false,
-					'WordPress',
+					$current_user, // user object
+					false, // do not update
+					'WordPress', // CMS
 					$this->get_civicrm_contact_type('Individual')
 				);
 				
