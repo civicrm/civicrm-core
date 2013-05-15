@@ -72,15 +72,15 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE  => array(
-          'name'  => ts('Edit'),
-          'url'   => 'civicrm/admin/financial/financialType/accounts',
-          'qs'    => 'action=update&id=%%id%%&aid=%%aid%%&reset=1',
+          'name' => ts('Edit'),
+          'url' => 'civicrm/admin/financial/financialType/accounts',
+          'qs' => 'action=update&id=%%id%%&aid=%%aid%%&reset=1',
           'title' => ts('Edit Financial Type Account'),
         ),
         CRM_Core_Action::DELETE  => array(
-          'name'  => ts('Delete'),
-          'url'   => 'civicrm/admin/financial/financialType/accounts',
-          'qs'    => 'action=delete&id=%%id%%&aid=%%aid%%',
+          'name' => ts('Delete'),
+          'url' => 'civicrm/admin/financial/financialType/accounts',
+          'qs' => 'action=delete&id=%%id%%&aid=%%aid%%',
           'title' => ts('Delete Financial Type Account'),
         ),
       );
@@ -135,6 +135,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
     $params['entity_id'] = $this->_aid;
     $params['entity_table'] = 'civicrm_financial_type';
     if ($this->_aid) {
+      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
       CRM_Utils_System::setTitle($this->_title .' - '.ts( 'Assigned Financial Accounts'));
       $financialAccountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
@@ -143,9 +144,9 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
       $dao->find();
       while ($dao->fetch()) {
         $financialType[$dao->id] = array();
-        CRM_Core_DAO::storeValues( $dao, $financialType[$dao->id] );
+        CRM_Core_DAO::storeValues($dao, $financialType[$dao->id]);
 
-        $params = array( 'id' => $dao->financial_account_id );
+        $params = array('id' => $dao->financial_account_id);
         $defaults = array();
         $financialAccount = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
         if (!empty($financialAccount)) {
@@ -166,10 +167,15 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
             $financialType[$dao->id]['account_relationship'] = CRM_Utils_Array::value($dao->account_relationship, $accountRelationship);
           }
         }
-
         // form all action links
         $action = array_sum(array_keys($this->links()));
-        $financialType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
+        $links = self::links();
+        
+        //CRM-12492
+        if ($dao->account_relationship == $relationTypeId) {
+          unset($links[CRM_Core_Action::DELETE]);
+        }
+        $financialType[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
           array(
             'id' => $dao->id,
             'aid'=> $dao->entity_id,
