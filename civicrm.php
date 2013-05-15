@@ -543,7 +543,11 @@ function civicrm_check_permission($args) {
 
   // allow petition sign in, CRM-7401
   if (in_array('CiviCampaign', $config->enableComponents)) {
-    if ($arg1 == 'petition' && $arg2 == 'sign') {
+    $validPaths = array('sign', 'thankyou', 'confirm');
+    if (
+      $arg1 == 'petition' &&
+      in_array($arg2, $validPaths)
+    ) {
       return TRUE;
     }
   }
