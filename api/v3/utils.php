@@ -182,6 +182,9 @@ function civicrm_api3_create_success($values = 1, $params = array(
       if (empty($item['id']) && !empty($item[$entity . "_id"])) {
         $values[$key]['id'] = $item[$entity . "_id"];
       }
+      if(!empty($item['financial_type_id'])){
+        $values[$key]['contribution_type_id'] = $item['financial_type_id'];
+      }
     }
   }
   //if ( array_key_exists ('debug',$params) && is_object ($dao)) {
@@ -280,13 +283,13 @@ function _civicrm_api3_get_DAO($name) {
   }
 
   //hack to deal with incorrectly named BAO/DAO - see CRM-10859 - remove after rename
-  if($name == 'price_set'){
+  if($name == 'price_set' || $name == 'PriceSet'){
     return 'CRM_Price_DAO_Set';
   }
-  if($name == 'price_field'){
+  if($name == 'price_field' || $name == 'PriceField'){
     return 'CRM_Price_DAO_Field';
   }
-  if($name == 'price_field_value'){
+  if($name == 'price_field_value' || $name == 'PriceFieldValue'){
     return 'CRM_Price_DAO_FieldValue';
   }
   // these aren't listed on ticket CRM-10859 - but same problem - lack of standardisation
@@ -299,7 +302,17 @@ function _civicrm_api3_get_DAO($name) {
   if(strtolower($name) == 'im'){
     return 'CRM_Core_BAO_IM';
   }
+  if(strtolower($name) == 'group'){
+    //    CRM-12628
+    //@todo we have to do this because the naming convention of MailingGroup is
+    // wrong & it clobbers group
+    return 'CRM_Contact_BAO_Group';
+  }
 
+  if(strtolower($name) == 'mailing_group' || $name == 'MailingGroup'){
+    //    CRM-12628
+    return 'CRM_Mailing_BAO_Group';
+  }
   return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
 }
 

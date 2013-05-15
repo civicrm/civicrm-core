@@ -436,7 +436,6 @@ class api_v3_CaseTest extends CiviUnitTestCase {
       'source_contact_id' => $this->_loggedInUser,
       'subject' => 'New subject',
       'version' => $this->_apiversion,
-      'debug' => 1,
     );
     $result = civicrm_api('activity', 'create', $params);
 
