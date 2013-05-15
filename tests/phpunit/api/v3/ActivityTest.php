@@ -504,6 +504,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
     $result = civicrm_api($this->_entity, 'create', $params);
+    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, ' in line ' . __LINE__);
     $result = civicrm_api($this->_entity, 'get', array('return.custom_' . $ids['custom_field_id'] => 1, 'version' => 3, 'id' => $result['id']));
     $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
