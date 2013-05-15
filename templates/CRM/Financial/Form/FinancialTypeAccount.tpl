@@ -26,142 +26,139 @@
 {* this template is used for adding/editing/deleting financial type  *}
 <h3>{if $action eq 8}{ts}Delete Financial Type Account{/ts}{elseif $action eq 1}{ts}Add New Financial Type Account{/ts}{elseif $action eq 2}{ts}Edit Financial Type Account{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-financial_type-form-block">
-   {if $action eq 8}
-      <div class="messages status">
-          <div class="icon inform-icon"></div>    
-          {ts}WARNING: You cannot delete a financial type if it is currently used by any Contributions, Contribution Pages or Membership Types. Consider disabling this option instead.{/ts} {ts}Deleting a financial type cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
+  {if $action eq 8}
+    <div class="messages status">
+      <div class="icon inform-icon"></div>    
+      {ts}WARNING: You cannot delete a financial type if it is currently used by any Contributions, Contribution Pages or Membership Types. Consider disabling this option instead.{/ts} {ts}Deleting a financial type cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
       </div>
-   {else}
-     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+  {else}
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  
-     <table class="form-layout">
+    <table class="form-layout">
      
-       <tr class="crm-contribution-form-block-account_relationship">	 
-    	  <td class="label">{$form.account_relationship.label}</td>
-	  <td class="html-adjust">{$form.account_relationship.html}</td>
-       </tr>
+      <tr class="crm-contribution-form-block-account_relationship">	 
+    	<td class="label">{$form.account_relationship.label}</td>
+	<td class="html-adjust">{$form.account_relationship.html}</td>
+      </tr>
       <tr class="crm-contribution-form-block-financial_account_id">	 
-    	  <td class="label">{$form.financial_account_id.label}</td>
-	  <td class="html-adjust">{$form.financial_account_id.html}</td>
-       </tr>
+    	<td class="label">{$form.financial_account_id.label}</td>
+	<td class="html-adjust">{$form.financial_account_id.html}</td>
+      </tr>
     
-      </table> 
+    </table> 
    {/if}
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>
 
 <script language="JavaScript" type="text/javascript">
 {literal}
-cj("#financial_account_id").change(function()
-{
+cj("#financial_account_id").change(function() {
 {/literal}
-            relationID         = "#account_relationship"
-	    financialAccountID = "#financial_account_id"
-            callbackURL        = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialRelation'}"
+  relationID = "#account_relationship"
+  financialAccountID = "#financial_account_id"
+  callbackURL = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialRelation'}"
 {literal}
-            var financialId    = cj("#financial_account_id").val();
-    	    var check          = cj(relationID).val();
-            if( check == 'select' || financialId == 'select' ){
-	        callbackURL = callbackURL+"&_value="+financialId;
-                cj.ajax({
-                         url: callbackURL,
-                         context: document.body,
-                         success: function( data, textStatus ){
-	                      cj(relationID).html("");//clear old options
-			      data = eval(data);//get json array
-                              if ( data != null ) {
-			         for (i = 0; i < data.length; i++) {
-			             if( data[i].selected == 'Selected')
-			               var idf = data[i].value;
-				     cj(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-			         }
-			     }
-			     if( idf != null)
-			       cj(relationID).val(idf);
-			       //cj("option:first", relationID).attr( "selected", "selected" );//select first option
-  	   
-			    }
-	       		});
-		if( financialId == 'select' ){
+  var financialId = cj("#financial_account_id").val();
+  var check = cj(relationID).val();
+  if (check == 'select' || financialId == 'select') {
+    callbackURL = callbackURL+"&_value=" + financialId;
+    cj.ajax({
+      url: callbackURL,
+      context: document.body,
+      success: function(data, textStatus) {
+	cj(relationID).html("");//clear old options
+	data = eval(data);//get json array
+        if (data != null) {
+	  for (i = 0; i < data.length; i++) {
+	    if (data[i].selected == 'Selected') {
+	      var idf = data[i].value;
+            }
+	    cj(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
+	  }
+        }
+	if (idf != null) {
+	  cj(relationID).val(idf);
+        } 
+      }
+    });
+    if (financialId == 'select') {
 {/literal}
-	
-		     callbackURLs       = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
+      callbackURLs = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
 {literal}
-		     callbackURLs = callbackURLs+"&_value=select";
-		      cj.ajax({
-                        url: callbackURLs,
-                        context: document.body,
-                        success: function( data, textStatus ){
-	                   cj(financialAccountID).html("");//clear old options
-			   data = eval(data);//get json array
-                           if ( data != null ) {
-			      for (i = 0; i < data.length; i++) {
-				 cj(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-			      }
-			   }
-  	   
-  	                 }	   
-	             });
-		}
+      callbackURLs = callbackURLs + "&_value=select";
+      cj.ajax({
+        url: callbackURLs,
+        context: document.body,
+        success: function(data, textStatus) {
+	  cj(financialAccountID).html("");//clear old options
+	  data = eval(data);//get json array
+          if (data != null) {
+	    for (i = 0; i < data.length; i++) {
+	      cj(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
 	    }
+	  }
+  	}	   
+      });
+    }
+  }
 });
 {/literal}
-
-{literal}
-	
-cj("#account_relationship").change(function()
-{
+{literal}	
+cj("#account_relationship").change(function() {
 {/literal}
-	    relationID         = "#account_relationship"
-	    financialAccountID = "#financial_account_id"
-            callbackURLs       = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
+  relationID = "#account_relationship"
+  financialAccountID = "#financial_account_id"
+  callbackURLs = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
 {literal}
-	    var financialId    = cj("#account_relationship").val();
-	    var check          = cj(financialAccountID).val();
-            if(  check == 'select' || financialId == 'select' ){
-	      callbackURLs = callbackURLs+"&_value="+financialId;
-              cj.ajax({
-                       url: callbackURLs,
-                       context: document.body,
-                       success: function( data, textStatus ){
-	                   cj(financialAccountID).html("");//clear old options
-			   data = eval(data);//get json array
-                           if ( data != null ) {
-			      for (i = 0; i < data.length; i++) {
-				 cj(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-			    }
-			}
-  	   
-  	             }	   
-	     });
-	     
-	     if( financialId == 'select' ){
-{/literal}
-		 callbackURL   = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialRelation'}"     
-{literal}	     	 
-		 callbackURL = callbackURL+"&_value=select";
-	         cj.ajax({
-                         url: callbackURL,
-                         context: document.body,
-                         success: function( data, textStatus ){
-	                      cj(relationID).html("");//clear old options
-			      data = eval(data);//get json array
-                              if ( data != null ) {
-			         for (i = 0; i < data.length; i++) {
-			             if( data[i].selected == 'Selected')
-			               var idf = data[i].value;
-				     cj(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-			         }
-			     }
-			     if( idf != null)
-			       cj(relationID).val(idf);
-			       //cj("option:first", relationID).attr( "selected", "selected" );//select first option
-  	   
-			    }
-	       	  });  
-	     }	
-	     
+  var financialId = cj("#account_relationship").val();
+  var check = cj(financialAccountID).val();
+  if (check == 'select' || financialId == 'select') {
+    callbackURLs = callbackURLs+"&_value="+financialId;
+    cj.ajax({
+      url: callbackURLs,
+      context: document.body,
+      success: function(data, textStatus) {
+	cj(financialAccountID).html("");//clear old options
+	data = eval(data);//get json array
+        if (data != null) {
+	  for (i = 0; i < data.length; i++) {
+	     if (data[i].selected == 'Selected') {
+	       var idf = data[i].value;
+             }
+	     cj(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
 	  }
+	}
+	if (idf != null) {
+	  cj(financialAccountID).val(idf);
+        }
+      }	   
+    });
+    if (financialId == 'select') {
+{/literal}
+      callbackURL = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialRelation'}"     
+{literal}	     	 
+      callbackURL = callbackURL+"&_value=select";
+      cj.ajax({
+        url: callbackURL,
+        context: document.body,
+        success: function(data, textStatus) {
+	  cj(relationID).html("");//clear old options
+	  data = eval(data);//get json array
+          if (data != null) {
+	    for (i = 0; i < data.length; i++) {
+	      if (data[i].selected == 'Selected') {
+		var idf = data[i].value;
+              }
+	      cj(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
+	    }
+	  }
+	  if (idf != null) {
+	    cj(relationID).val(idf);
+          }
+        }
+      });  
+    }	
+  }
 });
 {/literal}
 </script>
