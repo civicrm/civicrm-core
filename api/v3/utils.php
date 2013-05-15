@@ -182,6 +182,9 @@ function civicrm_api3_create_success($values = 1, $params = array(
       if (empty($item['id']) && !empty($item[$entity . "_id"])) {
         $values[$key]['id'] = $item[$entity . "_id"];
       }
+      if(!empty($item['financial_type_id'])){
+        $values[$key]['contribution_type_id'] = $item['financial_type_id'];
+      }
     }
   }
   //if ( array_key_exists ('debug',$params) && is_object ($dao)) {
