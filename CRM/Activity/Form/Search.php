@@ -439,7 +439,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
    * @return array the default array reference
    */
   function setDefaultValues() { // TODO test?
-    $defaults = array();
     $defaults = $this->_formValues;
     return $defaults;
   }
@@ -454,9 +453,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       $this->_defaults['activity_status'] = $status;
     }
 
-    $survey = CRM_Utils_Request::retrieve('survey', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $survey = CRM_Utils_Request::retrieve('survey', 'Positive', CRM_Core_DAO::$_nullObject);
+
     if ($survey) {
       $this->_formValues['activity_survey_id'] = $survey;
     }
@@ -473,7 +471,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
           $this->_formValues['activity_role'] = $activity_role;
         }
         else {
-          list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
           $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'sort_name');
         }
         // also assign individual mode to the template
