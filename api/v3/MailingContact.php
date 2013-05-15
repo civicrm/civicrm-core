@@ -51,37 +51,44 @@
  *
  */
 function civicrm_api3_mailing_contact_get($params) {
-  if (empty($params['contact_id'])) {
-    return civicrm_api3_create_error('contact_id is a required field');
+  return civicrm_api3_create_success(_civicrm_api3_mailing_contact_getresults($params, FALSE));
+}
+/**
+ * This is a wrapper for the functions that return the results from the 'quasi-entity'
+ * mailing contact
+ * @param array $params
+ * @param Boolean $count
+ * @throws Exception
+ */
+function _civicrm_api3_mailing_contact_getresults($params, $count){
+  if(empty($params['type'])){
+    //ie. because the api is an anomoly & passing in id is not valid
+    throw new Exception('This api call does not accept api as a parameter');
   }
-
-  if (empty($params['type'])) {
-    $params['type'] = 'Delivered';
-  }
-
-  $validTypeValues = array('Delivered', 'Bounced');
-  if (!in_array($params['type'], $validTypeValues)) {
-    return civicrm_api3_create_error(
-      'type should be one of the following: ' .
-      implode(', ', $validTypeValues)
-    );
-  }
-
-  if (!isset($params['offset'])) {
-    $params['offset'] = 0;
-  }
-
-  if (!isset($params['limit'])) {
-    $params['limit'] = 50;
-  }
-
+  $options  = _civicrm_api3_get_options_from_params($params, TRUE,'contribution','get');
   $fnName = '_civicrm_api3_mailing_contact_get_' . strtolower($params['type']);
   return $fnName(
-    $params['contact_id'],
-    $params['offset'],
-    $params['limit'],
-    CRM_Utils_Array::value('sort', $params),
-    CRM_Utils_Array::value('getcount', $params)
+      $params['contact_id'],
+      $options['offset'],
+      $options['limit'],
+      $options['sort'],
+      $count
+  );
+}
+/**
+ * Adjust Metadata for Get action
+ *
+ * @param array $params array or parameters determined by getfields
+ */
+function _civicrm_api3_mailing_contact_get_spec(&$params) {
+  $params['contact_id']['api.required'] = 1;
+  $params['type'] = array(
+    'api.default' => 'Delivered',
+    'type' => CRM_Utils_Type::T_STRING,
+    'options' => array(
+      'Delivered' => 'Delivered',
+      'Bounced' => 'Bounced',
+    )
   );
 }
 
@@ -121,7 +128,7 @@ GROUP BY   m.id
       'contact_id' => $contactID
     );
 
-    $results = array('count' => $dao->N);
+    $results = $dao->N;
   }
   else {
     $defaultFields = array(
@@ -182,16 +189,9 @@ LIMIT %2, %3
         $results[$dao->mailing_id][$l] = $dao->$l;
       }
     }
-
-    $params = array(
-      'type'   => $type,
-      'contact_id' => $contactID,
-      'offset' => $offset,
-      'limit'  => $limit
-    );
   }
 
-  return civicrm_api3_create_success($results, $params);
+  return $results;
 }
 
 function _civicrm_api3_mailing_contact_get_delivered(
@@ -264,11 +264,5 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
  *
  */
 function civicrm_api3_mailing_contact_getcount($params) {
-  if (empty($params['contact_id'])) {
-    return civicrm_api3_create_error('contact_id is a required field');
-  }
-
-  // set the count mode for the api
-  $params['getcount'] = 1;
-  return civicrm_api3_mailing_contact_get($params);
+  return _civicrm_api3_mailing_contact_getresults($params, TRUE);
 }
