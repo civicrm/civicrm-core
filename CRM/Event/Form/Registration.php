@@ -784,6 +784,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (CRM_Utils_Array::value('is_primary', $this->_params)) {
       $this->_params['fee_amount'] = $this->get('primaryParticipantAmount');
     }
+    else {
+      $this->_params['fee_amount'] = $this->_params['amount'];
+    }
 
     // add participant record
     $participant = $this->addParticipant($this->_params, $contactID);
