@@ -949,9 +949,10 @@ class CiviCRM_For_WordPress {
 
 		// allow petition sign in, CRM-7401
 		if ( in_array( 'CiviCampaign', $config->enableComponents ) ) {
+			$validPaths = array('sign', 'thankyou', 'confirm');
 			if (
 				$arg1 == 'petition' &&
-				$arg2 == 'sign'
+				in_array($arg2, $validPaths)
 			) {
 				return true;
 			}
