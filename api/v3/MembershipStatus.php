@@ -39,12 +39,6 @@
  */
 
 /**
- * Files required for this package
- */
-
-require_once 'CRM/Member/BAO/MembershipStatus.php';
-
-/**
  * Create a Membership Status
  *
  * This API is used for creating a Membership Status
@@ -102,7 +96,6 @@ function &civicrm_api3_membership_status_update($params) {
   //don't allow duplicate names.
   $name = CRM_Utils_Array::value('name', $params);
   if ($name) {
-    require_once 'CRM/Member/DAO/MembershipStatus.php';
     $status = new CRM_Member_DAO_MembershipStatus();
     $status->name = $params['name'];
     if ($status->find(TRUE) && $status->id != $params['id']) {
@@ -110,7 +103,6 @@ function &civicrm_api3_membership_status_update($params) {
     }
   }
 
-  require_once 'CRM/Member/BAO/MembershipStatus.php';
   $membershipStatusBAO = new CRM_Member_BAO_MembershipStatus();
   $membershipStatusBAO->id = $params['id'];
   if ($membershipStatusBAO->find(TRUE)) {
@@ -172,8 +164,6 @@ SELECT start_date, end_date, join_date
   $params = array(1 => array($membershipID, 'Integer'));
   $dao = &CRM_Core_DAO::executeQuery($query, $params);
   if ($dao->fetch()) {
-    require_once 'CRM/Member/BAO/MembershipStatus.php';
-
     // Take the is_admin column in MembershipStatus into consideration when requested
     if (! CRM_Utils_Array::value('ignore_admin_only', $membershipParams) ) {
       $result = &CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dao->start_date, $dao->end_date, $dao->join_date, 'today', TRUE);

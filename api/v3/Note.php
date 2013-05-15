@@ -42,8 +42,6 @@
  * Files required for this package
  */
 
-require_once 'CRM/Core/BAO/Note.php';
-
 /**
  * Create Note
  *

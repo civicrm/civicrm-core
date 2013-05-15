@@ -37,8 +37,6 @@
  * @version $Id: Address.php 2011-02-16 ErikHommel $
  */
 
-require_once 'CRM/Core/BAO/Address.php';
-
 /**
  *  Add an Address for a contact
  *

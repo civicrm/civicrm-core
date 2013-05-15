@@ -37,8 +37,6 @@
  * @version $Id: Email.php 2011-02-16 ErikHommel $
  */
 
-require_once 'CRM/Core/BAO/Email.php';
-
 /**
  * Add an Email for a contact
  *

@@ -41,7 +41,6 @@
 /**
  * Files required for this package
  */
-require_once 'CRM/Event/BAO/ParticipantPayment.php';
 
 /**
  * Create a Event Participant Payment

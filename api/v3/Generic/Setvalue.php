@@ -39,7 +39,6 @@ function civicrm_api3_generic_setValue($apiRequest) {
 
     case 2:
       //string
-      require_once ("CRM/Utils/Rule.php");
       if (!CRM_Utils_Rule::xssString($value)) {
         return civicrm_api3_create_error(ts('Illegal characters in input (potential scripting attack)'), array('error_code' => 'XSS'));
       }

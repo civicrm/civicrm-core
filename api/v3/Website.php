@@ -37,8 +37,6 @@
  * @version $Id: Website.php 2011-03-16 ErikHommel $
  */
 
-require_once 'CRM/Core/BAO/Website.php';
-
 /**
  *  Add an Website for a contact
  *
