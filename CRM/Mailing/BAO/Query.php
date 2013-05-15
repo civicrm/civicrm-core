@@ -399,13 +399,7 @@ class CRM_Mailing_BAO_Query {
     $form->assign('validCiviMailing', TRUE);
   }
 
-  static function addShowHide(&$showHide) {
-    $showHide->addHide('MailingForm');
-    $showHide->addShow('MailingForm_show');
-  }
-
-  static function searchAction(&$row, $id) {
-  }
+  static function searchAction(&$row, $id) {}
 
   static function tableNames(&$tables) {
   }
