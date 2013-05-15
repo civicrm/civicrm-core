@@ -280,13 +280,13 @@ function _civicrm_api3_get_DAO($name) {
   }
 
   //hack to deal with incorrectly named BAO/DAO - see CRM-10859 - remove after rename
-  if($name == 'price_set'){
+  if($name == 'price_set' || $name == 'PriceSet'){
     return 'CRM_Price_DAO_Set';
   }
-  if($name == 'price_field'){
+  if($name == 'price_field' || $name == 'PriceField'){
     return 'CRM_Price_DAO_Field';
   }
-  if($name == 'price_field_value'){
+  if($name == 'price_field_value' || $name == 'PriceFieldValue'){
     return 'CRM_Price_DAO_FieldValue';
   }
   // these aren't listed on ticket CRM-10859 - but same problem - lack of standardisation
