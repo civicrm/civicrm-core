@@ -336,6 +336,10 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       $this->_formValues['activity_type_id'][$activity_type_id] = 1;
     }
 
+    if (!CRM_Utils_Array::value('activity_survey_id', $this->_formValues) && ($surveyID = $this->get('surveyID'))) {
+      $this->_formValues['activity_survey_id'] = $surveyID;
+    }
+
     if (!CRM_Utils_Array::value('activity_test', $this->_formValues)) {
       $this->_formValues["activity_test"] = 0;
     }
@@ -459,6 +463,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
     );
     if ($survey) {
       $this->_formValues['activity_survey_id'] = $survey;
+      $this->set('surveyID', $survey);
     }
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
