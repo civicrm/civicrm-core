@@ -106,10 +106,13 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $this->add('hidden', 'contact_id', '', array('id' => 'contact_id'));
     $this->add('text', 'tax_rate', ts('Tax Rate'), $attributes['tax_rate']);
     $this->add('checkbox', 'is_deductible', ts('Tax-Deductible?'));
-    $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $elementActive = $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_tax', ts('Is Tax?'));
-    $this->add('checkbox', 'is_default', ts('Default?'));
-    
+    $element = $this->add('checkbox', 'is_default', ts('Default?'));
+    // CRM-12470 freeze is default if is_default is set
+    if ($this->_id && CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_default')) {
+      $element->freeze();
+    }
     $financialAccountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
     if (!empty($financialAccountType)) {
       $element = $this->add('select', 'financial_account_type_id', ts('Financial Account Type'),
@@ -117,6 +120,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       if ($this->_isARFlag) {
         $element->freeze();
         $elementAccounting->freeze();
+        $elementActive->freeze();
       }
     }
     
