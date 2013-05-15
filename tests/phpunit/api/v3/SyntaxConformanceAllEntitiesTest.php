@@ -411,7 +411,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     // we'll fix this once beta1 is released
     //        return;
 
-    $result = civicrm_api($Entity, 'Get', array( 'debug' => 1, 'version' => 3, 'id' => $nonExistantID));
+    $result = civicrm_api($Entity, 'Get', array('version' => 3, 'id' => $nonExistantID));
 
     if ($result['is_error']) {
       // just to get a clearer message in the log
@@ -720,7 +720,6 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
         'version' => 3,
         'id' => $entity['id'],
         $field => $entity[$field],
-        'debug' => 1,
       );
 
       $update = civicrm_api($entityName, 'create', $updateParams);

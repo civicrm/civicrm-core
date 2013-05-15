@@ -17,7 +17,6 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->params      = array(
       'version' => $this->_apiversion,
       'entity_id' => $this->individual,
-      'debug' => 1,
     );
     $this->ids['single'] = $this->entityCustomGroupWithSingleFieldCreate('mySingleField', 'Contacts');
     $this->ids['multi']  = $this->CustomGroupMultipleCreateWithFields();
