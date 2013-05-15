@@ -253,6 +253,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->documentMe($params, $contribution, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->_contributionTypeId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_type_id'], $this->_contributionTypeId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00, 'In line ' . __LINE__);
@@ -722,12 +723,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
 
     $contribution = civicrm_api('contribution', 'create', $params);
+    $this->assertAPISuccess($contribution);
     $this->documentMe($params, $contribution, __FUNCTION__, __FILE__, $description, $subfile);
     //     $result = civicrm_api('contribution','get', array('version' => 3,'return'=> 'soft_credit_to', 'sequential' => 1));
     //     $this->assertAPISuccess($result);
     //     $this->assertEquals($contact2['id'], $result['values'][$result['id']]['soft_credit_to']) ;
     //    well - the above doesn't work yet so lets do SQL
     $query = "SELECT count(*) FROM civicrm_contribution_soft WHERE contact_id = " . $contact2['id'];
+
     $count = CRM_Core_DAO::singleValueQuery($query);
     $this->assertEquals(1, $count);
 
