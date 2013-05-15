@@ -172,5 +172,28 @@ WHERE cft.id = %1
     );
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
+  
+  /**
+   * get AR account
+   *
+   * @param $financialAccountId financial account id
+   *
+   * @param $financialAccountTypeId financial account type id
+   *
+   * @param $accountTypeCode account type code
+   *
+   * @return integer count
+   * @static
+   */
+  static function getARAccounts($financialAccountId, $financialAccountTypeId, $accountTypeCode = 'ar') {
+    $query = "SELECT count(id) FROM civicrm_financial_account WHERE financial_account_type_id = %1 AND LCASE(account_type_code) = %2
+      AND id != %3;";
+    $params = array(
+      1 => array($financialAccountTypeId, 'Integer'),
+      2 => array(strtolower($accountTypeCode), 'String'),
+      3 => array($financialAccountId, 'Integer'),
+    );
+     return CRM_Core_DAO::singleValueQuery($query, $params);
+  }
 }
 

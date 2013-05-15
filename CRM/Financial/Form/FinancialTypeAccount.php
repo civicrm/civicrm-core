@@ -64,6 +64,13 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   protected $_BAOName;
   
   /**
+   * Flag if its a AR account type
+   *
+   * @var boolean
+   */
+  protected $_isARFlag = FALSE;
+  
+  /**
    * Function to set variables up before form is built
    *
    * @return void
@@ -71,28 +78,40 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    */
   public function preProcess() {
     $this->_aid = CRM_Utils_Request::retrieve('aid', 'Positive', $this);
-    $this->_id  = CRM_Utils_Request::retrieve('id' , 'Positive', $this); 
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this); 
     if (!$this->_id && ($this->_action & CRM_Core_Action::UPDATE)) {
-      $this->_id = CRM_Utils_Type::escape($this->_id , 'Positive');
+      $this->_id = CRM_Utils_Type::escape($this->_id, 'Positive');
     }
+    $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', 
+      "reset=1&action=browse&aid={$this->_aid}"); 
+      
     $this->_BAOName = 'CRM_Financial_BAO_FinancialTypeAccount';
     if ($this->_aid && ($this->_action & CRM_Core_Action::ADD)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
       CRM_Utils_System::setTitle($this->_title . ' - ' . ts('Financial Accounts'));
       
-      $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', 
-        "reset=1&action=browse&aid={$this->_aid}"); 
-      
       $session = CRM_Core_Session::singleton(); 
       $session->pushUserContext($url);
     } 
+    // CRM-12492
+    if (!($this->_action & CRM_Core_Action::ADD)) { 
+      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+      $accountRelationship = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $this->_id, 'account_relationship');
+      if ($accountRelationship == $relationTypeId) {
+        $this->_isARFlag = TRUE;
+        if ($this->_action & CRM_Core_Action::DELETE) {
+          CRM_Core_Session::setStatus(ts("Selected financial type account with 'Accounts Receivable Account is' account relationship cannot be deleted."), 
+            '', 'error');
+          CRM_Utils_System::redirect($url);
+        }
+      }
+    }
     if ($this->_id) {
       $financialAccount = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $this->_id, 'financial_account_id');
       $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccount, 'name');
-      CRM_Utils_System::setTitle($fieldTitle .' - '.ts('Financial Type Accounts'));
+      CRM_Utils_System::setTitle($fieldTitle . ' - '. ts('Financial Type Accounts'));
     }
     
-    $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$this->_aid}");
     $breadCrumb = array(
       array('title' => ts('Financial Type Accounts'),
         'url' => $url,
@@ -145,12 +164,15 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     }
     $AccountTypeRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
     if (!empty($AccountTypeRelationship)) {
-      $this->add('select', 
+      $element = $this->add('select', 
         'account_relationship', 
         ts('Financial Account Relationship'),
         array('select' => '- select -') + $AccountTypeRelationship,
         TRUE 
       );
+    }
+    if ($this->_isARFlag) {
+      $element->freeze();
     }
     
     if ($this->_action == CRM_Core_Action::ADD) {
