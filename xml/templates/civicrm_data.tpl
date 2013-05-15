@@ -878,15 +878,15 @@ SELECT @opCost := value FROM civicrm_option_value WHERE name = 'Cost of Sales' a
 INSERT INTO
    `civicrm_financial_account` (`name`, `contact_id`, `financial_account_type_id`, `description`, `accounting_code`, `account_type_code`, `is_reserved`, `is_active`, `is_deductible`, `is_default`)
 VALUES
-  ( '{ts escape="sql"}Donation{/ts}'            , @contactID, @opval, 'Default account for donations', '4200', 'INC', 0, 1, 1, 0 ),
+  ( '{ts escape="sql"}Donation{/ts}'            , @contactID, @opval, 'Default account for donations', '4200', 'INC', 0, 1, 1, 1 ),
   ( '{ts escape="sql"}Member Dues{/ts}'          , @contactID, @opval, 'Default account for membership sales', '4400', 'INC', 0, 1, 1, 0 ),
   ( '{ts escape="sql"}Campaign Contribution{/ts}', @contactID, @opval, 'Sample account for recording payments to a campaign', '4100', 'INC', 0, 1, 0, 0 ),
   ( '{ts escape="sql"}Event Fee{/ts}'            , @contactID, @opval, 'Default account for event ticket sales', '4300', 'INC', 0, 1, 0, 0 ),
-  ( '{ts escape="sql"}Banking Fees{/ts}'         , @contactID, @opexp, 'Payment processor fees and manually recorded banking fees', '5200', 'EXP', 0, 1, 0, 0 ),
+  ( '{ts escape="sql"}Banking Fees{/ts}'         , @contactID, @opexp, 'Payment processor fees and manually recorded banking fees', '5200', 'EXP', 0, 1, 0, 1 ),
   ( '{ts escape="sql"}Deposit Bank Account{/ts}' , @contactID, @opAsset, 'All manually recorded cash and cheques go to this account', '1100', 'BANK', 0, 1, 0, 1 ),
   ( '{ts escape="sql"}Accounts Receivable{/ts}'  , @contactID, @opAsset, 'Amounts to be received later (eg pay later event revenues)', '1200', 'AR', 0, 1, 0, 0 ),
-  ( '{ts escape="sql"}Accounts Payable{/ts}'     , @contactID, @opLiability, 'Amounts to be paid out such as grants and refunds', '2200', 'AP', 0, 1, 0, 0 ),
-  ( '{ts escape="sql"}Premiums{/ts}'             , @contactID, @opCost, 'Account to record cost of premiums provided to payors', '5100', 'COGS', 0, 1, 0, 0 ),
+  ( '{ts escape="sql"}Accounts Payable{/ts}'     , @contactID, @opLiability, 'Amounts to be paid out such as grants and refunds', '2200', 'AP', 0, 1, 0, 1 ),
+  ( '{ts escape="sql"}Premiums{/ts}'             , @contactID, @opCost, 'Account to record cost of premiums provided to payors', '5100', 'COGS', 0, 1, 0, 1 ),
   ( '{ts escape="sql"}Premiums inventory{/ts}'   , @contactID, @opAsset, 'Account representing value of premiums inventory', '1375', 'OCASSET', 0, 1, 0, 0 ),
   ( '{ts escape="sql"}Discounts{/ts}'            , @contactID, @opval, 'Contra-revenue account for amounts discounted from sales', '4900', 'INC', 0, 1, 0, 0 ),
   ( '{ts escape="sql"}Payment Processor Account{/ts}', @contactID, @opAsset, 'Account to record payments into a payment processor merchant account', '1150', 'BANK', 0, 1, 0, 0
@@ -1466,6 +1466,7 @@ SELECT @option_value_rel_id  := value FROM civicrm_option_value WHERE option_gro
 SELECT @option_value_rel_id_exp  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Expense Account is';
 SELECT @option_value_rel_id_ar  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Accounts Receivable Account is';
 SELECT @option_value_rel_id_as  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Asset Account is';
+SELECT @option_value_rel_id_cg  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Cost of Sales Account is';
 
 SELECT @financial_type_id_dtn 	       := max(id) FROM civicrm_financial_type WHERE name = '{ts escape="sql"}Donation{/ts}';
 SELECT @financial_type_id_md	       := max(id) FROM civicrm_financial_type WHERE name = '{ts escape="sql"}Member Dues{/ts}';
@@ -1480,6 +1481,7 @@ SELECT @financial_account_id_bf	       := max(id) FROM civicrm_financial_account
 SELECT @financial_account_id_ap	       := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Accounts Receivable{/ts}';
 SELECT @financial_account_id_ar        := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Deposit Bank Account{/ts}';
 SELECT @financial_account_id_pp        := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Payment Processor Account{/ts}';
+SELECT @financial_account_id_pr        := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Premiums{/ts}';
 
 INSERT INTO `civicrm_entity_financial_account`
      ( entity_table, entity_id, account_relationship, financial_account_id )
@@ -1487,15 +1489,19 @@ VALUES
      ( 'civicrm_financial_type', @financial_type_id_dtn, @option_value_rel_id, @financial_account_id_dtn ),
      ( 'civicrm_financial_type', @financial_type_id_dtn, @option_value_rel_id_exp, @financial_account_id_bf ),
      ( 'civicrm_financial_type', @financial_type_id_dtn, @option_value_rel_id_ar, @financial_account_id_ap ),
+     ( 'civicrm_financial_type', @financial_type_id_dtn, @option_value_rel_id_cg, @financial_account_id_pr ),
      ( 'civicrm_financial_type', @financial_type_id_md, @option_value_rel_id, @financial_account_id_md ),
      ( 'civicrm_financial_type', @financial_type_id_md, @option_value_rel_id_exp, @financial_account_id_bf ),
      ( 'civicrm_financial_type', @financial_type_id_md, @option_value_rel_id_ar, @financial_account_id_ap ),
+     ( 'civicrm_financial_type', @financial_type_id_md, @option_value_rel_id_cg, @financial_account_id_pr ),
      ( 'civicrm_financial_type', @financial_type_id_cc, @option_value_rel_id, @financial_account_id_cc ),
      ( 'civicrm_financial_type', @financial_type_id_cc, @option_value_rel_id_exp, @financial_account_id_bf ),
      ( 'civicrm_financial_type', @financial_type_id_cc, @option_value_rel_id_ar, @financial_account_id_ap ),
+     ( 'civicrm_financial_type', @financial_type_id_cc, @option_value_rel_id_cg, @financial_account_id_pr ),
      ( 'civicrm_financial_type', @financial_type_id_ef, @option_value_rel_id_exp, @financial_account_id_bf ),
      ( 'civicrm_financial_type', @financial_type_id_ef, @option_value_rel_id_ar, @financial_account_id_ap ),
-     ( 'civicrm_financial_type', @financial_type_id_ef, @option_value_rel_id, @financial_account_id_ef );
+     ( 'civicrm_financial_type', @financial_type_id_ef, @option_value_rel_id, @financial_account_id_ef ),
+     ( 'civicrm_financial_type', @financial_type_id_ef, @option_value_rel_id_cg, @financial_account_id_pr );
 
 -- CRM-11516
 INSERT INTO  civicrm_entity_financial_account (entity_table, entity_id, account_relationship, financial_account_id)
