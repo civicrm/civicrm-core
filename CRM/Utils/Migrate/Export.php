@@ -274,8 +274,8 @@ AND    entity_id    IS NULL
   }
 
   function fetch($groupName, $daoName, $sql = NULL) {
-    $map = isset($this->_xml[$groupName]['idNameFields']) ? $this->_xml[$groupName]['idNameFields'] : NULL;
-    $add = isset($this->_xml[$groupName]['mappedFields']) ? $this->_xml[$groupName]['mappedFields'] : NULL;
+    $idNameFields = isset($this->_xml[$groupName]['idNameFields']) ? $this->_xml[$groupName]['idNameFields'] : NULL;
+    $mappedFields = isset($this->_xml[$groupName]['mappedFields']) ? $this->_xml[$groupName]['mappedFields'] : NULL;
 
     $dao = new $daoName();
     if ($sql) {
@@ -286,13 +286,14 @@ AND    entity_id    IS NULL
     }
 
     while ($dao->fetch()) {
-      $this->_xml[$groupName]['data'][] = $this->exportDAO($this->_xml[$groupName]['name'], $dao, $add);
-      if ($map) {
-        if (isset($map[2])) {
-          $this->_xml[$groupName]['map'][$dao->{$map[2]} . '.' . $dao->{$map[0]}] = $dao->{$map[1]};
+      $this->_xml[$groupName]['data'][] = $this->exportDAO($this->_xml[$groupName]['name'], $dao, $mappedFields);
+      if ($idNameFields) {
+        // index the id/name fields so that we can translate from FK ids to FK names
+        if (isset($idNameFields[2])) {
+          $this->_xml[$groupName]['map'][$dao->{$idNameFields[2]} . '.' . $dao->{$idNameFields[0]}] = $dao->{$idNameFields[1]};
         }
         else {
-          $this->_xml[$groupName]['map'][$dao->{$map[0]}] = $dao->{$map[1]};
+          $this->_xml[$groupName]['map'][$dao->{$idNameFields[0]}] = $dao->{$idNameFields[1]};
         }
       }
     }
