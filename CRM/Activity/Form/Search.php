@@ -255,8 +255,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
         }
       }
 
-      $total = $cancel = 0;
-
       $permission = CRM_Core_Permission::getPermission();
 
       $tasks = array('' => ts('- actions -')) + CRM_Activity_Task::permissionedTaskTitles($permission);
@@ -397,50 +395,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       $query->setSkipPermission(TRUE);
     }
     $controller->run();
-  }
-
-  /**
-   * This function is used to add the rules (mainly global rules) for form.
-   * All local rules are added near the element
-   *
-   * @return None
-   * @access public
-   * @see valid_date
-   */
-  function addRules() {
-    $this->addFormRule(array('CRM_Activity_Form_Search', 'formRule'));
-  }
-
-  /**
-   * global validation rules for the form
-   *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
-   *
-   * @return void
-   * @static
-   * @access public
-   */
-  static function formRule($fields) {
-    $errors = array();
-
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Set the default form values
-   *
-   * @access protected
-   *
-   * @return array the default array reference
-   */
-  function setDefaultValues() { // TODO test?
-    $defaults = $this->_formValues;
-    return $defaults;
   }
 
   function fixFormValues() {
