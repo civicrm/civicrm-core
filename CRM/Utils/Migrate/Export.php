@@ -46,7 +46,7 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'CustomGroups',
         'required' => FALSE,
         'idNameFields' => array('id', 'name'),
-        'map' => array(),
+        'idNameMap' => array(),
       ),
       'customField' => array(
         'data' => array(),
@@ -54,7 +54,7 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'CustomFields',
         'required' => FALSE,
         'idNameFields' => array('id', 'column_name'),
-        'map' => array(),
+        'idNameMap' => array(),
         'mappedFields' => array(
           array('optionGroup', 'option_group_id', 'option_group_name'),
           array('customGroup', 'custom_group_id', 'custom_group_name'),
@@ -65,7 +65,7 @@ class CRM_Utils_Migrate_Export {
         'name' => 'OptionGroup',
         'scope' => 'OptionGroups',
         'required' => FALSE,
-        'map' => array(),
+        'idNameMap' => array(),
         'idNameFields' => array('id', 'name'),
       ),
       'relationshipType' => array(
@@ -74,7 +74,7 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'RelationshipTypes',
         'required' => FALSE,
         'idNameFields' => array('id', 'name_a_b'),
-        'map' => array(),
+        'idNameMap' => array(),
       ),
       'locationType' => array(
         'data' => array(),
@@ -82,14 +82,14 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'LocationTypes',
         'required' => FALSE,
         'idNameFields' => array('id', 'name'),
-        'map' => array(),
+        'idNameMap' => array(),
       ),
       'optionValue' => array(
         'data' => array(),
         'name' => 'OptionValue',
         'scope' => 'OptionValues',
         'required' => FALSE,
-        'map' => array(),
+        'idNameMap' => array(),
         'idNameFields' => array('value', 'name', 'prefix'),
         'mappedFields' => array(
           array('optionGroup', 'option_group_id', 'option_group_name'),
@@ -101,14 +101,14 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'ProfileGroups',
         'required' => FALSE,
         'idNameFields' => array('id', 'title'),
-        'map' => array(),
+        'idNameMap' => array(),
       ),
       'profileField' => array(
         'data' => array(),
         'name' => 'ProfileField',
         'scope' => 'ProfileFields',
         'required' => FALSE,
-        'map' => array(),
+        'idNameMap' => array(),
         'mappedFields' => array(
           array('profileGroup', 'uf_group_id', 'profile_group_name')
         ),
@@ -118,7 +118,7 @@ class CRM_Utils_Migrate_Export {
         'name' => 'ProfileJoin',
         'scope' => 'ProfileJoins',
         'required' => FALSE,
-        'map' => array(),
+        'idNameMap' => array(),
         'mappedFields' => array(
           array('profileGroup', 'uf_group_id', 'profile_group_name')
         ),
@@ -129,7 +129,7 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'MappingGroups',
         'required' => FALSE,
         'idNameFields' => array('id', 'name'),
-        'map' => array(),
+        'idNameMap' => array(),
         'mappedFields' => array(
           array('optionValue', 'mapping_type_id', 'mapping_type_name', 'mapping_type'),
         )
@@ -139,7 +139,7 @@ class CRM_Utils_Migrate_Export {
         'name' => 'MappingField',
         'scope' => 'MappingFields',
         'required' => FALSE,
-        'map' => array(),
+        'idNameMap' => array(),
         'mappedFields' => array(
           array('mappingGroup', 'mapping_id', 'mapping_group_name'),
           array('locationType', 'location_type_id', 'location_type_name'),
@@ -290,10 +290,10 @@ AND    entity_id    IS NULL
       if ($idNameFields) {
         // index the id/name fields so that we can translate from FK ids to FK names
         if (isset($idNameFields[2])) {
-          $this->_xml[$groupName]['map'][$dao->{$idNameFields[2]} . '.' . $dao->{$idNameFields[0]}] = $dao->{$idNameFields[1]};
+          $this->_xml[$groupName]['idNameMap'][$dao->{$idNameFields[2]} . '.' . $dao->{$idNameFields[0]}] = $dao->{$idNameFields[1]};
         }
         else {
-          $this->_xml[$groupName]['map'][$dao->{$idNameFields[0]}] = $dao->{$idNameFields[1]};
+          $this->_xml[$groupName]['idNameMap'][$dao->{$idNameFields[0]}] = $dao->{$idNameFields[1]};
         }
       }
     }
@@ -312,10 +312,10 @@ AND    entity_id    IS NULL
       foreach ($mappedFields as $mappedField) {
         if (isset($dao->{$mappedField[1]})) {
           if (isset($mappedField[3])) {
-            $label = $this->_xml[$mappedField[0]]['map']["{$mappedField[3]}." . $dao->{$mappedField[1]}];
+            $label = $this->_xml[$mappedField[0]]['idNameMap']["{$mappedField[3]}." . $dao->{$mappedField[1]}];
           }
           else {
-            $label = $this->_xml[$mappedField[0]]['map'][$dao->{$mappedField[1]}];
+            $label = $this->_xml[$mappedField[0]]['idNameMap'][$dao->{$mappedField[1]}];
           }
           $keyValues[$mappedField[2]] = $label;
         }
@@ -359,7 +359,7 @@ AND    entity_id    IS NULL
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
             $values = array();
             foreach ($types as $type) {
-              $values[] = $this->_xml['optionValue']['map']["$key.{$type}"];
+              $values[] = $this->_xml['optionValue']['idNameMap']["$key.{$type}"];
             }
             $value = implode(',', $values);
             $keyValues['extends_entity_column_value_option_value'] = $value;
