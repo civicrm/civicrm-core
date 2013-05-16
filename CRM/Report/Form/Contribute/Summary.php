@@ -485,6 +485,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   }
 
   function postProcess() {
+    $this->buildACLClause($this->_aliases['civicrm_contact']);
     parent::postProcess();
   }
 
