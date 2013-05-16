@@ -336,14 +336,10 @@ AND    entity_id    IS NULL
     $keyValues = array();
     foreach ($dbFields as $name => $dontCare) {
       // ignore all ids
-      if ($name == 'id' ||
-        substr($name, -3, 3) == '_id'
-      ) {
+      if ($name == 'id' || substr($name, -3, 3) == '_id') {
         continue;
       }
-      if (isset($object->$name) &&
-        $object->$name !== NULL
-      ) {
+      if (isset($object->$name) && $object->$name !== NULL) {
         // hack for extends_entity_column_value
         if ($name == 'extends_entity_column_value') {
           if ($object->extends == 'Event' ||
