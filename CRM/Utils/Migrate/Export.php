@@ -384,14 +384,24 @@ AND    entity_id    IS NULL
     }
 
     // We're ready to format $keyValues as XML
-    $xml = "    <$objectName>";
+    return $this->renderKeyValueXML($objectName, $keyValues, $additional);
+  }
+
+  /**
+   * @param string $tagName
+   * @param array $keyValues
+   * @param string $additional XML
+   * @return string XML
+   */
+  public function renderKeyValueXML($tagName, $keyValues, $additional) {
+    $xml = "    <$tagName>";
     foreach ($keyValues as $k => $v) {
       $xml .= "\n      " . $this->renderTextTag($k, str_replace(CRM_Core_DAO::VALUE_SEPARATOR, self::XML_VALUE_SEPARATOR, $v));
     }
     if ($additional) {
       $xml .= $additional;
     }
-    $xml .= "\n    </$objectName>\n";
+    $xml .= "\n    </$tagName>\n";
     return $xml;
   }
 
