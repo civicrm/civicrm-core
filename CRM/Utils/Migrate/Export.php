@@ -359,9 +359,7 @@ AND    entity_id    IS NULL
               $key = 'relationship_type';
             }
             $xml .= "\n      " . $this->renderTextTag('extends_entity_column_value_option_group', $key);
-            $types = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-              substr($object->$name, 1, -1)
-            );
+            $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
             $value = array();
             foreach ($types as $type) {
               $values[] = $this->_xml['optionValue']['map']["$key.{$type}"];
@@ -382,15 +380,11 @@ AND    entity_id    IS NULL
             list($tableName, $columnName, $groupID) = CRM_Core_BAO_CustomField::getTableColumnGroup($cfID);
             $value = "custom.{$tableName}.{$columnName}";
           }
-          $xml .= "\n      " . $this->renderTextTag($name, $value);
         }
         else {
-          $value = str_replace(CRM_Core_DAO::VALUE_SEPARATOR,
-            self::XML_VALUE_SEPARATOR,
-            $object->$name
-          );
-          $xml .= "\n      " . $this->renderTextTag($name, $value);
+          $value = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, self::XML_VALUE_SEPARATOR, $object->$name);
         }
+        $xml .= "\n      " . $this->renderTextTag($name, $value);
       }
     }
     if ($additional) {
