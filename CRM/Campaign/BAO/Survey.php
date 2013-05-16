@@ -239,15 +239,13 @@ SELECT  survey.id                         as id,
    * @param boolean $onlyActive  retrieve only active surveys.
    * @param boolean $onlyDefault retrieve only default survey.
    * @param boolean $forceAll    retrieve all surveys.
+   * @param boolean $includePetition include or exclude petitions
    *
    * @static
    */
-  static function getSurveys($onlyActive = TRUE,
-    $onlyDefault = FALSE,
-    $forceAll = FALSE
-  ) {
+  static function getSurveys($onlyActive = TRUE, $onlyDefault = FALSE, $forceAll = FALSE, $includePetition = FALSE ) {
     $cacheKey = 0;
-    $cacheKeyParams = array('onlyActive', 'onlyDefault', 'forceAll');
+    $cacheKeyParams = array('onlyActive', 'onlyDefault', 'forceAll', 'includePetition');
     foreach ($cacheKeyParams as $param) {
       $cacheParam = $$param;
       if (!$cacheParam) {
@@ -259,14 +257,15 @@ SELECT  survey.id                         as id,
     static $surveys;
 
     if (!isset($surveys[$cacheKey])) {
+      if (!$includePetition) {
+        //we only have activity type as a
+        //difference between survey and petition.
+        $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
 
-      //we only have activity type as a
-      //difference between survey and petition.
-      $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
-
-      $where = array();
-      if ($petitionTypeID) {
-        $where[] = "( survey.activity_type_id != {$petitionTypeID} )";
+        $where = array();
+        if ($petitionTypeID) {
+          $where[] = "( survey.activity_type_id != {$petitionTypeID} )";
+        }
       }
       if (!$forceAll && $onlyActive) {
         $where[] = '( survey.is_active  = 1 )';
