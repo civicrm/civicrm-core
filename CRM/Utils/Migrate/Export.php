@@ -332,7 +332,8 @@ AND    entity_id    IS NULL
   function exportDAO($object, $objectName, $additional = NULL) {
     $dbFields = & $object->fields();
 
-    $xml = "    <$objectName>";
+    // Filter the list of keys and values so that we only export interesting stuff
+    $keyValues = array();
     foreach ($dbFields as $name => $dontCare) {
       // ignore all ids
       if ($name == 'id' ||
@@ -358,14 +359,14 @@ AND    entity_id    IS NULL
             elseif ($object->extends == 'Relationship') {
               $key = 'relationship_type';
             }
-            $xml .= "\n      " . $this->renderTextTag('extends_entity_column_value_option_group', $key);
+            $keyValues['extends_entity_column_value_option_group'] = $key;
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
             $value = array();
             foreach ($types as $type) {
               $values[] = $this->_xml['optionValue']['map']["$key.{$type}"];
             }
             $value = implode(',', $values);
-            $xml .= "\n      " . $this->renderTextTag('extends_entity_column_value_option_value', $value);
+            $keyValues['extends_entity_column_value_option_value'] = $value;
           }
           else {
             echo "This extension: {$object->extends} is not yet handled";
@@ -384,8 +385,14 @@ AND    entity_id    IS NULL
         else {
           $value = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, self::XML_VALUE_SEPARATOR, $object->$name);
         }
-        $xml .= "\n      " . $this->renderTextTag($name, $value);
+        $keyValues[$name] = $value;
       }
+    }
+
+    // We're ready to format $keyValues as XML
+    $xml = "    <$objectName>";
+    foreach ($keyValues as $k => $v) {
+      $xml .= "\n      " . $this->renderTextTag($k, $v);
     }
     if ($additional) {
       $xml .= $additional;
