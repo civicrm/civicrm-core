@@ -373,17 +373,15 @@ AND    entity_id    IS NULL
             exit();
           }
         }
+
+        $value = $object->$name;
         if ($name == 'field_name') {
-          $value = $object->$name;
           // hack for profile field_name
           if (substr($value, 0, 7) == 'custom_') {
             $cfID = substr($value, 7);
             list($tableName, $columnName, $groupID) = CRM_Core_BAO_CustomField::getTableColumnGroup($cfID);
             $value = "custom.{$tableName}.{$columnName}";
           }
-        }
-        else {
-          $value = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, self::XML_VALUE_SEPARATOR, $object->$name);
         }
         $keyValues[$name] = $value;
       }
@@ -392,7 +390,7 @@ AND    entity_id    IS NULL
     // We're ready to format $keyValues as XML
     $xml = "    <$objectName>";
     foreach ($keyValues as $k => $v) {
-      $xml .= "\n      " . $this->renderTextTag($k, $v);
+      $xml .= "\n      " . $this->renderTextTag($k, str_replace(CRM_Core_DAO::VALUE_SEPARATOR, self::XML_VALUE_SEPARATOR, $v));
     }
     if ($additional) {
       $xml .= $additional;
