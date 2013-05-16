@@ -41,7 +41,7 @@ class CRM_Utils_Migrate_Export {
   function __construct() {
     $this->_xml = array(
       'customGroup' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'CustomGroup',
         'scope' => 'CustomGroups',
         'required' => FALSE,
@@ -49,7 +49,7 @@ class CRM_Utils_Migrate_Export {
         'map' => array(),
       ),
       'customField' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'CustomField',
         'scope' => 'CustomFields',
         'required' => FALSE,
@@ -61,7 +61,7 @@ class CRM_Utils_Migrate_Export {
         )
       ),
       'optionGroup' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'OptionGroup',
         'scope' => 'OptionGroups',
         'required' => FALSE,
@@ -69,7 +69,7 @@ class CRM_Utils_Migrate_Export {
         'idNameFields' => array('id', 'name'),
       ),
       'relationshipType' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'RelationshipType',
         'scope' => 'RelationshipTypes',
         'required' => FALSE,
@@ -77,7 +77,7 @@ class CRM_Utils_Migrate_Export {
         'map' => array(),
       ),
       'locationType' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'LocationType',
         'scope' => 'LocationTypes',
         'required' => FALSE,
@@ -85,7 +85,7 @@ class CRM_Utils_Migrate_Export {
         'map' => array(),
       ),
       'optionValue' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'OptionValue',
         'scope' => 'OptionValues',
         'required' => FALSE,
@@ -96,7 +96,7 @@ class CRM_Utils_Migrate_Export {
         ),
       ),
       'profileGroup' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'ProfileGroup',
         'scope' => 'ProfileGroups',
         'required' => FALSE,
@@ -104,7 +104,7 @@ class CRM_Utils_Migrate_Export {
         'map' => array(),
       ),
       'profileField' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'ProfileField',
         'scope' => 'ProfileFields',
         'required' => FALSE,
@@ -114,7 +114,7 @@ class CRM_Utils_Migrate_Export {
         ),
       ),
       'profileJoin' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'ProfileJoin',
         'scope' => 'ProfileJoins',
         'required' => FALSE,
@@ -124,7 +124,7 @@ class CRM_Utils_Migrate_Export {
         ),
       ),
       'mappingGroup' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'MappingGroup',
         'scope' => 'MappingGroups',
         'required' => FALSE,
@@ -135,7 +135,7 @@ class CRM_Utils_Migrate_Export {
         )
       ),
       'mappingField' => array(
-        'data' => NULL,
+        'data' => array(),
         'name' => 'MappingField',
         'scope' => 'MappingFields',
         'required' => FALSE,
@@ -259,7 +259,11 @@ AND    entity_id    IS NULL
     $buffer .= "\n\n<CustomData>\n";
     foreach (array_keys($this->_xml) as $key) {
       if (!empty($this->_xml[$key]['data'])) {
-        $buffer .= "  <{$this->_xml[$key]['scope']}>\n{$this->_xml[$key]['data']}  </{$this->_xml[$key]['scope']}>\n";
+        $buffer .= "  <{$this->_xml[$key]['scope']}>\n";
+        foreach ($this->_xml[$key]['data'] as $item) {
+          $buffer .= $this->renderKeyValueXML($this->_xml[$key]['name'], $item);
+        }
+        $buffer .= "  </{$this->_xml[$key]['scope']}>\n";
       }
       elseif ($this->_xml[$key]['required']) {
         CRM_Core_Error::fatal("No records in DB for $key");
@@ -282,11 +286,7 @@ AND    entity_id    IS NULL
     }
 
     while ($dao->fetch()) {
-      $keyValues = $this->exportDAO($this->_xml[$groupName]['name'], $dao, $add);
-      $this->_xml[$groupName]['data'] .= $this->renderKeyValueXML(
-        $this->_xml[$groupName]['name'],
-        $keyValues
-      );
+      $this->_xml[$groupName]['data'][] = $this->exportDAO($this->_xml[$groupName]['name'], $dao, $add);
       if ($map) {
         if (isset($map[2])) {
           $this->_xml[$groupName]['map'][$dao->{$map[2]} . '.' . $dao->{$map[0]}] = $dao->{$map[1]};
