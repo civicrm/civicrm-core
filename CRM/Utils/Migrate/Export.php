@@ -34,9 +34,12 @@
  */
 class CRM_Utils_Migrate_Export {
 
-  protected $_xml; function __construct() {
+  protected $_xml;
+
+  function __construct() {
     $this->_xml = array(
-      'customGroup' => array('data' => NULL,
+      'customGroup' => array(
+        'data' => NULL,
         'name' => 'CustomGroup',
         'scope' => 'CustomGroups',
         'required' => FALSE,
@@ -227,7 +230,8 @@ AND    cg.is_active = 1
       'CRM_Core_DAO_CustomField',
       $sql,
       array('id', 'column_name'),
-      array(array('optionGroup', 'option_group_id', 'option_group_name'),
+      array(
+        array('optionGroup', 'option_group_id', 'option_group_name'),
         array('customGroup', 'custom_group_id', 'custom_group_name'),
       )
     );
@@ -270,7 +274,8 @@ AND    entity_id    IS NULL
       'CRM_Core_DAO_MappingField',
       NULL,
       NULL,
-      array(array('mappingGroup', 'mapping_id', 'mapping_group_name'),
+      array(
+        array('mappingGroup', 'mapping_id', 'mapping_group_name'),
         array('locationType', 'location_type_id', 'location_type_name'),
         array('relationshipType', 'relationship_type_id', 'relationship_type_name'),
       )
@@ -333,7 +338,7 @@ AND    entity_id    IS NULL
   }
 
   function exportDAO($object, $objectName, $additional = NULL) {
-    $dbFields = &$object->fields();
+    $dbFields = & $object->fields();
 
     $xml = "    <$objectName>";
     foreach ($dbFields as $name => $dontCare) {
