@@ -282,9 +282,10 @@ AND    entity_id    IS NULL
     }
 
     while ($dao->fetch()) {
-      $this->_xml[$groupName]['data'] .= $this->exportDAO($dao,
+      $keyValues = $this->exportDAO($this->_xml[$groupName]['name'], $dao, $add);
+      $this->_xml[$groupName]['data'] .= $this->renderKeyValueXML(
         $this->_xml[$groupName]['name'],
-        $this->addMappedXMLFields($add, $dao)
+        $keyValues
       );
       if ($map) {
         if (isset($map[2])) {
@@ -298,14 +299,14 @@ AND    entity_id    IS NULL
   }
 
   /**
-   * Given a set of field mappings, generate XML for the mapped fields
+   * Compute any fields of the entity defined by the $mappedFields specification
    *
    * @param array $mappedFields each item is an array(0 => MappedEntityname, 1 => InputFieldName (id-field), 2 => OutputFieldName (name-field), 3 => OptionalPrefix)
-   * @param CRM_Core_DAO $dao
-   * @return null|string XML
+   * @param CRM_Core_DAO $dao the entity for which we want to prepare mapped fields
+   * @return array new fields
    */
-  public function addMappedXMLFields($mappedFields, $dao) {
-    $additional = NULL;
+  public function computeMappedFields($mappedFields, $dao) {
+    $keyValues = array();
     if ($mappedFields) {
       foreach ($mappedFields as $mappedField) {
         if (isset($dao->{$mappedField[1]})) {
@@ -315,21 +316,19 @@ AND    entity_id    IS NULL
           else {
             $label = $this->_xml[$mappedField[0]]['map'][$dao->{$mappedField[1]}];
           }
-          $additional .= "\n      " . $this->renderTextTag($mappedField[2], $label);
+          $keyValues[$mappedField[2]] = $label;
         }
       }
-      return $additional;
     }
-    return $additional;
+    return $keyValues;
   }
 
   /**
    * @param CRM_Core_DAO $object
    * @param string $objectName business-entity/xml-tag name
-   * @param string $additional XML
-   * @return string XML
+   * @return array
    */
-  function exportDAO($object, $objectName, $additional = NULL) {
+  function exportDAO($objectName, $object, $mappedFields) {
     $dbFields = & $object->fields();
 
     // Filter the list of keys and values so that we only export interesting stuff
@@ -383,8 +382,9 @@ AND    entity_id    IS NULL
       }
     }
 
-    // We're ready to format $keyValues as XML
-    return $this->renderKeyValueXML($objectName, $keyValues, $additional);
+    $keyValues += $this->computeMappedFields($mappedFields, $object);
+
+    return $keyValues;
   }
 
   /**
@@ -393,13 +393,10 @@ AND    entity_id    IS NULL
    * @param string $additional XML
    * @return string XML
    */
-  public function renderKeyValueXML($tagName, $keyValues, $additional) {
+  public function renderKeyValueXML($tagName, $keyValues) {
     $xml = "    <$tagName>";
     foreach ($keyValues as $k => $v) {
       $xml .= "\n      " . $this->renderTextTag($k, str_replace(CRM_Core_DAO::VALUE_SEPARATOR, self::XML_VALUE_SEPARATOR, $v));
-    }
-    if ($additional) {
-      $xml .= $additional;
     }
     $xml .= "\n    </$tagName>\n";
     return $xml;
