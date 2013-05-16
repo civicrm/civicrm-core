@@ -560,6 +560,10 @@ function civicrm_api3_contact_getquick($params) {
   }
   // If we are doing quicksearch by a field other than name, make sure that field is added to results
   if (!empty($params['field_name'])) {
+    // Unique name contact_id = id
+    if ($params['field_name'] == 'contact_id') {
+      $params['field_name'] = 'id';
+    }
     // phone_numeric should be phone
     $searchField = str_replace('_numeric', '', $params['field_name']);
     if(!in_array($searchField, $list)) {
