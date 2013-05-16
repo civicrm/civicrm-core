@@ -321,23 +321,9 @@ AND    entity_id    IS NULL
     }
 
     while ($dao->fetch()) {
-      $additional = NULL;
-      if ($add) {
-        foreach ($add as $filter) {
-          if (isset($dao->{$filter[1]})) {
-            if (isset($filter[3])) {
-              $label = $this->_xml[$filter[0]]['map']["{$filter[3]}." . $dao->{$filter[1]}];
-            }
-            else {
-              $label = $this->_xml[$filter[0]]['map'][$dao->{$filter[1]}];
-            }
-            $additional .= "\n      <{$filter[2]}>{$label}</{$filter[2]}>";
-          }
-        }
-      }
       $this->_xml[$groupName]['data'] .= $this->exportDAO($dao,
         $this->_xml[$groupName]['name'],
-        $additional
+        $this->addMappedXMLFields($add, $dao)
       );
       if ($map) {
         if (isset($map[2])) {
@@ -350,6 +336,38 @@ AND    entity_id    IS NULL
     }
   }
 
+  /**
+   * Given a set of field mappings, generate XML for the mapped fields
+   *
+   * @param array $mappedFields each item is an array(0 => MappedEntityname, 1 => InputFieldName (id-field), 2 => OutputFieldName (name-field), 3 => OptionalPrefix)
+   * @param CRM_Core_DAO $dao
+   * @return null|string XML
+   */
+  public function addMappedXMLFields($mappedFields, $dao) {
+    $additional = NULL;
+    if ($mappedFields) {
+      foreach ($mappedFields as $mappedField) {
+        if (isset($dao->{$mappedField[1]})) {
+          if (isset($mappedField[3])) {
+            $label = $this->_xml[$mappedField[0]]['map']["{$mappedField[3]}." . $dao->{$mappedField[1]}];
+          }
+          else {
+            $label = $this->_xml[$mappedField[0]]['map'][$dao->{$mappedField[1]}];
+          }
+          $additional .= "\n      <{$mappedField[2]}>{$label}</{$mappedField[2]}>";
+        }
+      }
+      return $additional;
+    }
+    return $additional;
+  }
+
+  /**
+   * @param CRM_Core_DAO $object
+   * @param string $objectName business-entity/xml-tag name
+   * @param string $additional XML
+   * @return string XML
+   */
   function exportDAO($object, $objectName, $additional = NULL) {
     $dbFields = & $object->fields();
 
