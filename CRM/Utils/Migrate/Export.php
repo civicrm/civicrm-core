@@ -354,7 +354,7 @@ AND    entity_id    IS NULL
           else {
             $label = $this->_xml[$mappedField[0]]['map'][$dao->{$mappedField[1]}];
           }
-          $additional .= "\n      <{$mappedField[2]}>{$label}</{$mappedField[2]}>";
+          $additional .= "\n      " . $this->renderTextTag($mappedField[2], $label);
         }
       }
       return $additional;
@@ -397,7 +397,7 @@ AND    entity_id    IS NULL
             elseif ($object->extends == 'Relationship') {
               $key = 'relationship_type';
             }
-            $xml .= "\n      <extends_entity_column_value_option_group>$key</extends_entity_column_value_option_group>";
+            $xml .= "\n      " . $this->renderTextTag('extends_entity_column_value_option_group', $key);
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR,
               substr($object->$name, 1, -1)
             );
@@ -406,7 +406,7 @@ AND    entity_id    IS NULL
               $values[] = $this->_xml['optionValue']['map']["$key.{$type}"];
             }
             $value = implode(',', $values);
-            $xml .= "\n      <extends_entity_column_value_option_value>$value</extends_entity_column_value_option_value>";
+            $xml .= "\n      " . $this->renderTextTag('extends_entity_column_value_option_value', $value);
           }
           else {
             echo "This extension: {$object->extends} is not yet handled";
@@ -421,14 +421,14 @@ AND    entity_id    IS NULL
             list($tableName, $columnName, $groupID) = CRM_Core_BAO_CustomField::getTableColumnGroup($cfID);
             $value = "custom.{$tableName}.{$columnName}";
           }
-          $xml .= "\n      <$name>$value</$name>";
+          $xml .= "\n      " . $this->renderTextTag($name, $value);
         }
         else {
           $value = str_replace(CRM_Core_DAO::VALUE_SEPARATOR,
             self::XML_VALUE_SEPARATOR,
             $object->$name
           );
-          $xml .= "\n      <$name>$value</$name>";
+          $xml .= "\n      " . $this->renderTextTag($name, $value);
         }
       }
     }
@@ -437,6 +437,19 @@ AND    entity_id    IS NULL
     }
     $xml .= "\n    </$objectName>\n";
     return $xml;
+  }
+
+  /**
+   * @param string $name tag name
+   * @param string $value text
+   * @param string $prefix
+   * @return string XML
+   */
+  function renderTextTag($name, $value, $prefix ='') {
+    if (!preg_match('/^[a-zA-Z0-9\_]+$/', $name)) {
+      throw new Exception("Malformed tag name: $name");
+    }
+    return $prefix . "<$name>" . htmlentities($value) . "</$name>";
   }
 }
 
