@@ -525,8 +525,8 @@ class CRM_Activity_BAO_Query {
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_activity');
     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_activity', NULL, TRUE, FALSE, TRUE);
 
-    $surveys = CRM_Campaign_BAO_Survey::getSurveys();
-    if ($surveys) $form->add('select', 'activity_survey_id', ts('Survey'),
+    $surveys = CRM_Campaign_BAO_Survey::getSurveys(TRUE, FALSE, FALSE, TRUE);
+    if ($surveys) $form->add('select', 'activity_survey_id', ts('Survey / Petition'),
       array(
         '' => ts('- none -')) + $surveys, FALSE
     );

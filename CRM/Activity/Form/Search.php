@@ -326,13 +326,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       // if we are editing / running a saved search and the form has not been posted
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
-    if (CRM_Utils_Array::value('activity_survey_id', $this->_formValues)) {
-      // if the user has choosen a survey but not any activity type, we force the activity type
-      $sid = CRM_Utils_Array::value('activity_survey_id', $this->_formValues);
-      $activity_type_id = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $sid, 'activity_type_id');
-
-      $this->_formValues['activity_type_id'][$activity_type_id] = 1;
-    }
 
     if (!CRM_Utils_Array::value('activity_test', $this->_formValues)) {
       $this->_formValues["activity_test"] = 0;
@@ -410,7 +403,12 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
     $survey = CRM_Utils_Request::retrieve('survey', 'Positive', CRM_Core_DAO::$_nullObject);
 
     if ($survey) {
-      $this->_formValues['activity_survey_id'] = $survey;
+      $this->_formValues['activity_survey_id'] = $this->_defaults['activity_survey_id'] = $survey;
+      $sid = CRM_Utils_Array::value('activity_survey_id', $this->_formValues);
+      $activity_type_id = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $sid, 'activity_type_id');
+
+      $this->_formValues['activity_type_id'][$activity_type_id] = 1;
+      $this->_defaults['activity_type_id'][$activity_type_id] = 1;
     }
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
@@ -431,6 +429,11 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
         $this->_single = TRUE;
       }
     }
+
+    if (!empty($this->_defaults)) {
+      $this->setDefaults($this->_defaults);
+    }
+
   }
 
   function getFormValues() {
