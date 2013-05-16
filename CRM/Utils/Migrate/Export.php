@@ -118,7 +118,12 @@ class CRM_Utils_Migrate_Export {
     );
   }
 
-  function run() {
+  /**
+   * Scan local customizations and build an in-memory representation
+   *
+   * @return void
+   */
+  function build() {
     // fetch the option group / values for
     // activity type and event_type
 
@@ -280,7 +285,14 @@ AND    entity_id    IS NULL
         array('relationshipType', 'relationship_type_id', 'relationship_type_name'),
       )
     );
+  }
 
+  /**
+   * Render the in-memory representation as XML
+   *
+   * @return string XML
+   */
+  function toXML() {
     $buffer = '<?xml version="1.0" encoding="iso-8859-1" ?>';
     $buffer .= "\n\n<CustomData>\n";
     foreach (array_keys($this->_xml) as $key) {
@@ -292,8 +304,7 @@ AND    entity_id    IS NULL
       }
     }
     $buffer .= "</CustomData>\n";
-
-    CRM_Utils_System::download('CustomGroupData.xml', 'text/plain', $buffer);
+    return $buffer;
   }
 
   function fetch($groupName, $daoName, $sql = NULL, $map = NULL, $add = NULL) {
