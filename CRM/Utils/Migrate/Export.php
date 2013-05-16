@@ -45,6 +45,7 @@ class CRM_Utils_Migrate_Export {
         'name' => 'CustomGroup',
         'scope' => 'CustomGroups',
         'required' => FALSE,
+        'idNameFields' => array('id', 'name'),
         'map' => array(),
       ),
       'customField' => array(
@@ -52,7 +53,12 @@ class CRM_Utils_Migrate_Export {
         'name' => 'CustomField',
         'scope' => 'CustomFields',
         'required' => FALSE,
+        'idNameFields' => array('id', 'column_name'),
         'map' => array(),
+        'mappedFields' => array(
+          array('optionGroup', 'option_group_id', 'option_group_name'),
+          array('customGroup', 'custom_group_id', 'custom_group_name'),
+        )
       ),
       'optionGroup' => array(
         'data' => NULL,
@@ -60,12 +66,14 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'OptionGroups',
         'required' => FALSE,
         'map' => array(),
+        'idNameFields' => array('id', 'name'),
       ),
       'relationshipType' => array(
         'data' => NULL,
         'name' => 'RelationshipType',
         'scope' => 'RelationshipTypes',
         'required' => FALSE,
+        'idNameFields' => array('id', 'name_a_b'),
         'map' => array(),
       ),
       'locationType' => array(
@@ -73,6 +81,7 @@ class CRM_Utils_Migrate_Export {
         'name' => 'LocationType',
         'scope' => 'LocationTypes',
         'required' => FALSE,
+        'idNameFields' => array('id', 'name'),
         'map' => array(),
       ),
       'optionValue' => array(
@@ -81,12 +90,17 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'OptionValues',
         'required' => FALSE,
         'map' => array(),
+        'idNameFields' => array('value', 'name', 'prefix'),
+        'mappedFields' => array(
+          array('optionGroup', 'option_group_id', 'option_group_name'),
+        ),
       ),
       'profileGroup' => array(
         'data' => NULL,
         'name' => 'ProfileGroup',
         'scope' => 'ProfileGroups',
         'required' => FALSE,
+        'idNameFields' => array('id', 'title'),
         'map' => array(),
       ),
       'profileField' => array(
@@ -95,6 +109,9 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'ProfileFields',
         'required' => FALSE,
         'map' => array(),
+        'mappedFields' => array(
+          array('profileGroup', 'uf_group_id', 'profile_group_name')
+        ),
       ),
       'profileJoin' => array(
         'data' => NULL,
@@ -102,13 +119,20 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'ProfileJoins',
         'required' => FALSE,
         'map' => array(),
+        'mappedFields' => array(
+          array('profileGroup', 'uf_group_id', 'profile_group_name')
+        ),
       ),
       'mappingGroup' => array(
         'data' => NULL,
         'name' => 'MappingGroup',
         'scope' => 'MappingGroups',
         'required' => FALSE,
+        'idNameFields' => array('id', 'name'),
         'map' => array(),
+        'mappedFields' => array(
+          array('optionValue', 'mapping_type_id', 'mapping_type_name', 'mapping_type'),
+        )
       ),
       'mappingField' => array(
         'data' => NULL,
@@ -116,6 +140,11 @@ class CRM_Utils_Migrate_Export {
         'scope' => 'MappingFields',
         'required' => FALSE,
         'map' => array(),
+        'mappedFields' => array(
+          array('mappingGroup', 'mapping_id', 'mapping_group_name'),
+          array('locationType', 'location_type_id', 'location_type_name'),
+          array('relationshipType', 'relationship_type_id', 'relationship_type_name'),
+        ),
       ),
     );
   }
@@ -136,11 +165,7 @@ SELECT distinct(g.id), g.*
 FROM   civicrm_option_group g
 WHERE  g.name IN $optionGroups
 ";
-    $this->fetch('optionGroup',
-      'CRM_Core_DAO_OptionGroup',
-      $sql,
-      array('id', 'name')
-    );
+    $this->fetch('optionGroup', 'CRM_Core_DAO_OptionGroup', $sql);
 
     $sql = "
 SELECT distinct(g.id), g.*
@@ -151,11 +176,7 @@ WHERE  f.option_group_id = g.id
 AND    f.custom_group_id = cg.id
 AND    cg.is_active = 1
 ";
-    $this->fetch('optionGroup',
-      'CRM_Core_DAO_OptionGroup',
-      $sql,
-      array('id', 'name')
-    );
+    $this->fetch('optionGroup', 'CRM_Core_DAO_OptionGroup', $sql);
 
     $sql = "
 SELECT v.*, g.name as prefix
@@ -165,12 +186,7 @@ WHERE  v.option_group_id = g.id
 AND    g.name IN $optionGroups
 ";
 
-    $this->fetch('optionValue',
-      'CRM_Core_DAO_OptionValue',
-      $sql,
-      array('value', 'name', 'prefix'),
-      array(array('optionGroup', 'option_group_id', 'option_group_name'))
-    );
+    $this->fetch('optionValue', 'CRM_Core_DAO_OptionValue', $sql);
 
     $sql = "
 SELECT distinct(v.id), v.*, g.name as prefix
@@ -184,47 +200,28 @@ AND    f.custom_group_id = cg.id
 AND    cg.is_active = 1
 ";
 
-    $this->fetch('optionValue',
-      'CRM_Core_DAO_OptionValue',
-      $sql,
-      array('id', 'name', 'prefix'),
-      array(array('optionGroup', 'option_group_id', 'option_group_name'))
-    );
+    $this->fetch('optionValue', 'CRM_Core_DAO_OptionValue', $sql);
 
     $sql = "
 SELECT rt.*
 FROM   civicrm_relationship_type rt
 WHERE  rt.is_active = 1
 ";
-    $this->fetch('relationshipType',
-      'CRM_Contact_DAO_RelationshipType',
-      $sql,
-      array('id', 'name_a_b')
-    );
-
+    $this->fetch('relationshipType', 'CRM_Contact_DAO_RelationshipType', $sql);
 
     $sql = "
 SELECT lt.*
 FROM   civicrm_location_type lt
 WHERE  lt.is_active = 1
 ";
-    $this->fetch('locationType',
-      'CRM_Core_DAO_LocationType',
-      $sql,
-      array('id', 'name')
-    );
-
+    $this->fetch('locationType', 'CRM_Core_DAO_LocationType', $sql);
 
     $sql = "
 SELECT cg.*
 FROM   civicrm_custom_group cg
 WHERE  cg.is_active = 1
 ";
-    $this->fetch('customGroup',
-      'CRM_Core_DAO_CustomGroup',
-      $sql,
-      array('id', 'name')
-    );
+    $this->fetch('customGroup', 'CRM_Core_DAO_CustomGroup', $sql);
 
     $sql = "
 SELECT f.*
@@ -233,29 +230,11 @@ FROM   civicrm_custom_field f,
 WHERE  f.custom_group_id = cg.id
 AND    cg.is_active = 1
 ";
-    $this->fetch('customField',
-      'CRM_Core_DAO_CustomField',
-      $sql,
-      array('id', 'column_name'),
-      array(
-        array('optionGroup', 'option_group_id', 'option_group_name'),
-        array('customGroup', 'custom_group_id', 'custom_group_name'),
-      )
-    );
+    $this->fetch('customField', 'CRM_Core_DAO_CustomField', $sql);
 
-    $this->fetch('profileGroup',
-      'CRM_Core_DAO_UFGroup',
-      NULL,
-      array('id', 'title'),
-      NULL
-    );
+    $this->fetch('profileGroup', 'CRM_Core_DAO_UFGroup');
 
-    $this->fetch('profileField',
-      'CRM_Core_DAO_UFField',
-      NULL,
-      NULL,
-      array(array('profileGroup', 'uf_group_id', 'profile_group_name'))
-    );
+    $this->fetch('profileField', 'CRM_Core_DAO_UFField');
 
     $sql = "
 SELECT *
@@ -263,30 +242,11 @@ FROM   civicrm_uf_join
 WHERE  entity_table IS NULL
 AND    entity_id    IS NULL
 ";
-    $this->fetch('profileJoin',
-      'CRM_Core_DAO_UFJoin',
-      $sql,
-      NULL,
-      array(array('profileGroup', 'uf_group_id', 'profile_group_name'))
-    );
+    $this->fetch('profileJoin', 'CRM_Core_DAO_UFJoin', $sql);
 
-    $this->fetch('mappingGroup',
-      'CRM_Core_DAO_Mapping',
-      NULL,
-      array('id', 'name'),
-      array(array('optionValue', 'mapping_type_id', 'mapping_type_name', 'mapping_type'))
-    );
+    $this->fetch('mappingGroup', 'CRM_Core_DAO_Mapping');
 
-    $this->fetch('mappingField',
-      'CRM_Core_DAO_MappingField',
-      NULL,
-      NULL,
-      array(
-        array('mappingGroup', 'mapping_id', 'mapping_group_name'),
-        array('locationType', 'location_type_id', 'location_type_name'),
-        array('relationshipType', 'relationship_type_id', 'relationship_type_name'),
-      )
-    );
+    $this->fetch('mappingField', 'CRM_Core_DAO_MappingField');
   }
 
   /**
@@ -309,7 +269,10 @@ AND    entity_id    IS NULL
     return $buffer;
   }
 
-  function fetch($groupName, $daoName, $sql = NULL, $map = NULL, $add = NULL) {
+  function fetch($groupName, $daoName, $sql = NULL) {
+    $map = isset($this->_xml[$groupName]['idNameFields']) ? $this->_xml[$groupName]['idNameFields'] : NULL;
+    $add = isset($this->_xml[$groupName]['mappedFields']) ? $this->_xml[$groupName]['mappedFields'] : NULL;
+
     $dao = new $daoName();
     if ($sql) {
       $dao->query($sql);
@@ -443,7 +406,7 @@ AND    entity_id    IS NULL
    * @param string $prefix
    * @return string XML
    */
-  function renderTextTag($name, $value, $prefix ='') {
+  function renderTextTag($name, $value, $prefix = '') {
     if (!preg_match('/^[a-zA-Z0-9\_]+$/', $name)) {
       throw new Exception("Malformed tag name: $name");
     }
