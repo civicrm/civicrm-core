@@ -357,7 +357,7 @@ AND    entity_id    IS NULL
             }
             $keyValues['extends_entity_column_value_option_group'] = $key;
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
-            $value = array();
+            $values = array();
             foreach ($types as $type) {
               $values[] = $this->_xml['optionValue']['map']["$key.{$type}"];
             }
