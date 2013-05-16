@@ -92,7 +92,7 @@ class CRM_Utils_Migrate_Import {
     foreach ($fields as $name => $dontCare) {
       if (isset($xml->$name)) {
         $value = (string ) $xml->$name;
-        $value = str_replace(":;:;:;",
+        $value = str_replace(CRM_Utils_Migrate_Export::XML_VALUE_SEPARATOR,
           CRM_Core_DAO::VALUE_SEPARATOR,
           $value
         );

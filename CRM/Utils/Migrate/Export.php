@@ -34,6 +34,8 @@
  */
 class CRM_Utils_Migrate_Export {
 
+  const XML_VALUE_SEPARATOR = ":;:;:;";
+
   protected $_xml;
 
   function __construct() {
@@ -405,7 +407,7 @@ AND    entity_id    IS NULL
         }
         else {
           $value = str_replace(CRM_Core_DAO::VALUE_SEPARATOR,
-            ":;:;:;",
+            self::XML_VALUE_SEPARATOR,
             $object->$name
           );
           $xml .= "\n      <$name>$value</$name>";
