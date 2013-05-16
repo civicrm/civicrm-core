@@ -135,7 +135,7 @@ class CRM_Admin_Page_AJAX {
         case 'CRM_Financial_BAO_FinancialAccount':
           if (!CRM_Financial_BAO_FinancialAccount::getARAccounts($recordID)) {
             $show   = 'noButton';
-            $status = ts('The selected financial account cannot be disabled because least one Accounts Receivable type account is required (to ensure that accounting transactions are in balance).');
+            $status = ts('The selected financial account cannot be disabled because at least one Accounts Receivable type account is required (to ensure that accounting transactions are in balance).');
           }
           else {
             $status = ts('Are you sure you want to disable this financial account?');
