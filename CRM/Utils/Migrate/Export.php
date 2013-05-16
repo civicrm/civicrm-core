@@ -175,75 +175,75 @@ class CRM_Utils_Migrate_Export {
     $optionGroups = "( 'activity_type', 'event_type', 'mapping_type' )";
 
     $sql = "
-SELECT distinct(g.id), g.*
-FROM   civicrm_option_group g
-WHERE  g.name IN $optionGroups
-";
+      SELECT distinct(g.id), g.*
+      FROM   civicrm_option_group g
+      WHERE  g.name IN $optionGroups
+    ";
     $this->fetch('optionGroup', 'CRM_Core_DAO_OptionGroup', $sql);
 
     $sql = "
-SELECT distinct(g.id), g.*
-FROM   civicrm_option_group g,
-       civicrm_custom_field f,
-       civicrm_custom_group cg
-WHERE  f.option_group_id = g.id
-AND    f.custom_group_id = cg.id
-AND    cg.is_active = 1
-";
+      SELECT distinct(g.id), g.*
+      FROM   civicrm_option_group g,
+             civicrm_custom_field f,
+             civicrm_custom_group cg
+      WHERE  f.option_group_id = g.id
+      AND    f.custom_group_id = cg.id
+      AND    cg.is_active = 1
+    ";
     $this->fetch('optionGroup', 'CRM_Core_DAO_OptionGroup', $sql);
 
     $sql = "
-SELECT v.*, g.name as prefix
-FROM   civicrm_option_value v,
-       civicrm_option_group g
-WHERE  v.option_group_id = g.id
-AND    g.name IN $optionGroups
-";
+      SELECT v.*, g.name as prefix
+      FROM   civicrm_option_value v,
+             civicrm_option_group g
+      WHERE  v.option_group_id = g.id
+      AND    g.name IN $optionGroups
+    ";
 
     $this->fetch('optionValue', 'CRM_Core_DAO_OptionValue', $sql);
 
     $sql = "
-SELECT distinct(v.id), v.*, g.name as prefix
-FROM   civicrm_option_value v,
-       civicrm_option_group g,
-       civicrm_custom_field f,
-       civicrm_custom_group cg
-WHERE  v.option_group_id = g.id
-AND    f.option_group_id = g.id
-AND    f.custom_group_id = cg.id
-AND    cg.is_active = 1
-";
+      SELECT distinct(v.id), v.*, g.name as prefix
+      FROM   civicrm_option_value v,
+             civicrm_option_group g,
+             civicrm_custom_field f,
+             civicrm_custom_group cg
+      WHERE  v.option_group_id = g.id
+      AND    f.option_group_id = g.id
+      AND    f.custom_group_id = cg.id
+      AND    cg.is_active = 1
+    ";
 
     $this->fetch('optionValue', 'CRM_Core_DAO_OptionValue', $sql);
 
     $sql = "
-SELECT rt.*
-FROM   civicrm_relationship_type rt
-WHERE  rt.is_active = 1
-";
+      SELECT rt.*
+      FROM   civicrm_relationship_type rt
+      WHERE  rt.is_active = 1
+    ";
     $this->fetch('relationshipType', 'CRM_Contact_DAO_RelationshipType', $sql);
 
     $sql = "
-SELECT lt.*
-FROM   civicrm_location_type lt
-WHERE  lt.is_active = 1
-";
+      SELECT lt.*
+      FROM   civicrm_location_type lt
+      WHERE  lt.is_active = 1
+    ";
     $this->fetch('locationType', 'CRM_Core_DAO_LocationType', $sql);
 
     $sql = "
-SELECT cg.*
-FROM   civicrm_custom_group cg
-WHERE  cg.is_active = 1
-";
+      SELECT cg.*
+      FROM   civicrm_custom_group cg
+      WHERE  cg.is_active = 1
+    ";
     $this->fetch('customGroup', 'CRM_Core_DAO_CustomGroup', $sql);
 
     $sql = "
-SELECT f.*
-FROM   civicrm_custom_field f,
-       civicrm_custom_group cg
-WHERE  f.custom_group_id = cg.id
-AND    cg.is_active = 1
-";
+      SELECT f.*
+      FROM   civicrm_custom_field f,
+             civicrm_custom_group cg
+      WHERE  f.custom_group_id = cg.id
+      AND    cg.is_active = 1
+    ";
     $this->fetch('customField', 'CRM_Core_DAO_CustomField', $sql);
 
     $this->fetch('profileGroup', 'CRM_Core_DAO_UFGroup');
@@ -251,11 +251,11 @@ AND    cg.is_active = 1
     $this->fetch('profileField', 'CRM_Core_DAO_UFField');
 
     $sql = "
-SELECT *
-FROM   civicrm_uf_join
-WHERE  entity_table IS NULL
-AND    entity_id    IS NULL
-";
+      SELECT *
+      FROM   civicrm_uf_join
+      WHERE  entity_table IS NULL
+      AND    entity_id    IS NULL
+    ";
     $this->fetch('profileJoin', 'CRM_Core_DAO_UFJoin', $sql);
 
     $this->fetch('mappingGroup', 'CRM_Core_DAO_Mapping');
