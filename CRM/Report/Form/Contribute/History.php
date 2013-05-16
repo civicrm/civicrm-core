@@ -293,10 +293,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
               continue;
             }
 
-            if ($fieldName == 'total_amount') {
-              $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}";
-            }
-
             if (CRM_Utils_Array::value('is_statistics', $field)) {
               $this->_columnHeaders[$fieldName]['type'] = $field['type'];
               $this->_columnHeaders[$fieldName]['title'] = $field['title'];
@@ -312,6 +308,9 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
                 }else{
                     $select[] = " YEAR(".$field['dbAlias'].")" . " as {$tableName}_{$fieldName}";
                 }
+            }
+            elseif ($fieldName == 'total_amount') {
+              $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}";
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
@@ -685,7 +684,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
   
   // Override "This Year" $op options
-  function getOperationPair($type = "string", $fieldName = NULL) {
+  static function getOperationPair($type = "string", $fieldName = NULL) {
       if ($fieldName == 'this_year' || $fieldName == 'other_year') {
           return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
       }
