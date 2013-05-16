@@ -527,13 +527,14 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     if ($anonymous) {
       $this->webtestLogout();
     }
-
+    $primaryParticipantInfo = array();
     $this->open($registerUrl);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->select("additional_participants", "value=" . $numberRegistrations);
 
     $email = $infoPassed ? $participantEmailInfo[0] : "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
+    $primaryParticipantInfo['email'] = $email;
     $this->type("email-Primary", $email);
     if (!$isPayLater) {
       if ($paymentProcessor) {
@@ -545,8 +546,10 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $this->type("cvv2", "000");
       $this->select("credit_card_exp_date[M]", "value=1");
       $this->select("credit_card_exp_date[Y]", "value=2020");
-      $this->type("billing_first_name", "Jane");
-      $this->type("billing_last_name", "Smith" . substr(sha1(rand()), 0, 7));
+      $primaryParticipantInfo['first_name'] = "Jane";
+      $primaryParticipantInfo['last_name'] = "Smith" . substr(sha1(rand()), 0, 7);
+      $this->type("billing_first_name", $primaryParticipantInfo['first_name']);
+      $this->type("billing_last_name", $primaryParticipantInfo['last_name']);
       $this->type("billing_street_address-5", "15 Main St.");
       $this->type(" billing_city-5", "San Jose");
       $this->select("billing_country_id-5", "value=1228");
@@ -584,6 +587,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $thankStrings += array("testing later instructions");
     }
     $this->assertStringsPresent($thankStrings);
+    return $primaryParticipantInfo;
   }
 
   function _testAddReminder($eventTitle) {
@@ -630,7 +634,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
   function testEventAddMultipleParticipant() {
     // Log in using webtestLogin() method
-    $this->webtestLogin(); 
+    $this->webtestLogin();
     $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
@@ -656,8 +660,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $secParticipant = "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
     $thirdParticipant = "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
     $participantEmails = array($primaryParticipant, $secParticipant, $thirdParticipant);
-
-    $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
+    $addtlPart = array($secParticipant, $thirdParticipant);
+    $primaryParticipantInfo = $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
+    $primaryDisplayName = "{$primaryParticipantInfo['first_name']} {$primaryParticipantInfo['last_name']}";
     $this->webtestLogin();
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->type('event_name', $eventTitle);
@@ -667,6 +672,19 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Search_refresh');
     $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(), '{$secParticipant}')]/../../td[6]", preg_quote('225.00'));
     $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(), '{$thirdParticipant}')]/../../td[6]", preg_quote('225.00'));
+
+    //CRM-12618 check edit screen of additional participant and ensuring record_contribution not present
+    foreach ($addtlPart as $value) {
+      $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(), '{$value}')]/../../td[11]/span/a[2][contains(text(), 'Edit')]", '_qf_Participant_upload-bottom');
+      $this->assertTrue($this->isElementPresent("xpath=//tr[@class='crm-participant-form-block-registered-by']/td[2]/a[contains(text(), '$primaryDisplayName')]"), 'Registered By info is wrong on additional participant edit form');
+      $this->assertElementContainsText("xpath=//form[@id='Participant']/h3", 'Edit Event Registration');
+      $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[@class='crm-participant-form-block-displayName']/td[2][contains(text(), '{$value}')]"),
+        'Wrong Participant edit form'
+      );
+      $this->assertFalse($this->isElementPresent('record_contribution'), 'Record Payment checkbox showed up wrongly for additional participant edit screen');
+      $this->clickLink("_qf_Participant_cancel-top");
+    }
+
     //unselect the payment processor configured
     $this->openCiviPage("event/manage/fee", "reset=1&action=update&id={$eventId}", '_qf_Fee_upload-bottom');
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='Test Processor']");
@@ -694,7 +712,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->click('_qf_Participant_upload-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->verifyFinancialRecords($contributionID);
-       
+    
     // add participant and 3 additional participant and change status of participant from edit contribution
     $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous, TRUE);
     $this->webtestLogin(); 
