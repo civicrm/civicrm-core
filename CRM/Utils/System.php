@@ -494,29 +494,31 @@ class CRM_Utils_System {
     $docAdd = "More info at:" . CRM_Utils_System::docURL2("Managing Scheduled Jobs", TRUE, NULL, NULL, NULL, "wiki");
 
     if (!$key) {
-      return self::authenticateAbort("ERROR: You need to send a valid key to execute this file. " . $docAdd . "\n",
+      return self::authenticateAbort(
+        "ERROR: You need to send a valid key to execute this file. " . $docAdd . "\n",
         $abort
       );
     }
 
     $siteKey = defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : NULL;
 
-    if (!$siteKey ||
-      empty($siteKey)
-    ) {
-      return self::authenticateAbort("ERROR: You need to set a valid site key in civicrm.settings.php. " . $docAdd . "\n",
+    if (!$siteKey || empty($siteKey)) {
+      return self::authenticateAbort(
+        "ERROR: You need to set a valid site key in civicrm.settings.php. " . $docAdd . "\n",
         $abort
       );
     }
 
     if (strlen($siteKey) < 8) {
-      return self::authenticateAbort("ERROR: Site key needs to be greater than 7 characters in civicrm.settings.php. " . $docAdd . "\n",
+      return self::authenticateAbort(
+        "ERROR: Site key needs to be greater than 7 characters in civicrm.settings.php. " . $docAdd . "\n",
         $abort
       );
     }
 
     if ($key !== $siteKey) {
-      return self::authenticateAbort("ERROR: Invalid key value sent. " . $docAdd . "\n",
+      return self::authenticateAbort(
+        "ERROR: Invalid key value sent. " . $docAdd . "\n",
         $abort
       );
     }
@@ -535,7 +537,8 @@ class CRM_Utils_System {
 
     // its ok to have an empty password
     if (!$name) {
-      return self::authenticateAbort("ERROR: You need to send a valid user name and password to execute this file\n",
+      return self::authenticateAbort(
+        "ERROR: You need to send a valid user name and password to execute this file\n",
         $abort
       );
     }
@@ -546,7 +549,8 @@ class CRM_Utils_System {
 
     $result = CRM_Utils_System::authenticate($name, $pass, $loadCMSBootstrap);
     if (!$result) {
-      return self::authenticateAbort("ERROR: Invalid username and/or password\n",
+      return self::authenticateAbort(
+        "ERROR: Invalid username and/or password\n",
         $abort
       );
     }
@@ -554,12 +558,12 @@ class CRM_Utils_System {
       // lets store contact id and user id in session
       list($userID, $ufID, $randomNumber) = $result;
       if ($userID && $ufID) {
-
         $config = CRM_Core_Config::singleton();
         $config->userSystem->setUserSession( array($userID, $ufID) );
       }
       else {
-        return self::authenticateAbort("ERROR: Unexpected error, could not match userID and contactID",
+        return self::authenticateAbort(
+          "ERROR: Unexpected error, could not match userID and contactID",
           $abort
         );
       }
