@@ -228,7 +228,7 @@ abstract class CRM_Import_Parser {
    *
    * @var int
    */
-  public $_dedupeRuleGroupID = NULL; 
+  public $_dedupeRuleGroupID = NULL;
 
   function __construct() {
     $this->_maxLinesToProcess = 0;

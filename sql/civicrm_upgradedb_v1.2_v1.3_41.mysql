@@ -245,7 +245,7 @@ CREATE TABLE civicrm_contribution (
 -- * 
 -- *
 -- *******************************************************/
-	
+  
   CREATE TABLE civicrm_financial_trxn (
 
 
@@ -312,7 +312,7 @@ CREATE TABLE civicrm_contribution (
      FOREIGN KEY (uf_group_id) REFERENCES civicrm_uf_group(id)
   
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
-	
+  
 
 -- /*******************************************************
 -- *
@@ -373,7 +373,7 @@ CREATE TABLE civicrm_contribution (
 -- * Modify the civicrm_uf_group  Table Structure
 -- *
 -- *******************************************************/
-	
+  
     ALTER TABLE `civicrm_uf_group` DROP `weight` ;
 
 
@@ -422,9 +422,9 @@ CREATE TABLE civicrm_contribution (
 -- *******************************************************/
 
   INSERT INTO `civicrm_accept_credit_card` VALUES (1,1,'Visa','Visa',0,1),
-					          (2,1,'MasterCard','Master Card',0,1),
-						  (3,1,'Amex','American Express',0,1),
-						  (4,1,'Discover','Discover',0,1);
+                    (2,1,'MasterCard','Master Card',0,1),
+              (3,1,'Amex','American Express',0,1),
+              (4,1,'Discover','Discover',0,1);
 
 
 -- /*******************************************************

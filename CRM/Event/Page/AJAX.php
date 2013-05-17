@@ -78,7 +78,7 @@ ORDER BY title
 SELECT v.label ,v.value
 FROM   civicrm_option_value v,
        civicrm_option_group g
-WHERE  v.option_group_id = g.id 
+WHERE  v.option_group_id = g.id
 AND g.name = 'event_type'
 AND v.is_active = 1
 AND {$whereClause}
@@ -102,14 +102,14 @@ ORDER by v.weight";
     }
 
     $whereClause = "cv.label LIKE '$name%' ";
-    
+
     $query = "SELECT DISTINCT (
 cv.label
 ), cv.id
 FROM civicrm_price_field_value cv
 LEFT JOIN civicrm_price_field cf ON cv.price_field_id = cf.id
 LEFT JOIN civicrm_price_set_entity ce ON ce.price_set_id = cf.price_set_id
-WHERE ce.entity_table = 'civicrm_event' AND {$whereClause} 
+WHERE ce.entity_table = 'civicrm_event' AND {$whereClause}
 GROUP BY cv.label";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {

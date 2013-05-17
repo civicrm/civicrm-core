@@ -53,10 +53,10 @@ class CRM_Member_Form_Task_SearchTaskHookSample extends CRM_Member_Form_Task {
     $query = "
     SELECT mem.start_date  as start_date,
            mem.end_date    as end_date,
-           mem.source      as source,  
-           ct.display_name as display_name    
+           mem.source      as source,
+           ct.display_name as display_name
 FROM       civicrm_membership mem
-INNER JOIN civicrm_contact ct ON ( mem.contact_id = ct.id )     
+INNER JOIN civicrm_contact ct ON ( mem.contact_id = ct.id )
 WHERE      mem.id IN ( $memberIDs )";
 
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);

@@ -4,15 +4,15 @@
 -- *
 -- *************************************************************************/
 
--- Please add script for all the schema / fixed-data related modifications to 
--- this sql script as you resolve 2.2 issues. Include the issue number which 
+-- Please add script for all the schema / fixed-data related modifications to
+-- this sql script as you resolve 2.2 issues. Include the issue number which
 -- is the source of the change, as part of the comment.
 
 -- fix version column first
-ALTER TABLE `civicrm_domain` 
+ALTER TABLE `civicrm_domain`
   MODIFY version varchar(32) COMMENT 'The civicrm version this instance is running';
 
--- make the register_by_id cascade in civicrm_participant	
+-- make the register_by_id cascade in civicrm_participant
 
 ALTER TABLE `civicrm_participant`
    DROP FOREIGN KEY `FK_civicrm_participant_registered_by_id`;
@@ -69,7 +69,7 @@ SET
     {foreach from=$locales item=locale}
       ce.intro_text_{$locale} = cp.intro_text_{$locale},
       ce.footer_text_{$locale} = cp.footer_text_{$locale},
-      ce.confirm_title_{$locale} = cp.confirm_title_{$locale},	
+      ce.confirm_title_{$locale} = cp.confirm_title_{$locale},
       ce.confirm_text_{$locale} = cp.confirm_text_{$locale},
       ce.confirm_footer_text_{$locale} = cp.confirm_footer_text_{$locale},
       ce.confirm_email_text_{$locale} = cp.confirm_email_text_{$locale},
@@ -83,7 +83,7 @@ SET
   {else}
     ce.intro_text = cp.intro_text,
     ce.footer_text = cp.footer_text,
-    ce.confirm_title = cp.confirm_title,	
+    ce.confirm_title = cp.confirm_title,
     ce.confirm_text = cp.confirm_text,
     ce.confirm_footer_text = cp.confirm_footer_text,
     ce.confirm_email_text = cp.confirm_email_text,
@@ -104,11 +104,11 @@ SET
     ce.is_multiple_registrations = cp.is_multiple_registrations;
 
 -- CRM-3391
--- Update table name in civicrm_option_group (Fee Level) 
+-- Update table name in civicrm_option_group (Fee Level)
 -- cleanup for unused option group
 
-DELETE og.* FROM civicrm_option_group og 
- LEFT JOIN civicrm_event_page ep ON ep.id = SUBSTRING_INDEX( SUBSTRING( og.name, 27 ) , '.discount', 1) 
+DELETE og.* FROM civicrm_option_group og
+ LEFT JOIN civicrm_event_page ep ON ep.id = SUBSTRING_INDEX( SUBSTRING( og.name, 27 ) , '.discount', 1)
  WHERE og.name LIKE 'civicrm_event_page.amount%' AND ep.id IS NULL;
 
 {foreach from =$eventFees item=ogid}
@@ -119,18 +119,18 @@ DELETE og.* FROM civicrm_option_group og
   SELECT @event_id := ep.event_id FROM civicrm_event_page ep WHERE ep.id = @event_page_id;
 
   UPDATE `civicrm_option_group`
-    SET `name` = REPLACE( name, CONCAT_WS('.', 'civicrm_event_page.amount', @event_page_id ), CONCAT_WS('.', 'civicrm_event.amount', @event_id ) )  
+    SET `name` = REPLACE( name, CONCAT_WS('.', 'civicrm_event_page.amount', @event_page_id ), CONCAT_WS('.', 'civicrm_event.amount', @event_id ) )
     WHERE `id` = @option_group_id;
 {/foreach}
 
--- Update table entity_table and entity_id civicrm_tell_friend 
+-- Update table entity_table and entity_id civicrm_tell_friend
 UPDATE civicrm_tell_friend tf
   SET tf.`entity_table` = 'civicrm_event',
       tf.`entity_id` = (SELECT e.`event_id` FROM civicrm_event_page e WHERE e.`id` = tf.`entity_id`)
   WHERE tf.`entity_table`='civicrm_event_page' ;
 
 --CRM-4256
--- Update table name in civicrm_price_set_entity (Price Set) 
+-- Update table name in civicrm_price_set_entity (Price Set)
 UPDATE civicrm_price_set_entity pse
   SET pse.`entity_table`='civicrm_event',
       pse.`entity_id` = (SELECT e.`event_id` FROM civicrm_event_page e WHERE e.`id` = pse.`entity_id`)
@@ -183,7 +183,7 @@ CREATE TABLE civicrm_pcp_block (
      link_text varchar(255)   DEFAULT NULL COMMENT 'Link text for PCP.',
      is_active tinyint   DEFAULT 1 COMMENT 'Is Personal Campaign Page Block enabled/active?',
      PRIMARY KEY ( id ),
-     CONSTRAINT FK_civicrm_pcp_block_entity_id FOREIGN KEY (entity_id) REFERENCES civicrm_contribution_page(id)   
+     CONSTRAINT FK_civicrm_pcp_block_entity_id FOREIGN KEY (entity_id) REFERENCES civicrm_contribution_page(id)
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- * civicrm_pcp
@@ -202,9 +202,9 @@ CREATE TABLE civicrm_pcp (
      goal_amount decimal(20,2)    COMMENT 'Goal amount of this Personal Campaign Page.',
      referer varchar(255)   DEFAULT NULL ,
      is_active tinyint   DEFAULT 0 COMMENT 'Is Personal Campaign Page enabled/active?',
-     PRIMARY KEY ( id ),      
-     CONSTRAINT FK_civicrm_pcp_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id) ON DELETE CASCADE,      
-     CONSTRAINT FK_civicrm_pcp_contribution_page_id FOREIGN KEY (contribution_page_id) REFERENCES civicrm_contribution_page(id)   
+     PRIMARY KEY ( id ),
+     CONSTRAINT FK_civicrm_pcp_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id) ON DELETE CASCADE,
+     CONSTRAINT FK_civicrm_pcp_contribution_page_id FOREIGN KEY (contribution_page_id) REFERENCES civicrm_contribution_page(id)
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- * civicrm_contribution_soft
@@ -219,9 +219,9 @@ CREATE TABLE civicrm_contribution_soft (
      pcp_roll_nickname varchar(255)   DEFAULT NULL ,
      pcp_personal_note varchar(255)   DEFAULT NULL ,
      PRIMARY KEY ( id ) ,
-     INDEX index_id( pcp_id ) ,      
-     CONSTRAINT FK_civicrm_contribution_soft_contribution_id FOREIGN KEY (contribution_id) REFERENCES civicrm_contribution(id) ON DELETE CASCADE,      
-     CONSTRAINT FK_civicrm_contribution_soft_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id) ON DELETE CASCADE  
+     INDEX index_id( pcp_id ) ,
+     CONSTRAINT FK_civicrm_contribution_soft_contribution_id FOREIGN KEY (contribution_id) REFERENCES civicrm_contribution(id) ON DELETE CASCADE,
+     CONSTRAINT FK_civicrm_contribution_soft_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
@@ -252,20 +252,20 @@ SELECT @option_group_id_gr  := max(id) from civicrm_option_group where name = 'g
 
 ALTER TABLE `civicrm_contact` ADD `greeting_type_id` int(10) unsigned NULL DEFAULT NULL AFTER greeting_type;
 
-SELECT @greetingvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'greeting_type' && civicrm_option_value.name = 'Dear [first]';
+SELECT @greetingvalue := value FROM civicrm_option_value, civicrm_option_group
+  WHERE civicrm_option_group.name = 'greeting_type' && civicrm_option_value.name = 'Dear [first]';
 UPDATE civicrm_contact SET greeting_type_id = @greetingvalue WHERE civicrm_contact.greeting_type = 'Informal';
 
-SELECT @greetingvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'greeting_type' && civicrm_option_value.name = 'Dear [prefix] [first] [last]';
+SELECT @greetingvalue := value FROM civicrm_option_value, civicrm_option_group
+  WHERE civicrm_option_group.name = 'greeting_type' && civicrm_option_value.name = 'Dear [prefix] [first] [last]';
 UPDATE civicrm_contact SET greeting_type_id = @greetingvalue WHERE civicrm_contact.greeting_type = 'Formal';
 
-SELECT @greetingvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'greeting_type' && civicrm_option_value.name = 'Dear [prefix] [last]';
+SELECT @greetingvalue := value FROM civicrm_option_value, civicrm_option_group
+  WHERE civicrm_option_group.name = 'greeting_type' && civicrm_option_value.name = 'Dear [prefix] [last]';
 UPDATE civicrm_contact SET greeting_type_id = @greetingvalue WHERE civicrm_contact.greeting_type = 'Honorific';
 
-SELECT @greetingvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'greeting_type' && civicrm_option_value.name = 'Customized';
+SELECT @greetingvalue := value FROM civicrm_option_value, civicrm_option_group
+  WHERE civicrm_option_group.name = 'greeting_type' && civicrm_option_value.name = 'Customized';
 UPDATE civicrm_contact SET greeting_type_id = @greetingvalue WHERE civicrm_contact.greeting_type = 'Custom';
 
 
@@ -323,26 +323,26 @@ ALTER TABLE `civicrm_phone`         ADD `phone_type_id` int(10) unsigned NULL DE
 ALTER TABLE `civicrm_mapping_field` ADD `phone_type_id` int(10) unsigned NULL DEFAULT NULL AFTER phone_type;
 ALTER TABLE `civicrm_uf_field`      ADD `phone_type_id` int(10) unsigned NULL DEFAULT NULL AFTER phone_type;
 
-SELECT @phonevalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'phone_type' && civicrm_option_value.name = 'Phone';
+SELECT @phonevalue := value FROM civicrm_option_value, civicrm_option_group
+  WHERE civicrm_option_group.name = 'phone_type' && civicrm_option_value.name = 'Phone';
 UPDATE civicrm_phone         SET phone_type_id = @phonevalue WHERE civicrm_phone.phone_type         = 'Phone';
 UPDATE civicrm_mapping_field SET phone_type_id = @phonevalue WHERE civicrm_mapping_field.phone_type = 'Phone';
 UPDATE civicrm_uf_field      SET phone_type_id = @phonevalue WHERE civicrm_uf_field.phone_type      = 'Phone';
 
-SELECT @phonevalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'phone_type' && civicrm_option_value.name = 'Mobile';
+SELECT @phonevalue := value FROM civicrm_option_value, civicrm_option_group
+  WHERE civicrm_option_group.name = 'phone_type' && civicrm_option_value.name = 'Mobile';
 UPDATE civicrm_phone         SET phone_type_id = @phonevalue WHERE civicrm_phone.phone_type         = 'Mobile';
 UPDATE civicrm_mapping_field SET phone_type_id = @phonevalue WHERE civicrm_mapping_field.phone_type = 'Mobile';
 UPDATE civicrm_uf_field      SET phone_type_id = @phonevalue WHERE civicrm_uf_field.phone_type      = 'Mobile';
 
-SELECT @phonevalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'phone_type' && civicrm_option_value.name = 'Fax';
+SELECT @phonevalue := value FROM civicrm_option_value, civicrm_option_group
+  WHERE civicrm_option_group.name = 'phone_type' && civicrm_option_value.name = 'Fax';
 UPDATE civicrm_phone         SET phone_type_id = @phonevalue WHERE civicrm_phone.phone_type         = 'Fax';
 UPDATE civicrm_mapping_field SET phone_type_id = @phonevalue WHERE civicrm_mapping_field.phone_type = 'Fax';
 UPDATE civicrm_uf_field      SET phone_type_id = @phonevalue WHERE civicrm_uf_field.phone_type      = 'Fax';
 
-SELECT @phonevalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'phone_type' && civicrm_option_value.name = 'Pager';
+SELECT @phonevalue := value FROM civicrm_option_value, civicrm_option_group
+  WHERE civicrm_option_group.name = 'phone_type' && civicrm_option_value.name = 'Pager';
 UPDATE civicrm_phone         SET phone_type_id = @phonevalue WHERE civicrm_phone.phone_type         = 'Pager';
 UPDATE civicrm_mapping_field SET phone_type_id = @phonevalue WHERE civicrm_mapping_field.phone_type = 'Pager';
 UPDATE civicrm_uf_field      SET phone_type_id = @phonevalue WHERE civicrm_uf_field.phone_type      = 'Pager';
@@ -351,7 +351,7 @@ ALTER TABLE `civicrm_phone`         DROP `phone_type`;
 ALTER TABLE `civicrm_mapping_field` DROP `phone_type`;
 ALTER TABLE `civicrm_uf_field`      DROP `phone_type`;
 
--- custom Group table 
+-- custom Group table
 ALTER TABLE civicrm_custom_group
   ADD  min_multiple int unsigned   DEFAULT 0 COMMENT 'minimum number of multiple records (typically 0?)',
   ADD  max_multiple int unsigned   DEFAULT 0 COMMENT 'maximum number of multiple records, if 0 - no max';
@@ -359,7 +359,7 @@ ALTER TABLE civicrm_custom_group
 ALTER TABLE civicrm_custom_field
   ADD text_length int unsigned    COMMENT 'field length if alphanumeric' AFTER options_per_line;
 
--- need to add update statement for site preference options to enable 
+-- need to add update statement for site preference options to enable
 -- preferences for contact_type / groups / tags, CRM-2794
 
 SELECT @option_group_id_aso  := max(id) from civicrm_option_group where name = 'advanced_search_options';
@@ -395,7 +395,7 @@ ALTER TABLE civicrm_mailing
   ADD override_verp tinyint   DEFAULT 0 AFTER msg_template_id,
   ADD created_id int unsigned NULL DEFAULT NULL AFTER override_verp,
   ADD scheduled_id int unsigned NULL DEFAULT NULL AFTER created_id,
-  ADD is_archived tinyint   DEFAULT 0 COMMENT 'Is this mailing archived?', 	
+  ADD is_archived tinyint   DEFAULT 0 COMMENT 'Is this mailing archived?',
   ADD CONSTRAINT FK_civicrm_mailing_created_id FOREIGN KEY (created_id) REFERENCES civicrm_contact(id) ON DELETE CASCADE,
   ADD CONSTRAINT FK_civicrm_mailing_scheduled_id FOREIGN KEY (scheduled_id) REFERENCES civicrm_contact(id) ON DELETE CASCADE;
 
@@ -406,7 +406,7 @@ ALTER TABLE civicrm_mailing_group
 
 
 -- CRM-3609 (used IGNORE as 2.1 post beta5 should have this already)
- 
+
 INSERT IGNORE INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES (5217, 1020, "BRU", "Brussels");
 
 -- ======== CiviCase Related Upgrade ==========
@@ -462,8 +462,8 @@ SELECT @max_val := MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.op
     (option_group_id,                {foreach from=$locales item=locale}label_{$locale},{/foreach}      value,                           name,                 weight,                          component_id) VALUES
     (@option_group_id_activity_type, {foreach from=$locales item=locale}'Open Case',{/foreach}          (SELECT @max_val := @max_val+1), 'Open Case',          (SELECT @max_val := @max_val+1), @caseCompId),
     (@option_group_id_activity_type, {foreach from=$locales item=locale}'Follow up',{/foreach}          (SELECT @max_val := @max_val+1), 'Follow up',          (SELECT @max_val := @max_val+1), @caseCompId),
-    (@option_group_id_activity_type, {foreach from=$locales item=locale}'Change Case Type',{/foreach}   (SELECT @max_val := @max_val+1), 'Change Case Type',   (SELECT @max_val := @max_val+1), @caseCompId),  
-    (@option_group_id_activity_type, {foreach from=$locales item=locale}'Change Case Status',{/foreach} (SELECT @max_val := @max_val+1), 'Change Case Status', (SELECT @max_val := @max_val+1), @caseCompId),  
+    (@option_group_id_activity_type, {foreach from=$locales item=locale}'Change Case Type',{/foreach}   (SELECT @max_val := @max_val+1), 'Change Case Type',   (SELECT @max_val := @max_val+1), @caseCompId),
+    (@option_group_id_activity_type, {foreach from=$locales item=locale}'Change Case Status',{/foreach} (SELECT @max_val := @max_val+1), 'Change Case Status', (SELECT @max_val := @max_val+1), @caseCompId),
     (@option_group_id_activity_type, {foreach from=$locales item=locale}'Close Case',{/foreach}         (SELECT @max_val := @max_val+1), 'Close Case',         (SELECT @max_val := @max_val+1), @caseCompId);
 {else}
   INSERT INTO civicrm_option_value
@@ -471,14 +471,14 @@ SELECT @max_val := MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.op
     (@option_group_id_activity_type, 'Open Case',          (SELECT @max_val := @max_val+1), 'Open Case',          (SELECT @max_val := @max_val+1), @caseCompId),
     (@option_group_id_activity_type, 'Follow up',          (SELECT @max_val := @max_val+1), 'Follow up',          (SELECT @max_val := @max_val+1), @caseCompId),
     (@option_group_id_activity_type, 'Change Case Type',   (SELECT @max_val := @max_val+1), 'Change Case Type',   (SELECT @max_val := @max_val+1), @caseCompId),
-    (@option_group_id_activity_type, 'Change Case Status', (SELECT @max_val := @max_val+1), 'Change Case Status', (SELECT @max_val := @max_val+1), @caseCompId),  
+    (@option_group_id_activity_type, 'Change Case Status', (SELECT @max_val := @max_val+1), 'Change Case Status', (SELECT @max_val := @max_val+1), @caseCompId),
     (@option_group_id_activity_type, 'Close Case',         (SELECT @max_val := @max_val+1), 'Close Case',         (SELECT @max_val := @max_val+1), @caseCompId);
 {/if}
 
 -- Encounter Medium Option Values for Case Activities
 {if $multilingual}
   INSERT INTO civicrm_option_group
-    (name, {foreach from=$locales item=locale}label_{$locale}, description_{$locale},{/foreach} is_reserved, is_active) 
+    (name, {foreach from=$locales item=locale}label_{$locale}, description_{$locale},{/foreach} is_reserved, is_active)
     VALUES
     ('encounter_medium', {foreach from=$locales item=locale}'Encounter Medium', 'Encounter medium for case activities (e.g. In Person, By Phone, etc.)',{/foreach} 1, 1 );
   SELECT @option_group_id_medium := max(id) FROM civicrm_option_group WHERE name = 'encounter_medium';
@@ -491,7 +491,7 @@ SELECT @max_val := MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.op
     (@option_group_id_medium, {foreach from=$locales item=locale}'Letter Mail',{/foreach}   5,     'letter_mail', 0,          5,      1);
 {else}
   INSERT INTO civicrm_option_group
-    (name, label, description, is_reserved, is_active ) 
+    (name, label, description, is_reserved, is_active )
     VALUES
     ('encounter_medium', 'Encounter Medium', 'Encounter medium for case activities (e.g. In Person, By Phone, etc.)', 1, 1);
   SELECT @option_group_id_medium := max(id) FROM civicrm_option_group WHERE name = 'encounter_medium';
@@ -504,7 +504,7 @@ SELECT @max_val := MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.op
     (@option_group_id_medium, 'Letter Mail', 5,     'letter_mail', 0,          5,      1);
 {/if}
 
--- CRM-3573 
+-- CRM-3573
 -- added column case_id in civicrm_relationship table.
 -- added columns medium, is_auto, relationship_id fileds in civicrm_activity.
 -- added value 'Case' in civicrm_custom_group.
@@ -523,7 +523,7 @@ ALTER TABLE `civicrm_activity`
   ADD `is_current_revision` tinyint   DEFAULT 1 ,
   ADD `original_id` int unsigned    COMMENT 'Activity ID of the first activity record in versioning chain.',
   ADD `is_deleted` tinyint   DEFAULT 0,
-  ADD CONSTRAINT FK_civicrm_activity_original_id FOREIGN KEY (original_id) REFERENCES civicrm_activity(id) ON DELETE CASCADE,  
+  ADD CONSTRAINT FK_civicrm_activity_original_id FOREIGN KEY (original_id) REFERENCES civicrm_activity(id) ON DELETE CASCADE,
   ADD CONSTRAINT FK_civicrm_relationship_id FOREIGN KEY (relationship_id) REFERENCES civicrm_relationship(id) ON DELETE SET NULL;
 
 ALTER TABLE `civicrm_custom_group`
@@ -537,7 +537,7 @@ ALTER TABLE `civicrm_custom_group` CHANGE `extends_entity_column_name` `extends_
 ALTER TABLE `civicrm_menu`
   ADD `skipBreadcrumb` tinyint(4) COMMENT 'skip this url being exposed to breadcrumb';
 
--- CRM-3709  
+-- CRM-3709
 CREATE INDEX index_option_group_id_name ON civicrm_option_value( `option_group_id` , `name` );
 
 -- fix constraint
@@ -555,11 +555,11 @@ ALTER TABLE `civicrm_contribution`
   ADD CONSTRAINT FK_civicrm_contribution_address_id FOREIGN KEY (address_id) REFERENCES civicrm_address(id) ON DELETE SET NULL;
 
 -- Removing solicitor_id as per CRM-3917
-INSERT INTO civicrm_contribution_soft (contribution_id, contact_id, amount) 
+INSERT INTO civicrm_contribution_soft (contribution_id, contact_id, amount)
 SELECT id, solicitor_id, total_amount FROM civicrm_contribution
 WHERE solicitor_id IS NOT NULL;
 
-ALTER TABLE `civicrm_contribution` 
+ALTER TABLE `civicrm_contribution`
 -- Added check_number as per CRM-3923
   ADD `check_number` varchar(255) collate utf8_unicode_ci default NULL,
   DROP FOREIGN KEY `FK_civicrm_contribution_solicitor_id`;
@@ -574,7 +574,7 @@ SET `is_billing` = 1
 WHERE `location_type_id` = 5;
 
 -- civicrm_note constraint fix
-ALTER TABLE civicrm_note 
+ALTER TABLE civicrm_note
     DROP FOREIGN KEY `FK_civicrm_note_contact_id`;
 ALTER TABLE `civicrm_note`
     ADD CONSTRAINT `FK_civicrm_note_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE SET NULL;

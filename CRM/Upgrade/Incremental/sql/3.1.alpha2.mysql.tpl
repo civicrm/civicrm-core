@@ -3,7 +3,7 @@
 
 --  CRM-5263
 
-UPDATE civicrm_country SET is_province_abbreviated = 1 
+UPDATE civicrm_country SET is_province_abbreviated = 1
 WHERE name IN ('Canada', 'United States');
 
 --  CRM-5106
@@ -14,7 +14,7 @@ SELECT @option_group_id_acsOpt := max(id) from civicrm_option_group where name =
 DELETE FROM `civicrm_option_value` WHERE option_group_id = @option_group_id_acsOpt;
 
 INSERT INTO `civicrm_option_value`
-    (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`) 
+    (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
 VALUES
     (@option_group_id_acsOpt, {localize}'Email Address'{/localize}  , 2, 'email',          NULL, 0, NULL, 2,  0, 0, 1, NULL, NULL),
     (@option_group_id_acsOpt, {localize}'Phone'{/localize}          , 3, 'phone',          NULL, 0, NULL, 3,  0, 0, 1, NULL, NULL),

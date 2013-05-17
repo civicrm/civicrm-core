@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -159,7 +158,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
           if (!empty($financialAccount->financial_account_type_id)) {
             $optionGroupName = 'financial_account_type';
             $financialType[$dao->id]['financial_account_type'] = CRM_Utils_Array::value($financialAccount->financial_account_type_id, $financialAccountType);
-            
+
           }
           if (!empty($dao->account_relationship)) {
             $optionGroupName = 'account_relationship';

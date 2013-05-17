@@ -41,7 +41,7 @@ VALUES
 Previously, a SELECT INTO @domainID was used. This method is deprecated and should NOT be used:
 
 ----------------------------------------------------
--- get domain id 
+-- get domain id
 SELECT  @domainID := min(id) FROM civicrm_domain;
 ----------------------------------------------------
 
@@ -71,7 +71,7 @@ If a field is NOT localizable, but we just need to make sure it can be translate
 ----------------------------------------------------
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES    
+VALUES
     ( {$domainID}, 'civicrm/admin&reset=1', '{ts escape="sql" skip="true"}Administration Console{/ts}', 'Administration Console', 'administer CiviCRM', '', @adminlastID, '1', NULL, 1 );
 ----------------------------------------------------
 

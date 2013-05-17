@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -40,9 +39,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   protected $_emailField_a = FALSE;
   protected $_emailField_b = FALSE;
   protected $_customGroupExtends = array(
-    'Relationship'); 
+    'Relationship');
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
-  
+
   function __construct() {
 
     $contact_type = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '_');
@@ -272,13 +271,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   function from() {
     $this->_from = "
         FROM civicrm_relationship {$this->_aliases['civicrm_relationship']}
- 
+
              INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                        ON ( {$this->_aliases['civicrm_relationship']}.contact_id_a = 
+                        ON ( {$this->_aliases['civicrm_relationship']}.contact_id_a =
                              {$this->_aliases['civicrm_contact']}.id )
 
              INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact_b']}
-                        ON ( {$this->_aliases['civicrm_relationship']}.contact_id_b = 
+                        ON ( {$this->_aliases['civicrm_relationship']}.contact_id_b =
                              {$this->_aliases['civicrm_contact_b']}.id )
 
              {$this->_aclFrom} ";
@@ -287,32 +286,32 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       !empty($this->_params['state_province_id_value'])
     ) {
       $this->_from .= "
-            INNER  JOIN civicrm_address {$this->_aliases['civicrm_address']} 
+            INNER  JOIN civicrm_address {$this->_aliases['civicrm_address']}
                          ON (( {$this->_aliases['civicrm_address']}.contact_id =
                                {$this->_aliases['civicrm_contact']}.id  OR
                                {$this->_aliases['civicrm_address']}.contact_id =
-                               {$this->_aliases['civicrm_contact_b']}.id ) AND 
+                               {$this->_aliases['civicrm_contact_b']}.id ) AND
                                {$this->_aliases['civicrm_address']}.is_primary = 1 ) ";
     }
 
     $this->_from .= "
         INNER JOIN civicrm_relationship_type {$this->_aliases['civicrm_relationship_type']}
-                        ON ( {$this->_aliases['civicrm_relationship']}.relationship_type_id  = 
+                        ON ( {$this->_aliases['civicrm_relationship']}.relationship_type_id  =
                              {$this->_aliases['civicrm_relationship_type']}.id  ) ";
 
     // include Email Field
     if ($this->_emailField_a) {
-      $this->_from .= " 
+      $this->_from .= "
              LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
                        ON ( {$this->_aliases['civicrm_contact']}.id =
-                            {$this->_aliases['civicrm_email']}.contact_id AND 
+                            {$this->_aliases['civicrm_email']}.contact_id AND
                             {$this->_aliases['civicrm_email']}.is_primary = 1 )";
     }
     if ($this->_emailField_b) {
-      $this->_from .= " 
-             LEFT JOIN civicrm_email {$this->_aliases['civicrm_email_b']} 
+      $this->_from .= "
+             LEFT JOIN civicrm_email {$this->_aliases['civicrm_email_b']}
                        ON ( {$this->_aliases['civicrm_contact_b']}.id =
-                            {$this->_aliases['civicrm_email_b']}.contact_id AND 
+                            {$this->_aliases['civicrm_email_b']}.contact_id AND
                             {$this->_aliases['civicrm_email_b']}.is_primary = 1 )";
     }
   }

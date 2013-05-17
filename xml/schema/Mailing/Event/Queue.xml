@@ -30,7 +30,7 @@
     <field>
         <name>email_id</name>
         <type>int unsigned</type>
-	<default>NULL</default>
+  <default>NULL</default>
         <comment>FK to Email</comment>
     </field>
     <foreignKey>
@@ -61,7 +61,7 @@
     <field>
         <name>phone_id</name>
         <type>int unsigned</type>
-	<default>NULL</default>
+        <default>NULL</default>
         <comment>FK to Phone</comment>
     </field>
     <foreignKey>

@@ -74,14 +74,14 @@
 {/if}
 
 {if $rows}
-	<div class="crm-results-block">
+  <div class="crm-results-block">
     {* Search request has returned 1 or more matching rows. Display results and collapse the search criteria fieldset. *}
         {* This section handles form elements for action task select and submit *}
        <div class="crm-search-tasks">
         {include file="CRM/Contact/Form/Search/ResultTasks.tpl"}
-		</div>
+    </div>
         {* This section displays the rows along and includes the paging controls *}
-	    <div class="crm-search-results">
+      <div class="crm-search-results">
 
         {include file="CRM/common/pager.tpl" location="top"}
 

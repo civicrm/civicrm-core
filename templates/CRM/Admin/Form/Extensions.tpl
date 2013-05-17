@@ -47,5 +47,5 @@
    {if $action eq 8 or $action eq 1 or $action eq 2}
         {include file="CRM/Admin/Page/ExtensionDetails.tpl"}
    {/if}
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>      
+   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

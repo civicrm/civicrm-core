@@ -348,7 +348,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
         CRM_Price_BAO_Set::addTo('civicrm_event', $event->id, $priceSetId);
       }
     }
-    
+
     $this->set('id', $event->id);
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -380,7 +380,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     return ts('Event Information and Settings');
   }
 
-  /* Retrieve event template custom data values 
+  /* Retrieve event template custom data values
      * and set as default values for current new event.
      *
      * @params int $tempId event template id.

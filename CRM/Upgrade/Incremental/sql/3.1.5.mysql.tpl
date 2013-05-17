@@ -2,7 +2,7 @@
    {include file='../CRM/Upgrade/3.1.5.msg_template/civicrm_msg_template.tpl'}
 
 -- CRM-6156
--- Update the names of several existing Taiwan provinces 
+-- Update the names of several existing Taiwan provinces
 UPDATE civicrm_state_province SET name = 'Changhua County'  WHERE id = 4848;
 UPDATE civicrm_state_province SET name = 'Chiayi County'    WHERE id = 4849;
 UPDATE civicrm_state_province SET name = 'Hsinchu County'   WHERE id = 4850;
@@ -21,7 +21,7 @@ UPDATE civicrm_state_province SET name = 'Taoyuan County'   WHERE id = 4862;
 UPDATE civicrm_state_province SET name = 'Yunlin Conuty'    WHERE id = 4863;
 UPDATE civicrm_state_province SET name = 'Keelung City'     WHERE id = 4864;
 
--- Create additional Taiwan provinces 
+-- Create additional Taiwan provinces
 SELECT @country_id := id from civicrm_country where name = 'Taiwan';
 INSERT INTO civicrm_state_province ( country_id, abbreviation, name ) VALUES
 ( @country_id, 'TXG', 'Taichung City'  ),

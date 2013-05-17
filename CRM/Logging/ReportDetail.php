@@ -60,15 +60,15 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     parent::__construct();
 
     CRM_Utils_System::resetBreadCrumb();
-    $breadcrumb = 
+    $breadcrumb =
       array(
-            array('title' => ts('Home'), 
+            array('title' => ts('Home'),
                   'url' => CRM_Utils_System::url()),
-            array('title' => ts('CiviCRM'), 
+            array('title' => ts('CiviCRM'),
                   'url' => CRM_Utils_System::url('civicrm', 'reset=1')),
-            array('title' => ts('View Contact'), 
+            array('title' => ts('View Contact'),
                   'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}")),
-            array('title' => ts('Search Results'), 
+            array('title' => ts('Search Results'),
                   'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1")),
             );
     CRM_Utils_System::appendBreadCrumb($breadcrumb);

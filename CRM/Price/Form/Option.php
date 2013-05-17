@@ -177,26 +177,26 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
           // count
           $this->add('text', 'count', ts('Participants Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
-          
+
           $this->add('text', 'max_value', ts('Max Participants'));
           $this->addRule('max_value', ts('Please enter a valid Max Participants.'), 'positiveInteger');
         }
-        
+
       }
       //Financial Type
       $financialType = CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-       
+
       if (count($financialType)) {
         $this->assign('financialType', $financialType);
       }
       $this->add(
-        'select', 
-        'financial_type_id', 
-        ts('Financial Type'), 
+        'select',
+        'financial_type_id',
+        ts('Financial Type'),
         array('' => ts('- select -')) + $financialType,
         true
       );
-      
+
       //CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_Field', $this->_fid, 'weight', 'id' );
       // FIX ME: duplicate rule?
       /*

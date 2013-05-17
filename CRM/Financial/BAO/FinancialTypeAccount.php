@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -74,15 +73,15 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     }
     return $defaults;
   }
-  
+
   /**
    * function to add the financial types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
-   * 
+   *
    * @access public
-   * @static 
+   * @static
    * @return object
    */
   static function add(&$params, &$ids = NULL) {
@@ -103,18 +102,18 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     $financialTypeAccount->save();
     return $financialTypeAccount;
   }
-    
+
   /**
-   * Function to delete financial Types 
-   * 
+   * Function to delete financial Types
+   *
    * @param int $contributionTypeId
    * @static
    */
   static function del($financialTypeAccountId, $accountId = null) {
-    //checking if financial type is present  
+    //checking if financial type is present
     $check = false;
     $relationValues = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
-    
+
     $financialTypeId = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id' );
     //check dependencies
     // FIXME more table containing financial_type_id to come
@@ -148,20 +147,20 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       }
       return CRM_Utils_System::redirect( CRM_Utils_System::url( 'civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$accountId}" ));
     }
-    
+
     //delete from financial Type table
     $financialType = new CRM_Financial_DAO_EntityFinancialAccount( );
     $financialType->id = $financialTypeAccountId;
     $financialType->delete();
   }
-  
+
   /**
-   * Function to get Financial Account Name 
-   * 
+   * Function to get Financial Account Name
+   *
    * @param int $entityId
-   * 
-   * @param string $entityTable 
-   * 
+   *
+   * @param string $entityTable
+   *
    * @param string $columnName Column to fetch
    * @static
    */
@@ -182,18 +181,18 @@ AND entity_id = %2";
   }
 
   /**
-   * Function to financial Account for payment instrument 
-   * 
+   * Function to financial Account for payment instrument
+   *
    * @param int $paymentInstrumentValue payment instrument value
-   * 
+   *
    * @static
    */
   static function getInstrumentFinancialAccount($paymentInstrumentValue = NULL) {
     if (!self::$financialAccount) {
       $query = "SELECT ceft.financial_account_id, cov.value
 FROM civicrm_entity_financial_account ceft
-INNER JOIN civicrm_option_value cov ON cov.id = ceft.entity_id AND ceft.entity_table = 'civicrm_option_value' 
-INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id 
+INNER JOIN civicrm_option_value cov ON cov.id = ceft.entity_id AND ceft.entity_table = 'civicrm_option_value'
+INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
 WHERE cog.name = 'payment_instrument' ";
 
       if ($paymentInstrumentValue) {

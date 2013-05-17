@@ -49,7 +49,7 @@
 <table class="form-layout-compressed">
     <tr><td>
     <strong>{ts}Example{/ts}</strong><br />
-    {ts 1=http://www.example.com/}If your site's home url is %1 ... then your CiviCRM Resource URL would be:{/ts} 
+    {ts 1=http://www.example.com/}If your site's home url is %1 ... then your CiviCRM Resource URL would be:{/ts}
     <div class="font-italic description">
     {if $config->userSystem->is_drupal EQ '1'}
      &nbsp;&nbsp; http://www.example.com/sites/all/modules/civicrm/

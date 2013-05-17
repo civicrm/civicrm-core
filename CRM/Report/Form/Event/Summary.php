@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -47,9 +46,9 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = array(
-    'Event'); 
+    'Event');
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
-  
+
   function __construct() {
 
     $this->_columns = array(
@@ -182,18 +181,18 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     $statusType2 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0');
 
     $sql = "
-          SELECT civicrm_participant.event_id    AS event_id, 
-                 civicrm_participant.status_id   AS statusId, 
-                 COUNT( civicrm_participant.id ) AS participant, 
+          SELECT civicrm_participant.event_id    AS event_id,
+                 civicrm_participant.status_id   AS statusId,
+                 COUNT( civicrm_participant.id ) AS participant,
                  SUM( civicrm_participant.fee_amount ) AS amount,
                  civicrm_participant.fee_currency
 
             FROM civicrm_participant
 
-            WHERE civicrm_participant.is_test = 0 
+            WHERE civicrm_participant.is_test = 0
                   $this->_participantWhere
 
-        GROUP BY civicrm_participant.event_id, 
+        GROUP BY civicrm_participant.event_id,
                  civicrm_participant.status_id";
 
     $info = CRM_Core_DAO::executeQuery($sql);

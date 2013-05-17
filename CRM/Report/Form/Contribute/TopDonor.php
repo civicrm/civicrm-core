@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -45,7 +44,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     'barChart' => 'Bar Chart',
     'pieChart' => 'Pie Chart',
   );
-  
+
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -63,9 +62,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
-		  'first_name' => array('title' => ts('First Name'),
+      'first_name' => array('title' => ts('First Name'),
           ),
-		  'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Last Name'),
           ),
         ),
       ),
@@ -83,7 +82,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
               'avg' => ts('Average'),
             ),
           ),
-          'currency' => 
+          'currency' =>
           array('required' => TRUE,
              'no_display' => TRUE,
           ),
@@ -121,7 +120,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
       ),
-	'civicrm_email' =>
+  'civicrm_email' =>
       array(
         'dao' => 'CRM_Core_DAO_Email',
         'fields' =>
@@ -134,7 +133,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         ),
         'grouping' => 'email-fields',
       ),
-	  
+
       'civicrm_phone' =>
       array(
         'dao' => 'CRM_Core_DAO_Phone',
@@ -248,15 +247,15 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   function from() {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-	       	 INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} 
-		             ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
-             LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']} 
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id  
+            INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+                 ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
+             LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
+                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
                          AND {$this->_aliases['civicrm_email']}.is_primary = 1
-             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']} 
+             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                            {$this->_aliases['civicrm_phone']}.is_primary = 1 
-	";
+                            {$this->_aliases['civicrm_phone']}.is_primary = 1
+  ";
   }
 
   function where() {
@@ -337,7 +336,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $setVariable = " SET @rows:=0, @rank=0 ";
     CRM_Core_DAO::singleValueQuery($setVariable);
 
-    $sql = " {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy} 
+    $sql = " {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
                      ORDER BY civicrm_contribution_total_amount_sum DESC
                  ) as abc {$this->_outerCluase} $this->_limit
                ";
@@ -363,8 +362,8 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   function add2group($groupID) {
     if (is_numeric($groupID)) {
 
-      $sql = " 
-{$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy} 
+      $sql = "
+{$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
 ORDER BY civicrm_contribution_total_amount_sum DESC
 ) as abc {$this->_outerCluase}";
       $dao = CRM_Core_DAO::executeQuery($sql);

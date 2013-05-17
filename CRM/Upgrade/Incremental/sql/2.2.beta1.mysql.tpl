@@ -4,7 +4,7 @@
   {/foreach}
 {/if}
 
-ALTER TABLE `civicrm_domain` 
+ALTER TABLE `civicrm_domain`
   MODIFY version varchar(32) COMMENT 'The civicrm version this instance is running';
 
 {if $notifyAbsent}

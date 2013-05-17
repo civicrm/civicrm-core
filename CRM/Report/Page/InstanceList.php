@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -43,7 +42,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   static $_links = NULL;
 
   static $_exceptions = array( 'logging/contact/detail' );
-  
+
   /**
    * Name of component if report list is filtered
    *
@@ -87,13 +86,13 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     if ($this->ovID) {
       $report .= " AND v.id = {$this->ovID} ";
     }
-    
+
     if ($this->compID) {
       if ($this->compID == 99) {
         $report .= " AND v.component_id IS NULL ";
         $this->_compName = 'Contact';
       } else {
-        $report .= " AND v.component_id = {$this->compID} ";        
+        $report .= " AND v.component_id = {$this->compID} ";
         $cmpName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component', $this->compID,
           'name', 'id'
         );
@@ -113,9 +112,9 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
                     g.name  = 'report_template'
           LEFT JOIN civicrm_report_instance inst
                  ON v.value = inst.report_id
-          LEFT JOIN civicrm_component comp 
+          LEFT JOIN civicrm_component comp
                  ON v.component_id = comp.id
-            
+
           WHERE v.is_active = 1 {$report}
                 AND inst.domain_id = %1
           ORDER BY  v.weight";

@@ -58,7 +58,7 @@
             <th>{ts}Option Label{/ts}</th>
             <th>{ts}Option Amount{/ts}</th>
           <th>{ts}Default{/ts}</th>
-	        <th>{ts}Financial Type{/ts}</th>
+          <th>{ts}Financial Type{/ts}</th>
             <th id="order" class="sortable">{ts}Order{/ts}</th>
           <th>{ts}Enabled?{/ts}</th>
             <th></th>
@@ -70,7 +70,7 @@
             <td class="crm-price-option-label">{$row.label}</td>
             <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
       <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
-	    <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
+      <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
             <td class="nowrap crm-price-option-order">{$row.weight}</td>
             <td id="row_{$row.id}_status" class="crm-price-option-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>

@@ -11,8 +11,8 @@
 -- First get max weight and value
 
 SELECT   @option_act := civicrm_option_group.id,
-	 @max_val    := max(ROUND(civicrm_option_value.value)), 
-         @max_wt     := max(civicrm_option_value.weight) 
+   @max_val    := max(ROUND(civicrm_option_value.value)),
+         @max_wt     := max(civicrm_option_value.weight)
 FROM     civicrm_option_value, civicrm_option_group
 WHERE    civicrm_option_group.name = 'activity_type'
 AND      civicrm_option_value.option_group_id = civicrm_option_group.id
@@ -20,7 +20,7 @@ GROUP BY civicrm_option_group.id;
 
 -- Insert new option values for option_group - activity_type
 
-INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name` , `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name` , `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_act, 'Pledge Acknowledgment', (SELECT @max_val := @max_val+1), 'Pledge Acknowledgment', NULL, 1, NULL, (SELECT @max_wt := @max_wt+1), 'Send Pledge Acknowledgment.', 0, 1, 1, NULL),
   (@option_act, 'Pledge Reminder', (SELECT @max_val := @max_val+1), 'Pledge Reminder', NULL, 1, NULL, (SELECT @max_wt := @max_wt+1), 'Send Pledge Reminder.', 0, 1, 1, NULL);
@@ -38,8 +38,8 @@ INSERT INTO `civicrm_option_group` (`name`, `description`, `is_reserved`, `is_ac
 
 SELECT @option_group_id_fu := max(id) from civicrm_option_group where name = 'recur_frequency_units';
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_group_id_fu, 'daily'    , 'day'  ,    'day',  NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL),
   (@option_group_id_fu, 'weekly'   , 'week' ,   'week',  NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL),
@@ -53,8 +53,8 @@ INSERT INTO `civicrm_option_group` (`name`, `description`, `is_reserved`, `is_ac
 
 SELECT @option_group_id_mt := max(id) from civicrm_option_group where name = 'mapping_type';
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_group_id_mt, '{ts escape="sql"}Search Builder{/ts}',      1, 'Search Builder',      NULL, 0, 0,    1, NULL, 0, 1, 1, NULL),
   (@option_group_id_mt, '{ts escape="sql"}Import Contact{/ts}',      2, 'Import Contact',      NULL, 0, 0,    2, NULL, 0, 1, 1, NULL),
@@ -110,8 +110,8 @@ SELECT @option_group_id_cvOpt := max(id) from civicrm_option_group where name = 
 
 DELETE FROM civicrm_option_value WHERE option_group_id=@option_group_id_cvOpt;
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_group_id_cvOpt, 'Activities'   ,   1, 'activity', NULL, 0, NULL,  1,  NULL, 0, 0, 1, NULL),
   (@option_group_id_cvOpt, 'Relationships',   2, 'rel', NULL, 0, NULL,  2,  NULL, 0, 0, 1, NULL),
@@ -133,8 +133,8 @@ SELECT @option_group_id_ceOpt          := max(id) from civicrm_option_group wher
 
 DELETE FROM civicrm_option_value WHERE option_group_id=@option_group_id_ceOpt;
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_group_id_ceOpt, 'Communication Preferences',   1, 'CommBlock', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL),
   (@option_group_id_ceOpt, 'Demographics'             ,   2, 'Demographics', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL),
@@ -148,8 +148,8 @@ SELECT @option_group_id_asOpt          := max(id) from civicrm_option_group wher
 
 DELETE FROM civicrm_option_value WHERE option_group_id=@option_group_id_asOpt;
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_group_id_asOpt, 'Address Fields'          ,   1, 'location', NULL, 0, NULL,  1, NULL, 0, 0, 1, NULL),
   (@option_group_id_asOpt, 'Custom Fields'           ,   2, 'custom', NULL, 0, NULL,  2, NULL, 0, 0, 1, NULL),
@@ -173,8 +173,8 @@ SELECT @option_group_id_udOpt          := max(id) from civicrm_option_group wher
 
 DELETE FROM civicrm_option_value WHERE option_group_id=@option_group_id_udOpt;
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_group_id_udOpt, 'Groups'                     , 1, 'Groups', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL),
   (@option_group_id_udOpt, 'Contributions'              , 2, 'CiviContribute', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL),
@@ -191,8 +191,8 @@ SELECT @option_group_id_adOpt          := max(id) from civicrm_option_group wher
 
 DELETE FROM civicrm_option_value WHERE option_group_id=@option_group_id_adOpt;
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_group_id_adOpt, 'Street Address'    ,  1, 'street_address', NULL, 0, NULL,  1, NULL, 0, 0, 1, NULL),
   (@option_group_id_adOpt, 'Addt\'l Address 1'  ,  2, 'supplemental_address_1', NULL, 0, NULL,  2, NULL, 0, 0, 1, NULL),
@@ -213,8 +213,8 @@ SELECT @option_group_id_csearch        := max(id) from civicrm_option_group wher
 
 DELETE FROM civicrm_option_value WHERE option_group_id=@option_group_id_csearch;
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_Sample'               , 1, 'CRM_Contact_Form_Search_Custom_Sample'      , NULL, 0, NULL, 1, 'Household Name and State', 0, 0, 1, NULL),
   (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_ContributionAggregate', 2, 'CRM_Contact_Form_Search_Custom_ContributionAggregate', NULL, 0, NULL, 2, 'Contribution Aggregate', 0, 0, 1, NULL),
@@ -227,14 +227,14 @@ VALUES
   (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_PriceSet', 9, 'CRM_Contact_Form_Search_Custom_PriceSet', NULL, 0, NULL, 9, 'Price Set Details for Event Participants', 0, 0, 1, NULL);
 
 -- option groups and values for 'wysiwyg_editor' , 'from_email_address'.
-INSERT INTO 
+INSERT INTO
    `civicrm_option_group` (`name`, `description`, `is_reserved`, `is_active`)
-VALUES 
+VALUES
    ('from_email_address', 'From Email Address', 0, 1),
    ('wysiwyg_editor'    , 'WYSIWYG Editor'    , 0, 1);
 SELECT @option_we := max(id) from civicrm_option_group where name = 'wysiwyg_editor';
 
-INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`,`name` , `grouping`, `filter`,`is_default`,`weight`, `description`,`is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`,`name` , `grouping`, `filter`,`is_default`,`weight`, `description`,`is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_we, 'TinyMCE'    , 1, NULL, NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL),
   (@option_we, 'FCKEditor'  , 2, NULL, NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL);
@@ -242,15 +242,15 @@ VALUES
 -- Insert new option value address_name for option_group = 'address_options'
 
 SELECT   @option_act := civicrm_option_group.id,
-	 @max_val    := max(ROUND(civicrm_option_value.value)), 
-         @max_wt     := max(civicrm_option_value.weight) 
+   @max_val    := max(ROUND(civicrm_option_value.value)),
+         @max_wt     := max(civicrm_option_value.weight)
 FROM     civicrm_option_value, civicrm_option_group
 WHERE    civicrm_option_group.name = 'address_options'
 AND      civicrm_option_value.option_group_id = civicrm_option_group.id
 GROUP BY civicrm_option_group.id;
 
 
-INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name` , `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name` , `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
 VALUES
   (@option_act, 'Address Name', (SELECT @max_val := @max_val+1), 'address_name', NULL, 0, NULL, (SELECT @max_wt := @max_wt+1), NULL, 0, 0, 1, NULL);
 

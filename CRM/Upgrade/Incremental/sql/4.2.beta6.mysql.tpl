@@ -9,7 +9,7 @@ CREATE TABLE `civicrm_managed` (
      `entity_type` varchar(64) NOT NULL   COMMENT 'API entity type',
      `entity_id` int unsigned NOT NULL   COMMENT 'Foreign key to the referenced item.',
     PRIMARY KEY ( `id` )
- 
+
     ,     INDEX `UI_managed_module_name`(
         `module`
       , `name`
@@ -18,6 +18,6 @@ CREATE TABLE `civicrm_managed` (
         `entity_type`
       , `entity_id`
   )
-  
- 
+
+
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;

@@ -29,13 +29,13 @@
 
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
- 
+
  <div id="help">
     <p>
     {ts}The Activity Import Wizard allows you to easily upload activity from other applications into CiviCRM. Contacts must already exist in your CiviCRM database prior to importing activity.{/ts}
     {help id="id-upload"}
     </p>
- </div>    
+ </div>
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  <div id="upload-file">
  <h3>{ts}Upload Data File{/ts}</h3>
@@ -46,7 +46,7 @@
                 <span class="description">{ts}File format must be comma-separated-values (CSV).{/ts}</span><br /><span>{ts 1=$uploadSize}Maximum Upload File Size: %1 MB{/ts}</span>
            </td>
         </tr>
-        <tr class="crm-activity-import-uploadfile-form-block-skipColumnHeader"> 
+        <tr class="crm-activity-import-uploadfile-form-block-skipColumnHeader">
            <td class="label"></td>
            <td>{$form.skipColumnHeader.html}{$form.skipColumnHeader.label}<br />
                <span class="description">{ts}Check this box if the first row of your file consists of field names (Example: 'Contact ID', 'Activity Type', 'Activity Date').{/ts}</span>

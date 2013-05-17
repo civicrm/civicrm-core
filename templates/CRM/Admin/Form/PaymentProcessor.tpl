@@ -29,8 +29,8 @@
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
 {if $action eq 8}
-  <div class="messages status no-popup">  
-      <div class="icon inform-icon"></div> 
+  <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>
         {ts}WARNING: Deleting this Payment Processor may result in some transaction pages being rendered inactive.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {else}
@@ -44,15 +44,15 @@
     <tr class="crm-paymentProcessor-form-block-description">
         <td class="label">{$form.description.label}</td><td>{$form.description.html}</td>
     </tr>
-    
+
     <tr class="crm-paymentProcessor-form-block-financial_account">
       <td class="label">{$form.financial_account_id.label}</td>
       <td>
-	{if $financialAccount}
-	  {$form.financial_account_id.html}
-    	{else}
-  	  {capture assign=ftUrl}{crmURL p='civicrm/admin/financial/financialAccount' q="reset=1"}{/capture}
-	  {ts 1=$ftUrl}There are no financial accounts configured with Financial Account Type 'Asset' Type. <a href='%1'>Click here</a> if you want to configure financial accounts for your site.{/ts}
+  {if $financialAccount}
+    {$form.financial_account_id.html}
+      {else}
+      {capture assign=ftUrl}{crmURL p='civicrm/admin/financial/financialAccount' q="reset=1"}{/capture}
+    {ts 1=$ftUrl}There are no financial accounts configured with Financial Account Type 'Asset' Type. <a href='%1'>Click here</a> if you want to configure financial accounts for your site.{/ts}
         {/if}
       </td>
     </tr>
@@ -102,12 +102,12 @@
             <td class="label">{$form.url_button.label}</td><td>{$form.url_button.html|crmAddClass:huge} {help id=$ppTypeName|cat:'-live-url-button' title=$form.url_button.label}</td>
         </tr>
 {/if}
-    </table>        
+    </table>
 </fieldset>
 
 <fieldset>
 <legend>{ts}Processor Details for Test Payments{/ts}</legend>
-    <table class="form-layout-compressed">                      
+    <table class="form-layout-compressed">
         <tr class="crm-paymentProcessor-form-block-test_user_name">
             <td class="label">{$form.test_user_name.label}</td><td>{$form.test_user_name.html} {help id=$ppTypeName|cat:'-test-user-name' title=$form.test_user_name.label}</td></tr>
 {if $form.test_password}
@@ -142,8 +142,8 @@
         <tr class="crm-paymentProcessor-form-block-test_url_button">
             <td class="label">{$form.test_url_button.label}</td><td>{$form.test_url_button.html|crmAddClass:huge} {help id=$ppTypeName|cat:'-test-url-button' title=$form.test_url_button.label}</td>
         </tr>
-{/if}  
-{/if} 
+{/if}
+{/if}
 </table>
        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </fieldset>
@@ -157,7 +157,7 @@
         var url = {/literal}"{$refreshURL}"{literal}
         var post = url + "&pp=" + paymentProcessorType.value;
         if( refresh ) {
-            window.location= post; 
+            window.location= post;
         }
     }
 {/literal}

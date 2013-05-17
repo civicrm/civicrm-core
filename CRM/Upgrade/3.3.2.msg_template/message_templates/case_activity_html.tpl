@@ -44,7 +44,7 @@
       </tr>
       {/if}
      {/if}
-     {if $editActURL} 
+     {if $editActURL}
      <tr>
        <td colspan="2" {$valueStyle}>
      <a href="{$editActURL}" title="{ts}Edit this activity{/ts}">{ts}Edit this activity{/ts}</a>
@@ -56,8 +56,8 @@
        <td colspan="2" {$valueStyle}>
      <a href="{$viewActURL}" title="{ts}View this activity{/ts}">{ts}View this activity{/ts}</a>
        </td>
-     </tr>  
-     {/if} 
+     </tr>
+     {/if}
      {foreach from=$activity.fields item=field}
       <tr>
        <td {$labelStyle}>

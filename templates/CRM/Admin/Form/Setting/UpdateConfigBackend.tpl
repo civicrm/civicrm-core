@@ -29,8 +29,8 @@
     {ts}Use this form if you need to reset the Base Directory Path and Base URL settings for your CiviCRM installation. These settings are stored in the database, and generally need adjusting after moving a CiviCRM installation to another location in the file system and/or to another URL.{/ts}</p>
     <p>
     {ts}CiviCRM will attempt to detect the new values that should be used. These are provided below as the default values for the <strong>New Base Directory</strong> and <strong>New Base URL</strong> fields.{/ts}</p>
-</div>  
-        <div>{$form._qf_UpdateConfigBackend_next_cleanup.html}</div>  
+</div>
+        <div>{$form._qf_UpdateConfigBackend_next_cleanup.html}</div>
         <table>
             <tr class="crm-config-backend-form-block-oldBaseDir">
                 <td class="label">{ts}Old Base Directory{/ts}</td>
@@ -60,7 +60,7 @@
                 <td>{$form.newSiteName.html|crmAddClass:'huge'}<br />
                 <span class="description">{ts}This is the your site name for a multisite install.{/ts}</span></td>
             </tr>
-{/if}  
+{/if}
         </table>
         <div>{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 <div class="spacer"></div>
