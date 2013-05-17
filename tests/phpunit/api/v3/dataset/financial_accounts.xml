@@ -9,15 +9,15 @@
     <column>is_deductible</column>
     <column>is_reserved</column>
     <column>is_active</column>
-    <column>financial_account_type_id</column>    
+    <column>financial_account_type_id</column>
     <row>
       <value>10</value>  <!--  id  -->
       <value>Gift</value>  <!--  name  -->
       <value>1004</value>  <!--  accounting_code  -->
       <value>For some worthwhile cause</value>  <!--  description  -->
       <value>0</value>  <!--  is_deductible  -->
-      <null />  <!--  is_reserved  -->      
-      <value>1</value>  <!--  is_active  -->      
+      <null />  <!--  is_reserved  -->
+      <value>1</value>  <!--  is_active  -->
       <value>3</value>   <!--  financial_account_type_id  -->
     </row>
     <row>
@@ -26,9 +26,9 @@
       <value>1005</value>  <!--  accounting_code  -->
       <value>Also for some worthwhile cause</value>  <!--  description  -->
       <value>0</value>  <!--  is_deductible  -->
-      <null />  <!--  is_reserved  -->      
-      <value>1</value>  <!--  is_active  -->      
-      <value>3</value>   <!--  financial_account_type_id  -->    
-    </row>    
+      <null />  <!--  is_reserved  -->
+      <value>1</value>  <!--  is_active  -->
+      <value>3</value>   <!--  financial_account_type_id  -->
+    </row>
   </table>
 </dataset>

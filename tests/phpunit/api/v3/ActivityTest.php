@@ -477,7 +477,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    'details'             => 'a test activity',
    'activity_status_id'           => 1,
    'activity_name'       => 'Test activity type',
-   'version'							=> $this->_apiversion,
+   'version'              => $this->_apiversion,
    );
 
    $result =  civicrm_api('activity', 'create' ,  $params );

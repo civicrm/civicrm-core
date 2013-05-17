@@ -74,7 +74,7 @@
             <td>
             {if $index eq 1}
               {$form.buttons._qf_Interview_submit_orderBy.html}
-	          {/if}
+            {/if}
             </td>
           </tr>
         {/section}
@@ -295,7 +295,7 @@ function registerInterview( voterId ) {
   //carry contact related profile field data.
   var fieldName = 'field_' + voterId;
   var checkBoxFieldName = 'field[' + voterId + ']';
-  cj('[id^="'+ fieldName +'"], [id^="'+ checkBoxFieldName +'"]').each(function( ) { 
+  cj('[id^="'+ fieldName +'"], [id^="'+ checkBoxFieldName +'"]').each(function( ) {
     fldId = cj(this).attr('id');
     if (fldId.indexOf('_custom_') == -1 &&
       fldId.indexOf('_result') == -1  &&

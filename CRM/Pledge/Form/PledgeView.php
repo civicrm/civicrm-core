@@ -101,8 +101,8 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
     $this->assign('displayName', $displayName);
 
-    $title = $displayName . 
-      ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format( $values['pledge_amount'] ) . 
+    $title = $displayName .
+      ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format( $values['pledge_amount'] ) .
       ' - ' . $values['financial_type'] . ')';
 
     // add Pledge to Recent Items

@@ -66,7 +66,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @access protected
    */
   protected $_isSetReserved = false;
-  
+
   /**
    * The action links that we need to display for the browse screen
    *

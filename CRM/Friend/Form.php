@@ -90,7 +90,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
         $this->_entityTable = 'civicrm_event';
         $isShare = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_entityId, 'is_share');
       } else {
-        $isShare = CRM_Utils_Array::value('is_share', $values);        
+        $isShare = CRM_Utils_Array::value('is_share', $values);
       }
       // Tell Form.tpl whether to include SocialNetwork.tpl for social media sharing
       $this->assign('isShare', $isShare);
@@ -112,10 +112,10 @@ class CRM_Friend_Form extends CRM_Core_Form {
       $this->_entityTable = 'civicrm_pcp';
 
       $sql = '
-   SELECT  pcp.title, 
+   SELECT  pcp.title,
            contrib.campaign_id
   FROM  civicrm_pcp pcp
-    INNER JOIN  civicrm_contribution_page contrib ON ( pcp.page_id = contrib.id AND pcp.page_type = "contribute" )  
+    INNER JOIN  civicrm_contribution_page contrib ON ( pcp.page_id = contrib.id AND pcp.page_type = "contribute" )
   WHERE  pcp.id = %1';
       $pcp = CRM_Core_DAO::executeQuery($sql, array(1 => array($this->_entityId, 'Positive')));
       while ($pcp->fetch()) {

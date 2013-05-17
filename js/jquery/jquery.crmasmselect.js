@@ -1,9 +1,9 @@
 /*
  * Alternate Select Multiple (asmSelect) 1.0.4a beta - jQuery Plugin
  * http://www.ryancramer.com/projects/asmselect/
- * 
+ *
  * Copyright (c) 2009 by Ryan Cramer - http://www.ryancramer.com
- * 
+ *
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  *
@@ -17,11 +17,11 @@
 
 			listType: 'ul',						// Ordered list 'ol', or unordered list 'ul'
 			sortable: false, 					// Should the list be sortable?
-			highlight: false,					// Use the highlight feature? 
+			highlight: false,					// Use the highlight feature?
 			animate: false,						// Animate the the adding/removing of items in the list?
 			addItemTarget: 'bottom',				// Where to place new selected items in list: top or bottom
 			hideWhenAdded: false,					// Hide the option when added to the list? works only in FF
-			debugMode: false,					// Debug mode keeps original select visible 
+			debugMode: false,					// Debug mode keeps original select visible
 
 			removeLabel: 'X',					// Text used in the "remove" link
 			highlightAddedLabel: 'Added: ',				// Text that precedes highlight of added item
@@ -40,7 +40,7 @@
 			respectParents: false				// Force selection of "parent" option items
 			};
 
-		$.extend(options, customOptions); 
+		$.extend(options, customOptions);
 
 		return this.each(function(index) {
 

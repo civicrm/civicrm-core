@@ -54,7 +54,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
   function tearDown() {
     unset($this->queue);
     unset($this->queueService);
-    
+
     CRM_Utils_Time::resetTime();
 
     $tablesToTruncate = array('civicrm_queue_item');
@@ -257,7 +257,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
   function _throwException($taskCtx, $value) {
     throw new Exception("Manufactured error: $value");
   }
-  
+
   static
   function _enqueueNumbers($taskCtx, $low, $high) {
     for ($i = $low; $i <= $high; $i++) {

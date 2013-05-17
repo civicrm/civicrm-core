@@ -27,7 +27,7 @@ SELECT @ogrID           := max(id) from civicrm_option_group where name = 'repor
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @max_weight      := MAX(ROUND(weight)) from civicrm_option_value WHERE option_group_id = @ogrID;
 INSERT INTO civicrm_option_value
-  (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight,{localize field='description'}description{/localize}, is_optgroup,is_reserved, is_active, component_id, visibility_id ) 
+  (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight,{localize field='description'}description{/localize}, is_optgroup,is_reserved, is_active, component_id, visibility_id )
 VALUES
     (@ogrID  , {localize}'{ts escape="sql"}Contribution History By Relationship Report{/ts}'{/localize}, 'contribute/history', 'CRM_Report_Form_Contribute_History', NULL, 0, 0,  @max_weight+1, {localize}'{ts escape="sql"}List contact\'s donation history, grouped by year, along with contributions attributed to any of the contact\'s related contacts.{/ts}'{/localize}, 0, 0, 1, @contributeCompId, NULL);
 
@@ -55,7 +55,7 @@ ALTER TABLE `civicrm_prevnext_cache`
 ALTER TABLE `civicrm_price_set`
    ADD `contribution_type_id` int(10) unsigned default NULL COMMENT 'Conditional foreign key to civicrm_contribution_type.id.',
    ADD CONSTRAINT `FK_civicrm_price_set_contribution_type_id` FOREIGN KEY (`contribution_type_id`) REFERENCES `civicrm_contribution_type` (`id`) ON DELETE SET NULL;
-  
+
 ALTER TABLE `civicrm_price_field_value`
    ADD `membership_type_id` int(10) unsigned default NULL COMMENT 'Conditional foreign key to civicrm_membership_type.id.',
    ADD CONSTRAINT `FK_civicrm_price_field_value_membership_type_id` FOREIGN KEY (`membership_type_id`) REFERENCES `civicrm_membership_type` (`id`) ON DELETE SET NULL;
@@ -65,7 +65,7 @@ SELECT @extensionsWeight := MAX(weight)+1 FROM civicrm_navigation where parent_i
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES            
+VALUES
     ( {$domainID}, 'civicrm/admin/price&reset=1&action=add', '{ts escape="sql" skip="true"}New Price Set{/ts}', 'New Price Set', 'access CiviMember,administer CiviCRM', '', @customizeID, '1', NULL, @extensionsWeight ),
     ( {$domainID}, 'civicrm/admin/price&reset=1',            '{ts escape="sql" skip="true"}Manage Price Sets{/ts}', 'Manage Price Sets', 'access CiviMember,administer CiviCRM', '', @customizeID, '1', NULL, @extensionsWeight+1 );
 
@@ -74,10 +74,10 @@ SELECT @extensionsWeight := MAX(weight)+1 FROM civicrm_navigation where parent_i
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES            
+VALUES
     ( {$domainID}, 'civicrm/admin/price&reset=1&action=add', '{ts escape="sql" skip="true"}New Price Set{/ts}', 'New Price Set', 'access CiviMember,administer CiviCRM', '', @customizeID, '1', NULL, @extensionsWeight ),
     ( {$domainID}, 'civicrm/admin/price&reset=1',            '{ts escape="sql" skip="true"}Manage Price Sets{/ts}', 'Manage Price Sets', 'access CiviMember,administer CiviCRM', '', @customizeID, '1', NULL, @extensionsWeight+1 );
-   
+
 
 -- CRM-8626
 UPDATE civicrm_payment_processor_type

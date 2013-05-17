@@ -145,7 +145,7 @@ registration process.{/ts}
 
 {ts}Total Participants{/ts}: {$count}
 {/if}
-   
+
 {if $is_pay_later }
 
 ==========================================================={if $participantCount }===================={/if}

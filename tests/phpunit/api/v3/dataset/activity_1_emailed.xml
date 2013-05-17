@@ -52,7 +52,7 @@ This is a test activity
       <null />   <!--  result  -->
       <value>0</value>   <!--  is_deleted  -->
       <null />   <!--  campaign_id  -->
-      <null />   <!--  engagement_level  --> 
+      <null />   <!--  engagement_level  -->
     </row>
   </table>
 </dataset>

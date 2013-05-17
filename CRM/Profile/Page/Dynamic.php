@@ -98,7 +98,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_multiRecord = NULL;
 
   protected $_recordId = NULL;
-  
+
   /*
    * fetch multirecord as well as non-multirecord fields
    */
@@ -130,21 +130,21 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     if (!array_key_exists('allFields', $_GET)) {
       $this->set('allFields', NULL);
     }
-    
+
     //specifies the action being done on a multi record field
     $multiRecordAction = CRM_Utils_Request::retrieve('multiRecord', 'String', $this);
-    
-    $this->_multiRecord = (!is_numeric($multiRecordAction)) ? 
+
+    $this->_multiRecord = (!is_numeric($multiRecordAction)) ?
       CRM_Core_Action::resolve($multiRecordAction) : $multiRecordAction;
     if ($this->_multiRecord) {
       $this->set('multiRecord', $this->_multiRecord);
     }
-  
+
     if ($this->_multiRecord & CRM_Core_Action::VIEW) {
       $this->_recordId  = CRM_Utils_Request::retrieve('recordId', 'Positive', $this);
       $this->_allFields = CRM_Utils_Request::retrieve('allFields', 'Integer', $this);
     }
-    
+
     if ($profileIds) {
       $this->_profileIds = $profileIds;
     }

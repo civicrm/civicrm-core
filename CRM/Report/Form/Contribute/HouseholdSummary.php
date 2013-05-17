@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -43,7 +42,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   protected $_summary = NULL;
-  
+
   function __construct() {
     self::validRelationships();
 

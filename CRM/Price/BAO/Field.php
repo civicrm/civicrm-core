@@ -242,7 +242,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
       /* FIXME: failure! */
       return NULL;
     }
-    
+
     $is_pay_later = 0;
     if (isset($qf->_mode) && empty($qf->_mode)) {
       $is_pay_later = 1;
@@ -300,7 +300,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
         if (!empty($qf->_membershipBlock) && !empty($qf->_quickConfig) && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
           $label = ts('Additional Contribution');
           $useRequired = 0;
-        } 
+        }
         elseif (CRM_Utils_Array::value('label', $fieldOptions[$optionKey])) {      //check for label.
           $label = $fieldOptions[$optionKey]['label'];
         }
@@ -326,7 +326,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
         if (!empty($qf->_quickConfig)) {
           $message = ts('Please enter a valid amount.');
           $type = 'money';
-        } 
+        }
         else {
           $message = ts('%1 must be an integer (whole number).', array(1 => $label));
           $type = 'positiveInteger';
@@ -356,15 +356,15 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
           );
           if (!empty($qf->_quickConfig) && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
-          } 
+          }
           elseif (!empty($qf->_quickConfig) && $field->name == 'membership_amount') {
             $extra += array(
               'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
               'membership-type' => $opt['membership_type_id'],
-            ); 
+            );
             $qf->assign('membershipFieldID',$field->id);
           }
-            
+
           $choice[$opId] = $qf->createElement('radio', NULL, '', $opt['label'], $opt['id'], $extra);
 
           if ($is_pay_later) {
@@ -388,10 +388,10 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
           // add "none" option
           if (CRM_Utils_Array::value('is_allow_other_amount', $otherAmount) && $field->name == 'contribution_amount') {
             $none = ts('Other Amount');
-          } 
+          }
           elseif (!empty($qf->_membershipBlock) && !CRM_Utils_Array::value('is_required', $qf->_membershipBlock) && $field->name == 'membership_amount') {
             $none = ts('No thank you');
-          } 
+          }
           else {
             $none = ts('- none -');
           }

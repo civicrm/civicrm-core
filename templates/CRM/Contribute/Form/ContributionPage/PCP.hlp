@@ -50,7 +50,7 @@
 {htxt id="id-notify"}
 <p>{ts}Notification will be sent to this email address whenever a Personal Campaign Page linked to this contribution page is either created or updated. The notification will include links to view the campaign page as well as the contact record of the creator of the page.{/ts}</p>
 <p>{ts}If you want Administrator of your organization to receive each PCP Notification receipt, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org) First Email will be sent to PCP user for support.{/ts}</p>
-{/htxt}   
+{/htxt}
 
 {htxt id="id-supporter_profile-title"}
   {ts}Supporter Profile{/ts}

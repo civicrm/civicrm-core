@@ -137,7 +137,7 @@
          <td colspan="2" {$labelStyle}>
           {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
          </td>
-        {/if} 
+        {/if}
        <tr>
        </tr>
         <td colspan="2" {$labelStyle}>

@@ -123,7 +123,7 @@ class CRM_Import_Field {
    * does this field have a related Contact info of Phone Type
    * @var string
    */
-  public $_relatedContactPhoneType; 
+  public $_relatedContactPhoneType;
 
   function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $columnPattern = '//', $dataPattern = '//', $hasLocationType = NULL, $phoneType = NULL, $related = NULL, $relatedContactType = NULL, $relatedContactDetails = NULL, $relatedContactLocType = NULL, $relatedContactPhoneType = NULL) {
     $this->_name = $name;

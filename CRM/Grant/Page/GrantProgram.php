@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -64,40 +63,40 @@ class CRM_Grant_Page_GrantProgram extends CRM_Core_Page
                                                                       'name'  => ts('View'),
                                                                       'url'   => 'civicrm/grant_program',
                                                                       'qs'    => 'action=view&id=%%id%%&reset=1',
-                                                                      'title' => ts('View Grant Program') 
+                                                                      'title' => ts('View Grant Program')
                                                                       ),
                                       CRM_Core_Action::UPDATE  => array(
                                                                         'name'  => ts('Edit'),
                                                                         'url'   => 'civicrm/grant_program',
                                                                         'qs'    => 'action=update&id=%%id%%&reset=1',
-                                                                        'title' => ts('Edit Grant Program') 
+                                                                        'title' => ts('Edit Grant Program')
                                                                         ),
                                       CRM_Core_Action::DELETE  => array(
                                                                         'name'  => ts('Delete'),
                                                                         'url'   => 'civicrm/grant_program',
                                                                         'qs'    => 'action=delete&id=%%id%%',
-                                                                        'title' => ts('Delete Grant Program') 
+                                                                        'title' => ts('Delete Grant Program')
                                                                         )
                                       );
             }
             return self::$_links;
         }
-    
+
     function browse( ) {
-        
+
         $grantProgram = array();
         require_once 'CRM/Grant/DAO/GrantProgram.php';
         $dao = new CRM_Grant_DAO_GrantProgram();
-        
+
         $dao->orderBy('label');
         $dao->find();
-        
+
         while ($dao->fetch()) {
             $grantProgram[$dao->id] = array();
             CRM_Core_DAO::storeValues( $dao, $grantProgram[$dao->id]);
             $action = array_sum(array_keys($this->links()));
 
-            $grantProgram[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action, 
+            $grantProgram[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
                                                                           array('id' => $dao->id));
         }
         require_once 'CRM/Grant/PseudoConstant.php';
@@ -109,17 +108,17 @@ class CRM_Grant_Page_GrantProgram extends CRM_Core_Page
         }
         $this->assign('rows',$grantProgram );
     }
-    
-    function run( ) 
+
+    function run( )
     {
         $action = CRM_Utils_Request::retrieve('action', 'String',
                                               $this, false, 0 );
-        if ( $action & CRM_Core_Action::VIEW ) { 
-            $this->view( $action); 
+        if ( $action & CRM_Core_Action::VIEW ) {
+            $this->view( $action);
         } else if ( $action & ( CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::DELETE ) ) {
             $this->edit( $action);
         } else {
-            $this->browse( ); 
+            $this->browse( );
         }
         $this->assign('action', $action);
         return parent::run( );
@@ -133,10 +132,10 @@ class CRM_Grant_Page_GrantProgram extends CRM_Core_Page
         $result = $controller->run();
     }
 
-    function view( $action ) 
-    {   
+    function view( $action )
+    {
         $controller = new CRM_Core_Controller_Simple( 'CRM_Grant_Form_GrantProgramView', ts(''), $action );
-        $controller->setEmbedded( true );  
+        $controller->setEmbedded( true );
         $result = $controller->process();
         $result = $controller->run();
     }

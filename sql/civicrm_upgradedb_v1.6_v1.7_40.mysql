@@ -157,7 +157,7 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	INSERT INTO `civicrm_currency` VALUES (1,'AUD','$'),(2,'CAD','$'),(3,'EUR','€'),(4,'GBP','£'),(5,'ILS','₪'),(6,'INR','₨'),(7,'JPY','¥'),(8,'KRW','₩'),(9,'LAK','₭'),(10,'MNT','₮'),(11,'NGN','₦'),(12,'PLN','zł'),(13,'THB','฿'),(14,'USD','$'),(15,'VND','₫'),(16,'ZAR','R');
+  INSERT INTO `civicrm_currency` VALUES (1,'AUD','$'),(2,'CAD','$'),(3,'EUR','€'),(4,'GBP','£'),(5,'ILS','₪'),(6,'INR','₨'),(7,'JPY','¥'),(8,'KRW','₩'),(9,'LAK','₭'),(10,'MNT','₮'),(11,'NGN','₦'),(12,'PLN','zł'),(13,'THB','฿'),(14,'USD','$'),(15,'VND','₫'),(16,'ZAR','R');
 
 -- /*******************************************************
 -- *
@@ -165,24 +165,24 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_address`
-	    MODIFY `geo_code_1` double NULL DEFAULT NULL COMMENT 'Latitude or UTM (Universal Transverse Mercator Grid) Northing.',
-	    MODIFY `geo_code_2` double NULL DEFAULT NULL COMMENT 'Longitude or UTM (Universal Transverse Mercator Grid) Easting.';
+  ALTER TABLE `civicrm_address`
+      MODIFY `geo_code_1` double NULL DEFAULT NULL COMMENT 'Latitude or UTM (Universal Transverse Mercator Grid) Northing.',
+      MODIFY `geo_code_2` double NULL DEFAULT NULL COMMENT 'Longitude or UTM (Universal Transverse Mercator Grid) Easting.';
 
 -- /*******************************************************
 -- *
 -- * civicrm_contact
 -- *
 -- *******************************************************/
-	
-	ALTER TABLE `civicrm_contact` ADD INDEX `UI_external_identifier` (`external_identifier`);
+  
+  ALTER TABLE `civicrm_contact` ADD INDEX `UI_external_identifier` (`external_identifier`);
 
 -- /*******************************************************
 -- *
 -- * civicrm_contribution_page
 -- *
 -- *******************************************************/
-	ALTER TABLE `civicrm_contribution_page`	ADD `default_amount_id` int unsigned NOT NULL  COMMENT 'FK to civicrm_custom_option.';
+  ALTER TABLE `civicrm_contribution_page`  ADD `default_amount_id` int unsigned NOT NULL  COMMENT 'FK to civicrm_custom_option.';
         ALTER TABLE `civicrm_contribution_page` DROP `default_amount`;
 
 -- /*******************************************************
@@ -191,15 +191,15 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_custom_group` MODIFY extends enum('Contact','Individual','Household','Organization','Location','Address','Contribution','Activity','Relationship','Phonecall','Meeting','Group','Membership','Participant','Event') NULL DEFAULT 'Contact' COMMENT 'Type of object this group extends (can add other options later e.g. contact_address, etc.).';
+  ALTER TABLE `civicrm_custom_group` MODIFY extends enum('Contact','Individual','Household','Organization','Location','Address','Contribution','Activity','Relationship','Phonecall','Meeting','Group','Membership','Participant','Event') NULL DEFAULT 'Contact' COMMENT 'Type of object this group extends (can add other options later e.g. contact_address, etc.).';
 
 -- /*******************************************************
 -- *
 -- * civicrm_custom_value
--- *	
+-- *  
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_custom_value` MODIFY float_data double NULL DEFAULT NULL COMMENT 'stores data for ext property data_type = float.';
+  ALTER TABLE `civicrm_custom_value` MODIFY float_data double NULL DEFAULT NULL COMMENT 'stores data for ext property data_type = float.';
 
 -- /*******************************************************
 -- *
@@ -207,7 +207,7 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_location_type` MODIFY vcard_name varchar(64) NULL DEFAULT NULL COMMENT 'vCard Location Type Name.';
+  ALTER TABLE `civicrm_location_type` MODIFY vcard_name varchar(64) NULL DEFAULT NULL COMMENT 'vCard Location Type Name.';
 
 -- /*******************************************************
 -- *
@@ -215,7 +215,7 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE civicrm_mapping MODIFY mapping_type enum('Export','Import','Export Contributions','Import Contributions','Import Activity History','Search Builder','Import Memberships','Import Participants') NULL DEFAULT NULL COMMENT 'Type of Mapping.';
+  ALTER TABLE civicrm_mapping MODIFY mapping_type enum('Export','Import','Export Contributions','Import Contributions','Import Activity History','Search Builder','Import Memberships','Import Participants') NULL DEFAULT NULL COMMENT 'Type of Mapping.';
 
 -- /*******************************************************
 -- *
@@ -223,8 +223,8 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE civicrm_mapping_field ADD `relationship_direction` varchar(6) NULL DEFAULT NULL COMMENT '';
-	UPDATE `civicrm_mapping_field` set `relationship_direction` = 'a_b';
+  ALTER TABLE civicrm_mapping_field ADD `relationship_direction` varchar(6) NULL DEFAULT NULL COMMENT '';
+  UPDATE `civicrm_mapping_field` set `relationship_direction` = 'a_b';
 
 -- /*******************************************************
 -- *
@@ -232,18 +232,18 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_membership_type` ADD `relationship_direction` varchar(6) NULL DEFAULT NULL COMMENT '';
-	UPDATE `civicrm_membership_type` set `relationship_direction` = 'a_b';
+  ALTER TABLE `civicrm_membership_type` ADD `relationship_direction` varchar(6) NULL DEFAULT NULL COMMENT '';
+  UPDATE `civicrm_membership_type` set `relationship_direction` = 'a_b';
 
 -- /*******************************************************
 -- *
 -- * civicrm_note
 -- *
 -- *******************************************************/
-	INSERT INTO `civicrm_note`
-		(`entity_table`, `contact_id`, `entity_id`, `note`)
-	 	 SELECT 'civicrm_contribution', `contact_id`, `civicrm_contribution`.`id`, `civicrm_contribution`.`note`
-		 FROM civicrm_contribution;
+  INSERT INTO `civicrm_note`
+    (`entity_table`, `contact_id`, `entity_id`, `note`)
+      SELECT 'civicrm_contribution', `contact_id`, `civicrm_contribution`.`id`, `civicrm_contribution`.`note`
+     FROM civicrm_contribution;
 
 -- /*******************************************************
 -- *
@@ -251,9 +251,9 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_contribution` ADD INDEX `received_date` (`receive_date`);
-	ALTER TABLE `civicrm_contribution` ADD `amount_level` varchar(255) NULL DEFAULT NULL COMMENT '' AFTER source;
-	ALTER TABLE `civicrm_contribution` DROP `note`;
+  ALTER TABLE `civicrm_contribution` ADD INDEX `received_date` (`receive_date`);
+  ALTER TABLE `civicrm_contribution` ADD `amount_level` varchar(255) NULL DEFAULT NULL COMMENT '' AFTER source;
+  ALTER TABLE `civicrm_contribution` DROP `note`;
 
 -- /*******************************************************
 -- *
@@ -261,8 +261,8 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_uf_group` ADD is_uf_link tinyint(4) NULL DEFAULT '0' COMMENT 'Should we display a link to the website profile in profile selector' AFTER is_edit_link;
-	ALTER TABLE `civicrm_uf_group` ADD is_update_dupe tinyint(4) NULL DEFAULT '0' COMMENT 'Should we update the contact record if we find a duplicate' AFTER is_uf_link;
+  ALTER TABLE `civicrm_uf_group` ADD is_uf_link tinyint(4) NULL DEFAULT '0' COMMENT 'Should we display a link to the website profile in profile selector' AFTER is_edit_link;
+  ALTER TABLE `civicrm_uf_group` ADD is_update_dupe tinyint(4) NULL DEFAULT '0' COMMENT 'Should we update the contact record if we find a duplicate' AFTER is_uf_link;
 
 -- /*******************************************************
 -- *
@@ -270,8 +270,8 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_uf_match` DROP INDEX UI_uf_id;
-	ALTER TABLE `civicrm_uf_match` ADD UNIQUE UI_uf_domain_id (uf_id, domain_id);
+  ALTER TABLE `civicrm_uf_match` DROP INDEX UI_uf_id;
+  ALTER TABLE `civicrm_uf_match` ADD UNIQUE UI_uf_domain_id (uf_id, domain_id);
 
 -- /*******************************************************
 -- *
@@ -290,7 +290,7 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	SELECT @domain_id := id from civicrm_domain;
+  SELECT @domain_id := id from civicrm_domain;
     INSERT INTO `civicrm_location_type` ( `domain_id`, `name`, `vcard_name`, `description`, `is_reserved`, `is_active` )
     VALUES
         ( @domain_id, 'Billing', NULL, 'Billing Address location', 1, 1 );
@@ -301,38 +301,38 @@ CREATE TABLE civicrm_currency (
 -- *
 -- *******************************************************/
 
-	SELECT @domain_id := id from civicrm_domain;
-	INSERT INTO `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`) 
-	VALUES 
-	      (@domain_id, 'participant_status', 'Participant Status', 0, 1),
-	      (@domain_id, 'participant_role', 'Participant Role', 0, 1),
+  SELECT @domain_id := id from civicrm_domain;
+  INSERT INTO `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`) 
+  VALUES 
+        (@domain_id, 'participant_status', 'Participant Status', 0, 1),
+        (@domain_id, 'participant_role', 'Participant Role', 0, 1),
               (@domain_id, 'event_type', 'Event Type', 0, 1);
-	
+  
 -- /*******************************************************
 -- *
 -- * civicrm_option_value
 -- *
 -- *******************************************************/
 
-	SELECT @option_group_id_ps    := max(id) from civicrm_option_group where name = 'participant_status';
-	SELECT @option_group_id_pRole := max(id) from civicrm_option_group where name = 'participant_role';
-	SELECT @option_group_id_etype := max(id) from civicrm_option_group where name = 'event_type';
-	
-	INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`) 
-	VALUES
-	  (@option_group_id_ps, 'Registered', 1, 'Registered', NULL, 0, NULL, 1, NULL, 0, 1, 1),
-	  (@option_group_id_ps, 'Attended',   2, 'Attended',   NULL, 0, NULL, 2, NULL, 0, 0, 1),
-	  (@option_group_id_ps, 'No-show',    3, 'No-show',    NULL, 0, NULL, 3, NULL, 0, 0, 1),
-	  (@option_group_id_ps, 'Cancelled',  4, 'Cancelled',  NULL, 0, NULL, 4, NULL, 0, 1, 1),
+  SELECT @option_group_id_ps    := max(id) from civicrm_option_group where name = 'participant_status';
+  SELECT @option_group_id_pRole := max(id) from civicrm_option_group where name = 'participant_role';
+  SELECT @option_group_id_etype := max(id) from civicrm_option_group where name = 'event_type';
+  
+  INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`) 
+  VALUES
+    (@option_group_id_ps, 'Registered', 1, 'Registered', NULL, 0, NULL, 1, NULL, 0, 1, 1),
+    (@option_group_id_ps, 'Attended',   2, 'Attended',   NULL, 0, NULL, 2, NULL, 0, 0, 1),
+    (@option_group_id_ps, 'No-show',    3, 'No-show',    NULL, 0, NULL, 3, NULL, 0, 0, 1),
+    (@option_group_id_ps, 'Cancelled',  4, 'Cancelled',  NULL, 0, NULL, 4, NULL, 0, 1, 1),
 
-	  (@option_group_id_pRole, 'Attendee',  1, 'Attendee',  NULL, 0, NULL, 1, NULL, 0, 0, 1),
-	  (@option_group_id_pRole, 'Volunteer', 2, 'Volunteer', NULL, 0, NULL, 2, NULL, 0, 0, 1),
-	  (@option_group_id_pRole, 'Host',      3, 'Host',      NULL, 0, NULL, 3, NULL, 0, 0, 1),
-	  (@option_group_id_pRole, 'Speaker',   4, 'Speaker',   NULL, 0, NULL, 4, NULL, 0, 0, 1),
-	
-	  (@option_group_id_etype, 'Conference', 1, 'Conference',  NULL, 0, NULL, 1, NULL, 0, 0, 1 ),
-	  (@option_group_id_etype, 'Exhibition', 2, 'Exhibition',  NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
-	  (@option_group_id_etype, 'Fundraiser', 3, 'Fundraiser',  NULL, 0, NULL, 3, NULL, 0, 0, 1 ),
-	  (@option_group_id_etype, 'Meeting',    4, 'Meeting',     NULL, 0, NULL, 4, NULL, 0, 0, 1 ),
-	  (@option_group_id_etype, 'Performance',5, 'Performance', NULL, 0, NULL, 5, NULL, 0, 0, 1 ),
-	  (@option_group_id_etype, 'Workshop',   6, 'Workshop',    NULL, 0, NULL, 6, NULL, 0, 0, 1 );
+    (@option_group_id_pRole, 'Attendee',  1, 'Attendee',  NULL, 0, NULL, 1, NULL, 0, 0, 1),
+    (@option_group_id_pRole, 'Volunteer', 2, 'Volunteer', NULL, 0, NULL, 2, NULL, 0, 0, 1),
+    (@option_group_id_pRole, 'Host',      3, 'Host',      NULL, 0, NULL, 3, NULL, 0, 0, 1),
+    (@option_group_id_pRole, 'Speaker',   4, 'Speaker',   NULL, 0, NULL, 4, NULL, 0, 0, 1),
+  
+    (@option_group_id_etype, 'Conference', 1, 'Conference',  NULL, 0, NULL, 1, NULL, 0, 0, 1 ),
+    (@option_group_id_etype, 'Exhibition', 2, 'Exhibition',  NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
+    (@option_group_id_etype, 'Fundraiser', 3, 'Fundraiser',  NULL, 0, NULL, 3, NULL, 0, 0, 1 ),
+    (@option_group_id_etype, 'Meeting',    4, 'Meeting',     NULL, 0, NULL, 4, NULL, 0, 0, 1 ),
+    (@option_group_id_etype, 'Performance',5, 'Performance', NULL, 0, NULL, 5, NULL, 0, 0, 1 ),
+    (@option_group_id_etype, 'Workshop',   6, 'Workshop',    NULL, 0, NULL, 6, NULL, 0, 0, 1 );

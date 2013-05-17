@@ -178,12 +178,12 @@ registration process.{/ts}</p>
              <th>{ts}Qty{/ts}</th>
              <th>{ts}Each{/ts}</th>
              <th>{ts}Total{/ts}</th>
-	     {if $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
+       {if $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
             </tr>
             {foreach from=$value item=line}
              <tr>
               <td>
-	      {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}	
+        {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}
               </td>
               <td>
                {$line.qty}
@@ -194,11 +194,11 @@ registration process.{/ts}</p>
               <td>
                {$line.line_total|crmMoney}
               </td>
-	      {if  $pricesetFieldsCount }
-	      <td>
-		{$line.participant_count}
+        {if  $pricesetFieldsCount }
+        <td>
+    {$line.participant_count}
               </td>
-	      {/if}
+        {/if}
              </tr>
             {/foreach}
            </table>
@@ -229,10 +229,10 @@ registration process.{/ts}</p>
        </tr>
        {if $pricesetFieldsCount }
      <tr>
-       <td {$labelStyle}> 
-	 {ts}Total Participants{/ts}</td>   
+       <td {$labelStyle}>
+   {ts}Total Participants{/ts}</td>
        <td {$valueStyle}>
-	 {assign var="count" value= 0}
+   {assign var="count" value= 0}
          {foreach from=$lineItem item=pcount}
          {assign var="lineItemCount" value=0}
          {if $pcount neq 'skip'}
@@ -241,11 +241,11 @@ registration process.{/ts}</p>
            {/foreach}
            {if $lineItemCount < 1 }
            assign var="lineItemCount" value=1}
-           {/if}	
+           {/if}
            {assign var="count" value=$count+$lineItemCount}
          {/if}
          {/foreach}
-	 {$count}
+   {$count}
        </td>
      </tr>
      {/if}

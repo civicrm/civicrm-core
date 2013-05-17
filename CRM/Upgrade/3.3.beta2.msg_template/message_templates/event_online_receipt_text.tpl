@@ -145,14 +145,14 @@ registration process.{/ts}
         {/foreach}
       {if $lineItemCount < 1 }
         {assign var="lineItemCount" value=1}
-      {/if}	
+      {/if}
       {assign var="count" value=$count+$lineItemCount}
       {/if}
       {/foreach}
 
 {ts}Total Participants{/ts}: {$count}
 {/if}
-  
+
 {if $is_pay_later }
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}

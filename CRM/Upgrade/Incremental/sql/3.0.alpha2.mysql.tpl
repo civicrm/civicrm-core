@@ -7,4 +7,4 @@
     INSERT INTO civicrm_navigation
         ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
     VALUES
-	( @domain_id, 'civicrm/contact/view/pledge&reset=1&action=add&context=standalone', '{ts escape="sql"}New Pledge{/ts}','New Pledge',  NULL, '', @nav_pl, '1', NULL, @nav_pl_wt+1 );
+  ( @domain_id, 'civicrm/contact/view/pledge&reset=1&action=add&context=standalone', '{ts escape="sql"}New Pledge{/ts}','New Pledge',  NULL, '', @nav_pl, '1', NULL, @nav_pl_wt+1 );

@@ -33,7 +33,7 @@
       {ts}Do you want to continue?{/ts}
   </div>
 {else}
-  
+
   <table class="form-layout-compressed">
     <tr class="crm-paymentProcessor-type-form-block-title">
         <td class="label">{$form.title.label}</td>
@@ -115,5 +115,5 @@
 </table>
 {/if}
 </fieldset>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div> 
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

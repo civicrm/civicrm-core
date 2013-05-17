@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Get information about fields for a given api request. Getfields information

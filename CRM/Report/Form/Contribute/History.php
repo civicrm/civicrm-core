@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -201,8 +200,8 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
           ),
-          'financial_type_id' => array( 
-            'title' => ts('Financial Type'), 
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
@@ -302,10 +301,10 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
               $this->_columnHeaders[$fieldName]['title'] = $field['title'];
               continue;
             }
-            elseif ($fieldName == 'receive_date') { 
-                if ((CRM_Utils_Array::value('this_year_op', $this->_params) == 'fiscal' && 
+            elseif ($fieldName == 'receive_date') {
+                if ((CRM_Utils_Array::value('this_year_op', $this->_params) == 'fiscal' &&
                      CRM_Utils_Array::value('this_year_value', $this->_params)) ||
-                    (CRM_Utils_Array::value('other_year_op', $this->_params == 'fiscal') && 
+                    (CRM_Utils_Array::value('other_year_op', $this->_params == 'fiscal') &&
                       CRM_Utils_Array::value('other_year_value', $this->_params)
                      )){
                     $select[] = self::fiscalYearOffset($field['dbAlias']) . " as {$tableName}_{$fieldName}";
@@ -332,31 +331,31 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   function from() {
     $this->_from = "
         FROM civicrm_contact  {$this->_aliases['civicrm_contact']}
-             INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']} 
+             INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
                         {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
 
     if ($this->_emailField) {
-      $this->_from .= " LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} 
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND 
+      $this->_from .= " LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
+                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                         {$this->_aliases['civicrm_email']}.is_primary = 1) ";
     }
 
     if ($this->_phoneField) {
-      $this->_from .= " LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']} 
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND 
+      $this->_from .= " LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                         {$this->_aliases['civicrm_phone']}.is_primary = 1) ";
     }
 
     $relContacAlias = 'contact_relationship';
-    $this->_relationshipFrom = " INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']} 
+    $this->_relationshipFrom = " INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
                      ON (({$this->_aliases['civicrm_relationship']}.contact_id_a = {$relContacAlias}.id OR {$this->_aliases['civicrm_relationship']}.contact_id_b = {$relContacAlias}.id ) AND {$this->_aliases['civicrm_relationship']}.is_active = 1) ";
 
     if ($this->_addressField) {
       $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-                         ON {$this->_aliases['civicrm_contact']}.id = 
-                            {$this->_aliases['civicrm_address']}.contact_id AND 
+                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                         ON {$this->_aliases['civicrm_contact']}.id =
+                            {$this->_aliases['civicrm_address']}.contact_id AND
                             {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
   }
@@ -528,10 +527,10 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     if (CRM_Utils_Array::value('this_year', $this->_referenceYear)) {
         (CRM_Utils_Array::value('this_year_op', $this->_params) == 'calendar') ? $receive_date = 'YEAR (contri.receive_date)' : $receive_date = self::fiscalYearOffset('contri.receive_date');
         $addWhere .= " AND {$this->_aliases['civicrm_contact']}.id IN ( SELECT DISTINCT cont.id FROM civicrm_contact cont, civicrm_contribution contri WHERE cont.id = contri.contact_id AND {$receive_date} = {$this->_referenceYear['this_year']} AND contri.is_test = 0 ) ";
-    }  
+    }
     $this->limit();
     $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid, SUM({$this->_aliases['civicrm_contribution']}.total_amount) as civicrm_contribution_total_amount_sum {$this->_from} {$this->_where} {$addWhere} GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_having} {$this->_limit}";
-    
+
     $dao = CRM_Core_DAO::executeQuery($getContacts);
 
     while ($dao->fetch()) {
@@ -683,7 +682,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $dao->free();
     return array($relationshipRows, $relatedContactIds);
   }
-  
+
   // Override "This Year" $op options
   function getOperationPair($type = "string", $fieldName = NULL) {
       if ($fieldName == 'this_year' || $fieldName == 'other_year') {
@@ -691,8 +690,8 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       }
       return parent::getOperationPair($type, $fieldName);
   }
-  
-  
+
+
 
   function alterDisplay(&$rows) {
     if (empty($rows)) {

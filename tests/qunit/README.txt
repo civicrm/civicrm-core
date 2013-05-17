@@ -61,7 +61,7 @@ To create a new test-suite:
    qunit test is part of the core codebase (aka extension="civicrm"),
    and suppose the suite is "my-stuff". Then navigate to:
 
-   http://localhost/civicrm/dev/qunit/civicrm/my-stuff   
+   http://localhost/civicrm/dev/qunit/civicrm/my-stuff
 
 ==== CONVENTIONS ====
 
@@ -83,7 +83,7 @@ with it, we can change it -- but please communicate any problems/issues
 
  * Each QUnit test-suite for CiviCRM lives in a subdirectory of
    "tests/qunit/".
-   
+
    Rationale: Following a predictable naming convention will help us automate
    testing/loading across all suites, and it will make the code more recognizable
    to other developers.
@@ -91,7 +91,7 @@ with it, we can change it -- but please communicate any problems/issues
  * Each QUnit test-suite *may* include the file "test.php" to specify
    loading of resource files or bundles (such as CSS/JS). The file will
    be recognized automatically.
-   
+
    Rationale: CiviCRM has its own resource-loading conventions. When
    preparing a test environment, one needs to load JS/CSS dependencies.
    Since there is no autoloader, this is most easily done with CiviCRM's
