@@ -47,7 +47,9 @@ class CRM_Utils_Migrate_ExportJSON {
 
   protected $_renameTags = 1;
 
-  protected $_sitePrefix = 'Site 1'; function __construct(&$params) {
+  protected $_sitePrefix = 'Site 1';
+
+  function __construct(&$params) {
     foreach ($params as $name => $value) {
       $varName = '_' . $name;
       $this->$varName = $value;
@@ -60,10 +62,10 @@ class CRM_Utils_Migrate_ExportJSON {
   function &splitContactIDs(&$contactIDs) {
     // contactIDs could be a real large array, so we split it up into
     // smaller chunks and then general xml for each chunk
-    $chunks           = array();
-    $current          = 0;
+    $chunks = array();
+    $current = 0;
     $chunks[$current] = array();
-    $count            = 0;
+    $count = 0;
 
     foreach ($contactIDs as $k => $v) {
       $chunks[$current][$k] = $v;
@@ -133,7 +135,7 @@ class CRM_Utils_Migrate_ExportJSON {
 
   function auxTable($tables) {
     foreach ($tables as $tableName => $daoName) {
-      $fields = &$this->dbFields($daoName, TRUE);
+      $fields = & $this->dbFields($daoName, TRUE);
 
       $sql = "SELECT * from $tableName";
       $this->sql($sql, $tableName, $fields);
@@ -153,7 +155,7 @@ SELECT *
 FROM   civicrm_option_group
 WHERE  name IN ( $nameString )
 ";
-    $fields = &$this->dbFields('CRM_Core_DAO_OptionGroup', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_OptionGroup', TRUE);
     $this->sql($sql, 'civicrm_option_group', $fields);
 
     $sql = "
@@ -162,15 +164,15 @@ FROM       civicrm_option_value v
 INNER JOIN civicrm_option_group g ON v.option_group_id = g.id
 WHERE      g.name IN ( $nameString )
 ";
-    $fields = &$this->dbFields('CRM_Core_DAO_OptionValue', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_OptionValue', TRUE);
     $this->sql($sql, 'civicrm_option_value', $fields);
   }
 
   function table(&$ids,
-    $tableName,
-    &$fields,
-    $whereField,
-    $additionalWhereCond = NULL
+                 $tableName,
+                 &$fields,
+                 $whereField,
+                 $additionalWhereCond = NULL
   ) {
     if (empty($ids)) {
       return;
@@ -192,7 +194,7 @@ SELECT *
   }
 
   function sql($sql, $tableName, &$fields) {
-    $dao = &CRM_Core_DAO::executeQuery($sql);
+    $dao = & CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {
       $value = array();
@@ -210,42 +212,42 @@ SELECT *
   }
 
   function contact(&$contactIDs) {
-    $fields = &$this->dbFields('CRM_Contact_DAO_Contact', TRUE);
+    $fields = & $this->dbFields('CRM_Contact_DAO_Contact', TRUE);
     $this->table($contactIDs, 'civicrm_contact', $fields, 'id', NULL);
   }
 
   function note(&$contactIDs) {
-    $fields = &$this->dbFields('CRM_Core_DAO_Note', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_Note', TRUE);
     $this->table($contactIDs, 'civicrm_note', $fields, 'entity_id', "entity_table = 'civicrm_contact'");
   }
 
   function phone(&$contactIDs) {
-    $fields = &$this->dbFields('CRM_Core_DAO_Phone', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_Phone', TRUE);
     $this->table($contactIDs, 'civicrm_phone', $fields, 'contact_id', NULL);
   }
 
   function email(&$contactIDs) {
-    $fields = &$this->dbFields('CRM_Core_DAO_Email', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_Email', TRUE);
     $this->table($contactIDs, 'civicrm_email', $fields, 'contact_id', NULL);
   }
 
   function im(&$contactIDs) {
-    $fields = &$this->dbFields('CRM_Core_DAO_IM', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_IM', TRUE);
     $this->table($contactIDs, 'civicrm_im', $fields, 'contact_id', NULL);
   }
 
   function website(&$contactIDs) {
-    $fields = &$this->dbFields('CRM_Core_DAO_Website', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_Website', TRUE);
     $this->table($contactIDs, 'civicrm_website', $fields, 'contact_id', NULL);
   }
 
   function address(&$contactIDs) {
-    $fields = &$this->dbFields('CRM_Core_DAO_Email', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_Email', TRUE);
     $this->table($contactIDs, 'civicrm_address', $fields, 'contact_id', NULL);
   }
 
   function groupContact(&$contactIDs) {
-    $fields = &$this->dbFields('CRM_Contact_DAO_GroupContact', TRUE);
+    $fields = & $this->dbFields('CRM_Contact_DAO_GroupContact', TRUE);
     $this->table($contactIDs, 'civicrm_group_contact', $fields, 'contact_id', NULL);
   }
 
@@ -271,7 +273,7 @@ WHERE  contact_id IN ( $ids )
       }
     }
 
-    $fields = &$this->dbFields('CRM_Contact_DAO_Group', TRUE);
+    $fields = & $this->dbFields('CRM_Contact_DAO_Group', TRUE);
     $this->table($groupIDs, 'civicrm_group', $fields, 'id');
 
     $this->savedSearch($groupIDs);
@@ -291,12 +293,12 @@ INNER JOIN civicrm_group g on g.saved_search_id = s.id
 WHERE      g.id IN ( $idString )
 ";
 
-    $fields = &$this->dbFields('CRM_Contact_DAO_SavedSearch', TRUE);
+    $fields = & $this->dbFields('CRM_Contact_DAO_SavedSearch', TRUE);
     $this->sql($sql, 'civicrm_saved_search', $fields);
   }
 
   function entityTag(&$contactIDs) {
-    $fields = &$this->dbFields('CRM_Core_DAO_EntityTag', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_EntityTag', TRUE);
     $this->table($contactIDs, 'civicrm_entity_tag', $fields, 'entity_id', "entity_table = 'civicrm_contact'");
   }
 
@@ -321,7 +323,7 @@ AND    entity_table = 'civicrm_contact'
       }
     }
 
-    $fields = &$this->dbFields('CRM_Core_DAO_Tag', TRUE);
+    $fields = & $this->dbFields('CRM_Core_DAO_Tag', TRUE);
     $this->table($tagIDs, 'civicrm_tag', $fields, 'id');
   }
 
@@ -343,7 +345,7 @@ AND    entity_table = 'civicrm_contact'
 ";
 
     $fields = $this->dbFields('CRM_Contact_DAO_Relationship', TRUE);
-    $dao = &CRM_Core_DAO::executeQuery($sql);
+    $dao = & CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       if (isset($_relationshipsHandled[$dao->id])) {
         continue;
@@ -362,7 +364,7 @@ AND    entity_table = 'civicrm_contact'
       $this->appendValue($dao->id, 'civicrm_relationship', $relationship);
 
       $this->addAdditionalContacts(array(
-        $dao->contact_id_a,
+          $dao->contact_id_a,
           $dao->contact_id_b,
         ),
         $additionalContacts
@@ -391,10 +393,10 @@ AND    entity_table = 'civicrm_contact'
 )
 ";
 
-    $fields = &$this->dbFields('CRM_Activity_DAO_Activity', TRUE);
+    $fields = & $this->dbFields('CRM_Activity_DAO_Activity', TRUE);
 
     $activityIDs = array();
-    $dao = &CRM_Core_DAO::executeQuery($sql);
+    $dao = & CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       if (isset($_activitiesHandled[$dao->id])) {
         continue;
@@ -426,8 +428,8 @@ AND    entity_table = 'civicrm_contact'
     $activityIDString = implode(",", $activityIDs);
 
     // now get all assignee contact ids and target contact ids for this activity
-    $sql              = "SELECT * FROM civicrm_activity_assignment WHERE activity_id IN ($activityIDString)";
-    $aaDAO            = &CRM_Core_DAO::executeQuery($sql);
+    $sql = "SELECT * FROM civicrm_activity_assignment WHERE activity_id IN ($activityIDString)";
+    $aaDAO = & CRM_Core_DAO::executeQuery($sql);
     $activityContacts = array();
     while ($aaDAO->fetch()) {
       $activityAssignee = array(
@@ -441,7 +443,7 @@ AND    entity_table = 'civicrm_contact'
     $aaDAO->free();
 
     $sql = "SELECT * FROM civicrm_activity_target WHERE activity_id IN ($activityIDString)";
-    $atDAO = &CRM_Core_DAO::executeQuery($sql);
+    $atDAO = & CRM_Core_DAO::executeQuery($sql);
     while ($atDAO->fetch()) {
       $activityTarget = array(
         'id' => $atDAO->id,
@@ -479,7 +481,7 @@ AND    entity_table = 'civicrm_contact'
       ) . '.php';
       include_once ($daoFile);
 
-      $daoFields = &$daoName::fields();
+      $daoFields = & $daoName::fields();
 
       foreach ($daoFields as $key => & $value) {
         $_fieldsRetrieved[$daoName][$value['name']] = array(
@@ -514,7 +516,7 @@ AND    entity_table = 'civicrm_contact'
   }
 
   function export(&$contactIDs) {
-    $chunks = &$this->splitContactIDs($contactIDs);
+    $chunks = & $this->splitContactIDs($contactIDs);
 
     $additionalContactIDs = array();
 
@@ -529,8 +531,8 @@ AND    entity_table = 'civicrm_contact'
   }
 
   function run($fileName,
-    $lastExportTime = NULL,
-    $discoverContacts = FALSE
+               $lastExportTime = NULL,
+               $discoverContacts = FALSE
   ) {
     $this->_discoverContacts = $discoverContacts;
 
@@ -555,7 +557,7 @@ WHERE  date >= $lastExportTime
     }
 
 
-    $dao = &CRM_Core_DAO::executeQuery($sql);
+    $dao = & CRM_Core_DAO::executeQuery($sql);
 
     $contactIDs = array();
     while ($dao->fetch()) {
