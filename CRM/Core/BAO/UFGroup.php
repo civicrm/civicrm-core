@@ -2018,9 +2018,19 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif ($fieldName == 'contribution_status_id') {
+      $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
+      $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      foreach (array(
+                 'In Progress',
+                 'Overdue',
+                 'Refunded'
+               ) as $suppress) {
+        unset($contributionStatuses[CRM_Utils_Array::key($suppress, $statusName)]);
+      }
+      
       $form->add('select', $name, $title,
         array(
-          '' => ts('- select -')) + CRM_Contribute_PseudoConstant::contributionStatus(), $required
+          '' => ts('- select -')) + $contributionStatuses, $required
       );
     }
     elseif ($fieldName == 'currency') {
