@@ -96,6 +96,7 @@ class CRM_Core_HTMLInputCoder implements API_Wrapper {
         'bcc_id',
         'premiums_intro_text',
         'honor_block_text',
+        'pay_later_text',
         'pay_later_receipt',
         'label', // This is needed for FROM Email Address configuration. dgg
         'url',  // This is needed for navigation items urls
