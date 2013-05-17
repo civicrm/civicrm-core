@@ -55,15 +55,20 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'title' => ts('Viewing Contacts'),
           'weight' => 1,
         ),
+        'contact_smart_group_display' => array(
+          'html_type' => 'radio',
+          'title' => ts('Viewing Smart Groups'),
+          'weight' => 2,
+        ),
         'contact_edit_options' => array(
           'html_type' => 'checkboxes',
           'title' => ts('Editing Contacts'),
-          'weight' => 2,
+          'weight' => 3,
         ),
         'advanced_search_options' => array(
           'html_type' => 'checkboxes',
           'title' => ts('Contact Search'),
-          'weight' => 3,
+          'weight' => 4,
         ),
         'activity_assignee_notification' => array(
           'html_type' => 'checkbox',
@@ -73,35 +78,34 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
         'activity_assignee_notification_ics' => array(
           'html_type' => 'checkbox',
           'title' => ts('Include ICal Invite to Activity Assignees'),
-          'weight' => 5,
+          'weight' => 6,
         ),
         'contact_ajax_check_similar' => array(
           'html_type' => 'checkbox',
           'title' => ts('Check for Similar Contacts'),
-          'weight' => 5,
+          'weight' => 7,
         ),
         'user_dashboard_options' => array(
           'html_type' => 'checkboxes',
           'title' => ts('Contact Dashboard'),
-          'weight' => 6,
+          'weight' => 8,
         ),
         'display_name_format' => array(
           'html_type' => 'textarea',
           'title' => ts('Individual Display Name Format'),
-          'weight' => 7,
+          'weight' => 9,
         ),
         'sort_name_format' => array(
           'html_type' => 'textarea',
           'title' => ts('Individual Sort Name Format'),
-          'weight' => 8,
+          'weight' => 10,
         ),
         'editor_id' => array(
           'html_type' => NULL,
-          'weight' => 9,
+          'weight' => 11,
         ),
       ),
     );
-
 
     parent::preProcess();
   }

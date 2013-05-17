@@ -31,6 +31,10 @@
       <td class="label">{$form.contact_view_options.label}</td>
       <td>{$form.contact_view_options.html}</td>
     </tr>
+    <tr class="crm-preferences-display-form-block-contact_smart_group_display">
+      <td class="label">{$form.contact_smart_group_display.label}</td>
+      <td>{$form.contact_smart_group_display.html}</td>
+    </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
