@@ -42,7 +42,9 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
 
     if (defined('CIVICRM_ACTIVITY_ASSIGNEE_MAIL') && CIVICRM_ACTIVITY_ASSIGNEE_MAIL) {
-      CRM_Core_Session::setStatus(ts('Your civicrm.settings.php file contains CIVICRM_ACTIVITY_ASSIGNEE_MAIL but this constant is no longer used. Please remove this from your config file and set your "Notify Activity Assignees" preference below.'), ts("Deprecated Constant"), "alert");
+      CRM_Core_Session::setStatus(ts('Your civicrm.settings.php file contains CIVICRM_ACTIVITY_ASSIGNEE_MAIL but this
+      constant is no longer used. Please remove this from your config file and set your "Notify Activity Assignees"
+      preference below.'), ts("Deprecated Constant"), "alert");
     }
 
     $this->_varNames = array(
@@ -112,7 +114,8 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
       $defaults['editor_id'] = $this->_config->editor_id;
     }
     if (empty($this->_config->display_name_format)) {
-      $defaults['display_name_format'] = "{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}";
+      $defaults['display_name_format'] =
+        "{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}";
     }
     else {
       $defaults['display_name_format'] = $this->_config->display_name_format;
@@ -126,9 +129,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     }
 
     $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal == '1' &&
-      module_exists("wysiwyg")
-    ) {
+    if ($config->userSystem->is_drupal == '1' && module_exists("wysiwyg")) {
       $defaults['wysiwyg_input_format'] = variable_get('civicrm_wysiwyg_input_format', 0);
     }
 
@@ -142,7 +143,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
    * @access public
    */
   public function buildQuickForm() {
-    $drupal_wysiwyg = FALSE;
     $wysiwyg_options = array('' => ts('Textarea')) + CRM_Core_PseudoConstant::wysiwygEditor();
 
     $config = CRM_Core_Config::singleton();
@@ -154,13 +154,17 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     }
 
     $drupal_wysiwyg = FALSE;
-    if (!$config->userSystem->is_drupal ||
-      !module_exists("wysiwyg")
-    ) {
+    if (!$config->userSystem->is_drupal || !module_exists("wysiwyg")) {
       unset($wysiwyg_options[4]);
     }
     else {
-      $extra['onchange'] = 'if (this.value==4) { cj("#crm-preferences-display-form-block-wysiwyg_input_format").show(); } else {  cj("#crm-preferences-display-form-block-wysiwyg_input_format").hide() }';
+      $extra['onchange'] = '
+      if (this.value==4) {
+        cj("#crm-preferences-display-form-block-wysiwyg_input_format").show();
+      }
+      else {
+        cj("#crm-preferences-display-form-block-wysiwyg_input_format").hide()
+      }';
 
       $formats           = filter_formats();
       $format_options    = array();
@@ -174,6 +178,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     if ($drupal_wysiwyg) {
       $this->addElement('select', 'wysiwyg_input_format', ts('Input Format'), $format_options, NULL);
     }
+
     $editOptions = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 0');
     $this->assign('editOptions', $editOptions);
 
@@ -211,9 +216,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     }
 
     $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal == '1' &&
-      module_exists("wysiwyg")
-    ) {
+    if ($config->userSystem->is_drupal == '1' && module_exists("wysiwyg")) {
       variable_set('civicrm_wysiwyg_input_format', $this->_params['wysiwyg_input_format']);
     }
 
