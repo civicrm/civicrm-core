@@ -567,6 +567,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
       CRM_Core_Error::fatal("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
     }
 
+
+
     $account = $userUid = $userMail = NULL;
     if ($loadCMSBootstrap) {
       $bootStrapParams = array();
@@ -721,8 +723,8 @@ AND    u.status = 1
    * @param $loadUser boolean load cms user?
    * @param $throwError throw error on failure?
    */
-  function loadBootStrap($params = array(
-    ), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+
+  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
     $cmsPath = $this->cmsRootPath($realPath);
 
@@ -749,9 +751,7 @@ AND    u.status = 1
 
     // explicitly setting error reporting, since we cannot handle drupal related notices
     error_reporting(1);
-    if (!function_exists('module_exists') ||
-      !module_exists('civicrm')
-    ) {
+    if (!function_exists('module_exists') || !module_exists('civicrm')) {
       if ($throwError) {
         echo '<br />Sorry, could not load drupal bootstrap.';
         exit();
@@ -761,8 +761,6 @@ AND    u.status = 1
 
     // seems like we've bootstrapped drupal
     $config = CRM_Core_Config::singleton();
-
-
 
     // lets also fix the clean url setting
     // CRM-6948
@@ -810,7 +808,8 @@ AND    u.status = 1
       exit();
     }
 
-    // CRM-6948: When using loadBootStrap, it's implicit that CiviCRM has already loaded its settings, which means that define(CIVICRM_CLEANURL) was correctly set.
+    // CRM-6948: When using loadBootStrap, it's implicit that CiviCRM has already loaded its settings
+    // which means that define(CIVICRM_CLEANURL) was correctly set.
     // So we correct it
     $config = CRM_Core_Config::singleton();
     $config->cleanURL = (int)variable_get('clean_url', '0');
@@ -908,7 +907,8 @@ AND    u.status = 1
    * @return string $url, formatted url.
    * @static
    */
-  function languageNegotiationURL($url,
+  function languageNegotiationURL(
+    $url,
     $addLanguagePart = TRUE,
     $removeLanguagePart = FALSE
   ) {
