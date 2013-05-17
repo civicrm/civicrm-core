@@ -94,7 +94,7 @@
             </tr>
             <tr>
                <td>&nbsp;</td>
-               <td class="description">{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form.{/ts}</td>
+               <td class="description">{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form. You may include HTML formatting tags.{/ts}</td>
             </tr>
             <tr class="crm-event-manage-fee-form-block-pay_later_receipt">
                <td class="label">{$form.pay_later_receipt.label}<span class="marker"> *</span> </td>
