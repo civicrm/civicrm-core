@@ -60,29 +60,6 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. GroupContact that in edit/view mode
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return None
-   */
-  function setDefaultValues() {
-    $defaults = array();
-    $params = array();
-
-    return $defaults;
-  }
-
-  /**
-   * This function is used to add the rules for form.
-   *
-   * @return None
-   * @access public
-   */
-  function addRules() {}
-
-  /**
    * Function to build the form
    *
    * @return None
