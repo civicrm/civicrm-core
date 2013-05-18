@@ -18,3 +18,10 @@ VALUES
 -- CRM-12580
 ALTER TABLE civicrm_contact ADD  INDEX index_is_deleted_sort_name(is_deleted, sort_name, id);
 ALTER TABLE civicrm_contact DROP INDEX index_is_deleted;
+
+-- CRM-12425
+SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Spam';
+INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
+    VALUES
+      (@bounceTypeID, 'X-HmXmrOriginalRecipient');
+
