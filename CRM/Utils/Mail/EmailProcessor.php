@@ -159,6 +159,9 @@ class CRM_Utils_Mail_EmailProcessor {
     // a tighter regex for finding bounce info in soft bounces’ mail bodies
     $rpRegex = '/Return-Path: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
 
+    // a regex for finding bound info X-Header
+    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
+
     // retrieve the emails
     try {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
@@ -199,6 +202,12 @@ class CRM_Utils_Mail_EmailProcessor {
           // CRM-5471: if $matches is empty, it still might be a soft bounce sent
           // to another address, so scan the body for ‘Return-Path: …bounce-pattern…’
           if (!$matches and preg_match($rpRegex, $mail->generateBody(), $matches)) {
+            list($match, $action, $job, $queue, $hash) = $matches;
+          }
+
+          // if $matches is still empty, look for the X-CiviMail-Bounce header
+          // CRM-9855
+          if (!$matches and preg_match($rpXheaderRegex, $mail->generateBody(), $matches)) {
             list($match, $action, $job, $queue, $hash) = $matches;
           }
 
