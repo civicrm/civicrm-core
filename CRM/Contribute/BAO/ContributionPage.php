@@ -607,8 +607,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'contribution_page_id' => $copy->id,
       ));
 
-    //copy option group and values
-    $copy->default_amount_id = CRM_Core_BAO_OptionGroup::copyValue('contribution', $id, $copy->id, CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'default_amount_id'));
+    //copy price sets
+    CRM_Price_BAO_Set::copyPriceSet('civicrm_contribution_page', $id, $copy->id);
+
     $copyTellFriend = &CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', array(
         'entity_id' => $id,
         'entity_table' => 'civicrm_contribution_page',
