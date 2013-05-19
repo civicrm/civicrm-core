@@ -1178,5 +1178,51 @@ WHERE       ps.id = %1
     return false;
   }
 
+  /*
+   * Copy priceSet when event/contibution page is copied
+   *
+   * @params string $baoName  BAO name
+   * @params int $id old event/contribution page id
+   * @params int $newId newly created event/contribution page id
+   *
+   */
+  static function copyPriceSet($baoName, $id, $newId) {
+    $priceSetId = CRM_Price_BAO_Set::getFor($baoName, $id);
+    if ($priceSetId) {
+      $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $priceSetId, 'is_quick_config');
+      if($isQuickConfig) {
+        $copyPriceSet = &CRM_Price_BAO_Set::copy($priceSetId);
+        CRM_Price_BAO_Set::addTo($baoName, $newId, $copyPriceSet->id);
+      } 
+      else {
+        $copyPriceSet = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_SetEntity',
+          array(
+            'entity_id' => $id,
+            'entity_table' => $baoName,
+          ),
+          array('entity_id' => $newId)
+        );
+      }
+      // copy event discount
+      if ($baoName == 'civicrm_event') {
+        $discount = CRM_Core_BAO_Discount::getOptionGroup($id, 'civicrm_event');
+        foreach ($discount as $discountId => $setId) {
+
+          $copyPriceSet = &CRM_Price_BAO_Set::copy($setId);
+        
+          $copyDiscount = &CRM_Core_DAO::copyGeneric(
+            'CRM_Core_DAO_Discount',
+            array(
+              'id' => $discountId,
+            ),
+            array(
+              'entity_id' => $newId,
+              'price_set_id' => $copyPriceSet->id,
+            )
+          );
+        }
+      }
+    }
+  }
 }
 
