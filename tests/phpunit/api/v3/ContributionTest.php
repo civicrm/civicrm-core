@@ -946,15 +946,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
       'financial_type_id' => $this->_contributionTypeId,
       'payment_instrument_id' => 1,
-      'contribution_status_id' => 2,
+      'contribution_status_id' => 2,  
+      'is_pay_later' => 1,                                           
       'version' => $this->_apiversion,
     );
     $contribution = civicrm_api('contribution', 'create', $contribParams);
 
     $newParams = array_merge($contribParams, array(
-                                                   'id' => $contribution['id'],
-                                                   'contribution_status_id' => 1,)
-                             );
+      'id' => $contribution['id'],
+      'contribution_status_id' => 1,)
+    );
     $contribution = civicrm_api('contribution', 'update', $newParams);
     $contribution = $contribution['values'][$contribution['id']];
     $this->assertEquals($contribution['contribution_status_id'],'1');
@@ -1009,6 +1010,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = civicrm_api('contribution', 'update', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund');
     $this->_checkFinancialItem($contribution['id'], 'refund');
+  } 
+
+  /*
+   * Function tests invalid contribution status change 
+   */
+  function testCreateUpdateContributionInValidStatusChange() {
+    $contribParams = array(
+      'contact_id' => 1,
+      'receive_date' => '2012-01-01',
+      'total_amount' => 100.00,
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 1,
+      'version' => 3,
+    );
+    $contribution = civicrm_api('contribution', 'create', $contribParams);
+    $newParams = array_merge($contribParams, array(
+     'id' => $contribution['id'],
+     'contribution_status_id' => 2,
+      )
+    );
+    $contribution = civicrm_api('contribution', 'update', $newParams);
+    $this->assertTrue(!empty($contribution['is_error']), 'In line ' . __LINE__);
+    $this->assertEquals($contribution['error_message'], ts('Cannot change contribution status from Completed to Pending.'), 'In line ' . __LINE__);
+
   }
 
   /*
@@ -1022,6 +1048,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => $this->_contributionTypeId,
       'payment_instrument_id' => 1,
       'contribution_status_id' => 2,
+      'is_pay_later' => 1,
       'version' => $this->_apiversion,
     );
     $contribution = civicrm_api('contribution', 'create', $contribParams);
