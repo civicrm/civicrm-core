@@ -67,7 +67,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
       if (CRM_Utils_Array::value('id', $defaults)) {
         $defaults['tf_id'] = CRM_Utils_Array::value('id', $defaults);
         $this->_friendId = $defaults['tf_id'];
-        // lets unset the 'id' since it conflict with eventID (or contribID)
+        // lets unset the 'id' since it conflicts with eventID (or contribID)
         // CRM-12667
         unset($defaults['id']);
       }
