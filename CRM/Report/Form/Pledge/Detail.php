@@ -31,9 +31,9 @@
  /*
   *   !!!!!!!!!!!!!!!!!!!!
   *     NB: this is named detail but behaves like a summary report.
-  * 	It is also accessed through the Pledge Summary link in the UI
-  * 	This should presumably be changed.
-  * 	~ Doten
+  *   It is also accessed through the Pledge Summary link in the UI
+  *   This should presumably be changed.
+  *   ~ Doten
   *   !!!!!!!!!!!!!!!!!!!!
   *
   */
@@ -55,8 +55,8 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   );
   function __construct() {
 
-	// Check if CiviCampaign is a) enabled and b) has active campaigns
-	$config = CRM_Core_Config::singleton();
+  // Check if CiviCampaign is a) enabled and b) has active campaigns
+  $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
@@ -211,15 +211,15 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     // If we have a campaign, build out the relevant elements
     $this->_tagFilter = TRUE;
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
-		$this->_columns['civicrm_pledge']['fields']['campaign_id'] = array(
+    $this->_columns['civicrm_pledge']['fields']['campaign_id'] = array(
           'title' => 'Campaign',
           'default' => 'false',
-		);
-		$this->_columns['civicrm_pledge']['filters']['campaign_id'] = array('title' => ts('Campaign'),
+    );
+    $this->_columns['civicrm_pledge']['filters']['campaign_id'] = array('title' => ts('Campaign'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $this->activeCampaigns,
-		);
-		$this->_columns['civicrm_pledge']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
+    );
+    $this->_columns['civicrm_pledge']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
 
     }
 
