@@ -264,6 +264,59 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
+   * @param array $customGroupIds list of custom groups to export
+   * @return void
+   */
+  function buildCustomGroups($customGroupIds) {
+    $customGroupIdsSql = implode(',', array_filter($customGroupIds, 'is_numeric'));
+    if (empty($customGroupIdsSql)) {
+      return;
+    }
+
+    $sql = "
+      SELECT distinct(g.id), g.*
+      FROM   civicrm_option_group g,
+             civicrm_custom_field f,
+             civicrm_custom_group cg
+      WHERE  f.option_group_id = g.id
+      AND    f.custom_group_id = cg.id
+      AND    cg.id in ($customGroupIdsSql)
+    ";
+    $this->fetch('optionGroup', 'CRM_Core_DAO_OptionGroup', $sql);
+
+    $sql = "
+      SELECT distinct(v.id), v.*, g.name as prefix
+      FROM   civicrm_option_value v,
+             civicrm_option_group g,
+             civicrm_custom_field f,
+             civicrm_custom_group cg
+      WHERE  v.option_group_id = g.id
+      AND    f.option_group_id = g.id
+      AND    f.custom_group_id = cg.id
+      AND    cg.id in ($customGroupIdsSql)
+    ";
+
+    $this->fetch('optionValue', 'CRM_Core_DAO_OptionValue', $sql);
+
+    $sql = "
+      SELECT cg.*
+      FROM   civicrm_custom_group cg
+      WHERE  cg.id in ($customGroupIdsSql)
+
+    ";
+    $this->fetch('customGroup', 'CRM_Core_DAO_CustomGroup', $sql);
+
+    $sql = "
+      SELECT f.*
+      FROM   civicrm_custom_field f,
+             civicrm_custom_group cg
+      WHERE  f.custom_group_id = cg.id
+      AND    cg.id in ($customGroupIdsSql)
+    ";
+    $this->fetch('customField', 'CRM_Core_DAO_CustomField', $sql);
+  }
+
+  /**
    * Render the in-memory representation as XML
    *
    * @return string XML
@@ -296,7 +349,7 @@ class CRM_Utils_Migrate_Export {
     $result = array();
     foreach (array_keys($this->_xml) as $key) {
       if (!empty($this->_xml[$key]['data'])) {
-        $result[ $this->_xml[$key]['name'] ] = $this->_xml[$key]['data'];
+        $result[ $this->_xml[$key]['name'] ] = array_values($this->_xml[$key]['data']);
       }
     }
     return $result;
@@ -315,7 +368,7 @@ class CRM_Utils_Migrate_Export {
     }
 
     while ($dao->fetch()) {
-      $this->_xml[$groupName]['data'][] = $this->exportDAO($this->_xml[$groupName]['name'], $dao, $mappedFields);
+      $this->_xml[$groupName]['data'][$dao->id] = $this->exportDAO($this->_xml[$groupName]['name'], $dao, $mappedFields);
       if ($idNameFields) {
         // index the id/name fields so that we can translate from FK ids to FK names
         if (isset($idNameFields[2])) {
