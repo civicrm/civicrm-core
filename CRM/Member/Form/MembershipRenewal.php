@@ -72,6 +72,16 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   protected $_context;
 
+  /**
+   * An array to hold a list of datefields on the form
+   * so that they can be converted to ISO in a consistent manner
+   *
+   * @var array
+   */
+  protected $_dateFields = array(
+    'receive_date' => array('default' => 'now'),
+  );
+
   public function preProcess() {
     //custom data related code
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
@@ -436,7 +446,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->add('text', 'total_amount', ts('Amount'));
       $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
 
-      $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDate'));
+      $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
 
       $this->add('text', 'num_terms', ts('Extend Membership by'), array('onchange' => "setPaymentBlock();"), TRUE);
       $this->addRule('num_terms', ts('Please enter a whole number for how many periods to renew.'), 'integer');
@@ -563,12 +573,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     $now = CRM_Utils_Date::getToday( null, 'YmdHis');
-    if (CRM_Utils_Array::value('receive_date', $this->_params)) {
-      $formValues['receive_date'] = CRM_Utils_Date::processDate($this->_params['receive_date']);
-    }
-    else {
-      $formValues['receive_date'] = $now;
-    }
+    $this->convertDateFieldsToMySQL($formValues);
     $this->assign('receive_date', $formValues['receive_date']);
 
     if (CRM_Utils_Array::value('send_receipt', $this->_params)) {

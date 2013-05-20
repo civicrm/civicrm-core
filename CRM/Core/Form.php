@@ -77,6 +77,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_renderer;
 
   /**
+   * An array to hold a list of datefields on the form
+   * so that they can be converted to ISO in a consistent manner
+   *
+   * @var array
+   *
+   * e.g on a form declare $_dateFields = array(
+   *  'receive_date' => array('default' => 'now'),
+   *  );
+   *  then in postProcess call $this->convertDateFieldsToMySQL($formValues)
+   *  to have the time field re-incorporated into the field & 'now' set if
+   *  no value has been passed in
+   */
+  protected $_dateFields = array();
+
+  /**
    * cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
@@ -1216,6 +1231,34 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $defaultCurrency = $config->defaultCurrency;
     }
     $this->setDefaults(array($name => $defaultCurrency));
+  }
+
+  /**
+   * Convert all date fields within the params to mysql date ready for the
+   * BAO layer. In this case fields are checked against the $_datefields defined for the form
+   * and if time is defined it is incorporated
+   *
+   * @param array $params input params from the form
+   *
+   * @todo it would probably be better to work on $this->_params than a passed array
+   * @todo standardise the format which dates are passed to the BAO layer in & remove date
+   * handling from BAO
+   */
+  function convertDateFieldsToMySQL(&$params){
+    foreach ($this->_dateFields as $fieldName => $specs){
+      if(!empty($params[$fieldName])){
+        $params[$fieldName] = CRM_Utils_Date::isoToMysql(
+          CRM_Utils_Date::processDate(
+          $params[$fieldName],
+          CRM_Utils_Array::value("{$fieldName}_time", $params), TRUE)
+        );
+      }
+      else{
+        if(isset($specs['default'])){
+          $params[$fieldName] = date('YmdHis', strtotime($specs['default']));
+        }
+      }
+    }
   }
 
   function removeFileRequiredRules($elementName) {
