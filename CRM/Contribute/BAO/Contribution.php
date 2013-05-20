@@ -2779,11 +2779,11 @@ WHERE  contribution_id = %1 ";
         $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
       }
-    }
-    // record line items and finacial items
+      // record line items and finacial items
 
-    if (!CRM_Utils_Array::value('skipLineItem', $params)) {
-      CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
+      if (!CRM_Utils_Array::value('skipLineItem', $params)) {
+        CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
+      }
     }
 
     // create batch entry if batch_id is passed
@@ -2974,6 +2974,12 @@ WHERE  contribution_id = %1 ";
    * @static
    */
   static function checkStatusValidation($values, &$fields, &$errors) {
+    if (CRM_Utils_System::isNull($values) && CRM_Utils_Array::value('id', $fields)) {
+      $values['contribution_status_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $fields['id'], 'contribution_status_id');
+      if ($values['contribution_status_id'] == $fields['contribution_status_id']) {
+        return FALSE;
+      }
+    }
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $checkStatus = array(
       'Cancelled' => array('Completed', 'Refunded'),

@@ -61,6 +61,15 @@ function civicrm_api3_contribution_create(&$params) {
   $ids = array();
   if (CRM_Utils_Array::value('id', $params)) {
     $ids['contribution'] = $params['id'];
+    // CRM-12498
+    if (CRM_Utils_Array::value('contribution_status_id', $params)) {
+      $error = array(); 
+      //throw error for invalid status change
+      CRM_Contribute_BAO_Contribution::checkStatusValidation(NULL, $params, $error);
+      if (array_key_exists('contribution_status_id', $error)) {
+        return civicrm_api3_create_error($error['contribution_status_id']);
+      }
+    }
   }
 
   $contribution = CRM_Contribute_BAO_Contribution::create($values, $ids);
