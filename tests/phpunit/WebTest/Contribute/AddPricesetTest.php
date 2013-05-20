@@ -163,58 +163,11 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
   }
 
   function _testAddFinancialType() {
-    // Add new Financial Account
-    $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
-    $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
-    $financialAccountDescription = "{$financialAccountTitle} Description";
-    $accountingCode = 1033;
-    $financialAccountType = 'Revenue';
-    $taxDeductible = FALSE;
-    $isActive = FALSE;
-    $isTax = TRUE;
-    $taxRate = 9;
-    $isDefault = FALSE;
-
-    //Add new organisation
-    if($orgName) {
-      $this->webtestAddOrganization($orgName);
-    }
-
-    $this->_testAddFinancialAccount($financialAccountTitle,
-      $financialAccountDescription,
-      $accountingCode,
-      $orgName,
-      $financialAccountType,
-      $taxDeductible,
-      $isActive,
-      $isTax,
-      $taxRate,
-      $isDefault
-    );
-    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-
     //Add new Financial Type
     $financialType['name'] = 'FinancialType '.substr(sha1(rand()), 0, 4);
     $financialType['is_deductible'] = TRUE;
     $financialType['is_reserved'] = FALSE;
     $this->addeditFinancialType($financialType);
-
-    $accountRelationship = "Income Account is";
-    $expected[] = array('financial_account' => $financialAccountTitle,
-
-      'account_relationship' => $accountRelationship
-    );
-
-    $this->select('account_relationship', "label={$accountRelationship}");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(2);
-    $this->select('financial_account_id', "label={$financialAccountTitle}");
-    $this->click('_qf_FinancialTypeAccount_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $text = 'The financial type Account has been saved.';
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     return $financialType['name'];
   }
 
