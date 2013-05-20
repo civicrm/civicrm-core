@@ -362,16 +362,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
       'is_deductible' => FALSE,
     );
     $this->addeditFinancialType($financialType);
-    $this->select('account_relationship', 'label=Income Account is');
-    $this->select('financial_account_id', 'label=Discounts');
-    $this->click('_qf_FinancialTypeAccount_next-botttom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $financialType['name'] = $financialTypeName2;
     $this->addeditFinancialType($financialType);
-    $this->select('account_relationship', 'label=Income Account is');
-    $this->select('financial_account_id', 'label=Discounts');
-    $this->click('_qf_FinancialTypeAccount_next-botttom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     //create 6 contribution
     $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone", "_qf_Contribution_upload");
     for ($i = 1; $i <= 6; $i++) {
