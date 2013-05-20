@@ -483,7 +483,8 @@ AND  civicrm_group_contact.group_id = $groupID ";
 SELECT     gc.group_id, gc.contact_id, g.title, g.children, g.description
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
-WHERE      gc.contact_id IN ($contactIDString)
+WHERE      g.saved_search_id IS NOT NULL AND
+           gc.contact_id IN ($contactIDString)
            $hiddenClause
 ORDER BY   gc.contact_id, g.children
 ";
