@@ -39,7 +39,10 @@ class CRM_Utils_Migrate_Import {
   function run($file) {
 
     // read xml file
-    $dom = DomDocument::load($file);
+    $dom = new DomDocument();
+    if (! $dom->load($file)) {
+      throw new CRM_Core_Exception("Failed to parse XML file \"$file\"");
+    }
     $dom->xinclude();
     $xml = simplexml_import_dom($dom);
 
