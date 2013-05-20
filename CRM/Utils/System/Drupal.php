@@ -696,20 +696,26 @@ AND    u.status = 1
   function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
     // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
+    // sometimes for CLI based on order called, this might not be set and/or empty
     global $language;
-    switch (TRUE) {
-      case $language->language == 'zh-hans':
-        return 'zh_CN';
 
-      case $language->language == 'zh-hant':
-        return 'zh_TW';
-
-      case preg_match('/^.._..$/', $language->language):
-        return $language->language;
-
-      default:
-        return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
+    if (empty($language)) {
+      return NULL;
     }
+
+    if ($language->language == 'zh-hans') {
+      return 'zh_CN';
+    }
+
+    if ($language->language == 'zh-hant') {
+      return 'zh_TW';
+    }
+
+    if (preg_match('/^.._..$/', $language->language)) {
+      return $language->language;
+    }
+
+    return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
   }
 
   function getVersion() {
