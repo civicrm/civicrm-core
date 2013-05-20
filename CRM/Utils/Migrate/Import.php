@@ -36,13 +36,31 @@ class CRM_Utils_Migrate_Import {
   function __construct() {
   }
 
+  /**
+   * Import custom-data from an XML file
+   *
+   * @param string $file path to an XML file
+   * @throws CRM_Core_Exception
+   * @return void;
+   */
   function run($file) {
-
     // read xml file
-    $dom = DomDocument::load($file);
+    $dom = new DomDocument();
+    if (! $dom->load($file)) {
+      throw new CRM_Core_Exception("Failed to parse XML file \"$file\"");
+    }
     $dom->xinclude();
     $xml = simplexml_import_dom($dom);
+    return $this->runXmlElement($xml);
+  }
 
+  /**
+   * Import custom-data from an XML element
+   *
+   * @param SimpleXMLElement $xml
+   * @return void
+   */
+  function runXmlElement($xml) {
     $idMap = array(
       'custom_group' => array(),
       'option_group' => array(),
