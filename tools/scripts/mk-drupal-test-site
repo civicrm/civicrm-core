@@ -86,7 +86,10 @@ if [ -d "sites/$SITE_URL" ]; then
   chmod u+w "sites/$SITE_URL"
   rm -rf "sites/$SITE_URL"
 fi
-drush site-install -y \
+
+# NB: Avoid sending e-mails for the site installation
+# On hosts without sendmail (ex: demo sites), this causes the installation to fail.
+php -d sendmail_path=`which true` `which drush` site-install -y \
   --db-url="mysql://${DB_USER}:${DB_PASS}@${DB_HOST}/${DB_NAME}" \
   --account-name="$ADMIN_USER" \
   --account-pass="$ADMIN_PASS" \
