@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
 */
 require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CRM/Financial/DAO/FinancialAccount.php';
-require_once 'CRM/Financial/BAO/FinancialAccount.php';
 
 class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
@@ -40,6 +38,11 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->organizationCreate();
+  }
+
+  function teardown() {
+    $this->financialAccountDelete('Donations');
   }
 
   /**
@@ -70,7 +73,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    */
   function testRetrieve() {
     $params = array(
-      'name' => 'Donations_1',
+      'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
     );
@@ -79,7 +82,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
 
-    $this->assertEquals($result->name, 'Donations_1', 'Verify financial type name.');
+    $this->assertEquals($result->name, 'Donations', 'Verify financial type name.');
   }
 
   /**
@@ -87,7 +90,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    */
   function testSetIsActive() {
     $params = array(
-      'name' => 'testDonations',
+      'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
     );
@@ -111,7 +114,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    */
   function testdel() {
     $params = array(
-      'name' => 'checkDonations',
+      'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
     );
@@ -129,25 +132,15 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    */
   function testGetAccountingCode() {
     $params = array(
-      'name' => 'TestFinancialAccount',
-      'accounting_code' => 4800,
-      'is_deductible' => 0,
+      'name' => 'Donations',
       'is_active' => 1,
       'is_reserved' => 0,
     );
 
     $ids = array();
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
-    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
-    $financialParams = array(
-      'entity_table' => 'civicrm_financial_type',
-      'entity_id' => $financialType->id,
-      'account_relationship' => $relationTypeId,
-      'financial_account_id' => $financialAccount->id,
-    );
-
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
+    $financialAccountid = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', 'Donations', 'id', 'name');
+    CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountid, 'accounting_code', '4800');
     $accountingCode = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialType->id);
     $this->assertEquals( $accountingCode, 4800, 'Verify accounting code.');
   }
