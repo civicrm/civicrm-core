@@ -187,7 +187,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
            '9' => 3 //discount account is
           );
         
-        $financialAccountType = $financialAccountType[$this->_submitValues['account_relationship']];
+        $financialAccountType = CRM_Utils_Array::value($this->_submitValues['account_relationship'], $financialAccountType);
         $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
         
         $financialAccountSelect = array('' => ts('- select -')) + $result;
