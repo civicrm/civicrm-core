@@ -5,6 +5,9 @@ set -ex
 ## If a site already exists, destroy and recreate it.
 ## Usage: mk-drupal-test-site <domain.name> <db_name> </path/to/drupal> </path/to/civi>
 
+## SOURCE:
+## https://github.com/civicrm/civicrm-core/blob/master/tools/scripts/mk-drupal-test-site
+
 ## Pre-requisites:
 ## - MySQL admin credentials in ~/.my.cnf
 ## - Apache vhost with mod_rewrite, etc
@@ -15,6 +18,34 @@ set -ex
 ## - drush
 ## - (strongly recommended) filesystem with "acl" support
 
+
+function usage() {
+  cat <<EOT
+Usage: mk-drupal-test-site SITE_URL DB_NAME DRUPAL_ROOT [CIVI_ROOT]
+Re/creates a Drupal-based CiviCRM site.
+
+  * SITE_URL: URL of the site. Example: example.org
+  * DB_NAME: MySQL database name. Example: civicrm_test
+  * DRUPAL_ROOT: Root path of the Drupal website. Example: /var/www/
+  * CIVI_ROOT: Root path of the CiviCRM directory. Will be symlinked.
+    You probably want to have a separate version somewhere to avoid
+    cloning a new version of the code base for each CMS.
+    The CiviCRM directory can either contain the main git repositories,
+    or an equivalent of the tar.gz archive.
+    Example: /srv/repositories/civicrm/
+  * SQL_DUMP (optional): instead of a standard blank install, import a
+    specific .sql dump. You can specify two .sql files.
+
+EOT
+
+  exit 99;
+}
+
+[ "$1" = "--help" ] && usage
+[ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] && usage
+[ ! -d "$3" ]                             && echo "ERROR: $3: Drupal root directory not found." && usage
+[ ! -d "$4" ]                             && echo "ERROR: $4: CiviCRM root directory not found." && usage
+
 SITE_URL="$1"
 DB_NAME="$2"
 DB_USER="$DB_NAME"
@@ -23,19 +54,24 @@ DB_HOST=localhost
 DRUPAL_ROOT="$3"
 CIVI_ROOT="$4"
 FACL_USERS="www-data $(whoami)"
+SQL_DUMP="$5"
+SQL_DUMP2="$6"
 
 SITE_KEY=$(makepasswd --chars=16)
 ADMIN_USER="admin"
 ADMIN_PASS=$(makepasswd --chars=12)
 
+# Check if the CiviCRM directory looks OK
 if [ -z "$CIVI_ROOT" -o ! -d "$CIVI_ROOT/bin" ]; then
   echo "Failed to locate civi root: $CIVI_ROOT"
   exit 1
 fi
 
-if [ -z "$DB_NAME" ]; then
-  echo "Missing database name"
-  exit 2
+if [ -n "$SQL_DUMP" ]; then
+  if [ ! -f "$SQL_DUMP" ]; then
+    echo "$SQL_DUMP: Could not find the .sql file. Try using an absolute path to the file."
+    exit 3;
+  fi
 fi
 
 ## Create database
@@ -138,10 +174,22 @@ pushd "$CIVI_ROOT"
 ./bin/setup.sh
 popd
 
-pushd "$DRUPAL_ROOT"
-drush -l "${SITE_URL}" -y pm-enable civicrm
-drush -l "${SITE_URL}" -y pm-enable civicrm_webtest
-drush -l "${SITE_URL}" -y user-create --password=demo --mail='demo@example.com' demo
-drush -l "${SITE_URL}" -y user-add-role civicrm_webtest_user demo
-drush -l "${SITE_URL}" -y -u "$ADMIN_USER" civicrm-api contact.create id=user_contact_id api_key="apikey$ADMIN_PASS"
-popd
+if [ -n "$SQL_DUMP" ]; then
+  echo "Importing SQL dump: $SQL_DUMP"
+  mysql $DB_NAME < $SQL_DUMP
+  echo "SQL import complete."
+
+  if [ -n "$SQL_DUMP2" -a -f "$SQL_DUMP2" ]; then
+    echo "Importing SQL dump: $SQL_DUMP2"
+    mysql $DB_NAME < $SQL_DUMP2
+    echo "SQL import complete."
+  fi
+else
+  pushd "$DRUPAL_ROOT"
+  drush -l "${SITE_URL}" -y pm-enable civicrm
+  drush -l "${SITE_URL}" -y pm-enable civicrm_webtest
+  drush -l "${SITE_URL}" -y user-create --password=demo --mail='demo@example.com' demo
+  drush -l "${SITE_URL}" -y user-add-role civicrm_webtest_user demo
+  popd
+fi
+
