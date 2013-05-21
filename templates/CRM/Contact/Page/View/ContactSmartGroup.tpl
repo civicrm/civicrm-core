@@ -24,9 +24,15 @@
  +--------------------------------------------------------------------+
 *}
 <div class="view-content">
+  {if !$groupSmart AND !$groupParent}
+    <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>
+      &nbsp;{ts}This contact does not currently belong to any smart groups.{/ts}
+    </div>
+  {/if}
+
   {if $groupSmart}
     <div class="ht-one"></div>
-    <h3>{ts}Smart Groups{/ts}</h3>
     <div class="description">
       {ts 1=$displayName}%1 is currently included in these Smart group(s) (e.g. saved searches).{/ts}
     </div>

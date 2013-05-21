@@ -35,13 +35,18 @@
 class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
 
   /**
+   * @var int contact id
+   */
+  public $_contactId;
+
+  /**
    * This function is called when action is browse
    *
    * return null
    * @access public
    */
   function browse() {
-    $in      = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added');
+    $in = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added');
 
     // keep track of all 'added' contact groups so we can remove them from the smart group
     // section
@@ -53,8 +58,8 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
     }
 
     $allGroup = CRM_Contact_BAO_GroupContactCache::contactGroup($this->_contactId);
-    $this->assign('groupSmart'  , null);
-    $this->assign('groupParent', null);
+    $this->assign('groupSmart'  , NULL);
+    $this->assign('groupParent', NULL);
 
     if (!empty($allGroup)) {
       $smart = $parent = array( );
@@ -84,11 +89,11 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
+    $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
+    $this->assign('displayName', $displayName);
+
     // check logged in url permission
     CRM_Contact_Page_View::checkUserPermission($this);
-
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->assign('action', $this->_action);
   }
 
   /**

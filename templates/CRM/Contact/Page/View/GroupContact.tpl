@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="view-content">
-  {if $groupCount eq 0 AND ! $groupSmart AND ! $groupParent}
+  {if $groupCount eq 0}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
       &nbsp;{ts}This contact does not currently belong to any groups.{/ts}
@@ -81,7 +81,21 @@
     {/strip}
   {/if}
 
-
+  {if $contactSmartGroupSettings neq 3}
+  <div class="accordion ui-accordion ui-widget ui-helper-reset">
+    <div class="crm-accordion-wrapper crm-ajax-accordion crm-smartgroup-accordion {if $contactSmartGroupSettings eq 1}collapsed{/if}">
+      <div class="crm-accordion-header" id="crm-contact_smartgroup" contact_id="{$contactId}">
+        {ts}Smart Groups{/ts}
+      </div>
+      <!-- /.crm-accordion-header -->
+      <div class="crm-accordion-body">
+        <div class="crm-contact_smartgroup"></div>
+      </div>
+      <!-- /.crm-accordion-body -->
+    </div>
+    <!-- /.crm-accordion-wrapper -->
+  </div>
+  {/if}
 
   {if $groupPending}
     <div class="ht-one"></div>
@@ -167,3 +181,38 @@
     {/strip}
   {/if}
 </div>
+
+
+{literal}
+<script type="text/javascript">
+  // bind first click of accordion header to load crm-accordion-body with snippet
+  // everything else taken care of by cj().crm-accordions()
+  cj(function () {
+    cj('.crm-ajax-accordion .crm-accordion-header').one('click', function () {
+      loadPanes(cj(this));
+    });
+    cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function (index) {
+      loadPanes(cj(this));
+    });
+  });
+
+  // load panes function calls for snippet based on id of crm-accordion-header
+  function loadPanes(paneObj) {
+    var id = paneObj.attr('id');
+    var contactId = paneObj.attr('contact_id');
+
+    var dataUrl = CRM.url('civicrm/contact/view/smartgroup', 'snippet=4&cid=' + contactId);
+
+    if (!cj('div.' + id).html()) {
+      var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
+      cj('div.' + id).html(loading);
+      cj.ajax({
+        url: dataUrl,
+        success: function (data) {
+          cj('div.' + id).html(data);
+        }
+      });
+    }
+  }
+</script>
+{/literal}
