@@ -110,7 +110,7 @@ for SUBDIR in modules files files/civicrm files/civicrm/templates_c ; do
   fi
 done
 
-ln -s "$CIVI_ROOT" "sites/$SITE_URL/modules/"
+ln -s "$CIVI_ROOT" "sites/$SITE_URL/modules/civicrm"
 
 cat "$CIVI_ROOT/templates/CRM/common/civicrm.settings.php.tpl" \
   | sed "s;%%baseURL%%;http://${SITE_URL};" \
