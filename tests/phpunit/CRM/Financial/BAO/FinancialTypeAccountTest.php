@@ -25,22 +25,20 @@
  +--------------------------------------------------------------------+
 */
 require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CRM/Financial/DAO/FinancialAccount.php';
-require_once 'CRM/Financial/BAO/FinancialAccount.php';
-require_once 'CRM/Financial/BAO/FinancialTypeAccount.php';
 
 class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
 
   function get_info() {
     return array(
-      'name'        => 'FinancialTypeAccount BAOs',
+      'name' => 'FinancialTypeAccount BAOs',
       'description' => 'Test all Contribute_BAO_Contribution methods.',
-      'group'       => 'CiviCRM BAO Tests',
+      'group' => 'CiviCRM BAO Tests',
     );
   }
 
   function setUp() {
     parent::setUp();
+    $this->organizationCreate();
   }
 
   /**
@@ -58,6 +56,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
 
     $ids = array();
     $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    $params['name'] = 'test_financialType1';
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
     $financialParams = array(
@@ -92,6 +91,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     $ids = array();
     $defaults = array();
     $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    $params['name'] = 'test_financialType2';
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
     $financialParams = array(
@@ -119,6 +119,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     );
     $ids = array();
     $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    $params['name'] = 'test_financialType3';
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
     $financialParams = array(
@@ -148,20 +149,20 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     );
     $ids = array();
     $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
-    $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
-    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
-    $financialParams = array(
-      'entity_table' => 'civicrm_financial_type',
-      'entity_id' => $financialType->id,
-      'account_relationship' => $relationTypeId,
+    $params = array(
       'financial_account_id' => $financialAccount->id,
+      'payment_processor_type_id' => 1,
+      'domain_id' => 1,
+      'billing_mode' => 1,
+      'name' => 'paymentProcessor',
     );
-    $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
+    $processor = CRM_Financial_BAO_PaymentProcessor::create($params);
+    
     $account = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount(
-      $financialAccountType->entity_id,
-      $financialAccountType->entity_table
+      $processor->id,
+      'civicrm_payment_processor'
     );
-    $this->assertEquals( $account, 'TestFinancialAccount', 'Verify Financial Account Name');
+    $this->assertEquals($account, 'TestFinancialAccount', 'Verify Financial Account Name');
   }
 
   /**
