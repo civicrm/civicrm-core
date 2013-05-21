@@ -6,8 +6,6 @@
      <title>CiviCRM</title>
      <access_callback>CRM_Core_Permission::checkMenu</access_callback>
      <access_arguments>access CiviCRM</access_arguments>
-     <access_arguments>edit my contact</access_arguments>
-     <access_arguments>view my contact</access_arguments>
      <page_callback>CRM_Contact_Page_DashBoard</page_callback>
      <page_arguments>null</page_arguments>
      <is_ssl>false</is_ssl>
@@ -82,6 +80,10 @@ p  <item>
   <item>
      <path>civicrm/contact/add</path>
      <title>New Contact</title>
+     <access_callback>CRM_Core_Permission::checkMenu</access_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>edit my contact</access_arguments>
+     <access_arguments>view my contact</access_arguments>
      <page_callback>CRM_Contact_Form_Contact</page_callback>
      <page_arguments>addSequence=1</page_arguments>
   </item>
@@ -142,6 +144,10 @@ p  <item>
      <path>civicrm/contact/view</path>
      <path_arguments>cid=%%cid%%</path_arguments>
      <title>Contact Summary</title>
+     <access_callback>CRM_Core_Permission::checkMenu</access_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>edit my contact</access_arguments>
+     <access_arguments>view my contact</access_arguments>
      <page_callback>CRM_Contact_Page_View_Summary</page_callback>
   </item>
   <item>
