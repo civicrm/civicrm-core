@@ -360,7 +360,8 @@ class CRM_Core_BAO_ConfigSetting {
 
     $url = $dir = $siteName = $siteRoot = NULL;
     if ($config->userFramework == 'Joomla') {
-      $url = preg_replace('|administrator/components/com_civicrm/civicrm/|',
+      $url = preg_replace(
+        '|administrator/components/com_civicrm/civicrm/|',
         '',
         $config->userFrameworkResourceURL
       );
@@ -368,17 +369,41 @@ class CRM_Core_BAO_ConfigSetting {
       // lets use imageUploadDir since we dont mess around with its values
       // in the config object, lets kep it a bit generic since folks
       // might have different values etc
-      $dir = preg_replace('|civicrm/templates_c/.*$|',
+      $dir = preg_replace(
+        '|civicrm/templates_c/.*$|',
         '',
         $config->templateCompileDir
       );
-      $siteRoot = preg_replace('|/media/civicrm/.*$|',
+      $siteRoot = preg_replace(
+        '|/media/civicrm/.*$|',
+        '',
+        $config->imageUploadDir
+      );
+    }
+    else if ($config->userFramework == 'WordPress') {
+      $url = preg_replace(
+        '|wp-content/plugins/civicrm/civicrm/|',
+        '',
+        $config->userFrameworkResourceURL
+      );
+
+      // lets use imageUploadDir since we dont mess around with its values
+      // in the config object, lets kep it a bit generic since folks
+      // might have different values etc
+      $dir = preg_replace(
+        '|civicrm/templates_c/.*$|',
+        '',
+        $config->templateCompileDir
+      );
+      $siteRoot = preg_replace(
+        '|/wp-content/plugins/files/civicrm/.*$|',
         '',
         $config->imageUploadDir
       );
     }
     else {
-      $url = preg_replace('|sites/[\w\.\-\_]+/modules/civicrm/|',
+      $url = preg_replace(
+        '|sites/[\w\.\-\_]+/modules/civicrm/|',
         '',
         $config->userFrameworkResourceURL
       );
@@ -386,13 +411,15 @@ class CRM_Core_BAO_ConfigSetting {
       // lets use imageUploadDir since we dont mess around with its values
       // in the config object, lets kep it a bit generic since folks
       // might have different values etc
-      $dir = preg_replace('|/files/civicrm/.*$|',
+      $dir = preg_replace(
+        '|/files/civicrm/.*$|',
         '/files/',
         $config->imageUploadDir
       );
 
       $matches = array();
-      if (preg_match('|/sites/([\w\.\-\_]+)/|',
+      if (preg_match(
+          '|/sites/([\w\.\-\_]+)/|',
           $config->imageUploadDir,
           $matches
         )) {
@@ -417,23 +444,28 @@ class CRM_Core_BAO_ConfigSetting {
     $url = $config->userFrameworkBaseURL;
     $siteName = $siteRoot = NULL;
     if ($config->userFramework == 'Joomla') {
-      $url = preg_replace('|/administrator|',
+      $url = preg_replace(
+        '|/administrator|',
         '',
         $config->userFrameworkBaseURL
       );
-      $siteRoot = preg_replace('|/media/civicrm/.*$|',
+      $siteRoot = preg_replace(
+        '|/media/civicrm/.*$|',
         '',
         $config->imageUploadDir
       );
     }
-    $dir = preg_replace('|civicrm/templates_c/.*$|',
+
+    $dir = preg_replace(
+      '|civicrm/templates_c/.*$|',
       '',
       $config->templateCompileDir
     );
 
-    if ($config->userFramework != 'Joomla') {
+    if ($config->userFramework->is_drupal) {
       $matches = array();
-      if (preg_match('|/sites/([\w\.\-\_]+)/|',
+      if (preg_match(
+          '|/sites/([\w\.\-\_]+)/|',
           $config->templateCompileDir,
           $matches
         )) {

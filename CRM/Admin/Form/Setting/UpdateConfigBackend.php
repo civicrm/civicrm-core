@@ -51,7 +51,8 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Cleanup Caches and Update Paths'));
 
-    list($this->_oldBaseURL,
+    list(
+      $this->_oldBaseURL,
       $this->_oldBaseDir,
       $this->_oldSiteName
     ) = CRM_Core_BAO_ConfigSetting::getConfigSettings();
@@ -60,7 +61,10 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
     $this->assign('oldBaseDir', $this->_oldBaseDir);
     $this->assign('oldSiteName', $this->_oldSiteName);
 
-    $this->addElement('submit', $this->getButtonName('next', 'cleanup'), 'Cleanup Caches', array('class' => 'form-submit', 'id' => 'cleanup-cache'));
+    $this->addElement(
+      'submit', $this->getButtonName('next', 'cleanup'), 'Cleanup Caches',
+      array('class' => 'form-submit', 'id' => 'cleanup-cache')
+    );
 
     $this->add('text', 'newBaseURL', ts('New Base URL'), NULL, TRUE);
     $this->add('text', 'newBaseDir', ts('New Base Directory'), NULL, TRUE);
@@ -77,7 +81,8 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
       parent::setDefaultValues();
 
       $config = CRM_Core_Config::singleton();
-      list($this->_defaults['newBaseURL'],
+      list(
+        $this->_defaults['newBaseURL'],
         $this->_defaults['newBaseDir'],
         $this->_defaults['newSiteName']
       ) = CRM_Core_BAO_ConfigSetting::getBestGuessSettings();
