@@ -143,6 +143,7 @@ VALUES
    ('participant_role'              , '{ts escape="sql"}Participant Role{/ts}'                   , 1, 1),
    ('event_type'                    , '{ts escape="sql"}Event Type{/ts}'                         , 1, 1),
    ('contact_view_options'          , '{ts escape="sql"}Contact View Options{/ts}'               , 1, 1),
+   ('contact_smart_group_display'   , '{ts escape="sql"}Contact Smart Group View Options{/ts}'   , 1, 1),
    ('contact_edit_options'          , '{ts escape="sql"}Contact Edit Options{/ts}'               , 1, 1),
    ('advanced_search_options'       , '{ts escape="sql"}Advanced Search Options{/ts}'            , 1, 1),
    ('user_dashboard_options'        , '{ts escape="sql"}User Dashboard Options{/ts}'             , 1, 1),
@@ -217,6 +218,7 @@ SELECT @option_group_id_pcp            := max(id) from civicrm_option_group wher
 SELECT @option_group_id_pRole          := max(id) from civicrm_option_group where name = 'participant_role';
 SELECT @option_group_id_etype          := max(id) from civicrm_option_group where name = 'event_type';
 SELECT @option_group_id_cvOpt          := max(id) from civicrm_option_group where name = 'contact_view_options';
+SELECT @option_group_id_csgOpt         := max(id) from civicrm_option_group where name = 'contact_smart_group_display';
 SELECT @option_group_id_ceOpt          := max(id) from civicrm_option_group where name = 'contact_edit_options';
 SELECT @option_group_id_asOpt          := max(id) from civicrm_option_group where name = 'advanced_search_options';
 SELECT @option_group_id_udOpt          := max(id) from civicrm_option_group where name = 'user_dashboard_options';
@@ -432,6 +434,11 @@ VALUES
   (@option_group_id_cvOpt, '{ts escape="sql"}Cases{/ts}'        ,  10, 'CiviCase', NULL, 0, NULL,  10, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_cvOpt, '{ts escape="sql"}Grants{/ts}'       ,  11, 'CiviGrant', NULL, 0, NULL,  11, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_cvOpt, '{ts escape="sql"}Pledges{/ts}'      ,  13, 'CiviPledge', NULL, 0, NULL,  13, NULL, 0, 0, 1, NULL, NULL),
+
+
+  (@option_group_id_csgOpt, '{ts escape="sql"}Show Smart Groups on Demand{/ts}',1, 'showondemand', NULL, 0, NULL,  1,  NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_csgOpt, '{ts escape="sql"}Always Show Smart Groups{/ts}',   2, 'alwaysshow', NULL, 0, NULL,  2,  NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_csgOpt, '{ts escape="sql"}Hide Smart Groups{/ts}'       ,   3, 'hide', NULL, 0, NULL,  3,  NULL, 0, 0, 1, NULL, NULL),
 
   (@option_group_id_ceOpt, '{ts escape="sql"}Custom Data{/ts}'              ,   1, 'CustomData', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_ceOpt, '{ts escape="sql"}Address{/ts}'                  ,   2, 'Address', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
