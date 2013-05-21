@@ -58,7 +58,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
 
     $eventInfoStrings = array($eventTitle, $eventDescription, $streetAddress);
-    $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);
+    $eventId = $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);
 
     $registerStrings = array("225.00", "Member", "300.00", "Non-member", $registerIntro);
     $registerUrl = $this->_testVerifyRegisterPage($registerStrings);
@@ -66,6 +66,12 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $numberRegistrations = 3;
     $anonymous = TRUE;
     $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous);
+    
+    // Now test making a copy of the event
+    $this->webtestLogin();
+    $this->openCiviPage("event/manage", "reset=1&action=copy&id=$eventId");
+    $copyEventId = $this->_testVerifyEventInfo('Copy of ' . $eventTitle, $eventInfoStrings);
+    $registerUrl = $this->_testVerifyRegisterPage($registerStrings);    
   }
 
   function testAddPaidEventDiscount() {
