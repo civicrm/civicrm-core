@@ -2304,6 +2304,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       $this->origExtensionSystem = NULL;
     }
   }
+
+  function financialAccountDelete($name) {
+    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
+    $financialAccount->name = $name;
+    if($financialAccount->find(TRUE)) {
+      $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount();
+      $entityFinancialType->financial_account_id = $financialAccount->id;
+      $entityFinancialType->delete();
+      $financialAccount->delete();
+    }
+  }
 }
 
 function CiviUnitTestCase_fatalErrorHandler($message) {

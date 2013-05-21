@@ -37,102 +37,35 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // Add new Financial Account
-    $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
-    $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
-    $financialAccountDescription = "{$financialAccountTitle} Description";
-    $accountingCode = 1033;
-    $financialAccountType = 'Revenue';
-    $taxDeductible = FALSE;
-    $isActive = FALSE;
-    $isTax = TRUE;
-    $taxRate = 5.20;
-    $isDefault = FALSE;
-
-    //Add new organisation
-    if ($orgName) {
-      $this->webtestAddOrganization($orgName);
-    }
-
-    $this->_testAddFinancialAccount(
-
-      $financialAccountTitle,
-      $financialAccountDescription,
-      $accountingCode,
-      $orgName,
-      $financialAccountType,
-      $taxDeductible,
-      $isActive,
-      $isTax,
-      $taxRate,
-      $isDefault
-    );
-
-    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-
-    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom');
-
-    //Varify Data after Adding new Financial Account
-    $verifyData = array(
-
-      'name' => $financialAccountTitle,
-      'description' => $financialAccountDescription,
-      'accounting_code' => $accountingCode,
-      'contact_name' => $orgName,
-      'tax_rate' => $taxRate,
-      'is_tax' => 'on',
-      'is_deductible' => 'off',
-      'is_default' => 'off',
-    );
-
-    $this->_assertFinancialAccount($verifyData);
-    $verifySelectFieldData = array(
-      'financial_account_type_id' => $financialAccountType,
-    );
-    $this->_assertSelectVerify($verifySelectFieldData);
-    $this->click('_qf_FinancialAccount_cancel-botttom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
     //Add new Financial Type
     $financialType['name'] = 'FinancialType '.substr(sha1(rand()), 0, 4);
     $financialType['is_deductible'] = true;
     $financialType['is_reserved'] = false;
     $this->addeditFinancialType($financialType);
-    $accountRelationship = "Income Account is";
-    $expected[] = array(
-
-      'financial_account' => $financialAccountTitle,
-
-      'account_relationship' => $accountRelationship
-
+    $expected = array(
+      array(
+        'financial_account' => $financialType['name'],
+        'account_relationship' => "Income Account is",
+      ),
+      array(
+        'financial_account' => 'Banking Fees',
+        'account_relationship' => 'Expense Account is',
+      ),
+      array(
+        'financial_account' => 'Accounts Receivable',
+        'account_relationship' => 'Accounts Receivable Account is',
+      ),
+      array(
+        'financial_account' => 'Premiums',
+        'account_relationship' => 'Cost of Sales Account is',
+      ),
     );
-
-    $this->select('account_relationship', "label={$accountRelationship}");
-    $this->select('financial_account_id', "label={$financialAccountTitle}");
-    $this->click('_qf_FinancialTypeAccount_next_new');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $text = 'The financial type Account has been saved.';
-    $this->waitForText('crm-notification-container', $text);
-    $text = 'You can add another Financial Account Type.';
-    $this->waitForText('crm-notification-container', $text);
-    $accountRelationship = 'Expense Account is';
-    $expected[] = array(
-      'financial_account' => 'Banking Fees',
-      'account_relationship' => $accountRelationship
-    );
-
-    $this->select('account_relationship', "label={$accountRelationship}");
-    $this->select('financial_account_id', "label=Banking Fees");
-    $this->click('_qf_FinancialTypeAccount_next');
-    $this->waitForElementPresent('newfinancialTypeAccount');
-    $text = 'The financial type Account has been saved.';
-    $this->waitForText('crm-notification-container', $text);
-
+    
     foreach ($expected as  $value => $label) {
       $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='$label[financial_account]']/../td[1]", preg_quote($label['account_relationship']));
     }
     $this->openCiviPage('admin/financial/financialType', 'reset=1', 'newFinancialType');
-    $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[3]", $financialAccountTitle. ',Banking Fees');
+    $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[3]", 'Accounts Receivable,Banking Fees,Premiums,' . $financialType['name']);
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent('newfinancialTypeAccount');
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Banking Fees']/../td[7]/span/a[text()='Edit']");
@@ -142,12 +75,12 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(1);
-    $this->select('account_relationship', "label=Accounts Receivable Account is");
-    $this->select('financial_account_id', "label=Accounts Receivable");
+    $this->select('account_relationship', "label=Premiums Inventory Account is");
+    $this->select('financial_account_id', "label=Premiums inventory");
     $this->click('_qf_FinancialTypeAccount_next');
-    $this->waitForElementPresent("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Accounts Receivable']/../td[7]/span/a[text()='Edit']");
-    $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Accounts Receivable']/../td[1]", preg_quote('Accounts Receivable Account is'));
-    $this->clickLink("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Accounts Receivable']/../td[7]/span/a[text()='Delete']", '_qf_FinancialTypeAccount_next-botttom');
+    $this->waitForElementPresent("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Premiums inventory']/../td[7]/span/a[text()='Edit']");
+    $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Premiums inventory']/../td[1]", preg_quote('Premiums Inventory Account is'));
+    $this->clickLink("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Premiums inventory']/../td[7]/span/a[text()='Delete']", '_qf_FinancialTypeAccount_next-botttom');
     $this->click('_qf_FinancialTypeAccount_next-botttom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', 'Selected financial type account has been deleted.');

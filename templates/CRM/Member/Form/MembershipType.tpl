@@ -214,9 +214,15 @@ function showHidePeriodSettings() {
     (cj("#duration_unit :selected").val() == "year")) {
     cj('#fixed_start_day_row, #fixed_rollover_day_row').show();
     cj('#month_fixed_rollover_day_row').hide();
-    cj("#fixed_period_start_day_M, #fixed_period_start_day_d").val("1");
-    cj("#fixed_period_rollover_day_M").val("12");
-    cj("#fixed_period_rollover_day_d").val("31");
+    if (!cj("#fixed_period_start_day_M, #fixed_period_start_day_d").val()) {
+      cj("#fixed_period_start_day_M, #fixed_period_start_day_d").val("1");
+    }
+    if (!cj("#fixed_period_rollover_day_M").val()) {
+      cj("#fixed_period_rollover_day_M").val("12");
+    }
+    if (!cj("#fixed_period_rollover_day_d").val()) {
+      cj("#fixed_period_rollover_day_d").val("31");
+    }  
     cj("#month_fixed_rollover_day_row").val("");
   }
   else if ((cj("#period_type :selected").val() == "fixed" ) &&

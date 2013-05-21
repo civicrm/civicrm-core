@@ -1666,7 +1666,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->click('_qf_FinancialType_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     if ($option == 'new') {
-      $text = "The financial type '{$financialType['name']}' has been added. You can add Financial Accounts to this Financial Type now.";
+      $text = "Your Financial '{$financialType['name']}' Type has been created, along with a corresponding income account '{$financialType['name']}'. That income account, along with standard financial accounts 'Accounts Receivable', 'Banking Fees' and 'Premiums' have been linked to the financial type. You may edit or replace those relationships here.";
     }
     else {
       $text = "The financial type '{$financialType['name']}' has been saved.";
@@ -1717,63 +1717,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->waitForPageToLoad($this->getTimeoutMsec());
       //$this->assertTrue($this->isTextPresent("Your CiviCRM Profile Field '" . $field['name'] . "' has been saved to '" . $profileTitle . "'. You can add another profile field."));
     }
-  }
-
-  function _testAddFinancialType() {
-    // Add new Financial Account
-    $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
-    $financialAccountTitle = 'Financial Account ' . substr(sha1(rand()), 0, 4);
-    $financialAccountDescription = "{$financialAccountTitle} Description";
-    $accountingCode = 1033;
-    $financialAccountType = 'Revenue'; //Asset Revenue
-    $taxDeductible = FALSE;
-    $isActive = FALSE;
-    $isTax = TRUE;
-    $taxRate = 9.99999999;
-    $isDefault = FALSE;
-
-    //Add new organisation
-    if ($orgName) {
-      $this->webtestAddOrganization($orgName);
-    }
-
-    $this->_testAddFinancialAccount(
-      $financialAccountTitle,
-      $financialAccountDescription,
-      $accountingCode,
-      $orgName,
-      $financialAccountType,
-      $taxDeductible,
-      $isActive,
-      $isTax,
-      $taxRate,
-      $isDefault
-    );
-    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[8]/span/a[text()='Edit']");
-
-    //Add new Financial Type
-    $financialType['name'] = 'FinancialType ' . substr(sha1(rand()), 0, 4);
-    $financialType['is_deductible'] = TRUE;
-    $financialType['is_reserved'] = FALSE;
-    $this->addeditFinancialType($financialType);
-
-    $accountRelationship = "Income Account is"; //Asset Account - of Income Account is
-    $expected[] = array(
-      'financial_account' => $financialAccountTitle,
-      'account_relationship' => $accountRelationship
-    );
-
-    $this->select('account_relationship', "label={$accountRelationship}");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(2);
-    $this->select('financial_account_id', "label={$financialAccountTitle}");
-    $this->click('_qf_FinancialTypeAccount_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $text = 'The financial type Account has been saved.';
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
-    return $financialType['name'];
   }
 
   function addPremium($name, $sku, $amount, $price, $cost, $financialType) {
@@ -1838,9 +1781,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
                                      which uses the entity info as its selection value
    * @param array  $pageUrl          the url which on which the ajax custom group load takes place
+   * @param $beforeTriggering        code to execute before actual element triggering
    * @return void
    */
-  function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl) {
+  function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
     //add the custom set
     $return = $this->addCustomGroupField($customSets);
 
@@ -1852,6 +1796,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         list($entity, $entityData) = explode('_', $entityType);
         $elementType = CRM_Utils_Array::value('type', $customData['triggerElement'], 'select');
         $elementName = CRM_Utils_Array::value('name', $customData['triggerElement']);
+        if ($beforeTriggering) {
+          call_user_func($beforeTriggering);
+        }
         if ($elementType == 'select') {
           //reset the select box, so triggering of ajax only happens
           //WRT input of value in this function

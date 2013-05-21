@@ -35,6 +35,7 @@ INSERT INTO civicrm_setting
   ( domain_id, contact_id, is_domain, group_name, name, value )
 VALUES
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_view_options', '{serialize}123456789101113{/serialize}' ),
+  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_smart_group_display', '{serialize}1{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_edit_options', '{serialize}12345678911{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'advanced_search_options', '{serialize}123456789101112131516171819{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'user_dashboard_options', '{serialize}1234578{/serialize}' ),
@@ -721,6 +722,11 @@ INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
 VALUES
     ( @domainID, 'Soft Credits', 'contribute/softcredit', 'Shows contributions made by contacts that have been soft-credited to other contacts.', 'access CiviContribute', '{literal}a:23:{s:6:"fields";a:5:{s:21:"display_name_creditor";s:1:"1";s:24:"display_name_constituent";s:1:"1";s:14:"email_creditor";s:1:"1";s:14:"phone_creditor";s:1:"1";s:12:"total_amount";s:1:"1";}s:5:"id_op";s:2:"in";s:8:"id_value";a:0:{}s:21:"receive_date_relative";s:1:"0";s:17:"receive_date_from";s:0:"";s:15:"receive_date_to";s:0:"";s:25:"contribution_status_id_op";s:2:"in";s:28:"contribution_status_id_value";a:1:{i:0;s:1:"1";}s:16:"total_amount_min";s:0:"";s:16:"total_amount_max";s:0:"";s:15:"total_amount_op";s:3:"lte";s:18:"total_amount_value";s:0:"";s:6:"gid_op";s:2:"in";s:9:"gid_value";a:0:{}s:8:"tagid_op";s:2:"in";s:11:"tagid_value";a:0:{}s:11:"description";s:20:"Soft Credit details.";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:21:"access CiviContribute";s:6:"groups";s:0:"";s:9:"domain_id";i:1;}{/literal}');
+
+INSERT INTO `civicrm_report_instance`
+    ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
+VALUES
+    (@domainID,'Contribution Aggregate by Relationship','contribute/history','List contact\'s donation history, grouped by year, along with contributions attributed to any of the contact\'s related contacts.','access CiviContribute','{literal}a:41:{s:6:"fields";a:7:{s:9:"sort_name";s:1:"1";s:20:"relationship_type_id";s:1:"1";s:17:"civicrm_upto_2009";s:1:"1";i:2010;s:1:"1";i:2011;s:1:"1";i:2012;s:1:"1";i:2013;s:1:"1";}s:12:"sort_name_op";s:3:"has";s:15:"sort_name_value";s:0:"";s:6:"id_min";s:0:"";s:6:"id_max";s:0:"";s:5:"id_op";s:3:"lte";s:8:"id_value";s:0:"";s:23:"relationship_type_id_op";s:2:"in";s:26:"relationship_type_id_value";a:0:{}s:12:"this_year_op";s:2:"eq";s:15:"this_year_value";s:0:"";s:13:"other_year_op";s:2:"eq";s:16:"other_year_value";s:0:"";s:21:"receive_date_relative";s:0:"";s:17:"receive_date_from";s:0:"";s:15:"receive_date_to";s:0:"";s:25:"contribution_status_id_op";s:2:"in";s:28:"contribution_status_id_value";a:1:{i:0;s:1:"1";}s:20:"financial_type_id_op";s:2:"in";s:23:"financial_type_id_value";a:0:{}s:16:"total_amount_min";s:0:"";s:16:"total_amount_max";s:0:"";s:15:"total_amount_op";s:3:"lte";s:18:"total_amount_value";s:0:"";s:13:"total_sum_min";s:0:"";s:13:"total_sum_max";s:0:"";s:12:"total_sum_op";s:3:"lte";s:15:"total_sum_value";s:0:"";s:6:"gid_op";s:2:"in";s:9:"gid_value";a:0:{}s:8:"tagid_op";s:2:"in";s:11:"tagid_value";a:0:{}s:11:"description";s:127:"List contact''s donation history, grouped by year, along with contributions attributed to any of the contact''s related contacts.";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:21:"access CiviContribute";s:9:"parent_id";s:0:"";s:6:"groups";s:0:"";s:9:"domain_id";i:1;s:11:"is_reserved";b:0;}{/literal}');
 
 INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)

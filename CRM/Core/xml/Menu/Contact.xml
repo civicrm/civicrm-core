@@ -185,6 +185,12 @@
      <page_callback>CRM_Contact_Page_View_GroupContact</page_callback>
   </item>
   <item>
+    <path>civicrm/contact/view/smartgroup</path>
+    <path_arguments>cid=%%cid%%</path_arguments>
+    <title>Smart Groups</title>
+    <page_callback>CRM_Contact_Page_View_ContactSmartGroup</page_callback>
+  </item>
+  <item>
      <path>civicrm/contact/view/sunlight</path>
      <title>Sunlight</title>
      <page_callback>CRM_Contact_Page_View_Sunlight</page_callback>

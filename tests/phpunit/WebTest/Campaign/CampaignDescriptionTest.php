@@ -85,6 +85,8 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
 
   function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
+
+    $this->enableComponents(array('CiviCampaign'));
     $triggerElement = array('name' => 'campaign_type_id', 'type' => 'select');
     $customSets = array(
       array('entity' => 'Campaign', 'subEntity' => 'Referral Program', 'triggerElement' => $triggerElement),

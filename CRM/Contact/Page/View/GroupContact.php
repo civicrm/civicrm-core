@@ -62,32 +62,10 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
     $this->assign_by_ref('groupPending', $pending);
     $this->assign_by_ref('groupOut', $out);
 
-    $allGroup = CRM_Contact_BAO_GroupContactCache::contactGroup($this->_contactId);
-    $this->assign('groupSmart'  , null);
-    $this->assign('groupParent', null);
-
-    if (!empty($allGroup)) {
-      $smart = $parent = array( );
-      foreach ($allGroup['group'] as $group) {
-        // delete all smart groups which are also in static groups
-        if (isset($staticGroups[$group['id']])) {
-          continue;
-        }
-        if (empty($group['children'])) {
-          $smart[] = $group;
-        }
-        else {
-          $parent[] = $group;
-        }
-      }
-
-      if (!empty($smart)) {
-        $this->assign_by_ref('groupSmart', $smart);
-      }
-      if (!empty($parent)) {
-        $this->assign_by_ref('groupParent', $parent);
-      }
-    }
+    // get the info on contact smart groups
+    $contactSmartGroupSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'contact_smart_group_display');
+    $this->assign('contactSmartGroupSettings', $contactSmartGroupSettings);
   }
 
   /**

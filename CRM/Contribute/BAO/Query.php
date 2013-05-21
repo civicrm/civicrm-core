@@ -201,7 +201,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   static function where(&$query) {
-    $testCondition = $grouping = NULL;
+    $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (!CRM_Utils_Array::value(0, $query->_params[$id])) {
         continue;
@@ -209,10 +209,6 @@ class CRM_Contribute_BAO_Query {
       if (substr($query->_params[$id][0], 0, 13) == 'contribution_' || substr($query->_params[$id][0], 0, 10) == 'financial_') {
         if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
-        }
-        if ($query->_params[$id][0] == 'contribution_test') {
-          $testCondition = $id;
-          continue;
         }
         // CRM-12065
         if (
@@ -227,17 +223,9 @@ class CRM_Contribute_BAO_Query {
           continue;
         }
 
-
         $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
-    }
-    // Only add test condition if other fields are selected
-    if ($grouping !== NULL && $testCondition &&
-      // we dont want to include all tests for sql OR CRM-7827
-      $query->getOperator() != 'OR'
-    ) {
-      self::whereClauseSingle($query->_params[$testCondition], $query);
     }
   }
 
@@ -437,11 +425,14 @@ class CRM_Contribute_BAO_Query {
 
       case 'contribution_is_test':
       case 'contribution_test':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.is_test", $op, $value, "Boolean");
-        if ($value) {
-          $query->_qill[$grouping][] = ts("Only Display Test Contributions");
+        // We dont want to include all tests for sql OR CRM-7827
+        if (!$value || $query->getOperator() != 'OR') {
+          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.is_test", $op, $value, "Boolean");
+          if ($value) {
+            $query->_qill[$grouping][] = ts("Only Display Test Contributions");
+          }
+          $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         }
-        $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
       case 'contribution_is_pay_later':

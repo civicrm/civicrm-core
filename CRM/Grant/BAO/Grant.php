@@ -188,7 +188,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       }
     }
     $grant = new CRM_Grant_DAO_Grant();
-    $grant->id = CRM_Utils_Array::value('grant', $ids);
+    $grant->id = CRM_Utils_Array::value('grant_id', $ids);
 
     $grant->copyValues($params);
 

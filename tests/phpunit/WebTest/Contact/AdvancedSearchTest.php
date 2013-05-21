@@ -178,7 +178,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     //--  search with non existing value ( sort name )
     $this->type("sort_name", "$dummyName");
     $this->clickLink("_qf_Advanced_refresh");
-    $this->waitForText('css=div.messages', "No matches found for");
+    $this->waitForText("xpath=//form[@id='Advanced']/div[3]/div/div", "No matches found for");
   }
 
   /*

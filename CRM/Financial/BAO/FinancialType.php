@@ -101,12 +101,17 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, false);
 
     // action is taken depending upon the mode
-    $financialType = new CRM_Financial_DAO_FinancialType( );
-    $financialType->copyValues( $params );;
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->copyValues($params);
     if (CRM_Utils_Array::value('financialType', $ids)) {
       $financialType->id = CRM_Utils_Array::value('financialType', $ids);
     }
-    $financialType->save( );
+    $financialType->save();
+    // CRM-12470
+    if (!CRM_Utils_Array::value('financialType', $ids)) {
+      $titles = CRM_Financial_BAO_FinancialTypeAccount::createDefaultFinancialAccounts($financialType);
+      $financialType->titles = $titles;
+    }
     return $financialType;
   }
 
