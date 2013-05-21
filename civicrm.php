@@ -300,6 +300,16 @@ function civicrm_wp_invoke() {
     return '';
   }
 
+  // CRM-12523
+  // WordPress has it's own timezone calculations
+  // Civi relies on the php default timezone which WP
+  // overrides with UTC in wp-settings.php
+  $wpBaseTimezone = date_default_timezone_get();
+  $wpUserTimezone = get_option('timezone_string');
+  if ($wpUserTimezone) {
+    date_default_timezone_set($wpUserTimezone);
+  }
+
   // Add our standard css & js
   CRM_Core_Resources::singleton()->addCoreResources();
 
@@ -332,6 +342,11 @@ function civicrm_wp_invoke() {
   }
 
   CRM_Core_Invoke::invoke($args);
+
+  // restore WP's timezone
+  if ($wpBaseTimezone) {
+    date_default_timezone_set($wpBaseTimezone);
+  }
 }
 
 function civicrm_wp_head() {
@@ -468,9 +483,7 @@ function civicrm_check_permission($args) {
   $arg3 = CRM_Utils_Array::value(3, $args);
 
   // allow editing of related contacts
-  if ($arg1 == 'contact' &&
-    $arg2 == 'relatedcontact'
-  ) {
+  if ($arg1 == 'contact' && $arg2 == 'relatedcontact') {
     return TRUE;
   }
 
@@ -509,7 +522,8 @@ function civicrm_check_permission($args) {
       return TRUE;
     }
 
-    if ($arg1 == 'pcp' &&
+    if (
+      $arg1 == 'pcp' &&
       (!$arg2 || in_array($arg2, array('info')))
     ) {
       return TRUE;
@@ -517,20 +531,26 @@ function civicrm_check_permission($args) {
   }
 
   // allow mailing urls to be processed
-  if ($arg1 == 'mailing' &&
+  if (
+    $arg1 == 'mailing' &&
     in_array('CiviMail', $config->enableComponents)
   ) {
-    if (in_array($arg2,
+    if (
+      in_array(
+        $arg2,
         array('forward', 'unsubscribe', 'resubscribe', 'optout', 'subscribe', 'confirm', 'view')
-      )) {
+      )
+    ) {
       return TRUE;
     }
   }
 
   // allow petition sign in, CRM-7401
   if (in_array('CiviCampaign', $config->enableComponents)) {
-    if ($arg1 == 'petition' &&
-      $arg2 == 'sign'
+    $validPaths = array('sign', 'thankyou', 'confirm');
+    if (
+      $arg1 == 'petition' &&
+      in_array($arg2, $validPaths)
     ) {
       return TRUE;
     }
@@ -553,7 +573,7 @@ function wp_civicrm_capability() {
     if (
       is_object($roleObj) &&
       is_array($roleObj->capabilities) &&
-      ! array_key_exists('access_civicrm', $wp_roles->get_role($role)->capabilities )
+      !array_key_exists('access_civicrm', $wp_roles->get_role($role)->capabilities )
     ) {
       $wp_roles->add_cap($role, 'access_civicrm');
     }
@@ -594,7 +614,7 @@ function civicrm_wp_main() {
 
   add_shortcode('civicrm', 'civicrm_shortcode_handler');
 
-  if (! $isAdmin) {
+  if (!$isAdmin) {
     add_action('wp_head', 'civicrm_wp_head');
     add_filter('get_header', 'civicrm_wp_shortcode_includes');
   }
