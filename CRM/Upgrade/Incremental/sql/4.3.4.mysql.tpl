@@ -22,3 +22,7 @@ INSERT INTO civicrm_setting
 VALUES
 ({$domainID}, NULL, 1, 'CiviCRM Preferences', 'contact_smart_group_display', '{serialize}1{/serialize}');
 
+-- CRM-12470
+UPDATE civicrm_financial_account
+SET is_default = 1
+WHERE name IN ('{ts escape="sql"}Premiums{/ts}', '{ts escape="sql"}Banking Fees{/ts}', '{ts escape="sql"}Accounts Payable{/ts}', '{ts escape="sql"}Donation{/ts}');

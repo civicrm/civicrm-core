@@ -121,12 +121,11 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
      'is_deductible' => 1,
    );
    $this->addeditFinancialType($financialType);
-   $this->select("account_relationship", "label=Cost of Sales Account is");
-   $this->select("financial_account_id", "label=$from");
-   $this->clickLink("_qf_FinancialTypeAccount_next_new-botttom");
+   $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']");
    $this->select("account_relationship", "label=Premiums Inventory Account is");
    $this->select("financial_account_id", "label=$to");
    $this->clickLink("_qf_FinancialTypeAccount_next-botttom");
+   
    $premiumName = 'Premium'.substr(sha1(rand()), 0, 7);
    $amount = 500;
    $sku = 'SKU';
@@ -187,18 +186,17 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $from = 'Premiums';
    $to = 'Premiums inventory';
    $financialType = array(
-     'name' => 'Test Financial'.substr(sha1(rand()), 0, 7),
+     'name' => 'Test Financial' . substr(sha1(rand()), 0, 7),
      'is_reserved' => 1,
      'is_deductible' => 1,
    );
    $this->addeditFinancialType($financialType);
-   $this->select("account_relationship", "label=Cost of Sales Account is");
-   $this->select("financial_account_id", "label=$from");
-   $this->clickLink("_qf_FinancialTypeAccount_next_new-botttom");
+   $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']");
+   
    $this->select("account_relationship", "label=Premiums Inventory Account is");
    $this->select("financial_account_id", "label=$to");
    $this->clickLink("_qf_FinancialTypeAccount_next-botttom");
-   $premiumName = 'Premium'.substr(sha1(rand()), 0, 7);
+   $premiumName = 'Premium' . substr(sha1(rand()), 0, 7);
    $amount = 500;
    $sku = 'SKU';
    $price = 300;
