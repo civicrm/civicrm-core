@@ -444,6 +444,8 @@ class CRM_Core_Permission {
       'add contacts' => $prefix . ts('add contacts'),
       'view all contacts' => $prefix . ts('view all contacts'),
       'edit all contacts' => $prefix . ts('edit all contacts'),
+      'view my contact' => $prefix . ts('view my contact'),
+      'edit my contact' => $prefix . ts('edit my contact'),
       'delete contacts' => $prefix . ts('delete contacts'),
       'access deleted contacts' => $prefix . ts('access deleted contacts'),
       'import contacts' => $prefix . ts('import contacts'),
