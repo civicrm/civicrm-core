@@ -2755,7 +2755,7 @@ ORDER BY cg.weight, cf.weight";
       }
 
       if (!array_key_exists('type', $curFields[$fieldName])) {
-        $curFields[$fieldName]['type'] = $curFilters[$fieldName]['type'];
+        $curFields[$fieldName]['type'] = CRM_Utils_Array::value('type', $curFilters[$fieldName], array());
       }
 
       if ($addFields) {
