@@ -36,7 +36,7 @@
      <weight>10</weight>
      <page_type>1</page_type>
   </item>
-  <item>
+p  <item>
     <path>civicrm/contact/image</path>
     <title>Process Uploaded Images</title>
     <page_callback>CRM_Contact_BAO_Contact::processImage</page_callback>
@@ -80,9 +80,12 @@
   <item>
      <path>civicrm/contact/add</path>
      <title>New Contact</title>
+     <access_callback>CRM_Core_Permission::checkMenu</access_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>edit my contact</access_arguments>
+     <access_arguments>view my contact</access_arguments>
      <page_callback>CRM_Contact_Form_Contact</page_callback>
      <page_arguments>addSequence=1</page_arguments>
-     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/contact/add/individual</path>
@@ -141,6 +144,10 @@
      <path>civicrm/contact/view</path>
      <path_arguments>cid=%%cid%%</path_arguments>
      <title>Contact Summary</title>
+     <access_callback>CRM_Core_Permission::checkMenu</access_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>edit my contact</access_arguments>
+     <access_arguments>view my contact</access_arguments>
      <page_callback>CRM_Contact_Page_View_Summary</page_callback>
   </item>
   <item>
@@ -171,7 +178,7 @@
      <path_arguments>action=add</path_arguments>
      <title>Activities</title>
      <page_callback>CRM_Contact_Form_Task_PDF</page_callback>
-  </item> 
+  </item>
   <item>
      <path>civicrm/contact/view/rel</path>
      <path_arguments>cid=%%cid%%</path_arguments>

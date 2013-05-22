@@ -102,19 +102,23 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
 
       $ids = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_saved_search', $groups);
-      foreach (array_values($ids) as $id) {
-        $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
-        $this->_viewPermissionedGroups[$groupKey][$id] = $title;
-        $this->_viewPermission = TRUE;
+      if (!empty($ids)) {
+        foreach (array_values($ids) as $id) {
+          $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
+          $this->_viewPermissionedGroups[$groupKey][$id] = $title;
+          $this->_viewPermission = TRUE;
+        }
       }
 
       $ids = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_saved_search', $groups);
-      foreach (array_values($ids) as $id) {
-        $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
-        $this->_editPermissionedGroups[$groupKey][$id] = $title;
-        $this->_viewPermissionedGroups[$groupKey][$id] = $title;
-        $this->_editPermission = TRUE;
-        $this->_viewPermission = TRUE;
+      if (!empty($ids)) {
+        foreach (array_values($ids) as $id) {
+          $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
+          $this->_editPermissionedGroups[$groupKey][$id] = $title;
+          $this->_viewPermissionedGroups[$groupKey][$id] = $title;
+          $this->_editPermission = TRUE;
+          $this->_viewPermission = TRUE;
+        }
       }
     }
 

@@ -216,7 +216,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $defaults['privacy_values'] = CRM_Core_SelectValues::privacy();
 
     //Show blocks only if they are visible in edit form
-    $this->_editOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    $this->_editOptions = CRM_Core_BAO_Setting::valueOptions(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'contact_edit_options'
     );
 
@@ -262,16 +263,23 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $allTabs = array();
     $weight = 10;
 
-    $this->_viewOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'contact_view_options', TRUE
+    $this->_viewOptions = CRM_Core_BAO_Setting::valueOptions(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'contact_view_options',
+      TRUE
     );
+
+    // show the tabs only if user has generic access to CiviCRM
+    $accessCiviCRM = CRM_Core_Permission::check('access CiviCRM');
+
     $changeLog = $this->_viewOptions['log'];
     $this->assign_by_ref('changeLog', $changeLog);
     $components = CRM_Core_Component::getEnabledComponents();
 
     foreach ($components as $name => $component) {
-      if ( CRM_Utils_Array::value($name, $this->_viewOptions) &&
-         CRM_Core_Permission::access($component->name)
+      if (
+        CRM_Utils_Array::value($name, $this->_viewOptions) &&
+        CRM_Core_Permission::access($component->name)
       ) {
         $elem = $component->registerTab();
 
@@ -317,10 +325,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     );
 
     foreach ($rest as $k => $v) {
-      if (CRM_Utils_Array::value($k, $this->_viewOptions)) {
+      if ($accessCiviCRM && CRM_Utils_Array::value($k, $this->_viewOptions)) {
         $allTabs[] = array(
           'id' => $k,
-          'url' => CRM_Utils_System::url("civicrm/contact/view/$k",
+          'url' => CRM_Utils_System::url(
+            "civicrm/contact/view/$k",
             "reset=1&snippet=1&cid={$this->_contactId}"
           ),
           'title' => $v,
