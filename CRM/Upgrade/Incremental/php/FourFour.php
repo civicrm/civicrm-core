@@ -59,10 +59,16 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * @return void
    */
   function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if ($rev == '4.4.alpha1') {
+      $config = CRM_Core_Config::singleton();
+      if (!empty($config->useIDS)) {
+        $postUpgradeMessage .= '<br />' . ts("The setting to skip IDS check has been deprecated. Please use the permission 'skip IDS check' to bypass the IDS system");
+      }
+    }
   }
 
   function upgrade_4_4_alpha1($rev) {
-    // task to process sql                                                         
+    // task to process sql
     $this->addTask(ts('Upgrade DB to 4.4.alpha1: SQL'), 'task_4_4_x_runSql', $rev);
 
     // Consolidate activity contacts CRM-12274.
@@ -83,12 +89,12 @@ class CRM_Upgrade_Incremental_php_FourFour {
     $ovValue[] = $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $ovValue[] = $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $ovValue[] = $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-    
+
     $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_contacts', 'id', 'name');
     if (!empty($ovValue)) {
       $ovValues = implode(', ', $ovValue);
       $query = "
-UPDATE civicrm_option_value 
+UPDATE civicrm_option_value
 SET    is_reserved = 1
 WHERE  option_group_id = {$optionGroupID} AND value IN ($ovValues)";
 
@@ -109,7 +115,7 @@ WHERE  option_group_id = {$optionGroupID} AND value IN ($ovValues)";
     }
 
     if (!$assigneeID || !$sourceID || !$targetID ) {
-      $insert =  "                                                                                                                                                                                    
+      $insert =  "
 INSERT INTO civicrm_option_value
 (option_group_id, label, value, name, weight, is_reserved, is_active)
 VALUES
@@ -134,24 +140,24 @@ CREATE TABLE IF NOT EXISTS civicrm_activity_contact (
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-    
-    $query = " 
+
+    $query = "
 INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type_id)
 SELECT      activity_id, target_contact_id, {$targetID} as record_type_id
 FROM        civicrm_activity_target";
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
-    $query = "  
+    $query = "
 INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type_id)
 SELECT      activity_id, assignee_contact_id, {$assigneeID} as record_type_id
 FROM        civicrm_activity_assignment";
     $dao = CRM_Core_DAO::executeQuery($query);
-    
+
     $query = "
   INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type_id)
 SELECT      id, source_contact_id, {$sourceID} as record_type_id
-FROM        civicrm_activity 
+FROM        civicrm_activity
 WHERE       source_contact_id IS NOT NULL";
 
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -162,9 +168,9 @@ WHERE       source_contact_id IS NOT NULL";
    $query = "DROP TABLE civicrm_activity_assignment";
    $dao = CRM_Core_DAO::executeQuery($query);
 
-   $query = "ALTER  TABLE civicrm_activity 
+   $query = "ALTER  TABLE civicrm_activity
      DROP FOREIGN KEY FK_civicrm_activity_source_contact_id";
-   
+
    $dao = CRM_Core_DAO::executeQuery($query);
 
    $query = "ALTER  TABLE civicrm_activity DROP COLUMN source_contact_id";

@@ -119,7 +119,7 @@ class CRM_Core_Invoke {
   static public function init($args) {
     // first fire up IDS and check for bad stuff
     $config = CRM_Core_Config::singleton();
-    if ($config->useIDS) {
+    if (!CRM_Core_Permission::check('skip IDS check')) {
       $ids = new CRM_Core_IDS();
       $ids->check($args);
     }
