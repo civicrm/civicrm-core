@@ -2064,7 +2064,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $objTypes;
   }
 
-  function hasReachedMaxLimit($customGroupId, $entityId) {
+  static function hasReachedMaxLimit($customGroupId, $entityId) {
     //check whether the group is multiple
     $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_multiple');
     $isMultiple = ($isMultiple) ? TRUE : FALSE;
