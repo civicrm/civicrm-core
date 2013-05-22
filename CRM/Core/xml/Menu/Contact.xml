@@ -36,7 +36,7 @@
      <weight>10</weight>
      <page_type>1</page_type>
   </item>
-p  <item>
+  <item>
     <path>civicrm/contact/image</path>
     <title>Process Uploaded Images</title>
     <page_callback>CRM_Contact_BAO_Contact::processImage</page_callback>
