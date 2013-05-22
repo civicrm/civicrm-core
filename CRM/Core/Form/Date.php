@@ -172,7 +172,10 @@ Class CRM_Core_Form_Date {
         'ending.month' => ts('From 1 Month Ago'),
         'ending.week' => ts('From 1 Week Ago'),
       );
-    $selector = array_merge($selector, $operators);
+
+    if (is_array($operators)) {
+      $selector = array_merge($selector, $operators);
+    }
 
     $config = CRM_Core_Config::singleton();
     //if fiscal year start on 1 jan then remove fiscal year task
