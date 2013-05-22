@@ -873,7 +873,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         if (in_array('Membership', $groupType) || in_array('Contribution', $groupType)
           || in_array('Organization', $groupType) || in_array('Household', $groupType) || in_array('Activity', $groupType)
         ) {
-          $errors['field_name'] = ts('Cannot add or update profile field type Participant with combination of Activity or Membership or Contribution or Household or Organization or Activity');
+          $errors['field_name'] = ts('Cannot add or update profile field type Participant with combination of Activity or Membership or Contribution or Household or Organization.');
         }
         else {
           self::formRuleSubType($fieldType, $groupType, $errors);
