@@ -148,7 +148,8 @@ class CRM_Core_Permission {
       return TRUE;
     }
 
-    if (self::check('administer Multiple Organizations') &&
+    if (
+      self::check('administer Multiple Organizations') &&
       self::isMultisiteEnabled()
     ) {
       return TRUE;
@@ -451,6 +452,7 @@ class CRM_Core_Permission {
       'import contacts' => $prefix . ts('import contacts'),
       'edit groups' => $prefix . ts('edit groups'),
       'administer CiviCRM' => $prefix . ts('administer CiviCRM'),
+      'skip IDS check' => $prefix . ts('skip IDS check'),
       'access uploaded files' => $prefix . ts('access uploaded files'),
       'profile listings and forms' => $prefix . ts('profile listings and forms'),
       'profile listings' => $prefix . ts('profile listings'),
