@@ -16,7 +16,6 @@
 <xi:include href="Contribute/files.xml"        parse="xml" />
 <xi:include href="Financial/files.xml"         parse="xml" />
 <xi:include href="SMS/files.xml"               parse="xml" />
-<xi:include href="Project/files.xml"           parse="xml" />
 <xi:include href="Member/files.xml"            parse="xml" />
 <xi:include href="Campaign/files.xml"          parse="xml" />
 <xi:include href="Activity/files.xml"          parse="xml" />

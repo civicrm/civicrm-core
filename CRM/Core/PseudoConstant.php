@@ -232,13 +232,6 @@ class CRM_Core_PseudoConstant {
   private static $currencySymbols;
 
   /**
-   * project tasks
-   * @var array
-   * @static
-   */
-  private static $tasks;
-
-  /**
    * preferred communication methods
    * @var array
    * @static
@@ -1211,21 +1204,6 @@ WHERE  id = %1";
       self::populate(self::$ufGroup, 'CRM_Core_DAO_UFGroup', FALSE, 'title', 'is_active', NULL, 'title');
     }
     return self::$ufGroup;
-  }
-
-  /**
-   * Get all the project tasks
-   *
-   * @access public
-   *
-   * @return array - array reference of all tasks
-   * @static
-   */
-  public static function &tasks() {
-    if (!self::$tasks) {
-      self::populate(self::$tasks, 'CRM_Project_DAO_Task', FALSE, 'title', 'is_active', NULL, 'title');
-    }
-    return self::$tasks;
   }
 
   /**

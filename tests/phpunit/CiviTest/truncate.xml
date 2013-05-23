@@ -69,12 +69,6 @@
 
   <civicrm_sms_provider />
 
-  <civicrm_project />
-
-  <civicrm_task />
-
-  <civicrm_task_status />
-
   <civicrm_membership_status />
 
   <civicrm_campaign />
