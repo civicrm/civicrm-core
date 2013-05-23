@@ -579,7 +579,14 @@ class CRM_Report_Form extends CRM_Core_Form {
         foreach ($table['filters'] as $fieldName => $field) {
           if (isset($field['default'])) {
             if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-              $this->_defaults["{$fieldName}_relative"] = $field['default'];
+              if(is_array($field['default'])){
+                $this->_defaults["{$fieldName}_from"] = CRM_Utils_Array::value('from', $field['default']);
+                $this->_defaults["{$fieldName}_to"] = CRM_Utils_Array::value('to', $field['default']);
+                $this->_defaults["{$fieldName}_relative"] = 0;
+              }
+              else{
+                $this->_defaults["{$fieldName}_relative"] = $field['default'];
+              }
             }
             else {
               $this->_defaults["{$fieldName}_value"] = $field['default'];
