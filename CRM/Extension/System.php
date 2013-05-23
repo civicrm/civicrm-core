@@ -108,7 +108,7 @@ class CRM_Extension_System {
       if (NULL !== $cmsRootPath) {
         $vendorPath = $cmsRootPath . DIRECTORY_SEPARATOR . 'vendor';
         if (is_dir($vendorPath)) {
-          $containers['cmsvendor'] = new CRM_Extension_Container_Basic($vendorPath, $config->userFrameworkBaseURL, $this->getCache(), 'cmsvendor');
+          $containers['cmsvendor'] = new CRM_Extension_Container_Basic($vendorPath, $config->userFrameworkBaseURL  . DIRECTORY_SEPARATOR . 'vendor', $this->getCache(), 'cmsvendor');
         }
       }
 
