@@ -3784,21 +3784,22 @@ WHERE  id IN ( $groupIDs )
       $this->_qill[$grouping][] = "$allRelationshipType[$value]  ( " . implode(", ", $qillNames) . " )";
     }
 
-
+    // Note we do not currently set mySql to handle timezones, so doing this the old-fashioned way
+    $today = date('Ymd');
     //check for active, inactive and all relation status
     if ($relStatus[2] == 0) {
       $this->_where[$grouping][] = "(
 civicrm_relationship.is_active = 1 AND
-( civicrm_relationship.end_date IS NULL OR civicrm_relationship.end_date >= CURDATE() ) AND
-( civicrm_relationship.start_date IS NULL OR civicrm_relationship.start_date <= CURDATE() )
+( civicrm_relationship.end_date IS NULL OR civicrm_relationship.end_date >= {$today} ) AND
+( civicrm_relationship.start_date IS NULL OR civicrm_relationship.start_date <= {$today} )
 )";
       $this->_qill[$grouping][] = ts('Relationship - Active and Current');
     }
     elseif ($relStatus[2] == 1) {
       $this->_where[$grouping][] = "(
 civicrm_relationship.is_active = 0 OR
-civicrm_relationship.end_date < CURDATE() OR
-civicrm_relationship.start_date > CURDATE()
+civicrm_relationship.end_date < {$today} OR
+civicrm_relationship.start_date > {$today}
 )";
       $this->_qill[$grouping][] = ts('Relationship - Inactive or not Current');
     }
