@@ -254,9 +254,6 @@ class CRM_Dedupe_Merger {
         'civicrm_log' => array('entity_table' => 'entity_id'),
         'civicrm_mailing_group' => array('entity_table' => 'entity_id'),
         'civicrm_note' => array('entity_table' => 'entity_id'),
-        'civicrm_project' => array('owner_entity_table' => 'owner_entity_id'),
-        'civicrm_task' => array('owner_entity_table' => 'owner_entity_id'),
-        'civicrm_task_status' => array('responsible_entity_table' => 'responsible_entity_id', 'target_entity_table' => 'target_entity_id'),
       );
 
       // Allow hook_civicrm_merge() to adjust $eidRefs
