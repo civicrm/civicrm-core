@@ -2654,6 +2654,9 @@ WHERE  contribution_id = %1 ";
     if (!CRM_Utils_Array::value('prevContribution', $params)) {
       $entityID = NULL;
     }
+    else {
+      $update = TRUE;
+    }
     // build line item array if its not set in $params
     if (!CRM_Utils_Array::value('line_item', $params) || $additionalPaticipantId) {
       CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
@@ -2771,7 +2774,6 @@ WHERE  contribution_id = %1 ";
             self::updateFinancialAccounts($params);
           }
         }
-        $update = TRUE;
       }
 
       if (!$update) {
@@ -2779,11 +2781,10 @@ WHERE  contribution_id = %1 ";
         $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
       }
-      // record line items and finacial items
-
-      if (!CRM_Utils_Array::value('skipLineItem', $params)) {
-        CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
-      }
+    }
+    // record line items and finacial items
+    if (!CRM_Utils_Array::value('skipLineItem', $params)) {
+      CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
     }
 
     // create batch entry if batch_id is passed
@@ -2792,7 +2793,7 @@ WHERE  contribution_id = %1 ";
         'batch_id' => $params['batch_id'],
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $financialTxn->id,
-                            );
+      );
       CRM_Batch_BAO_Batch::addBatchEntity($entityParams);
     }
 
