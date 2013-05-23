@@ -2779,11 +2779,10 @@ WHERE  contribution_id = %1 ";
         $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
       }
-      // record line items and finacial items
-
-      if (!CRM_Utils_Array::value('skipLineItem', $params)) {
-        CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
-      }
+    }
+    // record line items and finacial items
+    if (!CRM_Utils_Array::value('skipLineItem', $params)) {
+      CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
     }
 
     // create batch entry if batch_id is passed
