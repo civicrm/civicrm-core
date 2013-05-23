@@ -18,3 +18,10 @@ VALUES
 -- CRM-12580
 ALTER TABLE civicrm_contact ADD  INDEX index_is_deleted_sort_name(is_deleted, sort_name, id);
 ALTER TABLE civicrm_contact DROP INDEX index_is_deleted;
+
+-- CRM-12495
+DROP TABLE IF EXISTS `civicrm_task_status`;
+DROP TABLE IF EXISTS `civicrm_task`;
+DROP TABLE IF EXISTS `civicrm_project`;
+
+
