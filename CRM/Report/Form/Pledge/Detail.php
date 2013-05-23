@@ -27,13 +27,13 @@
  +--------------------------------------------------------------------+
 */
 
- 
+
  /*
   *   !!!!!!!!!!!!!!!!!!!!
   *     NB: this is named detail but behaves like a summary report.
-  * 	It is also accessed through the Pledge Summary link in the UI
-  * 	This should presumably be changed.
-  * 	~ Doten
+  *   It is also accessed through the Pledge Summary link in the UI
+  *   This should presumably be changed.
+  *   ~ Doten
   *   !!!!!!!!!!!!!!!!!!!!
   *
   */
@@ -54,9 +54,9 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     'Individual'
   );
   function __construct() {
-	  
-	// Check if CiviCampaign is a) enabled and b) has active campaigns
-	$config = CRM_Core_Config::singleton();
+
+  // Check if CiviCampaign is a) enabled and b) has active campaigns
+  $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
@@ -167,7 +167,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('contribution_status'),
           ),
-          
+
         ),
       ),
       'civicrm_pledge_payment' =>
@@ -186,7 +186,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
               'default' => TRUE,
               'type' => CRM_Utils_Type::T_MONEY,
             ),
-            
+
         ),
       ),
       'civicrm_group' =>
@@ -204,21 +204,22 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
             'options' => CRM_Core_PseudoConstant::group(),
           ),
         ),
-      ),
-    ) + $this->addAddressFields(FALSE, FALSE);
-    
+      )
+    )
+    + $this->getAddressColumns(array('group_by' => FALSE))
+    + $this->getPhoneColumns();
     // If we have a campaign, build out the relevant elements
     $this->_tagFilter = TRUE;
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
-		$this->_columns['civicrm_pledge']['fields']['campaign_id'] = array(
+    $this->_columns['civicrm_pledge']['fields']['campaign_id'] = array(
           'title' => 'Campaign',
           'default' => 'false',
-		);
-		$this->_columns['civicrm_pledge']['filters']['campaign_id'] = array('title' => ts('Campaign'),
+    );
+    $this->_columns['civicrm_pledge']['filters']['campaign_id'] = array('title' => ts('Campaign'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $this->activeCampaigns,
-		);
-		$this->_columns['civicrm_pledge']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
+    );
+    $this->_columns['civicrm_pledge']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
 
     }
 
@@ -280,15 +281,8 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       ";
     }
 
-    // include address field if address column is to be included
-    if ($this->_addressField) {
-      $this->_from .= "
-                 LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                           ON ({$this->_aliases['civicrm_contact']}.id =
-                               {$this->_aliases['civicrm_address']}.contact_id) AND
-                               {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
-
+    $this->addPhoneFromClause();
+    $this->addAddressFromClause();
     // include email field if email column is to be included
     if ($this->_emailField) {
       $this->_from .= "
@@ -319,7 +313,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       while ($dao->fetch()) {
        $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)."(".$dao->count.")";
        $average[] =   CRM_Utils_Money::format($dao->avg, $dao->currency);
-       $count += $dao->count; 
+       $count += $dao->count;
       }
 
       $statistics['counts']['amount'] = array(
