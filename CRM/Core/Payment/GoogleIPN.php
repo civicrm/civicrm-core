@@ -168,6 +168,10 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
           $contribution->invoice_id = $input['invoice'];
           $contribution->total_amount = $dataRoot['order-total']['VALUE'];
           $contribution->contribution_status_id = 2;
+          $contribution->honor_contact_id = $objects['contribution']->honor_contact_id;
+          $contribution->honor_type_id = $objects['contribution']->honor_type_id;
+          $contribution->campaign_id = $objects['contribution']->campaign_id;
+
           $objects['contribution'] = $contribution;
         }
         $transaction->commit();
