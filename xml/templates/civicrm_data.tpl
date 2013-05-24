@@ -1293,7 +1293,8 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'sender was rejected'),
     (@bounceTypeID, 'spam(check| reduction software| filters?)'),
     (@bounceTypeID, 'blocked by a user configured filter'),
-    (@bounceTypeID, 'detected as spam');
+    (@bounceTypeID, 'detected as spam'),
+    (@bounceTypeID, 'X-HmXmrOriginalRecipient');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)

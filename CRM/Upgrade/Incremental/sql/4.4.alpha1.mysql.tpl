@@ -24,4 +24,9 @@ DROP TABLE IF EXISTS `civicrm_task_status`;
 DROP TABLE IF EXISTS `civicrm_task`;
 DROP TABLE IF EXISTS `civicrm_project`;
 
+-- CRM-12425
+SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Spam';
+INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
+VALUES (@bounceTypeID, 'X-HmXmrOriginalRecipient');
+
 
