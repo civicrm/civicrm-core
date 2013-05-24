@@ -310,10 +310,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form {
     $this->fixFormValues();
 
     // we don't show test memberships in Contact Summary / User Dashboard
-    // in Search mode by default we hide test memberships
-    if (!CRM_Utils_Array::value('member_test',
-        $this->_formValues
-      )) {
+    if (empty($this->_formValues['member_test']) && $this->_single) {
       $this->_formValues["member_test"] = 0;
     }
 

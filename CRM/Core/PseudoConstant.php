@@ -1001,7 +1001,7 @@ WHERE  id = %1";
         return self::$country[$id];
       }
       else {
-        return NULL;
+        return CRM_Core_DAO::$_nullObject;
       }
     }
     return self::$country;
@@ -1031,7 +1031,7 @@ WHERE  id = %1";
         return self::$countryIsoCode[$id];
       }
       else {
-        return NULL;
+        return CRM_Core_DAO::$_nullObject;
       }
     }
     return self::$countryIsoCode;
@@ -1583,7 +1583,7 @@ WHERE  id = %1";
         return self::$county[$id];
       }
       else {
-        return NULL;
+        return CRM_Core_DAO::$_nullObject;
       }
     }
     return self::$county;
@@ -1688,7 +1688,7 @@ WHERE  id = %1";
         return self::$worldRegions[$id];
       }
       else {
-        return NULL;
+        return CRM_Core_DAO::$_nullObject;
       }
     }
 
@@ -1924,7 +1924,7 @@ ORDER BY name";
    */
   static function countryIDForStateID($stateID) {
     if (empty($stateID)) {
-      return NULL;
+      return CRM_Core_DAO::$_nullObject;
     }
 
     $query = "

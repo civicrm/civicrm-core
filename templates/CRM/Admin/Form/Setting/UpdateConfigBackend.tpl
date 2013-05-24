@@ -39,7 +39,7 @@
             <tr class="crm-config-backend-form-block-newBaseDir">
                 <td class="label">{$form.newBaseDir.label}</td>
                 <td>{$form.newBaseDir.html|crmAddClass:'huge'}<br />
-                <span class="description">{ts}For Drupal installs, this is the absolute path to the location of the 'files' directory. For Joomla installs this is the absolute path to the location of the 'media' directory.{/ts}</span></td>
+                <span class="description">{ts}For Drupal and WordPress installs, this is the absolute path to the location of the 'files' directory. For Joomla installs this is the absolute path to the location of the 'media' directory.{/ts}</span></td>
             </tr>
             <tr class="crm-config-backend-form-block-oldBaseURL">
                 <td class="label">{ts}Old Base URL{/ts}</td>
@@ -48,7 +48,7 @@
             <tr class="crm-config-backend-form-block-newBaseURL">
                 <td class="label">{$form.newBaseURL.label}</td>
                 <td>{$form.newBaseURL.html|crmAddClass:'huge'}<br />
-                <span class="description">{ts}This is the URL for your Drupal or Joomla site URL (e.g. http://www.mysite.com/drupal/).{/ts}</span></td>
+                <span class="description">{ts}This is the URL for your Drupal, Joomla or WordPress site (e.g. http://www.mysite.com/drupal/).{/ts}</span></td>
             </tr>
 {if $oldSiteName}
             <tr class="crm-config-backend-form-block-oldSiteName">

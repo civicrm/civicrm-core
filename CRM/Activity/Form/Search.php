@@ -327,9 +327,11 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
 
-    if (!CRM_Utils_Array::value('activity_test', $this->_formValues)) {
+    // we don't show test activities in Contact Summary / User Dashboard
+    if (empty($this->_formValues['activity_test']) && $this->_single) {
       $this->_formValues["activity_test"] = 0;
     }
+
     if (!CRM_Utils_Array::value('activity_contact_name', $this->_formValues) && !CRM_Utils_Array::value('contact_id', $this->_formValues)) {
       $this->_formValues['activity_role'] = NULL;
     }
