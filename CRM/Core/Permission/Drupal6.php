@@ -72,6 +72,7 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
   function check($str, $contactID = NULL) {
     $str = $this->translatePermission($str, 'Drupal6', array(
       'view user account' => 'access user profiles',
+      'administer users' => 'administer users',
     ));
     if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
