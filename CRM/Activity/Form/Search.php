@@ -435,7 +435,58 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
     if (!empty($this->_defaults)) {
       $this->setDefaults($this->_defaults);
     }
-
+        
+    // Added for membership search
+    
+    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive',
+      CRM_Core_DAO::$_nullObject
+    );
+    
+    if ($signupType) {
+      //$this->_formValues['activity_type_id'] = array();
+    
+      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
+      $signup = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
+      $renew = CRM_Utils_Array::key('Membership Signup', $activityTypes);
+      
+      switch ($signupType) {
+        case 3: // signups and renewals
+          $this->_formValues['activity_type_id'][$renew] = 1;
+          $this->_defaults['activity_type_id'][$renew] = 1;
+        case 1: // signups only
+          $this->_formValues['activity_type_id'][$signup] = 1;
+          $this->_defaults['activity_type_id'][$signup] = 1;
+          break;
+          
+        case 2: // renewals only
+          $this->_formValues['activity_type_id'][$renew] = 1;
+          $this->_defaults['activity_type_id'][$renew] = 1;
+          break;
+      }
+    }
+    
+    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'Positive',
+      CRM_Core_DAO::$_nullObject
+    );
+    
+    if ($dateLow) {
+      $this->_formValues['activity_date_low'] = $dateLow;
+      $this->_defaults['activity_date_low'] = $dateLow;
+    }
+    
+    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'Positive',
+      CRM_Core_DAO::$_nullObject
+    );
+    
+    if ($dateHigh) {
+      // Activity date time assumes midnight at the beginning of the date
+      // This sets it to almost midnight at the end of the date
+      if ($dateHigh <= 99999999) {
+        $dateHigh = 1000000 * $dateHigh + 235959;
+      }
+      $this->_formValues['activity_date_high'] = $dateHigh;
+      $this->_defaults['activity_date_high'] = $dateHigh;
+    } 
   }
 
   function getFormValues() {

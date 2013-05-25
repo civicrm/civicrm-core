@@ -49,17 +49,18 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
   function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviMember'));
     $membershipSummary = array();
-    $preMonth          = CRM_Utils_Date::customFormat(date("Y-m-d", mktime(0, 0, 0, date("m") - 1, 01, date("Y"))), '%Y%m%d');
-    $preMonthEnd       = CRM_Utils_Date::customFormat(date("Y-m-t", mktime(0, 0, 0, date("m") - 1, 01, date("Y"))), '%Y%m%d');
-    $prePreMonthEnd    = CRM_Utils_Date::customFormat(date("Y-m-t", mktime(0, 0, 0, date("m") - 2, 01, date("Y"))), '%Y%m%d');
+    $preMonth = date("Y-m-d", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
+    $preMonthEnd = date("Y-m-t", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
 
     $preMonthYear = mktime(0, 0, 0, substr($preMonth, 4, 2), 1, substr($preMonth, 0, 4));
 
-    $today          = getdate();
-    $date           = CRM_Utils_Date::getToday();
+    $today = getdate();
+    $date = CRM_Utils_Date::getToday();
     $isCurrentMonth = 0;
 
+    // You can force the dashboard to display based upon a certain date
     $ym = CRM_Utils_Array::value('date', $_GET);
+    
     if ($ym) {
       if (preg_match('/^\d{6}$/', $ym) == 0 ||
         !checkdate(substr($ym, 4, 2), 1, substr($ym, 0, 4)) ||
@@ -69,34 +70,22 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
       }
 
       $isPreviousMonth = 0;
-      $isCurrentMonth  = substr($ym, 0, 4) == $today['year'] && substr($ym, 4, 2) == $today['mon'];
-      $ymd             = date('Ymd', mktime(0, 0, -1, substr($ym, 4, 2) + 1, 1, substr($ym, 0, 4)));
-      $monthStartTs    = mktime(0, 0, 0, substr($ym, 4, 2), 1, substr($ym, 0, 4));
-      $current         = CRM_Utils_Date::customFormat($date, '%Y%m%d');
+      $isCurrentMonth = substr($ym, 0, 4) == $today['year'] && substr($ym, 4, 2) == $today['mon'];
+      $ymd = date('Y-m-d', mktime(0, 0, -1, substr($ym, 4, 2) + 1, 1, substr($ym, 0, 4)));
+      $monthStartTs = mktime(0, 0, 0, substr($ym, 4, 2), 1, substr($ym, 0, 4));
+      $current = CRM_Utils_Date::customFormat($date, '%Y-%m-%d');
+      $ym = substr($ym, 0, 4) . '-' . substr($ym, 4, 2);
     }
     else {
-      $ym              = sprintf("%04d%02d", $today['year'], $today['mon']);
-      $ymd             = sprintf("%04d%02d%02d", $today['year'], $today['mon'], $today['mday']);
-      $monthStartTs    = mktime(0, 0, 0, $today['mon'], 1, $today['year']);
-      $current         = NULL;
-      $isCurrentMonth  = 1;
+      $ym = sprintf("%04d-%02d", $today['year'], $today['mon']);
+      $ymd = sprintf("%04d-%02d-%02d", $today['year'], $today['mon'], $today['mday']);
+      $monthStartTs = mktime(0, 0, 0, $today['mon'], 1, $today['year']);
+      $current = CRM_Utils_Date::customFormat($date, '%Y-%m-%d');
+      $isCurrentMonth = 1;
       $isPreviousMonth = 1;
     }
-    $monthStart = $ym . '01';
-    $yearStart = substr($ym, 0, 4) . '0101';
-
-    // $preMonthStart is the day before $monthStart
-    $preMonthStart = CRM_Utils_Date::customFormat(date("Y-m-t",
-        mktime(0, 0, 0, substr($ym, 4, 2) - 1, 01, substr($ym, 0, 4))
-      ),
-      '%Y%m%d'
-    );
-    // $preYearStart is the day before $yearStart
-    $preYearStart = CRM_Utils_Date::customFormat(date("Y-m-t",
-        mktime(0, 0, 0, 12, 31, substr($ym, 0, 4) - 1)
-      ),
-      '%Y%m%d'
-    );
+    $monthStart = $ym . '-01';
+    $yearStart = substr($ym, 0, 4) . '-01-01';
 
     $membershipTypes = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     // added
@@ -175,6 +164,11 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent();
     $status = implode(',', $status);
 
+    /* Disabled for lack of appropriate search
+       
+       The Membership search isn't able to properly filter by join or renewal events.
+       Until that works properly, the subtotals shouldn't get links.
+ 
     foreach ($membershipSummary as $typeID => $details) {
       foreach ($details as $key => $value) {
         switch ($key) {
@@ -243,8 +237,26 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
         }
       }
     }
-    // LCD debug
-    //CRM_Core_Error::debug($membershipSummary);
+    */
+    
+    // Temporary replacement for current totals column
+    
+    foreach ($membershipSummary as $typeID => $details) {
+      if (!$isCurrentMonth) {
+        $membershipSummary[$typeID]['total']['total']['url'] = CRM_Utils_System::url('civicrm/member/search',
+          "reset=1&force=1&start=&end=$ymd&status=$status&type=$typeID"
+        );
+        $membershipSummary[$typeID]['total_owner']['total_owner']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&start=&end=$ymd&status=$status&type=$typeID&owner=1");
+      }
+      else {
+        $membershipSummary[$typeID]['total']['total']['url'] = CRM_Utils_System::url('civicrm/member/search',
+          "reset=1&force=1&status=$status"
+        );
+        $membershipSummary[$typeID]['total_owner']['total_owner']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1");
+      }
+      $membershipSummary[$typeID]['current']['total']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&type=$typeID");
+      $membershipSummary[$typeID]['current_owner']['current_owner']['url'] = CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&type=$typeID&owner=1");
+    }
 
     $totalCount = array();
 
@@ -276,64 +288,64 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 
     $totalCount['premonth']['new'] = array(
       'count' => $newCountPreMonth,
-      'url' => CRM_Utils_System::url('civicrm/member/search',
-        "reset=1&force=1&status=$status&join=$preMonth&joinEnd=$preMonthEnd&start=$preMonth&end=$preMonthEnd"
+      'url' => CRM_Utils_System::url('civicrm/activity/search',
+        "reset=1&force=1&signupType=1&dateLow=$preMonth&dateHigh=$preMonthEnd"
       ),
     );
 
     $totalCount['premonth']['renew'] = array(
       'count' => $renewCountPreMonth,
-      'url' => CRM_Utils_System::url('civicrm/member/search',
-        "reset=1&force=1&status=$status&joinEnd=$prePreMonthEnd&start=$preMonth&end=$preMonthEnd"
+      'url' => CRM_Utils_System::url('civicrm/activity/search',
+        "reset=1&force=1&signupType=2&dateLow=$preMonth&dateHigh=$preMonthEnd"
       ),
     );
 
     $totalCount['premonth']['total'] = array(
       'count' => $totalCountPreMonth,
-      'url' => CRM_Utils_System::url('civicrm/member/search',
-        "reset=1&force=1&status=$status&start=$preMonth&end=$preMonthEnd"
+      'url' => CRM_Utils_System::url('civicrm/activity/search',
+        "reset=1&force=1&signupType=3&dateLow=$preMonth&dateHigh=$preMonthEnd"
       ),
     );
 
     $totalCount['month']['new'] = array(
       'count' => $newCountMonth,
-      'url' => CRM_Utils_System::url('civicrm/member/search',
-        "reset=1&force=1&status=$status&join=$monthStart&joinEnd=$ymd&start=$monthStart&end=$ymd"
+      'url' => CRM_Utils_System::url('civicrm/activity/search',
+        "reset=1&force=1&signupType=1&dateLow=$monthStart&dateHigh=$ymd"
       ),
     );
 
     $totalCount['month']['renew'] = array(
       'count' => $renewCountMonth,
-      'url' => CRM_Utils_System::url('civicrm/member/search',
-        "reset=1&force=1&status=$status&joinEnd=$preMonthStart&start=$monthStart&end=$ymd"
+      'url' => CRM_Utils_System::url('civicrm/activity/search',
+        "reset=1&force=1&signupType=2&dateLow=$monthStart&dateHigh=$ymd"
       ),
     );
 
     $totalCount['month']['total'] = array(
       'count' => $totalCountMonth,
-      'url' => CRM_Utils_System::url('civicrm/member/search',
-        "reset=1&force=1&status=$status&start=$monthStart&end=$ymd"
+      'url' => CRM_Utils_System::url('civicrm/activity/search',
+        "reset=1&force=1&signupType=3&dateLow=$monthStart&dateHigh=$ymd"
       ),
     );
 
     $totalCount['year']['new'] = array(
       'count' => $newCountYear,
-      'url' => CRM_Utils_System::url('civicrm/member/search',
-        "reset=1&force=1&status=$status&join=$yearStart&joinEnd=$ymd&start=$yearStart&end=$ymd"
+      'url' => CRM_Utils_System::url('civicrm/activity/search',
+        "reset=1&force=1&signupType=1&dateLow=$yearStart&dateHigh=$ymd"
       ),
     );
 
     $totalCount['year']['renew'] = array(
       'count' => $renewCountYear,
-      'url' => CRM_Utils_System::url('civicrm/member/search',
-        "reset=1&force=1&status=$status&joinEnd=$preYearStart&start=$yearStart&end=$ymd"
+      'url' => CRM_Utils_System::url('civicrm/activity/search',
+        "reset=1&force=1&signupType=2&dateLow=$yearStart&dateHigh=$ymd"
       ),
     );
 
     $totalCount['year']['total'] = array(
       'count' => $totalCountYear,
-      'url' => CRM_Utils_System::url('civicrm/member/search',
-        "reset=1&force=1&status=$status&start=$yearStart&end=$ymd"
+      'url' => CRM_Utils_System::url('civicrm/activity/search',
+        "reset=1&force=1&signupType=3&dateLow=$yearStart&dateHigh=$ymd"
       ),
     );
 
@@ -360,6 +372,8 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
       );
     }
 
+    // Activity search also unable to handle owner vs. inherited
+
     //LCD add owner values
     $totalCount['premonth_owner']['premonth_owner'] = array(
       'count' => $totalCountPreMonth_owner,
@@ -368,28 +382,28 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 
     $totalCount['month_owner']['month_owner'] = array(
       'count' => $totalCountMonth_owner,
-      'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$monthStart&end=$ymd&owner=1"),
+    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$monthStart&end=$ymd&owner=1"),
     );
 
     $totalCount['year_owner']['year_owner'] = array(
       'count' => $totalCountYear_owner,
-      'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$yearStart&end=$ymd&owner=1"),
+    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$yearStart&end=$ymd&owner=1"),
     );
 
     $totalCount['current_owner']['current_owner'] = array(
       'count' => $totalCountCurrent_owner,
-      'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
+    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
     );
 
     $totalCount['total_owner']['total_owner'] = array(
       'count' => $totalCountTotal_owner,
-      'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
+    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
     );
 
     if (!$isCurrentMonth) {
       $totalCount['total_owner']['total_owner'] = array(
         'count' => $totalCountTotal_owner,
-        'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=&end=$ymd&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=&end=$ymd&owner=1"),
       );
     }
     //LCD end
