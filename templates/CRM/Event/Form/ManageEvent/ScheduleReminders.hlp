@@ -23,6 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-recipient"}
+{htxt id="recipient"}
   {ts}The scheduled reminders will be limited to ONLY the chosen recipients.{/ts}
 {/htxt}
