@@ -81,7 +81,7 @@
     <tr class="columnheader">
         <th>{ts}Pledger{/ts}</th>
         <th>{ts}Amount{/ts}</th>
-	<th>{ts}Financial Type{/ts}</th>
+  <th>{ts}Financial Type{/ts}</th>
         <th>{ts}Create date{/ts}</th>
         <th>{ts}Acknowledgment Sent{/ts}</th>
    <th>{ts}Acknowledgment Date{/ts}</th>

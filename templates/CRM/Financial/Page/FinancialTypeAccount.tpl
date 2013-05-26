@@ -30,14 +30,14 @@
 <div id="ltype">
   <div class="form-item">
     {if $action ne 1 and $action ne 2}
-	    <div class="action-link">
-    	<a href="{crmURL q="action=add&reset=1&aid=$aid"}" id="newfinancialTypeAccount" class="button"><span><div class="icon add-icon"></div>{ts}Assign Account{/ts}</span></a>
-	<a href="{crmURL p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1"}" class="button"><span><div class="icon edit-icon"></div>{ts}Edit Financial Type{/ts}</span></a>
+      <div class="action-link">
+      <a href="{crmURL q="action=add&reset=1&aid=$aid"}" id="newfinancialTypeAccount" class="button"><span><div class="icon add-icon"></div>{ts}Assign Account{/ts}</span></a>
+  <a href="{crmURL p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1"}" class="button"><span><div class="icon edit-icon"></div>{ts}Edit Financial Type{/ts}</span></a>
       </div>
     {/if}
     {strip}
-	  {* handle enable/disable actions*}
- 	  {include file="CRM/common/enableDisable.tpl"}
+    {* handle enable/disable actions*}
+     {include file="CRM/common/enableDisable.tpl"}
       <table cellpadding="0" cellspacing="0" border="0">
         <thead class="sticky">
           <th>{ts}Relationship{/ts}</th>
@@ -50,22 +50,22 @@
         </thead>
         {foreach from=$rows item=row}
         <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-	        <td>{$row.account_relationship}</td>
-	        <td>{$row.financial_account}</td>	
-		      <td>{$row.accounting_code}</td>	
-		      <td>{$row.financial_account_type}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>	
-	        <td>{$row.owned_by}</td>
-	        <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-	        <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.account_relationship}</td>
+          <td>{$row.financial_account}</td>
+          <td>{$row.accounting_code}</td>
+          <td>{$row.financial_account_type}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>
+          <td>{$row.owned_by}</td>
+          <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+          <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
       </table>
     {/strip}
 
     {if $action ne 1 and $action ne 2}
-	    <div class="action-link">
-    	<a href="{crmURL q="action=add&reset=1&aid=$aid"}" id="newfinancialTypeAccount" class="button"><span><div class="icon add-icon"></div>{ts}Assign Account{/ts}</span></a>
-	<a href="{crmURL p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1"}" class="button"><span><div class="icon edit-icon"></div>{ts}Edit Financial Type{/ts}</span></a>
+      <div class="action-link">
+      <a href="{crmURL q="action=add&reset=1&aid=$aid"}" id="newfinancialTypeAccount" class="button"><span><div class="icon add-icon"></div>{ts}Assign Account{/ts}</span></a>
+  <a href="{crmURL p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1"}" class="button"><span><div class="icon edit-icon"></div>{ts}Edit Financial Type{/ts}</span></a>
       </div>
     {/if}
     </div>
@@ -75,6 +75,6 @@
           <div class="icon inform-icon"></div>
           {capture assign=crmURL}{crmURL q="action=add&reset=1&aid=$aid"}{/capture}
           {ts 1=$crmURL}There are no financial accounts assigned to this financial type. You can <a href='%1'>assign one</a>.{/ts}
-      </div>    
+      </div>
   {/if}
 {/if}
