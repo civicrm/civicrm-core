@@ -72,6 +72,7 @@ function contribution_get_expectedresult(){
           'contribution_payment_instrument' => '',
           'contribution_check_number' => '',
           'id' => '1',
+          'contribution_type_id' => '1',
         ),
     ),
 );
