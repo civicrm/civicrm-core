@@ -131,7 +131,7 @@ UPDATE civicrm_country SET name = 'Libya' WHERE name LIKE 'Libyan%';
 UPDATE civicrm_country SET name = 'Congo, Republic of the' WHERE name = 'Congo';
 
 -- CRM-10621 Add component report links to reports menu for upgrade
-SELECT @reportlastID       := MAX(id) FROM civicrm_navigation where name = 'Reports';
+SELECT @reportlastID       := MAX(id) FROM civicrm_navigation where name = 'Reports' AND domain_id = {$domainID};
 SELECT @max_weight     := MAX(ROUND(weight)) from civicrm_navigation WHERE parent_id = @reportlastID;
 
 INSERT INTO civicrm_navigation
@@ -461,7 +461,7 @@ UPDATE civicrm_navigation SET  `label` = 'Financial Types', `name` = 'Financial 
 -- CRM-9199
 -- Insert menu item at Administer > CiviContribute, below the section break below Premiums (Thank-you Gifts), just below Financial Account.
 
-SELECT @parent_id := id from `civicrm_navigation` where name = 'CiviContribute';
+SELECT @parent_id := id from `civicrm_navigation` where name = 'CiviContribute' AND domain_id = {$domainID};
 SELECT @add_weight_id := weight from `civicrm_navigation` where `name` = 'Financial Types' and `parent_id` = @parent_id;
 
 UPDATE `civicrm_navigation`
@@ -475,7 +475,7 @@ VALUES
 	( {$domainID}, 'civicrm/admin/financial/financialAccount&reset=1',      '{ts escape="sql" skip="true"}Financial Account{/ts}', 'Financial Account', 'access CiviContribute,administer CiviCRM', 'AND', @parent_id, '1', NULL, @add_weight_id + 1 );
 
 -- CRM-10944
-SELECT @contributionlastID := max(id) from civicrm_navigation where name = 'Contributions';
+SELECT @contributionlastID := max(id) from civicrm_navigation where name = 'Contributions' AND domain_id = {$domainID};
 
 SELECT @pledgeWeight := weight from civicrm_navigation where name = 'Pledges' and parent_id = @contributionlastID;
 

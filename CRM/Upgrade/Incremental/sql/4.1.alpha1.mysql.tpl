@@ -95,13 +95,13 @@ INSERT INTO `civicrm_dashboard`
 
 -- CRM-9059 Admin menu rebuild
 SELECT @domainID := min(id) FROM civicrm_domain;
-SELECT @adminlastID := id   FROM civicrm_navigation where name = 'Administer';
-SELECT @customizeOld := id  FROM civicrm_navigation where name = 'Customize';
-SELECT @configureOld := id  FROM civicrm_navigation where name = 'Configure';
-SELECT @globalOld := id     FROM civicrm_navigation where name = 'Global Settings';
-SELECT @manageOld := id     FROM civicrm_navigation where name = 'Manage';
-SELECT @optionsOld := id    FROM civicrm_navigation where name = 'Option Lists';
-SELECT @customizeOld := id  FROM civicrm_navigation where name = 'Customize';
+SELECT @adminlastID := id   FROM civicrm_navigation where name = 'Administer' AND domain_id = @domainID;
+SELECT @customizeOld := id  FROM civicrm_navigation where name = 'Customize' AND domain_id = @domainID;
+SELECT @configureOld := id  FROM civicrm_navigation where name = 'Configure' AND domain_id = @domainID;
+SELECT @globalOld := id     FROM civicrm_navigation where name = 'Global Settings' AND domain_id = @domainID;
+SELECT @manageOld := id     FROM civicrm_navigation where name = 'Manage' AND domain_id = @domainID;
+SELECT @optionsOld := id    FROM civicrm_navigation where name = 'Option Lists' AND domain_id = @domainID;
+SELECT @customizeOld := id  FROM civicrm_navigation where name = 'Customize' AND domain_id = @domainID;
 
 DELETE from civicrm_navigation WHERE parent_id = @globalOld;
 DELETE from civicrm_navigation WHERE parent_id IN (@customizeOld, @configureOld, @manageOld, @optionsOld);
@@ -381,8 +381,8 @@ ALTER TABLE `civicrm_pcp` DROP COLUMN `referer`;
 
 UPDATE civicrm_navigation SET url = 'civicrm/admin/pcp?reset=1&page_type=contribute' WHERE url = 'civicrm/admin/pcp&reset=1';
 
-SELECT @lastEventId        := MAX(id) FROM civicrm_navigation where name = 'Events';
-SELECT @adminEventId       := MAX(id) FROM civicrm_navigation where name = 'CiviEvent';
+SELECT @lastEventId        := MAX(id) FROM civicrm_navigation where name = 'Events' AND domain_id = @domainID;
+SELECT @adminEventId       := MAX(id) FROM civicrm_navigation where name = 'CiviEvent' AND domain_id = @domainID;
 SELECT @lastEventIdWeight  := MAX(weight)+1 FROM civicrm_navigation where parent_id = @lastEventId;
 SELECT @adminEventIdWeight := MAX(weight)+1 FROM civicrm_navigation where parent_id = @adminEventId;
 
