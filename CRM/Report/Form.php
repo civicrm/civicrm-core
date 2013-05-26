@@ -428,9 +428,12 @@ class CRM_Report_Form extends CRM_Core_Form {
         require_once str_replace('_', DIRECTORY_SEPARATOR, $table['bao'] . '.php');
         eval("\$expFields = {$table['bao']}::exportableFields( );");
       }
-      else {
+      elseif (array_key_exists('dao', $table)){
         require_once str_replace('_', DIRECTORY_SEPARATOR, $table['dao'] . '.php');
         eval("\$expFields = {$table['dao']}::export( );");
+      }
+      else{
+        $expFields = array();
       }
 
       $doNotCopy = array('required');
