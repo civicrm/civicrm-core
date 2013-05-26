@@ -308,6 +308,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     elseif (defined('CIVICRM_UF_WP_BASEPAGE')) {
       $base .= CIVICRM_UF_WP_BASEPAGE;
     }
+    elseif (isset($config->wpBasePage)) {
+      $base .= $config->wpBasePage;
+    }
 
     if (isset($path)) {
       if (isset($query)) {
