@@ -24,5 +24,5 @@
  +--------------------------------------------------------------------+
 *}
 {htxt id="recipient"}
-  {ts}The scheduled reminders will be limited to ONLY the chosen recipients.{/ts}
+  {ts}Only send reminders to participants with the status(es) selected above AND who match this criteria. If you select Manual Recipients - only those people will receive the reminder (AND only if they are ALSO participants with the selected status).{/ts}
 {/htxt}
