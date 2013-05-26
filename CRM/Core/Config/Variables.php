@@ -452,6 +452,11 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    * Path to wkhtmltopdf if available
    */
   public $wkhtmltopdfPath = FALSE;
+  
+  /**
+   * Allow second-degree relations permission to edit contacts
+   */
+  public $wpBasePage = NULL;
 
   /**
    * Provide addressSequence
