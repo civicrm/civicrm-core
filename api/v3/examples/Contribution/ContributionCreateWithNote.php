@@ -66,6 +66,7 @@ function contribution_create_expectedresult(){
           'address_id' => '',
           'check_number' => 'null',
           'campaign_id' => '',
+          'contribution_type_id' => '1',
         ),
     ),
 );
