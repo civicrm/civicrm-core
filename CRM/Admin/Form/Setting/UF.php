@@ -68,6 +68,10 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       $tablePrefixes .= "\n);";
       $this->assign('tablePrefixes', $tablePrefixes);
     }
+    
+    if ($uf == 'WordPress') {
+      $this->addElement('text', 'wpBasePage', ts('WordPress Base Page'));
+    }
 
     parent::buildQuickForm();
   }
