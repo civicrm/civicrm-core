@@ -42,7 +42,7 @@ ALTER TABLE `civicrm_batch` ADD `total` decimal(20,2) DEFAULT NULL COMMENT 'Tota
 ALTER TABLE `civicrm_batch` ADD `item_count` int(10) unsigned NOT NULL COMMENT 'Number of items in a batch.';
 
 ALTER TABLE `civicrm_batch` ADD CONSTRAINT `FK_civicrm_batch_saved_search_id` FOREIGN KEY (`saved_search_id`) REFERENCES `civicrm_saved_search` (`id`) ON DELETE SET NULL;
- 
+
 --batch type and batch status option groups
 INSERT INTO
    `civicrm_option_group` (`name`, {localize field='title'}title{/localize}, `is_reserved`, `is_active`)
@@ -104,10 +104,10 @@ VALUES
 --navigation menu entries
 SELECT @navContributionsID := MAX(id) FROM civicrm_navigation where name = 'Contributions';
 SELECT @navMembershipsID := MAX(id) FROM civicrm_navigation where name = 'Memberships';
-	     
+
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES     
+VALUES
     ( {$domainID}, 'civicrm/batch&reset=1', '{ts escape="sql" skip="true"}Batches{/ts}', 'Batches', 'access CiviContribute,access CiviMember', '', @navContributionsID, '1', NULL, 4 ),
     ( {$domainID}, 'civicrm/batch&reset=1', '{ts escape="sql" skip="true"}Batches{/ts}', 'Batches', 'access CiviMember,acess CiviContribute',  '', @navMembershipsID, '1', NULL, 4 );
 
@@ -215,13 +215,13 @@ ALTER TABLE `civicrm_contribution_page` ADD COLUMN is_confirm_enabled tinyint(4)
   {/if}
     ALTER TABLE civicrm_group ADD title_{$locale} VARCHAR(64);
     ALTER TABLE civicrm_group ADD UNIQUE KEY `UI_title_{$locale}` (title_{$locale});
-    
-    ALTER TABLE `civicrm_batch` CHANGE `label_{$locale}` `title_{$locale}` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Friendly Name.'; 
+
+    ALTER TABLE `civicrm_batch` CHANGE `label_{$locale}` `title_{$locale}` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Friendly Name.';
     UPDATE civicrm_group SET title_{$locale} = title;
 
     ALTER TABLE civicrm_survey
      ADD COLUMN thankyou_title_{$locale} varchar(255)    COMMENT 'Title for Thank-you page (header title tag, and display at the top of the page).',
-     ADD COLUMN thankyou_text_{$locale}  text    COMMENT 'text and html allowed. displayed above result on success page';    
+     ADD COLUMN thankyou_text_{$locale}  text    COMMENT 'text and html allowed. displayed above result on success page';
   {/foreach}
 
   ALTER TABLE civicrm_group DROP INDEX `UI_title`;
@@ -247,10 +247,10 @@ INSERT INTO civicrm_country (name,iso_code,region_id,is_province_abbreviated) VA
 -- CRM-12428
 {if $multilingual}
     {foreach from=$locales item=locale}
-    	ALTER TABLE `civicrm_price_field_value` CHANGE label_{$locale} label_{$locale} VARCHAR(255)  NULL DEFAULT NULL;
+      ALTER TABLE `civicrm_price_field_value` CHANGE label_{$locale} label_{$locale} VARCHAR(255)  NULL DEFAULT NULL;
     {/foreach}
 {else}
-	ALTER TABLE `civicrm_price_field_value` CHANGE `label` `label` VARCHAR(255)  NULL DEFAULT NULL;
+  ALTER TABLE `civicrm_price_field_value` CHANGE `label` `label` VARCHAR(255)  NULL DEFAULT NULL;
 {/if}
 
 -- CRM-9714 create a default price set for contribution and membership
@@ -261,7 +261,7 @@ ADD         `is_quick_config` TINYINT(4) NOT NULL DEFAULT '0'
 ADD         `is_reserved`     TINYINT(4) DEFAULT '0'
                               COMMENT 'Is this a predefined system price set  (i.e. it can not be deleted, edited)?';
 
-SELECT @contribution_type_id := max(id) FROM `civicrm_contribution_type` WHERE `name` = 'Member Dues';  
+SELECT @contribution_type_id := max(id) FROM `civicrm_contribution_type` WHERE `name` = 'Member Dues';
 INSERT INTO `civicrm_price_set` ( `name`, {localize field='title'}`title`{/localize}, `is_active`, `extends`, `is_quick_config`, `is_reserved`, `contribution_type_id`)
 VALUES ( 'default_contribution_amount', {localize}'Contribution Amount'{/localize}, '1', '2', '1', '1', null),
  ( 'default_membership_type_amount', {localize}'Membership Amount'{/localize}, '1', '3', '1', '1', @contribution_type_id);
@@ -363,19 +363,19 @@ VALUES
   (@option_group_id_act, {localize field='label'}'Change Membership Type'{/localize}, (SELECT @max_val := @max_val+1), 'Change Membership Type', (SELECT @max_wt := @max_wt+1), {localize field='description'}'Change Membership Type.'{/localize}, 1, 1, @CompId);
 
 -- CRM-10084
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
 VALUES
    (@option_group_id_act, {localize}'Cancel Recurring Contribution'{/localize}, (SELECT @max_val := @max_val+1), 'Cancel Recurring Contribution', NULL,1, 0, (SELECT @max_wt := @max_wt+1), {localize}''{/localize}, 0, 1, 1, NULL, NULL);
 
 -- CRM-10090
-INSERT INTO 
+INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
 VALUES
 (@option_group_id_act, {localize}'Update Recurring Contribution Billing Details'{/localize}, (SELECT @max_val := @max_val+1), 'Update Recurring Contribution Billing Details', NULL,1, 0, (SELECT @max_wt := @max_wt+1), {localize}''{/localize}, 0, 1, 1, NULL, NULL),
 (@option_group_id_act, {localize}'Update Recurring Contribution'{/localize}, (SELECT @max_val := @max_val+1), 'Update Recurring Contribution', NULL,1, 0, (SELECT @max_wt := @max_wt+1), {localize}''{/localize}, 0, 1, 1, NULL, NULL);
 
--- CRM-10117 
+-- CRM-10117
 ALTER TABLE `civicrm_price_field_value` CHANGE `is_active` `is_active` TINYINT( 4 ) NULL DEFAULT '1' COMMENT 'Is this price field value active';
 
 
