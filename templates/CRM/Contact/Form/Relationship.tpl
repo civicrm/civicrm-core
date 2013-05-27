@@ -473,6 +473,14 @@ function checkSelected( ) {
 }
 
 function submitAjaxData() {
+  var total_checked = new Array();
+  cj.each(contact_checked, function (index, value) {
+    if (typeof value !== "undefined") {
+      total_checked.push(value);
+    }
+  });
+  contact_checked = total_checked;
+
     cj('#store_contacts').val( contact_checked.toString() );
     if ( useEmployer )  {
         cj('#store_employers').val( employer_checked.toString() );
