@@ -26,3 +26,8 @@ VALUES
 UPDATE civicrm_financial_account
 SET is_default = 1
 WHERE name IN ('{ts escape="sql"}Premiums{/ts}', '{ts escape="sql"}Banking Fees{/ts}', '{ts escape="sql"}Accounts Payable{/ts}', '{ts escape="sql"}Donation{/ts}');
+
+-- CRM-12665 remove options groups
+DELETE cov, cog FROM civicrm_option_group cog
+INNER JOIN civicrm_option_value cov ON cov.option_group_id = cog.id
+WHERE cog.name IN ('grant_program_status', 'allocation_algorithm');
