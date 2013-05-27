@@ -199,9 +199,7 @@ VALUES
    ('sms_provider_name'             , '{ts escape="sql"}Sms Provider Internal Name{/ts}'         , 1, 1),
    ('auto_renew_options'            , '{ts escape="sql"}Auto Renew Options{/ts}'         	       , 1, 1),
    ('financial_account_type'        , '{ts escape="sql"}Financial Account Type{/ts}'             , 1, 1),
-   ('financial_item_status'         , '{ts escape="sql"}Financial Item Status{/ts}'              , 1, 1),
-   ('grant_program_status'          , '{ts escape="sql"}Grant Program Status{/ts}'               , 1, 1),
-   ('allocation_algorithm'          , '{ts escape="sql"}Grant Program Allocation Algorithm{/ts}' , 1, 1);
+   ('financial_item_status'         , '{ts escape="sql"}Financial Item Status{/ts}'              , 1, 1);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -274,8 +272,6 @@ SELECT @option_group_id_sms_provider_name := max(id) from civicrm_option_group w
 SELECT @option_group_id_aro := max(id) from civicrm_option_group where name = 'auto_renew_options';
 SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
 SELECT @option_group_id_financial_item_status := max(id) from civicrm_option_group where name = 'financial_item_status';
-SELECT @option_group_id_grantProgramSt  := max(id) from civicrm_option_group where name = 'grant_program_status';
-SELECT @option_group_id_allocationAlgo  := max(id) from civicrm_option_group where name = 'allocation_algorithm';
 
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
@@ -913,15 +909,6 @@ VALUES
   (@option_group_id_grantTyp, '{ts escape="sql"}Family Support{/ts}'     , 2, 'Family Support'    , NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, @domainID, NULL),
   (@option_group_id_grantTyp, '{ts escape="sql"}General Protection{/ts}' , 3, 'General Protection', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, @domainID, NULL),
   (@option_group_id_grantTyp, '{ts escape="sql"}Impunity{/ts}'           , 4, 'Impunity'          , NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, @domainID, NULL),
-
--- grant program status
-  (@option_group_id_grantProgramSt, '{ts escape="sql"}Accepting Applications{/ts}'          , 1, 'Accepting Applications'         , NULL, 0, 1,    1, NULL, 0, 0, 1, NULL, @domainID, NULL),
-  (@option_group_id_grantProgramSt, '{ts escape="sql"}Trial Allocation{/ts}'     , 2, 'Trial Allocation'    , NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, @domainID, NULL),
-  (@option_group_id_grantProgramSt, '{ts escape="sql"}Allocation Finalized{/ts}' , 3, 'Allocation Finalized', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, @domainID, NULL),
-
--- grant program alocation algorithm
- (@option_group_id_allocationAlgo, '{ts escape="sql"}Over Threshold, Percentage of Request Funded{/ts}'          , 1, 'Over Threshold, Percentage of Request Funded'         , NULL, 0, 1,    1, NULL, 0, 0, 1, NULL, @domainID, NULL),
-  (@option_group_id_allocationAlgo, '{ts escape="sql"}Best to Worst, Fully Funded{/ts}'     , 2, 'Best to Worst, Fully Funded'    , NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, @domainID, NULL),
 
 -- Mail Approval Status Preferences
   (@option_group_id_mail_approval_status, '{ts escape="sql"}Approved{/ts}' , 1, 'Approved', NULL, 0, 1, 1, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
