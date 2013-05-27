@@ -54,6 +54,16 @@ class CRM_Core_Permission {
   CONST EDIT = 1, VIEW = 2, DELETE = 3, CREATE = 4, SEARCH = 5, ALL = 6, ADMIN = 7;
 
   /**
+   * A placeholder permission which always fails
+   */
+  const ALWAYS_DENY_PERMISSION = "*always deny*";
+
+  /**
+   * A placeholder permission which always fails
+   */
+  const ALWAYS_ALLOW_PERMISSION = "*always allow*";
+
+  /**
    * get the current permission of this user
    *
    * @return string the permission of the user (edit or view or null)
