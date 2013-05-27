@@ -365,6 +365,19 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @access public
    */
   public function buildQuickForm() {
+    // build profiles first so that we can determine address fields etc
+    // and then show copy address checkbox
+    $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
+    $this->buildCustom($this->_values['custom_post_id'], 'customPost');
+
+    if (!empty($this->_fields)) {
+      $profileAddressFields = array();
+      foreach ($this->_fields as $key => $value) {
+        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields);
+      }
+      $this->set('profileAddressFields', $profileAddressFields);
+    }
+
     // Build payment processor form
     if ($this->_ppType) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
@@ -484,17 +497,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       ) {
         CRM_Pledge_BAO_PledgeBlock::buildPledgeBlock($this);
       }
-    }
-
-    $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
-    $this->buildCustom($this->_values['custom_post_id'], 'customPost');
-
-    if ( !empty( $this->_fields ) ) {
-      $profileAddressFields = array();
-      foreach( $this->_fields as $key => $value ) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields);
-      }
-      $this->set('profileAddressFields', $profileAddressFields);
     }
 
     //to create an cms user
