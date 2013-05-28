@@ -114,7 +114,7 @@ LEFT JOIN civicrm_email      ON contact_a.id = civicrm_email.contact_id
       );
       _civicrm_api3_deprecated_add_formatted_param($value, $formatted);
 
-      $formatted['onDuplicate'] = CRM_Import_Parser::DUPLICATE_SKIP;
+      $formatted['onDuplicate'] = CRM_Contact_Import_Parser::DUPLICATE_SKIP;
       $formatted['fixAddress'] = TRUE;
       require_once 'api/api.php';
       $contact = civicrm_api('contact', 'create', $formatted);

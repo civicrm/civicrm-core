@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ | Version 3, 19 November 2009.                                       |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -34,30 +34,25 @@
  */
 
 /**
- * State machine for managing different states of the Import process.
- *
+ * This class mainly exists to allow imports to be triggered synchronously (i.e.
+ *  via a form post) and asynchronously (i.e. by the workflow system)
  */
-class CRM_Import_StateMachine extends CRM_Core_StateMachine {
+class CRM_Contact_Import_Importer {
+  public function __construct() {
+    // may not need this
+  }
 
-  /**
-   * class constructor
-   *
-   * @param object  CRM_Import_Controller
-   * @param int     $action
-   *
-   * @return object CRM_Import_StateMachine
-   */
-  function __construct(&$controller, $action = CRM_Core_Action::NONE) {
-    parent::__construct($controller, $action);
-
-    $this->_pages = array(
-      'CRM_Import_Form_DataSource' => NULL,
-      'CRM_Import_Form_MapField' => NULL,
-      'CRM_Import_Form_Preview' => NULL,
-      'CRM_Import_Form_Summary' => NULL,
-    );
-
-    $this->addSequentialPages($this->_pages, $action);
+  public function runIncompleteImportJobs($timeout = 55) {
+    $startTime = time();
+    $incompleteImportTables = CRM_Contact_Import_ImportJob::getIncompleteImportTables();
+    foreach ($incompleteImportTables as $importTable) {
+      $importJob = new CRM_Contact_Import_ImportJob($importTable);
+      $importJob->runImport(NULL, $timeout);
+      $currentTime = time();
+      if (($currentTime - $startTime) >= $timeout) {
+        break;
+      }
+    }
   }
 }
 

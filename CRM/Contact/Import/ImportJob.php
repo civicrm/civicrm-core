@@ -36,7 +36,7 @@
 /**
  * This class acts like a psuedo-BAO for transient import job tables
  */
-class CRM_Import_ImportJob {
+class CRM_Contact_Import_ImportJob {
 
   protected $_tableName;
   protected $_primaryKeyName;
@@ -245,7 +245,7 @@ class CRM_Import_ImportJob {
       }
     }
 
-    $this->_parser = new CRM_Import_Parser_Contact(
+    $this->_parser = new CRM_Contact_Import_Parser_Contact(
       $this->_mapperKeys,
       $this->_mapperLocTypes,
       $this->_mapperPhoneTypes,
@@ -261,7 +261,7 @@ class CRM_Import_ImportJob {
     );
 
     $this->_parser->run($this->_tableName, $mapperFields,
-      CRM_Import_Parser::MODE_IMPORT,
+      CRM_Contact_Import_Parser::MODE_IMPORT,
       $this->_contactType,
       $this->_primaryKeyName,
       $this->_statusFieldName,
@@ -269,7 +269,7 @@ class CRM_Import_ImportJob {
       $this->_statusID,
       $this->_totalRowCount,
       $this->_doGeocodeAddress,
-      CRM_Import_Parser::DEFAULT_TIMEOUT,
+      CRM_Contact_Import_Parser::DEFAULT_TIMEOUT,
       $this->_contactSubType,
       $this->_dedupe
     );
@@ -307,7 +307,7 @@ class CRM_Import_ImportJob {
   }
 
   public function setFormVariables($form) {
-    $this->_parser->set($form, CRM_Import_Parser::MODE_IMPORT);
+    $this->_parser->set($form, CRM_Contact_Import_Parser::MODE_IMPORT);
   }
 
   private function _addImportedContactsToNewGroup($contactIds,

@@ -32,27 +32,32 @@
  * $Id$
  *
  */
-class CRM_Import_Controller extends CRM_Core_Controller {
+
+/**
+ * This class contains all the function that are called using AJAX
+ */
+class CRM_Contact_Import_Page_AJAX {
 
   /**
-   * class constructor
+   * Function to show import status
    */
-  function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
-    parent::__construct($title, $modal);
-
-    // lets get around the time limit issue if possible, CRM-2113
-    if (!ini_get('safe_mode')) {
-      set_time_limit(0);
+  static function status() {
+    // make sure we get an id
+    if (!isset($_GET['id'])) {
+      return;
     }
 
-    $this->_stateMachine = new CRM_Import_StateMachine($this, $action);
-
-    // create and instantiate the pages
-    $this->addPages($this->_stateMachine, $action);
-
-    // add all the actions
     $config = CRM_Core_Config::singleton();
-    $this->addActions($config->uploadDir, array('uploadFile'));
+    $file = "{$config->uploadDir}status_{$_GET['id']}.txt";
+    if (file_exists($file)) {
+      $str = file_get_contents($file);
+      echo $str;
+    }
+    else {
+      $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
+      echo json_encode(array(0, $status));
+    }
+    CRM_Utils_System::civiExit();
   }
 }
 

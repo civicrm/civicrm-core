@@ -34,30 +34,30 @@
  */
 
 /**
- * This class contains all the function that are called using AJAX
+ * State machine for managing different states of the Import process.
+ *
  */
-class CRM_Import_Page_AJAX {
+class CRM_Contact_Import_StateMachine extends CRM_Core_StateMachine {
 
   /**
-   * Function to show import status
+   * class constructor
+   *
+   * @param object  CRM_Contact_Import_Controller
+   * @param int     $action
+   *
+   * @return object CRM_Contact_Import_StateMachine
    */
-  static function status() {
-    // make sure we get an id
-    if (!isset($_GET['id'])) {
-      return;
-    }
+  function __construct(&$controller, $action = CRM_Core_Action::NONE) {
+    parent::__construct($controller, $action);
 
-    $config = CRM_Core_Config::singleton();
-    $file = "{$config->uploadDir}status_{$_GET['id']}.txt";
-    if (file_exists($file)) {
-      $str = file_get_contents($file);
-      echo $str;
-    }
-    else {
-      $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
-      echo json_encode(array(0, $status));
-    }
-    CRM_Utils_System::civiExit();
+    $this->_pages = array(
+      'CRM_Contact_Import_Form_DataSource' => NULL,
+      'CRM_Contact_Import_Form_MapField' => NULL,
+      'CRM_Contact_Import_Form_Preview' => NULL,
+      'CRM_Contact_Import_Form_Summary' => NULL,
+    );
+
+    $this->addSequentialPages($this->_pages, $action);
   }
 }
 
