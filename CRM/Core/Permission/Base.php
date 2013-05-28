@@ -39,6 +39,28 @@
 class CRM_Core_Permission_Base {
 
   /**
+   * Translate permission
+   *
+   * @param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:action:com_asset"
+   * @param string $nativePrefix
+   * @param array $map array($portableName => $nativeName)
+   * @return NULL|string a permission name
+   */
+  public function translatePermission($perm, $nativePrefix, $map) {
+    list ($civiPrefix, $name) = CRM_Utils_String::parsePrefix(':', $perm, NULL);
+    switch ($civiPrefix) {
+      case $nativePrefix:
+        return $name; // pass through
+      case 'cms':
+        return CRM_Utils_Array::value($name, $map, CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
+      case NULL:
+        return $name;
+      default:
+        return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
+    }
+  }
+
+  /**
    * get the current permission of this user
    *
    * @return string the permission of the user (edit or view or null)
