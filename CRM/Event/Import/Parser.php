@@ -550,7 +550,7 @@ abstract class CRM_Event_Import_Parser {
         $this->_fields[$name] = new CRM_Event_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
       }
       else {
-        $this->_fields[$name] = new CRM_Import_Field($name, $title, $type, $headerPattern, $dataPattern,
+        $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern,
           CRM_Utils_Array::value('hasLocationType', $tempField[$name])
         );
       }
@@ -685,12 +685,12 @@ abstract class CRM_Event_Import_Parser {
   }
 
   function errorFileName($type) {
-    $fileName = CRM_Import_Parser::errorFileName($type);
+    $fileName = CRM_Contact_Import_Parser::errorFileName($type);
     return $fileName;
   }
 
   function saveFileName($type) {
-    $fileName = CRM_Import_Parser::saveFileName($type);
+    $fileName = CRM_Contact_Import_Parser::saveFileName($type);
     return $fileName;
   }
 }

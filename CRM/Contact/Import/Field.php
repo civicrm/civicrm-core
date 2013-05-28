@@ -24,7 +24,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
-class CRM_Import_Field {
+class CRM_Contact_Import_Field {
 
   /**#@+
    * @access protected

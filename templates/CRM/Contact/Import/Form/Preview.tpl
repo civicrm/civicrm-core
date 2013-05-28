@@ -143,7 +143,7 @@ function verify( ) {
  </table>
 
  {* Table for mapping preview *}
- {include file="CRM/Import/Form/MapTable.tpl"}
+ {include file="CRM/Contact/Import/Form/MapTable.tpl"}
 
  {* Group options *}
  {* New Group *}
