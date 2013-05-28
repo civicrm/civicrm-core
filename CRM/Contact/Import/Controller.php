@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2009.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -32,27 +32,27 @@
  * $Id$
  *
  */
+class CRM_Contact_Import_Controller extends CRM_Core_Controller {
 
-/**
- * This class mainly exists to allow imports to be triggered synchronously (i.e.
- *  via a form post) and asynchronously (i.e. by the workflow system)
- */
-class CRM_Import_Importer {
-  public function __construct() {
-    // may not need this
-  }
+  /**
+   * class constructor
+   */
+  function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
+    parent::__construct($title, $modal);
 
-  public function runIncompleteImportJobs($timeout = 55) {
-    $startTime = time();
-    $incompleteImportTables = CRM_Import_ImportJob::getIncompleteImportTables();
-    foreach ($incompleteImportTables as $importTable) {
-      $importJob = new CRM_Import_ImportJob($importTable);
-      $importJob->runImport(NULL, $timeout);
-      $currentTime = time();
-      if (($currentTime - $startTime) >= $timeout) {
-        break;
-      }
+    // lets get around the time limit issue if possible, CRM-2113
+    if (!ini_get('safe_mode')) {
+      set_time_limit(0);
     }
+
+    $this->_stateMachine = new CRM_Contact_Import_StateMachine($this, $action);
+
+    // create and instantiate the pages
+    $this->addPages($this->_stateMachine, $action);
+
+    // add all the actions
+    $config = CRM_Core_Config::singleton();
+    $this->addActions($config->uploadDir, array('uploadFile'));
   }
 }
 

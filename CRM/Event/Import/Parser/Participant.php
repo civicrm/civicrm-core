@@ -177,20 +177,20 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
     if (!(($index < 0) || ($this->_participantStatusIndex < 0))) {
       $errorRequired = !CRM_Utils_Array::value($this->_participantStatusIndex, $values);
       if (!CRM_Utils_Array::value('event_id', $params) && !CRM_Utils_Array::value('event_title', $params)) {
-        CRM_Import_Parser_Contact::addToErrorMsg('Event', $missingField);
+        CRM_Contact_Import_Parser_Contact::addToErrorMsg('Event', $missingField);
       }
       if (!CRM_Utils_Array::value('participant_status_id', $params)) {
-        CRM_Import_Parser_Contact::addToErrorMsg('Participant Status', $missingField);
+        CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Status', $missingField);
       }
     }
     else {
       $errorRequired = TRUE;
       $missingField = NULL;
       if ($index < 0) {
-        CRM_Import_Parser_Contact::addToErrorMsg('Event', $missingField);
+        CRM_Contact_Import_Parser_Contact::addToErrorMsg('Event', $missingField);
       }
       if ($this->_participantStatusIndex < 0) {
-        CRM_Import_Parser_Contact::addToErrorMsg('Participant Status', $missingField);
+        CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Status', $missingField);
       }
     }
 
@@ -211,7 +211,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           $params[$key] = $dateValue;
         }
         else {
-          CRM_Import_Parser_Contact::addToErrorMsg('Register Date', $errorMessage);
+          CRM_Contact_Import_Parser_Contact::addToErrorMsg('Register Date', $errorMessage);
         }
       }
       elseif ($val && ($key == 'participant_role_id' || $key == 'participant_role')) {
@@ -220,15 +220,15 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
         if ($key == 'participant_role_id') {
           foreach ($val as $role) {
             if (!in_array(trim($role), array_keys($roleIDs))) {
-              CRM_Import_Parser_Contact::addToErrorMsg('Participant Role Id', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Role Id', $errorMessage);
               break;
             }
           }
         }
         else {
           foreach ($val as $role) {
-            if (!CRM_Import_Parser_Contact::in_value(trim($role), $roleIDs)) {
-                CRM_Import_Parser_Contact::addToErrorMsg('Participant Role', $errorMessage);
+            if (!CRM_Contact_Import_Parser_Contact::in_value(trim($role), $roleIDs)) {
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Role', $errorMessage);
               break;
             }
           }
@@ -238,12 +238,12 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
         $statusIDs = CRM_Event_PseudoConstant::participantStatus();
         if ($key == 'participant_status_id') {
           if (!in_array(trim($val), array_keys($statusIDs))) {
-            CRM_Import_Parser_Contact::addToErrorMsg('Participant Status Id', $errorMessage);
+            CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Status Id', $errorMessage);
             break;
           }
         }
-        elseif (!CRM_Import_Parser_Contact::in_value($val, $statusIDs)) {
-          CRM_Import_Parser_Contact::addToErrorMsg('Participant Status', $errorMessage);
+        elseif (!CRM_Contact_Import_Parser_Contact::in_value($val, $statusIDs)) {
+          CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Status', $errorMessage);
           break;
         }
       }
@@ -252,13 +252,13 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
 
     $params['contact_type'] = 'Participant';
     //checking error in custom data
-    CRM_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       array_unshift($values, $tempMsg);
       $errorMessage = NULL;
-      return CRM_Import_Parser::ERROR;
+      return CRM_Contact_Import_Parser::ERROR;
     }
     return CRM_Event_Import_Parser::VALID;
   }
@@ -292,7 +292,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       if ($val) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
           if ($customFields[$customFieldID]['data_type'] == 'Date') {
-            CRM_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
+            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
             unset($params[$key]);
           }
           elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {

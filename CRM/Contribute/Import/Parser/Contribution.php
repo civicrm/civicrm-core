@@ -177,7 +177,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               $params[$key] = $dateValue;
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('Receive Date', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Receive Date', $errorMessage);
             }
             break;
 
@@ -186,7 +186,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               $params[$key] = $dateValue;
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('Cancel Date', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Cancel Date', $errorMessage);
             }
             break;
 
@@ -195,7 +195,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               $params[$key] = $dateValue;
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('Receipt date', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Receipt date', $errorMessage);
             }
             break;
 
@@ -204,7 +204,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               $params[$key] = $dateValue;
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('Thankyou Date', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Thankyou Date', $errorMessage);
             }
             break;
         }
@@ -215,7 +215,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     $params['contact_type'] = 'Contribution';
 
     //checking error in custom data
-    CRM_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
@@ -270,7 +270,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         }
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
           if ($customFields[$customFieldID]['data_type'] == 'Date') {
-            CRM_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
+            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
             unset($params[$key]);
           }
           elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {

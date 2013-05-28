@@ -53,11 +53,11 @@ class CRM_Event_Import_Form_Summary extends CRM_Core_Form {
     $totalRowCount += $relatedCount;
     $this->set('totalRowCount', $totalRowCount);
 
-    $invalidRowCount   = $this->get('invalidRowCount');
-    $conflictRowCount  = $this->get('conflictRowCount');
+    $invalidRowCount = $this->get('invalidRowCount');
+    $conflictRowCount = $this->get('conflictRowCount');
     $duplicateRowCount = $this->get('duplicateRowCount');
-    $onDuplicate       = $this->get('onDuplicate');
-    $mismatchCount     = $this->get('unMatchCount');
+    $onDuplicate = $this->get('onDuplicate');
+    $mismatchCount = $this->get('unMatchCount');
     if ($duplicateRowCount > 0) {
       $urlParams = 'type=' . CRM_Event_Import_Parser::DUPLICATE . '&parser=CRM_Event_Import_Parser';
       $this->set('downloadDuplicateRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
