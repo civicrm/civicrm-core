@@ -95,6 +95,7 @@ class CRM_Event_Form_EventFees {
         $discounts = array();
         if (!empty($form->_values['discount'])) {
           foreach ($form->_values['discount'] as $key => $value) {
+            $value = current($value);
             $discounts[$key] = $value['name'];
           }
         }
@@ -175,7 +176,38 @@ class CRM_Event_Form_EventFees {
       //             $defaults[$form->_pId]['credit_card_exp_date'] = array( 'Y' => '2012', 'M' => '05' );
     }
 
-    if ($priceSetId = CRM_Price_BAO_Set::getFor('civicrm_event', $form->_eventId)) {
+
+    // if user has selected discount use that to set default
+    if (isset($form->_discountId)) {
+      $defaults[$form->_pId]['discount_id'] = $form->_discountId;
+
+      //hack to set defaults for already selected discount value
+      if ($form->_action == CRM_Core_Action::UPDATE && !$form->_originalDiscountId) {
+        $form->_originalDiscountId = $defaults[$form->_pId]['discount_id'];
+        if ($form->_originalDiscountId) {
+          $defaults[$form->_pId]['discount_id'] = $form->_originalDiscountId;
+        }
+      }
+      $discountId = $form->_discountId;
+    }
+    else {
+      $discountId = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
+    }
+    
+    if ($discountId) {
+      $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
+    }
+    else {
+      $priceSetId = CRM_Price_BAO_Set::getFor('civicrm_event', $form->_eventId);
+    }
+
+    if (($form->_action == CRM_Core_Action::ADD) && $form->_eventId && $discountId) {
+      // this case is for add mode, where we show discount automatically
+        $defaults[$form->_pId]['discount_id'] = $discountId;
+    }
+
+
+    if ($priceSetId) {
       // get price set default values, CRM-4090
       if (in_array(get_class($form),
           array(
@@ -189,6 +221,7 @@ class CRM_Event_Form_EventFees {
           $defaults[$form->_pId] = array_merge($defaults[$form->_pId], $priceSetValues);
         }
       }
+              
       if ($form->_action == CRM_Core_Action::ADD && CRM_Utils_Array::value('fields', $form->_priceSet)) {
         foreach ($form->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
@@ -217,109 +250,6 @@ class CRM_Event_Form_EventFees {
         $form->assign('fee_level', $fee_level);
         $form->assign('fee_amount', CRM_Utils_Array::value('fee_amount', $defaults[$form->_pId]));
       }
-    }
-    else {
-      $optionGroupId = NULL;
-
-      // if user has selected discount use that to set default
-      if (isset($form->_discountId)) {
-        $defaults[$form->_pId]['discount_id'] = $form->_discountId;
-
-        //hack to set defaults for already selected discount value
-        if ($form->_action == CRM_Core_Action::UPDATE && !$form->_originalDiscountId) {
-          $form->_originalDiscountId = $defaults[$form->_pId]['discount_id'];
-          if ($form->_originalDiscountId) {
-            $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Discount',
-              $form->_originalDiscountId,
-              'option_group_id'
-            );
-            $defaults[$form->_pId]['discount_id'] = $form->_originalDiscountId;
-          }
-        }
-      }
-
-      if (($form->_action == CRM_Core_Action::ADD)) {
-        // this case is for add mode, where we show discount automatically
-        if (!isset($form->_discountId)) {
-          $discountId = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
-        }
-        else {
-          $discountId = $form->_discountId;
-        }
-
-        if ($form->_eventId && $discountId) {
-          $defaultDiscountId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
-            $form->_eventId,
-            'default_discount_fee_id'
-          );
-          if ($defaultDiscountId) {
-            $discountKey = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
-              $defaultDiscountId,
-              'weight'
-            );
-          }
-
-          $defaults[$form->_pId]['discount_id'] = $discountId;
-
-          $defaults[$form->_pId]['amount'] = key(array_slice($form->_values['discount'][$discountId],
-              $discountKey - 1,
-              $discountKey,
-              TRUE
-            ));
-          $optionGroupId =
-            CRM_Core_DAO::getFieldValue(
-              'CRM_Core_DAO_Discount',
-              $discountId,
-              'option_group_id'
-            );
-        }
-        else {
-          if ($form->_eventId) {
-            $defaults[$form->_pId]['amount'] =
-              CRM_Core_DAO::getFieldValue(
-                'CRM_Event_DAO_Event',
-                $form->_eventId,
-                'default_fee_id'
-              );
-          }
-        }
-      }
-
-      if (CRM_Utils_Array::value('event_id', $defaults[$form->_pId])
-        && ($form->_action == CRM_Core_Action::UPDATE || $form->_allowConfirmation)
-      ) {
-        if (!empty($form->_feeBlock)) {
-          $feeLevel = CRM_Utils_Array::value('fee_level',
-            $defaults[$form->_pId]
-          );
-          $feeAmount = CRM_Utils_Array::value('fee_amount',
-            $defaults[$form->_pId]
-          );
-          foreach ($form->_feeBlock as $amountId => $amountInfo) {
-            if ($amountInfo['label'] == $feeLevel &&
-              $amountInfo['value'] == $feeAmount
-            ) {
-              $defaults[$form->_pId]['amount'] = $amountInfo['amount_id'];
-            }
-
-            // if amount is not set do fuzzy matching
-            if (!isset($defaults[$form->_pId]['amount'])) {
-              // if only level use that
-              if ($amountInfo['label'] == $feeLevel) {
-                $defaults[$form->_pId]['amount'] = $amountInfo['amount_id'];
-              }
-              elseif (strpos($feeLevel, $amountInfo['label']) !== FALSE) {
-                $defaults[$form->_pId]['amount'] = $amountInfo['amount_id'];
-              }
-              elseif ($amountInfo['value'] == $feeAmount) {
-                // if amount matches use that
-                $defaults[$form->_pId]['amount'] = $amountInfo['amount_id'];
-              }
-            }
-          }
-        }
-      }
-      $form->assign('amountId', CRM_Utils_Array::value('amount', $defaults[$form->_pId]));
     }
 
     //CRM-4453
@@ -472,6 +402,7 @@ SELECT  id, html_type
       $discounts = array();
       if (!empty($form->_values['discount'])) {
         foreach ($form->_values['discount'] as $key => $value) {
+          $value = current($value);
           $discounts[$key] = $value['name'];
         }
 
