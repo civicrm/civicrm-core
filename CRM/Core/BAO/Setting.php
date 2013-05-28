@@ -90,7 +90,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
     $cacheKey = "CRM_Setting_{$group}_{$componentID}_{$contactID}_{$domainID}";
 
-    if ($load &&
+    if (
+      $load &&
       ($force || !isset(self::$_cache[$cacheKey]))
     ) {
 
@@ -178,7 +179,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @static
    * @access public
    */
-  static function getItem($group,
+  static function getItem(
+    $group,
     $name         = NULL,
     $componentID  = NULL,
     $defaultValue = NULL,
@@ -385,14 +387,14 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       foreach ($fieldsToSet as $name => $value) {
         if(empty($fields['values'][$name]['config_only'])){
           CRM_Core_BAO_Setting::setItem(
-          $value,
-          $fields['values'][$name]['group_name'],
-          $name,
-          CRM_Utils_Array::value('component_id', $params),
-          CRM_Utils_Array::value('contact_id', $params),
-          CRM_Utils_Array::value('created_id', $params),
-          $domainID
-         );
+            $value,
+            $fields['values'][$name]['group_name'],
+            $name,
+            CRM_Utils_Array::value('component_id', $params),
+            CRM_Utils_Array::value('contact_id', $params),
+            CRM_Utils_Array::value('created_id', $params),
+            $domainID
+          );
         }
         if(!empty($fields['values'][$name]['prefetch'])){
           if(!empty($fields['values'][$name]['config_key'])){
