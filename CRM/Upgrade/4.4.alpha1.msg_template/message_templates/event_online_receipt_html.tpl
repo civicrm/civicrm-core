@@ -21,13 +21,13 @@
 
   <tr>
    <td>
-	<p>Dear {contact.display_name},</p>
+  <p>Dear {contact.display_name},</p>
 
     {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
      <p>{$event.confirm_email_text|htmlize}</p>
 
     {else}
-	<p>Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to <strong>{if $isOnWaitlist}waitlisted{else}registered{/if}</strong> for the following:</p>
+  <p>Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to <strong>{if $isOnWaitlist}waitlisted{else}registered{/if}</strong> for the following:</p>
 
     {/if}
 
@@ -72,20 +72,20 @@ registration process.{/ts}</p>
      {if $conference_sessions}
       <tr>
        <td colspan="2" {$labelStyle}>
-	{ts}Your schedule:{/ts}
+  {ts}Your schedule:{/ts}
        </td>
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-	{assign var='group_by_day' value='NA'}
-	{foreach from=$conference_sessions item=session}
-	 {if $session.start_date|date_format:"%Y/%m/%d" != $group_by_day|date_format:"%Y/%m/%d"}
-	  {assign var='group_by_day' value=$session.start_date}
+  {assign var='group_by_day' value='NA'}
+  {foreach from=$conference_sessions item=session}
+   {if $session.start_date|date_format:"%Y/%m/%d" != $group_by_day|date_format:"%Y/%m/%d"}
+    {assign var='group_by_day' value=$session.start_date}
           <em>{$group_by_day|date_format:"%m/%d/%Y"}</em><br />
-	 {/if}
-	 {$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}<br />
-	 {if $session.location}&nbsp;&nbsp;&nbsp;&nbsp;{$session.location}<br />{/if}
-	{/foreach}
+   {/if}
+   {$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}<br />
+   {if $session.location}&nbsp;&nbsp;&nbsp;&nbsp;{$session.location}<br />{/if}
+  {/foreach}
        </td>
       </tr>
      {/if}
@@ -180,7 +180,7 @@ registration process.{/ts}</p>
      </tr>
      <tr>
        <td colspan="2" {$valueStyle}>
-	      {$payer.name}
+        {$payer.name}
        </td>
      </tr>
     {/if}
@@ -212,7 +212,7 @@ registration process.{/ts}</p>
              <th>{ts}Qty{/ts}</th>
              <th>{ts}Each{/ts}</th>
              <th>{ts}Total{/ts}</th>
-	     {if  $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
+       {if  $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
             </tr>
             {foreach from=$value item=line}
              <tr>
@@ -228,7 +228,7 @@ registration process.{/ts}</p>
               <td>
                {$line.line_total|crmMoney:$currency}
               </td>
-	      {if $pricesetFieldsCount }<td>{$line.participant_count}</td> {/if}
+        {if $pricesetFieldsCount }<td>{$line.participant_count}</td> {/if}
              </tr>
             {/foreach}
            </table>
@@ -252,17 +252,17 @@ registration process.{/ts}</p>
        <tr>
         <td {$labelStyle}>
          {ts}Total Amount{/ts}
-        </td>  
+        </td>
         <td {$valueStyle}>
          {$totalAmount|crmMoney:$currency} {if $hookDiscount.message}({$hookDiscount.message}){/if}
         </td>
        </tr>
        {if $pricesetFieldsCount }
      <tr>
-       <td {$labelStyle}> 
-      {ts}Total Participants{/ts}</td>   
+       <td {$labelStyle}>
+      {ts}Total Participants{/ts}</td>
       <td {$valueStyle}>
-      {assign var="count" value= 0}	 
+      {assign var="count" value= 0}
       {foreach from=$lineItem item=pcount}
       {assign var="lineItemCount" value=0}
       {if $pcount neq 'skip'}
@@ -271,7 +271,7 @@ registration process.{/ts}</p>
         {/foreach}
       {if $lineItemCount < 1 }
         {assign var="lineItemCount" value=1}
-      {/if}	
+      {/if}
       {assign var="count" value=$count+$lineItemCount}
       {/if}
       {/foreach}
@@ -414,8 +414,8 @@ registration process.{/ts}</p>
      <tr><th {$headerStyle}>{$customProfile.title.$pid}</th></tr>
      {foreach from=$eachProfile item=val key=field}
      <tr>{foreach from=$val item=v key=f}
-         <td {$labelStyle}>{$field}</td> 
-         <td {$valueStyle}>{$v}</td> 
+         <td {$labelStyle}>{$field}</td>
+         <td {$valueStyle}>{$v}</td>
          {/foreach}
      </tr>
      {/foreach}
@@ -442,7 +442,7 @@ registration process.{/ts}</p>
        {/foreach}
       {/foreach}
      {/if}
-   
+
     </table>
    </td>
   </tr>

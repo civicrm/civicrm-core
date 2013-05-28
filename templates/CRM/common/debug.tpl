@@ -35,14 +35,14 @@
 {$session->debug($smarty.get.sessionDebug)}
 {/if}
 
-{if $smarty.get.directoryCleanup} 
+{if $smarty.get.directoryCleanup}
 {$config->cleanup($smarty.get.directoryCleanup)}
 {/if}
 
-{if $smarty.get.cacheCleanup} 
+{if $smarty.get.cacheCleanup}
 {$config->clearDBCache()}
 {/if}
 
-{if $smarty.get.configReset} 
+{if $smarty.get.configReset}
 {$config->reset()}
 {/if}

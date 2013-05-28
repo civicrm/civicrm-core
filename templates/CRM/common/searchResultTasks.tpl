@@ -66,7 +66,7 @@
     {if $actionButtonName}
        {$form.$actionButtonName.html} &nbsp; &nbsp;
     {else}
-     {$form._qf_Search_next_action.html} 
+     {$form._qf_Search_next_action.html}
    {/if}
     </td>
   </tr>

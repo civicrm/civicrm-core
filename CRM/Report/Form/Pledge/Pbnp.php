@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -193,11 +191,11 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
       $this->_columns['civicrm_pledge']['fields']['campaign_id'] = array(
         'title' => 'Campaign',
         'default' => 'false',
-		  );
+      );
       $this->_columns['civicrm_pledge']['filters']['campaign_id'] = array('title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
-		  );
+      );
     }
 
     $this->_tagFilter = TRUE;

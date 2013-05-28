@@ -57,16 +57,16 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     // redirect to Administer Section After hitting either Save or Cancel button.
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
-    
+
     $this->addFormRule(array('CRM_Admin_Form_Setting_Mail', 'formRule'));
     $this->addRule('mailerBatchLimit', ts('Must be an integer'), 'integer');
     $this->addRule('mailThrottleTime', ts('Must be an integer'), 'integer');
     $this->addRule('mailerJobSize', ts('Must be an integer'), 'integer');
-    $this->addRule('mailerJobsMax', ts('Must be an integer'), 'integer');            
+    $this->addRule('mailerJobsMax', ts('Must be an integer'), 'integer');
 
     parent::buildQuickForm($check);
   }
-  
+
   static function formRule($fields) {
     $errors = array();
 
@@ -79,7 +79,7 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
         $errors['mailerJobSize'] = ts('A job size smaller than the batch limit will negate the effect of the batch limit.');
       }
     }
-    
+
     return empty($errors) ? TRUE : $errors;
   }
 }

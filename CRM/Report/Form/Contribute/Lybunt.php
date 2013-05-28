@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -63,7 +61,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
-    } 
+    }
 
     $this->_columns = array(
       'civicrm_contact' =>
@@ -77,9 +75,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'default' => TRUE,
             'required' => TRUE,
           ),
-		  'first_name' => array('title' => ts('First Name'),
+      'first_name' => array('title' => ts('First Name'),
           ),
-		  'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Last Name'),
           ),
         ),
         'filters' =>

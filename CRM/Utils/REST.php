@@ -257,7 +257,7 @@ class CRM_Utils_REST {
         return self::error('Unknown function invocation.');
       }
       $store = NULL;
-      
+
       if ($args[1] == 'ping') {
         return self::ping();
       }
@@ -268,7 +268,7 @@ class CRM_Utils_REST {
       $args[1] = CRM_Utils_array::value('entity', $_REQUEST);
       $args[2] = CRM_Utils_array::value('action', $_REQUEST);
     }
- 
+
 
     // Everyone should be required to provide the server key, so the whole
     //  interface can be disabled in more change to the configuration file.

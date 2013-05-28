@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -43,21 +41,21 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
   protected $_customGroupExtends = array('Contribution');
-  protected $_customGroupGroupBy = TRUE; 
+  protected $_customGroupGroupBy = TRUE;
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   function __construct() {
-	  
-	// Check if CiviCampaign is a) enabled and b) has active campaigns
-	$config = CRM_Core_Config::singleton();
+
+  // Check if CiviCampaign is a) enabled and b) has active campaigns
+  $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
     }
-    
+
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -112,11 +110,11 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       ),
       'civicrm_financial_type' =>
       array('dao' => 'CRM_Financial_DAO_FinancialType',
-        'fields' => array('financial_type' => null,), 
+        'fields' => array('financial_type' => null,),
         'grouping' => 'contri-fields',
-        'group_bys' => array( 
-          'financial_type' => array('title' => ts('Financial Type')), 
-        ), 
+        'group_bys' => array(
+          'financial_type' => array('title' => ts('Financial Type')),
+        ),
       ),
       'civicrm_contribution' =>
       array(
@@ -125,7 +123,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'fields' =>
         array(
           'contribution_source' => array('title' => ts('Source'),
-		  ),
+      ),
           'currency' =>
           array('required' => TRUE,
             'no_display' => TRUE,
@@ -161,7 +159,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
           'financial_type_id' =>
-          array('title' => ts('Financial Type'), 
+          array('title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options'  => CRM_Contribute_PseudoConstant::financialType(),
             'type' => CRM_Utils_Type::T_INT,
@@ -379,24 +377,24 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   function from() {
     $this->_from = "
         FROM civicrm_contact  {$this->_aliases['civicrm_contact']}
-             INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']} 
+             INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
                         {$this->_aliases['civicrm_contribution']}.is_test = 0
-             LEFT  JOIN civicrm_financial_type  {$this->_aliases['civicrm_financial_type']} 
+             LEFT  JOIN civicrm_financial_type  {$this->_aliases['civicrm_financial_type']}
                      ON {$this->_aliases['civicrm_contribution']}.financial_type_id ={$this->_aliases['civicrm_financial_type']}.id
-             LEFT  JOIN civicrm_email {$this->_aliases['civicrm_email']} 
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND 
-                        {$this->_aliases['civicrm_email']}.is_primary = 1) 
-              
-             LEFT  JOIN civicrm_phone {$this->_aliases['civicrm_phone']} 
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND 
+             LEFT  JOIN civicrm_email {$this->_aliases['civicrm_email']}
+                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
+                        {$this->_aliases['civicrm_email']}.is_primary = 1)
+
+             LEFT  JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                         {$this->_aliases['civicrm_phone']}.is_primary = 1)";
 
     if ($this->_addressField) {
       $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-                         ON {$this->_aliases['civicrm_contact']}.id = 
-                            {$this->_aliases['civicrm_address']}.contact_id AND 
+                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                         ON {$this->_aliases['civicrm_contact']}.id =
+                            {$this->_aliases['civicrm_address']}.contact_id AND
                             {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
   }
@@ -455,7 +453,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $select = "
             SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount )       as count,
                    SUM({$this->_aliases['civicrm_contribution']}.total_amount )         as amount,
-                   ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,                                                                                                                              {$this->_aliases['civicrm_contribution']}.currency as currency                
+                   ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,                                                                                                                              {$this->_aliases['civicrm_contribution']}.currency as currency
             ";
       $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
       $sql = "{$select} {$this->_from} {$this->_where}{$group}";

@@ -24,9 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 
-{* 
+{*
 file contains function to add and remove overlay during ajax request,
-this is defined in template because we want to localize the 
+this is defined in template because we want to localize the
 display message message.
 *}
 {literal}
@@ -35,7 +35,7 @@ display message message.
  * function to add overlay during ajax action
  */
 function addCiviOverlay( element ) {
-  var message = {/literal}"{ts escape='js'}Please wait...{/ts}"{literal}; 
+  var message = {/literal}"{ts escape='js'}Please wait...{/ts}"{literal};
   cj( element ).block({
     message: message,
     theme: true,

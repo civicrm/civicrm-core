@@ -361,7 +361,7 @@ class CRM_Activity_Page_AJAX {
     if (!empty($params['targetContactIds'])) {
       $targetContacts = array_unique(explode(',', $params['targetContactIds']));
     }
-    
+
     $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
