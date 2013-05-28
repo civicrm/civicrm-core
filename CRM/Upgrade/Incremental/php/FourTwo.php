@@ -130,7 +130,7 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
       $dao = CRM_Core_DAO::executeQuery($sql);
       if ($dao->fetch()) {
         $errors = ts("We found unexpected data values from an older version of CiviCRM in your database. The upgrade can not be run until this condition is corrected.<br /><br />Details: One or more rows are present in the civicrm_option_group with name like 'civicrm_price_field.amount.%'. <a href='%1'>Check here for information on diagnosing and correcting this problem.</a>", array(1 => 'http://forum.civicrm.org/index.php/topic,27744.msg118748.html#msg118748'));
-        CRM_Core_Error::fatal($errors);     
+        CRM_Core_Error::fatal($errors);
         return FALSE;
   }
     }
@@ -485,7 +485,7 @@ WHERE     cpse.price_set_id IS NULL";
       $fieldParams['option_label'] = $optionValue['label'];
       $fieldParams['option_amount'] = $optionValue['value'];
       $fieldParams['option_weight'] = $optionValue['weight'];
-      $fieldParams['is_quick_config'] = $setParams['is_quick_config']; 
+      $fieldParams['is_quick_config'] = $setParams['is_quick_config'];
       if ($defaultAmount = CRM_Core_DAO::getFieldValue($daoName[$addTo[0]][0], $addTo[2], $defaultAmountColumn)) {
         $fieldParams['default_option'] = array_search($defaultAmount, $optionValue['amount_id']);
       }

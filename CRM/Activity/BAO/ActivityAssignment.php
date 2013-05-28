@@ -134,7 +134,7 @@ INNER JOIN civicrm_activity_contact ON civicrm_activity_contact.contact_id = con
 LEFT JOIN  civicrm_email ce ON ce.contact_id = contact_a.id
 WHERE      civicrm_activity_contact.activity_id = %1
 AND        contact_a.is_deleted = 0
-AND        civicrm_activity_contact.record_type_id = $assigneeID 
+AND        civicrm_activity_contact.record_type_id = $assigneeID
            {$whereClause}
 ";
 

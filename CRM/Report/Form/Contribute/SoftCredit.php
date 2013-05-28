@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -44,9 +42,9 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     '' => 'Tabular',
     'barChart' => 'Bar Chart',
     'pieChart' => 'Pie Chart',
-  ); 
+  );
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
-  
+
   function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
@@ -56,7 +54,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
-    } 
+    }
 
     $this->_columns = array(
       'civicrm_contact' =>
@@ -144,7 +142,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
       ),
       'civicrm_financial_type' =>
       array('dao' => 'CRM_Financial_DAO_FinancialType',
-        'fields' => array('financial_type' => null,), 
+        'fields' => array('financial_type' => null,),
         'filters' =>
         array(
           'id' =>
@@ -336,27 +334,27 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     $alias_creditor    = 'contact_civireport';
     $this->_from       = "
         FROM  civicrm_contribution {$this->_aliases['civicrm_contribution']}
-              INNER JOIN civicrm_contribution_soft {$this->_aliases['civicrm_contribution_soft']} 
-                         ON {$this->_aliases['civicrm_contribution_soft']}.contribution_id = 
+              INNER JOIN civicrm_contribution_soft {$this->_aliases['civicrm_contribution_soft']}
+                         ON {$this->_aliases['civicrm_contribution_soft']}.contribution_id =
                             {$this->_aliases['civicrm_contribution']}.id
-              INNER JOIN civicrm_contact {$alias_constituent} 
-                         ON {$this->_aliases['civicrm_contribution']}.contact_id = 
+              INNER JOIN civicrm_contact {$alias_constituent}
+                         ON {$this->_aliases['civicrm_contribution']}.contact_id =
                             {$alias_constituent}.id
-              LEFT  JOIN civicrm_financial_type  {$this->_aliases['civicrm_financial_type']} 
-                         ON {$this->_aliases['civicrm_contribution']}.financial_type_id = 
+              LEFT  JOIN civicrm_financial_type  {$this->_aliases['civicrm_financial_type']}
+                         ON {$this->_aliases['civicrm_contribution']}.financial_type_id =
                             {$this->_aliases['civicrm_financial_type']}.id
               LEFT  JOIN civicrm_contact {$alias_creditor}
-                         ON {$this->_aliases['civicrm_contribution_soft']}.contact_id = 
-                            {$alias_creditor}.id 
+                         ON {$this->_aliases['civicrm_contribution_soft']}.contact_id =
+                            {$alias_creditor}.id
               {$this->_aclFrom} ";
 
     // include Constituent email field if email column is to be included
     if ($this->_emailField) {
       $alias = 'emailconst';
       $this->_from .= "
-            LEFT JOIN civicrm_email {$alias} 
-                      ON {$alias_constituent}.id = 
-                         {$alias}.contact_id   AND 
+            LEFT JOIN civicrm_email {$alias}
+                      ON {$alias_constituent}.id =
+                         {$alias}.contact_id   AND
                          {$alias}.is_primary = 1\n";
     }
 
@@ -364,9 +362,9 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     if ($this->_emailFieldCredit) {
       $alias = 'emailcredit';
       $this->_from .= "
-            LEFT JOIN civicrm_email {$alias} 
-                      ON {$alias_creditor}.id = 
-                         {$alias}.contact_id  AND 
+            LEFT JOIN civicrm_email {$alias}
+                      ON {$alias_creditor}.id =
+                         {$alias}.contact_id  AND
                          {$alias}.is_primary = 1\n";
     }
 
@@ -374,8 +372,8 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     if ($this->_phoneField) {
       $alias = 'pconst';
       $this->_from .= "
-            LEFT JOIN civicrm_phone {$alias} 
-                      ON {$alias_constituent}.id = 
+            LEFT JOIN civicrm_phone {$alias}
+                      ON {$alias_constituent}.id =
                          {$alias}.contact_id  AND
                          {$alias}.is_primary = 1\n";
     }
@@ -385,8 +383,8 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
       $alias = 'pcredit';
       $this->_from .= "
             LEFT JOIN civicrm_phone pcredit
-                      ON {$alias_creditor}.id = 
-                         {$alias}.contact_id  AND 
+                      ON {$alias_creditor}.id =
+                         {$alias}.contact_id  AND
                          {$alias}.is_primary = 1\n";
     }
   }

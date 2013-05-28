@@ -39,20 +39,20 @@
           {$pager->_response.first}&nbsp;
           {$pager->_response.back}&nbsp;
           {$pager->_response.next}&nbsp;
-          {$pager->_response.last}&nbsp;          
-          {$pager->_response.status}          
+          {$pager->_response.last}&nbsp;
+          {$pager->_response.status}
           </span>
 
         </div>
     {/if}
-    
+
     {* Controller for 'Rows Per Page' *}
     {if $location eq 'bottom' and $pager->_totalItems > 25}
      <div class="form-item float-right">
-           <label>{ts}Rows per page:{/ts}</label> &nbsp; 
+           <label>{ts}Rows per page:{/ts}</label> &nbsp;
            {$pager->_response.twentyfive}&nbsp; | &nbsp;
            {$pager->_response.fifty}&nbsp; | &nbsp;
-           {$pager->_response.onehundred}&nbsp; 
+           {$pager->_response.onehundred}&nbsp;
      </div>
      <div class="clear"></div>
     {/if}

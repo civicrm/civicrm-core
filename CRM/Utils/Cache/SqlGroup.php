@@ -51,7 +51,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @var int $componentID The optional component ID (so componenets can share the same name space)
    */
   protected $componentID;
-  
+
   /**
    * @var array in-memory cache to optimize redundant get()s
    */

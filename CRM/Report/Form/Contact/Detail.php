@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -55,9 +53,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
-		  'first_name' => array('title' => ts('First Name'),
+      'first_name' => array('title' => ts('First Name'),
           ),
-		  'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Last Name'),
           ),
           'id' =>
           array(
@@ -474,14 +472,14 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-        
+
         $this->_formComponent['activity_civireport'] = "FROM
                         civicrm_activity {$this->_aliases['civicrm_activity']}
                         LEFT JOIN civicrm_activity_contact civicrm_activity_target ON
                             {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id AND
                             civicrm_activity_target.record_type_id = {$targetID}
                         LEFT JOIN civicrm_activity_contact civicrm_activity_assignment ON
-                            {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id AND                                                                                                                   civicrm_activity_assignment.record_type_id = {$assigneeID}                                  
+                            {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id AND                                                                                                                   civicrm_activity_assignment.record_type_id = {$assigneeID}
                         LEFT JOIN civicrm_contact sourceContact ON
                             {$this->_aliases['civicrm_activity']}.source_contact_id = sourceContact.id
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_target']} ON
@@ -802,7 +800,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           // handle contribution
           if ($component == 'contribution_civireport') {
             if ($val = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_financial_type_id'] = 
+              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_financial_type_id'] =
                 CRM_Contribute_PseudoConstant::financialType($val, false);
             }
 

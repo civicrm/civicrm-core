@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 class CRM_Contact_DAO_Factory {
 

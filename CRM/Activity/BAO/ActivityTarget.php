@@ -60,7 +60,7 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
     $target = new CRM_Activity_BAO_ActivityContact();
     $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-    
+
     $target->copyValues($params);
     $target->record_type_id = $targetID ;
     return $target->save();

@@ -140,7 +140,7 @@
       }
       else {
         if (elementId.is('select') === true && firstElement.parent().find(':input').select().index() >= 1) {
-          // its a multiselect case       
+          // its a multiselect case
           firstElement.parent().find(':input').select().each( function(count) {
             var firstElementValue = cj(this).val();
             var elementId = cj('.crm-copy-fields [name^="field["][name*="[' + fname +'][' + count + '"][type!=hidden]');

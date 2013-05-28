@@ -25,7 +25,7 @@
 *}
 {literal}
 <script type="text/javascript">
-    
+
 cj(function($) {
   // The set of options we can use to initialize jQuery.dashboard().
   var options = {
@@ -44,7 +44,7 @@ cj(function($) {
     ajaxCallbacks: {
 
       // Server returns the configuration of widgets for this user;
-      // An array (keyed by zero-indexed column ID), of arrays (keyed by widget ID) of 
+      // An array (keyed by zero-indexed column ID), of arrays (keyed by widget ID) of
       // booleans; true if the widget is minimized.  False if not.
       // E.g. [{ widgetID: isMinimized, ...}, ...]
       getWidgetsByColumn: {
@@ -67,9 +67,9 @@ cj(function($) {
       //  * settings: Boolean.  True if widget has settings pane/display and server-side
       //    callback.
       //
-      // Server-side executable script callbacks are called and executed on certain 
+      // Server-side executable script callbacks are called and executed on certain
       // events.  They can use the widgets property of the dashboard object returned
-      // from jQuery.dashboard().  E.g. dashboard.widgets[widgetID].  They should be 
+      // from jQuery.dashboard().  E.g. dashboard.widgets[widgetID].  They should be
       // javascript files on the server.  Set the property to the path of the js file:
       //  * initScript:  Called when dashboard is initialising (but not finished).
       //  * fullscreenInitScript:  Called when the full screen element is initialising
@@ -90,7 +90,7 @@ cj(function($) {
         }
       },
 
-      // jQuery.dashboard() POSTs the widget-to-column settings here.  The server's 
+      // jQuery.dashboard() POSTs the widget-to-column settings here.  The server's
       // response is sent to console.log() (if it exists), but is not used.  No checks
       // for errors have been implemented yet.
       // The 'columns' property of data is reserved for the widget-to-columns settings:
@@ -103,7 +103,7 @@ cj(function($) {
           op: 'save_columns', key: {/literal}"{crmKey name='civicrm/ajax/dashboard'}"{literal}
         }
       },
-      
+
       // jQuery.dashboard() GETs a widget's settings object and POST's a users submitted
       // settings back to the server.  The return, in both cases, is an associative
       // array with the new settings markup and other info:
