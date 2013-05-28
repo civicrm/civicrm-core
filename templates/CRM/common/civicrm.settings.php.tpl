@@ -184,7 +184,9 @@ define( 'CIVICRM_MAIL_SMARTY', 0 );
 
 /**
  * This setting logs all emails to a file. Useful for debugging any mail (or civimail) issues.
- * This will not send any email, so ensure this is commented out in production
+ * Enabling this setting will not send any email, ensure this is commented out in production
+ * The CIVICRM_MAIL_LOG is a debug option which disables MTA (mail transport agent) interaction.
+ * You must disable CIVICRM_MAIL_LOG before CiviCRM will talk to your MTA.
  */
 // define( 'CIVICRM_MAIL_LOG', '%%templateCompileDir%%/mail.log' );
 
