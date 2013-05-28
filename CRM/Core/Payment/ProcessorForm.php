@@ -105,15 +105,15 @@ class CRM_Core_Payment_ProcessorForm {
         )
       );
     }
-
-    $profileAddressFields = $form->get('profileAddressFields');
-    if (!empty( $profileAddressFields)) {
-      $form->assign('profileAddressFields', $profileAddressFields);
-    }
   }
 
   static function buildQuickform(&$form) {
     $form->addElement('hidden', 'hidden_processor', 1);
+
+    $profileAddressFields = $form->get('profileAddressFields');
+    if (!empty($profileAddressFields)) {
+      $form->assign('profileAddressFields', $profileAddressFields);
+    }
 
     // before we do this lets see if the payment processor has implemented a buildForm method
     if (method_exists($form->_paymentProcessor['instance'], 'buildForm') &&

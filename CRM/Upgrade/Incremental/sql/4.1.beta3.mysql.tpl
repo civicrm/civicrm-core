@@ -15,7 +15,7 @@ UPDATE `civicrm_job`
 SET parameters = NULL;
 
 -- Insert Schedule Jobs admin menu item
-SELECT @systemSettingsID := id     FROM civicrm_navigation where name = 'System Settings';
+SELECT @systemSettingsID := id     FROM civicrm_navigation where name = 'System Settings' AND domain_id = @domainID;
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )

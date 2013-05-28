@@ -308,8 +308,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form {
 
     $this->fixFormValues();
 
-    // we don't show test pledges in Contact Summary / User Dashboard
-    if (empty($this->_formValues['pledge_test']) && $this->_single) {
+    // We don't show test records in summaries or dashboards
+    if (empty($this->_formValues['pledge_test']) && $this->_force) {
       $this->_formValues["pledge_test"] = 0;
     }
 

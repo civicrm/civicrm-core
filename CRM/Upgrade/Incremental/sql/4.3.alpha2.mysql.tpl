@@ -23,7 +23,7 @@ UPDATE `civicrm_navigation`
   name = 'Accounting Batches';
 
 -- CRM-11891
-SELECT @contributionlastID := max(id) from civicrm_navigation where name = 'Contributions';
+SELECT @contributionlastID := max(id) from civicrm_navigation where name = 'Contributions' AND domain_id = {$domainID};
 SELECT @importWeight := weight from civicrm_navigation where name = 'Import Contributions' and parent_id = @contributionlastID;
 
 -- since 'Bulk Data Entry' was renamed to 'Batch Data Entry'

@@ -122,7 +122,7 @@
       </td>
     </tr>
     <tr class="crm-scheduleReminder-form-block-recipient">
-        <td class="right">{$form.recipient.label}</td><td colspan="3">{$form.recipient.html}</td>
+        <td class="right">{$form.recipient.label}</td><td colspan="3">{$form.recipient.html}&nbsp;&nbsp;{help id="recipient" file="CRM/Admin/Page/ScheduleReminders.hlp" title=$form.recipient.label}</td>
     </tr>
     <tr id="recipientList" class="crm-scheduleReminder-form-block-recipientListing">
         <td class="right">{$form.recipient_listing.label}</td><td colspan="3">{$form.recipient_listing.html}</td>
