@@ -340,14 +340,14 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * Add urls for display in the actions menu
    */
   static function addUrls(&$obj, $cid) {
+    // TODO rewrite without so many hard-coded CMS bits; use abstractions like CRM_Core_Permission::check('cms:...') and CRM_Utils_System
+
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
     if ($uid) {
-      // To do: we should also allow drupal users with CRM_Core_Permission::check( 'view user profiles' ) true to access $userRecordUrl
-      // but this is currently returning false regardless of permission set for the role. dgg
       if ($config->userSystem->is_drupal == '1' &&
-        ($session->get('userID') == $cid || CRM_Core_Permission::check('administer users'))
+        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account')))
       ) {
         $userRecordUrl = CRM_Utils_System::url('user/' . $uid);
       }

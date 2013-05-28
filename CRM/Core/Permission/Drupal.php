@@ -62,6 +62,30 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   protected $_editPermissionedGroups;
 
 
+  /**
+   * given a permission string, check for access requirements
+   *
+   * @param string $str the permission to check
+   *
+   * @return boolean true if yes, else false
+   * @access public
+   */
+  function check($str, $contactID = NULL) {
+    $str = $this->translatePermission($str, 'Drupal', array(
+      'view user account' => 'access user profiles',
+      'administer users' => 'administer users',
+    ));
+    if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
+      return FALSE;
+    }
+    if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
+      return TRUE;
+    }
+    if (function_exists('user_access')) {
+      return user_access($str) ? TRUE : FALSE;
+    }
+    return TRUE;
+  }
 
   /**
    * Given a roles array, check for access requirements

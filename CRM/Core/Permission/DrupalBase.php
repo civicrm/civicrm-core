@@ -219,21 +219,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
     return NULL;
   }
 
-  /**
-   * given a permission string, check for access requirements
-   *
-   * @param string $str the permission to check
-   *
-   * @return boolean true if yes, else false
-   * @access public
-   */
-  function check($str, $contactID = NULL) {
-    if (function_exists('user_access')) {
-      return user_access($str) ? TRUE : FALSE;
-    }
-    return TRUE;
-  }
-
   function getContactEmails($uids) {
     if (empty($uids)) {
       return '';

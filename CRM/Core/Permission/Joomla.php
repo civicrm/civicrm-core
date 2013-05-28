@@ -48,16 +48,47 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   function check($str) {
     $config = CRM_Core_Config::singleton();
 
+    $translated = $this->translateJoomlaPermission($str);
+    if ($translated === CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
+      return FALSE;
+    }
+    if ($translated === CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
+      return TRUE;
+    }
+
     // ensure that we are running in a joomla context
     // we've not yet figured out how to bootstrap joomla, so we should
     // not execute hooks if joomla is not loaded
     if (defined('_JEXEC')) {
-      $permissionStr = 'civicrm.' . CRM_Utils_String::munge(strtolower($str));
-      $permission = JFactory::getUser()->authorise($permissionStr, 'com_civicrm');
+      $permission = JFactory::getUser()->authorise($translated[0], $translated[1]);
       return $permission;
     }
     else {
+      // This function is supposed to return a boolean. What does '(1)' mean?
       return '(1)';
+    }
+  }
+
+  /**
+   * @param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:example.action:com_some_asset"
+   * @return ALWAYS_DENY_PERMISSION|ALWAYS_ALLOW_PERMISSION|array(0 => $joomlaAction, 1 => $joomlaAsset)
+   */
+  function translateJoomlaPermission($perm) {
+    if ($perm === CRM_Core_Permission::ALWAYS_DENY_PERMISSION || $perm === CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
+      return $perm;
+    }
+
+    list ($civiPrefix, $name) = CRM_Utils_String::parsePrefix(':', $perm, NULL);
+    switch($civiPrefix) {
+      case 'Joomla':
+        return explode(':', $name);
+      case 'cms':
+        // FIXME: This needn't be DENY, but we don't currently have any translations.
+        return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
+      case NULL:
+        return array('civicrm.' . CRM_Utils_String::munge(strtolower($name)), 'com_civicrm');
+      default:
+        return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
     }
   }
 
