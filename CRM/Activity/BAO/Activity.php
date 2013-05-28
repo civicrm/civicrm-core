@@ -2198,10 +2198,8 @@ AND cl.modified_id  = c.id
 
     while ($activityContact->fetch()) {
       // finally delete activity.
-      if (CRM_Core_DAO::singleValueQuery($sql)) {
-        $activityParams = array('id' => $activityContact->activity_id);
-        $result = self::deleteActivity($activityParams);
-      }
+      $activityParams = array('id' => $activityContact->activity_id);
+      $result = self::deleteActivity($activityParams);
     }
 
     $activityContact->free();
