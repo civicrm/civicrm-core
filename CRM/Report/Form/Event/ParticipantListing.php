@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -39,20 +37,20 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   protected $_summary = NULL;
 
   protected $_customGroupExtends = array(
-    'Participant'); 
+    'Participant');
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
-  function __construct() {  
-	  
-  	// Check if CiviCampaign is a) enabled and b) has active campaigns
-	$config = CRM_Core_Config::singleton();
+  function __construct() {
+
+    // Check if CiviCampaign is a) enabled and b) has active campaigns
+  $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
     }
-    
+
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -65,9 +63,9 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'no_repeat' => TRUE,
             'dbAlias' => 'contact_civireport.sort_name',
           ),
-		  'first_name' => array('title' => ts('First Name'),
+      'first_name' => array('title' => ts('First Name'),
           ),
-		  'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Last Name'),
           ),
           'id' =>
           array(
@@ -82,10 +80,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         'order_bys' =>
         array(
           'sort_name' =>
-          array('title' => ts('Last Name, First Name'), 
-			'default' => '1', 
-			'default_weight' => '0', 
-			'default_order' => 'ASC',
+          array('title' => ts('Last Name, First Name'),
+      'default' => '1',
+      'default_weight' => '0',
+      'default_order' => 'ASC',
           ),
         ),
         'filters' =>
@@ -249,7 +247,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         ),
       ),
     );
-    
+
     // If we have active campaigns add those elements to both the fields and filters
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_participant']['fields']['campaign_id'] = array(
@@ -263,11 +261,11 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
       $this->_columns['civicrm_participant']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
 
     }
-    
+
     $this->_currencyColumn = 'civicrm_participant_fee_currency';
     parent::__construct();
   }
-  
+
 
   function preProcess() {
     parent::preProcess();
@@ -278,7 +276,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
     $this->_columnHeaders = array();
 
     //add blank column at the Start
-    if (array_key_exists('options', $this->_params) && 
+    if (array_key_exists('options', $this->_params) &&
         CRM_Utils_Array::value('blank_column_begin', $this->_params['options'])) {
       $select[] = " '' as blankColumnBegin";
       $this->_columnHeaders['blankColumnBegin']['title'] = '_ _ _ _';
@@ -319,23 +317,23 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   function from() {
     $this->_from = "
         FROM civicrm_participant {$this->_aliases['civicrm_participant']}
-             LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} 
-                    ON ({$this->_aliases['civicrm_event']}.id = {$this->_aliases['civicrm_participant']}.event_id ) AND 
-                       ({$this->_aliases['civicrm_event']}.is_template IS NULL OR  
+             LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
+                    ON ({$this->_aliases['civicrm_event']}.id = {$this->_aliases['civicrm_participant']}.event_id ) AND
+                       ({$this->_aliases['civicrm_event']}.is_template IS NULL OR
                         {$this->_aliases['civicrm_event']}.is_template = 0)
-             LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']} 
+             LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_participant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  )
              {$this->_aclFrom}
              LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND 
-                       {$this->_aliases['civicrm_address']}.is_primary = 1 
-             LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']} 
+                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
+                       {$this->_aliases['civicrm_address']}.is_primary = 1
+             LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                       {$this->_aliases['civicrm_email']}.is_primary = 1) 
-             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']} 
+                       {$this->_aliases['civicrm_email']}.is_primary = 1)
+             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                         {$this->_aliases['civicrm_phone']}.is_primary = 1 		   
-			";
+                         {$this->_aliases['civicrm_phone']}.is_primary = 1
+      ";
   }
 
   function where() {

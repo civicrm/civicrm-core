@@ -193,7 +193,7 @@ abstract class CRM_Activity_Import_Parser {
    * @var boolean
    */
   protected $_haveColumnHeader;
-  
+
   function __construct() {
     $this->_maxLinesToProcess = 0;
     $this->_maxErrorCount = self::MAX_ERRORS;

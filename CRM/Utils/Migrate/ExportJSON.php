@@ -378,7 +378,7 @@ AND    entity_table = 'civicrm_contact'
     $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     $ids = implode(',', $contactIDs);
 
     $sql = "(
@@ -390,7 +390,7 @@ AND    entity_table = 'civicrm_contact'
 ) UNION (
   SELECT     a.*
   FROM       civicrm_activity a
-  INNER JOIN civicrm_activity_contact at ON at.activity_id = a.id AND at.record_type_id = $targetID  
+  INNER JOIN civicrm_activity_contact at ON at.activity_id = a.id AND at.record_type_id = $targetID
   WHERE      at.contact_id IN ( $ids )
     AND      ( a.activity_type_id != 3 AND a.activity_type_id != 20 )
 )

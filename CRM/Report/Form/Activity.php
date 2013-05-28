@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -356,11 +354,11 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         FROM civicrm_activity {$this->_aliases['civicrm_activity']}
 
              LEFT JOIN civicrm_activity_contact  {$this->_aliases['civicrm_activity_target']}
-                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_target']}.activity_id AND 
+                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_target']}.activity_id AND
                        {$this->_aliases['civicrm_activity_target']}.record_type_id = {$targetID}
              LEFT JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_assignment']}
-                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_assignment']}.activity_id AND 
-                       {$this->_aliases['civicrm_activity_assignment']}.record_type_id = {$assigneeID} 
+                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_assignment']}.activity_id AND
+                       {$this->_aliases['civicrm_activity_assignment']}.record_type_id = {$assigneeID}
              LEFT JOIN civicrm_contact civicrm_contact_source
                     ON {$this->_aliases['civicrm_activity']}.source_contact_id = civicrm_contact_source.id
              LEFT JOIN civicrm_contact contact_civireport
@@ -639,8 +637,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       }
     }
   }
-  
-  
+
+
    /*
    * Add Target Contact Address into From Table if required
    */
