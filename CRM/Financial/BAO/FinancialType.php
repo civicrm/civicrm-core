@@ -148,6 +148,38 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
           'table'  => 'civicrm_pledge',
           'column' => 'financial_type_id',
         ),
+        array(
+          'table'  => 'civicrm_grant',
+          'column' => 'financial_type_id',
+        ),
+        array(
+          'table'  => 'civicrm_product',
+          'column' => 'financial_type_id',
+        ),
+        array(
+          'table'  => 'civicrm_event',
+          'column' => 'financial_type_id',
+        ),
+        array(
+          'table'  => 'civicrm_premiums_product',
+          'column' => 'financial_type_id',
+        ),
+        array(
+          'table'  => 'civicrm_price_set',
+          'column' => 'financial_type_id',
+        ),
+        array(
+          'table'  => 'civicrm_price_field_value',
+          'column' => 'financial_type_id',
+        ),
+        array(
+          'table'  => 'civicrm_line_item',
+          'column' => 'financial_type_id',
+        ),
+        array(
+          'table'  => 'civicrm_contribution_product ',
+          'column' => 'financial_type_id',
+        ),
       );
 
     $errors = array();
