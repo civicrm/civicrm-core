@@ -28,12 +28,6 @@
 {/htxt}
 {htxt id="id-pcp_intro_help"}
 {ts}Personal Campaign Pages provide your constituents with the ability to promote this event or a related fundraising effort. When Personal Campaign Pages are enabled constituents will see a link after registering for this event which invites them to create their own page to promote the event (or promote a related online contribution page). Event registration fees (or contributions) from people who come in through a Personal Campaign Page are recorded as "soft credits" for the supporter who created that campaign page.{/ts}
-{if $config->userSystem->is_drupal}
-    {ts}You can also place additional links (or menu items) allowing constituents to create their own fundraising pages using the following URL:{/ts}<br /><br />
-    <strong>{crmURL a=true p='civicrm/contribute/campaign' q="action=add&reset=1&pageId=`$params.pageId`&component=event"}</strong></dd>
-{elseif $config->userFramework EQ 'Joomla'}
-    {ts}You can also create front-end links (or menu items) allowing constituents to create their own fundraising pages using the Menu Manager. Select <strong>Contributions &raquo; Personal Campaign Pages</strong> and then select this event.{/ts}
-{/if}
 {/htxt}
 
 {htxt id="id-approval_needed-title"}
@@ -79,14 +73,6 @@
 {/htxt}
 {htxt id="id-link_text"}
 {ts}Text for the link inviting constituents to create a Personal Campaign Page. This link will appear on the Event registration Thank-you page as well as on each Personal Campaign Page.{/ts}
-<p>
-{if $config->userSystem->is_drupal}
-    {ts}When Personal Campaign Pages are enabled, you can also place additional links (or menu items) inviting constituents to create personal campaign pages using the following URL:{/ts}<br /><br />
-    <strong>{crmURL a=true p='civicrm/contribute/campaign' q="action=add&reset=1&pageId=`$params.pageId`&component=event"}</strong></dd>
-{elseif $config->userFramework EQ 'Joomla'}
-    {ts}When Personal Campaign Pages are enabled, you can create front-end links inviting constituents to create personal fundraising pages using the Menu Manager. Select <strong>Contributions &raquo; Personal Campaign Pages</strong> and then select this event.{/ts}
-{/if}
-</p>
 {/htxt}
 
 {htxt id="id-target_entity_type-title"}

@@ -75,7 +75,17 @@
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-link_text">
         <td class="label">{$form.link_text.label}</td>
-        <td>{$form.link_text.html|crmAddClass:huge} {help id="id-link_text"}</td>
+        <td>
+          {$form.link_text.html|crmAddClass:huge} {help id="id-link_text"}<br />
+          <span class="description">
+            {if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
+              {ts}You can also place additional links (or menu items) allowing constituents to create their own fundraising pages using the following URL:{/ts}<br />
+              <em>{crmURL a=1 fe=1 p='civicrm/contribute/campaign' q="action=add&reset=1&pageId=`$pageId`&component=`$context`"}</em>
+            {elseif $config->userFramework EQ 'Joomla'}
+              {ts}You can also create front-end links (or menu items) allowing constituents to create their own fundraising pages using the Menu Manager. Select <strong>Contributions &raquo; Personal Campaign Pages</strong> and then select this event.{/ts}
+            {/if}
+          </span>
+        </td>
      </tr>
   </table>
 {/crmRegion}
