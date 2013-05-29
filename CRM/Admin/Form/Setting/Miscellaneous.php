@@ -63,30 +63,37 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     // FIXME: for now, disable logging for multilingual sites OR if triggers are not permittted
     $domain = new CRM_Core_DAO_Domain;
     $domain->find(TRUE);
-    $attribs = $domain->locales || !$validTriggerPermission ? array(
-      'disabled' => 'disabled') : NULL;
+    $attribs = $domain->locales || !$validTriggerPermission ?
+      array('disabled' => 'disabled') : NULL;
 
     $this->assign('validTriggerPermission', $validTriggerPermission);
     $this->addYesNo('logging', ts('Logging'), NULL, NULL, $attribs);
 
-    $this->addElement('text', 'wkhtmltopdfPath', ts('Path to wkhtmltopdf executable'),
+    $this->addElement(
+      'text',
+      'wkhtmltopdfPath', ts('Path to wkhtmltopdf executable'),
       array('size' => 64, 'maxlength' => 256)
     );
 
-    $this->addElement('text', 'recaptchaPublicKey', ts('Public Key'),
+    $this->addElement(
+      'text', 'recaptchaPublicKey', ts('Public Key'),
       array('size' => 64, 'maxlength' => 64)
     );
-    $this->addElement('text', 'recaptchaPrivateKey', ts('Private Key'),
+    $this->addElement(
+      'text', 'recaptchaPrivateKey', ts('Private Key'),
       array('size' => 64, 'maxlength' => 64)
     );
 
-    $this->addElement('text', 'dashboardCacheTimeout', ts('Dashboard cache timeout'),
+    $this->addElement(
+      'text', 'dashboardCacheTimeout', ts('Dashboard cache timeout'),
       array('size' => 3, 'maxlength' => 5)
     );
-    $this->addElement('text', 'checksumTimeout', ts('CheckSum Lifespan'),
+    $this->addElement(
+      'text', 'checksumTimeout', ts('CheckSum Lifespan'),
       array('size' => 2, 'maxlength' => 8)
     );
-    $this->addElement('text', 'recaptchaOptions', ts('Recaptcha Options'),
+    $this->addElement(
+      'text', 'recaptchaOptions', ts('Recaptcha Options'),
       array('size' => 64, 'maxlength' => 64)
     );
 
@@ -98,11 +105,13 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   function setDefaultValues() {
     parent::setDefaultValues();
 
-    $this->_defaults['checksumTimeout'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'checksum_timeout',
-      NULL,
-      7
-    );
+    $this->_defaults['checksumTimeout'] =
+      CRM_Core_BAO_Setting::getItem(
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'checksum_timeout',
+        NULL,
+        7
+      );
     return $this->_defaults;
   }
 

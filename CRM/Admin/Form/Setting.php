@@ -50,7 +50,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    *
    * @return None
    */
-   function setDefaultValues() {
+  function setDefaultValues() {
     if (!$this->_defaults) {
       $this->_defaults = array();
       $formArray       = array('Component', 'Localization');
