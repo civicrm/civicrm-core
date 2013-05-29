@@ -171,10 +171,10 @@ Class CRM_Core_Form_Date {
         'current.quarter' => ts('Current Quarter to-date'),
         'current.month' => ts('Current Month to-date'),
         'current.week' => ts('Current Week to-date'),
-        'ending.year' => ts('From 12 Months Ago'),
-        'ending.quarter' => ts('From 3 Months Ago'),
-        'ending.month' => ts('From 1 Month Ago'),
-        'ending.week' => ts('From 1 Week Ago'),
+        'ending.year' => ts('Last 12 Months'),
+        'ending.quarter' => ts('Last 3 Months'),
+        'ending.month' => ts('Last Month'),
+        'ending.week' => ts('Last 7 days'),
       );
 
     if (is_array($operators)) {
