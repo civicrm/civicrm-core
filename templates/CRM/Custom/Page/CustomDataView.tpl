@@ -29,7 +29,7 @@
   {foreach from=$customValues item=cd_edit key=cvID}
     <table class="no-border">
       {assign var='index' value=$groupId|cat:"_$cvID"}
-      {if $editOwnCustomData or ($showEdit and $editCustomData and $groupId)}
+      {if ($editOwnCustomData and $showEdit) or ($showEdit and $editCustomData and $groupId)}
         <tr>
           <td>
             <a
