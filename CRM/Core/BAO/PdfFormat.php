@@ -97,7 +97,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    * @return array   array of page orientations
    * @access public
    */
-  function getPageOrientations() {
+  public static function getPageOrientations() {
     return array(
       'portrait' => ts('Portrait'),
       'landscape' => ts('Landscape'),
@@ -112,7 +112,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    * @return array   array of measurement units
    * @access public
    */
-  function getUnits() {
+  public static function getUnits() {
     return array(
       'in' => ts('Inches'),
       'cm' => ts('Centimeters'),
