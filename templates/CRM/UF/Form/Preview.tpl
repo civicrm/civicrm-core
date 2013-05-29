@@ -46,10 +46,6 @@
           {if $field.skipDisplay}
             {continue}
           {/if}
-          {if $field.field_type eq "Formatting"}
-            {$field.help_pre}
-            {continue}
-          {/if}
           {if $field.groupTitle != $fieldset}
             {if $fieldset != $zeroField}
               </table>
@@ -71,11 +67,13 @@
           <table class="form-layout-compressed" id="table-1">
           {/if}
           {* Show explanatory text for field if not in 'view' mode *}
-          {if $field.help_pre && $action neq 4}
+          {if $field.help_pre && $action neq 4 && $field.field_type neq "Formatting"}
             <tr><td>&nbsp;</td><td class="description">{$field.help_pre}</td></tr>
           {/if}
           {assign var=n value=$field.name}
-          {if $field.options_per_line }
+          {if $field.field_type eq "Formatting"}
+            <tr><td colspan="2">{$field.help_pre}</td></tr>
+          {elseif $field.options_per_line }
             <tr>
               <td class="option-label">{$form.$n.label}</td>
               <td>
