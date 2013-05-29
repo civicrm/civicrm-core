@@ -327,8 +327,6 @@ return array (
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'versionAlert',
-    'prefetch' => 1,
-    'config_only'=> 1,
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
