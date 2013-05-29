@@ -122,8 +122,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
 
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
-      $defaults['source_contact_id'] =
-        $activity->source_contact_id = $sourceContactId;
+      $defaults['source_contact_id'] = $sourceContactId;
 
       if ($sourceContactId &&
         !CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
