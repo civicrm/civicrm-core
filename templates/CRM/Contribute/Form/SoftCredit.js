@@ -34,7 +34,7 @@ cj(function($) {
         'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&id=' + $(this).val());
       $.ajax({
         url     : dataUrl,
-	async   : false,
+        async   : false,
         success : function(html){
           htmlText = html.split( '|' , 2);
           $('#soft_credit_contact_' + rowCnt).val(htmlText[0]);
