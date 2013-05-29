@@ -688,5 +688,27 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function getLoginDestination(&$form) {
     return;
   }
+
+  /**
+   * Return default Site Settings
+   * @return array array
+   * - $url, (Joomla - non admin url)
+   * - $siteName,
+   * - $siteRoot
+   */
+  function getDefaultSiteSettings($dir){
+    $config = CRM_Core_Config::singleton();
+    $url = preg_replace(
+      '|/administrator|',
+      '',
+      $config->userFrameworkBaseURL
+    );
+    $siteRoot = preg_replace(
+      '|/media/civicrm/.*$|',
+      '',
+      $config->imageUploadDir
+    );
+    return array($url, NULL, $siteRoot);
+  }
 }
 
