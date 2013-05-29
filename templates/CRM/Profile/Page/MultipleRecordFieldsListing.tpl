@@ -33,7 +33,7 @@
         <div>
         {strip}
         <table id="records" class="display">
-	  <thead>
+          <thead>
             <tr>
           {foreach from=$headers key=recId item=head}
              <th>{ts}{$head}{/ts}</th>
@@ -44,7 +44,7 @@
           {foreach from=$records key=recId item=rows}   
             <tr class="{cycle values="odd-row,even-row"}">
               {foreach from=$headers key=hrecId item=head}
-	        <td>{$rows.$hrecId}</td>
+                <td>{$rows.$hrecId}</td>
               {/foreach}
               <td>{$rows.action}</td>
             </tr>
