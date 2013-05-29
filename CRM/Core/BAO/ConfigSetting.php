@@ -438,48 +438,22 @@ class CRM_Core_BAO_ConfigSetting {
     return array($url, $dir, $siteName, $siteRoot);
   }
 
+/**
+ * Return likely default settings
+ * @return array site settings
+ *  -$url,
+ * - $dir Base Directory
+ * - $siteName
+ * - $siteRoot
+ */
   static function getBestGuessSettings() {
     $config = CRM_Core_Config::singleton();
-
-    $url = $config->userFrameworkBaseURL;
-    $siteName = $siteRoot = NULL;
-    if ($config->userFramework == 'Joomla') {
-      $url = preg_replace(
-        '|/administrator|',
-        '',
-        $config->userFrameworkBaseURL
-      );
-      $siteRoot = preg_replace(
-        '|/media/civicrm/.*$|',
-        '',
-        $config->imageUploadDir
-      );
-    }
-
     $dir = preg_replace(
       '|civicrm/templates_c/.*$|',
       '',
       $config->templateCompileDir
     );
-
-    if ($config->userFramework->is_drupal) {
-      $matches = array();
-      if (preg_match(
-          '|/sites/([\w\.\-\_]+)/|',
-          $config->templateCompileDir,
-          $matches
-        )) {
-        $siteName = $matches[1];
-        if ($siteName) {
-          $siteName = "/sites/$siteName/";
-          $siteNamePos = strpos($dir, $siteName);
-          if ($siteNamePos !== FALSE) {
-            $siteRoot = substr($dir, 0, $siteNamePos);
-          }
-        }
-      }
-    }
-
+    list($url, $siteName, $siteRoot) = $config->userSystem->getDefaultSiteSettings($dir);
     return array($url, $dir, $siteName, $siteRoot);
   }
 
