@@ -151,14 +151,18 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
    */
   public function setContactIDs() {
     $IDs = implode(',', $this->_activityHolderIds);
+
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $query = "
-SELECT source_contact_id
-  FROM civicrm_activity
- WHERE id IN ( $IDs )
-";
+SELECT contact_id
+FROM   civicrm_activity_contact
+WHERE  activity_id IN ( $IDs ) AND
+       record_type_id = {$sourceID}";
+
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $contactIDs[] = $dao->source_contact_id;
+      $contactIDs[] = $dao->contact_id;
     }
     $this->_contactIds = $contactIDs;
   }
