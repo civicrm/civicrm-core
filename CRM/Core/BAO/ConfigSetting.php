@@ -462,7 +462,7 @@ class CRM_Core_BAO_ConfigSetting {
       $config->templateCompileDir
     );
 
-    if ($config->userFramework->is_drupal) {
+    if ($config->userSystem->is_drupal) {
       $matches = array();
       if (preg_match(
           '|/sites/([\w\.\-\_]+)/|',
