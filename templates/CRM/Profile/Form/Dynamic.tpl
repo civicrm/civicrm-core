@@ -118,6 +118,17 @@ function proccessMultiRecordForm(formData, jqForm, options) {
       {/if}
       {assign var="profileID" value=$field.group_id}
       {assign var=n value=$field.name}
+      {if $field.groupTitle != $fieldset}
+        {if $mode neq 8 && $mode neq 4}
+          <div {if $context neq 'dialog'}id="profilewrap{$field.group_id}"{/if}>
+          <fieldset><legend>{$field.groupTitle}</legend>
+        {/if}
+        {assign var=fieldset  value=`$field.groupTitle`}
+        {assign var=groupHelpPost  value=`$field.groupHelpPost`}
+        {if $field.groupHelpPre}
+          <div class="messages help">{$field.groupHelpPre}</div>
+        {/if}
+      {/if}
       {if $field.field_type eq "Formatting"}
         {$field.help_pre}
       {elseif $n}
@@ -131,16 +142,6 @@ function proccessMultiRecordForm(formData, jqForm, options) {
               </fieldset>
             </div>
             {/if}
-          {/if}
-
-          {if $mode neq 8 && $mode neq 4}
-          <div {if $context neq 'dialog'}id="profilewrap{$field.group_id}"{/if}>
-          <fieldset><legend>{$field.groupTitle}</legend>
-          {/if}
-          {assign var=fieldset  value=`$field.groupTitle`}
-          {assign var=groupHelpPost  value=`$field.groupHelpPost`}
-          {if $field.groupHelpPre}
-            <div class="messages help">{$field.groupHelpPre}</div>
           {/if}
         <div class="form-layout-compressed">
         {/if}
