@@ -666,28 +666,29 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
 
   static function fixAllStateSelects(&$form, $defaults, $batchFieldNames = false) {
     $config = CRM_Core_Config::singleton();
-
     $map = null;
     if (is_array($batchFieldNames)) {
       $map = $batchFieldNames;
     }
-    else if (!empty($config->stateCountryMap)) {
+    elseif (!empty($config->stateCountryMap)) {
       $map = $config->stateCountryMap;
     }
-
     if (!empty($map)) {
       foreach ($map as $index => $match) {
-        if (
-          array_key_exists('state_province', $match) &&
-          array_key_exists('country', $match)
+        if (array_key_exists('state_province', $match)
+          || array_key_exists('country', $match)
+          || array_key_exists('county', $match)
         ) {
+          $countryElementName = CRM_Utils_Array::value('country', $match);
+          $stateProvinceElementName = CRM_Utils_Array::value('state_province', $match);
+          $countyElementName = CRM_Utils_Array::value('county', $match);
           CRM_Contact_Form_Edit_Address::fixStateSelect(
             $form,
-            $match['country'],
-            $match['state_province'],
-            CRM_Utils_Array::value('county', $match),
-            CRM_Utils_Array::value($match['country'], $defaults),
-            CRM_Utils_Array::value($match['state_province'], $defaults)
+            $countryElementName,
+            $stateProvinceElementName,
+            $countyElementName,
+            CRM_Utils_Array::value($countryElementName, $defaults),
+            CRM_Utils_Array::value($stateProvinceElementName, $defaults)
           );
         }
         else {
