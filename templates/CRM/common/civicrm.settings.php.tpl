@@ -193,13 +193,6 @@ define( 'CIVICRM_MAIL_SMARTY', 0 );
 define( 'CIVICRM_DOMAIN_ID'      , 1 );
 
 /**
- * For Wordpress users if your public pages are using a different template than the home page
- * you should set the name of the template with the below constant
- * This will be moved to a DB setting in a future version, check CRM-10682
- */
-// define( 'CIVICRM_UF_WP_BASEPAGE', 'YOUR TEMPLATE NAME HERE');
-
-/**
  * Settings to enable external caching using a Memcache server.  This is an
  * advanced feature, and you should read and understand the documentation
  * before you turn it on. We cannot store these settings in the DB since the
