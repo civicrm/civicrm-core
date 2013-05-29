@@ -124,5 +124,17 @@ abstract class CRM_Utils_System_Base {
   function flush() {
     // nullop by default
   }
+    /**
+   * Return default Site Settings
+   * @return array array
+   * - $url, (Joomla - non admin url)
+   * - $siteName,
+   * - $siteRoot
+   */
+  function getDefaultSiteSettings($dir){
+    $config = CRM_Core_Config::singleton();
+    $url = $config->userFrameworkBaseURL;
+    return array($url, NULL, NULL);
+  }
 }
 
