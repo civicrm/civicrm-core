@@ -71,14 +71,14 @@
 
     {if $params.isOnlineRegistration}
     <tr>
-        <td><a href="{crmURL p='civicrm/event/register' q="reset=1&action=preview&id=`$params.eventId`" fe=1}" id="idTest-drive">&raquo; {ts}Registration{/ts}</a><br />({ts}test-drive{/ts})</td>
+        <td><a href="{crmURL p='civicrm/event/register' q="reset=1&action=preview&id=`$params.eventId`" a=1 fe=1}" id="idTest-drive">&raquo; {ts}Registration{/ts}</a><br />({ts}test-drive{/ts})</td>
         <td>{ts}Test-drive the entire online registration process - including custom fields, confirmation, thank-you page, and receipting. Fee payment transactions will be directed to your payment processor's test server. <strong>No live financial transactions will be submitted. However, a contact record will be created or updated and participant and contribution records will be saved to the database. Use obvious test contact names so you can review and delete these records as needed.</strong>{/ts}</td>
     </tr>
 
     <tr>
-        <td><a href="{crmURL p='civicrm/event/register' q="reset=1&id=`$params.eventId`"}" id="idLive">&raquo; {ts}Registration{/ts}</a><br />({ts}live{/ts})</td>
+        <td><a href="{crmURL a=1 fe=1 p='civicrm/event/register' q="reset=1&id=`$params.eventId`"}" id="idLive">&raquo; {ts}Registration{/ts}</a><br />({ts}live{/ts})</td>
         <td>{ts}Review your customized <strong>LIVE</strong> online event registration page here. Use the following URL in links and buttons on any website to send visitors to this live page{/ts}:<br />
-            <strong>{crmURL a=true p='civicrm/event/register' q="reset=1&id=`$params.eventId`"}</strong>
+            <strong>{crmURL a=1 fe=1 p='civicrm/event/register' q="reset=1&id=`$params.eventId`"}</strong>
         </td>
     </tr>
     {/if}

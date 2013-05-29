@@ -73,7 +73,7 @@ You can use existing CiviCRM Profiles on your page - OR create profile(s) specif
 <tr>
   <td><a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageID`"}" id="idLive">&raquo; {ts}Online Contribution{/ts}</a><br /> ({ts}Live{/ts})</td>
   <td>{ts}Review your customized <strong>LIVE</strong> online contribution page here. Use the following URL in links and buttons on any website to send visitors to this live page{/ts}:<br />
-      <strong>{crmURL a=true p="civicrm/contribute/transact" q="reset=1&id=`$contributionPageID`"}</strong></td>
+      <strong>{crmURL a=1 fe=1 p="civicrm/contribute/transact" q="reset=1&id=`$contributionPageID`"}</strong></td>
 </tr>
 </table>
 {/htxt}
