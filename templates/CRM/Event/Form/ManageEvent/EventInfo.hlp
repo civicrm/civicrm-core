@@ -55,17 +55,17 @@
 {htxt id="id-listing"}
     {ts}To allow users to see a listing of participants, set this field to 'Name' (list names only), 'Name and Email', or 'Name, Status and Register Date'.{/ts}
     {if !$params.isTemplate}
-        {if $config->userSystem->is_drupal}
-            {ts}You will need to set Drupal Access Control permissions to include 'view event participants' for any Roles you want to access this listing.{/ts}
-            {if $params.action eq 2 AND $params.entityId}
-                {ts}Create links to the listing page by copying the following URL, and adding it to the Event Description below and / or as a menu item or links elsewhere on your site:{/ts}<br />
-                <em>{crmURL a=true p='civicrm/event/participant' q="reset=1&id=`$params.entityId`"}</em>
-            {else} {* Creating new event *}
-                {ts}After adding your event, create links to the listing page by copying the URL provided in the 'Participant Listing' section of the Configure Event page.{/ts}
-            {/if}
-        {elseif $config->userFramework EQ 'Joomla'}
-            {ts 1=$params.entityId}Then create front-end links to the Participant Listing page using the Menu Manager. Select <strong>Participant Listing Page</strong> and enter <strong>%1</strong> for the Event ID.{/ts}
+      {ts}You will need to set Access Control permissions to include 'view event participants' for any Roles you want to access this listing.{/ts}
+      {if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
+        {if $params.action eq 2 AND $params.entityId}
+          {ts}Create links to the listing page by copying the following URL, and adding it to the Event Description below and / or as a menu item or links elsewhere on your site:{/ts}<br />
+          <em>{crmURL a=1 p='civicrm/event/participant' q="reset=1&id=`$params.entityId`"}</em>
+        {else} {* Creating new event *}
+          {ts}After adding your event, create links to the listing page by copying the URL provided in the 'Participant Listing' section of the Configure Event page.{/ts}
         {/if}
+      {elseif $config->userFramework EQ 'Joomla'}
+          {ts 1=$params.entityId}Then create front-end links to the Participant Listing page using the Menu Manager. Select <strong>Participant Listing Page</strong> and enter <strong>%1</strong> for the Event ID.{/ts}
+      {/if}
     {/if}
 {/htxt}
 
