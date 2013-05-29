@@ -487,6 +487,7 @@ LIMIT 1;";
         $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)) {
         $input['payment_processor'] = $paymentProcessorId;
       }
+      $input['contribution_status_id'] = array_search('Completed', $contributionStatuses);
       $input['total_amount'] = $input['amount'];
       $input['contribution'] = $contribution;
       $input['financial_type_id'] = $contribution->financial_type_id;

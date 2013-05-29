@@ -1511,25 +1511,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $count++;
       }
 
-      if (!CRM_Utils_Array::value('is_recur', $params) && $params['total_amount'] > 0.0) {
-        $contribution = new CRM_Contribute_BAO_Contribution();
-        $contribution->trxn_id = CRM_Utils_Array::value('trxn_id', $result);
-        if ($contribution->find(TRUE)) {
-          // next create the transaction record
-          $trxnParams = array(
-            'contribution_id' => $contribution->id,
-            'trxn_date' => $now,
-            'trxn_type' => 'Debit',
-            'total_amount' => $params['total_amount'],
-            'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-            'net_amount' => CRM_Utils_Array::value('net_amount', $result, $params['total_amount']),
-            'currency' => $config->defaultCurrency,
-            'payment_processor' => $this->_paymentProcessor['payment_processor_type'],
-            'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-          );
-          $trxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
-        }
-      }
     }
     else {
       $params['action'] = $this->_action;
