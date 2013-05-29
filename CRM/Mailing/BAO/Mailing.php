@@ -2467,7 +2467,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @return None
    * @access public
    */
-  public function commonLetterCompose(&$form) {
+  public static function commonLetterCompose(&$form) {
     //get the tokens.
     $tokens = CRM_Core_SelectValues::contactTokens();
     if (CRM_Utils_System::getClassName($form) == 'CRM_Mailing_Form_Upload') {
@@ -2516,7 +2516,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
         'onkeyup' => "return verify(this)",
       )
     );
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $action = CRM_Utils_Request::retrieve('action', 'String', $form, FALSE);
     if ((CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Task_PDF') &&
       $action == CRM_Core_Action::VIEW
     ) {
