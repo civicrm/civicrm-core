@@ -281,16 +281,21 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $sql = "
             SELECT count(civicrm_address.country_id) as total,
                 IFNULL(country_id,'') as country_id,IFNULL(iso_code,'') as country_iso, IFNULL(civicrm_country.name,'') as country
-                FROM   civicrm_activity a, civicrm_survey, civicrm_contact
+                FROM  ( civicrm_activity a, civicrm_survey, civicrm_contact )
                 LEFT JOIN civicrm_address ON civicrm_address.contact_id = civicrm_contact.id AND civicrm_address.is_primary = 1
                 LEFT JOIN civicrm_country ON civicrm_address.country_id = civicrm_country.id
+                LEFT JOIN civicrm_activity_contact ac ON ( ac.activity_id = a.id AND  ac.record_type_id = %2 )
                 WHERE
-                a.source_contact_id = civicrm_contact.id AND
+                ac.contact_id = civicrm_contact.id AND
                 a.activity_type_id = civicrm_survey.activity_type_id AND
                 civicrm_survey.id =  %1 AND
                 a.source_record_id =  %1  ";
 
-    $params = array(1 => array($surveyId, 'Integer'));
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $params = array(
+      1 => array($surveyId, 'Integer'),
+      2 => array($sourceID, 'Integer'));
     $sql .= " GROUP BY civicrm_address.country_id";
     $fields = array('total', 'country_id', 'country_iso', 'country');
 
@@ -315,8 +320,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   static function getPetitionSignatureTotal($surveyId) {
     $surveyInfo = CRM_Campaign_BAO_Petition::getSurveyInfo((int) $surveyId);
     //$activityTypeID = $surveyInfo['activity_type_id'];
-    $signature = array();
-
     $sql = "
             SELECT
             status_id,count(id) as total
@@ -388,11 +391,12 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
             IFNULL(gender_id,'') AS gender_id,
             IFNULL(state_province_id,'') AS state_province_id,
             IFNULL(country_id,'') as country_id,IFNULL(iso_code,'') as country_iso, IFNULL(civicrm_country.name,'') as country
-            FROM   civicrm_activity a, civicrm_survey, civicrm_contact
+            FROM (civicrm_activity a, civicrm_survey, civicrm_contact )
+            LEFT JOIN civicrm_activity_contact ac ON ( ac.activity_id = a.id AND  ac.record_type_id = %3 )
             LEFT JOIN civicrm_address ON civicrm_address.contact_id = civicrm_contact.id  AND civicrm_address.is_primary = 1
             LEFT JOIN civicrm_country ON civicrm_address.country_id = civicrm_country.id
             WHERE
-            a.source_contact_id = civicrm_contact.id AND
+            ac.contact_id = civicrm_contact.id AND
             a.activity_type_id = civicrm_survey.activity_type_id AND
             civicrm_survey.id =  %1 AND
             a.source_record_id =  %1 ";
@@ -405,6 +409,10 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     }
     $sql .= " ORDER BY  a.activity_date_time";
 
+    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $params[3] = array($sourceID, 'Integer');
+
     $fields = array(
       'id', 'survey_id', 'contact_id',
       'activity_date_time', 'activity_type_id',
@@ -412,7 +420,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       'sort_name', 'gender_id', 'country_id',
       'state_province_id', 'country_iso', 'country',
     );
-
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {

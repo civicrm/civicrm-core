@@ -300,7 +300,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         ($bulkActivityTypeID == $activityTypeId)
       ) {
         $row['mailingId'] = CRM_Utils_System::url('civicrm/mailing/report',
-          "mid={$result->source_record_id}&reset=1&cid={$result->source_contact_id}&context=activitySelector"
+          "mid={$result->source_record_id}&reset=1&cid={$contactId}&context=activitySelector"
         );
         $row['recipients'] = ts('(recipients)');
         $row['target_contact_name'] = '';
