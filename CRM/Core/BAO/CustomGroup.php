@@ -316,7 +316,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @static
    *
    */
-  public static function &getTree($entityType,
+  public static function getTree($entityType,
     &$form,
     $entityID = NULL,
     $groupID  = NULL,
@@ -555,7 +555,7 @@ ORDER BY civicrm_custom_group.weight,
     // since we need to know the table and field names
     // add info to groupTree
 
-    if (isset($groupTree['info']) && !empty($groupTree['info'])) {
+    if (isset($groupTree['info']) && !empty($groupTree['info']) && !empty($groupTree['info']['tables'])) {
       $select = $from = $where = array();
       $groupTree['info']['where'] = NULL;
 
