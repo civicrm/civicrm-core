@@ -288,65 +288,65 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 
     $totalCount['premonth']['new'] = array(
       'count' => $newCountPreMonth,
-      'url' => CRM_Utils_System::url('civicrm/activity/search',
-        "reset=1&force=1&signupType=1&dateLow=$preMonth&dateHigh=$preMonthEnd"
-      ),
+      //'url' => CRM_Utils_System::url('civicrm/activity/search',
+      //  "reset=1&force=1&signupType=1&dateLow=$preMonth&dateHigh=$preMonthEnd"
+      //),
     );
 
     $totalCount['premonth']['renew'] = array(
       'count' => $renewCountPreMonth,
-      'url' => CRM_Utils_System::url('civicrm/activity/search',
-        "reset=1&force=1&signupType=2&dateLow=$preMonth&dateHigh=$preMonthEnd"
-      ),
+      //'url' => CRM_Utils_System::url('civicrm/activity/search',
+      //  "reset=1&force=1&signupType=2&dateLow=$preMonth&dateHigh=$preMonthEnd"
+      //),
     );
 
     $totalCount['premonth']['total'] = array(
       'count' => $totalCountPreMonth,
-      'url' => CRM_Utils_System::url('civicrm/activity/search',
-        "reset=1&force=1&signupType=3&dateLow=$preMonth&dateHigh=$preMonthEnd"
-      ),
+      //'url' => CRM_Utils_System::url('civicrm/activity/search',
+      //  "reset=1&force=1&signupType=3&dateLow=$preMonth&dateHigh=$preMonthEnd"
+      //),
     );
 
     $totalCount['month']['new'] = array(
       'count' => $newCountMonth,
-      'url' => CRM_Utils_System::url('civicrm/activity/search',
-        "reset=1&force=1&signupType=1&dateLow=$monthStart&dateHigh=$ymd"
-      ),
+      //'url' => CRM_Utils_System::url('civicrm/activity/search',
+      //  "reset=1&force=1&signupType=1&dateLow=$monthStart&dateHigh=$ymd"
+      //),
     );
 
     $totalCount['month']['renew'] = array(
       'count' => $renewCountMonth,
-      'url' => CRM_Utils_System::url('civicrm/activity/search',
-        "reset=1&force=1&signupType=2&dateLow=$monthStart&dateHigh=$ymd"
-      ),
+      //'url' => CRM_Utils_System::url('civicrm/activity/search',
+      //  "reset=1&force=1&signupType=2&dateLow=$monthStart&dateHigh=$ymd"
+      //),
     );
 
     $totalCount['month']['total'] = array(
       'count' => $totalCountMonth,
-      'url' => CRM_Utils_System::url('civicrm/activity/search',
-        "reset=1&force=1&signupType=3&dateLow=$monthStart&dateHigh=$ymd"
-      ),
+      //'url' => CRM_Utils_System::url('civicrm/activity/search',
+      //  "reset=1&force=1&signupType=3&dateLow=$monthStart&dateHigh=$ymd"
+      //),
     );
 
     $totalCount['year']['new'] = array(
       'count' => $newCountYear,
-      'url' => CRM_Utils_System::url('civicrm/activity/search',
-        "reset=1&force=1&signupType=1&dateLow=$yearStart&dateHigh=$ymd"
-      ),
+      //'url' => CRM_Utils_System::url('civicrm/activity/search',
+      //  "reset=1&force=1&signupType=1&dateLow=$yearStart&dateHigh=$ymd"
+      //),
     );
 
     $totalCount['year']['renew'] = array(
       'count' => $renewCountYear,
-      'url' => CRM_Utils_System::url('civicrm/activity/search',
-        "reset=1&force=1&signupType=2&dateLow=$yearStart&dateHigh=$ymd"
-      ),
+      //'url' => CRM_Utils_System::url('civicrm/activity/search',
+      //  "reset=1&force=1&signupType=2&dateLow=$yearStart&dateHigh=$ymd"
+      //),
     );
 
     $totalCount['year']['total'] = array(
       'count' => $totalCountYear,
-      'url' => CRM_Utils_System::url('civicrm/activity/search',
-        "reset=1&force=1&signupType=3&dateLow=$yearStart&dateHigh=$ymd"
-      ),
+      //'url' => CRM_Utils_System::url('civicrm/activity/search',
+      //  "reset=1&force=1&signupType=3&dateLow=$yearStart&dateHigh=$ymd"
+      //),
     );
 
     $totalCount['current']['total'] = array(
@@ -377,7 +377,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     //LCD add owner values
     $totalCount['premonth_owner']['premonth_owner'] = array(
       'count' => $totalCountPreMonth_owner,
-      'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$preMonth&end=$preMonthEnd&owner=1"),
+    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$preMonth&end=$preMonthEnd&owner=1"),
     );
 
     $totalCount['month_owner']['month_owner'] = array(
@@ -412,7 +412,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     $this->assign('totalCount', $totalCount);
     $this->assign('month', date('F', $monthStartTs));
     $this->assign('year', date('Y', $monthStartTs));
-    $this->assign('premonth', date('F', $preMonthYear));
+    $this->assign('premonth', date('F', strtotime($preMonth)));
     $this->assign('currentMonth', date('F'));
     $this->assign('currentYear', date('Y'));
     $this->assign('isCurrent', $isCurrentMonth);

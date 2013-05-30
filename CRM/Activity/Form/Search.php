@@ -396,6 +396,12 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
     if (!$this->_force) {
       return;
     }
+
+    $this->_formValues['activity_role'] = 1;
+    $this->_formValues['activity_contact_name'] = '';
+    $this->_defaults['activity_role'] = 1;
+    $this->_defaults['activity_contact_name'] = '';
+
     $status = CRM_Utils_Request::retrieve('status', 'String', $this);
     if ($status) {
       $this->_formValues['activity_status'] = $status;
@@ -431,10 +437,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
         $this->_single = TRUE;
       }
     }
-
-    if (!empty($this->_defaults)) {
-      $this->setDefaults($this->_defaults);
-    }
         
     // Added for membership search
     
@@ -446,8 +448,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       //$this->_formValues['activity_type_id'] = array();
     
       $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-      $signup = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
-      $renew = CRM_Utils_Array::key('Membership Signup', $activityTypes);
+
+      $renew = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
+      $signup = CRM_Utils_Array::key('Membership Signup', $activityTypes);
       
       switch ($signupType) {
         case 3: // signups and renewals
@@ -465,28 +468,38 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       }
     }
     
-    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'Positive',
+    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String',
       CRM_Core_DAO::$_nullObject
     );
     
     if ($dateLow) {
+      $dateLow = date('m/d/Y', strtotime($dateLow));
+      $this->_formValues['activity_date_relative'] = 0;
+      $this->_defaults['activity_date_relative'] = 0;
       $this->_formValues['activity_date_low'] = $dateLow;
       $this->_defaults['activity_date_low'] = $dateLow;
     }
     
-    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'Positive',
+    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String',
       CRM_Core_DAO::$_nullObject
     );
     
     if ($dateHigh) {
       // Activity date time assumes midnight at the beginning of the date
       // This sets it to almost midnight at the end of the date
-      if ($dateHigh <= 99999999) {
+   /*   if ($dateHigh <= 99999999) {
         $dateHigh = 1000000 * $dateHigh + 235959;
-      }
+      } */
+      $dateHigh = date('m/d/Y', strtotime($dateHigh));
+      $this->_formValues['activity_date_relative'] = 0;
+      $this->_defaults['activity_date_relative'] = 0;
       $this->_formValues['activity_date_high'] = $dateHigh;
       $this->_defaults['activity_date_high'] = $dateHigh;
     } 
+
+    if (!empty($this->_defaults)) {
+      $this->setDefaults($this->_defaults);
+    }
   }
 
   function getFormValues() {
