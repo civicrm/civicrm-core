@@ -196,6 +196,13 @@ class CRM_Core_PseudoConstant {
   private static $extensions;
 
   /**
+   * Financial Account Type
+   * @var array
+   * @static
+   */
+  private static $accountOptionValues;
+
+  /**
    * Low-level option getter, rarely accessed directly.
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
    *
@@ -207,7 +214,7 @@ class CRM_Core_PseudoConstant {
    *                            if true, the results are reversed
    * - grouping   boolean if true, return the value in 'grouping' column (currently unsupported for tables other than option_value)
    * - localize   boolean if true, localize the results before returning
-   * - condition  string|array add condition(s) to the sql query
+   * - condition  string|array add condition(s) to the sql query - will be concatenated using 'AND'
    * - keyColumn  string the column to use for 'id'
    * - labelColumn string the column to use for 'label'
    * - orderColumn string the column to use for sorting, defaults to 'weight' column if one exists, else defaults to labelColumn
@@ -273,7 +280,7 @@ class CRM_Core_PseudoConstant {
           $flip,
           $params['grouping'],
           $params['localize'],
-          $params['condition'],
+          $params['condition'] ? ' AND ' . implode(' AND ', (array) $params['condition']) : NULL,
           $params['labelColumn'] ? $params['labelColumn'] : 'label',
           $params['onlyActive'],
           $params['fresh'],
@@ -1644,6 +1651,31 @@ WHERE  id = %1
     }
 
     return self::$extensions;
+  }
+
+  /**
+   * Get all options values
+   *
+   * The static array option values is returned
+   *
+   * @access public
+   * @static
+   *
+   * @param boolean $optionGroupName - get All  Option Group values- default is to get only active ones.
+   *
+   * @return array - array reference of all Option Group Name
+   *
+   */
+  public static function accountOptionValues($optionGroupName, $id = null, $condition = null) {
+    $cacheKey = $optionGroupName . '_' . $condition;
+    if (empty(self::$accountOptionValues[$cacheKey])) {
+      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, false, false, false, $condition);
+    }
+    if ($id) {
+      return CRM_Utils_Array::value($id, self::$accountOptionValues[$cacheKey]);
+    }
+
+    return self::$accountOptionValues[$cacheKey];
   }
 
   /**
