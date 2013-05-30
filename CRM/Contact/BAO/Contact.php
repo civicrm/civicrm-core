@@ -772,13 +772,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       $logDAO->entity_table = 'civicrm_contact';
       $logDAO->entity_id = $id;
       $logDAO->delete();
-      
+
       // delete contact participants CRM-12155
       CRM_Event_BAO_Participant::deleteContactParticipant($id);
 
       // delete contact contributions CRM-12155
       CRM_Contribute_BAO_Contribution::deleteContactContribution($id);
-      
+
       // do activity cleanup, CRM-5604
       CRM_Activity_BAO_Activity::cleanupActivity($id);
 
@@ -2982,7 +2982,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     }
   }
 
-  
+
   /**
    * Delete a contact-related object that has an 'is_primary' field
    * Ensures that is_primary gets assigned to another object if available
