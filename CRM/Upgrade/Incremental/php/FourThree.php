@@ -390,7 +390,7 @@ AND       ceft.entity_table = 'civicrm_contribution'
       3 => array($cancelledStatus, 'Integer')
     );
 
-    $accountType = key(CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', array('condition' => " AND v.name = 'Asset' ")));
+    $accountType = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' "));
     $query = "
 SELECT id
 FROM   civicrm_financial_account
