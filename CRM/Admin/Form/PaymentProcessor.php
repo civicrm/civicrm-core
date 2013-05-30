@@ -189,7 +189,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     );
 
     // Financial Account of account type asset CRM-11515
-    $accountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', array('condition' => " AND v.name = 'Asset' "));
+    $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
     $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
     if ($fcount = count($financialAccount)) {
       $this->assign('financialAccount', $fcount);
@@ -380,7 +380,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     
     //CRM-11515
     
-    $relationTypeId = key(CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', array('condition' => " AND v.name LIKE 'Asset Account is' ")));
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
     $params = array(
       'entity_table' => 'civicrm_payment_processor',
       'entity_id' => $dao->id,

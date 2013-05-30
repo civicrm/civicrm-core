@@ -1745,7 +1745,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
       $params = array(1 => array($priceSetId, 'Integer'),
         2 => array($feeLevel, 'String'));
       $mainAmount = CRM_Core_DAO::singleValueQuery($query, $params);
-      $relationTypeId = key(CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', array('condition' => " AND v.name LIKE 'Discounts Account is' ")));
+      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Discounts Account is' "));
       $contributionParams['trxnParams']['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
         $contributionParams['contribution']->financial_type_id, $relationTypeId);
       if (CRM_Utils_Array::value('from_financial_account_id', $contributionParams['trxnParams'])) {
