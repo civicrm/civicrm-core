@@ -33,19 +33,6 @@
  *
  */
 class CRM_Core_I18n_PseudoConstant {
-  static function &languages() {
-    static $languages = NULL;
-    if ($languages === NULL) {
-      $rows = array();
-      CRM_Core_OptionValue::getValues(array('name' => 'languages'), $rows, 'weight', TRUE);
-
-      $languages = array();
-      foreach ($rows as $row) {
-        $languages[$row['name']] = $row['label'];
-      }
-    }
-    return $languages;
-  }
 
   static function longForShort($short) {
     $longForShortMapping = self::longForShortMapping();

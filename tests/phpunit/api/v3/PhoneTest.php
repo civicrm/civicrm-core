@@ -49,7 +49,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->_contactID    = $this->organizationCreate();
     $loc                 = $this->locationTypeCreate();
     $this->_locationType = $loc->id;
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
     $this->quickCleanup(array('civicrm_phone'));
     $this->_params = array(
       'contact_id' => $this->_contactID,

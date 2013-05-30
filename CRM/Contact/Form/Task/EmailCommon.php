@@ -105,7 +105,7 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     // now add domain from addresses
     $domainEmails = array();
-    $domainFrom = CRM_Core_PseudoConstant::fromEmailAddress();
+    $domainFrom = CRM_Core_OptionGroup::values('from_email_address');
     foreach (array_keys($domainFrom) as $k) {
       $domainEmail = $domainFrom[$k];
       $domainEmails[$domainEmail] = htmlspecialchars($domainEmail);

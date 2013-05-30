@@ -177,10 +177,10 @@ ORDER BY entity_id
     ) + CRM_Core_PseudoConstant::group();
     $customGroup = array('-1' => ts('- select -'),
       '0' => ts('All Custom Groups'),
-    ) + CRM_Core_PseudoConstant::customGroup();
+    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
     $ufGroup = array('-1' => ts('- select -'),
       '0' => ts('All Profiles'),
-    ) + CRM_Core_PseudoConstant::ufGroup();
+    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFGroup', 'uf_group_id');
 
     $event = array('-1' => ts('- select -'),
       '0' => ts('All Events'),

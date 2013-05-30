@@ -78,7 +78,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     CRM_Utils_System::setTitle($pcpInfo['title']);
     $this->assign('pcp', $pcpInfo);
 
-    $pcpStatus = CRM_PCP_PseudoConstant::pcpStatus();
+    $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
     $approvedId = CRM_Core_OptionGroup::getValue('pcp_status', 'Approved', 'name');
 
     // check if PCP is created by anonymous user

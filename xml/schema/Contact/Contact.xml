@@ -29,10 +29,10 @@
        <comment>Type of Contact.</comment>
        <export>true</export>
        <pseudoconstant>
-        <name>contactType</name>
-        <table>civicrm_location_type</table>
+        <table>civicrm_contact_type</table>
         <keyColumn>name</keyColumn>
         <labelColumn>label</labelColumn>
+        <condition>parent_id IS NULL</condition>
       </pseudoconstant>
        <add>1.1</add>
        <change>3.1</change>
@@ -51,6 +51,12 @@
        <import>true</import>
        <headerPattern>/C(ontact )?(subtype|sub-type|sub type)/i</headerPattern>
        <comment>May be used to over-ride contact view and edit templates.</comment>
+       <pseudoconstant>
+        <table>civicrm_contact_type</table>
+        <keyColumn>name</keyColumn>
+        <labelColumn>label</labelColumn>
+        <condition>parent_id IS NOT NULL</condition>
+      </pseudoconstant>
        <add>1.5</add>
   </field>
   <index>
@@ -212,15 +218,18 @@
        <add>1.1</add>
   </field>
   <field>
-       <name>preferred_communication_method</name>
-       <title>Preferred Communication Method</title>
-       <type>varchar</type>
-       <length>255</length>
-       <import>true</import>
-       <headerPattern>/^p(ref\w*\s)?c(omm\w*)|( meth\w*)$/i</headerPattern>
-       <dataPattern>/^\w+$/</dataPattern>
-       <comment>What is the preferred mode of communication.</comment>
-       <add>1.1</add>
+      <name>preferred_communication_method</name>
+      <title>Preferred Communication Method</title>
+      <type>varchar</type>
+      <length>255</length>
+      <import>true</import>
+      <headerPattern>/^p(ref\w*\s)?c(omm\w*)|( meth\w*)$/i</headerPattern>
+      <dataPattern>/^\w+$/</dataPattern>
+      <comment>What is the preferred mode of communication.</comment>
+      <add>1.1</add>
+      <pseudoconstant>
+        <optionGroupName>preferred_communication_method</optionGroupName>
+      </pseudoconstant>
   </field>
   <index>
        <name>index_preferred_communication_method</name>
@@ -235,6 +244,10 @@
       <comment>Which language is preferred for communication. FK to languages in civicrm_option_value.</comment>
       <headerPattern>/^lang/i</headerPattern>
       <import>true</import>
+      <pseudoconstant>
+        <optionGroupName>languages</optionGroupName>
+        <keyColumn>name</keyColumn>
+      </pseudoconstant>
       <add>3.2</add>
   </field>
   <field>
@@ -338,11 +351,11 @@
       <type>int unsigned</type>
       <comment>Prefix or Title for name (Ms, Mr...). FK to prefix ID</comment>
       <pseudoconstant>
-        <name>individualPrefix</name>
-        <optionGroupName>individualPrefix</optionGroupName>
+        <optionGroupName>individual_prefix</optionGroupName>
       </pseudoconstant>
       <headerPattern>/^(prefix|title)/i</headerPattern>
       <dataPattern>/^(mr|ms|mrs|sir|dr)\.?$/i</dataPattern>
+      <import>true</import>
       <add>1.2</add>
   </field>
   <index>
@@ -355,9 +368,9 @@
       <title>Individual Suffix</title>
       <type>int unsigned</type>
       <pseudoconstant>
-        <name>individualSuffix</name>
-        <optionGroupName>individualSuffix</optionGroupName>
+        <optionGroupName>individual_suffix</optionGroupName>
       </pseudoconstant>
+      <import>true</import>
       <comment>Suffix for name (Jr, Sr...). FK to suffix ID</comment>
       <headerPattern>/^suffix$/i</headerPattern>
       <dataPattern>/^(sr|jr)\.?|i{2,}$/</dataPattern>
@@ -482,11 +495,11 @@
       <title>Gender</title>
       <type>int unsigned</type>
       <pseudoconstant>
-        <name>gender</name>
         <optionGroupName>gender</optionGroupName>
       </pseudoconstant>
       <headerPattern>/^gender$/i</headerPattern>
       <comment>FK to gender ID</comment>
+      <import>true</import>
       <add>1.2</add>
   </field>
   <index>

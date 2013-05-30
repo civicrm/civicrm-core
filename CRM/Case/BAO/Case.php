@@ -974,7 +974,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   static function getCaseActivity($caseID, &$params, $contactID, $context = NULL, $userID = NULL, $type = NULL) {
     $values = array();
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
@@ -1104,7 +1104,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
     $activityTypes    = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
     $activityStatus   = CRM_Core_PseudoConstant::activityStatus();
-    $activityPriority = CRM_Core_PseudoConstant::priority();
+    $activityPriority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
 
     $url = CRM_Utils_System::url("civicrm/case/activity",
       "reset=1&cid={$contactID}&caseid={$caseID}", FALSE, NULL, FALSE
@@ -2256,7 +2256,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
 
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name');
     $activityStatuses = CRM_Core_PseudoConstant::activityStatus('name');
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);

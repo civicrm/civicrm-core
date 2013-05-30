@@ -173,7 +173,7 @@ class CRM_Core_Permission {
   }
 
   public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE) {
-    $customGroups = CRM_Core_PseudoConstant::customGroup($reset);
+    $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id', array('fresh' => $reset));
     $defaultGroups = array();
 
     // check if user has all powerful permission
@@ -209,7 +209,7 @@ class CRM_Core_Permission {
   }
 
   public static function ufGroup($type = CRM_Core_Permission::VIEW) {
-    $ufGroups = CRM_Core_PseudoConstant::ufGroup();
+    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFGroup', 'uf_group_id');
 
     $allGroups = array_keys($ufGroups);
 

@@ -94,7 +94,7 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
     $allMailSettings = array();
     $mailSetting = new CRM_Core_DAO_MailSettings();
 
-    $allProtocols = CRM_Core_PseudoConstant::mailProtocol();
+    $allProtocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol');
 
     //multi-domain support for mail settings. CRM-5244
     $mailSetting->domain_id = CRM_Core_Config::domainID();

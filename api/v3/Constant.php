@@ -27,7 +27,7 @@
  */
 
 /**
- * File for CiviCRM APIv3 pseudoconstants
+ * CiviCRM APIv3 pseudoconstants - DEPRECATED
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Constant
@@ -37,8 +37,8 @@
  */
 
 /**
- * Generic file to retrieve all the constants and
- * pseudo constants used in CiviCRM
+ * This api is DEPRECATED as of CiviCRM 4.4.
+ * It's recommended to use the api getoptions action instead
  *
  *  @param  string  Name of a public static method of
  *                  CRM_Core_PseudoContant: one of

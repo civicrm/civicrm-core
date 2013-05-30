@@ -1149,4 +1149,51 @@ SELECT is_primary,
   static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Address', $id);
   }
+
+  /**
+   * Get options for a given address field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
+   * TODO: In context of chainselect, what to return if e.g. a country has no states?
+   *
+   * @param String $fieldName
+   * @param String $context: e.g. "search" "edit" "create" "view"
+   * @param Array  $props: whatever is known about this dao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+    // Special logic for fields whose options depend on context or properties
+    switch ($fieldName) {
+      // Filter state_province list based on chosen country or site defaults
+      case 'state_province_id':
+        if (empty($props['country_id'])) {
+          $config = CRM_Core_Config::singleton();
+          if (!empty($config->provinceLimit)) {
+            $props['country_id'] = $config->provinceLimit;
+          }
+          else {
+            $props['country_id'] = $config->defaultContactCountry;
+          }
+        }
+        if (!empty($props['country_id'])) {
+          $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
+        }
+        break;
+      // Filter country list based on site defaults
+      case 'country_id':
+        $config = CRM_Core_Config::singleton();
+        if (!empty($config->countryLimit) && is_array($config->countryLimit)) {
+          $params['condition'] = 'id IN (' . implode(',', $config->countryLimit) . ')';
+        }
+        break;
+      // Filter county list based on chosen state
+      case 'county_id':
+        if (!empty($props['state_province_id'])) {
+          $params['condition'] = 'state_province_id IN (' . implode(',', (array) $props['state_province_id']) . ')';
+        }
+        break;
+    }
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params);
+  }
 }

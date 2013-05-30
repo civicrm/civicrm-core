@@ -39,7 +39,8 @@ function civicrm_api3_report_template_create($params) {
     'CRM_Core_DAO_OptionGroup', 'report_template', 'id', 'name'
   );
   if (!empty($params['component_id']) && !is_numeric($params['component_id'])) {
-    $params['component_id'] = array_search($params['component_id'], CRM_Core_PseudoConstant::component());
+    $components = CRM_Core_PseudoConstant::get('CRM_Core_DAO_OptionValue', 'component_id', array('onlyActive' => FALSE, 'labelColumn' => 'name'));
+    $params['component_id'] = array_search($params['component_id'], $components);
   }
   return civicrm_api3_option_value_create($params);
 }

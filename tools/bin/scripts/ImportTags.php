@@ -34,7 +34,7 @@ class tagsImporter extends civicrm_cli {
       die("you need to profide a csv file (1st column parent name, 2nd tag name");
     }
     $this->file = $this->args[0];
-    $this->tags = array_flip(CRM_Core_PseudoConstant::tag());
+    $this->tags = array_flip(CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE)));
   }
 
   //format expected: parent name, tag

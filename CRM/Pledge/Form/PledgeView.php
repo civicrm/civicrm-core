@@ -64,7 +64,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
         $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$values[honor_contact_id]");
         $values["honor_display"] = "<A href = $url>" . $dao->display_name . "</A>";
       }
-      $honor = CRM_Core_PseudoConstant::honor();
+      $honor = CRM_Core_PseudoConstant::get('CRM_Pledge_DAO_Pledge', 'honor_type_id');
       $values['honor_type'] = $honor[$values['honor_type_id']];
     }
 

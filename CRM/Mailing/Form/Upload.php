@@ -214,7 +214,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
       "CRM_Mailing_Controller_Send_{$this->controller->_key}"
     );
 
-    $fromEmailAddress = CRM_Core_PseudoConstant::fromEmailAddress('from_email_address');
+    $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address');
     if (empty($fromEmailAddress)) {
       //redirect user to enter from email address.
       $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'group=from_email_address&action=add&reset=1');
@@ -430,7 +430,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
 
     //handle mailing from name & address.
     $fromEmailAddress = CRM_Utils_Array::value($formValues['from_email_address'],
-      CRM_Core_PseudoConstant::fromEmailAddress('from_email_address')
+      CRM_Core_OptionGroup::values('from_email_address')
     );
 
     //get the from email address
@@ -441,7 +441,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
 
     //Add Reply-To to headers
     if (CRM_Utils_Array::value('reply_to_address', $formValues)) {
-      $replyToEmail = CRM_Core_PseudoConstant::fromEmailAddress('from_email_address');
+      $replyToEmail = CRM_Core_OptionGroup::values('from_email_address');
       $params['replyto_email'] = CRM_Utils_Array::value($formValues['reply_to_address'], $replyToEmail);
     }
 

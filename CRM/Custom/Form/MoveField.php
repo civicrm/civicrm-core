@@ -110,7 +110,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
    */
   public function buildQuickForm() {
 
-    $customGroup = CRM_Core_PseudoConstant::customGroup();
+    $customGroup = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
     unset($customGroup[$this->_srcGID]);
     if (empty($customGroup)) {
       CRM_Core_Error::statusBounce(ts('You need more than one custom group to move fields'));

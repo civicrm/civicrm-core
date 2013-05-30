@@ -378,13 +378,12 @@ class CRM_Utils_Array {
 
   /**
    *  Function to check if give array is empty
-   *  @param array $array array that needs to be check for empty condition
+   *  @param array $array array to check for empty condition
    *
    *  @return boolean true is array is empty else false
    *  @static
    */
-  static function crmIsEmptyArray($array = array(
-    )) {
+  static function crmIsEmptyArray($array = array()) {
     if (!is_array($array)) {
       return TRUE;
     }
@@ -486,7 +485,8 @@ class CRM_Utils_Array {
    * Convenient way to unset a bunch of items from an array
    *
    * @param array $items (reference)
-   * @param string/int/array $itemN: other params to this function will be treated as keys (or arrays of keys) to unset
+   * @param string/int/array $itemN: other params to this function will be treated as keys
+   * (or arrays of keys) to unset
    */
    static function remove(&$items) {
      foreach (func_get_args() as $n => $key) {

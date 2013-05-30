@@ -164,13 +164,13 @@ class CRM_Contribute_Form_AdditionalInfo {
   static function buildHonoree(&$form) {
     //Honoree section
     $form->add('hidden', 'hidden_Honoree', 1);
-    $honor = CRM_Core_PseudoConstant::honor();
+    $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
     $extraOption = array('onclick' => "return enableHonorType();");
     foreach ($honor as $key => $var) {
       $honorTypes[$key] = $form->createElement('radio', NULL, NULL, $var, $key, $extraOption);
     }
     $form->addGroup($honorTypes, 'honor_type_id', NULL);
-    $form->add('select', 'honor_prefix_id', ts('Prefix'), array('' => ts('- prefix -')) + CRM_Core_PseudoConstant::individualPrefix());
+    $form->add('select', 'honor_prefix_id', ts('Prefix'), array('' => ts('- prefix -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'));
     $form->add('text', 'honor_first_name', ts('First Name'));
     $form->add('text', 'honor_last_name', ts('Last Name'));
     $form->add('text', 'honor_email', ts('Email'));
@@ -362,8 +362,8 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     // retrieve individual prefix value for honoree
     if (CRM_Utils_Array::value('hidden_Honoree', $params)) {
-      $individualPrefix = CRM_Core_PseudoConstant::individualPrefix();
-      $honor = CRM_Core_PseudoConstant::honor();
+      $individualPrefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
       $params['honor_prefix'] = CRM_Utils_Array::value(CRM_Utils_Array::value('honor_prefix_id',
           $params
         ),
