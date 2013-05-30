@@ -101,7 +101,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
         $values[$key] = $value;
       }
       foreach ($this->_grantIds as $grantId) {
-        $ids['grant'] = $grantId;
+        $ids['grant_id'] = $grantId;
 
         CRM_Grant_BAO_Grant::add($values, $ids);
         $updatedGrants++;
