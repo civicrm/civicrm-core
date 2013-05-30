@@ -74,6 +74,16 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @return void
    */
   static function buildQuickForm(&$form) {
+    //Added for CRM-12682: Add activity subject and campaign fields
+    CRM_Campaign_BAO_Campaign::addCampaign($form);
+    $form->add(
+      'text',
+      'subject',
+      ts('Activity Subject'),
+      array('size' => 45, 'maxlength' => 255),
+      FALSE
+    );
+
     $form->add('static', 'pdf_format_header', NULL, ts('Page Format'));
     $form->add(
       'select',
@@ -354,6 +364,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   function createActivities($form, $html_message, $contactIds) {
+    //Added for CRM-12682: Add activity subject and campaign fields
+    $formValues     = $form->controller->exportValues($form->getName());
 
     $session        = CRM_Core_Session::singleton();
     $userID         = $session->get('userID');
@@ -363,6 +375,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       'name'
     );
     $activityParams = array(
+      'subject' => $formValues['subject'],
+      'campaign_id' => $formValues['campaign_id'],
       'source_contact_id' => $userID,
       'activity_type_id' => $activityTypeID,
       'activity_date_time' => date('YmdHis'),
