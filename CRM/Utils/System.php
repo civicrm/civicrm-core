@@ -259,7 +259,8 @@ class CRM_Utils_System {
       $p = self::currentPath();
     }
 
-    return self::url($p,
+    return self::url(
+      $p,
       CRM_Utils_Array::value('q', $params),
       CRM_Utils_Array::value('a', $params, FALSE),
       CRM_Utils_Array::value('f', $params),

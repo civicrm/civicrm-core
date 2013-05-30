@@ -32,25 +32,24 @@
       <div id="browseValues">
         <div>
         {strip}
-          <table id="records" class="display">
-	   <thead>
-               <tr>
+        <table id="records" class="display">
+          <thead>
+            <tr>
           {foreach from=$headers key=recId item=head}
              <th>{ts}{$head}{/ts}</th>
-         {/foreach}
+          {/foreach}
              <th></th>
              </tr>
-           </thead>
-     {foreach from=$records key=recId item=rows}   
-       <tr class="{cycle values="odd-row,even-row"}">     
-         {foreach from=$rows item=row}
-            {foreach from=$row item=val key=ids}
-              <td>{$val}</td>
-            {/foreach}
-         {/foreach}
-       </tr>
-     {/foreach}
-          </table>
+          </thead>
+          {foreach from=$records key=recId item=rows}   
+            <tr class="{cycle values="odd-row,even-row"}">
+              {foreach from=$headers key=hrecId item=head}
+                <td>{$rows.$hrecId}</td>
+              {/foreach}
+              <td>{$rows.action}</td>
+            </tr>
+          {/foreach}
+         </table>
         {/strip}
        </div>
       </div>
