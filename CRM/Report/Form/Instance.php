@@ -235,7 +235,7 @@ class CRM_Report_Form_Instance {
         $defaults['grouprole'] = $grouproles;
       }
     }
-    else {
+    else if (property_exists($form, '_description')) {
       $defaults['description'] = $form->_description;
     }
   }
