@@ -317,6 +317,18 @@ WHERE  id = %1
     if (array_key_exists($groupID, self::$_alreadyLoaded) && !$fresh) {
       return;
     }
+
+    // grab a lock so other processes dont compete and do the same query
+    $lockName = "civicrm.group.{$groupID}";
+    $lock = new CRM_Core_Lock($lockName);
+    if (!$lock->isAcquired()) {
+      // this can cause inconsistent results since we dont know if the other process
+      // will fill up the cache before our calling routine needs it.
+      // however this routine does not return the status either, so basically
+      // its a "lets return and hope for the best"
+      return;
+    }
+
     self::$_alreadyLoaded[$groupID] = 1;
     $sql         = NULL;
     $idName      = 'id';
@@ -354,9 +366,9 @@ WHERE  id = %1
         $query =
           new CRM_Contact_BAO_Query(
             $ssParams, $returnProperties, NULL,
-          FALSE, FALSE, 1,
-          TRUE, TRUE,
-          FALSE,
+            FALSE, FALSE, 1,
+            TRUE, TRUE,
+            FALSE,
             CRM_Utils_Array::value('display_relationship_type', $formValues),
             CRM_Utils_Array::value('operator', $formValues, 'AND')
         );
@@ -433,6 +445,8 @@ AND  civicrm_group_contact.group_id = $groupID ";
         self::store($groupIDs, $values);
       }
     }
+
+    $lock->release();
   }
 
   static function smartGroupCacheTimeout() {
