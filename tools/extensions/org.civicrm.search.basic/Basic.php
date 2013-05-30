@@ -102,7 +102,7 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     $form->addElement('select', 'group', ts('in'), $group);
 
     // add select for categories
-    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::tag();
+    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     $form->addElement('select', 'tag', ts('Tagged'), $tag);
 
     // text for sort_name

@@ -429,7 +429,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $params = array('id' => $this->_eventId);
 
       // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
       // CRM-8108 remove ts from Billing as the location type can not be translated in CiviCRM!
       //$this->_bltID = array_search( ts('Billing'),  $locationTypes );

@@ -68,7 +68,12 @@
       <title>Tag ID</title>
       <required>true</required>
       <comment>FK to civicrm_tag</comment>
-       <add>1.1</add>
+      <add>1.1</add>
+      <pseudoconstant>
+        <table>civicrm_tag</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
   </field>
   <foreignKey>
        <name>tag_id</name>

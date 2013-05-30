@@ -171,7 +171,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     // Financial Type
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     $revenueFinancialType = array();
-    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
+    $relationTypeId = key(CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', array('condition' => " AND v.name LIKE 'Income Account is' ")));
     CRM_Core_PseudoConstant::populate( 
       $revenueFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',

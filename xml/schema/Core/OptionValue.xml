@@ -125,7 +125,6 @@
       <comment>Component that this option value belongs/caters to.</comment>
       <add>2.0</add>
       <pseudoconstant>
-        <name>component</name>
         <table>civicrm_component</table>
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>

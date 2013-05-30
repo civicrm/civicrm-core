@@ -65,6 +65,14 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       static $_fields = null;
 
      /**
+      * static instance to hold the keys used in $_fields for each field.
+      *
+      * @var array
+      * @static
+      */
+      static $_fieldKeys = null;
+
+     /**
       * static instance to hold the FK relationships
       *
       * @var string
@@ -225,6 +233,30 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                                       );
           {rdelim}
           return self::$_fields;
+      {rdelim}
+
+      /**
+       * Returns an array containing, for each field, the arary key used for that
+       * field in self::$_fields.
+       *
+       * @access public
+       * @return array
+       */
+      static function &fieldKeys( ) {ldelim}
+        if ( ! ( self::$_fieldKeys ) ) {ldelim}
+               self::$_fieldKeys = array (
+{foreach from=$table.fields item=field}
+                    '{$field.name}' =>
+{if $field.uniqueName}
+                                            '{$field.uniqueName}'
+{else}
+                                            '{$field.name}'
+{/if},
+
+{/foreach} {* table.fields *}
+                                      );
+          {rdelim}
+          return self::$_fieldKeys;
       {rdelim}
 
       /**

@@ -50,7 +50,7 @@ class CRM_Contact_Form_Edit_Demographics {
   static function buildQuickForm(&$form) {
     // radio button for gender
     $genderOptions = array();
-    $gender = CRM_Core_PseudoConstant::gender(TRUE);
+    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
     foreach ($gender as $key => $var) {
       $genderOptions[$key] = $form->createElement('radio', NULL,
         ts('Gender'), $var, $key,

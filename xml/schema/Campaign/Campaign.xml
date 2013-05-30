@@ -79,8 +79,11 @@
       <default>NULL</default>
       <comment>Campaign Type ID.Implicit FK to civicrm_option_value where option_group = campaign_type</comment> 
       <import>true</import>
-      <add>3.3</add>
-  </field>
+      <pseudoconstant>
+        <optionGroupName>campaign_type</optionGroupName>
+      </pseudoconstant>
+      <add>3.3</add> 
+  </field> 
   <index>
       <name>UI_campaign_type_id</name>
       <fieldName>campaign_type_id</fieldName>
@@ -94,6 +97,9 @@
       <default>NULL</default>
       <comment>Campaign status ID.Implicit FK to civicrm_option_value where option_group = campaign_status</comment>
       <import>true</import>
+      <pseudoconstant>
+        <optionGroupName>campaign_status</optionGroupName>
+      </pseudoconstant>
       <add>3.3</add> 
   </field>
   <index>

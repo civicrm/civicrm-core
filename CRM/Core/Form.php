@@ -870,7 +870,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'editor_id'
     );
     $editor = strtolower(CRM_Utils_Array::value($editorID,
-        CRM_Core_PseudoConstant::wysiwygEditor()
+        CRM_Core_OptionGroup::values('wysiwyg_editor')
       ));
     if (!$editor || $forceTextarea) {
       $editor = 'textarea';

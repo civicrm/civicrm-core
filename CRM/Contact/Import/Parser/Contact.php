@@ -1305,7 +1305,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       return FALSE;
     }
 
-    $allGenders = CRM_Core_PseudoConstant::gender();
+    $allGenders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     foreach ($allGenders as $key => $value) {
       if (strlen($gender) > strlen($value)) {
         continue;
@@ -1373,7 +1373,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
             $preffComm = array();
             $preffComm = explode(',', $value);
             foreach ($preffComm as $v) {
-              if (!self::in_value(trim($v), CRM_Core_PseudoConstant::pcm())) {
+              if (!self::in_value(trim($v), CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method'))) {
                 self::addToErrorMsg(ts('Preferred Communication Method'), $errorMessage);
               }
             }
@@ -1386,13 +1386,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
             break;
 
           case 'individual_prefix':
-            if (!self::in_value($value, CRM_Core_PseudoConstant::individualPrefix())) {
+            if (!self::in_value($value, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'))) {
               self::addToErrorMsg(ts('Individual Prefix'), $errorMessage);
             }
             break;
 
           case 'individual_suffix':
-            if (!self::in_value($value, CRM_Core_PseudoConstant::individualSuffix())) {
+            if (!self::in_value($value, CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'))) {
               self::addToErrorMsg(ts('Individual Suffix'), $errorMessage);
             }
             break;

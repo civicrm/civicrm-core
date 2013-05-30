@@ -220,7 +220,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $fields = $subset;
     }
     else {
-      $ufGroups = CRM_Core_PseudoConstant::ufGroup();
+      $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFGroup', 'uf_group_id');
 
       $fields = array();
       foreach ($ufGroups as $id => $title) {
@@ -380,8 +380,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $formattedFields = array();
     foreach ($fieldArrs as $fieldArr) {
-      //$field = new CRM_Core_DAO_UFField();
-      //$field->copyValues($fieldArr); // no... converts string('') to string('null')
       $field = (object) $fieldArr;
       if (!self::filterUFField($field, $searchable, $showAll, $visibility)) {
         continue;
@@ -467,6 +465,15 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'add_captcha' => isset($group->add_captcha) ? $group->add_captcha : NULL,
       'field_type' => $field->field_type,
       'field_id' => $field->id,
+      'pseudoconstant' => CRM_Utils_Array::value(
+        'pseudoconstant',
+        CRM_Utils_Array::value($field->field_name, $importableFields)
+      ),
+      // obsolete this when we remove the name / dbName discrepancy with gender/suffix/prefix
+      'dbName' => CRM_Utils_Array::value(
+        'dbName',
+        CRM_Utils_Array::value($field->field_name, $importableFields)
+      ),
       'skipDisplay' => 0,
     );
 
@@ -906,9 +913,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $config = CRM_Core_Config::singleton();
 
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
-    $imProviders   = CRM_Core_PseudoConstant::IMProvider();
-    $websiteTypes  = CRM_Core_PseudoConstant::websiteType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $imProviders   = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $websiteTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
     $multipleFields = array('url');
     $nullIndex = $nullValueIndex = ' ';
@@ -961,7 +968,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           $params[$index] = $details->$idx;
         }
         elseif ($name === 'preferred_communication_method') {
-          $communicationFields = CRM_Core_PseudoConstant::pcm();
+          $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
           $compref = array();
           $pref    = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details->$name);
 
@@ -974,9 +981,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           $values[$index] = implode(',', $compref);
         }
         elseif ($name === 'preferred_language') {
-          $languages      = CRM_Core_PseudoConstant::languages();
           $params[$index] = $details->$name;
-          $values[$index] = $languages[$details->$name];
+          $values[$index] = CRM_Core_PseudoConstant::getValue('CRM_Contact_DAO_Contact', 'preferred_language', $details->$name);
         }
         elseif ($name == 'group') {
           $groups = CRM_Contact_BAO_GroupContact::getContactGroup($cid, 'Added', NULL, FALSE, TRUE);
@@ -1001,7 +1007,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         }
         elseif ($name == 'tag') {
           $entityTags = CRM_Core_BAO_EntityTag::getTag($cid);
-          $allTags    = CRM_Core_PseudoConstant::tag();
+          $allTags    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
           $title      = array();
           foreach ($entityTags as $tagId) {
             $title[] = $allTags[$tagId];
@@ -1795,13 +1801,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           }
           $form->add('select', $providerName, NULL,
             array(
-              '' => ts('- select -')) + CRM_Core_PseudoConstant::IMProvider(), $required
+              '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
           );
         }
         else {
           $form->add('select', $name . '-provider_id', $title,
             array(
-              '' => ts('- select -')) + CRM_Core_PseudoConstant::IMProvider(), $required
+              '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
           );
         }
 
@@ -1831,7 +1837,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif ($fieldName === 'gender') {
       $genderOptions = array();
-      $gender = CRM_Core_PseudoConstant::gender();
+      $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
       foreach ($gender as $key => $var) {
         $genderOptions[$key] = $form->createElement('radio', NULL, ts('Gender'), $var, $key);
       }
@@ -1843,13 +1849,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif ($fieldName === 'individual_prefix') {
       $form->add('select', $name, $title,
         array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::individualPrefix(), $required
+          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'), $required
       );
     }
     elseif ($fieldName === 'individual_suffix') {
       $form->add('select', $name, $title,
         array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::individualSuffix(), $required
+          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'), $required
       );
     }
     elseif ($fieldName === 'contact_sub_type') {
@@ -1909,7 +1915,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif ($fieldName === 'preferred_communication_method') {
-      $communicationFields = CRM_Core_PseudoConstant::pcm();
+      $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
       foreach ($communicationFields as $key => $var) {
         if ($key == '') {
           continue;
@@ -1922,7 +1928,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('select', $name, $title, CRM_Core_SelectValues::pmf());
     }
     elseif ($fieldName === 'preferred_language') {
-      $form->add('select', $name, $title, array('' => ts('- select -')) + CRM_Core_PseudoConstant::languages());
+      $form->add('select', $name, $title, array('' => ts('- select -')) + CRM_Contact_BAO_Contact::buildOptions('preferred_language'));
     }
     elseif ($fieldName == 'external_identifier') {
       $form->add('text', $name, $title, $attributes, $required);
@@ -1967,10 +1973,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         if (substr($name, -1) == ']') {
           $websiteTypeName = substr($name, 0, -1) . '-website_type_id]';
         }
-        $form->addElement('select', $websiteTypeName, NULL, CRM_Core_PseudoConstant::websiteType());
+        $form->addElement('select', $websiteTypeName, NULL, CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'));
       }
       else {
-        $form->addElement('select', $name . '-website_type_id', NULL, CRM_Core_PseudoConstant::websiteType());
+        $form->addElement('select', $name . '-website_type_id', NULL, CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'));
       }
     }
     // Note should be rendered as textarea
@@ -2439,7 +2445,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   static function getProfiles($types, $onlyPure = FALSE) {
     $profiles = array();
-    $ufGroups = CRM_Core_PseudoConstant::ufgroup();
+    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFGroup', 'uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
 
@@ -2472,7 +2478,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     $profiles = array();
-    $ufGroups = CRM_Core_PseudoConstant::ufgroup();
+    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFGroup', 'uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
 

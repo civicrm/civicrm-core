@@ -45,6 +45,9 @@
     <required>true</required>
     <add>4.3</add>  
     <comment>FK to a new civicrm_option_value (account_relationship)</comment>
+    <pseudoconstant>
+      <optionGroupName>account_relationship</optionGroupName>
+    </pseudoconstant>
   </field>  
   <field>
     <name>financial_account_id</name> 
@@ -52,6 +55,11 @@
     <required>true</required>
     <add>4.3</add>        
     <comment>FK to the financial_account_id</comment>
+    <pseudoconstant>
+      <table>civicrm_financial_account</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey> 
     <name>financial_account_id</name> 

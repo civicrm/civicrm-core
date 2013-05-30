@@ -349,7 +349,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   function from() {
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);

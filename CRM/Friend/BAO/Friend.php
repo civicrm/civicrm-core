@@ -135,7 +135,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     //activity creation
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
  
     //friend contacts creation

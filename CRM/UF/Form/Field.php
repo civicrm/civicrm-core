@@ -280,7 +280,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     $this->assign('noSearchable', $noSearchable);
 
-    $this->_location_types = CRM_Core_PseudoConstant::locationType();
+    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
     /**
@@ -331,7 +331,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
     $sel3[''] = NULL;
-    $phoneTypes = CRM_Core_PseudoConstant::phoneType();
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     ksort($phoneTypes);
 
     foreach ($sel1 as $k => $sel) {
@@ -407,6 +407,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
 
+    // CRM_Core_Error::debug(array($sel1, $sel2, $sel3, $sel4));
     $sel->setOptions(array($sel1, $sel2, $sel3, $sel4));
 
     // proper interpretation of spec in CRM-8732

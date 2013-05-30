@@ -285,8 +285,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $links = self::links();
     }
 
-    $batchTypes = CRM_Core_PseudoConstant::getBatchType();
-    $batchStatus = CRM_Core_PseudoConstant::getBatchStatus();
+    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id');
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
     $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $results = array();
@@ -596,7 +596,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   static function closeReOpen($batchIds = array(), $status) {
-    $batchStatus = CRM_Core_PseudoConstant::accountOptionValues( 'batch_status' );
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $params['status_id'] = CRM_Utils_Array::key( $status, $batchStatus );
     $session = CRM_Core_Session::singleton( );
     $params['modified_date'] = date('YmdHis');
