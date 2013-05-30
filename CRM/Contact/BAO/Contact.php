@@ -788,10 +788,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       // delete cases related to contact
       $contactCases = CRM_Case_BAO_Case::retrieveCaseIdsByContactId($id);
       if (!empty($contactCases)) {
-        foreach($contactCases as $caseId){
+        foreach ($contactCases as $caseId) {
           //check if case is associate with other contact or not.
           $caseContactId = CRM_Case_BAO_Case::getCaseClients($caseId);
-          if(count($caseContactId) <= 1){
+          if (count($caseContactId) <= 1) {
             CRM_Case_BAO_Case::deleteCase($caseId);
           }
         }
