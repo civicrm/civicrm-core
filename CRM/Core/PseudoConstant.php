@@ -293,7 +293,7 @@ class CRM_Core_PseudoConstant {
           $output = self::$cache[$cacheKey];
         }
         else {
-          $daoName = CRM_Core_AllCoreTables::getClassForTable($pseudoconstant['table']);
+          $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($pseudoconstant['table']);
           if (!class_exists($daoName)) {
             return FALSE;
           }
