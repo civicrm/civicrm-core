@@ -197,6 +197,20 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_absoluteUrl = FALSE;
 
   /**
+   * Flag to indicate if result-set is to be stored in a class variable which could be retrieved using getResultSet() method.
+   *
+   * @var boolean
+   */
+  protected $_storeResultSet = FALSE;
+
+  /**
+   * When _storeResultSet Flag is set use this var to store result set in form of array
+   *
+   * @var boolean
+   */
+  protected $_resultSet = array();
+
+  /**
    * To what frequency group-by a date column
    *
    * @var array
@@ -2358,6 +2372,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   function endPostProcess(&$rows = NULL) {
+    if ( $this->_storeResultSet ) {
+      $this->_resultSet = $rows;
+    }
+
     if ($this->_outputMode == 'print' ||
       $this->_outputMode == 'pdf' ||
       $this->_sendmail
@@ -2454,6 +2472,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       $this->_createNew = TRUE;
       CRM_Report_Form_Instance::postProcess($this);
     }
+  }
+
+  function storeResultSet() {
+    $this->_storeResultSet = TRUE;
+  }
+
+  function getResultSet() {
+    return $this->_resultSet;
   }
 
   /*
@@ -2879,7 +2905,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   function preProcessOrderBy(&$formValues) {
     // Object to show/hide form elements
-    $_showHide = &new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks('', '');
 
     $_showHide->addShow('optionField_1');
 
