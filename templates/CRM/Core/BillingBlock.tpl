@@ -171,8 +171,8 @@
 cj( function( ) {
   // build list of ids to track changes on
   var address_fields = {/literal}{$profileAddressFields|@json_encode}{literal};
-  var input_ids = [];
-  var select_ids = [];
+  var input_ids = {};
+  var select_ids = {};
   var orig_id = field = field_name = null;
 
   // build input ids
