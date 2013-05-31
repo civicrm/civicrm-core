@@ -142,9 +142,8 @@ class CRM_Activity_Page_AJAX {
     foreach ($clientRelationships as $key => $row) {
       $sortArray[$key]  = $row[$sort];
     }
-    $sort_type = "SORT_".strtoupper($sortOrder);
-    $sort_function = "array_multisort(\$sortArray, ".$sort_type.", \$clientRelationships);";
-    eval($sort_function);
+    $sort_type = "SORT_" . strtoupper($sortOrder);
+    array_multisort($sortArray, constant($sort_type), $clientRelationships);
 
     //limit the rows
     $allClientRelationships = $clientRelationships;
@@ -239,10 +238,8 @@ class CRM_Activity_Page_AJAX {
       $sortArray[$key]  = $row[$sort];
     }
 
-    $sort_type = "SORT_".strtoupper($sortOrder);
-
-    $sort_function = "array_multisort(\$sortArray, ".$sort_type.", \$caseRelationships);";
-    eval($sort_function);
+    $sort_type = "SORT_" . strtoupper($sortOrder);
+    array_multisort($sortArray, constant($sort_type), $caseRelationships);
 
     //limit rows display
     $allCaseRelationships = $caseRelationships;
