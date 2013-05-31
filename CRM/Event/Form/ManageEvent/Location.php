@@ -179,7 +179,8 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   public function buildQuickForm() {
     //load form for child blocks
     if ($this->_addBlockName) {
-      return eval('CRM_Contact_Form_Edit_' . $this->_addBlockName . '::buildQuickForm( $this );');
+      $className = "CRM_Contact_Form_Edit_{$this->_addBlockName}";
+      return $className::buildQuickForm($this);
     }
 
     $this->applyFilter('__ALL__', 'trim');

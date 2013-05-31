@@ -1572,7 +1572,7 @@ class CRM_Utils_Date {
       }
 
       // validate date.
-      eval('$valid = CRM_Utils_Rule::' . $ruleName . '( $dateVal );');
+      $valid = CRM_Utils_Rule::$ruleName($dateVal);
 
       if ($valid) {
         //format date and time to default.

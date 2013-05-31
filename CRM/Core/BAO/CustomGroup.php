@@ -304,7 +304,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @static
    *
    */
-  public static function &getTree($entityType,
+  public static function &getTree(
+    $entityType,
     &$form,
     $entityID = NULL,
     $groupID  = NULL,
@@ -2047,10 +2048,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
           // description is expected to be a callback func to subtypes
           list($callback, $args) = explode(';', trim($ovValues['description']));
 
-          if (!empty($args)) {
-            eval('$args = ' . $args . ';');
-          }
-          else {
+          if (empty($args)) {
             $args = array();
           }
 

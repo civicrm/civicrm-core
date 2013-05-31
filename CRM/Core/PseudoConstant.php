@@ -389,7 +389,7 @@ class CRM_Core_PseudoConstant {
    *
    * @return string
    */
-   function getValue($daoName, $fieldName, $key, $params = array()) {
+  static function getValue($daoName, $fieldName, $key, $params = array()) {
      $values = self::get($daoName, $fieldName, $params);
      return CRM_Utils_Array::value($key, $values);
    }
@@ -404,7 +404,7 @@ class CRM_Core_PseudoConstant {
    *
    * @return string
    */
-   function getKey($daoName, $fieldName, $value, $params = array()) {
+  static function getKey($daoName, $fieldName, $value, $params = array()) {
      $values = self::get($daoName, $fieldName, $params);
      return CRM_Utils_Array::key($value, $values);
    }
@@ -565,7 +565,7 @@ class CRM_Core_PseudoConstant {
     }
     return self::$activityType[$index];
   }
- 
+
   /**
    * Get all the State/Province from database.
    *

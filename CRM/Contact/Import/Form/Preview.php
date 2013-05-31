@@ -215,9 +215,13 @@ class CRM_Contact_Import_Form_Preview extends CRM_Core_Form {
       $title  = trim($fields['newGroupName']);
       $name   = CRM_Utils_String::titleToVar($title);
       $query  = 'select count(*) from civicrm_group where name like %1 OR title like %2';
-      $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
+      $grpCnt = CRM_Core_DAO::singleValueQuery(
+        $query,
+        array(
+          1 => array($name, 'String'),
           2 => array($title, 'String'),
-        ));
+        )
+      );
       if ($grpCnt) {
         $invalidGroupName = TRUE;
         $errors['newGroupName'] = ts('Group \'%1\' already exists.', array(1 => $fields['newGroupName']));
@@ -388,7 +392,8 @@ class CRM_Contact_Import_Form_Preview extends CRM_Core_Form {
         $relationType = new CRM_Contact_DAO_RelationshipType();
         $relationType->id = $id;
         $relationType->find(TRUE);
-        eval('$mapperRelatedContactType[$key] = $relationType->contact_type_' . $second . ';');
+        $fieldName = "contact_type_$second";
+        $mapperRelatedContactType[$key] = $relationType->$fieldName;
         $mapperRelated[$key] = $mapper[$key][0];
         $mapperRelatedContactDetails[$key] = $mapper[$key][1];
         $mapperRelatedContactLocType[$key] = $mapper[$key][2];
