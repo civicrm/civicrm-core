@@ -486,7 +486,7 @@ class CRM_Core_PseudoConstant {
    *
    */
   public static function flush($name = 'cache') {
-    if (property_exists(self, $name)) {
+    if (isset(self::$name)) {
       self::$$name = NULL;
     }
   }
