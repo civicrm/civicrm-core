@@ -103,6 +103,7 @@ class CRM_Core_OptionGroup {
     $localize = FALSE, $condition = NULL,
     $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE, $keyColumnName = 'value'
   ) {
+    $cache = CRM_Utils_Cache::singleton();
     $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
 
     if (!$fresh) {
@@ -111,7 +112,6 @@ class CRM_Core_OptionGroup {
         return self::$_cache[$cacheKey];
       }
       // Fetch from main cache
-      $cache = CRM_Utils_Cache::singleton();
       $var = $cache->get($cacheKey);
       if ($var) {
         return $var;
