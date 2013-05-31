@@ -330,7 +330,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         $showAdditionalInfo = TRUE;
         $allPanes[$name]['open'] = 'true';
       }
-      eval('CRM_Contribute_Form_AdditionalInfo::build' . $type . '( $this );');
+      $fnName = "build{$type}";
+      CRM_Contribute_Form_AdditionalInfo::$fnName($this);
     }
 
     $this->assign('allPanes', $allPanes);

@@ -118,8 +118,8 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, $this->_BAOName) . ".php");
-      eval($this->_BAOName . '::retrieve( $params, $defaults );');
+      $baoName = $this->_BAOName;
+      $baoName::retrieve($params, $defaults);
     }
     $defaults['is_active'] = 1;
 

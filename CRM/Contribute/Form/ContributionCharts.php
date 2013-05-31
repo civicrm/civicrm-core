@@ -187,7 +187,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
       $funName = ($chartType == 'bvg') ? 'barChart' : 'pieChart';
 
       // build the chart objects.
-      eval("\$values['object'] = CRM_Utils_OpenFlashChart::" . $funName . '( $values );');
+      $values['object'] = CRM_Utils_OpenFlashChart::$funName($values);
 
       //build the urls.
       $urlCnt = 0;

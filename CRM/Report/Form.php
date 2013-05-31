@@ -437,12 +437,12 @@ class CRM_Report_Form extends CRM_Core_Form {
 
       // higher preference to bao object
       if (array_key_exists('bao', $table)) {
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $table['bao'] . '.php');
-        eval("\$expFields = {$table['bao']}::exportableFields( );");
+        $baoName = $table['bao'];
+        $expFields = $baoName::exportableFields( );
       }
       elseif (array_key_exists('dao', $table)){
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $table['dao'] . '.php');
-        eval("\$expFields = {$table['dao']}::export( );");
+        $daoName = $table['dao'];
+        $expFields = $daoName::export( );
       }
       else{
         $expFields = array();
@@ -1284,7 +1284,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           if (isset($field['clause'])) {
             // FIXME: we not doing escape here. Better solution is to use two
             // different types - data-type and filter-type
-            eval("\$clause = \"{$field['clause']}\";");
+            $clause = $field['clause'];
           }
           else {
             $value = CRM_Utils_Type::escape($value, $type);
