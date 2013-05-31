@@ -123,8 +123,10 @@ class civicrm_api3 {
     echo "Calling static method '$name' " . implode(', ', $arguments) . "\n";
   }
 
-  function remoteCall($entity, $action, $params = array(
-    )) {
+  function remoteCall($entity, $action, $params = array()) {
+    foreach ($params as &$param) {
+      $param = str_replace('&', urlencode('&'), $param);
+    }   
     $fields = "key={$this->key}&api_key={$this->api_key}";
     $query = $this->uri . "&entity=$entity&action=$action";
     foreach ($params as $k => $v) {
