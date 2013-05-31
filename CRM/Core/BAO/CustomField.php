@@ -762,12 +762,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         else {
           $attributes .= 'rows=4';
         }
-
         if ($field->note_columns) {
           $attributes .= ' cols=' . $field->note_columns;
         }
         else {
           $attributes .= ' cols=60';
+        }
+        if ($field->text_length) {
+          $attributes .= ' maxlength=' . $field->text_length;
         }
         $element = &$qf->add(strtolower($field->html_type),
           $elementName,
@@ -958,7 +960,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'RichTextEditor':
-        $qf->addWysiwyg($elementName, $label, array('rows' => $field->note_rows, 'cols' => $field->note_columns), $search);
+        $attributes = array('rows' => $field->note_rows, 'cols' => $field->note_columns);
+        if ($field->text_length) {
+          $attributes['maxlength'] = $field->text_length; 
+        }
+        $qf->addWysiwyg($elementName, $label, $attributes, $search);
         break;
 
       case 'Autocomplete-Select':

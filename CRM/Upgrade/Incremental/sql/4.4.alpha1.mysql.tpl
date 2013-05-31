@@ -29,4 +29,6 @@ SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'S
 INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
 VALUES (@bounceTypeID, 'X-HmXmrOriginalRecipient');
 
+-- CRM-12716
+UPDATE civicrm_custom_field SET text_length = NULL WHERE html_type = 'TextArea' AND text_length = 255;
 
