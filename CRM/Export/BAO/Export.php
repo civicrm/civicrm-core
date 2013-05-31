@@ -994,7 +994,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           foreach (array_keys($paymentHeaders) as $paymentHdr) {
             self::sqlColumnDefn($query, $sqlColumns, $paymentHdr);
           }
-          $addPaymentHeader = FALSE;
         }
 
         if ($setHeader) {
@@ -1007,19 +1006,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         // If specific payment fields have been selected for export, payment
         // data will already be in $row. Otherwise, add payment related
         // information, if appropriate.
-        if (!$selectedPaymentFields) {
-          if ($paymentFields) {
-            $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
-            if (!is_array($paymentData) || empty($paymentData)) {
-              $paymentData = $nullContributionDetails;
+        if ($addPaymentHeader) {
+          if (!$selectedPaymentFields) {
+            if ($paymentFields) {
+              $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
+              if (!is_array($paymentData) || empty($paymentData)) {
+                $paymentData = $nullContributionDetails;
+              }
+              $row = array_merge($row, $paymentData);
             }
-            $row = array_merge($row, $paymentData);
-          }
-        elseif (!empty($paymentDetails)) {
-            $row = array_merge($row, $nullContributionDetails);
+            elseif (!empty($paymentDetails)) {
+              $row = array_merge($row, $nullContributionDetails);
+            }
           }
         }
-
         //remove organization name for individuals if it is set for current employer
         if (CRM_Utils_Array::value('contact_type', $row) &&
           $row['contact_type'] == 'Individual' && array_key_exists('organization_name', $row)
