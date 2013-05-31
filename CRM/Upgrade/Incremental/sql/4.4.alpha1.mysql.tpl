@@ -32,3 +32,23 @@ VALUES (@bounceTypeID, 'X-HmXmrOriginalRecipient');
 -- CRM-12716
 UPDATE civicrm_custom_field SET text_length = NULL WHERE html_type = 'TextArea' AND text_length = 255;
 
+-- CRM-12744
+-- quicksearch results
+SELECT @option_group_id_acsOpt := max(id) FROM civicrm_option_group WHERE name = 'contact_autocomplete_options';
+SELECT @max_val := MAX(ROUND(op.value)) FROM civicrm_option_value op  WHERE op.option_group_id  = @option_group_id_acsOpt;
+SELECT @max_wt := MAX(ROUND(val.weight)) FROM civicrm_option_value val WHERE val.option_group_id = @option_group_id_acsOpt;
+
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES
+  (@option_group_id_acsOpt, {localize}'{ts escape="sql"}Date of birth{/ts}'{/localize}, @max_val+1, 'birth_date', NULL, 0, NULL,  @max_wt+1, 0, 0, 1, NULL, NULL);
+
+-- contact reference field autocomplete
+SELECT @option_group_id_acConRef := max(id) FROM civicrm_option_group WHERE name = 'contact_reference_options';
+SELECT @max_val := MAX(ROUND(op.value)) FROM civicrm_option_value op  WHERE op.option_group_id  = @option_group_id_acConRef;
+SELECT @max_wt := MAX(ROUND(val.weight)) FROM civicrm_option_value val WHERE val.option_group_id = @option_group_id_acConRef;
+
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES
+  (@option_group_id_acConRef, {localize}'{ts escape="sql"}Date of birth{/ts}'{/localize}, @max_val+1, 'birth_date', NULL, 0, NULL,  @max_wt+1, 0, 0, 1, NULL, NULL);
