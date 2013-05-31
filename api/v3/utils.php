@@ -1445,7 +1445,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldname, &$fieldInfo, $ent
       $session = &CRM_Core_Session::singleton();
       $params[$fieldname] = $session->get('userID');
     }
-    if (CRM_Utils_Array::value('pseudoconstant', $fieldInfo) ) {
+    if (!empty($fieldInfo['options'])) {
       $constant = CRM_Utils_Array::value('options', $fieldInfo);
       if (is_numeric($params[$fieldname]) && !CRM_Utils_Array::value('FKClassName',$fieldInfo) && !array_key_exists($params[$fieldname], $fieldInfo['options'])) {
         throw new API_Exception("$fieldname is not valid", 2001, array('error_field' => $fieldname,"type"=>"integer"));
