@@ -140,6 +140,13 @@ class civicrm_api3 {
 
       //execute post
       $result = curl_exec($ch);
+      // CiviCRM expects to get back a CiviCRM error object.
+      if (curl_errno($ch)) {
+          $res = new stdClass;
+          $res->is_error = 1;
+          $res->error = array('cURL error' => curl_error($ch));
+          return $res;
+      }      
       curl_close($ch);
       return json_decode($result);
       // not good, all in get when should be in post.
