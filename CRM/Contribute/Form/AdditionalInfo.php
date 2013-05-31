@@ -114,7 +114,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     if ($form->_online) {
       $feeAmount->freeze();
     }
-    
+
     $netAmount = & $form->add('text', 'net_amount', ts('Net Amount'),
                $attributes['net_amount']
     );
@@ -145,13 +145,13 @@ class CRM_Contribute_Form_AdditionalInfo {
     );
 
     $form->add('textarea', 'note', ts('Notes'), array("rows" => 4, "cols" => 60));
-    
+
     $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     if ($form->_id && $form->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
       $netAmount->freeze();
       $feeAmount->freeze();
     }
-    
+
   }
 
   /**

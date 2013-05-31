@@ -41,12 +41,25 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
   /**
    * various Contact types
    */
-  CONST EXPORT_ALL = 1, EXPORT_SELECTED = 2, EXPORT_MERGE_DO_NOT_MERGE = 0, EXPORT_MERGE_SAME_ADDRESS = 1, EXPORT_MERGE_HOUSEHOLD = 2;
+  CONST
+    EXPORT_ALL = 1,
+    EXPORT_SELECTED = 2,
+    EXPORT_MERGE_DO_NOT_MERGE = 0,
+    EXPORT_MERGE_SAME_ADDRESS = 1,
+    EXPORT_MERGE_HOUSEHOLD = 2;
 
   /**
    * export modes
    */
-  CONST CONTACT_EXPORT = 1, CONTRIBUTE_EXPORT = 2, MEMBER_EXPORT = 3, EVENT_EXPORT = 4, PLEDGE_EXPORT = 5, CASE_EXPORT = 6, GRANT_EXPORT = 7, ACTIVITY_EXPORT = 8;
+  CONST
+    CONTACT_EXPORT = 1,
+    CONTRIBUTE_EXPORT = 2,
+    MEMBER_EXPORT = 3,
+    EVENT_EXPORT = 4,
+    PLEDGE_EXPORT = 5,
+    CASE_EXPORT = 6,
+    GRANT_EXPORT = 7,
+    ACTIVITY_EXPORT = 8;
 
   /**
    * current export mode
@@ -98,8 +111,10 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
       $components    = array('Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity');
 
       if (in_array($componentName[1], $components)) {
-        eval('$this->_exportMode = self::' . strtoupper($componentName[1]) . '_EXPORT;');
-        eval('CRM_' . $componentName[1] . '_Form_Task::preProcessCommon( $this, true );');
+        $fieldName = strtoupper($componentName[1]) . '_EXPORT';
+        $this->_exportMode = self::$fieldName;
+        $className = "CRM_{$componentName[1]}_Form_Task";
+        $className::preProcessCommon( $this, true );
         $values = $this->controller->exportValues('Search');
       }
       else {
@@ -161,7 +176,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     }
     else {
       $this->assign('taskName', "Export $componentName[1]");
-      eval('$componentTasks = CRM_' . $componentName[1] . '_Task::tasks();');
+      $className = "CRM_{$componentName[1]}_Task";
+      $componentTasks = $className::tasks();
       $taskName = $componentTasks[$this->_task];
       $component = TRUE;
     }

@@ -1004,8 +1004,8 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
     }
 
     if (!array_key_exists($block, $fields)) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, "CRM_Core_DAO_" . $block) . ".php");
-      eval('$fields[$block] =& CRM_Core_DAO_' . $block . '::fields( );');
+      $className = "CRM_Core_DAO_$block";
+      $fields[$block] =& $className::fields( );
     }
 
     $blockCnt = count($params[$name]);

@@ -82,7 +82,7 @@ abstract class CRM_SMS_Provider {
         CRM_Core_Error::fatal("Could not locate extension for {$providerName}.");
       }
 
-      self::$_singleton[$cacheKey] = eval('return ' . $paymentClass . '::singleton( $providerParams, $force );');
+      self::$_singleton[$cacheKey] = $paymentClass::singleton($providerParams, $force);
     }
     return self::$_singleton[$cacheKey];
   }

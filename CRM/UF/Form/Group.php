@@ -180,7 +180,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
         'id' => $type,
       );
 
-      eval('CRM_UF_Form_AdvanceSetting::' . $type . '( $this );');
+      CRM_UF_Form_AdvanceSetting::$type($this);
     }
 
     $this->addButtons(array(

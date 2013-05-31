@@ -113,7 +113,7 @@ abstract class CRM_Core_Payment {
       }
 
       //load the object.
-      self::$_singleton[$cacheKey] = eval('return ' . $paymentClass . '::singleton( $mode, $paymentProcessor );');
+      self::$_singleton[$cacheKey] = $paymentClass::singleton($mode, $paymentProcessor);
     }
 
     //load the payment form for required processor.
@@ -266,7 +266,7 @@ abstract class CRM_Core_Payment {
       }
 
       // Instantiate PP
-      eval('$processorInstance = ' . $paymentClass . '::singleton( $mode, $paymentProcessor );');
+      $processorInstance = $paymentClass::singleton($mode, $paymentProcessor);
 
       // Does PP implement this method, and can we call it?
       if (!method_exists($processorInstance, $method) ||
