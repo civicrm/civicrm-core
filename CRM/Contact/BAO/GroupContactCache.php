@@ -101,10 +101,11 @@ AND     ( g.cache_date IS NULL OR
    * @static
    * @public
    */
-  static function isGroupRefreshed($groupID, $includeHiddenGroups = FALSE) {
+  static function shouldGroupBeRefreshed($groupID, $includeHiddenGroups = FALSE) {
     $query = self::groupRefreshedClause("g.id = %1", $includeHiddenGroups);
     $params = array(1 => array($groupID, 'Integer'));
 
+    // if the query returns the group ID, it means the group is a valid candidate for refreshing
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
@@ -385,7 +386,7 @@ WHERE  id = %1
     // we allow hidden groups here since we dont know if the caller wants to evaluate an
     // hidden group
     // note that we ignore the force option in this case and rely on someone else having done it
-    if (self::isGroupRefreshed($groupID, FALSE, TRUE)) {
+    if (! self::shouldGroupBeRefreshed($groupID, FALSE, TRUE)) {
       $lock->release();
       return;
     }
