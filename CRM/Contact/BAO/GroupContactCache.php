@@ -53,6 +53,62 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
   }
 
   /**
+   * Common function that formulates the query to see which groups needs to be refreshed
+   * based on their cache date and the smartGroupCacheTimeOut
+   *
+   * @param string $groupIDClause the clause which limits which groups we need to evaluate
+   * @param boolean $includeHiddenGroups hidden groups are excluded by default
+   *
+   * @return string the sql query which lists the groups that need to be refreshed
+   * @static
+   * @public
+   */
+  static function groupRefreshedClause($groupIDClause = null, $includeHiddenGroups = FALSE) {
+    $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
+    $now = CRM_Utils_Date::getUTCTime();
+
+    $query = "
+SELECT  g.id
+FROM    civicrm_group g
+WHERE   ( g.saved_search_id IS NOT NULL OR g.children IS NOT NULL )
+AND     g.is_active = 1
+AND     ( g.cache_date IS NULL OR
+          ( TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout ) OR
+          ( $now >= g.refresh_date )
+        )
+";
+
+    if (!$includeHiddenGroups) {
+      $query .= "AND (g.is_hidden = 0 OR g.is_hidden IS NULL)";
+    }
+
+    if (!empty($groupIDClause)) {
+      $query .= " AND ( $groupIDClause ) ";
+    }
+
+    return $query;
+  }
+
+  /**
+   * Checks to see if a group has been refreshed recently. This is primarily used
+   * in a locking scenario when some other process might have refreshed things underneath
+   * this process
+   *
+   * @param int $groupID the group ID
+   * @param boolean $includeHiddenGroups hidden groups are excluded by default
+   *
+   * @return string the sql query which lists the groups that need to be refreshed
+   * @static
+   * @public
+   */
+  static function isGroupRefreshed($groupID, $includeHiddenGroups = FALSE) {
+    $query = self::groupRefreshedClause("g.id = %1", $includeHiddenGroups);
+    $params = array(1 => array($groupID, 'Integer'));
+
+    return CRM_Core_DAO::singleValueQuery($query, $params);
+  }
+
+  /**
    * Check to see if we have cache entries for this group
    * if not, regenerate, else return
    *
@@ -65,7 +121,6 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
   static function loadAll($groupIDs = null, $limit = 0) {
     // ensure that all the smart groups are loaded
     // this function is expensive and should be sparingly used if groupIDs is empty
-
     if (empty($groupIDs)) {
       $groupIDClause = null;
       $groupIDs = array( );
@@ -80,13 +135,10 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
       // of comma separated integers would not work.
       $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupIDs));
 
-      $groupIDClause = "AND (g.id IN ( {$groupIDString} ))";
+      $groupIDClause = "g.id IN ({$groupIDString})";
     }
 
-    $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
-
-    //make sure to give original timezone settings again.
-    $now = CRM_Utils_Date::getUTCTime();
+    $query = self::groupRefreshedClause($groupIDClause);
 
     $limitClause = $orderClause = NULL;
     if ($limit > 0) {
@@ -94,17 +146,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
       $orderClause = " ORDER BY g.cache_date, g.refresh_date";
     }
     // We ignore hidden groups and disabled groups
-    $query = "
-SELECT  g.id
-FROM    civicrm_group g
-WHERE   ( g.saved_search_id IS NOT NULL OR g.children IS NOT NULL )
-AND     ( g.is_hidden = 0 OR g.is_hidden IS NULL )
-AND     g.is_active = 1
-AND     ( g.cache_date IS NULL OR
-          ( TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout ) OR
-          ( $now >= g.refresh_date )
-        )
-        $groupIDClause
+    $query .= "
         $orderClause
         $limitClause
 ";
@@ -155,7 +197,7 @@ AND    g.refresh_date IS NULL
     $returnProperties = array('contact_id');
     foreach ($groupID as $gid) {
       $params = array(array('group', 'IN', array($gid => 1), 0, 0));
-      // the below call update the cache table as a byproduct of the query
+      // the below call updates the cache table as a byproduct of the query
       CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, FALSE);
     }
   }
@@ -214,7 +256,8 @@ WHERE  id IN ( $groupIDs )
     // to do this all the time
     // this optimization is done only when no groupID is passed
     // i.e. cache is reset for all groups
-    if ($onceOnly &&
+    if (
+      $onceOnly &&
       $invoked &&
       $groupID == NULL
     ) {
@@ -224,8 +267,9 @@ WHERE  id IN ( $groupIDs )
     if ($groupID == NULL) {
       $invoked = TRUE;
     } else if (is_array($groupID)) {
-      foreach ($groupID as $gid)
+      foreach ($groupID as $gid) {
         unset(self::$_alreadyLoaded[$gid]);
+      }
     } else if ($groupID && array_key_exists($groupID, self::$_alreadyLoaded)) {
       unset(self::$_alreadyLoaded[$groupID]);
     }
@@ -310,14 +354,42 @@ WHERE  id = %1
 
   /**
    * load the smart group cache for a saved search
+   *
+   * @param object  $group - the smart group that needs to be loaded
+   * @param boolean $force - should we force a search through
+   *
    */
-  static function load(&$group, $fresh = FALSE) {
+  static function load(&$group, $force = FALSE) {
     $groupID = $group->id;
     $savedSearchID = $group->saved_search_id;
-    if (array_key_exists($groupID, self::$_alreadyLoaded) && !$fresh) {
+    if (array_key_exists($groupID, self::$_alreadyLoaded) && !$force) {
       return;
     }
+
+    // grab a lock so other processes dont compete and do the same query
+    $lockName = "civicrm.group.{$groupID}";
+    $lock = new CRM_Core_Lock($lockName);
+    if (!$lock->isAcquired()) {
+      // this can cause inconsistent results since we dont know if the other process
+      // will fill up the cache before our calling routine needs it.
+      // however this routine does not return the status either, so basically
+      // its a "lets return and hope for the best"
+      return;
+    }
+
     self::$_alreadyLoaded[$groupID] = 1;
+
+    // we now have the lock, but some other proces could have actually done the work
+    // before we got here, so before we do any work, lets ensure that work needs to be
+    // done
+    // we allow hidden groups here since we dont know if the caller wants to evaluate an
+    // hidden group
+    // note that we ignore the force option in this case and rely on someone else having done it
+    if (self::isGroupRefreshed($groupID, FALSE, TRUE)) {
+      $lock->release();
+      return;
+    }
+
     $sql         = NULL;
     $idName      = 'id';
     $customClass = NULL;
@@ -354,9 +426,9 @@ WHERE  id = %1
         $query =
           new CRM_Contact_BAO_Query(
             $ssParams, $returnProperties, NULL,
-          FALSE, FALSE, 1,
-          TRUE, TRUE,
-          FALSE,
+            FALSE, FALSE, 1,
+            TRUE, TRUE,
+            FALSE,
             CRM_Utils_Array::value('display_relationship_type', $formValues),
             CRM_Utils_Array::value('operator', $formValues, 'AND')
         );
@@ -394,12 +466,13 @@ WHERE  civicrm_group_contact.status = 'Added'
     $groupIDs = array($groupID);
     self::remove($groupIDs);
 
+    $processed = FALSE;
     foreach (array($sql, $sqlB) as $selectSql) {
       if (!$selectSql) {
         continue;
       }
       $insertSql = "INSERT IGNORE INTO civicrm_group_contact_cache (group_id,contact_id) ($selectSql);";
-      $processed = TRUE; // FIXME
+      $processed = TRUE;
       $result = CRM_Core_DAO::executeQuery($insertSql);
     }
     self::updateCacheTime($groupIDs, $processed);
@@ -433,6 +506,8 @@ AND  civicrm_group_contact.group_id = $groupID ";
         self::store($groupIDs, $values);
       }
     }
+
+    $lock->release();
   }
 
   static function smartGroupCacheTimeout() {
