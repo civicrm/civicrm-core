@@ -359,7 +359,7 @@ invert              = 0
 
     function showRuleFields( ruleFields )
     {
-        var msg1 = '{/literal}{ts 1="' + ruleFields + '"}Primary participants will be able to register additional participants using the same e-email address.  The configured "Supervised" Dedupe Rule will use the following fields to prevent duplicate registrations: %1.  First and Last Name will be used to check for matches among multiple participants.{/ts}{literal}';
+        var msg1 = '{/literal}{ts 1="' + ruleFields + '"}Primary participants will be able to register additional participants using the same email address.  The configured "Supervised" Dedupe Rule will use the following fields to prevent duplicate registrations: %1.  First and Last Name will be used to check for matches among multiple participants.{/ts}{literal}';
         var msg2 = '{/literal}{ts escape='js'}Primary participants will be allowed to register for this event multiple times.  No duplicate registration checking will be performed.{/ts}{literal}';
         var msg3 = '{/literal}{ts escape='js'}Primary participants will be able to register additional participants during registration.{/ts}{literal}';
 
