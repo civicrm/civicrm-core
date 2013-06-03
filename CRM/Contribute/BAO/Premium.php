@@ -43,7 +43,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
   /**
    * class constructor
-   */ 
+   */
   function __construct() {
     parent::__construct();
   }
@@ -86,7 +86,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-     * Function to delete financial Types 
+     * Function to delete financial Types
    *
    * @param int $contributionTypeId
    * @static
