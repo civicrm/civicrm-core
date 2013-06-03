@@ -1275,12 +1275,10 @@ SELECT contact_id
       'CRM_Core_DAO_Domain',
     );
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-
     for ($i = 0; $i < $numObjects; ++$i) {
 
       ++$counter;
-      $object   = new $daoName ( );
+      $object = new $daoName();
 
       $fields = &$object->fields();
       foreach ($fields as $name => $value) {
@@ -1323,24 +1321,13 @@ SELECT contact_id
 
             continue;
           }
-          $constant = CRM_Utils_Array::value('pseudoconstant', $value);
-          if (!empty($constant)) {
-            if (empty($constant['name'])) {
-              throw new CRM_Core_Exception("Failed to choose value for $daoName ($name) -- missing pseudo-constant name");
-            }
-            $constantValues = CRM_Utils_PseudoConstant::getConstant($constant['name']);
-            if (!empty($constantValues)) {
-              $constantOptions = array_keys($constantValues);
-              $object->$dbName = $constantOptions[0];
-            }
+          // Pick an option value if needed
+          $options = $daoName::buildOptions($dbName);
+          if ($options) {
+            $object->$dbName = key($options);
             continue;
           }
-          $enum = CRM_Utils_Array::value('enumValues', $value);
-          if (!empty($enum)) {
-            $options = explode(',', $enum);
-            $object->$dbName = $options[0];
-            continue;
-          }
+
           switch ($value['type']) {
             case CRM_Utils_Type::T_INT:
             case CRM_Utils_Type::T_FLOAT:
