@@ -32,7 +32,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_EventTest extends CiviUnitTestCase {
   protected $_params;
   protected $_apiversion;
-  protected $_entity; function get_info() {
+  protected $_entity;
+
+  function get_info() {
     return array(
       'name' => 'Event Create',
       'description' => 'Test all Event Create API methods.',

@@ -35,7 +35,9 @@
 class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_ContributionPage {
   protected $_colors;
 
-  protected $_widget; function preProcess() {
+  protected $_widget;
+
+  function preProcess() {
     parent::preProcess();
 
     $this->_widget = new CRM_Contribute_DAO_Widget();

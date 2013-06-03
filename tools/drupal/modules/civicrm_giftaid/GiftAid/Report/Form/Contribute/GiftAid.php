@@ -36,7 +36,9 @@ require_once 'CRM/Report/Form.php';
 require_once 'GiftAid/Utils/Contribution.php';
 class GiftAid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
   protected $_addressField = FALSE;
-  protected $_customGroupExtends = array('Contribution'); function __construct() {
+  protected $_customGroupExtends = array('Contribution');
+
+  function __construct() {
     $this->_columns = array('civicrm_entity_batch' =>
       array('dao' => 'CRM_Batch_DAO_EntityBatch',
         'filters' =>

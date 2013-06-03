@@ -46,7 +46,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   protected $lifeTime_from = NULL;
-  protected $lifeTime_where = NULL; function __construct() {
+  protected $lifeTime_where = NULL;
+
+  function __construct() {
     $yearsInPast   = 10;
     $yearsInFuture = 1;
     $date          = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, $yearsInFuture);

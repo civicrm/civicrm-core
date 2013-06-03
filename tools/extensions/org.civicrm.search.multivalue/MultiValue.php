@@ -38,7 +38,9 @@ class org_civicrm_search_multivalue extends CRM_Contact_Form_Search_Custom_Basei
 
   protected $_groupTree;
   protected $_tables;
-  protected $_options; function __construct(&$formValues) {
+  protected $_options;
+
+  function __construct(&$formValues) {
     parent::__construct($formValues);
 
     require_once 'CRM/Core/BAO/CustomGroup.php';

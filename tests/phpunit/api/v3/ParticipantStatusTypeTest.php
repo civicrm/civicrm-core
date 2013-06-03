@@ -9,7 +9,9 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   protected $id;
   public $_eNoticeCompliant = TRUE;
 
-  public $DBResetRequired = FALSE; function setUp() {
+  public $DBResetRequired = FALSE;
+
+  function setUp() {
     $this->_apiversion = 3;
     $this->params = array(
       'version' => 3,
