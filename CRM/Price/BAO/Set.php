@@ -1193,7 +1193,7 @@ WHERE       ps.id = %1
       if($isQuickConfig) {
         $copyPriceSet = &CRM_Price_BAO_Set::copy($priceSetId);
         CRM_Price_BAO_Set::addTo($baoName, $newId, $copyPriceSet->id);
-      } 
+      }
       else {
         $copyPriceSet = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_SetEntity',
           array(
@@ -1209,7 +1209,7 @@ WHERE       ps.id = %1
         foreach ($discount as $discountId => $setId) {
 
           $copyPriceSet = &CRM_Price_BAO_Set::copy($setId);
-        
+
           $copyDiscount = &CRM_Core_DAO::copyGeneric(
             'CRM_Core_DAO_Discount',
             array(

@@ -107,7 +107,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if ($updateStatus) {
       CRM_Core_Session::setStatus($updateStatus);
     }
-    
+
     CRM_Utils_System::civiExit(1);
   }
   //end of function

@@ -58,7 +58,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     //create mode only as we don't support editing line items
 
     CRM_Utils_Hook::pre('create', 'LineItem', $params['entity_id'], $params);
-    
+
     $lineItemBAO = new CRM_Price_BAO_LineItem();
     $lineItemBAO->copyValues($params);
 
@@ -226,10 +226,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         'auto_renew' => CRM_Utils_Array::value('auto_renew', $options[$oid]),
         'html_type' => $fields['html_type'],
         'financial_type_id' => CRM_Utils_Array::value( 'financial_type_id', $options[$oid]),
-        
+
       );
       if ($values[$oid]['membership_type_id'] && !isset($values[$oid]['auto_renew'])) {
-        $values[$oid]['auto_renew'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values[$oid]['membership_type_id'], 'auto_renew');                                      
+        $values[$oid]['auto_renew'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values[$oid]['membership_type_id'], 'auto_renew');
       }
     }
   }
@@ -243,7 +243,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @access public
    * @static
    */
-  public static function deleteLineItems($entityId, $entityTable) { 
+  public static function deleteLineItems($entityId, $entityTable) {
     if (!$entityId || !$entityTable) {
       return FALSE;
     }
@@ -275,7 +275,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     ) {
       return;
     }
-    
+
     foreach ($lineItem as $priceSetId => $values) {
       if (!$priceSetId) {
         continue;
@@ -295,7 +295,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         }
       }
     }
-  } 
+  }
 
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
     if (!$entityId || CRM_Utils_System::isNull($amount))
@@ -305,10 +305,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       LEFT JOIN   civicrm_price_field pf ON pf.id = li.price_field_id
       LEFT JOIN   civicrm_price_set ps ON ps.id = pf.price_set_id ";
 
-    $set = " li.unit_price = %3, 
+    $set = " li.unit_price = %3,
       li.line_total = %3 ";
 
-    $where = " li.entity_id = %1 AND 
+    $where = " li.entity_id = %1 AND
       li.entity_table = %2 ";
 
     $params = array(
@@ -320,8 +320,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     if ($entityTable == 'civicrm_contribution') {
       $entityName = 'default_contribution_amount';
       $where .= " AND ps.name = %4 ";
-      $params[4] = array($entityName, 'String'); 
-    } 
+      $params[4] = array($entityName, 'String');
+    }
     elseif ($entityTable == 'civicrm_participant') {
       $from .= "
         LEFT JOIN civicrm_price_set_entity cpse ON cpse.price_set_id = ps.id
@@ -336,10 +336,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       );
     }
 
-    $query = "                                                                                                                                                                                             
+    $query = "
       UPDATE $from
       SET    $set
-      WHERE  $where    
+      WHERE  $where
       ";
 
     CRM_Core_DAO::executeQuery($query, $params);
@@ -358,7 +358,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @static
    */
   static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution') {
-    
+
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_Set::getDefaultPriceSet();
       foreach ($priceSetDetails as $values) {
@@ -372,7 +372,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
           'financial_type_id' => $params['financial_type_id']
         );
       }
-    } 
+    }
     else {
       $setID = NULL;
       $totalEntityId = count($entityId);

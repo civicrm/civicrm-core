@@ -90,7 +90,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
         return CRM_Utils_System::redirect(CRM_Utils_System::url( 'civicrm/admin/financial/financialType', "reset=1&action=browse"));
       }
       CRM_Core_Session::setStatus(ts('Selected financial type has been deleted.'));
-    } 
+    }
     else {
       $params = $ids = array( );
       // store the submitted values in an array
@@ -104,7 +104,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType', 'reset=1&action=browse');
         CRM_Core_Session::setStatus(ts('The financial type \'%1\' has been saved.', array( 1 => $financialType->name)));
-      } 
+      }
       else {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', 'reset=1&action=browse&aid=' . $financialType->id);
         $statusArray = array(

@@ -222,7 +222,7 @@ class CRM_Core_Selector_Controller {
     $this->_sort = new CRM_Utils_Sort($this->_sortOrder, $this->_sortID);
 
     /*
-         * if we are in transfer mode, do not goto database, use the 
+         * if we are in transfer mode, do not goto database, use the
          * session values instead
          */
 
