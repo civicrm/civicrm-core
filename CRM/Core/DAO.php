@@ -1325,6 +1325,9 @@ SELECT contact_id
           }
           $constant = CRM_Utils_Array::value('pseudoconstant', $value);
           if (!empty($constant)) {
+            if (empty($constant['name'])) {
+              throw new CRM_Core_Exception("Failed to choose value for $daoName ($name) -- missing pseudo-constant name");
+            }
             $constantValues = CRM_Utils_PseudoConstant::getConstant($constant['name']);
             if (!empty($constantValues)) {
               $constantOptions = array_keys($constantValues);
