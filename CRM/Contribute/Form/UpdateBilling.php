@@ -64,7 +64,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'info');
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
-      
+
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
       if ($this->_subscriptionDetails->membership_id) {
         $this->_mid = $this->_subscriptionDetails->membership_id;
@@ -290,7 +290,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
         );
         $msgTitle = ts('Details Updated');
         $msgType = 'success';
-        
+
         $tplParams = array(
           'recur_frequency_interval' => $this->_subscriptionDetails->frequency_interval,
           'recur_frequency_unit' => $this->_subscriptionDetails->frequency_unit,
@@ -413,12 +413,12 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     if ( $userID && $status) {
       $session->setStatus($status, $msgTitle, $msgType);
     } else if (!$userID) {
-      if ($status) 
+      if ($status)
         CRM_Utils_System::setUFMessage($status);
       $result = (int) ($updateSubscription && isset($ctype));
-      if (isset($tplParams)) 
+      if (isset($tplParams))
         $session->set('resultParams', $tplParams);
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus', 
+      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
                                                               "reset=1&task=billing&result={$result}"));
     }
   }
