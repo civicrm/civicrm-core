@@ -43,7 +43,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   );
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
-  protected $_add2groupSupported = FALSE; function __construct() {
+  protected $_add2groupSupported = FALSE;
+
+  function __construct() {
     $yearsInPast   = 10;
     $yearsInFuture = 1;
     $date          = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, $yearsInFuture);

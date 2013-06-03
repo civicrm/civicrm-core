@@ -36,7 +36,9 @@
 require_once 'CRM/Contact/Form/Search/Interface.php';
 class org_civicrm_search_activityimplementsCRM_Contact_Form_Search_Interface {
 
-  protected $_formValues; function __construct(&$formValues) {
+  protected $_formValues;
+
+  function __construct(&$formValues) {
     $this->_formValues = $formValues;
 
     /**

@@ -47,7 +47,9 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
   protected $_customGroupExtends = array('Contact', 'Individual', 'Household', 'Organization', 'Activity');
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
-  private static $_surveyRespondentStatus; function __construct() {
+  private static $_surveyRespondentStatus;
+
+  function __construct() {
 
     //filter options for survey activity status.
     $responseStatus = array('' => '- Any -');

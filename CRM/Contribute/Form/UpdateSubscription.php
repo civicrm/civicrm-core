@@ -66,7 +66,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    * @var int
    * @public
    */
-  public $_contactID; function preProcess() {
+  public $_contactID;
+
+  function preProcess() {
 
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->_crid) {

@@ -35,7 +35,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_MailingGroupTest extends CiviUnitTestCase {
   protected $_groupID;
   protected $_email;
-  protected $_apiversion; function get_info() {
+  protected $_apiversion;
+
+  function get_info() {
     return array(
       'name' => 'Mailer Group',
       'description' => 'Test all Mailer Group methods.',

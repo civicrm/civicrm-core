@@ -45,7 +45,9 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   protected $_contributionTypeId;
   protected $_entity = 'PledgePayment';
 
-  public $DBResetRequired = TRUE; function setUp() {
+  public $DBResetRequired = TRUE;
+
+  function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
     $tablesToTruncate = array(

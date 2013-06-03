@@ -89,7 +89,9 @@ class CRM_Contribute_Import_Field {
    * this is soft credit field
    * @var string
    */
-  public $_softCreditField; function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//', $softCreditField = NULL) {
+  public $_softCreditField;
+
+  function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//', $softCreditField = NULL) {
     $this->_name = $name;
     $this->_title = $title;
     $this->_type = $type;

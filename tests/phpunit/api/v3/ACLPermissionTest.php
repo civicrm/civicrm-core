@@ -43,7 +43,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   public $_eNoticeCompliant = TRUE;
 
-  protected $_entity; function setUp() {
+  protected $_entity;
+
+  function setUp() {
     $this->_apiversion = 3;
 
     parent::setUp();

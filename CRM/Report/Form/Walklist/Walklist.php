@@ -46,7 +46,10 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   protected $_customGroupExtends = array(
-    'Contact', 'Individual', 'Household', 'Organization'); function __construct() {
+    'Contact', 'Individual', 'Household', 'Organization'
+  );
+
+  function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
       array(

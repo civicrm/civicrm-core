@@ -138,7 +138,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
   protected $_image_URL;
 
-  protected $_defaults = NULL; function __construct() {
+  protected $_defaults = NULL;
+
+  function __construct() {
     parent::__construct();
     // this property used by civicrm_fb module and if true, forces thank you email to be sent
     // for users signing in via Facebook connect; also sets Fb email to check against
