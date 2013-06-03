@@ -94,40 +94,40 @@
     <comment>What components are using this price set?</comment>
     <add>3.1</add>
   </field>
-  <field>  
-    <name>contribution_type_id</name> 
-    <type>int unsigned</type>  
+  <field>
+    <name>contribution_type_id</name>
+    <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Contribution Type(for membership price sets only).</comment>
-    <add>3.4</add> 
-    <drop>4.3</drop>  
-  </field>    
-  <foreignKey>  
-    <name>contribution_type_id</name>  
-    <table>civicrm_contribution_type</table>  
-    <key>id</key>  
-    <add>3.4</add> 
-    <drop>4.3</drop>   
+    <add>3.4</add>
+    <drop>4.3</drop>
+  </field>
+  <foreignKey>
+    <name>contribution_type_id</name>
+    <table>civicrm_contribution_type</table>
+    <key>id</key>
+    <add>3.4</add>
+    <drop>4.3</drop>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  <field>  
-    <name>financial_type_id</name> 
+  <field>
+    <name>financial_type_id</name>
     <title>Financial Type</title>
-    <type>int unsigned</type>  
+    <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Financial Type(for membership price sets only).</comment>
-    <add>4.3</add>  
-  </field>    
-  <foreignKey>  
-    <name>financial_type_id</name>  
-    <table>civicrm_financial_type</table>  
-    <key>id</key>  
-    <add>4.3</add>  
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <add>4.3</add>
     <onDelete>SET NULL</onDelete>
-  </foreignKey>  
+  </foreignKey>
   <field>
     <name>is_quick_config</name>
-    <type>boolean</type>  
+    <type>boolean</type>
     <default>0</default>
     <comment>Is set if edited on Contribution or Event Page rather than through Manage Price Sets</comment>
     <add>4.1</add>
@@ -140,4 +140,3 @@
     <add>4.2</add>
   </field>
 </table>
-

@@ -156,7 +156,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
     //fix for CRM-2752
     $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
     foreach ($this->_contributionIds as $contributionId) {
-            $typeId = CRM_Core_DAO::getFieldValue( "CRM_Contribute_DAO_Contribution", $contributionId, 'financial_type_id' ); 
+            $typeId = CRM_Core_DAO::getFieldValue( "CRM_Contribute_DAO_Contribution", $contributionId, 'financial_type_id' );
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $customValue = CRM_Utils_Array::value($customFieldID, $customFields);

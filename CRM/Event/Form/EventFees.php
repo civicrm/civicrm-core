@@ -118,7 +118,7 @@ class CRM_Event_Form_EventFees {
       list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults();
     }
 
-    //CRM-11601 we should keep the record contribution 
+    //CRM-11601 we should keep the record contribution
     //true by default while adding participant
      if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent) {
       $defaults[$form->_pId]['record_contribution'] = 1;

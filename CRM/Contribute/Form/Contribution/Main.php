@@ -789,7 +789,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
 
       // CRM-12233
-      if ($membershipIsActive && !$self->_membershipBlock['is_required'] 
+      if ($membershipIsActive && !$self->_membershipBlock['is_required']
         && $self->_values['amount_block_is_active']) {
         $membershipFieldId = $contributionFieldId = $errorKey = $otherFieldId = NULL;
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
@@ -804,7 +804,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             elseif ($fieldValue['name'] == 'contribution_amount') {
               $contributionFieldId = $fieldKey;
             }
-          
+
             if (!$errorKey || CRM_Utils_Array::value('price_' . $contributionFieldId, $fields) == '0') {
               $errorKey = $fieldKey;
             }
@@ -889,7 +889,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Price_BAO_Set::processAmount($self->_values['fee'],
         $fields, $lineItem
       );
-      
+
       if ($fields['amount'] < 0) {
         $errors['_qf_default'] = ts('Contribution can not be less than zero. Please select the options accordingly');
       }

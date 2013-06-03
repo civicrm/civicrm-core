@@ -65,7 +65,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       'log_civicrm_note_comment' =>
       array( 'fk'  => 'entity_id',
         'table_name'  => 'log_civicrm_note',
-        'joins' => array('table' => 'log_civicrm_note', 
+        'joins' => array('table' => 'log_civicrm_note',
                          'join'  => "entity_log_civireport.entity_id = fk_table.id AND entity_log_civireport.entity_table = 'civicrm_note'"),
         'entity_table' => true,
         'bracket_info' => array('table' => 'log_civicrm_note', 'column' => 'subject'),
@@ -160,7 +160,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   function postProcess() {
     $this->beginPostProcess();
     $rows = array();
-    
+
     $tempColumns = "id int(10)";
     if (CRM_Utils_Array::value('log_action', $this->_params['fields'])) {
       $tempColumns .= ", log_action varchar(64)";
@@ -241,8 +241,8 @@ ORDER BY entity_log_civireport.log_date DESC {$this->_limit}";
       if (CRM_Utils_Array::value('entity_column', $this->_logTables[$entity]['bracket_info'])) {
         $logTable = CRM_Utils_Array::value('table_name', $this->_logTables[$entity]) ? $this->_logTables[$entity]['table_name'] : $entity;
         $sql = "
-SELECT {$this->_logTables[$entity]['bracket_info']['entity_column']} 
-  FROM `{$this->loggingDB}`.{$logTable} 
+SELECT {$this->_logTables[$entity]['bracket_info']['entity_column']}
+  FROM `{$this->loggingDB}`.{$logTable}
  WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
         $entityID = CRM_Core_DAO::singleValueQuery($sql, array(1 => array(CRM_Utils_Date::isoToMysql($logDate), 'Timestamp'), 2 => array ($id, 'Integer')));
       } else {
@@ -250,15 +250,15 @@ SELECT {$this->_logTables[$entity]['bracket_info']['entity_column']}
       }
 
       // since case_type_id is a varchar field with separator
-      if ($entity == 'log_civicrm_case') { 
+      if ($entity == 'log_civicrm_case') {
         $entityID = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR,$entityID);
         $entityID = CRM_Utils_Array::value(1, $entityID);
       }
 
       if ($entityID && $logDate && array_key_exists('table', $this->_logTables[$entity]['bracket_info'])) {
         $sql = "
-SELECT {$this->_logTables[$entity]['bracket_info']['column']} 
-FROM  `{$this->loggingDB}`.{$this->_logTables[$entity]['bracket_info']['table']} 
+SELECT {$this->_logTables[$entity]['bracket_info']['column']}
+FROM  `{$this->loggingDB}`.{$this->_logTables[$entity]['bracket_info']['table']}
 WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
         return CRM_Core_DAO::singleValueQuery($sql, array(1 => array(CRM_Utils_Date::isoToMysql($logDate), 'Timestamp'), 2 => array ($entityID, 'Integer')));
       } else if (array_key_exists('options', $this->_logTables[$entity]['bracket_info']) && $entityID) {

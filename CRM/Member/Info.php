@@ -111,7 +111,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
               'query' => "reset=1&action=add&context=standalone&mode=live",
               'ref' => 'new-membership-cc',
               'title' => $title,
-            )));        
+            )));
       }
     }
   }
