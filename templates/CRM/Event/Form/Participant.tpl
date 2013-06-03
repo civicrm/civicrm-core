@@ -559,6 +559,7 @@
         CRM.buildCustomData( '{$customDataType}', {$eventTypeID}, {$eventTypeCustomDataTypeID} );
       {/if}
       {literal}
+      removeDuplicateCustomData( );
 
       //call pane js
       cj().crmAccordions();
@@ -598,6 +599,22 @@ cj('.initial-payment').show();
   function buildEventTypeCustomData( eventID, eventTypeCustomDataTypeID, eventAndTypeMapping ) {
     var mapping = eval('(' + eventAndTypeMapping + ')');
     CRM.buildCustomData( 'Participant', mapping[eventID], eventTypeCustomDataTypeID );
+    removeDuplicateCustomData( );
+  }
+
+  function removeDuplicateCustomData( ) {
+    var participantsCustomIds = new Array( );
+    participantsCustomIds.push('{/literal}{$eventTypeCustomDataTypeID}{literal}');
+    participantsCustomIds.push('{/literal}{$eventNameCustomDataTypeID}{literal}');
+
+    cj.each(participantsCustomIds, function(i, val) {
+      if (val) {
+        cj.each(cj('#customData'+val+' .crm-accordion-wrapper'),function(){
+	  var removeDiv = cj(this).attr("id");
+	  cj('#customData').find( '#'+removeDiv ).remove( );
+	});
+      }
+    });
   }
 
   function loadCampaign( eventId, campaigns ) {
