@@ -1723,7 +1723,7 @@ class CRM_Contact_BAO_Query {
         $this->_qill[$grouping][] = ts('State') . " ($lType) $op '$value'";
       }
     }
-    elseif ($field['pseudoconstant']) {
+    elseif (!empty($field['pseudoconstant'])) {
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
         CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $field['name']),
