@@ -99,7 +99,36 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
     $this->addRule('checksumTimeout', ts('Value should be a positive number'), 'positiveInteger');
 
+    $this->addFormRule(array('CRM_Admin_Form_Setting_Miscellaneous', 'formRule'), $this);
+
     parent::buildQuickForm();
+  }
+
+  /**
+   * global form rule
+   *
+   * @param array $fields  the input form values
+   * @param array $files   the uploaded files if any
+   * @param array $options additional user data
+   *
+   * @return true if no errors, else array of errors
+   * @access public
+   * @static
+   */
+  static function formRule($fields, $files, $options) {
+    $errors = array();
+
+    if (!empty($fields['wkhtmltopdfPath'])) {
+      // check and ensure that thi leads to the wkhtmltopdf binary
+      // and it is a valid executable binary
+      if (
+        !file_exists($fields['wkhtmltopdfPath']) ||
+        !is_executable($fields['wkhtmltopdfPath'])
+      ) {
+        $errors['wkhtmltopdfPath'] = ts('The wkhtmltodfPath does not exist or is not valid');
+      }
+    }
+    return $errors;
   }
 
   function setDefaultValues() {
