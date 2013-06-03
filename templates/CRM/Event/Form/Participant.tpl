@@ -575,11 +575,6 @@
 
 <script type="text/javascript">
   {literal}
-if(cj("#priceset").length == 0) {
-cj('.initial-payment').hide();
-}else {
-cj('.initial-payment').show();
-}
   sendNotification();
   cj("#notify").hide();
   function sendNotification( ) {
