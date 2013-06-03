@@ -53,7 +53,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   protected $_includeCaseDetailExtra = FALSE;
 
   protected $_caseDetailExtra = array(
-    ); function __construct() {
+    );
+
+  function __construct() {
     $this->case_statuses = CRM_Case_PseudoConstant::caseStatus();
     $this->case_types    = CRM_Case_PseudoConstant::caseType();
     $rels                = CRM_Core_PseudoConstant::relationshipType();

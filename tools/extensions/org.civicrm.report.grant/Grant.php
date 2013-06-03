@@ -37,7 +37,9 @@ require_once 'CRM/Report/Form.php';
 require_once 'CRM/Grant/PseudoConstant.php';
 class org_civicrm_report_grant extends CRM_Report_Form {
 
-  protected $_addressField = FALSE; function __construct() {
+  protected $_addressField = FALSE;
+
+  function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
       array('dao' => 'CRM_Contact_DAO_Contact',

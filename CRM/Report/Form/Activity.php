@@ -37,7 +37,10 @@
 class CRM_Report_Form_Activity extends CRM_Report_Form {
 
   protected $_customGroupExtends = array(
-    'Activity'); function __construct() {
+    'Activity'
+  );
+
+  function __construct() {
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {

@@ -8,7 +8,9 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
   protected $params;
   protected $id;
   public $_eNoticeCompliant = TRUE;
-  public $DBResetRequired = FALSE; function setUp() {
+  public $DBResetRequired = FALSE;
+
+  function setUp() {
     $this->_apiversion = 3;
     $this->params = array(
       'version' => 3,

@@ -45,7 +45,9 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_customGroupExtends = array('Contact', 'Contribution'); function __construct() {
+  protected $_customGroupExtends = array('Contact', 'Contribution');
+
+  function __construct() {
     $this->_columns = array('civicrm_contact' =>
       array('dao' => 'CRM_Contact_DAO_Contact',
         'fields' =>
@@ -261,7 +263,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
       array('dao' => 'CRM_Contact_DAO_GroupContact',
         'alias' => 'cgroup',
         'fields' =>
-        array(,
+        array(
         ),
         'filters' =>
         array('gid' =>

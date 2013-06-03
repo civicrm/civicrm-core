@@ -41,7 +41,9 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   protected $_locationType;
   protected $_params;
   public $_eNoticeCompliant = TRUE;
-  protected $_entity; function setUp() {
+  protected $_entity;
+
+  function setUp() {
     $this->_apiversion = 3;
     $this->_entity = 'Address';
     parent::setUp();
