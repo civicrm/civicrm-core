@@ -43,7 +43,11 @@ class CiviReportTestCase extends CiviUnitTestCase {
       $_GET['fld']  = $fields;
       $_GET['ufld'] = 1;
     }
-
+    if (!empty($inputParams['filters'])) {
+      foreach ($inputParams['filters'] as $key => $val) {
+        $_GET[$key] = $val;
+      }
+    }
     $reportObj->storeResultSet();
     $reportObj->buildForm();
     $rows = $reportObj->getResultSet();
@@ -64,22 +68,5 @@ class CiviReportTestCase extends CiviUnitTestCase {
       fclose($handle);
     }
     return $arrFile;
-  }
-
-  function compareCsvFiles($csvFile1, $csvFile2) {
-    $arrFile1 = $this->getArrayFromCsv($csvFile1);
-    $arrFile2 = $this->getArrayFromCsv($csvFile2);
-
-    $intRow = 0;
-    foreach($arrFile1 as $intKey => $strVal) {
-      if (count($strVal) != count($arrFile2[$intKey])) {
-        //FIXME : exit("Column count doesn't match\n");
-      }
-      if (!isset($arrFile2[$intKey]) || ($arrFile2[$intKey] != $strVal)) {
-        //FIXME: exit("Column $intKey, row $intRow of $strFile1 doesn't match\n");
-      }
-      $intRow++;
-    }
-    // FIXME: print "All rows match fine.\n";
   }
 }

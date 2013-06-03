@@ -51,6 +51,10 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
             'email',
             'total_amount',
           ),
+          'filters' => array(
+            'total_amount_op'    => 'gte',
+            'total_amount_value' => 50,
+          ),
           // FIXME: add filters
         ),
         'fixtures/dataset.sql',
@@ -82,7 +86,9 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
     $this->assertEquals(count($reportCsvArray[0]), count($expectedOutputCsvArray[0]), 'In line ' . __LINE__);
 
-    $this->compareCsvFiles($reportCsvFile, dirname(__FILE__) . "/{$expectedOutputCsvFile}");
-    // FIXME: add more asserts 
+    foreach($reportCsvArray as $intKey => $strVal) {
+      $this->assertNotNull($expectedOutputCsvArray[$intKey], 'In line ' . __LINE__);
+      $this->assertEquals($expectedOutputCsvArray[$intKey], $strVal);
+    }
   }
 }
