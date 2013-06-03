@@ -82,12 +82,6 @@
       count++;
     });
 
-    // FIXME
-    var url=location.href.split('&');
-    if (url[3]) {
-      $('#popup-button').click();
-    }
-
     columns    = columns.substring(0, columns.length - 1 );
     sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
     eval('sortColumn =[' + sortColumn + ']');
