@@ -181,6 +181,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
           $comps = array(
             'Event' => 'civicrm_event',
             'Contribution' => 'civicrm_contribution_page',
+            'EventTemplate' => 'civicrm_event_template'
           );
           $priceSetContexts = array();
           foreach ($comps as $name => $table) {
