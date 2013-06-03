@@ -161,6 +161,8 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   public $_drilldownReport = array();
 
+  protected $_grandFlag = FALSE;
+
   /**
    * An attribute for checkbox/radio form field layout
    *
