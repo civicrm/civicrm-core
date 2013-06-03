@@ -571,22 +571,20 @@
   {* include jscript to warn if unsaved form field changes *}
   {include file="CRM/common/formNavigate.tpl"}
 
-{/if} {* end of eventshow condition*}
-
 <script type="text/javascript">
   {literal}
-  sendNotification();
-  cj("#notify").hide();
-  function sendNotification( ) {
-    var status = cj("select#status_id option:selected").text();
-    cj("#notify").hide();
 
-    if ( status == 'Cancelled' ||
-      status == 'Pending from waitlist' ||
-      status == 'Pending from approval' ||
-      status == 'Expired' ) {
+  sendNotification();
+  function sendNotification() {
+    var notificationStatusIds = {/literal}"{$notificationStatusIds}"{literal};
+    notificationStatusIds = notificationStatusIds.split(',');
+    if (cj.inArray(cj('select#status_id option:selected').val(), notificationStatusIds) > -1) {
       cj("#notify").show();
-      cj("#is_notify").attr('checked',true);
+      cj("#is_notify").attr('checked', true);
+    }
+    else {
+      cj("#notify").hide();
+      cj("#is_notify").removeAttr('checked');
     }
   }
 
@@ -617,4 +615,6 @@
   });
 </script>
 {/literal}
+
+{/if} {* end of main event block*}
 

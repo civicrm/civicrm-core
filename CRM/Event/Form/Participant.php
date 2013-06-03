@@ -887,6 +887,20 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
       $confirmJS = array('onclick' => "return confirmStatus( {$participantStatusId}, {$contributionStatusId} );");
     }
 
+    // get the participant status names to build special status array which is used to show notification
+    // checkbox below participant status select
+    $participantStatusName = CRM_Event_PseudoConstant::participantStatus();
+    $notificationStatuses = array(
+      'Cancelled',
+      'Pending from waitlist',
+      'Pending from approval',
+      'Expired',
+    );
+
+    // get the required status and then implode only ids
+    $notificationStatusIds = implode(',', array_keys(array_intersect($participantStatusName, $notificationStatuses)));
+    $this->assign('notificationStatusIds', $notificationStatusIds);
+
     $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $this->add('select', 'status_id', ts('Participant Status'),
       array(
