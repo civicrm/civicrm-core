@@ -229,7 +229,7 @@ class CRM_Core_PseudoConstant {
     $flip = !empty($params['flip']);
 
     // Custom fields are not in the schema
-    if (strpos($fieldName, 'custom') === 0) {
+    if (strpos($fieldName, 'custom') === 0 && is_numeric($fieldName[7])) {
       $dao = new CRM_Core_DAO_CustomField;
       $dao->id = (int) substr($fieldName, 7);
       $dao->find(TRUE);
@@ -237,6 +237,8 @@ class CRM_Core_PseudoConstant {
       $dao->free();
       $output = array();
       CRM_Core_BAO_CustomField::buildOption($customField, $output);
+      // @see FIXME note in CRM_Core_BAO_CustomField::buildOption()
+      unset($output['attributes']);
       return $flip ? array_flip($output) : $output;
     }
 

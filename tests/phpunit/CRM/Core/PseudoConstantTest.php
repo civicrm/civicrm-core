@@ -60,7 +60,27 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     $result = civicrm_api('customGroup', 'create', $api_params);
     $this->assertAPISuccess($result);
 
-    // Create a Group for testing.
+    // Add a custom field to the above field group.
+    $api_params = array(
+      'version' => 3,
+      'debug' => 1,
+      'custom_group_id' => $result['id'],
+      'label' => $custom_group_name,
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'is_active' => TRUE,
+      'option_values' => array(array(
+        'label' => 'Foo',
+        'value' => 'foo',
+        'is_active' => 1,
+        'weight' => 0,
+      )),
+    );
+    $result = civicrm_api('custom_field', 'create', $api_params);
+    $this->assertAPISuccess($result);
+    $customFieldId = $result['id'];
+
+    // Create a Contact Group for testing.
     $group_name = md5(microtime());
     $api_params = array(
       'version' => 3,
@@ -416,6 +436,11 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'preferred_language',
           'sample' => array('en_US' => 'English (United States)'),
           'max' => 250,
+        ),
+        array(
+          'fieldName' => "custom_$customFieldId",
+          'sample' => array('foo' => 'Foo'),
+          'max' => 1,
         ),
       ),
       'CRM_Batch_DAO_Batch' => array(

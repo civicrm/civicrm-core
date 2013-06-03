@@ -2167,6 +2167,8 @@ ORDER BY html_type";
   }
 
   static function buildOption($field, &$options) {
+    // Fixme - adding anything but options to the $options array is a bad idea
+    // What if an option had the key 'attributes'?
     $options['attributes'] = array(
       'label' => $field['label'],
       'data_type' => $field['data_type'],
