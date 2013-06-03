@@ -342,12 +342,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'CiviContribute',
         ),
       ),
-      'CRM_Project_DAO_Task' => array(
-        array(
-          'fieldName' => 'priority_id',
-          'sample' => 'Urgent',
-        ),
-      ),
       'CRM_Core_DAO_MailSettings' => array(
         array(
           'fieldName' => 'protocol',
