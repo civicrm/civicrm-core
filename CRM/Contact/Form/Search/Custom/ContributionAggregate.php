@@ -34,18 +34,24 @@
  */
 class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contact_Form_Search_Interface {
 
-  protected $_formValues; function __construct(&$formValues) {
-    $this->_formValues = $formValues;
+  protected $_formValues;
+  public $_permissionedComponent;
 
+  function __construct(&$formValues) {
+    $this->_formValues = $formValues;
     /**
      * Define the columns for search result rows
      */
+
     $this->_columns = array(
       ts('Contact Id') => 'contact_id',
       ts('Name') => 'sort_name',
       ts('Donation Count') => 'donation_count',
       ts('Donation Amount') => 'donation_amount',
     );
+
+    // define component access permission needed
+    $this->_permissionedComponent = 'CiviContribute';
   }
 
   function buildForm(&$form) {

@@ -81,6 +81,12 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
 
     // instantiate the new class
     $this->_customClass = new $this->_customSearchClass( $this->_formValues );
+
+    // CRM-12747
+    if (isset($this->_customClass->_permissionedComponent) &&
+      !self::isPermissioned($this->_customClass->_permissionedComponent)) {
+      CRM_Utils_System::permissionDenied();
+    }
   }
 
   function setDefaultValues() {
@@ -132,5 +138,23 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
   public function getTitle() {
     return ts('Custom Search');
   }
-}
 
+  function isPermissioned($components) {
+    if (empty($components)) {
+      return TRUE;
+    }
+    if (is_array($components)) {
+      foreach ($components as $component) {
+        if (!CRM_Core_Permission::access($component)) {
+          return FALSE;
+        }
+      }
+    }
+    else {
+      if (!CRM_Core_Permission::access($components)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+}
