@@ -201,7 +201,7 @@ WHERE     cpf.price_set_id = %1";
       switch ($table) {
         case 'civicrm_event':
           $ids = implode(',', $entities);
-          $queryString = "SELECT ce.id as id, ce.title as title, ce.is_public as isPublic, ce.start_date as startDate, ce.end_date as endDate, civicrm_option_value.label as eventType
+          $queryString = "SELECT ce.id as id, ce.title as title, ce.is_public as isPublic, ce.start_date as startDate, ce.end_date as endDate, civicrm_option_value.label as eventType, ce.is_template as isTemplate, ce.template_title as templateTitle
 FROM       civicrm_event ce
 LEFT JOIN  civicrm_option_value ON
            ( ce.event_type_id = civicrm_option_value.value )
@@ -209,16 +209,22 @@ LEFT JOIN  civicrm_option_group ON
            ( civicrm_option_group.id = civicrm_option_value.option_group_id )
 WHERE
          civicrm_option_group.name = 'event_type' AND
-           ( ce.is_template IS NULL OR ce.is_template = 0) AND
            ce.id IN ($ids) AND
            ce.is_active = 1;";
           $crmDAO = CRM_Core_DAO::executeQuery($queryString);
           while ($crmDAO->fetch()) {
-            $usedBy[$table][$crmDAO->id]['title'] = $crmDAO->title;
-            $usedBy[$table][$crmDAO->id]['eventType'] = $crmDAO->eventType;
-            $usedBy[$table][$crmDAO->id]['startDate'] = $crmDAO->startDate;
-            $usedBy[$table][$crmDAO->id]['endDate'] = $crmDAO->endDate;
-            $usedBy[$table][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
+            if ($crmDAO->isTemplate) {
+              $usedBy['civicrm_event_template'][$crmDAO->id]['title'] = $crmDAO->templateTitle;
+              $usedBy['civicrm_event_template'][$crmDAO->id]['eventType'] = $crmDAO->eventType;
+              $usedBy['civicrm_event_template'][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
+            }
+            else {
+              $usedBy[$table][$crmDAO->id]['title'] = $crmDAO->title;
+              $usedBy[$table][$crmDAO->id]['eventType'] = $crmDAO->eventType;
+              $usedBy[$table][$crmDAO->id]['startDate'] = $crmDAO->startDate;
+              $usedBy[$table][$crmDAO->id]['endDate'] = $crmDAO->endDate;
+              $usedBy[$table][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
+            }
           }
           break;
 
