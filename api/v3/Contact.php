@@ -604,7 +604,7 @@ function civicrm_api3_contact_getquick($params) {
         if ($value != 'id') {
           $suffix = 'cc';
           if (!empty($params['field_name']) && $params['field_name'] == 'value') {
-            $suffix = CRM_Utils_Array::value('table_name', $params, 'cc');
+            $suffix = CRM_Utils_String::munge(CRM_Utils_Array::value('table_name', $params, 'cc'));
           }
           $actualSelectElements[] = $select[] = $suffix . '.' . $value;
         }
@@ -626,7 +626,8 @@ function civicrm_api3_contact_getquick($params) {
     $selectAliases = ", $selectAliases";
   }
   $from = implode(' ', $from);
-  $limit = CRM_Utils_Array::value('limit', $params, 10);
+  $limit = (int) CRM_Utils_Array::value('limit', $params);
+  $limit = $limit > 0 ? $limit : 10;
 
   // add acl clause here
   list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
@@ -643,7 +644,7 @@ function civicrm_api3_contact_getquick($params) {
     $currEmpDetails = array();
     if (CRM_Utils_Array::value('employee_id', $params)) {
       if ($currentEmployer = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          CRM_Utils_Array::value('employee_id', $params),
+          (int) $params['employee_id'],
           'employer_id'
         )) {
         if ($config->includeWildCardInName) {
@@ -768,8 +769,8 @@ LIMIT    0, {$limit}
   // send query to hook to be modified if needed
   CRM_Utils_Hook::contactListQuery($query,
     $name,
-    CRM_Utils_Array::value('context', $params),
-    CRM_Utils_Array::value('id', $params)
+    empty($params['context']) ? NULL : CRM_Utils_Type::escape($params['context'], 'String'),
+    empty($params['id']) ? NULL : $params['id']
   );
 
   $dao = CRM_Core_DAO::executeQuery($query);
