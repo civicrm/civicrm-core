@@ -224,7 +224,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
       );
-      $this->_columns['civicrm_contribution']['grouping']['campaign_id'] = 'contri-fields';
       $this->_columns['civicrm_contribution']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
     }
 
