@@ -141,7 +141,7 @@ cat > "$CIVI_ROOT/bin/setup.conf" << EOF
   DBPASS="$DB_PASS"
   DBARGS=""
   PHP5PATH=
-  DBLOAD=
+  DBLOAD="$DBLOAD"
   # DBADD=
 EOF
 
