@@ -123,7 +123,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'fields' =>
         array(
           'contribution_source' => array('title' => ts('Source'),
-      ),
+          ),
           'currency' =>
           array('required' => TRUE,
             'no_display' => TRUE,
@@ -227,7 +227,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
       );
-      $this->_columns['civicrm_contribution']['grouping']['campaign_id'] = 'contri-fields';
       $this->_columns['civicrm_contribution']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
     }
 
