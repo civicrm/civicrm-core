@@ -137,6 +137,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_customGroupExtends = NULL;
   protected $_customGroupFilters = TRUE;
   protected $_customGroupGroupBy = FALSE;
+  protected $_customGroupJoin    = 'LEFT JOIN';
 
   /**
    * build tags filter
@@ -2819,8 +2820,9 @@ ORDER BY cg.weight, cf.weight";
           continue;
         }
 
+        $customJoin   = is_array($this->_customGroupJoin) ? $this->_customGroupJoin[$table] : $this->_customGroupJoin;
         $this->_from .= "
-LEFT JOIN $table {$this->_aliases[$table]} ON {$this->_aliases[$table]}.entity_id = {$this->_aliases[$extendsTable]}.id";
+{$customJoin} {$table} {$this->_aliases[$table]} ON {$this->_aliases[$table]}.entity_id = {$this->_aliases[$extendsTable]}.id";
         // handle for ContactReference
         if (array_key_exists('fields', $prop)) {
           foreach ($prop['fields'] as $fieldName => $field) {
@@ -2959,7 +2961,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   function selectedTables() {
     if (!$this->_selectedTables) {
       $orderByColumns = array();
-      if (is_array($this->_params['order_bys'])) {
+      if (array_key_exists('order_bys', $this->_params) && is_array($this->_params['order_bys'])) {
         foreach ($this->_params['order_bys'] as $orderBy) {
           $orderByColumns[] = $orderBy['column'];
         }
