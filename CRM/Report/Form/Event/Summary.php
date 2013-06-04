@@ -224,9 +224,10 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
         }
       }
 
-      $participant_info[$event_id]['totalAmount'] = CRM_Utils_Money::format($amt, $currency[$event_id]);
+      $participant_info[$event_id]['totalAmount'] = $amt;
       $participant_info[$event_id]['statusType1'] = $particiType1;
       $participant_info[$event_id]['statusType2'] = $particiType2;
+      $participant_info[$event_id]['currency']    = $currency[$event_id];
       $amt = $particiType1 = $particiType2 = 0;
     }
 
@@ -362,8 +363,11 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
 
     if (is_array($rows)) {
       $eventType = CRM_Core_OptionGroup::values('event_type');
-      foreach ($rows as $rowNum => $row) {
 
+      foreach ($rows as $rowNum => $row) {
+        if (array_key_exists('totalAmount', $row) && array_key_exists('currency', $row)) {
+          $rows[$rowNum]['totalAmount'] = CRM_Utils_Money::format($rows[$rowNum]['totalAmount'], $rows[$rowNum]['currency']);
+        }
         if (array_key_exists('civicrm_event_title', $row)) {
           if ($value = $row['civicrm_event_id']) {
             //CRM_Event_PseudoConstant::event( $value, false );
