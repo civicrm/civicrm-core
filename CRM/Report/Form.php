@@ -199,6 +199,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_sections = NULL;
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
   protected $_absoluteUrl = FALSE;
+  protected $_grandFlag   = FALSE;
 
   /**
    * To what frequency group-by a date column
@@ -1578,7 +1579,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
     $lastRow = array_pop($rows);
 
-    $this->_grandFlag = FALSE;
     foreach ($this->_columnHeaders as $fld => $val) {
       if (!in_array($fld, $this->_statFields)) {
         if (!$this->_grandFlag) {
