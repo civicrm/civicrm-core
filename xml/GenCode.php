@@ -141,7 +141,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       exit();
     }
 
-    $this->generateTemplateVersion($argVersion);
+    $this->generateTemplateVersion($db_version);
 
     $this->setupCms($argCms, $db_version);
 
@@ -355,16 +355,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $this->beautifier->save();
   }
 
-  function generateTemplateVersion($argVersion) {
-    // add the Subversion revision to templates
-    // use svnversion if the version was not specified explicitely on the commandline
-    if (isset($argVersion) and $argVersion != '') {
-      $svnversion = $argVersion;
-    }
-    else {
-      $svnversion = `svnversion .`;
-    }
-    file_put_contents($this->tplCodePath . "/CRM/common/version.tpl", $svnversion);
+  function generateTemplateVersion($dbVersion) {
+    file_put_contents($this->tplCodePath . "/CRM/common/version.tpl", $dbVersion);
   }
 
   function findLocales() {
