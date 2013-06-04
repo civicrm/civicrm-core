@@ -437,6 +437,16 @@ class CiviCRM_For_WordPress {
 			return '';
 		}
 
+		// CRM-12523
+		// WordPress has it's own timezone calculations
+		// Civi relies on the php default timezone which WP
+		// overrides with UTC in wp-settings.php
+		$wpBaseTimezone = date_default_timezone_get();
+		$wpUserTimezone = get_option('timezone_string');
+		if ($wpUserTimezone) {
+			date_default_timezone_set($wpUserTimezone);
+		}
+
 		// Add our standard css & js
 		CRM_Core_Resources::singleton()->addCoreResources();
 
@@ -469,6 +479,11 @@ class CiviCRM_For_WordPress {
 		
 		// do the business
 		CRM_Core_Invoke::invoke($args);
+
+		// restore WP's timezone
+		if ($wpBaseTimezone) {
+			date_default_timezone_set($wpBaseTimezone);
+		}
 
 		// notify plugins
 		do_action( 'civicrm_invoked' );
