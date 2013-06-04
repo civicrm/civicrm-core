@@ -2987,7 +2987,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     }
   }
 
-  
+
   /**
    * Delete a contact-related object that has an 'is_primary' field
    * Ensures that is_primary gets assigned to another object if available
