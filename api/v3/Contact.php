@@ -540,7 +540,7 @@ function civicrm_api3_contact_quicksearch($params) {
 
 function civicrm_api3_contact_getquick($params) {
   civicrm_api3_verify_mandatory($params, NULL, array('name'));
-  $name = CRM_Utils_Array::value('name', $params);
+  $name = CRM_Utils_Type::escape($params['name'], 'String');
 
   // get the autocomplete options from settings
   $acpref = explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -560,12 +560,13 @@ function civicrm_api3_contact_getquick($params) {
   }
   // If we are doing quicksearch by a field other than name, make sure that field is added to results
   if (!empty($params['field_name'])) {
+    $field_name = CRM_Utils_String::munge($params['field_name']);
     // Unique name contact_id = id
-    if ($params['field_name'] == 'contact_id') {
-      $params['field_name'] = 'id';
+    if ($field_name == 'contact_id') {
+      $field_name = 'id';
     }
     // phone_numeric should be phone
-    $searchField = str_replace('_numeric', '', $params['field_name']);
+    $searchField = str_replace('_numeric', '', $field_name);
     if(!in_array($searchField, $list)) {
       $list[] = $searchField;
     }
@@ -603,7 +604,7 @@ function civicrm_api3_contact_getquick($params) {
         if ($value != 'id') {
           $suffix = 'cc';
           if (!empty($params['field_name']) && $params['field_name'] == 'value') {
-            $suffix = CRM_Utils_Array::value('table_name', $params, 'cc');
+            $suffix = CRM_Utils_String::munge(CRM_Utils_Array::value('table_name', $params, 'cc'));
           }
           $actualSelectElements[] = $select[] = $suffix . '.' . $value;
         }
@@ -625,7 +626,8 @@ function civicrm_api3_contact_getquick($params) {
     $selectAliases = ", $selectAliases";
   }
   $from = implode(' ', $from);
-  $limit = CRM_Utils_Array::value('limit', $params, 10);
+  $limit = (int) CRM_Utils_Array::value('limit', $params);
+  $limit = $limit > 0 ? $limit : 10;
 
   // add acl clause here
   list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
@@ -642,7 +644,7 @@ function civicrm_api3_contact_getquick($params) {
     $currEmpDetails = array();
     if (CRM_Utils_Array::value('employee_id', $params)) {
       if ($currentEmployer = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          CRM_Utils_Array::value('employee_id', $params),
+          (int) $params['employee_id'],
           'employer_id'
         )) {
         if ($config->includeWildCardInName) {
@@ -667,11 +669,11 @@ function civicrm_api3_contact_getquick($params) {
 
   //set default for current_employer or return contact with particular id
   if (CRM_Utils_Array::value('id', $params)) {
-    $where .= " AND cc.id = " .$params['id'];
+    $where .= " AND cc.id = " . (int) $params['id'];
   }
 
   if (CRM_Utils_Array::value('cid', $params)) {
-    $where .= " AND cc.id <> {$params['cid']}";
+    $where .= " AND cc.id <> " . (int) $params['cid'];
   }
 
   //contact's based of relationhip type
@@ -696,8 +698,7 @@ function civicrm_api3_contact_getquick($params) {
 
   //CRM-10687
   if (!empty($params['field_name']) && !empty($params['table_name'])) {
-    $field_name = $params['field_name'];
-    $table_name = $params['table_name'];
+    $table_name = CRM_Utils_String::munge($params['table_name']);
     $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch')";
     $exactWhereClause = " WHERE ( $table_name.$field_name = '$name')";
     // Search by id should be exact
@@ -768,8 +769,8 @@ LIMIT    0, {$limit}
   // send query to hook to be modified if needed
   CRM_Utils_Hook::contactListQuery($query,
     $name,
-    CRM_Utils_Array::value('context', $params),
-    CRM_Utils_Array::value('id', $params)
+    empty($params['context']) ? NULL : CRM_Utils_Type::escape($params['context'], 'String'),
+    empty($params['id']) ? NULL : $params['id']
   );
 
   $dao = CRM_Core_DAO::executeQuery($query);
