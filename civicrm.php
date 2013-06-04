@@ -234,31 +234,18 @@ class CiviCRM_For_WordPress {
 			
 			// modify the admin menu
 			add_action( 'admin_menu', array( $this, 'add_menu_items' ) );
-
-			// Adding "embed form" button
-			// CMW: better to use get_current_screen()
-			// see http://codex.wordpress.org/Function_Reference/get_current_screen
-			if ( in_array(
 			
-				basename( $_SERVER['PHP_SELF'] ),
-				array( 'post.php', 'page.php', 'page-new.php', 'post-new.php' )
-				
-			) ) {
-				
-				// CMW: the check above does not allow Custom Post Types to make
-				// use of the CiviCRM shortcode...
+			// the following three hooks CiviCRM button to post and page screens
 
-				// adds the CiviCRM button to post and page screens
-				add_action( 'media_buttons_context', array( $this, 'add_form_button' ) );
-				
-				// adds the HTML triggered by the button above
-				add_action( 'admin_footer', array( $this, 'add_form_button_html' ) );
-				
-				// add the javascript to make it all happen
-				add_action( 'admin_enqueue_scripts', array( $this, 'add_form_button_js' ) );
-				
-			}
-
+			// adds the CiviCRM button to post and page screens
+			add_action( 'media_buttons_context', array( $this, 'add_form_button' ) );
+			
+			// adds the HTML triggered by the button above
+			add_action( 'admin_footer', array( $this, 'add_form_button_html' ) );
+			
+			// add the javascript to make it all happen
+			add_action( 'admin_enqueue_scripts', array( $this, 'add_form_button_js' ) );
+			
 			// check if settings file exist, do not show configuration link on
 			// install / settings page
 			if ( isset( $_GET['page'] ) && $_GET['page'] != 'civicrm-install' ) {
@@ -969,7 +956,7 @@ class CiviCRM_For_WordPress {
 	 * @return string warning message
 	 */
 	public function show_permission_denied() {
-		return ts( 'You do not have permission to execute this url.' );
+		return __( 'You do not have permission to execute this url.', 'civicrm-wordpress' );
 	}
 
 
@@ -1249,14 +1236,22 @@ class CiviCRM_For_WordPress {
 	 */
 	public function add_form_button( $context ) {
 
-		if ( ! $this->initialize() ) {
-			return '';
-		}
+		// get screen object
+		$screen = get_current_screen();
+		
+		// only add on default WP post types
+		if ( $screen->post_type == 'post' OR $screen->post_type == 'page' ) {
+		
+			if ( ! $this->initialize() ) {
+				return '';
+			}
 
-		$config      = CRM_Core_Config::singleton();
-		$imageBtnURL = $config->resourceBase . 'i/logo16px.png';
-		$out         = '<a href="#TB_inline?width=480&inlineId=civicrm_frontend_pages" class="button thickbox" id="add_civi" style="padding-left: 4px;" title="' . __( 'Add CiviCRM Public Pages', 'civicrm-wordpress' ) . '"><img src="' . $imageBtnURL . '" height="15" width="15" alt="' . __( 'Add CiviCRM Public Pages', 'civicrm-wordpress' ) . '" />'. __( 'CiviCRM', 'civicrm-wordpress' ) .'</a>';
-		return $context . $out;
+			$config      = CRM_Core_Config::singleton();
+			$imageBtnURL = $config->resourceBase . 'i/logo16px.png';
+			$out         = '<a href="#TB_inline?width=480&inlineId=civicrm_frontend_pages" class="button thickbox" id="add_civi" style="padding-left: 4px;" title="' . __( 'Add CiviCRM Public Pages', 'civicrm-wordpress' ) . '"><img src="' . $imageBtnURL . '" height="15" width="15" alt="' . __( 'Add CiviCRM Public Pages', 'civicrm-wordpress' ) . '" />'. __( 'CiviCRM', 'civicrm-wordpress' ) .'</a>';
+			return $context . $out;
+		
+		}
 
 	}
 
@@ -1304,156 +1299,165 @@ class CiviCRM_For_WordPress {
 	 * @description: callback method for 'admin_footer' hook as set in register_hooks()
 	 */
 	public function add_form_button_html() {
+		
+		// get screen object
+		$screen = get_current_screen();
+		
+		// only add on default WP post types
+		if ( $screen->post_type == 'post' OR $screen->post_type == 'page' ) {
+		
+			$title = __( 'Please select a CiviCRM front-end page type.', 'civicrm-wordpress' );
 
-		$title = ts( 'Please select a CiviCRM front-end page type.' );
+			$now = date('Ymdhis');
 
-		$now = date('Ymdhis');
+			$sql = "
+				SELECT id, title
+				FROM   civicrm_contribution_page
+				WHERE  is_active = 1
+				AND    (
+						 ( start_date IS NULL AND end_date IS NULL )
+				OR       ( start_date <= $now AND end_date IS NULL )
+				OR       ( start_date IS NULL AND end_date >= $now )
+				OR       ( start_date <= $now AND end_date >= $now )
+					   )
+				";
 
-		$sql = "
-			SELECT id, title
-			FROM   civicrm_contribution_page
-			WHERE  is_active = 1
-			AND    (
-					 ( start_date IS NULL AND end_date IS NULL )
-			OR       ( start_date <= $now AND end_date IS NULL )
-			OR       ( start_date IS NULL AND end_date >= $now )
-			OR       ( start_date <= $now AND end_date >= $now )
-				   )
-			";
+			$dao = CRM_Core_DAO::executeQuery( $sql );
+			$contributionPages = array();
+			while ( $dao->fetch() ) {
+				$contributionPages[$dao->id] = $dao->title;
+			}
 
-		$dao = CRM_Core_DAO::executeQuery( $sql );
-		$contributionPages = array();
-		while ( $dao->fetch() ) {
-			$contributionPages[$dao->id] = $dao->title;
-		}
+			$sql = "
+				SELECT id, title
+				FROM   civicrm_event
+				WHERE  is_active = 1
+				AND ( is_template = 0 OR is_template IS NULL )
+				AND    (
+						 ( start_date IS NULL AND end_date IS NULL )
+				OR       ( start_date <= $now AND end_date IS NULL )
+				OR       ( start_date IS NULL AND end_date >= $now )
+				OR       ( start_date <= $now AND end_date >= $now )
+				OR       ( start_date >= $now )
+					   )
+				";
 
-		$sql = "
-			SELECT id, title
-			FROM   civicrm_event
-			WHERE  is_active = 1
-			AND ( is_template = 0 OR is_template IS NULL )
-			AND    (
-					 ( start_date IS NULL AND end_date IS NULL )
-			OR       ( start_date <= $now AND end_date IS NULL )
-			OR       ( start_date IS NULL AND end_date >= $now )
-			OR       ( start_date <= $now AND end_date >= $now )
-			OR       ( start_date >= $now )
-				   )
-			";
-
-		$dao = CRM_Core_DAO::executeQuery( $sql );
-		$eventPages = array();
-		while ( $dao->fetch() ) {
-			$eventPages[$dao->id] = $dao->title;
-		}
+			$dao = CRM_Core_DAO::executeQuery( $sql );
+			$eventPages = array();
+			while ( $dao->fetch() ) {
+				$eventPages[$dao->id] = $dao->title;
+			}
 
 
-		$sql = "
-			SELECT g.id as id, g.title as title
-			FROM   civicrm_uf_group g, civicrm_uf_join j
-			WHERE  g.is_active = 1
-			AND    j.is_active = 1
-			AND    ( group_type LIKE '%Individual%'
-			   OR    group_type LIKE '%Contact%' )
-			AND    g.id = j.uf_group_id
-			AND    j.module = 'Profile'
-			";
+			$sql = "
+				SELECT g.id as id, g.title as title
+				FROM   civicrm_uf_group g, civicrm_uf_join j
+				WHERE  g.is_active = 1
+				AND    j.is_active = 1
+				AND    ( group_type LIKE '%Individual%'
+				   OR    group_type LIKE '%Contact%' )
+				AND    g.id = j.uf_group_id
+				AND    j.module = 'Profile'
+				";
 
-		$dao = CRM_Core_DAO::executeQuery( $sql );
-		$profilePages = array();
-		while ( $dao->fetch() ) {
-			$profilePages[$dao->id] = $dao->title;
-		}
+			$dao = CRM_Core_DAO::executeQuery( $sql );
+			$profilePages = array();
+			while ( $dao->fetch() ) {
+				$profilePages[$dao->id] = $dao->title;
+			}
 
-	  ?>
-		<div id="civicrm_frontend_pages" style="display:none;">
-			<div class="wrap">
-				<div>
-					<div style="padding:15px 15px 0 15px;">
-						<h3 style="color:#5A5A5A!important; font-family:Georgia,Times New Roman,Times,serif!important; font-size:1.8em!important; font-weight:normal!important;">
-						<?php echo $title; ?>
-						</h3>
-						<span>
+		  ?>
+			<div id="civicrm_frontend_pages" style="display:none;">
+				<div class="wrap">
+					<div>
+						<div style="padding:15px 15px 0 15px;">
+							<h3 style="color:#5A5A5A!important; font-family:Georgia,Times New Roman,Times,serif!important; font-size:1.8em!important; font-weight:normal!important;">
 							<?php echo $title; ?>
-						</span>
-					</div>
-					<div style="padding:15px 15px 0 15px;">
-						<select id="add_civicomponent_id">
-							<option value=""><?php _e( 'Select a frontend element.', 'civicrm-wordpress' ); ?></option>
-							<option value="contribution"><?php _e( 'Contribution Page', 'civicrm-wordpress' ); ?></option>
-							<option value="event"><?php _e( 'Event Page', 'civicrm-wordpress' ); ?></option>
-							<option value="profile"><?php _e( 'Profile', 'civicrm-wordpress' ); ?></option>
-							<option value="user-dashboard"><?php _e( 'User Dashboard', 'civicrm-wordpress' ); ?></option>
-						</select>
-
-						 <span id="contribution-section" style="display:none;">
-							<select id="add_contributepage_id">
-							<?php
-							  foreach ($contributionPages as $key => $value) { ?>
-								<option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
-								<?php
-							  }
-							  ?>
+							</h3>
+							<span>
+								<?php echo $title; ?>
+							</span>
+						</div>
+						<div style="padding:15px 15px 0 15px;">
+							<select id="add_civicomponent_id">
+								<option value=""><?php _e( 'Select a frontend element.', 'civicrm-wordpress' ); ?></option>
+								<option value="contribution"><?php _e( 'Contribution Page', 'civicrm-wordpress' ); ?></option>
+								<option value="event"><?php _e( 'Event Page', 'civicrm-wordpress' ); ?></option>
+								<option value="profile"><?php _e( 'Profile', 'civicrm-wordpress' ); ?></option>
+								<option value="user-dashboard"><?php _e( 'User Dashboard', 'civicrm-wordpress' ); ?></option>
 							</select>
-						</span>
 
-						<span id="event-section" style="display:none;">
-							<select id="add_eventpage_id">
-							<?php
-							  foreach ($eventPages as $key => $value) { ?>
-								<option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+							 <span id="contribution-section" style="display:none;">
+								<select id="add_contributepage_id">
 								<?php
-							  }
-							  ?>
-							</select>
-						</span>
-						<br>
-						<span id="action-section-event" style="display:none;">
-						   <div style="padding:15px 15px 0 15px;">
-							<input type="radio" name="event_action" value="info" checked="checked" /> <?php _e( 'Event Info Page', 'civicrm-wordpress' ); ?>
-							<input type="radio" name="event_action" value="register" /> <?php _e( 'Event Registration Page', 'civicrm-wordpress' ); ?>
-						   </div>
-						</span>
-						<br/>
-						<span id="component-section" style="display:none;">
-						   <div style="padding:15px 15px 0 15px;">
-							<input type="radio" name="component_mode" value="live" checked="checked"/> <?php _e( 'Live Page', 'civicrm-wordpress' ); ?>
-							<input type="radio" name="component_mode" value="test" /> <?php _e( 'Test Drive', 'civicrm-wordpress' ); ?>
-						   </div>
-						</span>
-						<br/>
+								  foreach ($contributionPages as $key => $value) { ?>
+									<option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+									<?php
+								  }
+								  ?>
+								</select>
+							</span>
 
-						<span id="profile-section" style="display:none;">
-						   <select id="add_profilepage_id">
-						   <?php
-							 foreach ($profilePages as $key => $value) { ?>
-							   <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+							<span id="event-section" style="display:none;">
+								<select id="add_eventpage_id">
+								<?php
+								  foreach ($eventPages as $key => $value) { ?>
+									<option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+									<?php
+								  }
+								  ?>
+								</select>
+							</span>
+							<br>
+							<span id="action-section-event" style="display:none;">
+							   <div style="padding:15px 15px 0 15px;">
+								<input type="radio" name="event_action" value="info" checked="checked" /> <?php _e( 'Event Info Page', 'civicrm-wordpress' ); ?>
+								<input type="radio" name="event_action" value="register" /> <?php _e( 'Event Registration Page', 'civicrm-wordpress' ); ?>
+							   </div>
+							</span>
+							<br/>
+							<span id="component-section" style="display:none;">
+							   <div style="padding:15px 15px 0 15px;">
+								<input type="radio" name="component_mode" value="live" checked="checked"/> <?php _e( 'Live Page', 'civicrm-wordpress' ); ?>
+								<input type="radio" name="component_mode" value="test" /> <?php _e( 'Test Drive', 'civicrm-wordpress' ); ?>
+							   </div>
+							</span>
+							<br/>
+
+							<span id="profile-section" style="display:none;">
+							   <select id="add_profilepage_id">
 							   <?php
-							}
-							?>
-						   </select>
-						</span>
-						<br/>
+								 foreach ($profilePages as $key => $value) { ?>
+								   <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+								   <?php
+								}
+								?>
+							   </select>
+							</span>
+							<br/>
 
-						<span id="profile-mode-section" style="display:none;">
-						   <div style="padding:15px 15px 0 15px;">
-							<input type="radio" name="profile_mode" value="create" checked="checked"/> <?php _e( 'Create', 'civicrm-wordpress' ); ?>
-							<input type="radio" name="profile_mode" value="edit" /> <?php _e( 'Edit', 'civicrm-wordpress' ); ?>
-							<input type="radio" name="profile_mode" value="edit" /> <?php _e( 'View', 'civicrm-wordpress' ); ?>
-						   </div>
-						</span>
+							<span id="profile-mode-section" style="display:none;">
+							   <div style="padding:15px 15px 0 15px;">
+								<input type="radio" name="profile_mode" value="create" checked="checked"/> <?php _e( 'Create', 'civicrm-wordpress' ); ?>
+								<input type="radio" name="profile_mode" value="edit" /> <?php _e( 'Edit', 'civicrm-wordpress' ); ?>
+								<input type="radio" name="profile_mode" value="edit" /> <?php _e( 'View', 'civicrm-wordpress' ); ?>
+							   </div>
+							</span>
 
-						<div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php _e( "Can't find your form? Make sure it is active.", 'civicrm-wordpress' ); ?></div>
-					</div>
-					<div style="padding:15px;">
-					  <input type="button" class="button-primary" value="Insert Form" id="crm-wp-insert-shortcode"/>&nbsp;&nbsp;&nbsp;
-					  <a class="button" style="color:#bbb;" href="#" onclick="tb_remove(); return false;"><?php _e( 'Cancel', 'civicrm-wordpress' ); ?></a>
+							<div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php _e( "Can't find your form? Make sure it is active.", 'civicrm-wordpress' ); ?></div>
+						</div>
+						<div style="padding:15px;">
+						  <input type="button" class="button-primary" value="Insert Form" id="crm-wp-insert-shortcode"/>&nbsp;&nbsp;&nbsp;
+						  <a class="button" style="color:#bbb;" href="#" onclick="tb_remove(); return false;"><?php _e( 'Cancel', 'civicrm-wordpress' ); ?></a>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 
-	<?php
+		<?php
+		
+		}
+	
 	}
 
 
