@@ -384,6 +384,43 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
 
+  /*
+   * Webtest for CRM-10983
+   *
+   */
+  function testCheckDuplicateCustomDataLoad() {
+    $this->webtestLogin();
+
+    $customSets = array(
+      array('entity' => 'ParticipantEventType', 'subEntity' => '- Any -',
+        'triggerElement' => array('name' => "event_id", 'type' => "select")),
+      array('entity' => 'ParticipantEventName', 'subEntity' => '- Any -',
+        'triggerElement' => array('name' => "event_id", 'type' => "select")),
+      array('entity' => 'ParticipantEventName', 'subEntity' => 'Rain-forest Cup Youth Soccer Tournament',
+        'triggerElement' => array('name' => "event_id", 'type' => "select")),
+      array('entity' => 'ParticipantRole', 'subEntity' => '- Any -','triggerElement' => array('type' => "checkbox")),
+      array('entity' => 'ParticipantRole', 'subEntity' => 'Volunteer','triggerElement' => array('type' => "checkbox"))
+    );
+
+    $return = $this->addCustomGroupField($customSets);
+
+    $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
+
+    // Select event.
+    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+
+    // Select role.
+    $this->click('role_id[2]');
+
+    foreach($return as $values) {
+      foreach ($values as $entityType => $customData) {
+        //checking for duplicate custom data present or not
+        $this->assertElementPresent("xpath=//div[@id='{$customData['cgtitle']}'][@class='crm-accordion-wrapper ']");
+        $this->assertEquals(1, $this->getXpathCount("//div[@id='{$customData['cgtitle']}'][@class='crm-accordion-wrapper ']"));
+      }
+    }
+  }
+
   function _fillParticipantDetails($firstName, $lastName, $processorId) {
     $this->select("id=profiles_1", "label=New Individual");
     $this->waitForElementPresent('_qf_Edit_next');
