@@ -219,7 +219,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->_lineItemParticipantsCount = array();
     }
     $this->_availableRegistrations = $this->get('availableRegistrations');
-    $this->_totalParticipantCount = $this->get('totalParticipantcount');
     $this->_participantIDS = $this->get('participantIDs');
 
     //check if participant allow to walk registration wizard.
@@ -448,9 +447,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if ($pcpId) {
       $pcp             = CRM_PCP_BAO_PCP::handlePcp($pcpId, 'event', $this->_values['event']);
       $this->_pcpId    = $pcp['pcpId'];
-      $this->_pcpBlock = $pcp['pcpBlock'];
-      $this->_pcpInfo  = $pcp['pcpInfo'];
-      $this->_values['event']['intro_text'] = CRM_Utils_Array::value('intro_text', $this->_pcpInfo);
+      $this->_values['event']['intro_text'] = CRM_Utils_Array::value('intro_text', $pcp['pcpInfo']);
     }
 
     // assign all event properties so wizard templates can display event info.
