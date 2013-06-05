@@ -116,7 +116,9 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     parent::buildQuickForm();
     $this->add('text', 'title', ts('Reminder Name'),
       array(
-        'size' => 45, 'maxlength' => 128), TRUE
+        'size' => 45,
+        'maxlength' => 128
+      ), TRUE
     );
 
     $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection($this->_mappingID);
@@ -166,7 +168,10 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $this->add('select', 'end_date', ts('Date Field'), $sel4, TRUE);
 
     $recipient = 'event_contacts';
-    $this->add('select', 'recipient', ts('Limit Recipients'), $sel5[$recipient],
+    $limitOptions = array(1 => ts('Limit to'), 0 => ts('Addition to'));
+    $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions);
+
+    $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
       FALSE, array('onClick' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
     $recipientListing = $this->add('select', 'recipient_listing', ts('Recipient Listing'),
@@ -174,14 +179,14 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     );
     $recipientListing->setMultiple(TRUE);
 
-    //autocomplete url
+    //auto-complete url
     $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
       "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=activity&reset=1",
       FALSE, NULL, FALSE
     );
 
     $this->assign('dataUrl', $dataUrl);
-    //tokeninput url
+    //token input url
     $tokenUrl = CRM_Utils_System::url('civicrm/ajax/checkemail',
       'noemail=1',
       FALSE, NULL, FALSE
@@ -255,20 +260,24 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
       'subject',
       'absolute_date',
       'group_id',
-      'record_activity'
+      'record_activity',
+      'limit_to'
     );
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $values);
     }
 
     $moreKeys = array(
-      'start_action_offset', 'start_action_unit',
-      'start_action_condition', 'start_action_date',
+      'start_action_offset',
+      'start_action_unit',
+      'start_action_condition',
+      'start_action_date',
       'repetition_frequency_unit',
       'repetition_frequency_interval',
       'end_frequency_unit',
       'end_frequency_interval',
-      'end_action', 'end_date',
+      'end_action',
+      'end_date',
     );
 
     if ($absoluteDate = CRM_Utils_Array::value('absolute_date', $params)) {
