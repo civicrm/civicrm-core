@@ -998,7 +998,7 @@ class CiviCRM_For_WordPress {
 	 * Callback function for 'profile_update' hook
 	 * 
 	 * CMW: seems to (wrongly) create new CiviCRM Contact every time a user changes their
-	 * first_name or last_name attributes
+	 * first_name or last_name attributes in WordPress.
 	 */
 	public function update_user( $userID ) {
 
@@ -1021,7 +1021,7 @@ class CiviCRM_For_WordPress {
 			);
 			
 			/*
-			// synchronizeUFMatch returns the contact object
+			// IN progress: synchronizeUFMatch does return the contact object, however
 			$civi_contact = CRM_Core_BAO_UFMatch::synchronizeUFMatch(
 				$user, // user object
 				$user->ID, // ID
@@ -1030,6 +1030,9 @@ class CiviCRM_For_WordPress {
 				'WordPress' // CMS
 				'Individual' // contact type
 			);
+			
+			// now we can allow other plugins to do their thing
+			do_action( 'civicrm_contact_synced', $user, $civi_contact );
 			*/
 
 		}
@@ -1053,7 +1056,7 @@ class CiviCRM_For_WordPress {
 		}
 
 		// Minimum capabilities (Civicrm permissions) arrays
-		$min_capabilities =  array(
+		$default_min_capabilities =  array(
 			'access_civimail_subscribe_unsubscribe_pages' => 1,
 			'access_all_custom_data' => 1,
 			'access_uploaded_files' => 1,
@@ -1066,6 +1069,9 @@ class CiviCRM_For_WordPress {
 			'sign_civicrm_petition' => 1,
 			'view_public_civimail_content' => 1,
 		);
+
+		// allow other plugins to filter
+		$min_capabilities = apply_filters( 'civicrm_min_capabilities', $default_min_capabilities );
 
 		// Assign the Minimum capabilities (Civicrm permissions) to all WP roles
 		foreach ( $wp_roles->role_names as $role => $name ) {
@@ -1104,7 +1110,7 @@ class CiviCRM_For_WordPress {
 		}
 
 		// give access to civicrm page menu link to particular roles
-		$roles = array( 'super admin', 'administrator' );
+		$roles = apply_filters( 'civicrm_access_roles', array( 'super admin', 'administrator' ) );
 		foreach ( $roles as $role ) {
 			$roleObj = $wp_roles->get_role( $role );
 			if (
