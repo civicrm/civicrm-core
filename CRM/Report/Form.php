@@ -199,7 +199,6 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_sections = NULL;
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
   protected $_absoluteUrl = FALSE;
-  protected $_grandFlag   = FALSE;
 
   /**
    * To what frequency group-by a date column
