@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -38,11 +37,6 @@
  */
 
 /**
- * Include utility functions
- */
-require_once 'CRM/Core/BAO/Tag.php';
-
-/**
  *  Add a Tag. Tags are used to classify CRM entities (including Contacts, Groups and Actions).
  *
  * Allowed @params array keys are:
@@ -70,7 +64,7 @@ function civicrm_api3_tag_create($params) {
   }
 
 /**
- * Specify Meta data for create. Note that this data is retrievable via the getfields function 
+ * Specify Meta data for create. Note that this data is retrievable via the getfields function
  * and is used for pre-filling defaults and ensuring mandatory requirements are met.
  */
 function _civicrm_api3_tag_create_spec(&$params) {

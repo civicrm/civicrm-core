@@ -7,7 +7,7 @@ VALUES
 
 SELECT @optGrpIdEngagementIndex := max(id) from civicrm_option_group where name = 'engagement_index';
 
-INSERT INTO civicrm_option_value 
+INSERT INTO civicrm_option_value
    (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, is_optgroup, is_reserved, is_active, component_id, visibility_id)
 VALUES
    (@optGrpIdEngagementIndex, {localize}'{ts escape="sql"}1{/ts}'{/localize}, 1, 1, NULL, 0, NULL, 1, 0, 0, 1, NULL, NULL),

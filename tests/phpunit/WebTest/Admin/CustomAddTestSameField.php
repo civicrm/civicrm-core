@@ -35,28 +35,28 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
   function testCustomSameFieldAdd() {
     $this->open($this->sboxPath);
     $this->webtestLogin();
-    
+
     $this->_testCustomAdd();
     $this->_testCustomAdd();
   }
-  
+
   function _testCustomAdd() {
     //CRM-7564 : Different gropus can contain same custom fields
-    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");   
+    $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //fill custom group title
     $customGroupTitle = 'custom_group' . substr(sha1(rand()), 0, 3);
     $this->click("title");
     $this->type("title", $customGroupTitle);
-    
+
     //custom group extends
     $this->click("extends[0]");
     $this->select("extends[0]", "label=Contacts");
     $this->click("//option[@value='Contact']");
     $this->click("//form[@id='Group']/div[2]/div[3]/span[1]/input");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     //Is custom group created?
     $this->assertTrue($this->isTextPresent("Your custom field set '$customGroupTitle' has been added. You can add custom fields now."));
     //add custom field - alphanumeric text
@@ -71,7 +71,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->click("data_type[1]");
     $this->select("data_type[1]", "label=CheckBox");
     $this->click("//option[@value='CheckBox']");
-    
+
     $checkboxFieldLabel = 'test_checkbox';
     $this->type("label", $checkboxFieldLabel);
     $checkboxOptionLabel1 = 'check1';
@@ -88,32 +88,32 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $checkboxOptionLabel4 = 'check4';
     $this->type("option_label_4", $checkboxOptionLabel4);
     $this->type("option_value_4", "4");
-    
+
     //enter options per line
     $this->type("options_per_line", "2");
-    
+
     //enter pre help message
     $this->type("help_pre", "this is field pre help");
 
     //enter post help message
     $this->type("help_post", "this field post help");
-    
+
     //Is searchable?
     $this->click("is_searchable");
-    
+
     //clicking save
     $this->click("_qf_Field_next_new-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     //Is custom field created?
     $this->assertTrue($this->isTextPresent("Your custom field '$checkboxFieldLabel' has been saved."));
-    
+
     //add custom field - alphanumeric text
     $textFieldLabel = 'test_text_field';
     $this->click("header");
     $this->type("label", $textFieldLabel);
     $this->click("_qf_Field_next_new-bottom");
-  
+
     // Same group will not contain same custome fields so will show error for this field :
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("data_type[0]");
@@ -124,7 +124,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->click("//option[@value='CheckBox']");
     //Is custom field created
     $this->assertTrue($this->isTextPresent("Custom field '$textFieldLabel' already exists in Database."));
-    
+
     //create another custom field - Number Radio
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=2");
@@ -132,7 +132,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->click("data_type[1]");
     $this->select("data_type[1]", "value=Radio");
     $this->click("//option[@value='Radio']");
-    
+
     $radioFieldLabel = 'test_radio';
     $this->type("label", $radioFieldLabel);
     $radioOptionLabel1 = 'radio1';
@@ -141,26 +141,26 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $radioOptionLabel2 = 'radio2';
     $this->type("option_label_2", $radioOptionLabel2);
     $this->type("option_value_2", "2");
-    
+
     //select options per line
     $this->type("options_per_line", "3");
-    
+
     //enter pre help msg
     $this->type("help_pre", "this is field pre help");
-    
+
     //enter post help msg
     $this->type("help_post", "this is field post help");
-    
+
     //Is searchable?
     $this->click("is_searchable");
-    
+
     //clicking save
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved.")); 
-    
-  } 
+    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved."));
+
+  }
 }
 

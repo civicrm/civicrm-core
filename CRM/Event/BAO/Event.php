@@ -495,7 +495,7 @@ LIMIT      0, 10
       $eventSummary['events'][$dao->id]['is_subevent'] = $dao->slot_label_id;
       $eventSummary['events'][$dao->id]['is_pcp_enabled'] = $dao->is_pcp_enabled;
       $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
-      
+
       $statusTypes = CRM_Event_PseudoConstant::participantStatus();
       foreach ($statusValues as $statusId => $statusValue) {
         if (!array_key_exists($statusId, $statusTypes)) {
@@ -866,23 +866,7 @@ WHERE civicrm_event.is_active = 1
          $fieldsFix
        );
     }
-    $priceSetId = CRM_Price_BAO_Set::getFor('civicrm_event', $id);
-    if ($priceSetId) {
-      $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $priceSetId, 'is_quick_config');
-      if(!$isQuickConfig) {
-        $copyPriceSet = &CRM_Price_BAO_Set::copy($priceSetId);
-        CRM_Price_BAO_Set::addTo('civicrm_event', $copyEvent->id, $copyPriceSet->id);
-      } else {
-        $copyPriceSet = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_SetEntity',
-          array(
-            'entity_id' => $id,
-            'entity_table' => 'civicrm_event',
-          ),
-          array('entity_id' => $copyEvent->id)
-        );
-      }
-    }
-
+    CRM_Price_BAO_Set::copyPriceSet('civicrm_event', $id, $copyEvent->id);
     $copyUF = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
       array(
         'entity_id' => $id,
@@ -1354,7 +1338,7 @@ WHERE civicrm_event.is_active = 1
         }
       }
       $customVal     = '';
-      $imProviders   = CRM_Core_PseudoConstant::IMProvider();
+      $imProviders   = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
       //start of code to set the default values
       foreach ($fields as $name => $field) {
         $skip = FALSE;
@@ -1396,15 +1380,15 @@ WHERE civicrm_event.is_active = 1
           }
         }
         elseif ('gender' == substr($name, 0, 6)) {
-          $gender = CRM_Core_PseudoConstant::gender();
+          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
           $values[$index] = $gender[$params[$name]];
         }
         elseif ('individual_prefix' == substr($name, 0, 17)) {
-          $prefix = CRM_Core_PseudoConstant::individualPrefix();
+          $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
           $values[$index] = $prefix[$params[$name]];
         }
         elseif ('individual_suffix' == substr($name, 0, 17)) {
-          $suffix = CRM_Core_PseudoConstant::individualSuffix();
+          $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
           $values[$index] = $suffix[$params[$name]];
         }
         elseif (in_array($name, array(
@@ -1414,7 +1398,7 @@ WHERE civicrm_event.is_active = 1
           $values[$index]  = $greeting[$params[$name]];
         }
         elseif ($name === 'preferred_communication_method') {
-          $communicationFields = CRM_Core_PseudoConstant::pcm();
+          $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
           $compref             = array();
           $pref                = $params[$name];
           if (is_array($pref)) {
@@ -1441,7 +1425,7 @@ WHERE civicrm_event.is_active = 1
         }
         elseif ($name == 'tag') {
           $entityTags = $params[$name];
-          $allTags    = CRM_Core_PseudoConstant::tag();
+          $allTags    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
           $title      = array();
           if (is_array($entityTags)) {
             foreach ($entityTags as $tagId => $dontCare) {

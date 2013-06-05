@@ -167,7 +167,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       // also check for billing information
       // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       // CRM-8108 remove ts around Billing location type
       //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
       $this->_bltID = array_search('Billing', $locationTypes);
@@ -235,7 +235,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/Membership.js');
         }
       }
-      else { 
+      else {
         $resources = CRM_Core_Resources::singleton();
         $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/MembershipStandalone.js');
         $statuses = array();
@@ -766,7 +766,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       // causes a conflict in standalone mode so skip in standalone for now
       $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
       $this->add( 'select', 'honor_type_id', ts('Membership payment is : '),
-                        array( '' => ts( '-') ) + CRM_Core_PseudoConstant::honor() );
+                        array( '' => ts( '-') ) + CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id') );
       CRM_Contact_Form_NewContact::buildQuickForm($this,1, null, false,'contribution_');
     }
 

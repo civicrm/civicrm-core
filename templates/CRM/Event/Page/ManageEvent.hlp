@@ -47,7 +47,7 @@
 <p>{ts}By default, both methods get all events whose starting date is greater than or equal to the current date. However, you can modify this by passing additional parameters in the URL:{/ts}</p>
 <ul>
 <li>{ts}start=YYYYMMDD - Specify a different starting date range for the events to be listed.{/ts}</li>
-<li>{ts}type=N - Specify a particular Event Type using the event_type_id value. (You can find these values by browsing the listing at Administer CiviCRM &raquo; CiviEvent &raquo; Event Types.){/ts}</li>
+<li>{ts}type=N - Specify a particular Event Type using the event_type_id value. (You can find these values by browsing the listing at Administer &raquo; CiviEvent &raquo; Event Types.){/ts}</li>
 </ul>
 <p>{ts}EXAMPLE: Given the default event types, this URL will retrieve all events with start dates on or after January 1, 2007 whose event type is 'Fundraiser':{/ts}</p>
 <pre>

@@ -429,8 +429,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $this->fail('ID not populated. Please fix your assertDBState usage!!!');
     }
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-    eval('$object   = new ' . $daoName . '( );');
+    $object = new $daoName();
     $object->id = $id;
     $verifiedCount = 0;
 
@@ -676,19 +675,23 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   private function _contactCreate($params) {
     $params['version'] = API_LATEST_VERSION;
-    $result = civicrm_api('Contact', 'create', $params);
+    $params['debug'] = 1;
+    $result = civicrm_api('contact', 'create', $params);
     if (CRM_Utils_Array::value('is_error', $result) ||
       !CRM_Utils_Array::value('id', $result)
     ) {
-      throw new Exception('Could not create test contact, with message: ' . CRM_Utils_Array::value('error_message', $result));
+      throw new Exception('Could not create test contact, with message: ' . CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . CRM_Utils_Array::value('trace', $result));
     }
     return $result['id'];
   }
 
   function contactDelete($contactID) {
-    $params['id'] = $contactID;
-    $params['version'] = API_LATEST_VERSION;
-    $params['skip_undelete'] = 1;
+    $params = array(
+      'id' => $contactID,
+      'version' => API_LATEST_VERSION,
+      'skip_undelete' => 1,
+      'debug' => 1,
+    );
     $domain = new CRM_Core_BAO_Domain;
     $domain->contact_id = $contactID;
     if ($domain->find(TRUE)) {
@@ -696,9 +699,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       //since this is mainly for cleanup lets put a safeguard here
       return;
     }
-    $result = civicrm_api('Contact', 'delete', $params);
+    $result = civicrm_api('contact', 'delete', $params);
     if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not delete contact, with message: ' . CRM_Utils_Array::value('error_message', $result));
+      throw new Exception('Could not delete contact, with message: ' . CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . CRM_Utils_Array::value('trace', $result));
     }
     return;
   }
@@ -1443,7 +1446,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $locationType->copyValues($params);
     $locationType->save();
     // clear getfields cache
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
     civicrm_api('phone', 'getfields', array('version' => 3, 'cache_clear' => 1));
     return $locationType;
   }
@@ -2303,6 +2306,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if ($this->origExtensionSystem !== NULL) {
       CRM_Extension_System::setSingleton($this->origExtensionSystem);
       $this->origExtensionSystem = NULL;
+    }
+  }
+
+  function financialAccountDelete($name) {
+    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
+    $financialAccount->name = $name;
+    if($financialAccount->find(TRUE)) {
+      $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount();
+      $entityFinancialType->financial_account_id = $financialAccount->id;
+      $entityFinancialType->delete();
+      $financialAccount->delete();
     }
   }
 }

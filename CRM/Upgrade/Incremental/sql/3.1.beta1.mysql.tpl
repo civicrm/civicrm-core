@@ -16,13 +16,13 @@
 {/if}
 
 --  CRM-5435
-ALTER TABLE `civicrm_contribution_soft` 
+ALTER TABLE `civicrm_contribution_soft`
     ADD CONSTRAINT `FK_civicrm_contribution_soft_pcp_id` FOREIGN KEY (`pcp_id`) REFERENCES `civicrm_pcp` (`id`) ON DELETE SET NULL;
 
-ALTER TABLE `civicrm_contribution_soft` 
+ALTER TABLE `civicrm_contribution_soft`
     CHANGE `pcp_id` `pcp_id` int(10) unsigned default NULL COMMENT 'FK to civicrm_pcp.id';
 
-ALTER TABLE `civicrm_pcp_block`  
+ALTER TABLE `civicrm_pcp_block`
     ADD CONSTRAINT `FK_civicrm_pcp_block_supporter_profile_id` FOREIGN KEY (`supporter_profile_id`) REFERENCES `civicrm_uf_group` (`id`) ON DELETE SET NULL;
 
 ALTER TABLE `civicrm_pcp_block`
@@ -45,30 +45,30 @@ ALTER TABLE `civicrm_pcp_block`
 -- CRM-5333
 -- Delete duplicate records in target and assignment exists if any
 
-DELETE cat.* FROM civicrm_activity_target cat 
-             INNER JOIN ( SELECT id, activity_id, target_contact_id 
-                          FROM civicrm_activity_target 
-                          GROUP BY activity_id, target_contact_id HAVING count(*) > 1 ) dup_cat 
-                     ON ( cat.activity_id = dup_cat.activity_id 
-                          AND cat.target_contact_id = dup_cat.target_contact_id 
+DELETE cat.* FROM civicrm_activity_target cat
+             INNER JOIN ( SELECT id, activity_id, target_contact_id
+                          FROM civicrm_activity_target
+                          GROUP BY activity_id, target_contact_id HAVING count(*) > 1 ) dup_cat
+                     ON ( cat.activity_id = dup_cat.activity_id
+                          AND cat.target_contact_id = dup_cat.target_contact_id
                           AND cat.id <> dup_cat.id );
 
-DELETE caa.* FROM civicrm_activity_assignment caa 
-              INNER JOIN ( SELECT id, activity_id, assignee_contact_id 
-                           FROM civicrm_activity_assignment 
-                           GROUP BY activity_id, assignee_contact_id HAVING count(*) > 1 ) dup_caa 
-                      ON ( caa.activity_id = dup_caa.activity_id 
-                           AND caa.assignee_contact_id = dup_caa.assignee_contact_id 
+DELETE caa.* FROM civicrm_activity_assignment caa
+              INNER JOIN ( SELECT id, activity_id, assignee_contact_id
+                           FROM civicrm_activity_assignment
+                           GROUP BY activity_id, assignee_contact_id HAVING count(*) > 1 ) dup_caa
+                      ON ( caa.activity_id = dup_caa.activity_id
+                           AND caa.assignee_contact_id = dup_caa.assignee_contact_id
                            AND caa.id <> dup_caa.id );
 
 
 -- Drop unique indexes of activity_target and activity_assignment
 
-ALTER TABLE  civicrm_activity_assignment 
+ALTER TABLE  civicrm_activity_assignment
 DROP INDEX `UI_activity_assignee_contact_id` ,
 ADD UNIQUE INDEX `UI_activity_assignee_contact_id` (`assignee_contact_id`,`activity_id`);
 
-ALTER TABLE  civicrm_activity_target 
+ALTER TABLE  civicrm_activity_target
 DROP INDEX `UI_activity_target_contact_id` ,
 ADD UNIQUE INDEX `UI_activity_target_contact_id` (`target_contact_id`,`activity_id`);
 

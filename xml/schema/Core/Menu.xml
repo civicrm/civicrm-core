@@ -103,10 +103,15 @@
     <add>2.1</add>
   </field>
   <field>
-       <name>component_id</name>
-       <type>int unsigned</type>
-       <comment>Component that this menu item belongs to</comment>
-       <add>2.1</add>
+    <name>component_id</name>
+    <type>int unsigned</type>
+    <comment>Component that this menu item belongs to</comment>
+    <add>2.1</add>
+    <pseudoconstant>
+      <table>civicrm_component</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
        <name>component_id</name>

@@ -132,7 +132,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     $this->assertEquals($activity->subject, 'Scheduling Meeting', 'Verify activity subject is correct.');
     $this->assertEquals($activity->activity_type_id, 2, 'Verify activity type id is correct.');
-    $this->assertEquals($activity->source_contact_id, $contactId, 'Verify source contact id is correct.');
+    $this->assertEquals($defaults['source_contact_id'], $contactId, 'Verify source contact id is correct.');
 
     $this->assertEquals($defaults['subject'], 'Scheduling Meeting', 'Verify activity subject is correct.');
     $this->assertEquals($defaults['activity_type_id'], 2, 'Verify activity type id is correct.');

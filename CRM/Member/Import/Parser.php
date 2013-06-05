@@ -447,7 +447,7 @@ abstract class CRM_Member_Import_Parser {
             $this->_activeFields[$i]->_hasLocationType = $elements[$i];
         }
     }
-    
+
     function setActiveFieldPhoneTypes( $elements ) {
         for ($i = 0; $i < count( $elements ); $i++) {
             $this->_activeFields[$i]->_phoneType = $elements[$i];
@@ -545,7 +545,7 @@ abstract class CRM_Member_Import_Parser {
         $this->_fields[$name] = new CRM_Member_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
       }
       else {
-        $this->_fields[$name] = new CRM_Import_Field($name, $title, $type, $headerPattern, $dataPattern,
+        $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern,
           CRM_Utils_Array::value('hasLocationType', $tempField[$name])
         );
       }
@@ -675,17 +675,17 @@ abstract class CRM_Member_Import_Parser {
     }
 
     foreach ($values as $k => $v) {
-      $values[$k] = preg_replace("/^$enclosure(.*) $enclosure$/", '$1', $v);
+      $values[$k] = preg_replace("/^$enclosure(.*)$enclosure$/", '$1', $v);
     }
   }
 
   function errorFileName($type) {
-    $fileName = CRM_Import_Parser::errorFileName($type);
+    $fileName = CRM_Contact_Import_Parser::errorFileName($type);
     return $fileName;
   }
 
   function saveFileName($type) {
-    $fileName = CRM_Import_Parser::saveFileName($type);
+    $fileName = CRM_Contact_Import_Parser::saveFileName($type);
     return $fileName;
   }
 }

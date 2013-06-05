@@ -93,11 +93,13 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
       $limitClause = " LIMIT 0, $limit";
       $orderClause = " ORDER BY g.cache_date, g.refresh_date";
     }
+    // We ignore hidden groups and disabled groups
     $query = "
 SELECT  g.id
 FROM    civicrm_group g
-WHERE   ( g.saved_search_id IS NOT NULL OR
-          g.children IS NOT NULL )
+WHERE   ( g.saved_search_id IS NOT NULL OR g.children IS NOT NULL )
+AND     ( g.is_hidden = 0 OR g.is_hidden IS NULL )
+AND     g.is_active = 1
 AND     ( g.cache_date IS NULL OR
           ( TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout ) OR
           ( $now >= g.refresh_date )
@@ -124,7 +126,7 @@ AND     ( g.cache_date IS NULL OR
 
     if (!empty($refreshGroupIDs)) {
       $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDs));
-      $time  = CRM_Utils_Date::getUTCTime('YmdHis', $smartGroupCacheTimeout * 60);
+      $time  = CRM_Utils_Date::getUTCTime($smartGroupCacheTimeout * 60);
       $query = "
 UPDATE civicrm_group g
 SET    g.refresh_date = $time
@@ -233,7 +235,7 @@ WHERE  id IN ( $groupIDs )
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
 
     $now         = CRM_Utils_Date::getUTCTime();
-    $refreshTime = CRM_Utils_Date::getUTCTime('YmdHis', $smartGroupCacheTimeout * 60);
+    $refreshTime = CRM_Utils_Date::getUTCTime($smartGroupCacheTimeout * 60);
 
     if (!isset($groupID)) {
       if ($smartGroupCacheTimeout == 0) {
@@ -447,7 +449,17 @@ AND  civicrm_group_contact.group_id = $groupID ";
     return 5;
   }
 
-  static function contactGroup($contactID) {
+  /**
+   * Get all the smart groups that this contact belongs to
+   * Note that this could potentially be a super slow function since
+   * it ensure that all contact groups are loaded in the cache
+   *
+   * @param int     $contactID
+   * @param boolean $showHidden - hidden groups are shown only if this flag is set
+   *
+   * @return array an array of groups that this contact belongs to
+   */
+  static function contactGroup($contactID, $showHidden = FALSE) {
     if (empty($contactID)) {
       return;
     }
@@ -461,12 +473,18 @@ AND  civicrm_group_contact.group_id = $groupID ";
 
     self::loadAll();
 
+    $hiddenClause = '';
+    if (!$showHidden) {
+      $hiddenClause = ' AND (g.is_hidden = 0 OR g.is_hidden IS NULL) ';
+    }
+
     $contactIDString = CRM_Core_DAO::escapeString(implode(', ', $contactIDs));
     $sql = "
 SELECT     gc.group_id, gc.contact_id, g.title, g.children, g.description
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
 WHERE      gc.contact_id IN ($contactIDString)
+           $hiddenClause
 ORDER BY   gc.contact_id, g.children
 ";
 

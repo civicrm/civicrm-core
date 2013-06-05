@@ -13,7 +13,7 @@ CREATE TABLE `civicrm_extension` (
     PRIMARY KEY ( `id` ) ,
     UNIQUE INDEX `UI_extension_full_name`(
         `full_name`
-    ), 
+    ),
     INDEX `UI_extension_name`(
         `name`
     )

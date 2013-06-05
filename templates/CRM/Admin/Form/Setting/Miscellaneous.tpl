@@ -73,10 +73,14 @@
                 <p class="description">{ts 1="http://code.google.com/p/wkhtmltopdf/"}<a href="%1">wkhtmltopdf is an alternative utility for generating PDF's</a> which may provide better performance especially if you are generating a large number of PDF letters or receipts. Your system administrator will need to download and install this utility, and enter the executable path here.{/ts}</p>
             </td>
         </tr>
+        <tr class="crm-miscellaneous-form-block-versionAlert">
+            <td class="label">{$form.versionAlert.label}</td>
+            <td>{$form.versionAlert.html}<br />
+                <p class="description">{ts}Displays an on-screen alert to users with "Administer CiviCRM" permissions when a new version of CiviCRM is available. This setting will only work if the "Version Check &amp; Statistics Reporting" setting is enabled.{/ts}</p></td>
+        </tr>
         <tr class="crm-miscellaneous-form-block-versionCheck">
             <td class="label">{$form.versionCheck.label}</td>
             <td>{$form.versionCheck.html}<br />
-                <p class="description">{ts}If enabled, CiviCRM automatically checks availablity of a newer version of the software. New version alerts will be displayed on the main CiviCRM Administration page.{/ts}</p>
                 <p class="description">{ts}When enabled, statistics about your CiviCRM installation are reported anonymously to the CiviCRM team to assist in prioritizing ongoing development efforts. The following information is gathered: CiviCRM version, versions of PHP, MySQL and framework (Drupal/Joomla/standalone), and default language. Counts (but no actual data) of the following record types are reported: contacts, activities, cases, relationships, contributions, contribution pages, contribution products, contribution widgets, discounts, price sets, profiles, events, participants, tell-a-friend pages, grants, mailings, memberships, membership blocks, pledges, pledge blocks and active payment processor types.{/ts}</p></td>
         </tr>
         <tr class="crm-miscellaneous-form-block-max_attachments">

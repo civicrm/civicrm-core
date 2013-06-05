@@ -249,11 +249,11 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-    
+
     while ($result->fetch()) {
       $row = array();
 
@@ -300,7 +300,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         ($bulkActivityTypeID == $activityTypeId)
       ) {
         $row['mailingId'] = CRM_Utils_System::url('civicrm/mailing/report',
-          "mid={$result->source_record_id}&reset=1&cid={$result->source_contact_id}&context=activitySelector"
+          "mid={$result->source_record_id}&reset=1&cid={$contactId}&context=activitySelector"
         );
         $row['recipients'] = ts('(recipients)');
         $row['target_contact_name'] = '';

@@ -42,9 +42,10 @@
  * Initialize CiviCRM - should be run at the start of each API function
  */
 function _civicrm_api3_initialize() {
-  require_once 'CRM/Core/Config.php';
-  $config = CRM_Core_Config::singleton();
-  }
+  require_once 'CRM/Core/ClassLoader.php';
+  CRM_Core_ClassLoader::singleton()->register();
+  CRM_Core_Config::singleton();
+}
 
 /**
  * Wrapper Function for civicrm_verify_mandatory to make it simple to pass either / or fields for checking
@@ -182,18 +183,13 @@ function civicrm_api3_create_success($values = 1, $params = array(
       if (empty($item['id']) && !empty($item[$entity . "_id"])) {
         $values[$key]['id'] = $item[$entity . "_id"];
       }
+      if(!empty($item['financial_type_id'])){
+        $values[$key]['contribution_type_id'] = $item['financial_type_id'];
+      }
     }
   }
   //if ( array_key_exists ('debug',$params) && is_object ($dao)) {
   if (is_array($params) && array_key_exists('debug', $params)) {
-    if (!is_object($dao)) {
-      $d = _civicrm_api3_get_DAO(CRM_Utils_Array::value('entity', $params));
-      if (!empty($d)) {
-        $file = str_replace('_', '/', $d) . ".php";
-        require_once ($file);
-        $dao = new $d();
-      }
-    }
     if (is_string($action) && $action != 'getfields') {
       $apiFields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => $action) + $params);
     }
@@ -256,8 +252,6 @@ function _civicrm_api3_load_DAO($entity) {
   if (empty($dao)) {
     return FALSE;
   }
-  $file = str_replace('_', '/', $dao) . ".php";
-  require_once ($file);
   $d = new $dao();
   return $d;
 }
@@ -280,13 +274,13 @@ function _civicrm_api3_get_DAO($name) {
   }
 
   //hack to deal with incorrectly named BAO/DAO - see CRM-10859 - remove after rename
-  if($name == 'price_set'){
+  if($name == 'price_set' || $name == 'PriceSet'){
     return 'CRM_Price_DAO_Set';
   }
-  if($name == 'price_field'){
+  if($name == 'price_field' || $name == 'PriceField'){
     return 'CRM_Price_DAO_Field';
   }
-  if($name == 'price_field_value'){
+  if($name == 'price_field_value' || $name == 'PriceFieldValue'){
     return 'CRM_Price_DAO_FieldValue';
   }
   // these aren't listed on ticket CRM-10859 - but same problem - lack of standardisation
@@ -299,9 +293,7 @@ function _civicrm_api3_get_DAO($name) {
   if(strtolower($name) == 'im'){
     return 'CRM_Core_BAO_IM';
   }
-
-
-  return CRM_Core_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
+  return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
 }
 
 /**
@@ -540,7 +532,11 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
     }
     else {
       if ($unique) {
-        $dao->$allfields[$field]['name'] = $params[$field];
+        $daoFieldName = $allfields[$field]['name'];
+        if (empty($daoFieldName)) {
+          throw new API_Exception("Failed to determine field name for \"$field\"");
+        }
+        $dao->{$daoFieldName} = $params[$field];
       }
       else {
         $dao->$field = $params[$field];
@@ -899,8 +895,6 @@ function _civicrm_api3_api_check_permission($entity, $action, &$params, $throw =
     return TRUE;
   }
 
-  require_once 'CRM/Core/Permission.php';
-
   require_once 'CRM/Core/DAO/permissions.php';
   $permissions = _civicrm_api3_permissions($entity, $action, $params);
 
@@ -1017,8 +1011,6 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  *
  */
 function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
-  require_once 'CRM/Core/BAO/CustomGroup.php';
-  require_once 'CRM/Core/BAO/CustomField.php';
   $groupTree = &CRM_Core_BAO_CustomGroup::getTree($entity,
     CRM_Core_DAO::$_nullObject,
     $entity_id,
@@ -1150,8 +1142,6 @@ function _civicrm_api3_validate_date(&$params, &$fieldname, &$fieldInfo) {
  * @param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_constraint(&$params, &$fieldname, &$fieldInfo) {
-  $file = str_replace('_', '/', $fieldInfo['FKClassName']) . ".php";
-  require_once ($file);
   $dao = new $fieldInfo['FKClassName'];
   $dao->id = $params[$fieldname];
   $dao->selectAdd();
@@ -1196,7 +1186,6 @@ function _civicrm_api3_validate_uniquekey(&$params, &$fieldname, &$fieldInfo) {
  */
 function _civicrm_api3_generic_replace($entity, $params) {
 
-  require_once 'CRM/Core/Transaction.php';
   $transaction = new CRM_Core_Transaction();
   try {
     if (!is_array($params['values'])) {
@@ -1271,8 +1260,6 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array(
   if (empty($dao)) {
     return array();
   }
-  $file = str_replace('_', '/', $dao) . ".php";
-  require_once ($file);
   $d = new $dao();
   $fields = $d->fields();
   // replace uniqueNames by the normal names as the key
@@ -1306,7 +1293,6 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array(
  * fields are prefixed with 'custom_' to represent api params
  */
 function _civicrm_api_get_custom_fields($entity, &$params) {
-  require_once 'CRM/Core/BAO/CustomField.php';
   $customfields = array();
   $entity = _civicrm_api_get_camel_name($entity);
   if (strtolower($entity) == 'contact') {
@@ -1459,7 +1445,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldname, &$fieldInfo, $ent
       $session = &CRM_Core_Session::singleton();
       $params[$fieldname] = $session->get('userID');
     }
-    if (CRM_Utils_Array::value('pseudoconstant', $fieldInfo) ) {
+    if (!empty($fieldInfo['options'])) {
       $constant = CRM_Utils_Array::value('options', $fieldInfo);
       if (is_numeric($params[$fieldname]) && !CRM_Utils_Array::value('FKClassName',$fieldInfo) && !array_key_exists($params[$fieldname], $fieldInfo['options'])) {
         throw new API_Exception("$fieldname is not valid", 2001, array('error_field' => $fieldname,"type"=>"integer"));
@@ -1513,7 +1499,15 @@ function _civicrm_api3_validate_html(&$params, &$fieldname, &$fieldInfo) {
  */
 function _civicrm_api3_validate_string(&$params, &$fieldname, &$fieldInfo) {
   // If fieldname exists in params
-  $value = (string) CRM_Utils_Array::value($fieldname, $params,'');
+  $value = CRM_Utils_Array::value($fieldname, $params, '');
+  if(!is_array($value)){
+    $value = (string) $value;
+  }
+  else{
+    //@todo what do we do about passed in arrays. For many of these fields
+    // the missing piece of functionality is separating them to a separated string
+    // & many save incorrectly. But can we change them wholesale?
+  }
   if ($value ) {
     if (!CRM_Utils_Rule::xssString($value)) {
       throw new Exception('Illegal characters in input (potential scripting attack)');
@@ -1529,7 +1523,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldname, &$fieldInfo) {
       $lowerCaseOptions = array_map("strtolower", $options);
       // If value passed is not a key, it may be a label
       // Try to lookup key from label - if it can't be found throw error
-      if (!isset($options[strtolower($value)]) && !isset($options[$value]) ) {
+      if (!is_array($value) && !isset($options[strtolower($value)]) && !isset($options[$value]) ) {
         if (!in_array(strtolower($value), $lowerCaseOptions)) {
           throw new Exception("$fieldname `$value` is not valid.");
         }

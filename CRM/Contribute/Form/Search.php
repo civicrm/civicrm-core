@@ -358,11 +358,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
 
     $this->fixFormValues();
 
-    // we don't show test contributions in Contact Summary / User Dashboard
-    // in Search mode by default we hide test contributions
-    if (!CRM_Utils_Array::value('contribution_test',
-        $this->_formValues
-      )) {
+    // We don't show test records in summaries or dashboards
+    if (empty($this->_formValues['contribution_test']) && $this->_force) {
       $this->_formValues["contribution_test"] = 0;
     }
 

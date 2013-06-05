@@ -27,12 +27,12 @@
 
 
 /*
- * This file checks and updates the status of all membership records for a given domain using the calc_membership_status and 
+ * This file checks and updates the status of all membership records for a given domain using the calc_membership_status and
  * update_contact_membership APIs.
  * It takes the first argument as the domain-id if specified, otherwise takes the domain-id as 1.
  *
- * IMPORTANT: 
- * We are using the default Domain FROM Name and FROM Email Address as the From email address for emails sent by this script.  
+ * IMPORTANT:
+ * We are using the default Domain FROM Name and FROM Email Address as the From email address for emails sent by this script.
  * Verify that this value has been properly set from Administer > Configure > Domain Information
  * If you want to use some other FROM email address, modify line 125 and set your valid email address.
  *

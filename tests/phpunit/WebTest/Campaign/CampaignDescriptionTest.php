@@ -82,5 +82,18 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $fetchedVaue = $this->getValue('description');
     $this->assertEquals($campaignDescription, $fetchedVaue);
   }
-}
 
+  function testAjaxCustomGroupLoad() {
+    $this->webtestLogin();
+
+    $this->enableComponents(array('CiviCampaign'));
+    $triggerElement = array('name' => 'campaign_type_id', 'type' => 'select');
+    $customSets = array(
+      array('entity' => 'Campaign', 'subEntity' => 'Referral Program', 'triggerElement' => $triggerElement),
+      array('entity' => 'Campaign', 'subEntity' => 'Constituent Engagement', 'triggerElement' => $triggerElement)
+    );
+
+    $pageUrl = array('url' => 'campaign/add', 'args' => 'reset=1');
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+}

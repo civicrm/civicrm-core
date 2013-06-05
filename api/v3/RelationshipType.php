@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -39,11 +38,6 @@
  */
 
 /**
- * Include common API util functions
- */
-require_once 'CRM/Contact/BAO/RelationshipType.php';
-
-/**
  * Function to create relationship type
  *
  * @param  array $params   Associative array of property name/value pairs to insert in new relationship type.
@@ -65,8 +59,6 @@ function civicrm_api3_relationship_type_create($params) {
     $params['label_b_a'] = $params['name_b_a'];
   }
 
-  require_once 'CRM/Utils/Rule.php';
-
   $ids = array();
   if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
     return civicrm_api3_create_error('Invalid value for relationship type ID');
@@ -87,7 +79,7 @@ function civicrm_api3_relationship_type_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */
@@ -122,7 +114,6 @@ function civicrm_api3_relationship_type_get($params) {
  */
 function civicrm_api3_relationship_type_delete($params) {
 
-  require_once 'CRM/Utils/Rule.php';
   if ($params['id'] != NULL && !CRM_Utils_Rule::integer($params['id'])) {
     return civicrm_api3_create_error('Invalid value for relationship type ID');
   }

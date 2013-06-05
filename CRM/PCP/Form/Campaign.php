@@ -211,7 +211,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
         $params[$field] = CRM_Utils_String::purifyHTML($params[$field]);
       }
     }
-    
+
     $entity_table = CRM_PCP_BAO_PCP::getPcpEntityTable($params['page_type']);
 
     $pcpBlock = new CRM_PCP_DAO_PCPBlock();

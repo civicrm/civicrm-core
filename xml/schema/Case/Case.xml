@@ -45,7 +45,10 @@
        <import>true</import>
        <export>false</export>
        <title>Case Type Id</title>
-       <comment>Id of first case category.</comment>
+       <comment>Multivalued pseudo-fk to option_value table where option_group_name = case_type.</comment>
+       <pseudoconstant>
+         <optionGroupName>case_type</optionGroupName>
+       </pseudoconstant>
        <add>2.0</add>
   </field>
   <index>
@@ -144,6 +147,9 @@
        <export>false</export>
        <title>Case Status Id</title>
        <comment>Id of case status.</comment>
+       <pseudoconstant>
+         <optionGroupName>case_status</optionGroupName>
+       </pseudoconstant>
        <add>1.8</add>
   </field>
   <field>

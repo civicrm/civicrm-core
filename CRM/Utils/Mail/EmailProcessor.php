@@ -159,6 +159,9 @@ class CRM_Utils_Mail_EmailProcessor {
     // a tighter regex for finding bounce info in soft bounces’ mail bodies
     $rpRegex = '/Return-Path: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
 
+    // a regex for finding bound info X-Header
+    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
+
     // retrieve the emails
     try {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
@@ -202,6 +205,12 @@ class CRM_Utils_Mail_EmailProcessor {
             list($match, $action, $job, $queue, $hash) = $matches;
           }
 
+          // if $matches is still empty, look for the X-CiviMail-Bounce header
+          // CRM-9855
+          if (!$matches and preg_match($rpXheaderRegex, $mail->generateBody(), $matches)) {
+            list($match, $action, $job, $queue, $hash) = $matches;
+          }
+
           // if all else fails, check Delivered-To for possible pattern
           if (!$matches and preg_match($regex, $mail->getHeader('Delivered-To'), $matches)) {
             list($match, $action, $job, $queue, $hash) = $matches;
@@ -213,7 +222,7 @@ class CRM_Utils_Mail_EmailProcessor {
           // if its the activities that needs to be processed ..
           $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
 
-          require_once 'api/v3/DeprecatedUtils.php';
+          require_once 'CRM/Utils/DeprecatedUtils.php';
           $params = _civicrm_api3_deprecated_activity_buildmailparams($mailParams, $emailActivityTypeId);
 
           $params['version'] = 3;

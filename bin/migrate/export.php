@@ -44,8 +44,8 @@ function run() {
 
   require_once 'CRM/Utils/Migrate/Export.php';
   $export = new CRM_Utils_Migrate_Export();
-
-  $export->run();
+  $export->build();
+  CRM_Utils_System::download('CustomGroupData.xml', 'text/plain', $export->toXML());
 }
 
 run();

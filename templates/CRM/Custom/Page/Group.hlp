@@ -55,7 +55,7 @@
 {/htxt}
 
 {htxt id=id-is_multiple-title"}
-  {ts}Multiple{/ts}
+  {ts}Allow Multiple Records{/ts}
 {/htxt}
 {htxt id=id-is_multiple"}
     <p>{ts}Checking this box allows you to enter multiple sets of values for a given contact.{/ts}</p>
@@ -64,7 +64,6 @@
     <p>
     {ts}CAUTION: The following features are NOT available for custom fields in 'multiple record' custom set:{/ts}
         <ul>
-            <li>{ts}These fields can not be used in Profiles{/ts}</li>
             <li>{ts}They can not be Imported or Exported{/ts}</li>
             <li>{ts}If they are included in a report as a display column, only the first set of values are shown.{/ts}</li>
         </ul>

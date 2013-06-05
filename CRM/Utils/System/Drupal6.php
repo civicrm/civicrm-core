@@ -36,11 +36,7 @@
 /**
  * Drupal specific stuff goes here
  */
-class CRM_Utils_System_Drupal6 extends CRM_Utils_System_Base {
-  function __construct() {
-    $this->is_drupal = TRUE;
-    $this->supports_form_extensions = TRUE;
-  }
+class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
   /**
    * if we are using a theming system, invoke theme, else just print the
@@ -93,7 +89,9 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_Base {
       'mail' => $params[$mail],
       'op' => 'Create new account',
     );
-    if (!variable_get('user_email_verification', TRUE)) {
+
+    $admin = user_access('administer users');
+    if (!variable_get('user_email_verification', TRUE) || $admin) {
       $form_state['values']['pass']['pass1'] = $params['cms_pass'];
       $form_state['values']['pass']['pass2'] = $params['cms_pass'];
     }

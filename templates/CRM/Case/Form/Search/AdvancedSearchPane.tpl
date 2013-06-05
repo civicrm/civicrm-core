@@ -25,7 +25,7 @@
 *}
 {if $validCiviCase}
     <div id="case-search">
-    <table class="form-layout"> 
+    <table class="form-layout">
        {include file="CRM/Case/Form/Search/Common.tpl"}
     </table>
     </div>

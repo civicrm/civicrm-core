@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -38,11 +37,6 @@
  */
 
 /**
- * Include utility functions
- */
-require_once 'CRM/Core/BAO/Phone.php';
-
-/**
  *  Add an Phone for a contact
  *
  * Allowed @params array keys are:
@@ -58,7 +52,7 @@ function civicrm_api3_phone_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */

@@ -76,8 +76,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     $suffix_id  = CRM_Utils_Array::value('suffix_id', $params, '');
 
     // get prefix and suffix names
-    $prefixes = CRM_Core_PseudoConstant::individualPrefix();
-    $suffixes = CRM_Core_PseudoConstant::individualSuffix();
+    $prefixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+    $suffixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
 
     $prefix = $suffix = NULL;
     if ($prefix_id) {
@@ -383,8 +383,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @return string  the constructed display name
    */
   function displayName() {
-    $prefix = CRM_Core_PseudoConstant::individualPrefix();
-    $suffix = CRM_Core_PseudoConstant::individualSuffix();
+    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
     return str_replace('  ', ' ', trim($prefix[$this->prefix_id] . ' ' . $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name . ' ' . $suffix[$this->suffix_id]));
   }
 

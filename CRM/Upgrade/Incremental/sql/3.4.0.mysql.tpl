@@ -9,7 +9,7 @@ VALUES
 
 SELECT @option_group_id_cgeo    := max(id) from civicrm_option_group where name = 'cg_extend_objects';
 
-INSERT INTO civicrm_option_value 
+INSERT INTO civicrm_option_value
    (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, is_optgroup, is_reserved, is_active, component_id, visibility_id)
 VALUES
    (@option_group_id_cgeo,    {localize}'{ts escape="sql"}Survey{/ts}'{/localize}, 'Survey', 'civicrm_survey', NULL, 0, NULL, 1, 0, 0, 1, NULL, NULL);

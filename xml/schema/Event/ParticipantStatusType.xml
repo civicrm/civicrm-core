@@ -75,5 +75,8 @@
     <type>int unsigned</type>
     <comment>whether the status type is visible to the public, an implicit foreign key to option_value.value related to the `visibility` option_group</comment>
     <add>3.0</add>
+    <pseudoconstant>
+      <optionGroupName>visibility</optionGroupName>
+    </pseudoconstant>
   </field>
 </table>

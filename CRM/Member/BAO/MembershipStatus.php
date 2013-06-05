@@ -189,8 +189,8 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
     $dependancy = array('Membership', 'MembershipLog');
     foreach ($dependancy as $name) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, "CRM_Member_BAO_" . $name) . ".php");
-      eval('$dao = new CRM_Member_BAO_' . $name . '();');
+      $baoString = 'CRM_Member_BAO_' . $name;
+      $dao = new $baoString();
       $dao->status_id = $membershipStatusId;
       if ($dao->find(TRUE)) {
         $check = TRUE;

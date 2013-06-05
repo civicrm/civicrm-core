@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  *  File for the TestActivityType class

@@ -365,6 +365,19 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @access public
    */
   public function buildQuickForm() {
+    // build profiles first so that we can determine address fields etc
+    // and then show copy address checkbox
+    $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
+    $this->buildCustom($this->_values['custom_post_id'], 'customPost');
+
+    if (!empty($this->_fields)) {
+      $profileAddressFields = array();
+      foreach ($this->_fields as $key => $value) {
+        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields);
+      }
+      $this->set('profileAddressFields', $profileAddressFields);
+    }
+
     // Build payment processor form
     if ($this->_ppType) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
@@ -486,17 +499,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
-    $this->buildCustom($this->_values['custom_post_id'], 'customPost');
-
-    if ( !empty( $this->_fields ) ) {
-      $profileAddressFields = array();
-      foreach( $this->_fields as $key => $value ) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields);
-      }
-      $this->set('profileAddressFields', $profileAddressFields);
-    }
-
     //to create an cms user
     if (!$this->_userID) {
       $createCMSUser = FALSE;
@@ -597,14 +599,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $extraOption = array('onclick' => "enableHonorType();");
     // radio button for Honor Type
     $honorOptions = array();
-    $honor = CRM_Core_PseudoConstant::honor();
+    $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
     foreach ($honor as $key => $var) {
       $honorTypes[$key] = $this->createElement('radio', NULL, NULL, $var, $key, $extraOption);
     }
     $this->addGroup($honorTypes, 'honor_type_id', NULL);
 
     // prefix
-    $this->addElement('select', 'honor_prefix_id', ts('Prefix'), array('' => ts('- prefix -')) + CRM_Core_PseudoConstant::individualPrefix());
+    $this->addElement('select', 'honor_prefix_id', ts('Prefix'), array('' => ts('- prefix -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'));
     // first_name
     $this->addElement('text', 'honor_first_name', ts('First Name'), $attributes['first_name']);
 
@@ -787,7 +789,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
 
       // CRM-12233
-      if ($membershipIsActive && !$self->_membershipBlock['is_required'] 
+      if ($membershipIsActive && !$self->_membershipBlock['is_required']
         && $self->_values['amount_block_is_active']) {
         $membershipFieldId = $contributionFieldId = $errorKey = $otherFieldId = NULL;
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
@@ -802,7 +804,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             elseif ($fieldValue['name'] == 'contribution_amount') {
               $contributionFieldId = $fieldKey;
             }
-          
+
             if (!$errorKey || CRM_Utils_Array::value('price_' . $contributionFieldId, $fields) == '0') {
               $errorKey = $fieldKey;
             }
@@ -887,7 +889,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Price_BAO_Set::processAmount($self->_values['fee'],
         $fields, $lineItem
       );
-      
+
       if ($fields['amount'] < 0) {
         $errors['_qf_default'] = ts('Contribution can not be less than zero. Please select the options accordingly');
       }

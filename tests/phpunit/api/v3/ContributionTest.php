@@ -97,6 +97,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->contributionTypeDelete();
     $this->quickCleanup(array(
       'civicrm_contribution',
+      'civicrm_contribution_soft',
       'civicrm_event',
       'civicrm_contribution_page',
       'civicrm_participant',
@@ -253,6 +254,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->documentMe($params, $contribution, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->_contributionTypeId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_type_id'], $this->_contributionTypeId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00, 'In line ' . __LINE__);
@@ -719,15 +721,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contact2    = civicrm_api('Contact', 'create', array('version' => 3, 'display_name' => 'superman', 'version' => 3, 'contact_type' => 'Individual'));
     $params      = $this->_params + array(
       'soft_credit_to' => $contact2['id'],
+
     );
 
     $contribution = civicrm_api('contribution', 'create', $params);
+    $this->assertAPISuccess($contribution);
     $this->documentMe($params, $contribution, __FUNCTION__, __FILE__, $description, $subfile);
     //     $result = civicrm_api('contribution','get', array('version' => 3,'return'=> 'soft_credit_to', 'sequential' => 1));
     //     $this->assertAPISuccess($result);
     //     $this->assertEquals($contact2['id'], $result['values'][$result['id']]['soft_credit_to']) ;
     //    well - the above doesn't work yet so lets do SQL
     $query = "SELECT count(*) FROM civicrm_contribution_soft WHERE contact_id = " . $contact2['id'];
+
     $count = CRM_Core_DAO::singleValueQuery($query);
     $this->assertEquals(1, $count);
 
@@ -946,15 +951,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
       'financial_type_id' => $this->_contributionTypeId,
       'payment_instrument_id' => 1,
-      'contribution_status_id' => 2,
+      'contribution_status_id' => 2,  
+      'is_pay_later' => 1,                                           
       'version' => $this->_apiversion,
     );
     $contribution = civicrm_api('contribution', 'create', $contribParams);
 
     $newParams = array_merge($contribParams, array(
-                                                   'id' => $contribution['id'],
-                                                   'contribution_status_id' => 1,)
-                             );
+      'id' => $contribution['id'],
+      'contribution_status_id' => 1,)
+    );
     $contribution = civicrm_api('contribution', 'update', $newParams);
     $contribution = $contribution['values'][$contribution['id']];
     $this->assertEquals($contribution['contribution_status_id'],'1');
@@ -1009,6 +1015,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = civicrm_api('contribution', 'update', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund');
     $this->_checkFinancialItem($contribution['id'], 'refund');
+  } 
+
+  /*
+   * Function tests invalid contribution status change 
+   */
+  function testCreateUpdateContributionInValidStatusChange() {
+    $contribParams = array(
+      'contact_id' => 1,
+      'receive_date' => '2012-01-01',
+      'total_amount' => 100.00,
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 1,
+      'version' => 3,
+    );
+    $contribution = civicrm_api('contribution', 'create', $contribParams);
+    $newParams = array_merge($contribParams, array(
+     'id' => $contribution['id'],
+     'contribution_status_id' => 2,
+      )
+    );
+    $contribution = civicrm_api('contribution', 'update', $newParams);
+    $this->assertTrue(!empty($contribution['is_error']), 'In line ' . __LINE__);
+    $this->assertEquals($contribution['error_message'], ts('Cannot change contribution status from Completed to Pending.'), 'In line ' . __LINE__);
+
   }
 
   /*
@@ -1022,6 +1053,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => $this->_contributionTypeId,
       'payment_instrument_id' => 1,
       'contribution_status_id' => 2,
+      'is_pay_later' => 1,
       'version' => $this->_apiversion,
     );
     $contribution = civicrm_api('contribution', 'create', $contribParams);

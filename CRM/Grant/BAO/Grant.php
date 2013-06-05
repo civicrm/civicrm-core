@@ -65,7 +65,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     $status = array();
     $summary = array();
     $summary['total_grants'] = NULL;
-    $status = CRM_Grant_PseudoConstant::grantStatus();
+    $status = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
 
     foreach ($status as $id => $name) {
       $stats[$id] = array(
@@ -188,7 +188,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       }
     }
     $grant = new CRM_Grant_DAO_Grant();
-    $grant->id = CRM_Utils_Array::value('grant', $ids);
+    $grant->id = CRM_Utils_Array::value('grant_id', $ids);
 
     $grant->copyValues($params);
 
@@ -204,7 +204,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       "action=view&reset=1&id={$grant->id}&cid={$grant->contact_id}&context=home"
     );
 
-    $grantTypes = CRM_Grant_PseudoConstant::grantType();
+    $grantTypes = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
     if (!CRM_Utils_Array::value('skipRecentView', $params)) {
       if(!isset($grant->contact_id) || !isset($grant->grant_type_id)){
         $grant->find(TRUE);

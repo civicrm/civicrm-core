@@ -197,14 +197,14 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
             $params[$key] = $dateValue;
           }
           else {
-            CRM_Import_Parser_Contact::addToErrorMsg('Activity date', $errorMessage);
+            CRM_Contact_Import_Parser_Contact::addToErrorMsg('Activity date', $errorMessage);
           }
         }
       }
       elseif ($key == 'activity_engagement_level' && $val &&
         !CRM_Utils_Rule::positiveInteger($val)
       ) {
-        CRM_Import_Parser_Contact::addToErrorMsg('Activity Engagement Index', $errorMessage);
+        CRM_Contact_Import_Parser_Contact::addToErrorMsg('Activity Engagement Index', $errorMessage);
       }
     }
     //date-Format part ends
@@ -212,13 +212,13 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     //checking error in custom data
     $params['contact_type'] = isset($this->_contactType) ? $this->_contactType : 'Activity';
 
-    CRM_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       array_unshift($values, $tempMsg);
       $errorMessage = NULL;
-      return CRM_Import_Parser::ERROR;
+      return CRM_Contact_Import_Parser::ERROR;
     }
 
     return CRM_Activity_Import_Parser::VALID;
@@ -256,8 +256,11 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     foreach ($params as $key => $val) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        if ($customFields[$customFieldID]['data_type'] == 'Date') {
-          CRM_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
+        if ($key == 'activity_date_time' && $val) {
+          $params[$key] = CRM_Utils_Date::formatDate($val, $dateType);
+        }
+        elseif ($customFields[$customFieldID]['data_type'] == 'Date') {
+          CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
         }
         elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
           $params[$key] = CRM_Utils_String::strtoboolstr($val);

@@ -67,6 +67,7 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $engagementLevel;
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    * Get all the survey activity types
    *
    * @access public
@@ -91,6 +92,7 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    * Get all campaign types.
    *
    * The static array campaignType is returned
@@ -110,6 +112,7 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    * Get all campaign status.
    *
    * The static array campaignStatus is returned
@@ -129,6 +132,7 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    * Get all Engagement Level.
    *
    * The static array Engagement Level is returned
@@ -148,7 +152,7 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * Flush given pseudoconstant so it can be reread from db
-   * nex time it's requested.
+   * next time it's requested.
    *
    * @access public
    * @static
@@ -156,8 +160,10 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param boolean $name pseudoconstant to be flushed
    *
    */
-  public static function flush($name) {
-    self::$$name = NULL;
+  public static function flush($name = 'cache') {
+   if (isset(self::$$name)) {
+      self::$$name = NULL;
+    }
   }
 }
 

@@ -29,7 +29,7 @@
 
 {include file="CRM/common/TrackingFields.tpl"}
 
-<div class="crm-block crm-contribution-confirm-form-block">
+<div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block">
     <div id="help">
         <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
             {if $contributeMode EQ 'notify' and ! $is_pay_later}

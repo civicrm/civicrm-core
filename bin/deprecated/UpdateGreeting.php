@@ -32,10 +32,10 @@
  * params for this script
  * ct=Individual or ct=Household or ct=Organization (ct = contact type)
  * gt=email_greeting or gt=postal_greeting or gt=addressee (gt = greeting )
- * id=greeting option value 
+ * id=greeting option value
  *
- * IMPORTANT: You must first create valid option value before using via admin interface. 
- * Check option lists for Email Greetings, Postal Greetings and Addressee 
+ * IMPORTANT: You must first create valid option value before using via admin interface.
+ * Check option lists for Email Greetings, Postal Greetings and Addressee
  */
 class CRM_UpdateGreeting {
   function __construct() {
@@ -137,9 +137,9 @@ class CRM_UpdateGreeting {
       if ($idFldName) {
         $sql = "
 SELECT DISTINCT id, $idFldName
-  FROM civicrm_contact 
- WHERE contact_type = %1 
-   AND ( {$idFldName} IS NULL OR 
+  FROM civicrm_contact
+ WHERE contact_type = %1
+   AND ( {$idFldName} IS NULL OR
          ( {$idFldName} IS NOT NULL AND {$displayFldName} IS NULL ) )
    ";
         $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contactType, 'String')));
@@ -215,8 +215,8 @@ SELECT DISTINCT id, $idFldName
       if (!empty($contactIds)) {
         // need to update greeting _id field.
         $queryString = "
-UPDATE civicrm_contact 
-   SET {$greeting}_id = {$valueID} 
+UPDATE civicrm_contact
+   SET {$greeting}_id = {$valueID}
  WHERE id IN (" . implode(',', $contactIds) . ")";
         CRM_Core_DAO::executeQuery($queryString);
       }

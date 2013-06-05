@@ -300,7 +300,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $ids['grant'] = $this->_id;
+      $ids['grant_id'] = $this->_id;
     }
 
     // get the submitted form values.

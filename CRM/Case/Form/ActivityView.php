@@ -84,7 +84,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $tags = CRM_Core_BAO_EntityTag::getTag($activityID, 'civicrm_activity');
     if (!empty($tags)) {
-      $allTag = CRM_Core_PseudoConstant::tag();
+      $allTag = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
       foreach ($tags as $tid) {
         $tags[$tid] = $allTag[$tid];
       }
@@ -132,7 +132,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
     //viewing activity should get diplayed in recent list.CRM-4670
     $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityID, 'activity_type_id');
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $activityTargetContacts = CRM_Activity_BAO_ActivityContact::retrieveContactIdsByActivityId($activityID, $targetID);
     if (!empty($activityTargetContacts)) {

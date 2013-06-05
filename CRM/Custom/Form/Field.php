@@ -123,6 +123,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($this->_id) {
       $params = array('id' => $this->_id);
       CRM_Core_BAO_CustomField::retrieve($params, $this->_values);
+      // note_length is an alias for the text_length field
+      $this->_values['note_length'] = CRM_Utils_Array::value('text_length', $this->_values);
     }
 
     if (self::$_dataToLabels == NULL) {
@@ -445,9 +447,16 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $attributes['note_rows'],
       FALSE
     );
+    $this->add('text',
+      'note_length',
+      ts('Maximum length') . ' ',
+      $attributes['text_length'], // note_length is an alias for the text-length field
+      FALSE
+    );
 
     $this->addRule('note_columns', ts('Value should be a positive number'), 'positiveInteger');
     $this->addRule('note_rows', ts('Value should be a positive number'), 'positiveInteger');
+    $this->addRule('note_length', ts('Value should be a positive number'), 'positiveInteger');
 
     // weight
     $this->add('text', 'weight', ts('Order'),
@@ -954,6 +963,12 @@ SELECT id
           }
           break;
       }
+    }
+
+    // The text_length attribute for Memo fields is in a different input as there
+    // are different label, help text and default value than for other type fields
+    if ($params['data_type'] == "Memo") {
+      $params['text_length'] = $params['note_length'];
     }
 
     // need the FKEY - custom group id

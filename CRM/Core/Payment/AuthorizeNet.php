@@ -185,7 +185,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     // hence treat that also as test mode transaction
     // fix for CRM-2566
     if (($this->_mode == 'test') || $response_fields[6] == 0) {
-      $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
+      $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id RLIKE 'test[0-9]+'";
       $p                 = array();
       $trxn_id           = strval(CRM_Core_Dao::singleValueQuery($query, $p));
       $trxn_id           = str_replace('test', '', $trxn_id);
@@ -274,9 +274,12 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     $template->assign( 'startDate', $startDate->format('Y-m-d') );
-    // for open ended subscription totalOccurrences has to be 9999
+
     $installments = $this->_getParam('installments');
-    $template->assign('totalOccurrences', $installments ? $installments : 9999);
+
+    // for open ended subscription totalOccurrences has to be 9999
+    $installments = empty($installments) ? 9999 : $installments;
+    $template->assign('totalOccurrences', $installments);
 
     $template->assign('amount', $this->_getParam('amount'));
 
@@ -554,8 +557,9 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    */
   function _getParam($field, $xmlSafe = FALSE) {
     $value = CRM_Utils_Array::value($field, $this->_params, '');
-    if ($xmlSafe)
+    if ($xmlSafe) {
       $value = str_replace(array( '&', '"', "'", '<', '>' ), '', $value);
+    }
     return $value;
   }
 

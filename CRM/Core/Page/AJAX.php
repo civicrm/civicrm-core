@@ -100,11 +100,11 @@ class CRM_Core_Page_AJAX {
     if (CRM_Utils_Array::value('id', $_REQUEST)) {
       $id = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
     }
-    
+
     if (CRM_Utils_Array::value('context', $_REQUEST)) {
       $context = CRM_Utils_Type::escape($_REQUEST['context'], 'String');
     }
-    // return false if $id is null and 
+    // return false if $id is null and
     // $context is not civicrm_event or civicrm_contribution_page
     if (!$id || !in_array($context, array('civicrm_event', 'civicrm_contribution_page'))) {
       return false;

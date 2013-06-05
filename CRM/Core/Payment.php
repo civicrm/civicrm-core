@@ -113,7 +113,7 @@ abstract class CRM_Core_Payment {
       }
 
       //load the object.
-      self::$_singleton[$cacheKey] = eval('return ' . $paymentClass . '::singleton( $mode, $paymentProcessor );');
+      self::$_singleton[$cacheKey] = $paymentClass::singleton($mode, $paymentProcessor);
     }
 
     //load the payment form for required processor.
@@ -266,7 +266,7 @@ abstract class CRM_Core_Payment {
       }
 
       // Instantiate PP
-      eval('$processorInstance = ' . $paymentClass . '::singleton( $mode, $paymentProcessor );');
+      $processorInstance = $paymentClass::singleton($mode, $paymentProcessor);
 
       // Does PP implement this method, and can we call it?
       if (!method_exists($processorInstance, $method) ||
@@ -379,5 +379,15 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     return $newCredit;
   }
 
+  /* Return a static array of available billing modes, in the format:
+   * $array[numeric key] = 'descriptive text'.
+   */
+  static function getBillingModes() {
+    return array(
+      CRM_Core_Payment::BILLING_MODE_FORM => 'form',
+      CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
+      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+    );
+  }
 }
 

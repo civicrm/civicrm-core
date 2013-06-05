@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
   +--------------------------------------------------------------------+
@@ -41,10 +40,6 @@
  * Include common API util functions
  */
 require_once 'api/v3/utils.php';
-
-require_once 'CRM/Core/BAO/UFGroup.php';
-require_once 'CRM/Core/BAO/UFField.php';
-require_once 'CRM/Core/Permission.php';
 
 /**
  * Retrieve Profile field values.
@@ -88,7 +83,6 @@ function civicrm_api3_profile_get($params) {
   if ($isContactActivityProfile) {
     civicrm_api3_verify_mandatory($params, NULL, array('activity_id'));
 
-    require_once 'CRM/Profile/Form.php';
     $errors = CRM_Profile_Form::validateContactActivityProfile($params['activity_id'],
       $params['contact_id'],
       $params['profile_id']
@@ -166,7 +160,6 @@ function civicrm_api3_profile_set($params) {
   if ($isContactActivityProfile) {
     civicrm_api3_verify_mandatory($params, NULL, array('activity_id'));
 
-    require_once 'CRM/Profile/Form.php';
     $errors = CRM_Profile_Form::validateContactActivityProfile($params['activity_id'],
       $params['contact_id'],
       $params['profile_id']
@@ -252,7 +245,6 @@ function civicrm_api3_profile_set($params) {
   }
 
   if (isset($profileFields['tag'])) {
-    require_once 'CRM/Core/BAO/EntityTag.php';
     CRM_Core_BAO_EntityTag::create($tags,
       'civicrm_contact',
       $params['contact_id']
@@ -284,7 +276,6 @@ function civicrm_api3_profile_set($params) {
 function civicrm_api3_profile_apply($params) {
 
   civicrm_api3_verify_mandatory($params, NULL, array('profile_id'));
-  require_once 'CRM/Contact/BAO/Contact.php';
 
   if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $params['profile_id'], 'is_active')) {
     return civicrm_api3_create_error('Invalid value for profile_id');
@@ -322,8 +313,6 @@ function civicrm_api3_profile_apply($params) {
  */
 function civicrm_api3_profile_getfields($params) {
   $dao = _civicrm_api3_get_DAO('UFGroup');
-  $file = str_replace('_', '/', $dao) . ".php";
-  require_once ($file);
   $d = new $dao();
   $fields = $d->fields();
   return civicrm_api3_create_success($fields);

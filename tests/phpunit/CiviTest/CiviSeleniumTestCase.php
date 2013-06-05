@@ -1666,7 +1666,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->click('_qf_FinancialType_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     if ($option == 'new') {
-      $text = "The financial type '{$financialType['name']}' has been added. You can add Financial Accounts to this Financial Type now.";
+      $text = "Your Financial '{$financialType['name']}' Type has been created, along with a corresponding income account '{$financialType['name']}'. That income account, along with standard financial accounts 'Accounts Receivable', 'Banking Fees' and 'Premiums' have been linked to the financial type. You may edit or replace those relationships here.";
     }
     else {
       $text = "The financial type '{$financialType['name']}' has been saved.";
@@ -1719,63 +1719,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
   }
 
-  function _testAddFinancialType() {
-    // Add new Financial Account
-    $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
-    $financialAccountTitle = 'Financial Account ' . substr(sha1(rand()), 0, 4);
-    $financialAccountDescription = "{$financialAccountTitle} Description";
-    $accountingCode = 1033;
-    $financialAccountType = 'Revenue'; //Asset Revenue
-    $taxDeductible = FALSE;
-    $isActive = FALSE;
-    $isTax = TRUE;
-    $taxRate = 9.99999999;
-    $isDefault = FALSE;
-
-    //Add new organisation
-    if ($orgName) {
-      $this->webtestAddOrganization($orgName);
-    }
-
-    $this->_testAddFinancialAccount(
-      $financialAccountTitle,
-      $financialAccountDescription,
-      $accountingCode,
-      $orgName,
-      $financialAccountType,
-      $taxDeductible,
-      $isActive,
-      $isTax,
-      $taxRate,
-      $isDefault
-    );
-    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[8]/span/a[text()='Edit']");
-
-    //Add new Financial Type
-    $financialType['name'] = 'FinancialType ' . substr(sha1(rand()), 0, 4);
-    $financialType['is_deductible'] = TRUE;
-    $financialType['is_reserved'] = FALSE;
-    $this->addeditFinancialType($financialType);
-
-    $accountRelationship = "Income Account is"; //Asset Account - of Income Account is
-    $expected[] = array(
-      'financial_account' => $financialAccountTitle,
-      'account_relationship' => $accountRelationship
-    );
-
-    $this->select('account_relationship', "label={$accountRelationship}");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(2);
-    $this->select('financial_account_id', "label={$financialAccountTitle}");
-    $this->click('_qf_FinancialTypeAccount_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $text = 'The financial type Account has been saved.';
-    $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
-    return $financialType['name'];
-  }
-
   function addPremium($name, $sku, $amount, $price, $cost, $financialType) {
     $this->waitForElementPresent("_qf_ManagePremiums_upload-bottom");
     $this->type("name", $name);
@@ -1825,5 +1768,105 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $timeout = ($this->settings && @$this->settings->timeout) ? ($this->settings->timeout * 1000) : 30000;
     return (string) $timeout; // don't know why, but all our old code used a string
   }
-}
 
+  /**
+   * CRM-12378
+   * checks custom fields rendering / loading properly on the fly WRT entity passed as parameter
+   *
+   *
+   * @param array  $customSets       custom sets i.e entity wise sets want to be created and checked
+                                     e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
+                                     'triggerElement' => $triggerElement))
+                                      array  $triggerElement:   the element which is responsible for custom group to load
+
+                                     which uses the entity info as its selection value
+   * @param array  $pageUrl          the url which on which the ajax custom group load takes place
+   * @param $beforeTriggering        code to execute before actual element triggering
+   * @return void
+   */
+  function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
+    //add the custom set
+    $return = $this->addCustomGroupField($customSets);
+
+    $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
+
+    foreach($return as $values) {
+      foreach ($values as $entityType => $customData) {
+        //initiate necessary variables
+        list($entity, $entityData) = explode('_', $entityType);
+        $elementType = CRM_Utils_Array::value('type', $customData['triggerElement'], 'select');
+        $elementName = CRM_Utils_Array::value('name', $customData['triggerElement']);
+        if ($beforeTriggering) {
+          call_user_func($beforeTriggering);
+        }
+        if ($elementType == 'select') {
+          //reset the select box, so triggering of ajax only happens
+          //WRT input of value in this function
+          $this->select($elementName, "index=0");
+        }
+        if (!empty($entityData)) {
+          if ($elementType == 'select') {
+            $this->select($elementName, "label=regexp:{$entityData}");
+          }
+          elseif ($elementType == 'checkbox') {
+            $val = explode(',', $entityData);
+            foreach($val as $v) {
+              $checkId = $this->getAttribute("xpath=//label[text()='{$v}']/@for");
+              $this->check($checkId);
+            }
+          }
+        }
+
+        //sleep method is used as to wait for custom field div to load -
+        //we cant use wait for the div element as we are asserting for the same,
+        //so wait for some time till the div loads
+        sleep(1);
+
+        //checking for proper custom data which is loading through ajax
+        $this->assertElementPresent("xpath=//div[@id='{$customData['cgtitle']}'][@class='crm-accordion-body']",
+          "The on the fly custom group has not been rendered for entity : {$entity} => {$entityData}");
+        $this->assertElementPresent("xpath=//div[@id='{$customData['cgtitle']}'][@class='crm-accordion-body']/table/tbody/tr/td[2]/input",
+          "The on the fly custom group field is not present for entity : {$entity} => {$entityData}");
+      }
+    }
+  }
+
+  function addCustomGroupField($customSets) {
+    foreach ($customSets as $customSet) {
+      $this->openCiviPage("admin/custom/group", "action=add&reset=1");
+
+      //fill custom group title
+      $customGroupTitle = "webtest_for_ajax_cd" . substr(sha1(rand()), 0, 4);
+      $this->click("title");
+      $this->type("title", $customGroupTitle);
+
+      //custom group extends
+      $this->click("extends_0");
+      $this->select("extends_0", "value={$customSet['entity']}");
+      if (!empty($customSet['subEntity'])) {
+        $this->addSelection("extends_1", "label={$customSet['subEntity']}");
+      }
+
+      // Don't collapse
+      $this->uncheck('collapse_display');
+
+      // Save
+      $this->click('_qf_Group_next-bottom');
+      $this->waitForElementPresent('_qf_Field_cancel-bottom');
+
+      //Is custom group created?
+      $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
+      $gid = $this->urlArg('gid');
+
+      $fieldLabel = "custom_field_for_{$customSet['entity']}_{$customSet['subEntity']}" . substr(sha1(rand()), 0, 4);
+      $this->type('label', $fieldLabel);
+      $this->click('_qf_Field_next-bottom');
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
+
+      $return[] = array(
+        "{$customSet['entity']}_{$customSet['subEntity']}" => array('cgtitle' => $customGroupTitle, 'gid' => $gid, 'triggerElement' => $customSet['triggerElement']));
+    }
+    return $return;
+  }
+}

@@ -168,7 +168,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'type' => 'select',
         'label' => ts('Priority'),
         'attributes' =>
-        CRM_Core_PseudoConstant::priority(),
+        CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
         'required' => TRUE
       ),
       'source_contact_id' => array(
@@ -461,7 +461,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->setFields();
 
     if ($this->_activityTypeFile) {
-      eval("CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}::preProcess( \$this );");
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
+      $className::preProcess($this);
     }
 
     $this->_values = $this->get('values');
@@ -592,12 +593,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if ($this->_activityTypeFile) {
-      eval('$defaults += CRM_' . $this->_crmDir . '_Form_Activity_' .
-        $this->_activityTypeFile . '::setDefaultValues($this);'
-      );
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
+      $defaults += $className::setDefaultValues($this);
     }
     if (!CRM_Utils_Array::value('priority_id', $defaults)) {
-      $priority = CRM_Core_PseudoConstant::priority();
+      $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
       $defaults['priority_id'] = array_search('Normal', $priority);
     }
     if (!CRM_Utils_Array::value('status_id', $defaults)) {
@@ -874,14 +874,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if ($this->_activityTypeFile) {
-      eval("CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}::buildQuickForm( \$this );");
-    }
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
 
-    if ($this->_activityTypeFile) {
-      eval('$this->addFormRule' .
-        "(array(
-          'CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}', 'formrule'), \$this);"
-      );
+      $className::buildQuickForm($this);
+      $this->addFormRule(array($className, 'formRule'), $this);
     }
 
     $this->addFormRule(array('CRM_Activity_Form_Activity', 'formRule'), $this);
@@ -1078,7 +1074,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   protected function processActivity(&$params) {
     $activityAssigned = array();
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     // format assignee params
     if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
@@ -1217,9 +1213,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   function beginPostProcess(&$params) {
     if ($this->_activityTypeFile) {
-      eval("CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}" .
-        "::beginPostProcess( \$this, \$params );"
-      );
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
+      $className::beginPostProcess($this, $params);
     }
   }
 
@@ -1230,9 +1225,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   function endPostProcess(&$params, &$activity) {
     if ($this->_activityTypeFile) {
-      eval("CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}" .
-        "::endPostProcess( \$this, \$params, \$activity );"
-      );
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
+      $className::endPostProcess($this, $params, $activity );
     }
   }
 }

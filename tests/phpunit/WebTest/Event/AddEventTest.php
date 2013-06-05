@@ -58,7 +58,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
 
     $eventInfoStrings = array($eventTitle, $eventDescription, $streetAddress);
-    $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);
+    $eventId = $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);
 
     $registerStrings = array("225.00", "Member", "300.00", "Non-member", $registerIntro);
     $registerUrl = $this->_testVerifyRegisterPage($registerStrings);
@@ -66,6 +66,12 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $numberRegistrations = 3;
     $anonymous = TRUE;
     $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous);
+    
+    // Now test making a copy of the event
+    $this->webtestLogin();
+    $this->openCiviPage("event/manage", "reset=1&action=copy&id=$eventId");
+    $copyEventId = $this->_testVerifyEventInfo('Copy of ' . $eventTitle, $eventInfoStrings);
+    $registerUrl = $this->_testVerifyRegisterPage($registerStrings);    
   }
 
   function testAddPaidEventDiscount() {
@@ -310,6 +316,18 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->assertNotChecked('is_pay_later');
   }
 
+  function testAjaxCustomGroupLoad() {
+    $this->webtestLogin();
+
+    $triggerElement = array('name' => 'event_type_id', 'type' => 'select');
+    $customSets = array(
+      array('entity' => 'Event', 'subEntity' => 'Conference', 'triggerElement' => $triggerElement),
+    );
+
+    $pageUrl = array('url' => 'event/add', 'args' => "reset=1&action=add");
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -507,22 +525,37 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
-  function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE, $isPayLater = FALSE) {
+  function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE, $isPayLater = FALSE, $participantEmailInfo = array(), $paymentProcessor = NULL) {
+    $infoPassed = FALSE;
+    if (!empty($participantEmailInfo)) {
+      $infoPassed = TRUE;
+    }
     if ($anonymous) {
       $this->webtestLogout();
     }
+    $primaryParticipantInfo = array();
     $this->open($registerUrl);
-    $this->waitForPageToLoad($this->getTimeoutMsec());   
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
     $this->select("additional_participants", "value=" . $numberRegistrations);
-    $this->type("email-Primary", "smith" . substr(sha1(rand()), 0, 7) . "@example.org");
+
+    $email = $infoPassed ? $participantEmailInfo[0] : "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
+    $primaryParticipantInfo['email'] = $email;
+    $this->type("email-Primary", $email);
     if (!$isPayLater) {
+      if ($paymentProcessor) {
+       $paymentProcessorEle = $this->getAttribute("xpath=//form[@id='Register']//label[contains(text(), '{$paymentProcessor}')]/@for");
+       $this->check($paymentProcessorEle);
+      }
       $this->select("credit_card_type", "value=Visa");
       $this->type("credit_card_number", "4111111111111111");
       $this->type("cvv2", "000");
       $this->select("credit_card_exp_date[M]", "value=1");
       $this->select("credit_card_exp_date[Y]", "value=2020");
-      $this->type("billing_first_name", "Jane");
-      $this->type("billing_last_name", "Smith" . substr(sha1(rand()), 0, 7));
+      $primaryParticipantInfo['first_name'] = "Jane";
+      $primaryParticipantInfo['last_name'] = "Smith" . substr(sha1(rand()), 0, 7);
+      $this->type("billing_first_name", $primaryParticipantInfo['first_name']);
+      $this->type("billing_last_name", $primaryParticipantInfo['last_name']);
       $this->type("billing_street_address-5", "15 Main St.");
       $this->type(" billing_city-5", "San Jose");
       $this->select("billing_country_id-5", "value=1228");
@@ -537,7 +570,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
         $this->waitForPageToLoad($this->getTimeoutMsec());
         // Look for Skip button
         $this->waitForElementPresent("_qf_Participant_{$i}_next_skip-Array");
-        $this->type("email-Primary", "smith" . substr(sha1(rand()), 0, 7) . "@example.org");
+        $addtlEmail = $infoPassed ? $participantEmailInfo[$i] : "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
+        $this->type("email-Primary", $addtlEmail);
         $this->click("_qf_Participant_{$i}_next");
       }
     }
@@ -559,6 +593,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $thankStrings += array("testing later instructions");
     }
     $this->assertStringsPresent($thankStrings);
+    return $primaryParticipantInfo;
   }
 
   function _testAddReminder($eventTitle) {
@@ -605,7 +640,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
   function testEventAddMultipleParticipant() {
     // Log in using webtestLogin() method
-    $this->webtestLogin(); 
+    $this->webtestLogin();
     $this->openCiviPage("event/add", "reset=1&action=add");
 
     $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
@@ -614,21 +649,56 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $streetAddress = "100 Main Street";
     $this->_testAddLocation($streetAddress);
 
-    $this->_testAddFees(FALSE, FALSE, NULL, FALSE, TRUE);
+    $this->_testAddFees(FALSE, FALSE, "Test Processor", FALSE, TRUE);
     $registerIntro = "Fill in all the fields below and click Continue.";
     $multipleRegistrations = TRUE;
     $this->_testAddOnlineRegistration($registerIntro, $multipleRegistrations);
     $eventInfoStrings = array($eventTitle, $eventDescription, $streetAddress);
-    $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);
+    $eventId = $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);
 
     $registerStrings = array("225.00", "Member", "300.00", "Non-member", $registerIntro);
     $registerUrl = $this->_testVerifyRegisterPage($registerStrings);
-
     $numberRegistrations = 3;
     $anonymous = TRUE;
+
+    // CRM-12615 add additional participants and check email, amount
+    $primaryParticipant = "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
+    $secParticipant = "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
+    $thirdParticipant = "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
+    $participantEmails = array($primaryParticipant, $secParticipant, $thirdParticipant);
+    $addtlPart = array($secParticipant, $thirdParticipant);
+    $primaryParticipantInfo = $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
+    $primaryDisplayName = "{$primaryParticipantInfo['first_name']} {$primaryParticipantInfo['last_name']}";
+    $this->webtestLogin();
+    $this->openCiviPage("event/search?reset=1", "reset=1");
+    $this->type('event_name', $eventTitle);
+    $this->click("event_name");
+    $this->waitForElementPresent("css=div.ac_results-inner li");
+    $this->click("css=div.ac_results-inner li");
+    $this->clickLink('_qf_Search_refresh');
+    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(), '{$secParticipant}')]/../../td[6]", preg_quote('225.00'));
+    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(), '{$thirdParticipant}')]/../../td[6]", preg_quote('225.00'));
+
+    //CRM-12618 check edit screen of additional participant and ensuring record_contribution not present
+    foreach ($addtlPart as $value) {
+      $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(), '{$value}')]/../../td[11]/span/a[2][contains(text(), 'Edit')]", '_qf_Participant_upload-bottom');
+      $this->assertTrue($this->isElementPresent("xpath=//tr[@class='crm-participant-form-block-registered-by']/td[2]/a[contains(text(), '$primaryDisplayName')]"), 'Registered By info is wrong on additional participant edit form');
+      $this->assertElementContainsText("xpath=//form[@id='Participant']/h3", 'Edit Event Registration');
+      $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[@class='crm-participant-form-block-displayName']/td[2][contains(text(), '{$value}')]"),
+        'Wrong Participant edit form'
+      );
+      $this->assertFalse($this->isElementPresent('record_contribution'), 'Record Payment checkbox showed up wrongly for additional participant edit screen');
+      $this->clickLink("_qf_Participant_cancel-top");
+    }
+
+    //unselect the payment processor configured
+    $this->openCiviPage("event/manage/fee", "reset=1&action=update&id={$eventId}", '_qf_Fee_upload-bottom');
+    $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='Test Processor']");
+    $this->clickLink("_qf_Fee_upload-bottom");
+
     // add participant and 3 additional participant and change status of participant from edit participant
     $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous, TRUE);
-    $this->webtestLogin(); 
+    $this->webtestLogin();
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->type('event_name', $eventTitle);
@@ -648,7 +718,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->click('_qf_Participant_upload-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->verifyFinancialRecords($contributionID);
-       
+    
     // add participant and 3 additional participant and change status of participant from edit contribution
     $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous, TRUE);
     $this->webtestLogin(); 

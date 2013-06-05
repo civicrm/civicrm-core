@@ -6,7 +6,7 @@
 function grant_get_example(){
 $params = array( 
   'version' => 3,
-  'contact_id' => 4,
+  'contact_id' => 3,
   'application_received_date' => 'now',
   'decision_date' => 'next Monday',
   'amount_total' => '500',
@@ -30,13 +30,13 @@ function grant_get_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 2,
+  'id' => 1,
   'values' => array( 
-      '2' => array( 
-          'id' => '2',
-          'contact_id' => '4',
-          'application_received_date' => '2013-02-04',
-          'decision_date' => '2013-02-11',
+      '1' => array( 
+          'id' => '1',
+          'contact_id' => '3',
+          'application_received_date' => '2013-05-14',
+          'decision_date' => '2013-05-20',
           'grant_type_id' => '1',
           'amount_total' => '500.00',
           'currency' => 'USD',

@@ -114,10 +114,10 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   public static function getEmailAddress($queue_id) {
     $email = CRM_Core_BAO_Email::getTableName();
     $eq    = self::getTableName();
-    $query = "  SELECT      $email.email as email 
-                    FROM        $email 
-                    INNER JOIN  $eq 
-                    ON          $eq.email_id = $email.id 
+    $query = "  SELECT      $email.email as email
+                    FROM        $email
+                    INNER JOIN  $eq
+                    ON          $eq.email_id = $email.id
                     WHERE       $eq.id = " . CRM_Utils_Type::rule($queue_id, 'Integer');
 
     $q = new CRM_Mailing_Event_BAO_Queue();

@@ -74,7 +74,7 @@ class CRM_Contact_Form_Edit_Address {
       "address[$blockId][location_type_id]",
       ts('Location Type'),
       array(
-        '' => ts('- select -')) + CRM_Core_PseudoConstant::locationType(),
+        '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
         $js
     );
 
@@ -205,6 +205,9 @@ class CRM_Contact_Form_Edit_Address {
         }
       }
       else {
+        if ($name == 'state_province_id') {
+          $stateCountryMap[$blockId]['state_province'] = "address_{$blockId}_{$name}";
+        }
         $form->addElement('select',
           "address[$blockId][$name]",
           $title,
@@ -392,16 +395,12 @@ class CRM_Contact_Form_Edit_Address {
         $countryID = CRM_Utils_Array::value(0, $form->getElementValue($countryElementName));
       }
     }
-
     $stateTitle = ts('State/Province');
     if (isset($form->_fields[$stateElementName]['title'])) {
       $stateTitle = $form->_fields[$stateElementName]['title'];
     }
 
-    if ($countryID &&
-      isset($form->_elementIndex[$stateElementName])
-    ) {
-
+    if (isset($form->_elementIndex[$stateElementName])) {
       $submittedValState = $form->getSubmitValue($stateElementName);
       if ($submittedValState) {
         $stateID = $submittedValState;
@@ -412,7 +411,10 @@ class CRM_Contact_Form_Edit_Address {
       else {
         $stateID = CRM_Utils_Array::value(0, $form->getElementValue($stateElementName));
       }
-
+    }
+    if ($countryID &&
+      isset($form->_elementIndex[$stateElementName])
+    ) {
       $stateSelect = &$form->addElement('select',
         $stateElementName,
         $stateTitle,
@@ -420,30 +422,28 @@ class CRM_Contact_Form_Edit_Address {
           '' => ts('- select -')) +
         CRM_Core_PseudoConstant::stateProvinceForCountry($countryID)
       );
+    }
+    if ($stateID &&
+      isset($form->_elementIndex[$stateElementName]) &&
+      isset($form->_elementIndex[$countyElementName])
+    ) {
+      $form->addElement('select',
+        $countyElementName,
+        ts('County'),
+        array(
+          '' => ts('- select -')) +
+        CRM_Core_PseudoConstant::countyForState($stateID)
+      );
+    }
 
-
-      if ($stateID &&
-        isset($form->_elementIndex[$stateElementName]) &&
-        isset($form->_elementIndex[$countyElementName])
-      ) {
-        $form->addElement('select',
-          $countyElementName,
-          ts('County'),
-          array(
-            '' => ts('- select -')) +
-          CRM_Core_PseudoConstant::countyForState($stateID)
-        );
-      }
-
-      // CRM-7296 freeze the select for state if address is shared with household
-      // CRM-9070 freeze the select for state if it is view only
-      if (isset($form->_fields) &&
-          CRM_Utils_Array::value($stateElementName, $form->_fields) &&
-          (CRM_Utils_Array::value('is_shared', $form->_fields[$stateElementName]) ||
-          CRM_Utils_Array::value('is_view', $form->_fields[$stateElementName]))
-      ) {
-        $stateSelect->freeze();
-      }
+    // CRM-7296 freeze the select for state if address is shared with household
+    // CRM-9070 freeze the select for state if it is view only
+    if (isset($form->_fields) &&
+      CRM_Utils_Array::value($stateElementName, $form->_fields) &&
+      (CRM_Utils_Array::value('is_shared', $form->_fields[$stateElementName]) ||
+        CRM_Utils_Array::value('is_view', $form->_fields[$stateElementName]))
+    ) {
+      $stateSelect->freeze();
     }
   }
 
@@ -514,7 +514,6 @@ class CRM_Contact_Form_Edit_Address {
           foreach ($parseFields as $field) {
             $addressValues["{$field}_{$cnt}"] = CRM_Utils_Array::value($field, $address);
           }
-
           // don't load fields, use js to populate.
           foreach (array('street_number', 'street_name', 'street_unit') as $f) {
             if (isset($address[$f])) {

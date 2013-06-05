@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
 
@@ -92,9 +91,10 @@ class civicrm_api3 {
     if (isset($config) && isset($config['conf_path'])) {
       define('CIVICRM_SETTINGS_PATH', $config['conf_path'] . '/civicrm.settings.php');
       require_once CIVICRM_SETTINGS_PATH;
-      require_once 'CRM/Core/Config.php';
+      require_once 'CRM/Core/Classloader.php';
       require_once 'api/api.php';
       require_once "api/v3/utils.php";
+      CRM_Core_Classloader::singleton()->register();
       $this->cfg = CRM_Core_Config::singleton();
       $this->init();
     }
@@ -140,6 +140,13 @@ class civicrm_api3 {
 
       //execute post
       $result = curl_exec($ch);
+      // CiviCRM expects to get back a CiviCRM error object.
+      if (curl_errno($ch)) {
+          $res = new stdClass;
+          $res->is_error = 1;
+          $res->error = array('cURL error' => curl_error($ch));
+          return $res;
+      }      
       curl_close($ch);
       return json_decode($result);
       // not good, all in get when should be in post.

@@ -36,7 +36,7 @@
         <name>dest_queue_id</name>
         <table>civicrm_mailing_event_queue</table>
         <key>id</key>
-	<onDelete>SET NULL</onDelete>
+        <onDelete>SET NULL</onDelete>
     </foreignKey>
     <field>
         <name>time_stamp</name>

@@ -161,5 +161,24 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     );
     $this->webtestVerifyTabularData($expected);
   }
-}
 
+  function testAjaxCustomGroupLoad() {
+    $this->webtestLogin();
+    $triggerElement = array('name' => 'membership_type_id_1', 'type' => 'select');
+    $customSets = array(
+      array('entity' => 'Membership', 'subEntity' => 'General', 'triggerElement' => $triggerElement),
+      array('entity' => 'Membership', 'subEntity' => 'Student', 'triggerElement' => $triggerElement)
+    );
+
+    $pageUrl = array('url' => 'member/add', 'args' => 'reset=1&action=add&context=standalone');
+
+    //case where we should fire certain
+    //ui actions which helps triggering possible
+    $test = $this;
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl,
+      function() use ($test) {
+        $test->select('membership_type_id_0', 'value=1');
+      }
+    );
+  }
+}

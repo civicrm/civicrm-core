@@ -44,7 +44,7 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
     $surveyID = $survey['id'];
     $this->params = array (
                            'version' => $this->_apiversion,
-                           'sequential' =>'1', 
+                           'sequential' =>'1',
                            'survey_id' => $surveyID
                            );
     parent::setUp();
@@ -53,7 +53,7 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   function tearDown() {
     $this->quickCleanup(array('civicrm_survey'));
   }
-  
+
   /**
    * Test surveyRespondent get with wrong params type.
    */
@@ -62,7 +62,7 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
     $GetWrongParamsType = civicrm_api("SurveyRespondant","get", $params );
     $this->assertEquals($GetWrongParamsType['error_message'], 'Input variable `params` is not an array');
   }
- 	
+
   /**
    * Test surveyRespondent get with empty params.
    */

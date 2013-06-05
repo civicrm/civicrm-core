@@ -408,8 +408,6 @@
      <title>WordPress Access Control</title>
      <desc>Grant access to CiviCRM components and other CiviCRM permissions.</desc>
      <page_callback>CRM_ACL_Form_WordPress_Permissions</page_callback>
-     <adminGroup>Users and Permissions</adminGroup>
-     <icon>admin/small/03.png</icon>
      <weight>10</weight>
   </item>
   <item>

@@ -249,12 +249,12 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $this->system->getCache()->flush();
     $this->system->getManager()->refresh();
   }
-  
+
   public static function incHookCount($module, $name) {
     global $_test_extension_manager_moduletest_counts;
     $_test_extension_manager_moduletest_counts[$module][$name] = 1 + (int) $_test_extension_manager_moduletest_counts[$module][$name];
   }
-  
+
   const MODULE_TEMPLATE = "
 <?php
 function _FILE__civicrm_install() {

@@ -131,7 +131,7 @@ WHERE  email = %2
     $transaction = new CRM_Core_Transaction();
 
     $do = new CRM_Core_DAO();
-    $mgObject = new CRM_Mailing_DAO_Group();
+    $mgObject = new CRM_Mailing_DAO_MailingGroup();
     $mg = $mgObject->getTableName();
     $jobObject = new CRM_Mailing_BAO_Job();
     $job = $jobObject->getTableName();

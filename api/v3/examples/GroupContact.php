@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 function group_contact__example() {
   $params = array(

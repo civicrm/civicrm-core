@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -39,11 +38,6 @@
  */
 
 /**
- * Files required for this package
- */
-require_once 'CRM/Member/BAO/MembershipType.php';
-
-/**
  * API to Create or update a Membership Type
  *
  * @param   array  $params  an associative array of name/value property values of civicrm_membership_type
@@ -61,7 +55,6 @@ function civicrm_api3_membership_type_create($params) {
   $ids['memberOfContact'] = CRM_Utils_Array::value('member_of_contact_id', $values);
   $ids['contributionType'] = CRM_Utils_Array::value('financial_type_id', $values);
 
-  require_once 'CRM/Member/BAO/MembershipType.php';
   $membershipTypeBAO = CRM_Member_BAO_MembershipType::add($values, $ids);
   $membershipType = array();
   _civicrm_api3_object_to_array($membershipTypeBAO, $membershipType[$membershipTypeBAO->id]);
@@ -71,7 +64,7 @@ function civicrm_api3_membership_type_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */

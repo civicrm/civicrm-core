@@ -78,8 +78,8 @@ class CRM_Utils_Money {
     }
 
     if (!self::$_currencySymbols) {
-      $currencySymbolName = CRM_Core_PseudoConstant::currencySymbols('name');
-      $currencySymbol = CRM_Core_PseudoConstant::currencySymbols();
+      $currencySymbolName = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'));
+      $currencySymbol = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency');
 
       self::$_currencySymbols = array_combine($currencySymbolName, $currencySymbol);
     }

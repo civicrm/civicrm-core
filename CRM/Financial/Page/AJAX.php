@@ -48,7 +48,7 @@ class CRM_Financial_Page_AJAX {
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
     }
-
+    $defaultId = NULL;
     if ($_GET['_value'] == 'select') {
       $result = CRM_Contribute_PseudoConstant::financialAccount();
     }
@@ -62,9 +62,11 @@ class CRM_Financial_Page_AJAX {
         '8' => 1, //premium inventory
         '9' => 3, //discount account is
       );
-
-      $financialAccountType = "{$financialAccountType[$_GET['_value']]}";
+      $financialAccountType = CRM_Utils_Array::value($_GET['_value'], $financialAccountType);
       $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
+      if ($financialAccountType) {
+        $defaultId = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = $financialAccountType");
+      }
     }
     $elements = array(
       array(
@@ -75,10 +77,14 @@ class CRM_Financial_Page_AJAX {
 
     if (!empty($result)){
       foreach ($result as $id => $name) {
+        $selectedArray = array();
+        if ($id == $defaultId) {
+          $selectedArray['selected'] = 'Selected';
+        }
         $elements[] = array(
           'name'  => $name,
           'value' => $id,
-        );
+        ) + $selectedArray;
       }
     }
     echo json_encode($elements);
@@ -92,7 +98,7 @@ class CRM_Financial_Page_AJAX {
     }
 
     if ($_GET['_value'] == 'select') {
-      $result = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
+      $result = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
     }
     else {
       $financialAccountType = array(
@@ -102,7 +108,7 @@ class CRM_Financial_Page_AJAX {
         '4' => array(7), //cost of sales
       );
       $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $_GET['_value'], 'financial_account_type_id');
-      $result = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
+      $result = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
     }
 
     $elements = array(
@@ -210,7 +216,7 @@ class CRM_Financial_Page_AJAX {
           case 'reopen':
             $status = $op == 'close' ? 'Closed' : 'Open';
             $ids['batchID'] = $recordID;
-            $batchStatus = CRM_Core_PseudoConstant::accountOptionValues('batch_status');
+            $batchStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
             $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
             $session = CRM_Core_Session::singleton();
             $params['modified_date'] = date('YmdHis');

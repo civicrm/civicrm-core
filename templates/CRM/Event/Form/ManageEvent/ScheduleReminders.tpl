@@ -93,14 +93,14 @@
     </tr>
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-  	<td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong>{ts}OR{/ts}</strong><br /></td>
+    <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong>{ts}OR{/ts}</strong><br /></td>
     </tr>
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
         <td class="right"></td>
-  	<td colspan="3">{$form.start_action_offset.html}&nbsp;&nbsp;&nbsp;{$form.start_action_unit.html}&nbsp;&nbsp;&nbsp;{$form.start_action_condition.html}&nbsp;&nbsp;&nbsp;{$form.start_action_date.html}</td>
+    <td colspan="3">{$form.start_action_offset.html}&nbsp;&nbsp;&nbsp;{$form.start_action_unit.html}&nbsp;&nbsp;&nbsp;{$form.start_action_condition.html}&nbsp;&nbsp;&nbsp;{$form.start_action_date.html}</td>
     </tr>
     <tr id="recordActivity" class="crm-scheduleReminder-form-block-record_activity">
-    	<td class="label" width="20%">{$form.record_activity.label}</td>
+      <td class="label" width="20%">{$form.record_activity.label}</td>
         <td>{$form.record_activity.html}</td>
     </tr>
     <tr id="relativeDateRepeat" class="crm-scheduleReminder-form-block-is_repeat"><td class="label" width="20%">{$form.is_repeat.label}</td>
@@ -112,23 +112,23 @@
         <table class="form-layout-compressed">
             <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
                 <td class="label">{$form.repetition_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.repetition_frequency_interval.html}</td>
-    		<td>{$form.repetition_frequency_unit.html}</td>
+        <td>{$form.repetition_frequency_unit.html}</td>
             </tr>
-      	    <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
-            	<td class="label">{$form.end_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.end_frequency_interval.html}
-    		<td>{$form.end_frequency_unit.html}&nbsp;&nbsp;&nbsp;{$form.end_action.html}&nbsp;&nbsp;&nbsp;{$form.end_date.html}</td>
+            <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
+              <td class="label">{$form.end_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.end_frequency_interval.html}
+        <td>{$form.end_frequency_unit.html}&nbsp;&nbsp;&nbsp;{$form.end_action.html}&nbsp;&nbsp;&nbsp;{$form.end_date.html}</td>
             </tr>
         </table>
       </td>
     </tr>
     <tr class="crm-scheduleReminder-form-block-recipient">
-        <td class="right">{$form.recipient.label}</td><td colspan="3">{$form.recipient.html}</td>
+        <td class="right">{$form.recipient.label}</td><td colspan="3">{$form.recipient.html}&nbsp;&nbsp;{help id="recipient" file="CRM/Admin/Page/ScheduleReminders.hlp" title=$form.recipient.label}</td>
     </tr>
     <tr id="recipientList" class="crm-scheduleReminder-form-block-recipientListing">
         <td class="right">{$form.recipient_listing.label}</td><td colspan="3">{$form.recipient_listing.html}</td>
     </tr>
     <tr id="recipientManual" class="crm-scheduleReminder-form-block-recipient_manual_id">
-      	<td class="label">{$form.recipient_manual_id.label}</td>
+        <td class="label">{$form.recipient_manual_id.label}</td>
         <td>{$form.recipient_manual_id.html}{edit}<span class="description">{ts}You can manually send out the reminders to these recipients.{/ts}</span>{/edit}</td>
     </tr>
     <tr id="recipientGroup" class="crm-scheduleReminder-form-block-recipient_group_id">
@@ -140,7 +140,7 @@
   <fieldset id="compose_id"><legend>{ts}Email{/ts}</legend>
      <table id="email-field-table" class="form-layout-compressed">
        <tr class="crm-scheduleReminder-form-block-active">
-      	   <td class="label"></td>
+           <td class="label"></td>
            <td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
        </tr>
        <tr class="crm-scheduleReminder-form-block-template">

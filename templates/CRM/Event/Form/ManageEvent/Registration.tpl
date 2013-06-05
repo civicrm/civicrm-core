@@ -194,7 +194,7 @@
    {/if}
         <tr class='crm-event-manage-registration-form-block-create-new-profile'>
             <td class="label"></td>
-            <td><a href="{crmURL p='civicrm/admin/uf/group/add' q='reset=1&action=add'}" target="_blank">{ts}Click here for new profile{/ts}</a></td>
+            <td><a href="{crmURL p='civicrm/admin/uf/group/add' q='reset=1&action=add'}" target="_blank">{ts}Click here to create a new profile{/ts}</a></td>
         </tr>
         </table>
         </div>

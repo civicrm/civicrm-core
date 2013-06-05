@@ -48,7 +48,7 @@
        </fieldset>
         {else}
       {assign var=isRecordPayment value=0 }
-            <div class='messages status'>{ts}No any active price fields found for this event!{/ts}</div>
+            <div class='messages status'>{ts}No active price fields found for this event!{/ts}</div>
           {/if}
     </table>
     {/if}
@@ -56,7 +56,7 @@
     </tr>
  {/if}
 
-    { if $accessContribution and ! $participantMode and ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId) and $isRecordPayment }
+    { if $accessContribution and ! $participantMode and ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId) and $isRecordPayment and ! $registeredByParticipantId }
         <tr class="crm-event-eventfees-form-block-record_contribution">
             <td class="label">{$form.record_contribution.label}</td>
             <td>{$form.record_contribution.html}<br />

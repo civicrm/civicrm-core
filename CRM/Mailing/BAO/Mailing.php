@@ -108,11 +108,11 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $storeRecipients = FALSE,
     $dedupeEmail = FALSE,
     $mode = NULL) {
-    $mailingGroup = new CRM_Mailing_DAO_Group();
+    $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
 
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $job     = CRM_Mailing_BAO_Job::getTableName();
-    $mg      = CRM_Mailing_DAO_Group::getTableName();
+    $mg      = CRM_Mailing_DAO_MailingGroup::getTableName();
     $eq      = CRM_Mailing_Event_DAO_Queue::getTableName();
     $ed      = CRM_Mailing_Event_DAO_Delivered::getTableName();
     $eb      = CRM_Mailing_Event_DAO_Bounce::getTableName();
@@ -517,7 +517,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   }
 
   private function _getMailingGroupIds($type = 'Include') {
-    $mailingGroup = new CRM_Mailing_DAO_Group();
+    $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
     $group = CRM_Contact_DAO_Group::getTableName();
     if (!isset($thi->sid)) {
       // we're just testing tokens, so return any group
@@ -1404,8 +1404,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (!isset($this->id)) {
       return array();
     }
-    $mg      = new CRM_Mailing_DAO_Group();
-    $mgtable = CRM_Mailing_DAO_Group::getTableName();
+    $mg      = new CRM_Mailing_DAO_MailingGroup();
+    $mgtable = CRM_Mailing_DAO_MailingGroup::getTableName();
     $group   = CRM_Contact_BAO_Group::getTableName();
 
     $mg->query("SELECT      $group.title as name FROM $mgtable
@@ -1564,7 +1564,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $mailingTableName = CRM_Mailing_BAO_Mailing::getTableName();
 
     /* Create the mailing group record */
-    $mg = new CRM_Mailing_DAO_Group();
+    $mg = new CRM_Mailing_DAO_MailingGroup();
     foreach (array('groups', 'mailings') as $entity) {
       foreach (array('include', 'exclude', 'base') as $type) {
         if (isset($params[$entity]) &&
@@ -1634,7 +1634,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $t = array(
       'mailing' => self::getTableName(),
-      'mailing_group' => CRM_Mailing_DAO_Group::getTableName(),
+      'mailing_group' => CRM_Mailing_DAO_MailingGroup::getTableName(),
       'group' => CRM_Contact_BAO_Group::getTableName(),
       'job' => CRM_Mailing_BAO_Job::getTableName(),
       'queue' => CRM_Mailing_Event_BAO_Queue::getTableName(),
@@ -2196,7 +2196,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   public function &getRows($offset, $rowCount, $sort, $additionalClause = NULL, $additionalParams = NULL) {
     $mailing = self::getTableName();
     $job     = CRM_Mailing_BAO_Job::getTableName();
-    $group   = CRM_Mailing_DAO_Group::getTableName();
+    $group   = CRM_Mailing_DAO_MailingGroup::getTableName();
     $session = CRM_Core_Session::singleton();
 
     $mailingACL = self::mailingACL();
@@ -2531,7 +2531,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @access public
    */
   public function searchMailingIDs() {
-    $group = CRM_Mailing_DAO_Group::getTableName();
+    $group = CRM_Mailing_DAO_MailingGroup::getTableName();
     $mailing = self::getTableName();
 
     $query = "
@@ -2559,7 +2559,7 @@ SELECT  $mailing.id as mailing_id
    * @return $report array content/component.
    * @access public
    */
-  public static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
+  static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
     $htmlHeader = $textHeader = NULL;
     $htmlFooter = $textFooter = NULL;
 

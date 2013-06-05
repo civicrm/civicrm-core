@@ -23,7 +23,12 @@
       <type>int unsigned</type>
       <required>true</required>
       <comment>FK to civicrm_custom_group.</comment>
-       <add>1.1</add>
+      <add>1.1</add>
+      <pseudoconstant>
+        <table>civicrm_custom_group</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>title</labelColumn>
+      </pseudoconstant>
   </field>
   <foreignKey>
        <name>custom_group_id</name>

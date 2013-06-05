@@ -41,13 +41,13 @@ class CRM_Group_Page_AJAX {
 
     if ( isset($params['parent_id']) ) {
       // requesting child groups for a given parent
-      $params['page'] = 1; 
+      $params['page'] = 1;
       $params['rp']   = 25;
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
 
       echo json_encode($groups);
-      CRM_Utils_System::civiExit();      
-    } else {      
+      CRM_Utils_System::civiExit();
+    } else {
       $sortMapper = array(
         0 => 'groups.title', 1 => 'groups.id', 2 => 'createdBy.sort_name', 3 => '',
         4 => 'groups.group_type', 5 => 'groups.visibility',
@@ -70,7 +70,7 @@ class CRM_Group_Page_AJAX {
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
 
       // if no groups found with parent-child hierarchy and logged in user say can view child groups only (an ACL case),
-      // go ahead with flat hierarchy, CRM-12225 
+      // go ahead with flat hierarchy, CRM-12225
       if (empty($groups)) {
         $groupsAccessible = CRM_Core_PseudoConstant::group();
         $parentsOnly      = CRM_Utils_Array::value('parentsOnly', $params);

@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -237,7 +235,7 @@ class CRM_Report_Form_Instance {
         $defaults['grouprole'] = $grouproles;
       }
     }
-    else {
+    else if (property_exists($form, '_description')) {
       $defaults['description'] = $form->_description;
     }
   }
@@ -321,11 +319,11 @@ class CRM_Report_Form_Instance {
     $instanceID = $form->getVar('_id');
     $isNew = $form->getVar('_createNew');
     $isCopy = 0;
-    
+
     if ($instanceID) {
       if (!$isNew) {
         // updating an existing report instance
-        $dao->id = $instanceID;        
+        $dao->id = $instanceID;
       } else {
         // making a copy of an existing instance
         $isCopy = 1;
@@ -401,7 +399,7 @@ class CRM_Report_Form_Instance {
     $instanceUrl = CRM_Utils_System::url("civicrm/report/instance/{$dao->id}",
       "reset=1"
     );
-          
+
     CRM_Core_Session::setStatus($statusMsg);
 
     if ( $redirect ) {

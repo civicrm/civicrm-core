@@ -380,7 +380,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (isset($defaults['honor_contact_id'])) {
       $honorDefault = $ids = array();
       $this->_honorID = $defaults['honor_contact_id'];
-      $honorType = CRM_Core_PseudoConstant::honor();
+      $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
       $idParams = array(
         'id' => $defaults['honor_contact_id'],
         'contact_id' => $defaults['honor_contact_id'],
@@ -844,22 +844,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     //CRM-7362 --add campaigns.
     CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
 
-    // CRM-7368 allow user to set or edit PCP link for contributions
-    $siteHasPCPs = CRM_Contribute_PseudoConstant::pcPage();
-    if (!CRM_Utils_Array::crmIsEmptyArray($siteHasPCPs)) {
-      $this->assign('siteHasPCPs', 1);
-      $pcpDataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-        'className=CRM_Contact_Page_AJAX&fnName=getPCPList&json=1&context=contact&reset=1',
-        FALSE, NULL, FALSE
-      );
-      $this->assign('pcpDataUrl', $pcpDataUrl);
-      $this->addElement('text', 'pcp_made_through', ts('Credit to a Personal Campaign Page'));
-      $this->addElement('hidden', 'pcp_made_through_id', '', array('id' => 'pcp_made_through_id'));
-      $this->addElement('checkbox', 'pcp_display_in_roll', ts('Display in Honor Roll?'), NULL);
-      $this->addElement('text', 'pcp_roll_nickname', ts('Name (for Honor Roll)'));
-      $this->addElement('textarea', 'pcp_personal_note', ts('Personal Note (for Honor Roll)'));
-    }
-
     CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
 
     $js = NULL;
@@ -955,32 +939,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    // if honor roll fields are populated but no PCP is selected
-    if (!CRM_Utils_Array::value('pcp_made_through_id', $fields)) {
-      if (CRM_Utils_Array::value('pcp_display_in_roll', $fields) ||
-        CRM_Utils_Array::value('pcp_roll_nickname', $fields) ||
-        CRM_Utils_Array::value('pcp_personal_note', $fields)
-      ) {
-        $errors['pcp_made_through'] = ts('Please select a Personal Campaign Page, OR uncheck Display in Honor Roll and clear both the Honor Roll Name and the Personal Note field.');
-      }
-    }
-
-    if (!empty($fields['soft_credit_amount'])) {
-      $repeat = array_count_values($fields['soft_credit_contact_select_id']);
-      foreach ($fields['soft_credit_amount'] as $key => $val) {
-        if (!empty($fields['soft_credit_contact_select_id'][$key])) {
-          if ($repeat[$fields['soft_credit_contact_select_id'][$key]] > 1) {
-            $errors["soft_credit_contact_select_id[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');  
-          }
-          if ($fields['soft_credit_amount'][$key] && ($fields['soft_credit_amount'][$key] > $fields['total_amount'])) {
-            $errors["soft_credit_amount[$key]"] = ts('Soft credit amount cannot be more than the total amount.');
-          }
-          if (empty($fields['soft_credit_amount'][$key])) {
-            $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
-          }
-        }
-      }
-    }
+    $softErrors = CRM_Contribute_Form_SoftCredit::formRule($fields);
 
     if (CRM_Utils_Array::value('total_amount', $fields) && (CRM_Utils_Array::value('net_amount', $fields) || CRM_Utils_Array::value('fee_amount', $fields))) {
       $sum = CRM_Utils_Rule::cleanMoney($fields['net_amount']) + CRM_Utils_Rule::cleanMoney($fields['fee_amount']);
@@ -1007,6 +966,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
+    $errors = array_merge($errors, $softErrors);
     return $errors;
   }
 
@@ -1128,13 +1088,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     else {
       //build soft credit params
       if (!empty($submittedValues['soft_credit_contact_select_id'])) {
-        $softParams = array();
+        $softParams = $softIDs =array();
         foreach ($submittedValues['soft_credit_contact_select_id'] as $key => $val) {
           if ($val && $submittedValues['soft_credit_amount'][$key]) {
             $softParams[$key]['contact_id'] = $val;
             $softParams[$key]['amount'] = $submittedValues['soft_credit_amount'][$key];
-            if ($submittedValues['soft_credit_id'][$key]) {
-              $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
+            if (!empty($submittedValues['soft_credit_id'][$key])) {
+              $softIDs[] = $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
             }
           }
         }
@@ -1181,6 +1141,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       if (!empty($softParams)) {
         $params['soft_credit'] = $softParams;
+        $params['soft_credit_ids'] = $softIDs;
       }
 
       //if priceset is used, no need to cleanup money
@@ -1417,6 +1378,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (isset($submittedValues[$key])) {
         unset($submittedValues[$key]);
       }
+    }
+
+    // CRM-12680 set $_lineItem if its not set
+    if (empty($this->_lineItem) && !empty($lineItem)) {
+      $this->_lineItem = $lineItem;
     }
 
     //Get the rquire fields value only.

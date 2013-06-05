@@ -239,15 +239,13 @@ SELECT  survey.id                         as id,
    * @param boolean $onlyActive  retrieve only active surveys.
    * @param boolean $onlyDefault retrieve only default survey.
    * @param boolean $forceAll    retrieve all surveys.
+   * @param boolean $includePetition include or exclude petitions
    *
    * @static
    */
-  static function getSurveys($onlyActive = TRUE,
-    $onlyDefault = FALSE,
-    $forceAll = FALSE
-  ) {
+  static function getSurveys($onlyActive = TRUE, $onlyDefault = FALSE, $forceAll = FALSE, $includePetition = FALSE ) {
     $cacheKey = 0;
-    $cacheKeyParams = array('onlyActive', 'onlyDefault', 'forceAll');
+    $cacheKeyParams = array('onlyActive', 'onlyDefault', 'forceAll', 'includePetition');
     foreach ($cacheKeyParams as $param) {
       $cacheParam = $$param;
       if (!$cacheParam) {
@@ -259,14 +257,15 @@ SELECT  survey.id                         as id,
     static $surveys;
 
     if (!isset($surveys[$cacheKey])) {
+      if (!$includePetition) {
+        //we only have activity type as a
+        //difference between survey and petition.
+        $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
 
-      //we only have activity type as a
-      //difference between survey and petition.
-      $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
-
-      $where = array();
-      if ($petitionTypeID) {
-        $where[] = "( survey.activity_type_id != {$petitionTypeID} )";
+        $where = array();
+        if ($petitionTypeID) {
+          $where[] = "( survey.activity_type_id != {$petitionTypeID} )";
+        }
       }
       if (!$forceAll && $onlyActive) {
         $where[] = '( survey.is_active  = 1 )';
@@ -517,7 +516,7 @@ Group By  contact.id";
     }
 
     $targetContactIds = ' ( ' . implode(',', $voterIds) . ' ) ';
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
  
@@ -607,7 +606,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
             contact_a.display_name as voter_name";
     }
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
@@ -1007,7 +1006,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     }
 
     $interviewers = array();
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $query = "

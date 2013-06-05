@@ -193,7 +193,7 @@ abstract class CRM_Activity_Import_Parser {
    * @var boolean
    */
   protected $_haveColumnHeader;
-  
+
   function __construct() {
     $this->_maxLinesToProcess = 0;
     $this->_maxErrorCount = self::MAX_ERRORS;
@@ -426,14 +426,14 @@ abstract class CRM_Activity_Import_Parser {
     }
   }
 
-  /*function setActiveFieldLocationTypes( $elements ) 
+  /*function setActiveFieldLocationTypes( $elements )
     {
         for ($i = 0; $i < count( $elements ); $i++) {
             $this->_activeFields[$i]->_hasLocationType = $elements[$i];
         }
     }
-    
-    function setActiveFieldPhoneTypes( $elements ) 
+
+    function setActiveFieldPhoneTypes( $elements )
     {
         for ($i = 0; $i < count( $elements ); $i++) {
             $this->_activeFields[$i]->_phoneType = $elements[$i];
@@ -528,7 +528,7 @@ abstract class CRM_Activity_Import_Parser {
         $this->_fields[$name] = new CRM_Activity_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
       }
       else {
-        $this->_fields[$name] = new CRM_Import_Field($name, $title, $type, $headerPattern, $dataPattern, CRM_Utils_Array::value('hasLocationType', $tempField[$name]));
+        $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern, CRM_Utils_Array::value('hasLocationType', $tempField[$name]));
       }
     }
   }
@@ -634,17 +634,17 @@ abstract class CRM_Activity_Import_Parser {
     }
 
     foreach ($values as $k => $v) {
-      $values[$k] = preg_replace("/^$enclosure(.*) $enclosure$/", '$1', $v);
+      $values[$k] = preg_replace("/^$enclosure(.*)$enclosure$/", '$1', $v);
     }
   }
 
   function errorFileName($type) {
-    $fileName = CRM_Import_Parser::errorFileName($type);
+    $fileName = CRM_Contact_Import_Parser::errorFileName($type);
     return $fileName;
   }
 
   function saveFileName($type) {
-    $fileName = CRM_Import_Parser::saveFileName($type);
+    $fileName = CRM_Contact_Import_Parser::saveFileName($type);
     return $fileName;
   }
 }

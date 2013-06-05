@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -173,7 +172,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
   }
   function testGetEventByIdSort() {
-  	$params = array(
+    $params = array(
       'return.sort' => 'id ASC',
       'return.max_results' => 1,
       'version' => $this->_apiversion,
@@ -313,6 +312,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result, ' Event Creation Failedon line ' . __LINE__);
     $getresult = civicrm_api('event', 'get', array('version' => 3,) + $contributionTypeArray);
     $this->assertAPISuccess($result, ' Event Creation on line ' . __LINE__);
+    $this->assertEquals($getresult['values'][$getresult['id']]['contribution_type_id'], 3);
     $this->assertEquals($result['id'], $getresult['id']);
     civicrm_api('event', 'delete', array('version' => 3, 'id' => $result['id']));
   }

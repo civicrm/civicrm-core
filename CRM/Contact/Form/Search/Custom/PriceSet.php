@@ -36,7 +36,10 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
 
   protected $_eventID = NULL;
 
-  protected $_tableName = NULL; function __construct(&$formValues) {
+  protected $_tableName = NULL;
+  public $_permissionedComponent;
+
+  function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->_eventID = CRM_Utils_Array::value('event_id',
@@ -47,9 +50,11 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
 
     if ($this->_eventID) {
       $this->buildTempTable();
-
       $this->fillTable();
     }
+
+    // define component access permission needed
+    $this->_permissionedComponent = 'CiviEvent';
   }
 
   function __destruct() {

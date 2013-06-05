@@ -241,7 +241,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addRadio('privacy_toggle', ts('Privacy Options'), $options);
 
     // preferred communication method
-    $comm = CRM_Core_PseudoConstant::pcm();
+    $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
     $commPreff = array();
     foreach ($comm as $k => $v) {
@@ -254,13 +254,12 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addGroup($commPreff, 'preferred_communication_method', ts('Preferred Communication Method'));
 
     //CRM-6138 Preferred Language
-    $langPreff = CRM_Core_PseudoConstant::languages();
-    $form->add('select', 'preferred_language', ts('Preferred Language'), array('' => ts('- any -')) + $langPreff);
+    $form->add('select', 'preferred_language', ts('Preferred Language'), array('' => ts('- any -')) + CRM_Contact_BAO_Contact::buildOptions('preferred_language'));
 
     // Phone search
     $form->addElement('text', 'phone_numeric', ts('Phone Number'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
-    $locationType = CRM_Core_PseudoConstant::locationType();
-    $phoneType = CRM_Core_PseudoConstant::phoneType();
+    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $phoneType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $form->add('select', 'phone_location_type_id', ts('Phone Location'), array('' => ts('- any -')) + $locationType);
     $form->add('select', 'phone_phone_type_id', ts('Phone Type'), array('' => ts('- any -')) + $phoneType);
   }
@@ -381,7 +380,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     // checkboxes for location type
     $location_type = array();
-    $locationType = CRM_Core_PseudoConstant::locationType();
+    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     foreach ($locationType as $locationTypeID => $locationTypeName) {
       $location_type[] = $form->createElement('checkbox', $locationTypeID, NULL, $locationTypeName);
     }
@@ -470,14 +469,14 @@ class CRM_Contact_Form_Search_Criteria {
     $form->add('hidden', 'hidden_demographics', 1);
     // radio button for gender
     $genderOptions = array();
-    $gender = CRM_Core_PseudoConstant::gender();
+    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     foreach ($gender as $key => $var) {
       $genderOptions[$key] = $form->createElement('radio', NULL,
         ts('Gender'), $var, $key,
         array('id' => "civicrm_gender_{$var}_{$key}")
       );
     }
-    $form->addGroup($genderOptions, 'gender', ts('Gender'));
+    $form->addGroup($genderOptions, 'gender_id', ts('Gender'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'birth_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
 

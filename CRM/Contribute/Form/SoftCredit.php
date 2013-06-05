@@ -72,6 +72,21 @@ class CRM_Contribute_Form_SoftCredit {
       }
     }
 
+    // CRM-7368 allow user to set or edit PCP link for contributions
+    $siteHasPCPs = CRM_Contribute_PseudoConstant::pcPage();
+    if (!CRM_Utils_Array::crmIsEmptyArray($siteHasPCPs)) {
+      $form->assign('siteHasPCPs', 1);
+      $pcpDataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
+        'className=CRM_Contact_Page_AJAX&fnName=getPCPList&json=1&context=contact&reset=1',
+        FALSE, NULL, FALSE
+      );
+      $form->assign('pcpDataUrl', $pcpDataUrl);
+      $form->addElement('text', 'pcp_made_through', ts('Credit to a Personal Campaign Page'));
+      $form->addElement('hidden', 'pcp_made_through_id', '', array('id' => 'pcp_made_through_id'));
+      $form->addElement('checkbox', 'pcp_display_in_roll', ts('Display in Honor Roll?'), NULL);
+      $form->addElement('text', 'pcp_roll_nickname', ts('Name (for Honor Roll)'));
+      $form->addElement('textarea', 'pcp_personal_note', ts('Personal Note (for Honor Roll)'));
+    }
     $form->assign('showSoftCreditRow', $showSoftCreditRow);
     $form->assign('rowCount', $item_count);
     $form->assign('showCreateNew', $showCreateNew);
@@ -93,7 +108,7 @@ class CRM_Contribute_Form_SoftCredit {
       }
     }
 
-    if (CRM_Utils_Array::value('pcp_id', $form->_softCreditInfo)) {
+    elseif (CRM_Utils_Array::value('pcp_id', $form->_softCreditInfo)) {
       $pcpInfo = $form->_softCreditInfo;
       $pcpId = CRM_Utils_Array::value('pcp_id', $pcpInfo);
       $pcpTitle = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcpId, 'title');
@@ -104,6 +119,47 @@ class CRM_Contribute_Form_SoftCredit {
       $defaults['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcpInfo);
       $defaults['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcpInfo);
     }
+  }
+
+  /**
+   * global form rule
+   *
+   * @param array $fields  the input form values
+   *
+   * @return true if no errors, else array of errors
+   * @access public
+   * @static
+   */
+  static function formRule($fields) {
+    $errors = array();
+
+    // if honor roll fields are populated but no PCP is selected
+    if (!CRM_Utils_Array::value('pcp_made_through_id', $fields)) {
+      if (CRM_Utils_Array::value('pcp_display_in_roll', $fields) ||
+        CRM_Utils_Array::value('pcp_roll_nickname', $fields) ||
+        CRM_Utils_Array::value('pcp_personal_note', $fields)
+      ) {
+        $errors['pcp_made_through'] = ts('Please select a Personal Campaign Page, OR uncheck Display in Honor Roll and clear both the Honor Roll Name and the Personal Note field.');
+      }
+    }
+
+    if (!empty($fields['soft_credit_amount'])) {
+      $repeat = array_count_values($fields['soft_credit_contact_select_id']);
+      foreach ($fields['soft_credit_amount'] as $key => $val) {
+        if (!empty($fields['soft_credit_contact_select_id'][$key])) {
+          if ($repeat[$fields['soft_credit_contact_select_id'][$key]] > 1) {
+            $errors["soft_credit_contact_select_id[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
+          }
+          if ($fields['soft_credit_amount'][$key] && ($fields['soft_credit_amount'][$key] > $fields['total_amount'])) {
+            $errors["soft_credit_amount[$key]"] = ts('Soft credit amount cannot be more than the total amount.');
+          }
+          if (empty($fields['soft_credit_amount'][$key])) {
+            $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
+          }
+        }
+      }
+    }
+    return $errors;
   }
 }
 

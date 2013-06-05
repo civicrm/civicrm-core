@@ -93,7 +93,7 @@ fi
 cd $CALLEDPATH/..
 "$PHP5PATH"php bin/cli.php -e System -a flush --triggers 1 --session 1
 
-# reset config_backend and userFrameworkResourceURL which gets set 
+# reset config_backend and userFrameworkResourceURL which gets set
 # when config object is initialized
 mysql -u$DBUSER $PASSWDSECTION $DBARGS $DBNAME -e "UPDATE civicrm_domain SET config_backend = NULL; UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL';"
 

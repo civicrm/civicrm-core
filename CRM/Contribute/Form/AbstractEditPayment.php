@@ -167,12 +167,12 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
     if (CRM_Utils_Array::value('financialTrxnId', $fids)) {
       $this->_online = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $fids['financialTrxnId'], 'payment_processor_id');
     }
-    
+
     // Also don't allow user to update some fields for recurring contributions.
     if (!$this->_online) {
       $this->_online = CRM_Utils_Array::value('contribution_recur_id', $values);
     }
-    
+
     $this->assign('isOnline', $this->_online ? TRUE : FALSE);
 
     //unset the honor type id:when delete the honor_contact_id
@@ -354,7 +354,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @return void
    */
   public function assignBillingType() {
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $this->_bltID = array_search('Billing', $locationTypes);
     if (!$this->_bltID) {
       CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));

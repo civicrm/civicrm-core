@@ -150,18 +150,25 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         $group->name = CRM_Utils_String::munge($group->title, '_', 64);
       }
 
-      // lets create the table associated with the group and save it
-      $tableName = $group->table_name = "civicrm_value_" . strtolower($group->name);
+      if (isset($params['table_name'])) {
+        $tableName = $params['table_name'];
+
+        if (CRM_Core_DAO_AllCoreTables::isCoreTable($tableName)) {
+          // Bad idea.  Prevent group creation because it might lead to a broken configuration.
+          CRM_Core_Error::fatal(ts("Cannot create custom table because %1 is already a core table.", array('1' => $tableName)));
+        }
+      }
     }
 
     // enclose the below in a transaction
     $transaction = new CRM_Core_Transaction();
 
     $group->save();
-    if ($tableName) {
-      // now append group id to table name, this prevent any name conflicts
-      // like CRM-2742
-      $tableName .= "_{$group->id}";
+    if (!isset($params['id'])) {
+      if (!isset($params['table_name'])) {
+        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 32));
+        $tableName = "civicrm_value_{$munged_title}_{$group->id}";
+      }
       $group->table_name = $tableName;
       CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomGroup',
         $group->id,
@@ -297,7 +304,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @static
    *
    */
-  public static function &getTree($entityType,
+  public static function &getTree(
+    $entityType,
     &$form,
     $entityID = NULL,
     $groupID  = NULL,
@@ -2040,10 +2048,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
           // description is expected to be a callback func to subtypes
           list($callback, $args) = explode(';', trim($ovValues['description']));
 
-          if (!empty($args)) {
-            eval('$args = ' . $args . ';');
-          }
-          else {
+          if (empty($args)) {
             $args = array();
           }
 
@@ -2064,7 +2069,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $objTypes;
   }
 
-  function hasReachedMaxLimit($customGroupId, $entityId) {
+  static function hasReachedMaxLimit($customGroupId, $entityId) {
     //check whether the group is multiple
     $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_multiple');
     $isMultiple = ($isMultiple) ? TRUE : FALSE;

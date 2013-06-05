@@ -429,7 +429,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $params = array('id' => $this->_eventId);
 
       // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
       // CRM-8108 remove ts from Billing as the location type can not be translated in CiviCRM!
       //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
@@ -688,7 +688,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
       }
       $this->assign($name, $fields);
-      $profileAddressFields = array();
       if (is_array($fields)) {
         foreach ($fields as $key => $field) {
           if ($viewOnly &&
@@ -715,15 +714,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             }
             $stateCountryMap[$index][$prefixName] = $key;
           }
-          CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields);
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
 
           $this->_fields[$key] = $field;
         }
       }
-      if (!empty($profileAddressFields)) {
-        $this->set('profileAddressFields', $profileAddressFields);
-      }
+
       CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
       if ($addCaptcha && !$viewOnly) {

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -36,11 +35,6 @@
  * @copyright CiviCRM LLC (c) 2004-2013
  * @version $Id: CustomField.php 30879 2010-11-22 15:45:55Z shot $
  */
-
-/**
- * Files required for this package
- */
-require_once 'CRM/Core/BAO/CustomField.php';
 
 /**
  * Most API functions take in associative arrays ( name => value pairs
@@ -98,7 +92,7 @@ function civicrm_api3_custom_field_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_custom_field_create_spec(&$params) {
@@ -139,11 +133,11 @@ function civicrm_api3_custom_field_get($params) {
 }
 
 /*
- * Helper function to validate custom field values 
- * 
+ * Helper function to validate custom field values
+ *
  * @params Array   $params             Custom fields with values
- * @params Array   $errors             Reference fields to be check with 
- * @params Boolean $checkForDisallowed Check for disallowed elements 
+ * @params Array   $errors             Reference fields to be check with
+ * @params Boolean $checkForDisallowed Check for disallowed elements
  *                                     in params
  * @params Boolean $checkForRequired   Check for non present required elements
  *                                     in params
@@ -152,7 +146,7 @@ function civicrm_api3_custom_field_get($params) {
 
 /**
  * Helper function to validate custom field value
- * 
+ *
  * @params String $fieldName    Custom field name (eg: custom_8 )
  * @params Mixed  $value        Field value to be validate
  * @params Array  $fieldDetails Field Details
@@ -238,7 +232,7 @@ function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDet
       }
 
       $query = "
-SELECT count(*) 
+SELECT count(*)
   FROM civicrm_state_province
  WHERE id IN ('" . implode("','", $value) . "')";
       if (CRM_Core_DAO::singleValueQuery($query) < count($value)) {
@@ -255,7 +249,6 @@ SELECT count(*)
     'Select', 'Multi-Select', 'CheckBox', 'Radio', 'AdvMulti-Select')) &&
     !isset($errors[$fieldName])
   ) {
-    require_once 'CRM/Core/OptionGroup.php';
     $options = CRM_Core_OptionGroup::valuesByID($fieldDetails['option_group_id']);
     if (!is_array($value)) {
       $value = array($value);

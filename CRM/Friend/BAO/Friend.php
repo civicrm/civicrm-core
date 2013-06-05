@@ -135,7 +135,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     //activity creation
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
  
     //friend contacts creation
@@ -240,7 +240,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @return None
    * @access public
    */
-  function buildFriendForm($form) {
+  static function buildFriendForm($form) {
     $form->addElement('checkbox', 'tf_is_active', ts('Tell a Friend enabled?'), NULL, array('onclick' => "friendBlock(this)"));
     // name
     $form->add('text', 'tf_title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'title'), TRUE);

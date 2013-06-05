@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -150,7 +149,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           'priority_id' =>
           array('title' => ts('Priority'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::priority(),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
           ),
         ),
         'group_bys' =>
@@ -291,25 +290,25 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
     $this->_from = "
         FROM civicrm_activity {$this->_aliases['civicrm_activity']}
-        
-             LEFT JOIN civicrm_activity_target target_activity 
-                    ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id 
+
+             LEFT JOIN civicrm_activity_target target_activity
+                    ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id
              LEFT JOIN civicrm_activity_assignment assignment_activity
-                    ON {$this->_aliases['civicrm_activity']}.id = assignment_activity.activity_id 
+                    ON {$this->_aliases['civicrm_activity']}.id = assignment_activity.activity_id
              LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_activity']}.source_contact_id = {$this->_aliases['civicrm_contact']}.id OR
                          target_activity.target_contact_id = {$this->_aliases['civicrm_contact']}.id                      OR
                          assignment_activity.assignee_contact_id = {$this->_aliases['civicrm_contact']}.id )
              {$this->_aclFrom}
-             LEFT JOIN civicrm_option_value 
+             LEFT JOIN civicrm_option_value
                     ON ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
-             LEFT JOIN civicrm_option_group 
+             LEFT JOIN civicrm_option_group
                     ON civicrm_option_group.id = civicrm_option_value.option_group_id
-             LEFT JOIN civicrm_case_activity 
+             LEFT JOIN civicrm_case_activity
                     ON civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
-             LEFT JOIN civicrm_case 
+             LEFT JOIN civicrm_case
                     ON civicrm_case_activity.case_id = civicrm_case.id
-             LEFT JOIN civicrm_case_contact 
+             LEFT JOIN civicrm_case_contact
                     ON civicrm_case_contact.case_id = civicrm_case.id ";
 
     if ($this->_emailField) {
@@ -328,7 +327,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   }
 
   function where() {
-    $this->_where = " WHERE civicrm_option_group.name = 'activity_type' AND 
+    $this->_where = " WHERE civicrm_option_group.name = 'activity_type' AND
                                 {$this->_aliases['civicrm_activity']}.is_test = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_current_revision = 1";

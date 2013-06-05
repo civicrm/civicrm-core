@@ -115,9 +115,11 @@ function custom_option_html_type( ) {
     if ( data_type_id == 4 ) {
         cj("#noteColumns").show();
         cj("#noteRows").show();
+        cj("#noteLength").show();
     } else {
         cj("#noteColumns").hide();
         cj("#noteRows").hide();
+        cj("#noteLength").hide();
     }
 
     if ( data_type_id > 3) {
@@ -208,6 +210,10 @@ function custom_option_html_type( ) {
       <tr class="crm-custom-field-form-block-note_columns" id="noteColumns" {if $action neq 2 && ($form.data_type.value.0.0 != 4)}class="hide-block"{/if}>
             <td class="label">{$form.note_columns.label}</td>
             <td class="html-adjust">{$form.note_columns.html}</td>
+        </tr>
+        <tr class="crm-custom-field-form-block-note_length" id="noteLength" {if $action neq 2 && ($form.data_type.value.0.0 != 4)}class="hide-block"{/if}>
+            <td class="label">{$form.note_length.label}</td>
+            <td class="html-adjust">{$form.note_length.html} <span class="description">{ts}Leave blank for unlimited. This limit is not implemented by all browsers and rich text editors.{/ts}</span></td>
         </tr>
         <tr class="crm-custom-field-form-block-weight" >
             <td class="label">{$form.weight.label}</td>

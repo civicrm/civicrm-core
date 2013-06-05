@@ -49,7 +49,7 @@
     <column>sic_code</column>
     <column>user_unique_id</column>
     <column>employer_id</column>
-	<column>is_deleted</column>
+  <column>is_deleted</column>
     <row>
       <value>23</value>  <!--  id  -->
       <value>Individual</value>           <!--  contact_type  -->
@@ -98,7 +98,7 @@
       <null /><!--  sic_code  -->
       <null /><!--  user_unique_id  -->
       <null /><!--  employer_id  -->
-	  <value>0</value>
+    <value>0</value>
     </row>
   </table>
 </dataset>

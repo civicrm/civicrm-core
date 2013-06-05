@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -38,12 +37,6 @@
  */
 
 /**
- * Include utility functions
- */
-
-require_once 'CRM/Member/DAO/MembershipPayment.php';
-
-/**
  * Add or update a link between contribution and membership
  *
  * @param  array   $params           (reference ) input parameters
@@ -55,7 +48,6 @@ require_once 'CRM/Member/DAO/MembershipPayment.php';
  */
 function civicrm_api3_membership_payment_create($params) {
 
-  require_once 'CRM/Core/Transaction.php';
   $transaction = new CRM_Core_Transaction();
 
 
@@ -77,7 +69,7 @@ function civicrm_api3_membership_payment_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */

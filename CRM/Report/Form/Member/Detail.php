@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -41,15 +39,25 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
   protected $_emailField = FALSE;
 
   protected $_phoneField = FALSE;
-  
+
   protected $_contribField = FALSE;
 
   protected $_summary = NULL;
 
   protected $_customGroupExtends = array('Membership', 'Contribution');
-  protected $_customGroupGroupBy = FALSE; 
-  
+  protected $_customGroupGroupBy = FALSE;
+
   function __construct() {
+
+    // Check if CiviCampaign is a) enabled and b) has active campaigns
+  $config = CRM_Core_Config::singleton();
+    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    if ($campaignEnabled) {
+      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
+      $this->activeCampaigns = $getCampaigns['campaigns'];
+      asort($this->activeCampaigns);
+    }
+
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -94,6 +102,15 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           ),
           'id' =>
           array('no_display' => TRUE),
+        ),
+        'order_bys' =>
+        array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'ASC'
+          ),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -257,6 +274,20 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
+  // If we have active campaigns add those elements to both the fields and filters
+    if ($campaignEnabled && !empty($this->activeCampaigns)) {
+      $this->_columns['civicrm_membership']['fields']['campaign_id'] = array(
+        'title' => ts('Campaign'),
+        'default' => 'false',
+      );
+      $this->_columns['civicrm_membership']['filters']['campaign_id'] = array('title' => ts('Campaign'),
+        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'options' => $this->activeCampaigns,
+      );
+      $this->_columns['civicrm_membership']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
+
+    }
+
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
   }
@@ -305,49 +336,49 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
     $this->_from = "
          FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-               INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']} 
-                          ON {$this->_aliases['civicrm_contact']}.id = 
+               INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
+                          ON {$this->_aliases['civicrm_contact']}.id =
                              {$this->_aliases['civicrm_membership']}.contact_id AND {$this->_aliases['civicrm_membership']}.is_test = 0
                LEFT  JOIN civicrm_membership_status {$this->_aliases['civicrm_membership_status']}
-                          ON {$this->_aliases['civicrm_membership_status']}.id = 
+                          ON {$this->_aliases['civicrm_membership_status']}.id =
                              {$this->_aliases['civicrm_membership']}.status_id ";
 
 
     //used when address field is selected
     if ($this->_addressField) {
       $this->_from .= "
-             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-                       ON {$this->_aliases['civicrm_contact']}.id = 
-                          {$this->_aliases['civicrm_address']}.contact_id AND 
+             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                       ON {$this->_aliases['civicrm_contact']}.id =
+                          {$this->_aliases['civicrm_address']}.contact_id AND
                           {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
     //used when email field is selected
     if ($this->_emailField) {
       $this->_from .= "
-              LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} 
-                        ON {$this->_aliases['civicrm_contact']}.id = 
-                           {$this->_aliases['civicrm_email']}.contact_id AND 
+              LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
+                        ON {$this->_aliases['civicrm_contact']}.id =
+                           {$this->_aliases['civicrm_email']}.contact_id AND
                            {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
     //used when phone field is selected
     if ($this->_phoneField) {
       $this->_from .= "
-              LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']} 
-                        ON {$this->_aliases['civicrm_contact']}.id = 
-                           {$this->_aliases['civicrm_phone']}.contact_id AND 
+              LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+                        ON {$this->_aliases['civicrm_contact']}.id =
+                           {$this->_aliases['civicrm_phone']}.contact_id AND
                            {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
     }
     //used when contribution field is selected
     if ($this->_contribField) {
       $this->_from .= "
               LEFT JOIN (
-                  SELECT cc.*, cmp.membership_id as membership_id 
+                  SELECT cc.*, cmp.membership_id as membership_id
                   FROM civicrm_membership_payment cmp
-                    JOIN civicrm_contribution cc 
-                      ON cc.id = cmp.contribution_id 
+                    JOIN civicrm_contribution cc
+                      ON cc.id = cmp.contribution_id
                   ORDER BY cc.receive_date DESC
-                  ) {$this->_aliases['civicrm_contribution']} 
-                ON {$this->_aliases['civicrm_membership']}.id = 
+                  ) {$this->_aliases['civicrm_contribution']}
+                ON {$this->_aliases['civicrm_membership']}.id =
                   {$this->_aliases['civicrm_contribution']}.membership_id\n";
     }
   }
@@ -400,10 +431,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
   }
 
-  function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  }
-
   function postProcess() {
 
     $this->beginPostProcess();
@@ -424,11 +451,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     // custom code to alter rows
     $entryFound = FALSE;
     $checkList = array();
-    
+
     $contributionTypes  = CRM_Contribute_PseudoConstant::financialType();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
-    
+
     foreach ($rows as $rowNum => $row) {
 
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
@@ -482,7 +509,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
         $entryFound = TRUE;
       }
-      
+
       if ($value = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $contributionTypes[$value];
         $entryFound = TRUE;
@@ -494,6 +521,14 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       if ($value = CRM_Utils_Array::value('civicrm_contribution_payment_instrument_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_payment_instrument_id'] = $paymentInstruments[$value];
         $entryFound = TRUE;
+      }
+
+      // Convert campaign_id to campaign title
+      if (array_key_exists('civicrm_membership_campaign_id', $row)) {
+        if ($value = $row['civicrm_membership_campaign_id']) {
+          $rows[$rowNum]['civicrm_membership_campaign_id'] = $this->activeCampaigns[$value];
+          $entryFound = TRUE;
+        }
       }
 
       if (!$entryFound) {

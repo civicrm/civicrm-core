@@ -16,10 +16,15 @@
         <autoincrement>true</autoincrement>
     </primaryKey>
     <field>
-        <name>group_id</name>
-        <type>int unsigned</type>
-        <required>true</required>
-        <comment>FK to Group</comment>
+      <name>group_id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <comment>FK to Group</comment>
+      <pseudoconstant>
+        <table>civicrm_group</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>title</labelColumn>
+      </pseudoconstant>
     </field>
     <foreignKey>
         <name>group_id</name>

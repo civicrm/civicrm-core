@@ -32,13 +32,13 @@
           {ts}WARNING: Deleting this option value will result in the loss of all records which use the option value.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
       </div>
    {else}
-      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div> 
+      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
         <tr class="crm-admin-optionvalue-form-block-label">
-            <td class="label">{$form.label.label} 
+            <td class="label">{$form.label.label}
               {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_option_value' field='label' id=$id}{/if}</td>
             <td>{$form.label.html}</td>
-        </tr>    
+        </tr>
         <tr class="crm-admin-optionvalue-form-block-value">
             <td class="label">{$form.value.label}</td>
             <td>{$form.value.html}<br />
@@ -49,8 +49,8 @@
               <span class="description">{ts}The same option value is stored for all languages. Changing this value will change it for all languages.{/ts}</span>
             {/if}
             </td>
-        </tr> 
-        <tr class="crm-admin-optionvalue-form-block-name">   
+        </tr>
+        <tr class="crm-admin-optionvalue-form-block-name">
             <td class="label">{$form.name.label}</td>
             <td>{$form.name.html}</td>
         </tr>
@@ -58,12 +58,12 @@
             <td class="label">{$form.grouping.label}</td>
             <td>{$form.grouping.html}</td>
         </tr>
-	{if $form.financial_account_id}
+  {if $form.financial_account_id}
           <tr class="crm-admin-optionvalue-form-block-financialAccount">
             <td class="label">{$form.financial_account_id.label}</td>
             <td>{$form.financial_account_id.html}</td>
           </tr>
-	{/if}
+  {/if}
         <tr class="crm-admin-optionvalue-form-block-description">
             <td class="label">{$form.description.label}</td>
             <td>{$form.description.html}</td>
@@ -91,8 +91,8 @@
             <td class="label">{$form.contactOptions.label}</td>
             <td>{$form.contactOptions.html}</td>
         </tr>
-       {/if}  
-      </table> 
+       {/if}
+      </table>
      {/if}
-     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>      
+     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

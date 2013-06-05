@@ -176,7 +176,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
       $queryString = "
       SELECT cg.id as cgId
  FROM civicrm_custom_group cg
- INNER JOIN civicrm_custom_field cf 
+ INNER JOIN civicrm_custom_field cf
  ON cg.id = cf.custom_group_id
 WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
 
@@ -433,14 +433,14 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     return TRUE;
   }
 
-  /* Function to find out whether given profile group uses $required 
+  /* Function to find out whether given profile group uses $required
    * and/or $optionalprofile types
-   *  
+   *
    * @param integer $ufGroupId  profile id
    * @param array   $required   array of types those are required
    * @param array   $optional   array of types those are optional
    *
-   * @return boolean $valid  
+   * @return boolean $valid
    * @static
    */
   static function checkValidProfileType($ufGroupId, $required, $optional = NULL) {
@@ -724,8 +724,8 @@ SELECT ufg.id as id
     }
 
     $query = "
-SELECT  id 
-  From  civicrm_uf_field 
+SELECT  id
+  From  civicrm_uf_field
  WHERE  (in_selector = 1 OR is_searchable = 1)
    AND  uf_group_id = {$profileID}";
 

@@ -55,7 +55,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @return void
    * @access public
-   */ 
+   */
   function preProcess() {
     $this->_addProfileBottom = CRM_Utils_Array::value('addProfileBottom', $_GET, FALSE);
     $this->_profileBottomNum = CRM_Utils_Array::value('addProfileNum', $_GET, 0);
@@ -257,11 +257,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       ts('Allow Online Registration?'),
       NULL,
       array(
-        'onclick' => "return showHideByValue('is_online_registration', 
-        '', 
-        'registration_blocks', 
-        'block', 
-        'radio', 
+        'onclick' => "return showHideByValue('is_online_registration',
+        '',
+        'registration_blocks',
+        'block',
+        'radio',
         false );",
       )
     );
@@ -288,7 +288,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       ts('Register multiple participants?'),
       NULL,
       array(
-        'onclick' => "return (showHideByValue('is_multiple_registrations', '', 'additional_profile_pre|additional_profile_post', 'table-row', 'radio', false) || 
+        'onclick' => "return (showHideByValue('is_multiple_registrations', '', 'additional_profile_pre|additional_profile_post', 'table-row', 'radio', false) ||
                                                       showRuleFields( " . json_encode($ruleFields) . " ));")
     );
 
@@ -350,7 +350,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $form->add('select', 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $mainProfiles);
 
     $form->add('select', 'additional_custom_pre_id', ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $addtProfiles);
-    $form->add('select', 'additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $addtProfiles);
+    // Allow user to NOT provide a bottom profile for Additional Participant registration
+    $form->add('select', 'additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), array('none' => ts('- no profile -')) + $addtProfiles);
   }
 
   function buildMultipleProfileBottom(&$form, $count, $prefix = '', $name = 'Include Profile') {
@@ -362,7 +363,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     if ($prefix == 'additional_') {
       $mainProfiles = array(
-        '' => ts('- same as for main contact -')) + $profiles;
+        '' => ts('- same as for main contact -'), 'none' => ts('- no profile -')) + $profiles;
     }
     else {
       $mainProfiles = array(
@@ -458,7 +459,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           $errorMsg['confirm_from_email'] = ts('Please enter Confirmation Email FROM Email Address.');
         }
       }
-      
+
       if ($values['registration_start_date'] && $values['registration_end_date']) {
         $start = CRM_Utils_Date::processDate($values['registration_start_date']);
         $end   = CRM_Utils_Date::processDate($values['registration_end_date']);
@@ -529,7 +530,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         else {
           $isPreError = FALSE;
         }
-        
+
         // We don't have required Individual fields in the pre-custom profile, so now check the post-custom profile
         if ($isPreError) {
           $additionalCustomPostId = CRM_Utils_Array::value('additional_custom_post_id', $values);

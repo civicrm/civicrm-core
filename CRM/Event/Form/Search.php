@@ -382,11 +382,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
 
-    // we don't show test registrations in Contact Summary / User Dashboard
-    // in Search mode by default we hide test registrations
-    if (!CRM_Utils_Array::value('participant_test',
-        $this->_formValues
-      )) {
+    // We don't show test records in summaries or dashboards
+    if (empty($this->_formValues['participant_test']) && $this->_force) {
       $this->_formValues["participant_test"] = 0;
     }
 

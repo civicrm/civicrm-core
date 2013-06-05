@@ -14,3 +14,21 @@ INSERT INTO civicrm_setting
   (domain_id, contact_id, is_domain, group_name, name, value)
 VALUES
   ({$domainID}, NULL, 1, 'Mailing Preferences', 'write_activity_record', '{serialize}1{/serialize}');
+
+-- CRM-12580
+ALTER TABLE civicrm_contact ADD  INDEX index_is_deleted_sort_name(is_deleted, sort_name, id);
+ALTER TABLE civicrm_contact DROP INDEX index_is_deleted;
+
+-- CRM-12495
+DROP TABLE IF EXISTS `civicrm_task_status`;
+DROP TABLE IF EXISTS `civicrm_task`;
+DROP TABLE IF EXISTS `civicrm_project`;
+
+-- CRM-12425
+SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Spam';
+INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
+VALUES (@bounceTypeID, 'X-HmXmrOriginalRecipient');
+
+-- CRM-12716
+UPDATE civicrm_custom_field SET text_length = NULL WHERE html_type = 'TextArea' AND text_length = 255;
+

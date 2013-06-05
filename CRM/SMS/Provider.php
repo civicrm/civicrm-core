@@ -82,7 +82,7 @@ abstract class CRM_SMS_Provider {
         CRM_Core_Error::fatal("Could not locate extension for {$providerName}.");
       }
 
-      self::$_singleton[$cacheKey] = eval('return ' . $paymentClass . '::singleton( $providerParams, $force );');
+      self::$_singleton[$cacheKey] = $paymentClass::singleton($providerParams, $force);
     }
     return self::$_singleton[$cacheKey];
   }
@@ -126,10 +126,10 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     }
 
     if (!$sourceContactID) {
-    	$sourceContactID = CRM_Utils_Array::value('Contact', $headers);
+      $sourceContactID = CRM_Utils_Array::value('Contact', $headers);
     }
     if (!$sourceContactID) {
-    	return false;
+      return false;
     }
 
     $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'SMS', 'name');
@@ -160,30 +160,32 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
   }
 
   function processInbound($from, $body, $to = NULL, $trackID = NULL) {
-  	$formatFrom   = $this->formatPhone($this->stripPhone($from), $like, "like"); 
+    $formatFrom   = $this->formatPhone($this->stripPhone($from), $like, "like");
     $escapedFrom  = CRM_Utils_Type::escape($formatFrom, 'String');
     $fromContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone WHERE phone LIKE "' . $escapedFrom . '"');
-    
+
     if (! $fromContactID) {
-    	// unknown mobile sender -- create new contact
-    	// use fake @mobile.sms email address for new contact since civi
-    	// requires email or name for all contacts
-    	$locationTypes =& CRM_Core_PseudoConstant::locationType();
-    	$phoneTypes    =& CRM_Core_PseudoConstant::phoneType();
-    	$phoneloc  = array_search( 'Home',  $locationTypes );
-    	$phonetype = array_search( 'Mobile', $phoneTypes );
-    	$stripFrom = $this->stripPhone($from);
-    	$contactparams = 
-        Array ( 'contact_type' => 'Individual',
-                'email' => Array ( 1 => Array ( 'location_type_id' => $phoneloc,
-                                                'email' => $stripFrom . '@mobile.sms' )
-                                   ),
-                'phone' => Array ( 1 => Array( 'phone_type_id' => $phonetype,
-                                               'location_type_id' => $phoneloc,
-                                               'phone' => $stripFrom )
-                                   )
-                );
-    	$fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);
+      // unknown mobile sender -- create new contact
+      // use fake @mobile.sms email address for new contact since civi
+      // requires email or name for all contacts
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+      $phoneloc = array_search('Home', $locationTypes);
+      $phonetype = array_search('Mobile', $phoneTypes);
+      $stripFrom = $this->stripPhone($from);
+      $contactparams = array(
+        'contact_type' => 'Individual',
+        'email' => array(1 => array(
+          'location_type_id' => $phoneloc,
+          'email' => $stripFrom . '@mobile.sms'
+        )),
+        'phone' => array(1 => array(
+          'phone_type_id' => $phonetype,
+          'location_type_id' => $phoneloc,
+          'phone' => $stripFrom
+        )),
+      );
+      $fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);
       $fromContactID = $fromContact->id;
     }
 

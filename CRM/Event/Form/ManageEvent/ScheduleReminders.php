@@ -104,7 +104,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    * @access public
    */
   public function buildQuickForm() {
-    $field = 'civicrm_event';  
+    $field = 'civicrm_event';
     if ($this->_isTemplate) {
       $field = 'event_template';
     }
@@ -166,7 +166,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $this->add('select', 'end_date', ts('Date Field'), $sel4, TRUE);
 
     $recipient = 'event_contacts';
-    $this->add('select', 'recipient', ts('Additional Recipient(s)'), $sel5[$recipient],
+    $this->add('select', 'recipient', ts('Limit Recipients'), $sel5[$recipient],
       FALSE, array('onClick' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
     $recipientListing = $this->add('select', 'recipient_listing', ts('Recipient Listing'),

@@ -274,8 +274,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     }
 
     if (!$key) {
-      $msg = ts('We can\'t load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site adminstrator for assistance.') . '<br /><br />' . ts('Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.') . '<br /><br />' . ts('Error type: Could not find a valid session key.');
-      CRM_Core_Error::fatal($msg);
+      $this->invalidKey();
     }
 
     $this->_key = $key;
@@ -749,5 +748,17 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     list($pageName, $action) = $actionName;
     return $this->_pages[$pageName]->cancelAction();
   }
-}
 
+  /**
+   * Write a simple fatal error message. Other controllers can decide to do something else
+   * and present the user a better message and/or redirect to the same page with a reset url
+   *
+   * @return void
+   *
+   */
+  public function invalidKey() {
+    $msg = ts('We can\'t load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site adminstrator for assistance.') . '<br /><br />' . ts('Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.') . '<br /><br />' . ts('Error type: Could not find a valid session key.');
+    CRM_Core_Error::fatal($msg);
+  }
+
+}

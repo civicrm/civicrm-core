@@ -27,7 +27,7 @@
   {ts}Destination{/ts}
 {/htxt}
 {htxt id="id-menu_url"}
-{ts}Enter the destination URL. Generally you should use relative URLs for CiviCRM pages (e.g. links to profiles). Use complete URLs for external pages. Leave this field empty if you are creating a menu section that does not have a clickable destination.{/ts} 
+{ts}Enter the destination URL. Generally you should use relative URLs for CiviCRM pages (e.g. links to profiles). Use complete URLs for external pages. Leave this field empty if you are creating a menu section that does not have a clickable destination.{/ts}
 {/htxt}
 
 {htxt id="id-parent-title"}

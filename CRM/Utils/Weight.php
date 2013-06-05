@@ -88,8 +88,7 @@ class CRM_Utils_Weight {
    * @return bool
    */
   static function delWeight($daoName, $fieldID, $fieldValues = NULL, $weightField = 'weight') {
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-    eval('$object   = new ' . $daoName . '( );');
+    $object = new $daoName();
     $object->id = $fieldID;
     if (!$object->find(TRUE)) {
       return FALSE;
@@ -354,7 +353,7 @@ class CRM_Utils_Weight {
       'url' => $returnURL,
       'filter' => $filter,
     );
-    
+
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$SIGNABLE_FIELDS);
     $queryParams['_sgn'] = $signer->sign($queryParams);
     $baseURL = CRM_Utils_System::url('civicrm/admin/weight', $queryParams);
@@ -412,9 +411,7 @@ class CRM_Utils_Weight {
     $src     = CRM_Utils_Request::retrieve('src', 'Integer', CRM_Core_DAO::$_nullObject);
     $dst     = CRM_Utils_Request::retrieve('dst', 'Integer', CRM_Core_DAO::$_nullObject);
     $dir     = CRM_Utils_Request::retrieve('dir', 'String', CRM_Core_DAO::$_nullObject);
-
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-    eval('$object   = new ' . $daoName . '( );');
+    $object   = new $daoName();
     $srcWeight = CRM_Core_DAO::getFieldValue($daoName, $src, 'weight', $idName);
     $dstWeight = CRM_Core_DAO::getFieldValue($daoName, $dst, 'weight', $idName);
     if ($srcWeight == $dstWeight) {

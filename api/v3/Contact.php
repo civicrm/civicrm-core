@@ -78,7 +78,7 @@ function civicrm_api3_contact_create($params) {
   }
 
   if (!empty($params['home_url'])) {
-    $websiteTypes = CRM_Core_PseudoConstant::websiteType();
+    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
     $params['website'] = array(1 => array('website_type_id' => key($websiteTypes),
         'url' => $params['home_url'],
       ),
@@ -86,15 +86,15 @@ function civicrm_api3_contact_create($params) {
   }
 
   if (isset($params['suffix_id']) && !(is_numeric($params['suffix_id']))) {
-    $params['suffix_id'] = array_search($params['suffix_id'], CRM_Core_PseudoConstant::individualSuffix());
+    $params['suffix_id'] = array_search($params['suffix_id'], CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'));
   }
 
   if (isset($params['prefix_id']) && !(is_numeric($params['prefix_id']))) {
-    $params['prefix_id'] = array_search($params['prefix_id'], CRM_Core_PseudoConstant::individualPrefix());
+    $params['prefix_id'] = array_search($params['prefix_id'], CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'));
   }
 
   if (isset($params['gender_id']) && !(is_numeric($params['gender_id']))) {
-    $params['gender_id'] = array_search($params['gender_id'], CRM_Core_PseudoConstant::gender());
+    $params['gender_id'] = array_search($params['gender_id'], CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'));
   }
 
   $error = _civicrm_api3_greeting_format_params($params);
@@ -560,6 +560,10 @@ function civicrm_api3_contact_getquick($params) {
   }
   // If we are doing quicksearch by a field other than name, make sure that field is added to results
   if (!empty($params['field_name'])) {
+    // Unique name contact_id = id
+    if ($params['field_name'] == 'contact_id') {
+      $params['field_name'] = 'id';
+    }
     // phone_numeric should be phone
     $searchField = str_replace('_numeric', '', $params['field_name']);
     if(!in_array($searchField, $list)) {

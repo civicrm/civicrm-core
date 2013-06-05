@@ -81,7 +81,6 @@
     <type>int unsigned</type>
     <title>Grant Type Id</title>
     <pseudoconstant>
-      <name>grantType</name>
       <optionGroupName>grant_type</optionGroupName>
     </pseudoconstant>
     <export>false</export>
@@ -92,6 +91,9 @@
   <index>
     <name>index_grant_type_id</name>
     <fieldName>grant_type_id</fieldName>
+    <pseudoconstant>
+      <optionGroupName>grant_type</optionGroupName>
+    </pseudoconstant>
     <add>1.8</add>
   </index>
   <field>     
@@ -128,6 +130,11 @@
     <required>true</required>
     <comment>3 character string, value from config setting or input via user.</comment>
     <add>3.2</add>
+      <pseudoconstant>
+        <table>civicrm_currency</table>
+        <keyColumn>name</keyColumn>
+        <labelColumn>symbol</labelColumn>
+      </pseudoconstant>
   </field>
   <field>
     <name>currency</name>
@@ -158,6 +165,9 @@
     <import>true</import> 
     <export>false</export>
     <comment>Id of Grant status.</comment>
+    <pseudoconstant>
+      <optionGroupName>grant_status</optionGroupName>
+    </pseudoconstant>
     <add>1.8</add>
   </field>
   <index> 

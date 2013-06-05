@@ -47,7 +47,7 @@ class CRM_Auction_StateMachine_Item extends CRM_Core_StateMachine {
    * @param object  CRM_Auction_Controller
    * @param int     $action
    *
-   * @return object CRM_Import_StateMachine
+   * @return object CRM_Contact_Import_StateMachine
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);

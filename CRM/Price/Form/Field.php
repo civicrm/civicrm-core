@@ -197,13 +197,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if (count($financialType)) {
       $this->assign('financialType', $financialType);
     }
-   
+
     $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
     $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
     $attributes        = CRM_Core_DAO::getAttribute('CRM_Price_DAO_FieldValue');
-    
-    $this->add('select', 'financial_type_id', 
-      ts('Financial Type'), 
+
+    $this->add('select', 'financial_type_id',
+      ts('Financial Type'),
       array(' '=> ts('- select -')) + $financialType
     );
 
@@ -265,10 +265,10 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
       //Financial Type
       $this->add(
-        'select', 
-        'option_financial_type_id['.$i.']', 
-        ts('Financial Type'), 
-        array('' => ts('- select -')) + $financialType 
+        'select',
+        'option_financial_type_id['.$i.']',
+        ts('Financial Type'),
+        array('' => ts('- select -')) + $financialType
       );
       if (in_array($eventComponentId, $this->_extendComponentId)) {
         // count
@@ -407,7 +407,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
          $fields['html_type'] == 'Text' && $fields['financial_type_id'] == '') {
       $errors['financial_type_id'] = ts('Financial Type is a required field');
     }
-    
+
     //avoid the same price field label in Within PriceSet
     $priceFieldLabel = new CRM_Price_DAO_Field();
     $priceFieldLabel->label = $fields['label'];
@@ -481,7 +481,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           }
           if (!$noLabel && !$noAmount && CRM_Utils_Array::value('option_financial_type_id', $fields) && $fields['option_financial_type_id'][$index] == '' && $fields['html_type'] != 'Text') {
             $errors["option_financial_type_id[{$index}]"] = ts('Financial Type is a Required field.');
-          } 
+          }
           if ($noLabel && !$noAmount) {
             $errors["option_label[{$index}]"] = ts('Label cannot be empty.');
             $_flagOption = 1;
@@ -542,7 +542,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
             $errors['_qf_default'] = ts('You have selected multiple memberships for the same organization or entity. Please review your selections and choose only one membership per entity.');
           }
         }
-          
+
           // CRM-10390 - Only one price field in a set can include auto-renew membership options
           $foundAutorenew = FALSE;
           foreach ($memTypesIDS as $key => $val) {
@@ -661,7 +661,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if ($this->_fid) {
       $params['id'] = $this->_fid;
     }
-    
+
     $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;
 
     $priceField = CRM_Price_BAO_Field::create($params);

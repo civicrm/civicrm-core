@@ -90,7 +90,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       $group->id
     );
   }
-  
+
   /**
    * Allow removing contact from a parent group even if contact is in
    * a child group. (CRM-8858)
@@ -135,7 +135,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
       $parent->id
     );
-    
+
     // Remove $c1 from $parent
     $result = civicrm_api('group_contact', 'create', array(
       'contact_id' => $deceased[0]->id,
@@ -144,16 +144,16 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       'version' => '3',
     ));
     $this->assertAPISuccess($result);
-    
+
     // Assert $c1 not in $parent
     CRM_Contact_BAO_GroupContactCache::load($parent, TRUE);
     $this->assertCacheMatches(
       array( /* deceased[0], */ $deceased[1]->id, $deceased[2]->id),
       $parent->id
     );
-    
+
     // Assert $c1 still in $child
-    $this->assertDBQuery(1, 
+    $this->assertDBQuery(1,
       'select count(*) from civicrm_group_contact where group_id=%1 and contact_id=%2 and status=%3',
       array(
         1 => array($child->id, 'Integer'),

@@ -130,7 +130,6 @@ WHERE    entity_value = '' OR entity_value IS NULL
         $postUpgradeMessage .=  '<br />' .ts("Scheduled Reminders must be linked to one or more 'entities' (Events, Event Templates, Activity Types, Membership Types). The following reminders are not configured properly and will not be run. Please review them and update or delete them: %1", array(1 => $list));
       }
     }
-
     if ($rev == '4.3.beta2') {
       $postUpgradeMessage .= '<br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li><li>Events - Registration Confirmation and Receipt (off-line)</li><li>Pledges - Acknowledgement</li><li>Pledges - Payment Reminder</li><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li><li>Memberships - Receipt (on-line)</li><li>Personal Campaign Pages - Admin Notification</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
     }
@@ -183,9 +182,13 @@ WHERE     ceft.entity_id IS NULL;
       }
 
       if ($isOrphanData) {
-        $postUpgradeMessage .= "</br> <strong>" . ts('Your database contains extraneous financial records related to deleted contacts and contributions. These records should not affect the site and will not appear in reports, search results or exports. However you may wish to clean them up. Refer to <a href="%1">this wiki page for details</a>.
+        $postUpgradeMessage .= "</br> <strong>" . ts('Your database contains extraneous financial records related to deleted contacts and contributions. These records should not affect the site and will not appear in reports, search results or exports. However you may wish to clean them up. Refer to <a href="%1" target="_blank">this wiki page for details</a>.
         ', array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Clean+up+extraneous+financial+data+-+4.3+upgrades')) . "</strong>";
       }
+    }
+    if ($rev == '4.3.4') {
+      $postUpgradeMessage .= '<br />' . ts('System Administrator Alert: If you are running scheduled jobs using CLI.php, you will need to reconfigure cron tasks to include a password. Scheduled jobs will no longer run if the password is not provided (<a href="%1" target="_blank">learn more</a>).',
+      array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Managing+Scheduled+Jobs'));
     }
   }
 
@@ -287,6 +290,10 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
       CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
     }
     $this->addTask(ts('Upgrade DB to 4.3.beta5: SQL'), 'task_4_3_x_runSql', $rev);
+  }
+
+  function upgrade_4_3_4($rev) {
+    $this->addTask(ts('Upgrade DB to 4.3.4: SQL'), 'task_4_3_x_runSql', $rev);
   }
 
   //CRM-11636
@@ -392,14 +399,14 @@ AND    financial_account_type_id = {$accountType}
 ";
     $financialAccountId = CRM_Core_DAO::singleValueQuery($query);
 
-    $accountRelationsips = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL);
+    $accountRelationsips = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
 
     $accountsReceivableAccount = array_search('Accounts Receivable Account is', $accountRelationsips);
     $incomeAccountIs = array_search('Income Account is', $accountRelationsips);
     $assetAccountIs = array_search('Asset Account is', $accountRelationsips);
     $expenseAccountIs = array_search('Expense Account is', $accountRelationsips);
 
-    $financialItemStatus = CRM_Core_PseudoConstant::accountOptionValues('financial_item_status');
+    $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $unpaidStatus = array_search('Unpaid', $financialItemStatus);
     $paidStatus = array_search('Paid', $financialItemStatus);
 

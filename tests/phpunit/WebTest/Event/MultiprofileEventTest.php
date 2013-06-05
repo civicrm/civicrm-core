@@ -524,6 +524,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->check("is_multiple_registrations");
     $this->select("custom_pre_id", "value=1");
     $this->select("custom_post_id", "value=" . $profileId[3]);
+    $this->select("additional_custom_post_id", "label=- same as for main contact -");
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add profile']");
     $this->click("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add profile']");

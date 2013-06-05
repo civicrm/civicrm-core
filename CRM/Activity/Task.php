@@ -110,10 +110,13 @@ class CRM_Activity_Task {
 
       $config = CRM_Core_Config::singleton();
       if (in_array('CiviCase', $config->enableComponents)) {
-        self::$_tasks[6] = array('title' => ts('File on Case'),
-          'class' => 'CRM_Activity_Form_Task_FileOnCase',
-          'result' => FALSE,
-        );
+        if ( CRM_Core_Permission::check('access all cases and activities') ||
+          CRM_Core_Permission::check('access my cases and activities') ) {
+          self::$_tasks[6] = array('title' => ts('File on Case'),
+            'class' => 'CRM_Activity_Form_Task_FileOnCase',
+            'result' => FALSE,
+          );
+        }
       }
 
       //CRM-4418, check for delete

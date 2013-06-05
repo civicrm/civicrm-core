@@ -60,7 +60,7 @@
         <tr class="crm-search-setting-form-block-smartGroupCacheTimeout">
             <td class="label">{$form.smartGroupCacheTimeout.label}</td>
             <td>{$form.smartGroupCacheTimeout.html}<br />
-                <span class="description">{ts}The number of minutes to cache smart group contacts. A value of '0' means the cache is emptied immediately when any contact is edited or a new one is added. If your contact data changes frequently, you may want to try setting this to a value of 5 minutes or so.{/ts}</span></td>
+                <span class="description">{ts}The number of minutes to cache smart group contacts. This value needs to be greater than zero. If your contact data changes frequently, you may want to try setting this to a value of 5 minutes or more.{/ts}</span></td>
         </tr>
         <tr class="crm-search-setting-form-block-autocompleteContactSearch">
             <td class="label">{$form.autocompleteContactSearch.label}</td>
@@ -79,5 +79,5 @@
         </tr>
        </table>
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-        
+
 </div>

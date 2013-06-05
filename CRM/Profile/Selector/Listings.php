@@ -309,7 +309,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         ),
       );
 
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
       foreach ($this->_fields as $name => $field) {
         // skip pseudo fields
@@ -497,7 +497,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     }
     $links = self::links($this->_map, $this->_editLink, $this->_linkToUF, $this->_profileIds);
 
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     $names = array();
     static $skipFields = array('group', 'tag');
@@ -568,9 +568,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     // we need to determine of overlay profile should be shown
     $showProfileOverlay = CRM_Core_BAO_UFGroup::showOverlayProfile();
 
-    $imProviders  = CRM_Core_PseudoConstant::IMProvider();
-    $websiteTypes = CRM_Core_PseudoConstant::websiteType();
-    $languages    = CRM_Core_PseudoConstant::languages();
     while ($result->fetch()) {
       if (isset($result->country)) {
         // the query returns the untranslated country name
@@ -606,7 +603,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         ) {
           $url      = CRM_Utils_System::fixURL($result->$name);
           $typeId   = substr($name, 0, -4) . "-website_type_id";
-          $typeName = $websiteTypes[$result->$typeId];
+          $typeName = CRM_Core_PseudoConstant::getValue('CRM_Core_DAO_Website', 'website_type_id', $result->$typeId);
           if ($typeName) {
             $row[] = "<a href=\"$url\">{$result->$name} (${typeName})</a>";
           }
@@ -615,7 +612,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           }
         }
         elseif ($name == 'preferred_language') {
-          $row[] = $languages[$result->$name];
+          $row[] = CRM_Core_PseudoConstant::getValue('CRM_Contact_DAO_Contact', 'preferred_language', $result->$name);
         }
         elseif ($multipleSelectFields &&
           array_key_exists($name, $multipleSelectFields)
@@ -642,7 +639,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         elseif (strpos($name, '-im')) {
           if (!empty($result->$name)) {
             $providerId   = $name . "-provider_id";
-            $providerName = $imProviders[$result->$providerId];
+            $providerName = CRM_Core_PseudoConstant::getValue('CRM_Core_DAO_IM', 'provider_id', $result->$providerId);
             $row[]        = $result->$name . " ({$providerName})";
           }
           else {

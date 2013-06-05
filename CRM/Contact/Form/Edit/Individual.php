@@ -56,7 +56,7 @@ class CRM_Contact_Form_Edit_Individual {
 
     if ( !$inlineEditMode || $inlineEditMode == 1 ) {
       //prefix
-      $prefix = CRM_Core_PseudoConstant::individualPrefix();
+      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
       if (!empty($prefix)) {
         $form->addElement('select', 'prefix_id', ts('Prefix'), array('' => '') + $prefix);
       }
@@ -73,7 +73,7 @@ class CRM_Contact_Form_Edit_Individual {
       $form->addElement('text', 'last_name', ts('Last Name'), $attributes['last_name']);
 
       // suffix
-      $suffix = CRM_Core_PseudoConstant::individualSuffix();
+      $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
       if ($suffix) {
         $form->addElement('select', 'suffix_id', ts('Suffix'), array('' => '') + $suffix);
       }

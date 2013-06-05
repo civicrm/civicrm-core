@@ -29,7 +29,7 @@ var stregexp = new RegExp;
 function initFilter( id ) {
     //build the array
     filterArray = new Array();
-    filterArray = {/literal}{$tokens}{literal};    
+    filterArray = {/literal}{$tokens}{literal};
 
     tempArray  = new Array();
     remvdArray = new Array();

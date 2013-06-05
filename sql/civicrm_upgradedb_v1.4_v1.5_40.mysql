@@ -501,29 +501,29 @@ CREATE TABLE civicrm_entity_file (
 -- * Modify the civicrm_individual  Table Structure
 -- *******************************************************/
 
-	 ALTER TABLE `civicrm_individual` ADD deceased_date date COMMENT 'Date of deceased';
+   ALTER TABLE `civicrm_individual` ADD deceased_date date COMMENT 'Date of deceased';
 
 -- /*******************************************************
 -- *
 -- * Modify the civicrm_contact  Table Structure
 -- *******************************************************/
-	 ALTER TABLE `civicrm_contact` DROP INDEX `index_sort_name`;
- 	 ALTER TABLE `civicrm_contact` DROP `hash`;
-	
-	 ALTER TABLE `civicrm_contact` ADD hash varchar(32) DEFAULT NULL COMMENT 'Key for validating requests related to this contact.';
-	 ALTER TABLE `civicrm_contact` ADD contact_sub_type varchar(64) DEFAULT NULL COMMENT 'May be used to over-ride contact view and edit templates.';
+   ALTER TABLE `civicrm_contact` DROP INDEX `index_sort_name`;
+    ALTER TABLE `civicrm_contact` DROP `hash`;
+  
+   ALTER TABLE `civicrm_contact` ADD hash varchar(32) DEFAULT NULL COMMENT 'Key for validating requests related to this contact.';
+   ALTER TABLE `civicrm_contact` ADD contact_sub_type varchar(64) DEFAULT NULL COMMENT 'May be used to over-ride contact view and edit templates.';
 
-	 ALTER TABLE `civicrm_contact` MODIFY preferred_communication_method varchar(255) DEFAULT NULL COMMENT 'What is the preferred mode of communication.';
+   ALTER TABLE `civicrm_contact` MODIFY preferred_communication_method varchar(255) DEFAULT NULL COMMENT 'What is the preferred mode of communication.';
 
-	 ALTER TABLE `civicrm_contact` ADD INDEX index_sort_name_domain(sort_name, domain_id, hash);
+   ALTER TABLE `civicrm_contact` ADD INDEX index_sort_name_domain(sort_name, domain_id, hash);
 
-	 ALTER TABLE `civicrm_contact` ADD INDEX index_hash_domain(hash, domain_id);	
+   ALTER TABLE `civicrm_contact` ADD INDEX index_hash_domain(hash, domain_id);  
 
 -- /*******************************************************
 -- *
 -- * fix preferred communication data
 -- *******************************************************/
-	SELECT @domain_id := id from civicrm_domain;
+  SELECT @domain_id := id from civicrm_domain;
     INSERT INTO 
     `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`) 
     VALUES 
@@ -549,10 +549,10 @@ CREATE TABLE civicrm_entity_file (
 -- *
 -- * Modify the civicrm_contribution_page  Table Structure
 -- *******************************************************/
-	ALTER TABLE `civicrm_contribution_page` ADD amount_block_is_active tinyint unsigned DEFAULT 1 COMMENT 'Is this property active?';
-	ALTER TABLE `civicrm_contribution_page` ADD goal_amount  decimal(20,2) COMMENT 'The target goal for this page, allows people to build a goal meter';
-	ALTER TABLE `civicrm_contribution_page` ADD is_thermometer int(4) unsigned DEFAULT 1 COMMENT 'Should this contribution have the thermometer block enabled?';
-	ALTER TABLE `civicrm_contribution_page` ADD thermometer_title varchar(255) DEFAULT NULL COMMENT 'Title for contribution page thermometer block.';
+  ALTER TABLE `civicrm_contribution_page` ADD amount_block_is_active tinyint unsigned DEFAULT 1 COMMENT 'Is this property active?';
+  ALTER TABLE `civicrm_contribution_page` ADD goal_amount  decimal(20,2) COMMENT 'The target goal for this page, allows people to build a goal meter';
+  ALTER TABLE `civicrm_contribution_page` ADD is_thermometer int(4) unsigned DEFAULT 1 COMMENT 'Should this contribution have the thermometer block enabled?';
+  ALTER TABLE `civicrm_contribution_page` ADD thermometer_title varchar(255) DEFAULT NULL COMMENT 'Title for contribution page thermometer block.';
 
 -- /*******************************************************
 -- *
@@ -567,9 +567,9 @@ CREATE TABLE civicrm_entity_file (
 -- * Modify the civicrm_custom_field  Table Structure
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_custom_field` CHANGE `html_type` `html_type` ENUM( 'Text', 'TextArea', 'Select', 'Multi-Select', 'Radio', 'CheckBox', 'Select Date', 'Select State/Province', 'Select Country','File') DEFAULT NULL COMMENT 'HTML types plus several built-in extended types.';
+  ALTER TABLE `civicrm_custom_field` CHANGE `html_type` `html_type` ENUM( 'Text', 'TextArea', 'Select', 'Multi-Select', 'Radio', 'CheckBox', 'Select Date', 'Select State/Province', 'Select Country','File') DEFAULT NULL COMMENT 'HTML types plus several built-in extended types.';
 
-	ALTER TABLE `civicrm_custom_field` CHANGE `data_type` `data_type` ENUM('String', 'Int', 'Float', 'Money', 'Memo', 'Date', 'Boolean', 'StateProvince', 'Country', 'File') DEFAULT NULL COMMENT 'Controls location of data storage in extended_data table.';
+  ALTER TABLE `civicrm_custom_field` CHANGE `data_type` `data_type` ENUM('String', 'Int', 'Float', 'Money', 'Memo', 'Date', 'Boolean', 'StateProvince', 'Country', 'File') DEFAULT NULL COMMENT 'Controls location of data storage in extended_data table.';
 
 
 -- /*******************************************************
@@ -578,7 +578,7 @@ CREATE TABLE civicrm_entity_file (
 -- *
 -- *******************************************************/
 
-  	ALTER TABLE `civicrm_custom_group` CHANGE `extends` `extends` ENUM( 'Contact', 'Individual', 'Household', 'Organization', 'Location', 'Address', 'Contribution', 'Activity', 'Phonecall', 'Meeting', 'Group','Relationship') DEFAULT 'Contact' COMMENT 'Type of object this group extends (can add other options later e.g. contact_address, etc.).';
+    ALTER TABLE `civicrm_custom_group` CHANGE `extends` `extends` ENUM( 'Contact', 'Individual', 'Household', 'Organization', 'Location', 'Address', 'Contribution', 'Activity', 'Phonecall', 'Meeting', 'Group','Relationship') DEFAULT 'Contact' COMMENT 'Type of object this group extends (can add other options later e.g. contact_address, etc.).';
 
 -- /*******************************************************
 -- *
@@ -586,10 +586,10 @@ CREATE TABLE civicrm_entity_file (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_custom_value` ADD file_id int(10) unsigned DEFAULT NULL COMMENT 'FK to civicrm_file';
-	ALTER TABLE `civicrm_custom_value` ADD INDEX (`file_id`);
-	ALTER TABLE `civicrm_custom_value` ADD FOREIGN KEY (`file_id`) REFERENCES `civicrm_file`(`id`);
-	
+  ALTER TABLE `civicrm_custom_value` ADD file_id int(10) unsigned DEFAULT NULL COMMENT 'FK to civicrm_file';
+  ALTER TABLE `civicrm_custom_value` ADD INDEX (`file_id`);
+  ALTER TABLE `civicrm_custom_value` ADD FOREIGN KEY (`file_id`) REFERENCES `civicrm_file`(`id`);
+  
 
 -- /*******************************************************
 -- *
@@ -597,7 +597,7 @@ CREATE TABLE civicrm_entity_file (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_email` ADD INDEX `UI_email` (`email`);
+  ALTER TABLE `civicrm_email` ADD INDEX `UI_email` (`email`);
 
 -- /*******************************************************
 -- *
@@ -606,7 +606,7 @@ CREATE TABLE civicrm_entity_file (
 -- *******************************************************/
 
 
-	ALTER TABLE `civicrm_mapping` CHANGE `mapping_type` `mapping_type` ENUM('Export', 'Import', 'Export Contributions', 'Import Contributions', 'Import Activity History', 'Search Builder') default NULL COMMENT 'Type of Mapping.';
+  ALTER TABLE `civicrm_mapping` CHANGE `mapping_type` `mapping_type` ENUM('Export', 'Import', 'Export Contributions', 'Import Contributions', 'Import Activity History', 'Search Builder') default NULL COMMENT 'Type of Mapping.';
 
 
 -- /*******************************************************
@@ -615,11 +615,11 @@ CREATE TABLE civicrm_entity_file (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_mapping_field` ADD grouping int(10) unsigned DEFAULT 1 COMMENT 'Used to group mapping_field records into related sets (e.g. for criteria sets in search builder mappings).';
+  ALTER TABLE `civicrm_mapping_field` ADD grouping int(10) unsigned DEFAULT 1 COMMENT 'Used to group mapping_field records into related sets (e.g. for criteria sets in search builder mappings).';
 
-	ALTER TABLE `civicrm_mapping_field` ADD operator ENUM('=','!=','>','<','>=','<=','IN','NOT IN','LIKE','NOT LIKE') DEFAULT NULL COMMENT 'SQL WHERE operator for search-builder mapping fields (search criteria).';
+  ALTER TABLE `civicrm_mapping_field` ADD operator ENUM('=','!=','>','<','>=','<=','IN','NOT IN','LIKE','NOT LIKE') DEFAULT NULL COMMENT 'SQL WHERE operator for search-builder mapping fields (search criteria).';
 
-	ALTER TABLE `civicrm_mapping_field` ADD value varchar(255) DEFAULT NULL COMMENT 'SQL WHERE value for search-builder mapping fields.';
+  ALTER TABLE `civicrm_mapping_field` ADD value varchar(255) DEFAULT NULL COMMENT 'SQL WHERE value for search-builder mapping fields.';
 
 -- /*******************************************************
 -- *
@@ -627,15 +627,15 @@ CREATE TABLE civicrm_entity_file (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_uf_group` ADD add_to_group_id int unsigned DEFAULT NULL COMMENT 'foreign key to civicrm_group_id';
-	ALTER TABLE `civicrm_uf_group` ADD INDEX (`add_to_group_id`);
-	ALTER TABLE `civicrm_uf_group` ADD FOREIGN KEY (`add_to_group_id`) REFERENCES `civicrm_group` (`id`);	
-	
-	ALTER TABLE `civicrm_uf_group` ADD add_captcha tinyint DEFAULT 0 COMMENT 'Should a CAPTCHA widget be included this Profile form.';
+  ALTER TABLE `civicrm_uf_group` ADD add_to_group_id int unsigned DEFAULT NULL COMMENT 'foreign key to civicrm_group_id';
+  ALTER TABLE `civicrm_uf_group` ADD INDEX (`add_to_group_id`);
+  ALTER TABLE `civicrm_uf_group` ADD FOREIGN KEY (`add_to_group_id`) REFERENCES `civicrm_group` (`id`);  
+  
+  ALTER TABLE `civicrm_uf_group` ADD add_captcha tinyint DEFAULT 0 COMMENT 'Should a CAPTCHA widget be included this Profile form.';
 
-	ALTER TABLE `civicrm_uf_group` ADD cancel_URL varchar(255) DEFAULT NULL COMMENT 'Redirect to URL when Cancle button clik .';
-	ALTER TABLE `civicrm_uf_group` ADD is_map tinyint DEFAULT 0 COMMENT 'Do we want to map results from this profile.';
-	ALTER TABLE `civicrm_uf_group` ADD collapse_display int(10) unsigned DEFAULT 0 COMMENT 'Will this group be in collapsed or expanded mode on initial display ?';
+  ALTER TABLE `civicrm_uf_group` ADD cancel_URL varchar(255) DEFAULT NULL COMMENT 'Redirect to URL when Cancle button clik .';
+  ALTER TABLE `civicrm_uf_group` ADD is_map tinyint DEFAULT 0 COMMENT 'Do we want to map results from this profile.';
+  ALTER TABLE `civicrm_uf_group` ADD collapse_display int(10) unsigned DEFAULT 0 COMMENT 'Will this group be in collapsed or expanded mode on initial display ?';
 
 -- /*******************************************************
 -- *
@@ -643,7 +643,7 @@ CREATE TABLE civicrm_entity_file (
 -- *
 -- *******************************************************/
 
-	 ALTER TABLE `civicrm_uf_match` ADD INDEX `UI_uf_id` (`uf_id`);
+   ALTER TABLE `civicrm_uf_match` ADD INDEX `UI_uf_id` (`uf_id`);
 
 -- /*******************************************************
 -- *
@@ -652,7 +652,7 @@ CREATE TABLE civicrm_entity_file (
 -- *******************************************************/
 
 
-	 ALTER TABLE `civicrm_note` ADD `subject` varchar(255) DEFAULT NULL COMMENT 'subject of note description';
+   ALTER TABLE `civicrm_note` ADD `subject` varchar(255) DEFAULT NULL COMMENT 'subject of note description';
 
 -- /*******************************************************
 -- *
@@ -661,7 +661,7 @@ CREATE TABLE civicrm_entity_file (
 -- *******************************************************/
 
 
-	 ALTER TABLE `civicrm_relationship` ADD `description` varchar(255) COMMENT 'Optional verbose description for the relationship.' ;
+   ALTER TABLE `civicrm_relationship` ADD `description` varchar(255) COMMENT 'Optional verbose description for the relationship.' ;
 
 -- /*******************************************************
 -- *
@@ -669,15 +669,15 @@ CREATE TABLE civicrm_entity_file (
 -- *
 -- *******************************************************/
 
-	ALTER TABLE `civicrm_saved_search` ADD `mapping_id` INT UNSIGNED COMMENT 'Foreign key to civicrm_mapping used for saved search-builder searches.';
-	ALTER TABLE `civicrm_saved_search` ADD INDEX (`mapping_id`);
-	ALTER TABLE `civicrm_saved_search` ADD FOREIGN KEY (`mapping_id`) REFERENCES `civicrm_mapping` (`id`);
+  ALTER TABLE `civicrm_saved_search` ADD `mapping_id` INT UNSIGNED COMMENT 'Foreign key to civicrm_mapping used for saved search-builder searches.';
+  ALTER TABLE `civicrm_saved_search` ADD INDEX (`mapping_id`);
+  ALTER TABLE `civicrm_saved_search` ADD FOREIGN KEY (`mapping_id`) REFERENCES `civicrm_mapping` (`id`);
 
-	ALTER TABLE `civicrm_saved_search` DROP FOREIGN KEY `civicrm_saved_search_ibfk_1`;
+  ALTER TABLE `civicrm_saved_search` DROP FOREIGN KEY `civicrm_saved_search_ibfk_1`;
 
-	ALTER TABLE `civicrm_saved_search` DROP `query`,
-					   DROP `domain_id`,	
-					   DROP `is_active`;
+  ALTER TABLE `civicrm_saved_search` DROP `query`,
+             DROP `domain_id`,
+             DROP `is_active`;
 -- /*******************************************************
 -- *
 -- * Modify the civicrm_custom_value  Table Structure

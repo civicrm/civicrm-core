@@ -55,7 +55,10 @@ class CRM_Core_DAO extends DB_DataObject {
   // special value for mail bulk inserts to avoid
   // potential duplication, assuming a smaller number reduces number of queries
   // by some factor, so some tradeoff. CRM-8678
-  BULK_MAIL_INSERT_COUNT = 10;
+  BULK_MAIL_INSERT_COUNT = 10,
+  QUERY_FORMAT_WILDCARD = 1,
+  QUERY_FORMAT_NO_QUOTES = 2;
+
   /*
    * Define entities that shouldn't be created or deleted when creating/ deleting
    *  test objects - this prevents world regions, countries etc from being added / deleted
@@ -965,10 +968,17 @@ FROM   civicrm_domain
             $item[1] == 'Memo' ||
             $item[1] == 'Link'
           ) {
-            if (isset($item[2]) &&
-              $item[2]
-            ) {
-              $item[0] = "'%{$item[0]}%'";
+            // Support class constants stipulating wildcard characters and/or
+            // non-quoting of strings. Also support legacy code which may be
+            // passing in TRUE or 1 for $item[2], which used to indicate the
+            // use of wildcard characters.
+            if (!empty($item[2])) {
+              if ($item[2] & CRM_Core_DAO::QUERY_FORMAT_WILDCARD || $item[2] === TRUE) {
+                $item[0] = "'%{$item[0]}%'";
+              }
+              elseif (!($item[2] & CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)) {
+                $item[0] = "'{$item[0]}'";
+              }
             }
             else {
               $item[0] = "'{$item[0]}'";
@@ -1265,12 +1275,10 @@ SELECT contact_id
       'CRM_Core_DAO_Domain',
     );
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-
     for ($i = 0; $i < $numObjects; ++$i) {
 
       ++$counter;
-      $object   = new $daoName ( );
+      $object = new $daoName();
 
       $fields = &$object->fields();
       foreach ($fields as $name => $value) {
@@ -1313,21 +1321,13 @@ SELECT contact_id
 
             continue;
           }
-          $constant = CRM_Utils_Array::value('pseudoconstant', $value);
-          if (!empty($constant)) {
-            $constantValues = CRM_Utils_PseudoConstant::getConstant($constant['name']);
-            if (!empty($constantValues)) {
-              $constantOptions = array_keys($constantValues);
-              $object->$dbName = $constantOptions[0];
-            }
+          // Pick an option value if needed
+          $options = $daoName::buildOptions($dbName);
+          if ($options) {
+            $object->$dbName = key($options);
             continue;
           }
-          $enum = CRM_Utils_Array::value('enumValues', $value);
-          if (!empty($enum)) {
-            $options = explode(',', $enum);
-            $object->$dbName = $options[0];
-            continue;
-          }
+
           switch ($value['type']) {
             case CRM_Utils_Type::T_INT:
             case CRM_Utils_Type::T_FLOAT:
@@ -1695,7 +1695,7 @@ EOS;
     AND {$refSpec->getTypeColumn()} = %2
 EOS;
       }
-      $daoName = CRM_Core_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
+      $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
       $result = self::executeQuery($sql, $params, TRUE, $daoName);
       while ($result->fetch()) {
         $obj = new $daoName();
@@ -1723,7 +1723,7 @@ EOS;
    */
   static function getReferencesToTable($tableName) {
     $refsFound = array();
-    foreach (CRM_Core_AllCoreTables::getClasses() as $daoClassName) {
+    foreach (CRM_Core_DAO_AllCoreTables::getClasses() as $daoClassName) {
       $links = $daoClassName::getReferenceColumns();
       $daoTableName = $daoClassName::getTableName();
 
@@ -1756,6 +1756,21 @@ EOS;
     else {
       return $default;
     }
+  }
+
+  /**
+   * Get options for the called BAO object's field.
+   * This function can be overridden by each BAO to add more logic related to context.
+   * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
+   *
+   * @param String $fieldName
+   * @param String $context: e.g. "search" "edit" "create" "view"
+   * @param Array  $props: whatever is known about this bao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    // If a given bao does not override this function
+    $baoName = get_called_class();
+    return CRM_Core_PseudoConstant::get($baoName, $fieldName);
   }
 }
 

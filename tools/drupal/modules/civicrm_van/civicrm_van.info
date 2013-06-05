@@ -1,7 +1,0 @@
-name = CiviCRM <-> VAN Integration 
-description = CiviCRM <-> VAN Integration 
-version = 3.4
-dependencies[] = civicrm
-package = CiviCRM
-core = 6.x
-php = 5.2

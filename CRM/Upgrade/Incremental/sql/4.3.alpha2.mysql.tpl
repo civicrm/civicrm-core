@@ -2,7 +2,7 @@
 UPDATE `civicrm_dedupe_rule_group`
   SET name = 'IndividualGeneral'
   WHERE name = 'IndividualComplete';
-  
+
 -- CRM-11791
 INSERT IGNORE INTO `civicrm_relationship_type` ( name_a_b,label_a_b, name_b_a,label_b_a, description, contact_type_a, contact_type_b, is_reserved )
   VALUES
@@ -16,14 +16,14 @@ UPDATE `civicrm_navigation`
   name = 'Closed Batches' OR
   name = 'Exported Batches' OR
   name = 'Accounting Batches';
-    
+
 UPDATE `civicrm_navigation`
   SET permission = 'create manual batch'
   WHERE
   name = 'Accounting Batches';
 
 -- CRM-11891
-SELECT @contributionlastID := max(id) from civicrm_navigation where name = 'Contributions';
+SELECT @contributionlastID := max(id) from civicrm_navigation where name = 'Contributions' AND domain_id = {$domainID};
 SELECT @importWeight := weight from civicrm_navigation where name = 'Import Contributions' and parent_id = @contributionlastID;
 
 -- since 'Bulk Data Entry' was renamed to 'Batch Data Entry'

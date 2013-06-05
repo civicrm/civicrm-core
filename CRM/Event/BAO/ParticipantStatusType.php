@@ -122,8 +122,8 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
 LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
     WHERE  participant.status_id IN {$statusIds}
      AND   (event.end_date > now() OR event.end_date IS NULL)
-     AND   event.is_active = 1 
- ORDER BY  participant.register_date, participant.id 
+     AND   event.is_active = 1
+ ORDER BY  participant.register_date, participant.id
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {

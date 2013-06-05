@@ -111,7 +111,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    */
   function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
     if (isset(self::$ufClass)) {
-      eval('$url = ' . self::$ufClass . '::url($path, $query, $absolute, $fragment);');
+      $className = self::$ufClass;
+      $url = $className::url($path, $query, $absolute, $fragment);
       return $url;
     }
     else {
@@ -152,7 +153,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    */
   function &authenticate($name, $pass) {
     if (isset(self::$ufClass)) {
-      eval('$result =& ' . self::$ufClass . '::authenticate($name, $pass);');
+      $className = self::$ufClass;
+      $result =& $className::authenticate($name, $pass);
       return $result;
     }
     else {
@@ -183,7 +185,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   function getUFLocale() {
     return NULL;
   }
-  
+
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *

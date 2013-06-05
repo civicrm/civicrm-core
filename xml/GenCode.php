@@ -1,6 +1,18 @@
 <?php
 ini_set('include_path', '.' . PATH_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'packages' . PATH_SEPARATOR . '..');
-ini_set('memory_limit', '512M');
+// make sure the memory_limit is at least 512 MB
+$memLimitString = trim(ini_get('memory_limit'));
+$memLimitUnit   = strtolower(substr($memLimitString, -1));
+$memLimit       = (int) $memLimitString;
+switch ($memLimitUnit) {
+    case 'g': $memLimit *= 1024;
+    case 'm': $memLimit *= 1024;
+    case 'k': $memLimit *= 1024;
+}
+
+if ($memLimit >= 0 and $memLimit < 536870912) {
+    ini_set('memory_limit', '512M');
+}
 date_default_timezone_set('UTC'); // avoid php warnings if timezone is not set - CRM-10844
 
 define('CIVICRM_UF', 'Drupal');
@@ -129,7 +141,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       exit();
     }
 
-    $this->generateTemplateVersion($argVersion);
+    $this->generateTemplateVersion($db_version);
 
     $this->setupCms($argCms, $db_version);
 
@@ -189,7 +201,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   function generateListAll($tables) {
     $this->smarty->clear_all_assign();
     $this->smarty->assign('tables', $tables);
-    file_put_contents($this->CoreDAOCodePath . "../AllCoreTables.php", $this->smarty->fetch('listAll.tpl'));
+    file_put_contents($this->CoreDAOCodePath . "AllCoreTables.php", $this->smarty->fetch('listAll.tpl'));
   }
 
   function generateCiviTestTruncate($tables) {
@@ -343,16 +355,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $this->beautifier->save();
   }
 
-  function generateTemplateVersion($argVersion) {
-    // add the Subversion revision to templates
-    // use svnversion if the version was not specified explicitely on the commandline
-    if (isset($argVersion) and $argVersion != '') {
-      $svnversion = $argVersion;
-    }
-    else {
-      $svnversion = `svnversion .`;
-    }
-    file_put_contents($this->tplCodePath . "/CRM/common/version.tpl", $svnversion);
+  function generateTemplateVersion($dbVersion) {
+    file_put_contents($this->tplCodePath . "/CRM/common/version.tpl", $dbVersion);
   }
 
   function findLocales() {
@@ -705,7 +709,16 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     if(!empty($fieldXML->pseudoconstant)){
       //ok this is a bit long-winded but it gets there & is consistent with above approach
       $field['pseudoconstant'] = array();
-      $validOptions = array('name', 'optionGroupName', 'table', 'keyColumn', 'labelColumn','class');
+      $validOptions = array(
+        // Fields can specify EITHER optionGroupName OR table, not both
+        // (since declaring optionGroupName means we are using the civicrm_option_value table)
+        'optionGroupName',
+        'table',
+        // Optional additional params will be passed into CRM_Core_PseudoConstant::get()
+        'keyColumn',
+        'labelColumn',
+        'condition',
+      );
       foreach ($validOptions as $pseudoOption){
         if(!empty($fieldXML->pseudoconstant->$pseudoOption)){
           $field['pseudoconstant'][$pseudoOption] = $this->value($pseudoOption, $fieldXML->pseudoconstant);

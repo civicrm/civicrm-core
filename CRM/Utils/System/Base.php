@@ -87,10 +87,13 @@ abstract class CRM_Utils_System_Base {
     return $url;
   }
 
-  /*
-   * Currently this is just helping out the test class as defaults is calling it - maybe move fix to defaults
+  /**
+   * Determine the location of the CMS root.
+   *
+   * @return string|NULL local file system path to CMS root, or NULL if it cannot be determined
    */
   function cmsRootPath() {
+    return NULL;
   }
 
   /**
@@ -123,6 +126,18 @@ abstract class CRM_Utils_System_Base {
    */
   function flush() {
     // nullop by default
+  }
+    /**
+   * Return default Site Settings
+   * @return array array
+   * - $url, (Joomla - non admin url)
+   * - $siteName,
+   * - $siteRoot
+   */
+  function getDefaultSiteSettings($dir){
+    $config = CRM_Core_Config::singleton();
+    $url = $config->userFrameworkBaseURL;
+    return array($url, NULL, NULL);
   }
 }
 
