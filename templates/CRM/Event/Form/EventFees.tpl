@@ -27,6 +27,11 @@
 {if $paid} {* We retrieve this tpl when event is selected - keep it empty if event is not paid *}
     <table class="form-layout">
     {if $priceSet}
+      {if $discount and $hasPayment}
+        <tr class="crm-event-eventfees-form-block-discount"><td class="label">&nbsp;&nbsp;{ts}Discount Set{/ts}</td><td class="view-value">{$discount}</td></tr>
+      {elseif $form.discount_id.label}
+        <tr class="crm-event-eventfees-form-block-discount_id"><td class="label">&nbsp;&nbsp;{$form.discount_id.label}</td><td>{$form.discount_id.html}</td></tr>
+      {/if}
       {if $action eq 2 and $hasPayment} {* Updating *}
             {if $lineItem}
                 <tr class="crm-event-eventfees-form-block-line_items">

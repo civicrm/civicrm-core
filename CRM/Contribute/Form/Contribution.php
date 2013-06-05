@@ -1393,7 +1393,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     );
 
     //get the payment processor id as per mode.
-    $params['payment_processor_id'] = $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+    $this->_params['payment_processor'] = $params['payment_processor_id'] = 
+      $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
 
     $now = date('YmdHis');
     $fields = array();

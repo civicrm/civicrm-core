@@ -1070,11 +1070,12 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $errorMode = 
         //field is of type date or datetime
         _civicrm_api3_validate_date($params, $fieldname, $fieldInfo);
         break;
-    case 32://blob
+
+      case 32://blob
         _civicrm_api3_validate_html($params, $fieldname, $fieldInfo);
         break;
-      case CRM_Utils_Type::T_STRING:
 
+      case CRM_Utils_Type::T_STRING:
         _civicrm_api3_validate_string($params, $fieldname, $fieldInfo);
         break;
 

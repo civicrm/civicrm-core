@@ -163,8 +163,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactID);
     $this->assign('displayName', $displayName);
 
-    $title = $displayName . ' - ' . $caseType;
-    CRM_Utils_System::setTitle(ts('Case Summary for') .  ' ' . $title);
+    CRM_Utils_System::setTitle($displayName . ' - ' . $caseType);
 
     $recentOther = array();
     if (CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
@@ -173,7 +172,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       );
     }
 
-    // add the recently created case
+    // Add the recently viewed case
     CRM_Utils_Recent::add($displayName . ' - ' . $caseType,
       $url,
       $this->_caseID,

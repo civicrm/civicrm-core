@@ -3,7 +3,9 @@ class CRM_Event_Cart_Form_Checkout_ConferenceEvents extends CRM_Event_Cart_Form_
   public $conference_event = NULL;
   public $events_by_slot = array();
   public $main_participant = NULL;
-  public $contact_id = NULL; function preProcess() {
+  public $contact_id = NULL;
+
+  function preProcess() {
     parent::preProcess();
     $matches = array();
     preg_match("/.*_(\d+)_(\d+)/", $this->getAttribute('name'), $matches);

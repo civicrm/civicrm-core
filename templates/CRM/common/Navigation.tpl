@@ -119,7 +119,7 @@ cj(function( ) {
   });
 });
 
-{/literal}{if $config->userFramework neq 'Joomla'}{literal}
+{/literal}{if $config->userFramework neq 'Joomla' and $config->userFrameworkFrontend ne 1}{literal}
   cj('body').prepend( cj("#menu-container").html() );
 
   //Track Scrolling

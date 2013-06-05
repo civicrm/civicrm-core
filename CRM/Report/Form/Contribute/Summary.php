@@ -122,8 +122,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         //'bao'           => 'CRM_Contribute_BAO_Contribution',
         'fields' =>
         array(
-          'contribution_source' => array('title' => ts('Source'),
-          ),
+          'contribution_source' => array('title' => ts('Source'), ),
           'currency' =>
           array('required' => TRUE,
             'no_display' => TRUE,

@@ -146,7 +146,7 @@
     var input = $('.crm-search-value input', row);
     if (!input.hasClass('hasDatepicker')) {
       // Remove operators that can't be used with a date
-      removeOperators(row, ['IN', 'NOT IN', 'LIKE', 'RLIKE']);
+      removeOperators(row, ['IN', 'NOT IN', 'LIKE', 'RLIKE', 'IS EMPTY', 'IS NOT EMPTY']);
       input.addClass('dateplugin').datepicker({
         dateFormat: 'yymmdd',
         changeMonth: true,

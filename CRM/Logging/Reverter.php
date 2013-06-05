@@ -35,7 +35,9 @@
 class CRM_Logging_Reverter {
   private $db;
   private $log_conn_id;
-  private $log_date; function __construct($log_conn_id, $log_date) {
+  private $log_date;
+
+  function __construct($log_conn_id, $log_date) {
     $dsn               = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
     $this->db          = $dsn['database'];
     $this->log_conn_id = $log_conn_id;

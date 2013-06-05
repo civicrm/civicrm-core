@@ -40,7 +40,9 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $params;
   protected $id;
-  public $DBResetRequired = FALSE; function setUp() {
+  public $DBResetRequired = FALSE;
+
+  function setUp() {
     $this->_apiversion = 3;
     $phoneBankActivity = civicrm_api('Option_value', 'Get', array('label' => 'PhoneBank', 'version' => $this->_apiversion, 'sequential' => 1));
     $phoneBankActivityTypeID = $phoneBankActivity['values'][0]['value'];

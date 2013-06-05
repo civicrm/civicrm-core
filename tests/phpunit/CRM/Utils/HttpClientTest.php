@@ -4,7 +4,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
 
   const VALID_HTTP_URL = 'http://civicrm.org/INSTALL.mysql.txt';
   const VALID_HTTP_REGEX = '/MySQL/';
-  const VALID_HTTPS_URL = 'https://drupal.org/INSTALL.mysql.txt';
+  const VALID_HTTPS_URL = 'https://civicrm.org/INSTALL.mysql.txt';
   const VALID_HTTPS_REGEX = '/MySQL/';
   const SELF_SIGNED_HTTPS_URL = 'https://self-signed.onebitwise.com:4443/';
   const SELF_SIGNED_HTTPS_REGEX = '/self-signed/';

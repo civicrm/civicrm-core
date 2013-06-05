@@ -24,84 +24,82 @@
  +--------------------------------------------------------------------+
 *}
 {if $showListing}
-<h1>{ts}{$customGroupTitle}{/ts}</h1>
-
-    {if $records and $headers}
+  <h1>{ts}{$customGroupTitle}{/ts}</h1>
+  {if $records and $headers}
     {include file="CRM/common/jsortable.tpl"}
-
-      <div id="browseValues">
-        <div>
+    <div id="browseValues">
+      <div>
         {strip}
           <table id="records" class="display">
-     <thead>
-               <tr>
-          {foreach from=$headers key=recId item=head}
-             <th>{ts}{$head}{/ts}</th>
-         {/foreach}
-             <th></th>
-             </tr>
-           </thead>
-     {foreach from=$records key=recId item=rows}
-       <tr class="{cycle values="odd-row,even-row"}">
-         {foreach from=$rows item=row}
-            {foreach from=$row item=val key=ids}
-              <td>{$val}</td>
+            <thead>
+            <tr>
+              {foreach from=$headers key=recId item=head}
+                <th>{ts}{$head}{/ts}</th>
+              {/foreach}
+              <th></th>
+            </tr>
+            </thead>
+            {foreach from=$records key=recId item=rows}
+              <tr class="{cycle values="odd-row,even-row"}">
+                {foreach from=$headers key=hrecId item=head}
+                  <td>{$rows.$hrecId}</td>
+                {/foreach}
+                <td>{$rows.action}</td>
+              </tr>
             {/foreach}
-         {/foreach}
-       </tr>
-     {/foreach}
           </table>
         {/strip}
-       </div>
       </div>
-<div id='profile-dialog' class="hiddenElement"></div>
-{literal}
-<script type='text/javascript'>
-cj(function() {
+    </div>
+    <div id='profile-dialog' class="hiddenElement"></div>
+    {literal}
+      <script type='text/javascript'>
+        cj(function () {
+          function formDialog(dataURL, dialogTitle) {
+            cj.ajax({
+              url: dataURL,
+              success: function (content) {
+                cj('#profile-dialog').show().html(content).dialog({
+                  title: dialogTitle,
+                  modal: true,
+                  width: 680,
+                  overlay: {
+                    opacity: 0.5,
+                    background: "black"
+                  },
 
-function formDialog(dataURL, dialogTitle){
-      cj.ajax({
-         url: dataURL,
-         success: function( content ) {
-         cj('#profile-dialog').show( ).html( content ).dialog({
-                 title: dialogTitle,
-                 modal: true,
-                 width: 680,
-                 overlay: {
-                   opacity: 0.5,
-                   background: "black"
-                 },
+                  close: function (event, ui) {
+                    cj('#profile-dialog').html('');
+                  }
+                });
+                cj('.action-link').hide();
+                cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
+              }});
+          }
 
-                 close: function(event, ui) {
-             cj('#profile-dialog').html('');
-                 }
-             });
-       cj('.action-link').hide();
-             cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
-   }});
-}
+          cj('.action-item').each(function () {
+            cj(this).attr('jshref', cj(this).attr('href'));
+            cj(this).attr('href', '#browseValues');
+          });
 
-cj('.action-item').each(function(){
- cj(this).attr('jshref', cj(this).attr('href'));
- cj(this).attr('href', '#browseValues');
-});
+          cj(".action-item").click(function () {
+            dataURL = cj(this).attr('jshref');
+            dialogTitle = cj(this).attr('title');
+            formDialog(dataURL, dialogTitle);
+          });
+        });
+      </script>
+    {/literal}
+  {elseif !$records}
+    <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>
+      &nbsp;
+      {ts}No multi-record entries found. Note: check is Include in multi-record listing property of the fields you want to display in listings{/ts}
+    </div>
+  {/if}
 
- cj(".action-item").click(function(){
-    dataURL = cj(this).attr('jshref');
-    dialogTitle = cj(this).attr('title');
-    formDialog(dataURL, dialogTitle);
- });
-});
-</script>
-{/literal}
-{elseif !$records}
-<div class="messages status no-popup">
-  <div class="icon inform-icon"></div>&nbsp;
-        {ts}No multi-record entries found. Note: check is Include in multi-record listing property of the fields you want to display in listings{/ts}
- </div>
-{/if}
-
-{if !$reachedMax}
-<a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="id=`$contactId`&multiRecord=add&gid=`$gid`"}" class="button"><span><div class="icon add-icon"></div>{ts}Add New Record{/ts}</span></a>
-{/if}
+  {if !$reachedMax}
+    <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="id=`$contactId`&multiRecord=add&gid=`$gid`"}"
+       class="button"><span><div class="icon add-icon"></div>{ts}Add New Record{/ts}</span></a>
+  {/if}
 {/if}

@@ -453,6 +453,7 @@ class CRM_Core_BAO_ConfigSetting {
       '',
       $config->templateCompileDir
     );
+
     list($url, $siteName, $siteRoot) = $config->userSystem->getDefaultSiteSettings($dir);
     return array($url, $dir, $siteName, $siteRoot);
   }

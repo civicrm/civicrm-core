@@ -785,6 +785,18 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       // delete all notes related to contact
       CRM_Core_BAO_Note::cleanContactNotes($id);
 
+      // delete cases related to contact
+      $contactCases = CRM_Case_BAO_Case::retrieveCaseIdsByContactId($id);
+      if (!empty($contactCases)) {
+        foreach ($contactCases as $caseId) {
+          //check if case is associate with other contact or not.
+          $caseContactId = CRM_Case_BAO_Case::getCaseClients($caseId);
+          if (count($caseContactId) <= 1) {
+            CRM_Case_BAO_Case::deleteCase($caseId);
+          }
+        }
+      }
+
       $contact->delete();
     }
     else {

@@ -44,17 +44,22 @@ class CRM_Contact_Page_AJAX {
 
     $params = array('version' => 3, 'check_permissions' => TRUE);
 
-    if ($context = CRM_Utils_Array::value('context', $_GET)) {
-      $params['context'] = CRM_Utils_Type::escape($_GET['context'], 'String');
-    }
-
-    if ($name = CRM_Utils_Array::value('s', $_GET)) {
-      $params['name'] = CRM_Utils_Type::escape($name, 'String');
+    // String params
+    // FIXME: param keys don't match input keys, using this array to translate
+    $whitelist = array(
+      's' => 'name',
+      'fieldName' => 'field_name',
+      'tableName' => 'table_name',
+      'context' => 'context',
+    );
+    foreach ($whitelist as $key => $param) {
+      if (!empty($_GET[$key])) {
+        $params[$param] = $_GET[$key];
+      }
     }
 
     //CRM-10687: Allow quicksearch by multiple fields
-    if (!empty($_GET['fieldName'])) {
-      $params['field_name'] = CRM_Utils_Type::escape($_GET['fieldName'], 'String');
+    if (!empty($params['field_name'])) {
       if ($params['field_name'] == 'phone_numeric') {
         $params['name'] = preg_replace('/[^\d]/', '', $params['name']);
       }
@@ -63,39 +68,19 @@ class CRM_Contact_Page_AJAX {
       }
     }
 
-    if (!empty($_GET['tableName'])) {
-      $params['table_name'] = CRM_Utils_Type::escape($_GET['tableName'], 'String');
-    }
-
-    $params['limit'] = 10;
-    if (CRM_Utils_Array::value('limit', $_GET)) {
-      $params['limit'] = CRM_Utils_Type::escape($_GET['limit'], 'Positive');
-    }
-
-    $orgId = $employee_id = $cid = $id = $context = $rel = NULL;
-    $params['org'] = CRM_Utils_Array::value('org', $_GET);
-    if (CRM_Utils_Array::value('id', $_GET)) {
-      $params['orgId'] = CRM_Utils_Type::escape($_GET['id'], 'Positive');
-    }
-
-    if (CRM_Utils_Array::value('employee_id', $_GET)) {
-      $params['employee_id'] = CRM_Utils_Type::escape($_GET['employee_id'], 'Positive');
-    }
-
-    if (CRM_Utils_Array::value('cid', $_GET)) {
-      $params['cid'] = CRM_Utils_Type::escape($_GET['cid'], 'Positive');
-    }
-
-    if (CRM_Utils_Array::value('id', $_GET)) {
-      $params['id'] = CRM_Utils_Type::escape($_GET['id'], 'Positive');
-    }
-
-    if (isset($_GET['rel'])) {
-      $params['rel'] = $_GET['rel'];
-    }
-
-    if (CRM_Utils_Array::value('cmsuser', $_GET)) {
-      $params['cmsuser'] = CRM_Utils_Type::escape($_GET['cmsuser'], 'Boolean');
+    // Numeric params
+    $whitelist = array(
+      'limit',
+      'org',
+      'employee_id',
+      'cid',
+      'id',
+      'cmsuser',
+    );
+    foreach ($whitelist as $key) {
+      if (!empty($_GET[$key]) && is_numeric($_GET[$key])) {
+        $params[$key] = $_GET[$key];
+      }
     }
 
     $result = civicrm_api('Contact', 'getquick', $params);

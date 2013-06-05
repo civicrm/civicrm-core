@@ -61,6 +61,6 @@
 {if call_user_func(array('CRM_Core_Permission','access'), 'CiviMember')}
         <option value="Membership">{ts}Memberships{/ts}</option>
 {/if}
-    </select>{help id="id-fullText-block" file="CRM/Contact/Form/Search/Custom/FullText.hlp"}
+    </select> {help id="id-fullText" file="CRM/Contact/Form/Search/Custom/FullText.hlp"}
     </form>
 </div>

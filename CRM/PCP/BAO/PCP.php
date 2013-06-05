@@ -358,7 +358,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @return None
    * @access public
    */
-  function buildPCPForm($form) {
+  public static function buildPCPForm($form) {
     $form->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages?'), NULL, array('onclick' => "return showHideByValue('pcp_active',true,'pcpFields','block','radio',false);"));
 
     $form->addElement('checkbox', 'is_approval_needed', ts('Approval required'));

@@ -887,6 +887,20 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
       $confirmJS = array('onclick' => "return confirmStatus( {$participantStatusId}, {$contributionStatusId} );");
     }
 
+    // get the participant status names to build special status array which is used to show notification
+    // checkbox below participant status select
+    $participantStatusName = CRM_Event_PseudoConstant::participantStatus();
+    $notificationStatuses = array(
+      'Cancelled',
+      'Pending from waitlist',
+      'Pending from approval',
+      'Expired',
+    );
+
+    // get the required status and then implode only ids
+    $notificationStatusIds = implode(',', array_keys(array_intersect($participantStatusName, $notificationStatuses)));
+    $this->assign('notificationStatusIds', $notificationStatusIds);
+
     $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $this->add('select', 'status_id', ts('Participant Status'),
       array(
@@ -1080,22 +1094,9 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
         //lets carry currency, CRM-4453
         $params['fee_currency'] = $config->defaultCurrency;
-        // fix for CRM-3088
-        if ($discountId &&
-          !empty($this->_values['discount'][$discountId])
-        ) {
-          $params['amount_level'] = $this->_values['discount'][$discountId][$params['amount']]['label'];
-          $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
-        }
-        elseif (!isset($params['priceSetId']) && CRM_Utils_Array::value('amount', $params)) {
-          $params['amount_level'] = $this->_values['fee'][$params['amount']]['label'];
-          $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
-        }
-        else {
-          CRM_Price_BAO_Set::processAmount($this->_values['fee'],
-            $params, $lineItem[0]
-          );
-        }
+        CRM_Price_BAO_Set::processAmount($this->_values['fee'],
+          $params, $lineItem[0]
+        );
         //CRM-11529 for quick config backoffice transactions
         //when financial_type_id is passed in form, update the
         //lineitems with the financial type selected in form

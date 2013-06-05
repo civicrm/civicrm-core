@@ -72,4 +72,26 @@
       {/foreach}
 </table>
 {/if}
+{if $context EQ "EventTemplate"}
+  {if $action eq 8}
+    {ts}If you no longer want to use this price set, click the event template title below, and modify the fees for that event.{/ts}
+  {else}
+    {ts}This price set is used by the event template(s) listed below. Click the event template title to change or remove the price set.{/ts}
+  {/if}
+  <br /><br />
+<table class="report">
+  <thead class="sticky">
+    <th scope="col">{ts}Event Template Name{/ts}</th>
+    <th scope="col">{ts}Type{/ts}</th>
+    <th scope="col">{ts}Public{/ts}</th>
+  </thead>
+  {foreach from=$usedBy.civicrm_event_template item=eventTemplate key=id}
+    <tr>
+      <td><a href="{crmURL p="civicrm/event/manage/fee" q="action=update&reset=1&id=`$id`"}" title="{ts}Change or remove the price set used for this event template.{/ts}">{$eventTemplate.title}</a></td>
+      <td>{$eventTemplate.eventType}</td>
+      <td>{if $eventTemplate.isPublic}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}</td>
+    </tr>
+  {/foreach}
+</table>
+{/if}
 {/foreach}
