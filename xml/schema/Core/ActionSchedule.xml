@@ -40,6 +40,13 @@
        <add>3.4</add>
   </field>
   <field>
+       <name>limit_to</name>
+       <type>boolean</type>
+       <default>1</default>
+       <comment>Is this the recipient criteria limited to OR in addition to?</comment>
+       <add>4.4</add>
+  </field>
+  <field>
        <name>entity_value</name>
        <type>varchar</type>
        <length>64</length>
