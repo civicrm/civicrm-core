@@ -220,6 +220,39 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * check with data type - Options with option_values
    */
+  function testCustomFieldCreateWithEmptyOptionGroup() {
+    $customGroup = $this->customGroupCreate('Contact', 'select_test_group', 3);
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Country',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'weight' => 4,
+      'is_required' => 1,
+      'is_searchable' => 0,
+      'is_active' => 1,
+      'version' => $this->_apiversion,
+    );
+
+    $customField = civicrm_api('custom_field', 'create', $params);
+    $this->assertAPISuccess($customField);
+    $this->assertNotNull($customField['id']);
+    $optionGroupID = civicrm_api('custom_field', 'getvalue', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => 'option_group_id',
+    ));
+
+    $this->assertTrue(is_numeric($optionGroupID) && ($optionGroupID > 0));
+    $optionGroup = civicrm_api('option_group', 'getsingle', array(
+      'version' => 3, 'id' => $optionGroupID));
+    $this->assertEquals($optionGroup['title'],'Country');
+    $optionValueCount = civicrm_api('option_value', 'getcount', array(
+      'version' => 3, 'option_group_id' => $optionGroupID));
+    $this->assertEquals(0, $optionValueCount);
+  }
+
+
   function testCustomFieldCreateWithOptionValues() {
     $customGroup = $this->customGroupCreate('Contact', 'select_test_group', 3);
 
@@ -252,7 +285,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $customField = civicrm_api('custom_field', 'create', $params);
 
-    $this->assertEquals($customField['is_error'], 0);
+    $this->assertAPISuccess($customField);
     $this->assertNotNull($customField['id']);
     $getFieldsParams = array(
       'options' => array('get_options' => 'custom_' . $customField['id']),
@@ -329,7 +362,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     );
 
     $customField = civicrm_api('custom_field', 'delete', $customOptionValueFields);
-    $this->assertEquals($customField['is_error'], 0);
+    $this->assertAPISuccess($customField);
   }
 }
 
