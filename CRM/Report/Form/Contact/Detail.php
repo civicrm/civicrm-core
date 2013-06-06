@@ -278,10 +278,6 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           array('title' => ts('Subject'),
             'default' => TRUE,
           ),
-          'source_contact_id' =>
-          array('title' => ts('Added By'),
-            'default' => TRUE,
-          ),
           'activity_date_time' =>
           array('title' => ts('Activity Date'),
             'default' => TRUE,
@@ -300,8 +296,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Activity_DAO_ActivityContact',
         'fields' =>
         array(
-          'contact_id' =>
+          'target_contact_id' =>
           array('title' => ts('With Contact'),
+            'name' => 'contact_id',
             'default' => TRUE,
           ),
         ),
@@ -312,13 +309,28 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Activity_DAO_ActivityContact',
         'fields' =>
         array(
-          'contact_id' =>
+          'assignee_contact_id' =>
           array('title' => ts('Assigned To'),
+            'name' => 'contact_id',
             'default' => TRUE,
           ),
         ),
         'grouping' => 'activity-fields',
       ),
+      'civicrm_activity_source' =>
+        array(
+          'dao' => 'CRM_Activity_DAO_ActivityContact',
+          'fields' =>
+          array(
+            'source_contact_id' =>
+            array(
+              'title' => ts('Added By'),
+              'name' => 'contact_id',
+              'default' => TRUE,
+            ),
+          ),
+        'grouping' => 'activity-fields',
+      ), 
       'civicrm_group' =>
       array(
         'dao' => 'CRM_Contact_DAO_Group',
@@ -370,13 +382,17 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
               $this->_columnHeadersComponent[$table['alias']]["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
             }
             elseif ($table['alias'] == $this->_aliases['civicrm_activity_target'] ||
-              $table['alias'] == $this->_aliases['civicrm_activity_assignment']
+              $table['alias'] == $this->_aliases['civicrm_activity_assignment'] ||
+              $table['alias'] == $this->_aliases['civicrm_activity_source']
             ) {
               if ($table['alias'] == $this->_aliases['civicrm_activity_target']) {
-                $addContactId = 'civicrm_activity_target.contact_id';
+                $addContactId = 'civicrm_activity_target.contact_id as target_contact_id';
+              }
+              elseif ($table['alias'] == $this->_aliases['civicrm_activity_source']) {
+                $addContactId = 'civicrm_activity_source.contact_id';
               }
               else {
-                $addContactId = 'civicrm_activity_assignment.contact_id';
+                $addContactId = 'civicrm_activity_assignment.contact_id as assignee_contact_id';
               }
 
               $tableName = $table['alias'];
@@ -472,6 +488,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
         $this->_formComponent['activity_civireport'] = "FROM
                         civicrm_activity {$this->_aliases['civicrm_activity']}
@@ -479,14 +496,17 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
                             {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id AND
                             civicrm_activity_target.record_type_id = {$targetID}
                         LEFT JOIN civicrm_activity_contact civicrm_activity_assignment ON
-                            {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id AND                                                                                                                   civicrm_activity_assignment.record_type_id = {$assigneeID}
-                        LEFT JOIN civicrm_contact sourceContact ON
-                            {$this->_aliases['civicrm_activity']}.source_contact_id = sourceContact.id
+                            {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id AND                                                                      civicrm_activity_assignment.record_type_id = {$assigneeID}
+                        LEFT JOIN civicrm_activity_contact civicrm_activity_source
+                            ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_source.activity_id AND
+                            civicrm_activity_source.record_type_id = {$sourceID} 
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_target']} ON
                             civicrm_activity_target.contact_id = {$this->_aliases['civicrm_activity_target']}.id
 
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_assignment']} ON
                             civicrm_activity_assignment.contact_id = {$this->_aliases['civicrm_activity_assignment']}.id
+                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_source']} ON
+                            civicrm_activity_source.contact_id = {$this->_aliases['civicrm_activity_source']}.id
                         LEFT JOIN civicrm_option_value ON
                             ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
                         LEFT JOIN civicrm_option_group ON
@@ -637,9 +657,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       $val = 'activity_civireport';
       $eligibleResult[$val] = $val;
       $sql = "{$this->_selectComponent[$val]} ,
-                 sourceContact.display_name as added_by {$this->_formComponent[$val]}
+                 {$this->_aliases['civicrm_activity_source']}.display_name as added_by {$this->_formComponent[$val]}
 
-                 WHERE ( {$this->_aliases['civicrm_activity']}.source_contact_id IN ($selectedContacts) OR
+                 WHERE ( civicrm_activity_source.contact_id IN ($selectedContacts) OR
                          civicrm_activity_target.contact_id IN ($selectedContacts) OR
                          civicrm_activity_assignment.contact_id IN ($selectedContacts) OR
                          civicrm_case_contact.contact_id IN ($selectedContacts) ) AND

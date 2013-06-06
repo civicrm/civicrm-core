@@ -1017,7 +1017,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
                     AND ca.is_current_revision = 1';
 
     if (CRM_Utils_Array::value('reporter_id', $params)) {
-      $where .= " AND ca.source_contact_id = " . CRM_Utils_Type::escape($params['reporter_id'], 'Integer');
+      $where .= " AND cac.contact_id = " . CRM_Utils_Type::escape($params['reporter_id'], 'Integer');
     }
 
     if (CRM_Utils_Array::value('status_id', $params)) {
