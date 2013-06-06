@@ -48,7 +48,7 @@ class CRM_Custom_Form_CustomData {
    * @return void
    */
   static function preProcess(&$form, $subName = NULL, $subType = NULL,
-    $groupCount = NULL, $type = NULL, $entityID = NULL
+    $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {
     if ($type) {
       $form->_type = $type;
@@ -122,7 +122,8 @@ class CRM_Custom_Form_CustomData {
       $gid,
       $subType,
       $form->_subName,
-      $getCachedTree
+      $getCachedTree,
+      $onlySubType
     );
 
     if (property_exists($form, '_customValueCount') && !empty($groupTree)) {

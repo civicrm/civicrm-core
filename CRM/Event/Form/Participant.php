@@ -321,7 +321,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     $this->assign('cdType', FALSE);
     if ($this->_cdType) {
       $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
+      return CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, NULL, NULL, NULL, TRUE);
     }
 
     //check the mode when this form is called either single or as

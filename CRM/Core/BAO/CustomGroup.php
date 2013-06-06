@@ -311,7 +311,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $groupID  = NULL,
     $subType  = NULL,
     $subName  = NULL,
-    $fromCache = TRUE
+    $fromCache = TRUE,
+    $onlySubType = NULL
   ) {
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
@@ -401,13 +402,24 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
           $subTypePart = CRM_Core_DAO::VALUE_SEPARATOR . trim($subTypePart, CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
           $subTypeClauses[] = "civicrm_custom_group.extends_entity_column_value LIKE '%$subTypePart%'";
         }
-        $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . " OR civicrm_custom_group.extends_entity_column_value IS NULL )";
+
+        if ($onlySubType) {
+          $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
+        }
+        else {
+          $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . " OR civicrm_custom_group.extends_entity_column_value IS NULL )";
+        }
       }
       else {
         $subType = CRM_Core_DAO::VALUE_SEPARATOR . trim($subType, CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
 
-        $subTypeClause = "( civicrm_custom_group.extends_entity_column_value LIKE '%$subType%'
-   OR   civicrm_custom_group.extends_entity_column_value IS NULL )";
+        if ($onlySubType) {
+          $subTypeClause = "( civicrm_custom_group.extends_entity_column_value LIKE '%$subType%' )";
+        }
+        else {
+          $subTypeClause = "( civicrm_custom_group.extends_entity_column_value LIKE '%$subType%'
+    OR    civicrm_custom_group.extends_entity_column_value IS NULL )";
+        }
       }
 
       $strWhere = "
