@@ -93,6 +93,7 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
     'api.default' => 1,
     'type' => CRM_Utils_Type::T_BOOL,
   );
+  $params['data_type']['api.default'] = 'String';
 }
 
 /**
