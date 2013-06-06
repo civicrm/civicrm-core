@@ -367,7 +367,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                        {$this->_aliases['civicrm_activity_assignment']}.record_type_id = {$assigneeID}
              LEFT JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_source']}
                     ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_source']}.activity_id AND
-                       {$this->_aliases['civicrm_activity_target']}.record_type_id = {$sourceID}
+                       {$this->_aliases['civicrm_activity_source']}.record_type_id = {$sourceID}
              LEFT JOIN civicrm_contact contact_civireport
                     ON {$this->_aliases['civicrm_activity_target']}.contact_id = contact_civireport.id
              LEFT JOIN civicrm_contact civicrm_contact_assignee
