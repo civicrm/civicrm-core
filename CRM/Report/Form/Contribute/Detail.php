@@ -861,7 +861,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
 
       $query = "select "
         . implode(", ", $ifnulls)
-        ."$addtotals, count(*) as ct from ($sql) as subquery group by ".  implode(", ", $sectionAliases);
+        ."$addtotals, count(*) as ct from civireport_contribution_detail_temp3 group by ".  implode(", ", $sectionAliases);
       // initialize array of total counts
       $sumcontribs = $totals = array();
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -895,10 +895,17 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       }
       if ($showsumcontribs) {
         $totalandsum = array();
+        $title = ts('contributions / soft-credits');
+        if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only') {
+          $title = ts('contributions');
+        } else if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'soft_credits_only') {
+          $title = ts('soft-credits');
+        }
         foreach ($totals as $key => $total) {
-          $totalandsum[$key] = ts("%1 contributions: %2", array(
+          $totalandsum[$key] = ts("%1 %2: %3", array(
             1 => $total,
-            2 => CRM_Utils_Money::format($sumcontribs[$key])
+            2 => $title, 
+            3 => CRM_Utils_Money::format($sumcontribs[$key])
           ));
         }
         $this->assign('sectionTotals', $totalandsum);
