@@ -59,7 +59,7 @@ global $civicrm_root;
 if (empty($civicrm_root)) {
   $civicrm_root = dirname (dirname (dirname (dirname( __FILE__ ) )));
 }
-#$civicrm_root = '/var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/modules/civicrm'; 
+#$civicrm_root = '/var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/modules/civicrm';
 
 // set this to a temporary directory. it defaults to /tmp/civi on linux
 //define( 'CIVICRM_TEMPLATE_COMPILEDIR', 'the/absolute/path/' );

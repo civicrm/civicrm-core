@@ -962,7 +962,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'RichTextEditor':
         $attributes = array('rows' => $field->note_rows, 'cols' => $field->note_columns);
         if ($field->text_length) {
-          $attributes['maxlength'] = $field->text_length; 
+          $attributes['maxlength'] = $field->text_length;
         }
         $qf->addWysiwyg($elementName, $label, $attributes, $search);
         break;
