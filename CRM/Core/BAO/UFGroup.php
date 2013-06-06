@@ -1367,7 +1367,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return object
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, $ids = array()) {
     $fields = array('is_active', 'add_captcha', 'is_map', 'is_update_dupe', 'is_edit_link', 'is_uf_link', 'is_cms_user');
     foreach ($fields as $field) {
       $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
@@ -1379,7 +1379,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $ufGroup = new CRM_Core_DAO_UFGroup();
     $ufGroup->copyValues($params);
 
-    $ufGroupID = CRM_Utils_Array::value('ufgroup', $ids);
+    $ufGroupID = CRM_Utils_Array::value('ufgroup', $ids, CRM_Utils_Array::value('id', $params));
     if (!$ufGroupID) {
       $ufGroup->name = CRM_Utils_String::munge($ufGroup->title, '_', 56);
     }
@@ -2033,7 +2033,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                ) as $suppress) {
         unset($contributionStatuses[CRM_Utils_Array::key($suppress, $statusName)]);
       }
-      
+
       $form->add('select', $name, $title,
         array(
           '' => ts('- select -')) + $contributionStatuses, $required
