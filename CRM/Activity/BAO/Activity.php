@@ -1084,7 +1084,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
                 civicrm_activity.activity_date_time,
                 civicrm_activity.status_id,
                 civicrm_activity.subject,
-                civicrm_activity.source_contact_id,
+                ac.contact_id,
                 civicrm_activity.source_record_id,
                 civicrm_option_value.value as activity_type_id,
                 civicrm_option_value.label as activity_type,
