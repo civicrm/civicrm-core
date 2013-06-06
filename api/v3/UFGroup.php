@@ -60,15 +60,7 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_uf_group_create($params) {
-
-  $ids = array();
-  $ids['ufgroup'] = $params['id'];
-
-
-  $ufGroup = CRM_Core_BAO_UFGroup::add($params, $ids);
-  _civicrm_api3_object_to_array($ufGroup, $ufGroupArray[$ufGroup->id]);
-
-  return civicrm_api3_create_success($ufGroupArray, $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
