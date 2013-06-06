@@ -4,7 +4,7 @@
  
  */
 function loc_block_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'address_id' => 2,
   'phone_id' => 2,
@@ -21,13 +21,13 @@ $params = array(
  */
 function loc_block_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
           'address_id' => '2',
           'email_id' => '3',
