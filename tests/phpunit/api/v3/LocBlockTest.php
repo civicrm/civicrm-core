@@ -99,7 +99,11 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
 
     // Now check our results using the return param 'all'
-    $getParams = array('version' => $this->_apiversion, 'id' => $id, 'return' => 'all');
+    $getParams = array(
+      'version' => $this->_apiversion,
+      'id' => $id,
+      'return' => 'all'
+    );
     $result = civicrm_api($this->_entity, 'getsingle', $getParams);
     $this->documentMe($getParams, $result, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call', NULL, 'get');
     $this->assertNotNull($result['email_id'], 'In line ' . __LINE__);
