@@ -291,7 +291,7 @@ UNION
           'contact_type' => 'Organization',
           'organization_name' => trim($orgName[0]),
         );
-        $org = CRM_Contact_BAO_Contact::add($newOrg);
+        $org = CRM_Contact_BAO_Contact::create($newOrg);
         $organizationId = $org->id;
       }
     }
