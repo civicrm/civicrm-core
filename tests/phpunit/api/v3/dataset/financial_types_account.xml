@@ -11,15 +11,15 @@
       <value>10</value>  <!--  id  -->
       <value>civicrm_financial_type</value>  <!-- entity_table   -->
       <value>10</value>  <!--  entity_id  -->
-      <value>1</value>  <!-- account_relationship   -->   
-      <value>1</value>  <!-- financial_account_id   --> 
+      <value>1</value>  <!-- account_relationship   -->
+      <value>1</value>  <!-- financial_account_id   -->
     </row>
     <row>
       <value>11</value>  <!--  id  -->
       <value>civicrm_financial_type</value>  <!-- entity_table   -->
       <value>11</value>  <!--  entity_id  -->
-      <value>1</value>  <!-- account_relationship   -->   
-      <value>1</value>  <!-- financial_account_id   -->      
-    </row>    
+      <value>1</value>  <!-- account_relationship   -->
+      <value>1</value>  <!-- financial_account_id   -->
+    </row>
   </table>
 </dataset>

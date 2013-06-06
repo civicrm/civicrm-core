@@ -215,12 +215,12 @@
     />
     <civicrm_entity_tag
         entity_id="14"
-        entity_table="civicrm_contact" 
+        entity_table="civicrm_contact"
         tag_id="9"
     />
     <civicrm_entity_tag
         entity_id="16"
-        entity_table="civicrm_contact" 
+        entity_table="civicrm_contact"
         tag_id="9"
     />
     <civicrm_entity_tag
