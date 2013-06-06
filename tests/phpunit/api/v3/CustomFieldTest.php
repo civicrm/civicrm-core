@@ -321,7 +321,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $params = array(
       'custom_group_id' => $customGroup['id'],
-      'label' => 'Country',
+      'label' => 'Our special field',
       'html_type' => 'Select',
       'data_type' => 'String',
       'weight' => 4,

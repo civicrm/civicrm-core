@@ -554,7 +554,7 @@ function contact_getfields_expectedresult(){
           'uniqueName' => 'contact_is_deleted',
         ),
       'custom_1' => array(
-          'label' => 'Country',
+          'label' => 'Our special field',
           'groupTitle' => 'select_test_g',
           'data_type' => 'String',
           'html_type' => 'Select',
