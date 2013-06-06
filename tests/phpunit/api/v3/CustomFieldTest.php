@@ -253,6 +253,55 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
 
+  /**
+   * Test custom field get works & return param works
+   */
+  function testCustomFieldGetReturnOptions(){
+    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+
+    $result = civicrm_api('custom_field', 'getsingle', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => 'data_type',
+    ));
+    $this->assertTrue(array_key_exists('data_type', $result));
+    $this->assertFalse(array_key_exists('custom_group_id', $result));
+  }
+
+  /**
+   * Test custom field get works & return param works
+   */
+  function testCustomFieldGetReturnArray(){
+    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+
+    $result = civicrm_api('custom_field', 'getsingle', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => array('data_type'),
+    ));
+    $this->assertTrue(array_key_exists('data_type', $result));
+    $this->assertFalse(array_key_exists('custom_group_id', $result));
+  }
+
+  /**
+   * Test custom field get works & return param works
+   */
+  function testCustomFieldGetReturnTwoOptions(){
+    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+
+    $result = civicrm_api('custom_field', 'getsingle', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => 'data_type, custom_group_id',
+    ));
+    $this->assertTrue(array_key_exists('data_type', $result));
+    $this->assertTrue(array_key_exists('custom_group_id', $result));
+    $this->assertFalse(array_key_exists('label', $result));
+  }
+
   function testCustomFieldCreateWithOptionValues() {
     $customGroup = $this->customGroupCreate('Contact', 'select_test_group', 3);
 

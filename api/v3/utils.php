@@ -459,6 +459,8 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
     //if entity_id is set then treat it as ID (will be overridden by id if set)
     $dao->id = $params[$entity . "_id"];
   }
+
+  $options = _civicrm_api3_get_options_from_params($params);
   //apply options like sort
   _civicrm_api3_apply_options_to_dao($params, $dao, $entity);
 
@@ -543,13 +545,14 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
       }
     }
   }
-  if (!empty($params['return']) && is_array($params['return'])) {
+  if (!empty($options['return']) && is_array($options['return'])) {
     $dao->selectAdd();
+    $options['return']['id'] = TRUE;// ensure 'id' is included
     $allfields =  _civicrm_api3_get_unique_name_array($dao);
-    $returnMatched = array_intersect($params['return'], $allfields);
+    $returnMatched = array_intersect(array_keys($options['return']), $allfields);
     $returnUniqueMatched = array_intersect(
       array_diff(// not already matched on the field names
-        $params['return'],
+        $options['return'],
         $returnMatched),
         array_flip($allfields)// but a match for the field keys
     );
@@ -561,7 +564,6 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
       $dao->selectAdd($allfields[$uniqueVal]);
 
     }
-    $dao->selectAdd('id');
   }
 }
 
