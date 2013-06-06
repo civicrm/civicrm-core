@@ -324,16 +324,15 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
         'is_enabled'
       )) {
-        // in order to make sure that every contact must be added to a group (CRM-4613) -
+        // Enabling multisite causes the contact to be added to the domain group
         $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
-        if (CRM_Utils_Array::value('group', $params) && is_array($params['group'])) {
-          $grpFlp = array_flip($params['group']);
-          if (!array_key_exists(1, $grpFlp)) {
+        if(!empty($domainGroupID)){
+          if (CRM_Utils_Array::value('group', $params) && is_array($params['group'])) {
             $params['group'][$domainGroupID] = 1;
           }
-        }
-        else {
-          $params['group'] = array($domainGroupID => 1);
+          else {
+            $params['group'] = array($domainGroupID => 1);
+          }
         }
       }
 
@@ -2987,7 +2986,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     }
   }
 
-  
+
   /**
    * Delete a contact-related object that has an 'is_primary' field
    * Ensures that is_primary gets assigned to another object if available
