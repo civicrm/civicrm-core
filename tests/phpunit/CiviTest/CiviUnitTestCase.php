@@ -1441,7 +1441,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       );
     }
 
-    require_once 'CRM/Core/DAO/LocationType.php';
     $locationType = new CRM_Core_DAO_LocationType();
     $locationType->copyValues($params);
     $locationType->save();
@@ -1794,7 +1793,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     $customGroup = $this->CustomGroupCreate($entity, $function);
     $customField = $this->customFieldCreate($customGroup['id'], $function);
-    CRM_Core_PseudoConstant::flush('customGroup');
+    CRM_Core_PseudoConstant::flush();
 
     return array('custom_group_id' => $customGroup['id'], 'custom_field_id' => $customField['id']);
   }

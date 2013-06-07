@@ -488,8 +488,11 @@ class CRM_Core_PseudoConstant {
    *
    */
   public static function flush($name = 'cache') {
-    if (isset(self::$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
+    }
+    if ($name == 'cache') {
+      CRM_Core_OptionGroup::flushAll();
     }
   }
 

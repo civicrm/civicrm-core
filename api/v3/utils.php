@@ -1567,16 +1567,15 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
   if (isset($options[$value])) {
     return;
   }
-  // Generate error msg before overwriting the value
-  $errorMsg = "'$value' is not a valid option for field $fieldName";
 
   // Case-insensitive matching
-  $value = strtolower($value);
+  $newValue = strtolower($value);
   $options = array_map("strtolower", $options);
-  $value = array_search($value, $options);
-  if ($value === FALSE) {
-    throw new API_Exception($errorMsg, 2001, array('error_field' => $fieldName));
+  $newValue = array_search($newValue, $options);
+  if ($newValue === FALSE) {
+    throw new API_Exception("'$value' is not a valid option for field $fieldName", 2001, array('error_field' => $fieldName));
   }
+  $value = $newValue;
 }
 
 /**

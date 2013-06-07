@@ -120,7 +120,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     );
     $this->organizationSponsor = $this->organizationCreate($params);
     //refresh php cached variables
-    CRM_Core_PseudoConstant::flush('customGroup');
+    CRM_Core_PseudoConstant::flush();
     CRM_Core_BAO_CustomField::getTableColumnGroup($this->IndividualField['id'], True);
     CRM_Core_BAO_CustomField::getTableColumnGroup($this->IndiStudentField['id'], True);
   }
