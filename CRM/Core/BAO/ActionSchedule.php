@@ -791,6 +791,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       }
 
       if ($mapping->entity == 'civicrm_participant') {
+        $table = 'civicrm_event';
         $contactField = 'e.contact_id';
         $join[] = 'INNER JOIN civicrm_event r ON e.event_id = r.id';
         if ($actionSchedule->recipient_listing) {
@@ -856,16 +857,20 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $where[] = "e.status_id IN ({$mStatus})";
 
       }
-
-      if ($actionSchedule->group_id) {
-        $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
-        $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
+      if ($limitTo) {
+        if ($actionSchedule->group_id) {
+          $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
+          $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
+        }
+        elseif (!empty($actionSchedule->recipient_manual)) {
+          $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
+          $where[] = "{$contactField} IN ({$rList})";
+        }
+      } else {
+        if (!empty($actionSchedule->recipient_manual)) {
+          $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
+        }
       }
-      elseif (!empty($actionSchedule->recipient_manual)) {
-        $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
-        $where[] = "{$contactField} IN ({$rList})";
-      }
-
       $select[] = "{$contactField} as contact_id";
       $select[] = 'e.id as entity_id';
       $select[] = "'{$mapping->entity}' as entity_table";
@@ -904,14 +909,29 @@ reminder.action_schedule_id = %1";
       $fromClause = "FROM $from";
       $joinClause = !empty($join) ? implode(' ', $join) : '';
       $whereClause = 'WHERE ' . implode(' AND ', $where);
+      $union = '';
 
+    if ($limitTo == 0) {
+
+        $union =
+          "union
+        SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id
+FROM (civicrm_contact c, {$table} r)
+LEFT JOIN civicrm_action_log reminder ON reminder.contact_id = c.id AND
+        reminder.entity_id          = c.id AND
+        reminder.entity_table       = 'civicrm_contact' AND
+        reminder.action_schedule_id = {$actionSchedule->id}
+WHERE (reminder.id IS NULL AND c.is_deleted = 0 AND c.is_deceased = 0 AND c.id IN ({$rList}))AND
+ {$dateClause}";
+      }
       $query = "
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
 {$selectClause}
 {$fromClause}
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
-{$whereClause} AND {$dateClause} {$notINClause}";
+{$whereClause} AND {$dateClause} {$notINClause}
+ {$union}";
 
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
