@@ -63,14 +63,14 @@ class CRM_Upgrade_Incremental_php_FourThree {
       }
     }
     if ($rev == '4.3.beta4' && CRM_Utils_Constant::value('CIVICRM_UF', FALSE) == 'Drupal6') {
-      // CRM-11823 - Make sure the D6 HTML HEAD technique will work on upgrade pages
-      theme('item_list', array()); // force-load theme registry
-      $theme_registry = theme_get_registry();
-      if (
-        !isset($theme_registry['page']['preprocess functions']) ||
-        FALSE === array_search('civicrm_preprocess_page_inject', $theme_registry['page']['preprocess functions'])
-      ) {
-        CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
+      // CRM-11823 - Make sure the D6 HTML HEAD technique will work on
+      // upgrade pages ... except when we're in Drush.
+      if (!function_exists('drush_main')) {
+        theme('item_list', array()); // force-load theme registry
+        $theme_registry = theme_get_registry();
+        if (!isset($theme_registry['page']['preprocess functions']) || FALSE === array_search('civicrm_preprocess_page_inject', $theme_registry['page']['preprocess functions'])) {
+          CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
+        }
       }
     }
   }
