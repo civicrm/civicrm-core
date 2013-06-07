@@ -37,7 +37,6 @@ function activity__expectedresult(){
   'values' => array( 
       '1' => array( 
           'id' => '1',
-          'source_contact_id' => '17',
           'source_record_id' => '',
           'activity_type_id' => '1',
           'subject' => 'Make-it-Happen Meeting',

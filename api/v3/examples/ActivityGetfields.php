@@ -37,6 +37,12 @@ function activity_getfields_expectedresult(){
           'import' => true,
           'where' => 'civicrm_activity.activity_type_id',
           'headerPattern' => '/(activity.)?type(.id$)/i',
+          'pseudoconstant' => array( 
+              'optionGroupName' => 'activity_type',
+            ),
+          'api.aliases' => array( 
+              '0' => 'activity_type',
+            ),
         ),
       'activity_date_time' => array( 
           'name' => 'activity_date_time',
@@ -65,16 +71,10 @@ function activity_getfields_expectedresult(){
           'type' => 1,
           'title' => 'Priority',
           'pseudoconstant' => array( 
-              'name' => 'priority',
               'optionGroupName' => 'priority',
             ),
           'api.aliases' => array( 
               '0' => 'priority',
-            ),
-          'options' => array( 
-              '1' => 'Urgent',
-              '2' => 'Normal',
-              '3' => 'Low',
             ),
         ),
       'parent_id' => array( 
@@ -181,7 +181,13 @@ function activity_getfields_expectedresult(){
           'import' => true,
           'where' => 'civicrm_activity.status_id',
           'headerPattern' => '/(activity.)?status(.label$)?/i',
+          'pseudoconstant' => array( 
+              'optionGroupName' => 'activity_status',
+            ),
           'uniqueName' => 'activity_status_id',
+          'api.aliases' => array( 
+              '0' => 'status',
+            ),
         ),
       'is_test' => array( 
           'name' => 'is_test',
@@ -198,7 +204,13 @@ function activity_getfields_expectedresult(){
           'type' => 1,
           'title' => 'Activity Medium',
           'default' => 'UL',
+          'pseudoconstant' => array( 
+              'optionGroupName' => 'encounter_medium',
+            ),
           'uniqueName' => 'activity_medium_id',
+          'api.aliases' => array( 
+              '0' => 'medium',
+            ),
         ),
       'result' => array( 
           'name' => 'result',
@@ -235,22 +247,29 @@ function activity_getfields_expectedresult(){
           'import' => true,
           'where' => 'civicrm_activity.engagement_level',
           'export' => true,
+          'pseudoconstant' => array( 
+              'optionGroupName' => 'engagement_index',
+            ),
           'uniqueName' => 'activity_engagement_level',
         ),
       'source_contact_id' => array( 
+          'name' => 'source_contact_id',
+          'title' => 'Activity Source Contact',
+          'type' => 1,
+          'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
           'api.default' => 'user_contact_id',
         ),
       'assignee_contact_id' => array( 
           'name' => 'assignee_id',
           'title' => 'assigned to',
           'type' => 1,
-          'FKClassName' => 'CRM_Activity_DAO_ActivityAssignment',
+          'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
         ),
       'target_contact_id' => array( 
           'name' => 'target_id',
           'title' => 'Activity Target',
           'type' => 1,
-          'FKClassName' => 'CRM_Activity_DAO_ActivityTarget',
+          'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
         ),
       'activity_status_id' => array( 
           'name' => 'status_id',

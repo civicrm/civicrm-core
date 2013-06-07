@@ -32,7 +32,6 @@ function activity_get_expectedresult(){
   'values' => array( 
       '0' => array( 
           'id' => '1',
-          'source_contact_id' => '17',
           'activity_type_id' => '44',
           'subject' => 'test activity type id',
           'activity_date_time' => '2011-06-02 14:36:13',
@@ -48,8 +47,12 @@ function activity_get_expectedresult(){
           'assignee_contact_id' => array( 
               '0' => '19',
             ),
+          'source_contact_id' => '17',
           'api.contact.get' => array( 
               'is_error' => 0,
+              'undefined_fields' => array( 
+                  '0' => 'api.has_parent',
+                ),
               'version' => 3,
               'count' => 1,
               'id' => 17,
@@ -83,12 +86,6 @@ function activity_get_expectedresult(){
                       'organization_name' => '',
                       'sic_code' => '',
                       'contact_is_deleted' => 0,
-                      'gender_id' => '',
-                      'gender' => '',
-                      'prefix_id' => '',
-                      'prefix' => '',
-                      'suffix_id' => '',
-                      'suffix' => '',
                       'current_employer' => '',
                       'address_id' => '',
                       'street_address' => '',

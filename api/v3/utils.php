@@ -1060,46 +1060,46 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $errorMode = 
   }
   $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => $action));
   $fields = array_intersect_key($fields['values'], $params);
-  foreach ($fields as $fieldname => $fieldInfo) {
+  foreach ($fields as $fieldName => $fieldInfo) {
     switch (CRM_Utils_Array::value('type', $fieldInfo)) {
       case CRM_Utils_Type::T_INT:
         //field is of type integer
-        _civicrm_api3_validate_integer($params, $fieldname, $fieldInfo, $entity);
+        _civicrm_api3_validate_integer($params, $fieldName, $fieldInfo, $entity);
         break;
 
       case 4:
       case 12:
         //field is of type date or datetime
-        _civicrm_api3_validate_date($params, $fieldname, $fieldInfo);
+        _civicrm_api3_validate_date($params, $fieldName, $fieldInfo);
         break;
 
-      case 32://blob
-        _civicrm_api3_validate_html($params, $fieldname, $fieldInfo);
+    case 32://blob
+        _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
         break;
 
       case CRM_Utils_Type::T_STRING:
-        _civicrm_api3_validate_string($params, $fieldname, $fieldInfo);
+        _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
         break;
 
       case CRM_Utils_Type::T_MONEY:
-        if (!CRM_Utils_Rule::money($params[$fieldname])) {
-          throw new Exception($fieldname . " is  not a valid amount: " . $params[$fieldname]);
+        if (!CRM_Utils_Rule::money($params[$fieldName])) {
+          throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
         }
     }
 
     // intensive checks - usually only called after DB level fail
     if (!empty($errorMode) && strtolower($action) == 'create') {
       if (CRM_Utils_Array::value('FKClassName', $fieldInfo)) {
-        if (CRM_Utils_Array::value($fieldname, $params)) {
-          _civicrm_api3_validate_constraint($params, $fieldname, $fieldInfo);
+        if (CRM_Utils_Array::value($fieldName, $params)) {
+          _civicrm_api3_validate_constraint($params, $fieldName, $fieldInfo);
         }
         elseif (CRM_Utils_Array::value('required', $fieldInfo)) {
-          throw new Exception("DB Constraint Violation - possibly $fieldname should possibly be marked as mandatory for this API. If so, please raise a bug report");
+          throw new Exception("DB Constraint Violation - possibly $fieldName should possibly be marked as mandatory for this API. If so, please raise a bug report");
         }
       }
       if (CRM_Utils_Array::value('api.unique', $fieldInfo)) {
         $params['entity'] = $entity;
-        _civicrm_api3_validate_uniquekey($params, $fieldname, $fieldInfo);
+        _civicrm_api3_validate_uniquekey($params, $fieldName, $fieldInfo);
       }
     }
   }
@@ -1116,10 +1116,10 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $errorMode = 
  * may not be the best thing to do. There is no code level documentation on the existing functions to work off
  *
  * @param array $params params from civicrm_api
- * @param string $fieldname uniquename of field being checked
+ * @param string $fieldName uniquename of field being checked
  * @param array $fieldinfo array of fields from getfields function
  */
-function _civicrm_api3_validate_date(&$params, &$fieldname, &$fieldInfo) {
+function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   //should we check first to prevent it from being copied if they have passed in sql friendly format?
   if (CRM_Utils_Array::value($fieldInfo['name'], $params)) {
     //accept 'whatever strtotime accepts
@@ -1128,12 +1128,12 @@ function _civicrm_api3_validate_date(&$params, &$fieldname, &$fieldInfo) {
     }
     $params[$fieldInfo['name']] = CRM_Utils_Date::processDate($params[$fieldInfo['name']]);
   }
-  if ((CRM_Utils_Array::value('name', $fieldInfo) != $fieldname) && CRM_Utils_Array::value($fieldname, $params)) {
+  if ((CRM_Utils_Array::value('name', $fieldInfo) != $fieldName) && CRM_Utils_Array::value($fieldName, $params)) {
     //If the unique field name differs from the db name & is set handle it here
-    if (strtotime($params[$fieldname]) === FALSE) {
-      throw new Exception($fieldname . " is not a valid date: " . $params[$fieldname]);
+    if (strtotime($params[$fieldName]) === FALSE) {
+      throw new Exception($fieldName . " is not a valid date: " . $params[$fieldName]);
     }
-    $params[$fieldname] = CRM_Utils_Date::processDate($params[$fieldname]);
+    $params[$fieldName] = CRM_Utils_Date::processDate($params[$fieldName]);
   }
 }
 
@@ -1141,16 +1141,16 @@ function _civicrm_api3_validate_date(&$params, &$fieldname, &$fieldInfo) {
  * Validate foreign constraint fields being passed into API.
  *
  * @param array $params params from civicrm_api
- * @param string $fieldname uniquename of field being checked
+ * @param string $fieldName uniquename of field being checked
  * @param array $fieldinfo array of fields from getfields function
  */
-function _civicrm_api3_validate_constraint(&$params, &$fieldname, &$fieldInfo) {
+function _civicrm_api3_validate_constraint(&$params, &$fieldName, &$fieldInfo) {
   $dao = new $fieldInfo['FKClassName'];
-  $dao->id = $params[$fieldname];
+  $dao->id = $params[$fieldName];
   $dao->selectAdd();
   $dao->selectAdd('id');
   if (!$dao->find()) {
-    throw new Exception("$fieldname is not valid : " . $params[$fieldname]);
+    throw new Exception("$fieldName is not valid : " . $params[$fieldName]);
   }
 }
 
@@ -1158,18 +1158,18 @@ function _civicrm_api3_validate_constraint(&$params, &$fieldname, &$fieldInfo) {
  * Validate foreign constraint fields being passed into API.
  *
  * @param array $params params from civicrm_api
- * @param string $fieldname uniquename of field being checked
+ * @param string $fieldName uniquename of field being checked
  * @param array $fieldinfo array of fields from getfields function
  */
-function _civicrm_api3_validate_uniquekey(&$params, &$fieldname, &$fieldInfo) {
+function _civicrm_api3_validate_uniquekey(&$params, &$fieldName, &$fieldInfo) {
   $existing = civicrm_api($params['entity'], 'get', array(
       'version' => $params['version'],
-      $fieldname => $params[$fieldname],
+      $fieldName => $params[$fieldName],
     ));
   // an entry already exists for this unique field
   if ($existing['count'] == 1) {
     // question - could this ever be a security issue?
-    throw new Exception("Field: `$fieldname` must be unique. An conflicting entity already exists - id: " . $existing['id']);
+    throw new Exception("Field: `$fieldName` must be unique. An conflicting entity already exists - id: " . $existing['id']);
   }
 }
 
@@ -1437,59 +1437,37 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest) {
  * It currently converts the incoming value 'user_contact_id' into the id of the currenty logged in user
  *
  * @param array $params params from civicrm_api
- * @param string $fieldname uniquename of field being checked
+ * @param string $fieldName uniquename of field being checked
  * @param array $fieldinfo array of fields from getfields function
  */
-function _civicrm_api3_validate_integer(&$params, &$fieldname, &$fieldInfo, $entity) {
+function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $entity) {
   //if fieldname exists in params
-  if (CRM_Utils_Array::value($fieldname, $params)) {
+  if (CRM_Utils_Array::value($fieldName, $params)) {
     //if value = 'user_contact_id' replace value with logged in user id
-    if ($params[$fieldname] == "user_contact_id") {
+    if ($params[$fieldName] == "user_contact_id") {
       $session = &CRM_Core_Session::singleton();
-      $params[$fieldname] = $session->get('userID');
+      $params[$fieldName] = $session->get('userID');
     }
-    if (!empty($fieldInfo['options'])) {
-      $constant = CRM_Utils_Array::value('options', $fieldInfo);
-      if (is_numeric($params[$fieldname]) && !CRM_Utils_Array::value('FKClassName',$fieldInfo) && !array_key_exists($params[$fieldname], $fieldInfo['options'])) {
-        throw new API_Exception("$fieldname is not valid", 2001, array('error_field' => $fieldname,"type"=>"integer"));
-      }
-    }
-    // we are looking for strings that should be swapped out e.g swap 'Donation' to financial_type_id 1
-    if (!is_numeric($params[$fieldname]) && !is_array($params[$fieldname])) {
-      if(CRM_Utils_Array::value('FKClassName', $fieldInfo)){
-        // we'll get the options for this now since we are doing a swap out
-        $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldname));
-        if(empty($options['is_error'])){
-          $fieldInfo['options'] = $options['values'];
-        }
-      }
-      if(!empty($fieldInfo['options'])){
-        $numericvalue = array_search($params[$fieldname], $fieldInfo['options']);
-        if (empty($numericvalue)) {
-          throw new Exception("$fieldname " . $params[$fieldname] . " is not valid");
-        }
-        else {
-          $params[$fieldname] = $numericvalue;
-        }
-      }
+    if (!empty($fieldInfo['pseudoconstant'])) {
+      _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, 'integer');
     }
 
     // once we have done any swaps check our field length
-    if(is_string($params[$fieldname]) &&
+    if(is_string($params[$fieldName]) &&
       CRM_Utils_Array::value('maxlength',$fieldInfo)
-      && strlen($params[$fieldname]) > $fieldInfo['maxlength']
+      && strlen($params[$fieldName]) > $fieldInfo['maxlength']
       ){
-      throw new API_Exception( $params[$fieldname] . " is " . strlen($params[$fieldname]) . " characters  - longer than $fieldname length" . $fieldInfo['maxlength'] . ' characters',
-        2100, array('field' => $fieldname, "max_length"=>$fieldInfo['maxlength'])
+      throw new API_Exception( $params[$fieldName] . " is " . strlen($params[$fieldName]) . " characters  - longer than $fieldName length" . $fieldInfo['maxlength'] . ' characters',
+        2100, array('field' => $fieldName, "max_length"=>$fieldInfo['maxlength'])
       );
     }
   }
 }
 
-function _civicrm_api3_validate_html(&$params, &$fieldname, &$fieldInfo) {
-  if ($value = CRM_Utils_Array::value($fieldname, $params)) {
+function _civicrm_api3_validate_html(&$params, &$fieldName, &$fieldInfo) {
+  if ($value = CRM_Utils_Array::value($fieldName, $params)) {
     if (!CRM_Utils_Rule::xssString($value)) {
-      throw new API_Exception('Illegal characters in input (potential scripting attack)',array("field"=>$fieldname,"error_code"=>"xss"));
+      throw new API_Exception('Illegal characters in input (potential scripting attack)',array("field"=>$fieldName,"error_code"=>"xss"));
     }
   }
 }
@@ -1497,12 +1475,12 @@ function _civicrm_api3_validate_html(&$params, &$fieldname, &$fieldInfo) {
 /**
  * Validate string fields being passed into API.
  * @param array $params params from civicrm_api
- * @param string $fieldname uniquename of field being checked
+ * @param string $fieldName uniquename of field being checked
  * @param array $fieldinfo array of fields from getfields function
  */
-function _civicrm_api3_validate_string(&$params, &$fieldname, &$fieldInfo) {
+function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
   // If fieldname exists in params
-  $value = CRM_Utils_Array::value($fieldname, $params, '');
+  $value = CRM_Utils_Array::value($fieldName, $params, '');
   if(!is_array($value)){
     $value = (string) $value;
   }
@@ -1515,28 +1493,108 @@ function _civicrm_api3_validate_string(&$params, &$fieldname, &$fieldInfo) {
     if (!CRM_Utils_Rule::xssString($value)) {
       throw new Exception('Illegal characters in input (potential scripting attack)');
     }
-    if ($fieldname == 'currency') {
+    if ($fieldName == 'currency') {
       if (!CRM_Utils_Rule::currencyCode($value)) {
         throw new Exception("Currency not a valid code: $value");
       }
     }
-    if (!empty ($fieldInfo['options'])) {
-      // Validate & swap out any pseudoconstants / options
-      $options = $fieldInfo['options'];
-      $lowerCaseOptions = array_map("strtolower", $options);
-      // If value passed is not a key, it may be a label
-      // Try to lookup key from label - if it can't be found throw error
-      if (!is_array($value) && !isset($options[strtolower($value)]) && !isset($options[$value]) ) {
-        if (!in_array(strtolower($value), $lowerCaseOptions)) {
-          throw new Exception("$fieldname `$value` is not valid.");
-        }
-      }
+    if (!empty($fieldInfo['pseudoconstant'])) {
+      _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, 'string');
     }
     // Check our field length
     elseif (is_string($value) && !empty($fieldInfo['maxlength']) && strlen($value) > $fieldInfo['maxlength']) {
-      throw new API_Exception("Value for $fieldname is " . strlen($value) . " characters  - This field has a maxlength of {$fieldInfo['maxlength']} characters.",
-        2100, array('field' => $fieldname)
+      throw new API_Exception("Value for $fieldName is " . strlen($value) . " characters  - This field has a maxlength of {$fieldInfo['maxlength']} characters.",
+        2100, array('field' => $fieldName)
       );
     }
   }
+}
+
+/**
+ * Validate & swap out any pseudoconstants / options
+ *
+ * @param $params: api parameters
+ * @param $entity: api entity name
+ * @param $fieldName: entity field name
+ * @param $type: field type from metadata
+ */
+function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $type) {
+  $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldName));
+  $options = CRM_Utils_Array::value('values', $options, array());
+
+  // If passed a value-seperated string, explode to an array, then re-implode after matching values
+  $implode = FALSE;
+  if (is_string($params[$fieldName]) && strpos($params[$fieldName], CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+    $params[$fieldName] = CRM_Utils_Array::explodePadded($params[$fieldName]);
+    $implode = TRUE;
+  }
+  // If passed multiple options, validate each
+  if (is_array($params[$fieldName])) {
+    foreach ($params[$fieldName] as &$value) {
+      _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName);
+    }
+    // TODO: unwrap the call to implodePadded from the conditional and do it always
+    // need to verify that this is safe and doesn't break anything though.
+    // Better yet would be to leave it as an array and ensure that every dao/bao can handle array input
+    if ($implode) {
+      CRM_Utils_Array::implodePadded($params[$fieldName]);
+    }
+  }
+  else {
+    _civicrm_api3_api_match_pseudoconstant_value($params[$fieldName], $options, $fieldName);
+  }
+}
+
+/**
+ * Validate & swap a single option value for a field
+ *
+ * @param $value: field value
+ * @param $options: array of options for this field
+ * @param $fieldName: entity field name
+ */
+function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName) {
+  // If option is a key, no need to translate
+  if (isset($options[$value])) {
+    return;
+  }
+  // Generate error msg before overwriting the value
+  $errorMsg = "'$value' is not a valid option for field $fieldName";
+
+  // Case-insensitive matching
+  $value = strtolower($value);
+  $options = array_map("strtolower", $options);
+  $value = array_search($value, $options);
+  if ($value === FALSE) {
+    throw new Exception($errorMsg);
+  }
+}
+
+/**
+ * Returns the canonical name of a field
+ * @param $entity: api entity
+ * @param $fieldName: any variation of a field's name (name, unique_name, api.alias)
+ *
+ * @return (string|bool) fieldName or FALSE if the field does not exist
+ */
+function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
+  $result = civicrm_api($entity, 'getfields', array(
+    'version' => 3,
+    'action' => 'create',
+  ));
+  $meta = $result['values'];
+  if (isset($meta[$fieldName])) {
+    return $meta[$fieldName]['name'];
+  }
+  if ($fieldName == "{$entity}_id") {
+    return 'id';
+  }
+  foreach ($meta as $info) {
+    if ($fieldName == CRM_Utils_Array::value('uniqueName', $info)) {
+      return $info['name'];
+    }
+    if (array_search($fieldName, CRM_Utils_Array::value('api.aliases', $info, array())) !== FALSE) {
+      return $info['name'];
+    }
+  }
+  return FALSE;
 }
