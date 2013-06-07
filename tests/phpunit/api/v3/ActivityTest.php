@@ -310,7 +310,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $result = civicrm_api('activity', 'create', $params);
     $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
     $this->assertEquals("'44' is not a valid option for field priority_id", $result['error_message']);
-    $this->assertEquals('priority_id',$result['error_field']);
+    $this->assertEquals(2001, $result['error_code']);
+    $this->assertEquals('priority_id', $result['error_field']);
   }
 
   function testActivityCreateWithValidStringPriority() {
@@ -1094,7 +1095,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $params['target_contact_id'] = array($contact2 => $contact2);
     $result = civicrm_api('Activity', 'Create', $params);
 
-    $result = civicrm_api('activity', 'create', $params);
     $activityId = $result['id'];
     $this->assertAPISuccess($result);
     $getParams = array(

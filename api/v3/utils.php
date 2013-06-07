@@ -1452,9 +1452,11 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
       _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, $fieldInfo);
     }
 
-    // After swapping options, ensure we have an integer
-    if (!is_numeric($params[$fieldName]) || (int) $params[$fieldName] != $params[$fieldName]) {
-      throw new API_Exception("$fieldname is not a valid integer", 2001, array('error_field' => $fieldname,"type" => "integer"));
+    // After swapping options, ensure we have an integer(s)
+    foreach ((array) ($params[$fieldName]) as $value) {
+      if (!is_numeric($value) || (int) $value != $value) {
+        throw new API_Exception("$fieldName is not a valid integer", 2001, array('error_field' => $fieldName, "type" => "integer"));
+      }
     }
 
     // Check our field length
@@ -1573,7 +1575,7 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
   $options = array_map("strtolower", $options);
   $value = array_search($value, $options);
   if ($value === FALSE) {
-    throw new Exception($errorMsg);
+    throw new API_Exception($errorMsg, 2001, array('error_field' => $fieldName));
   }
 }
 
