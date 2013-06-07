@@ -1448,11 +1448,16 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
       $session = &CRM_Core_Session::singleton();
       $params[$fieldName] = $session->get('userID');
     }
-    if (!empty($fieldInfo['pseudoconstant'])) {
-      _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, 'integer');
+    if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
+      _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, $fieldInfo);
     }
 
-    // once we have done any swaps check our field length
+    // After swapping options, ensure we have an integer
+    if (!is_numeric($params[$fieldName]) || (int) $params[$fieldName] != $params[$fieldName]) {
+      throw new API_Exception("$fieldname is not a valid integer", 2001, array('error_field' => $fieldname,"type" => "integer"));
+    }
+
+    // Check our field length
     if(is_string($params[$fieldName]) &&
       CRM_Utils_Array::value('maxlength',$fieldInfo)
       && strlen($params[$fieldName]) > $fieldInfo['maxlength']
@@ -1498,8 +1503,8 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
         throw new Exception("Currency not a valid code: $value");
       }
     }
-    if (!empty($fieldInfo['pseudoconstant'])) {
-      _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, 'string');
+    if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
+      _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, $fieldInfo);
     }
     // Check our field length
     elseif (is_string($value) && !empty($fieldInfo['maxlength']) && strlen($value) > $fieldInfo['maxlength']) {
@@ -1515,12 +1520,15 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
  *
  * @param $params: api parameters
  * @param $entity: api entity name
- * @param $fieldName: entity field name
- * @param $type: field type from metadata
+ * @param $fieldName: field name used in api call (not necessarily the canonical name)
+ * @param $fieldInfo: getfields meta-data
  */
-function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $type) {
-  $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldName));
-  $options = CRM_Utils_Array::value('values', $options, array());
+function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $fieldInfo) {
+  $options = CRM_Utils_Array::value('options', $fieldInfo);
+  if (!$options) {
+    $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldInfo['name']));
+    $options = CRM_Utils_Array::value('values', $options, array());
+  }
 
   // If passed a value-seperated string, explode to an array, then re-implode after matching values
   $implode = FALSE;
@@ -1550,7 +1558,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $
  *
  * @param $value: field value
  * @param $options: array of options for this field
- * @param $fieldName: entity field name
+ * @param $fieldName: field name used in api call (not necessarily the canonical name)
  */
 function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName) {
   // If option is a key, no need to translate
