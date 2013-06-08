@@ -195,31 +195,31 @@ class CRM_Contact_Import_Form_MapField extends CRM_Core_Form {
     $highlightedFields[] = 'external_identifier';
     //format custom field names, CRM-2676
     switch ($this->get('contactType')) {
-      case CRM_Contact_Import_Parser::CONTACT_INDIVIDUAL:
+      case CRM_Import_Parser::CONTACT_INDIVIDUAL:
         $contactType         = 'Individual';
         $highlightedFields[] = 'first_name';
         $highlightedFields[] = 'last_name';
         break;
 
-      case CRM_Contact_Import_Parser::CONTACT_HOUSEHOLD:
+      case CRM_Import_Parser::CONTACT_HOUSEHOLD:
         $contactType = 'Household';
         $highlightedFields[] = 'household_name';
         break;
 
-      case CRM_Contact_Import_Parser::CONTACT_ORGANIZATION:
+      case CRM_Import_Parser::CONTACT_ORGANIZATION:
         $contactType = 'Organization';
         $highlightedFields[] = 'organization_name';
         break;
     }
     $this->_contactType = $contactType;
-    if ($this->_onDuplicate == CRM_Contact_Import_Parser::DUPLICATE_SKIP) {
+    if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
       unset($this->_mapperFields['id']);
     }
     else {
       $highlightedFields[] = 'id';
     }
 
-    if ($this->_onDuplicate != CRM_Contact_Import_Parser::DUPLICATE_NOCHECK) {
+    if ($this->_onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK) {
       //Mark Dedupe Rule Fields as required, since it's used in matching contact
       foreach (array(
         'Individual', 'Household', 'Organization') as $cType) {
@@ -431,7 +431,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Core_Form {
 
         //Modified the Relationship fields if the fields are
         //present in dedupe rule
-        if ($this->_onDuplicate != CRM_Contact_Import_Parser::DUPLICATE_NOCHECK &&
+        if ($this->_onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK &&
           is_array($this->_dedupeFields[$cType])
         ) {
           static $cTypeArray = array();
@@ -498,15 +498,15 @@ class CRM_Contact_Import_Form_MapField extends CRM_Core_Form {
             if (isset($mappingRelation[$i])) {
               // relationship mapping
               switch ($this->get('contactType')) {
-                case CRM_Contact_Import_Parser::CONTACT_INDIVIDUAL:
+                case CRM_Import_Parser::CONTACT_INDIVIDUAL:
                   $contactType = 'Individual';
                   break;
 
-                case CRM_Contact_Import_Parser::CONTACT_HOUSEHOLD:
+                case CRM_Import_Parser::CONTACT_HOUSEHOLD:
                   $contactType = 'Household';
                   break;
 
-                case CRM_Contact_Import_Parser::CONTACT_ORGANIZATION:
+                case CRM_Import_Parser::CONTACT_ORGANIZATION:
                   $contactType = 'Organization';
               }
               //CRM-5125
@@ -964,15 +964,15 @@ class CRM_Contact_Import_Form_MapField extends CRM_Core_Form {
       $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $contactType = $this->get('contactType');
       switch ($contactType) {
-        case CRM_Contact_Import_Parser::CONTACT_INDIVIDUAL:
+        case CRM_Import_Parser::CONTACT_INDIVIDUAL:
           $cType = 'Individual';
           break;
 
-        case CRM_Contact_Import_Parser::CONTACT_HOUSEHOLD:
+        case CRM_Import_Parser::CONTACT_HOUSEHOLD:
           $cType = 'Household';
           break;
 
-        case CRM_Contact_Import_Parser::CONTACT_ORGANIZATION:
+        case CRM_Import_Parser::CONTACT_ORGANIZATION:
           $cType = 'Organization';
       }
 
@@ -1040,7 +1040,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Core_Form {
     $statusFieldName = $this->get('statusFieldName');
     $parser->run($this->_importTableName,
       $mapper,
-      CRM_Contact_Import_Parser::MODE_PREVIEW,
+      CRM_Import_Parser::MODE_PREVIEW,
       $this->get('contactType'),
       $primaryKeyName,
       $statusFieldName,

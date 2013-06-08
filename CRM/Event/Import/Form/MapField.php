@@ -185,7 +185,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Core_Form {
     else {
       $this->assign('rowDisplayCount', 2);
     }
-    if ($this->_onDuplicate == CRM_Event_Import_Parser::DUPLICATE_UPDATE) {
+    if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
       $remove = array('participant_contact_id', 'email', 'first_name', 'last_name', 'external_identifier');
       foreach ($remove as $value) {
         unset($this->_mapperFields[$value]);
@@ -195,8 +195,8 @@ class CRM_Event_Import_Form_MapField extends CRM_Core_Form {
         $highlightedFields[] = $name;
       }
     }
-    elseif ($this->_onDuplicate == CRM_Event_Import_Parser::DUPLICATE_SKIP ||
-      $this->_onDuplicate == CRM_Event_Import_Parser::DUPLICATE_NOCHECK
+    elseif ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP ||
+      $this->_onDuplicate == CRM_Import_Parser::DUPLICATE_NOCHECK
     ) {
       unset($this->_mapperFields['participant_id']);
       $highlightedFieldsArray = array('participant_contact_id', 'event_id', 'email', 'first_name', 'last_name', 'external_identifier', 'participant_status_id');
@@ -420,9 +420,9 @@ class CRM_Event_Import_Form_MapField extends CRM_Core_Form {
 
       $contactTypeId = $self->get('contactType');
       $contactTypes = array(
-        CRM_Event_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-        CRM_Event_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-        CRM_Event_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
+        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
+        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
       );
       $params = array(
         'used'         => 'Unsupervised',
@@ -447,7 +447,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Core_Form {
             ) {
               continue;
             }
-            if ($self->_onDuplicate == CRM_Event_Import_Parser::DUPLICATE_UPDATE) {
+            if ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
               $errors['_qf_default'] .= ts('Missing required field: Provide Particiapnt ID') . '<br />';
             }
             else {
@@ -594,7 +594,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Core_Form {
 
     $parser = new CRM_Event_Import_Parser_Participant($mapperKeysMain);
     $parser->run($fileName, $seperator, $mapper, $skipColumnHeader,
-      CRM_Event_Import_Parser::MODE_PREVIEW, $this->get('contactType')
+      CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
     );
     // add all the necessary variables to the form
     $parser->set($this);

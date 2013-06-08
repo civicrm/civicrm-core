@@ -704,15 +704,15 @@ pppp   * @return void
 
     switch ($this->_contactType) {
       case 'Individual':
-        $store->set('contactType', CRM_Contribute_Import_Parser::CONTACT_INDIVIDUAL);
+        $store->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
         break;
 
       case 'Household':
-        $store->set('contactType', CRM_Contribute_Import_Parser::CONTACT_HOUSEHOLD);
+        $store->set('contactType', CRM_Import_Parser::CONTACT_HOUSEHOLD);
         break;
 
       case 'Organization':
-        $store->set('contactType', CRM_Contribute_Import_Parser::CONTACT_ORGANIZATION);
+        $store->set('contactType', CRM_Import_Parser::CONTACT_ORGANIZATION);
     }
 
     if ($this->_invalidRowCount) {
@@ -812,22 +812,22 @@ pppp   * @return void
     $fileName = $config->uploadDir . "sqlImport";
 
     switch ($type) {
-      case CRM_Contribute_Import_Parser::ERROR:
-      case CRM_Contribute_Import_Parser::NO_MATCH:
-      case CRM_Contribute_Import_Parser::CONFLICT:
-      case CRM_Contribute_Import_Parser::DUPLICATE:
+      case CRM_Import_Parser::ERROR:
+      case CRM_Import_Parser::NO_MATCH:
+      case CRM_Import_Parser::CONFLICT:
+      case CRM_Import_Parser::DUPLICATE:
         //here constants get collides.
-        if ($type == CRM_Contribute_Import_Parser::ERROR) {
-          $type = CRM_Contact_Import_Parser::ERROR;
+        if ($type == CRM_Import_Parser::ERROR) {
+          $type = CRM_Import_Parser::ERROR;
         }
-        elseif ($type == CRM_Contribute_Import_Parser::NO_MATCH) {
-          $type = CRM_Contact_Import_Parser::NO_MATCH;
+        elseif ($type == CRM_Import_Parser::NO_MATCH) {
+          $type = CRM_Import_Parser::NO_MATCH;
         }
-        elseif ($type == CRM_Contribute_Import_Parser::CONFLICT) {
-          $type = CRM_Contact_Import_Parser::CONFLICT;
+        elseif ($type == CRM_Import_Parser::CONFLICT) {
+          $type = CRM_Import_Parser::CONFLICT;
         }
         else {
-          $type = CRM_Contact_Import_Parser::DUPLICATE;
+          $type = CRM_Import_Parser::DUPLICATE;
         }
         $fileName = CRM_Contact_Import_Parser::errorFileName($type);
         break;
@@ -851,22 +851,22 @@ pppp   * @return void
     }
 
     switch ($type) {
-      case CRM_Contribute_Import_Parser::ERROR:
-      case CRM_Contribute_Import_Parser::NO_MATCH:
-      case CRM_Contribute_Import_Parser::CONFLICT:
-      case CRM_Contribute_Import_Parser::DUPLICATE:
+      case CRM_Import_Parser::ERROR:
+      case CRM_Import_Parser::NO_MATCH:
+      case CRM_Import_Parser::CONFLICT:
+      case CRM_Import_Parser::DUPLICATE:
         //here constants get collides.
-        if ($type == CRM_Contribute_Import_Parser::ERROR) {
-          $type = CRM_Contact_Import_Parser::ERROR;
+        if ($type == CRM_Import_Parser::ERROR) {
+          $type = CRM_Import_Parser::ERROR;
         }
-        elseif ($type == CRM_Contribute_Import_Parser::NO_MATCH) {
-          $type = CRM_Contact_Import_Parser::NO_MATCH;
+        elseif ($type == CRM_Import_Parser::NO_MATCH) {
+          $type = CRM_Import_Parser::NO_MATCH;
         }
-        elseif ($type == CRM_Contribute_Import_Parser::CONFLICT) {
-          $type = CRM_Contact_Import_Parser::CONFLICT;
+        elseif ($type == CRM_Import_Parser::CONFLICT) {
+          $type = CRM_Import_Parser::CONFLICT;
         }
         else {
-          $type = CRM_Contact_Import_Parser::DUPLICATE;
+          $type = CRM_Import_Parser::DUPLICATE;
         }
         $fileName = CRM_Contact_Import_Parser::saveFileName($type);
         break;

@@ -584,15 +584,15 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
 
     switch ($this->_contactType) {
       case 'Individual':
-        $store->set('contactType', CRM_Event_Import_Parser::CONTACT_INDIVIDUAL);
+        $store->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
         break;
 
       case 'Household':
-        $store->set('contactType', CRM_Event_Import_Parser::CONTACT_HOUSEHOLD);
+        $store->set('contactType', CRM_Import_Parser::CONTACT_HOUSEHOLD);
         break;
 
       case 'Organization':
-        $store->set('contactType', CRM_Event_Import_Parser::CONTACT_ORGANIZATION);
+        $store->set('contactType', CRM_Import_Parser::CONTACT_ORGANIZATION);
     }
 
     if ($this->_invalidRowCount) {

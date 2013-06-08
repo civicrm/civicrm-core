@@ -239,15 +239,15 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     $this->_dedupeRuleGroupID = $dedupeRuleGroupID;
 
     switch ($contactType) {
-      case CRM_Contact_Import_Parser::CONTACT_INDIVIDUAL:
+      case CRM_Import_Parser::CONTACT_INDIVIDUAL:
         $this->_contactType = 'Individual';
         break;
 
-      case CRM_Contact_Import_Parser::CONTACT_HOUSEHOLD:
+      case CRM_Import_Parser::CONTACT_HOUSEHOLD:
         $this->_contactType = 'Household';
         break;
 
-      case CRM_Contact_Import_Parser::CONTACT_ORGANIZATION:
+      case CRM_Import_Parser::CONTACT_ORGANIZATION:
         $this->_contactType = 'Organization';
     }
 
@@ -826,15 +826,15 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
     switch ($this->_contactType) {
       case 'Individual':
-        $store->set('contactType', CRM_Contact_Import_Parser::CONTACT_INDIVIDUAL);
+        $store->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
         break;
 
       case 'Household':
-        $store->set('contactType', CRM_Contact_Import_Parser::CONTACT_HOUSEHOLD);
+        $store->set('contactType', CRM_Import_Parser::CONTACT_HOUSEHOLD);
         break;
 
       case 'Organization':
-        $store->set('contactType', CRM_Contact_Import_Parser::CONTACT_ORGANIZATION);
+        $store->set('contactType', CRM_Import_Parser::CONTACT_ORGANIZATION);
     }
 
     if ($this->_invalidRowCount) {
@@ -955,23 +955,23 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     $config = CRM_Core_Config::singleton();
     $fileName = $config->uploadDir . "sqlImport";
     switch ($type) {
-      case CRM_Contact_Import_Parser::ERROR:
+      case CRM_Import_Parser::ERROR:
         $fileName .= '.errors';
         break;
 
-      case CRM_Contact_Import_Parser::CONFLICT:
+      case CRM_Import_Parser::CONFLICT:
         $fileName .= '.conflicts';
         break;
 
-      case CRM_Contact_Import_Parser::DUPLICATE:
+      case CRM_Import_Parser::DUPLICATE:
         $fileName .= '.duplicates';
         break;
 
-      case CRM_Contact_Import_Parser::NO_MATCH:
+      case CRM_Import_Parser::NO_MATCH:
         $fileName .= '.mismatch';
         break;
 
-      case CRM_Contact_Import_Parser::UNPARSED_ADDRESS_WARNING:
+      case CRM_Import_Parser::UNPARSED_ADDRESS_WARNING:
         $fileName .= '.unparsedAddress';
         break;
     }
@@ -985,23 +985,23 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       return $fileName;
     }
     switch ($type) {
-      case CRM_Contact_Import_Parser::ERROR:
+      case CRM_Import_Parser::ERROR:
         $fileName = 'Import_Errors.csv';
         break;
 
-      case CRM_Contact_Import_Parser::CONFLICT:
+      case CRM_Import_Parser::CONFLICT:
         $fileName = 'Import_Conflicts.csv';
         break;
 
-      case CRM_Contact_Import_Parser::DUPLICATE:
+      case CRM_Import_Parser::DUPLICATE:
         $fileName = 'Import_Duplicates.csv';
         break;
 
-      case CRM_Contact_Import_Parser::NO_MATCH:
+      case CRM_Import_Parser::NO_MATCH:
         $fileName = 'Import_Mismatch.csv';
         break;
 
-      case CRM_Contact_Import_Parser::UNPARSED_ADDRESS_WARNING:
+      case CRM_Import_Parser::UNPARSED_ADDRESS_WARNING:
         $fileName = 'Import_Unparsed_Address.csv';
         break;
     }

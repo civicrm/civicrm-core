@@ -196,7 +196,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Core_Form {
 
     //CRM-2219 removing other required fields since for updation only
     //membership id is required.
-    if ($this->_onDuplicate == CRM_Member_Import_Parser::DUPLICATE_UPDATE) {
+    if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
       $remove = array('membership_contact_id', 'email', 'first_name', 'last_name', 'external_identifier');
       foreach ($remove as $value) {
         unset($this->_mapperFields[$value]);
@@ -206,7 +206,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Core_Form {
         $highlightedFields[] = $name;
       }
     }
-    elseif ($this->_onDuplicate == CRM_Member_Import_Parser::DUPLICATE_SKIP) {
+    elseif ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
       unset($this->_mapperFields['membership_id']);
       $highlightedFieldsArray = array('membership_contact_id', 'email', 'external_identifier', 'membership_start_date', 'membership_type_id');
       foreach ($highlightedFieldsArray as $name) {
@@ -438,9 +438,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Core_Form {
 
       $contactTypeId = $self->get('contactType');
       $contactTypes = array(
-        CRM_Member_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-        CRM_Member_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-        CRM_Member_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
+        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
+        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
       );
       $params = array(
         'used'         => 'Unsupervised',
@@ -462,7 +462,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Core_Form {
         if (!in_array($field, $importKeys)) {
           if ($field == 'membership_contact_id') {
             if ((($weightSum >= $threshold || in_array('external_identifier', $importKeys)) &&
-                $self->_onDuplicate != CRM_Member_Import_Parser::DUPLICATE_UPDATE
+                $self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE
               ) ||
               in_array('membership_id', $importKeys)
             ) {
@@ -626,7 +626,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Core_Form {
 
     $parser = new CRM_Member_Import_Parser_Membership($mapperKeysMain, $mapperLocType, $mapperPhoneType);
     $parser->run($fileName, $seperator, $mapper, $skipColumnHeader,
-      CRM_Member_Import_Parser::MODE_PREVIEW, $this->get('contactType')
+      CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
     );
     // add all the necessary variables to the form
     $parser->set($this);

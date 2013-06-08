@@ -79,17 +79,17 @@ class CRM_Event_Import_Form_UploadFile extends CRM_Core_Form {
 
     $duplicateOptions = array();
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Skip'), CRM_Event_Import_Parser::DUPLICATE_SKIP
+      NULL, NULL, ts('Skip'), CRM_Import_Parser::DUPLICATE_SKIP
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update'), CRM_Event_Import_Parser::DUPLICATE_UPDATE
+      NULL, NULL, ts('Update'), CRM_Import_Parser::DUPLICATE_UPDATE
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('No Duplicate Checking'), CRM_Event_Import_Parser::DUPLICATE_NOCHECK
+      NULL, NULL, ts('No Duplicate Checking'), CRM_Import_Parser::DUPLICATE_NOCHECK
     );
     // for contributions NOCHECK == SKIP
     //      $duplicateOptions[] = $this->createElement('radio',
-    //          null, null, ts('No Duplicate Checking'), CRM_Contribute_Import_Parser::DUPLICATE_NOCHECK);
+    //          null, null, ts('No Duplicate Checking'), CRM_Import_Parser::DUPLICATE_NOCHECK);
 
     $this->addGroup($duplicateOptions, 'onDuplicate',
       ts('On Duplicate Entries')
@@ -110,31 +110,31 @@ class CRM_Event_Import_Form_UploadFile extends CRM_Core_Form {
 
     $this->setDefaults(array(
       'onDuplicate' =>
-        CRM_Event_Import_Parser::DUPLICATE_SKIP,
+        CRM_Import_Parser::DUPLICATE_SKIP,
       ));
 
     //contact types option
     $contactOptions = array();
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Individual'), CRM_Event_Import_Parser::CONTACT_INDIVIDUAL
+        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL
       );
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Household'), CRM_Event_Import_Parser::CONTACT_HOUSEHOLD
+        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD
       );
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Organization'), CRM_Event_Import_Parser::CONTACT_ORGANIZATION
+        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION
       );
     }
     $this->addGroup($contactOptions, 'contactType', ts('Contact Type'));
 
     $this->setDefaults(array(
       'contactType' =>
-        CRM_Event_Import_Parser::CONTACT_INDIVIDUAL,
+        CRM_Import_Parser::CONTACT_INDIVIDUAL,
       )
     );
 
@@ -189,7 +189,7 @@ class CRM_Event_Import_Form_UploadFile extends CRM_Core_Form {
     $parser->run($fileName, $seperator,
       $mapper,
       $skipColumnHeader,
-      CRM_Event_Import_Parser::MODE_MAPFIELD, $contactType
+      CRM_Import_Parser::MODE_MAPFIELD, $contactType
     );
 
     // add all the necessary variables to the form

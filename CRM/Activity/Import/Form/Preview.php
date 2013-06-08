@@ -74,17 +74,17 @@ class CRM_Activity_Import_Form_Preview extends CRM_Core_Form {
     }
 
     if ($invalidRowCount) {
-      $urlParams = 'type=' . CRM_Activity_Import_Parser::ERROR . '&parser=CRM_Activity_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Activity_Import_Parser';
       $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
     if ($conflictRowCount) {
-      $urlParams = 'type=' . CRM_Activity_Import_Parser::CONFLICT . '&parser=CRM_Activity_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Activity_Import_Parser';
       $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
     if ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Activity_Import_Parser::NO_MATCH . '&parser=CRM_Activity_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Activity_Import_Parser';
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
@@ -194,12 +194,12 @@ class CRM_Activity_Import_Form_Preview extends CRM_Core_Form {
     $parser->run($fileName, $seperator,
       $mapperFields,
       $skipColumnHeader,
-      CRM_Activity_Import_Parser::MODE_IMPORT,
+      CRM_Import_Parser::MODE_IMPORT,
       $onDuplicate
     );
 
     // add all the necessary variables to the form
-    $parser->set($this, CRM_Activity_Import_Parser::MODE_IMPORT);
+    $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
 
     // check if there is any error occured
 
@@ -220,11 +220,11 @@ class CRM_Activity_Import_Form_Preview extends CRM_Core_Form {
       fclose($fd);
 
       $this->set('errorFile', $errorFile);
-      $urlParams = 'type=' . CRM_Activity_Import_Parser::ERROR . '&parser=CRM_Activity_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::ERROR . '&parser=CRM_Activity_Import_Parser';
       $this->set('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-      $urlParams = 'type=' . CRM_Activity_Import_Parser::CONFLICT . '&parser=CRM_Activity_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::CONFLICT . '&parser=CRM_Activity_Import_Parser';
       $this->set('downloadConflictRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-      $urlParams = 'type=' . CRM_Activity_Import_Parser::NO_MATCH . '&parser=CRM_Activity_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Activity_Import_Parser';
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
   }

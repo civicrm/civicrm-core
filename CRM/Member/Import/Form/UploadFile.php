@@ -79,10 +79,10 @@ class CRM_Member_Import_Form_UploadFile extends CRM_Core_Form {
 
     $duplicateOptions = array();
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Insert new Membership'), CRM_Member_Import_Parser::DUPLICATE_SKIP
+      NULL, NULL, ts('Insert new Membership'), CRM_Import_Parser::DUPLICATE_SKIP
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update existing Membership'), CRM_Member_Import_Parser::DUPLICATE_UPDATE
+      NULL, NULL, ts('Update existing Membership'), CRM_Import_Parser::DUPLICATE_UPDATE
     );
 
     $this->addGroup($duplicateOptions, 'onDuplicate',
@@ -90,7 +90,7 @@ class CRM_Member_Import_Form_UploadFile extends CRM_Core_Form {
     );
     $this->setDefaults(array(
       'onDuplicate' =>
-        CRM_Member_Import_Parser::DUPLICATE_SKIP,
+        CRM_Import_Parser::DUPLICATE_SKIP,
       ));
 
     //get the saved mapping details
@@ -110,17 +110,17 @@ class CRM_Member_Import_Form_UploadFile extends CRM_Core_Form {
     $contactOptions = array();
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Individual'), CRM_Member_Import_Parser::CONTACT_INDIVIDUAL
+        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL
       );
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Household'), CRM_Member_Import_Parser::CONTACT_HOUSEHOLD
+        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD
       );
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Organization'), CRM_Member_Import_Parser::CONTACT_ORGANIZATION
+        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION
       );
     }
 
@@ -130,7 +130,7 @@ class CRM_Member_Import_Form_UploadFile extends CRM_Core_Form {
 
     $this->setDefaults(array(
       'contactType' =>
-        CRM_Member_Import_Parser::CONTACT_INDIVIDUAL,
+        CRM_Import_Parser::CONTACT_INDIVIDUAL,
       ));
 
     //build date formats
@@ -185,7 +185,7 @@ class CRM_Member_Import_Form_UploadFile extends CRM_Core_Form {
     $parser->run($fileName, $seperator,
       $mapper,
       $skipColumnHeader,
-      CRM_Member_Import_Parser::MODE_MAPFIELD, $contactType
+      CRM_Import_Parser::MODE_MAPFIELD, $contactType
     );
 
     // add all the necessary variables to the form

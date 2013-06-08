@@ -79,13 +79,13 @@ class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
 
     $duplicateOptions = array();
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Skip'), CRM_Activity_Import_Parser::DUPLICATE_SKIP
+      NULL, NULL, ts('Skip'), CRM_Import_Parser::DUPLICATE_SKIP
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update'), CRM_Activity_Import_Parser::DUPLICATE_UPDATE
+      NULL, NULL, ts('Update'), CRM_Import_Parser::DUPLICATE_UPDATE
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Fill'), CRM_Activity_Import_Parser::DUPLICATE_FILL
+      NULL, NULL, ts('Fill'), CRM_Import_Parser::DUPLICATE_FILL
     );
 
     $this->addGroup($duplicateOptions, 'onDuplicate',
@@ -107,7 +107,7 @@ class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
 
     $this->setDefaults(array(
       'onDuplicate' =>
-        CRM_Activity_Import_Parser::DUPLICATE_SKIP,
+        CRM_Import_Parser::DUPLICATE_SKIP,
       ));
 
     //build date formats
@@ -160,7 +160,7 @@ class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
     $parser->run($fileName, $seperator,
       $mapper,
       $skipColumnHeader,
-      CRM_Activity_Import_Parser::MODE_MAPFIELD
+      CRM_Import_Parser::MODE_MAPFIELD
     );
 
     // add all the necessary variables to the form

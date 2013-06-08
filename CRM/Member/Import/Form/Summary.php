@@ -60,11 +60,11 @@ class CRM_Member_Import_Form_Summary extends CRM_Core_Form {
     $onDuplicate = $this->get('onDuplicate');
     $mismatchCount = $this->get('unMatchCount');
     if ($duplicateRowCount > 0) {
-      $urlParams = 'type=' . CRM_Member_Import_Parser::DUPLICATE . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Member_Import_Parser';
       $this->set('downloadDuplicateRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     elseif ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Member_Import_Parser::NO_MATCH . '&parser=CRM_Member_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Member_Import_Parser';
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     else {
@@ -74,10 +74,10 @@ class CRM_Member_Import_Form_Summary extends CRM_Core_Form {
 
     $this->assign('dupeError', FALSE);
 
-    if ($onDuplicate == CRM_Member_Import_Parser::DUPLICATE_UPDATE) {
+    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
       $dupeActionString = ts('These records have been updated with the imported data.');
     }
-    elseif ($onDuplicate == CRM_Member_Import_Parser::DUPLICATE_FILL) {
+    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
       $dupeActionString = ts('These records have been filled in with the imported data.');
     }
     else {

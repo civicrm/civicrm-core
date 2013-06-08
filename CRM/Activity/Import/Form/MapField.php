@@ -588,7 +588,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Core_Form {
 
     $parser = new CRM_Activity_Import_Parser_Activity($mapperKeysMain, $mapperLocType, $mapperPhoneType);
     $parser->run($fileName, $seperator, $mapper, $skipColumnHeader,
-      CRM_Activity_Import_Parser::MODE_PREVIEW
+      CRM_Import_Parser::MODE_PREVIEW
     );
 
     // add all the necessary variables to the form
