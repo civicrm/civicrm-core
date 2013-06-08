@@ -341,7 +341,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'version' => 3,
       'action' => 'create',
     );
-    $description  = "Demonstrate retrieving custom field options";
+    $description  = "Demonstrate retrieving metadata with custom field options";
     $subfile = "GetFieldsOptions";
     $fields = civicrm_api('contact', 'getfields', $getFieldsParams);
     $this->documentMe($getFieldsParams, $fields, __FUNCTION__, 'ContactTest.php', $description,$subfile,'GetFields');

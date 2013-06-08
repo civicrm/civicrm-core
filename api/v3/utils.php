@@ -1322,10 +1322,12 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
   }
 
   foreach ($customfields as $key => $value) {
+    // Regular fields have a 'name' property
+    $value['name'] = 'custom_' . $key;
     $customfields['custom_' . $key] = $value;
-   if(in_array('custom_' . $key, $getoptions)){
-     $customfields['custom_' . $key]['options'] = CRM_Core_BAO_CustomOption::valuesByID($key);
-   }
+    if (in_array('custom_' . $key, $getoptions)) {
+      $customfields['custom_' . $key]['options'] = CRM_Core_BAO_CustomOption::valuesByID($key);
+    }
     unset($customfields[$key]);
   }
   return $customfields;
@@ -1568,6 +1570,12 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
     return;
   }
 
+  // Translate value into key
+  $newValue = array_search($value, $options);
+  if ($newValue !== FALSE) {
+    $value = $newValue;
+    return;
+  }
   // Case-insensitive matching
   $newValue = strtolower($value);
   $options = array_map("strtolower", $options);
@@ -1586,6 +1594,12 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
  * @return (string|bool) fieldName or FALSE if the field does not exist
  */
 function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
+  if (strpos($fieldName, 'custom') === 0 && is_numeric($fieldName[7])) {
+    return $fieldName;
+  }
+  if ($fieldName == "{$entity}_id") {
+    return 'id';
+  }
   $result = civicrm_api($entity, 'getfields', array(
     'version' => 3,
     'action' => 'create',
@@ -1593,9 +1607,6 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
   $meta = $result['values'];
   if (isset($meta[$fieldName])) {
     return $meta[$fieldName]['name'];
-  }
-  if ($fieldName == "{$entity}_id") {
-    return 'id';
   }
   foreach ($meta as $info) {
     if ($fieldName == CRM_Utils_Array::value('uniqueName', $info)) {

@@ -108,7 +108,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
     $helper($metadata);
   }
 
-  $fieldsToResolve = CRM_Utils_Array::value('get_options', $apiOptions, array());
+  $fieldsToResolve = (array) CRM_Utils_Array::value('get_options', $apiOptions, array());
 
   foreach ($metadata as $fieldname => $fieldSpec) {
     _civicrm_api3_generic_get_metadata_options($metadata, $apiRequest['entity'], $fieldname, $fieldSpec, $fieldsToResolve);
@@ -241,7 +241,7 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldn
     $metadata[$fieldname]['api.aliases'][] = substr($fieldname, 0, -3);
   }
 
-  if (!in_array($fieldname, $fieldsToResolve)) {
+  if (!empty($metadata[$fieldname]['options']) || !in_array($fieldname, $fieldsToResolve)) {
     return;
   }
 

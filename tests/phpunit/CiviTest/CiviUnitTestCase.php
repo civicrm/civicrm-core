@@ -319,7 +319,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // FIXME: look at it closer in second stage
 
     // initialize the object once db is loaded
-    require_once 'CRM/Core/Config.php';
     $config = CRM_Core_Config::singleton();
 
     // when running unit tests, use mockup user framework
