@@ -123,7 +123,6 @@ function getChart( ) {
    chartUrl    += "&year=" + year + "&type=" + charttype;
    cj.ajax({
        url     : chartUrl,
-       async    : false,
        success  : function(html){
            cj( "#chartData" ).html( html );
        }
@@ -135,7 +134,6 @@ function buildTabularView( ) {
     var tableUrl = {/literal}"{crmURL p='civicrm/contribute/ajax/tableview' q='showtable=1&snippet=4' h=0}"{literal};
     cj.ajax({
         url      : tableUrl,
-        async    : false,
         success  : function(html){
             cj( "#tableData" ).html( html );
         }

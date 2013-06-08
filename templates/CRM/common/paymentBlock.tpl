@@ -50,13 +50,7 @@ function buildPaymentBlock( type ) {
     {/if}
   {literal}
 
-  var fname = '#billing-payment-block';
-  var response = cj.ajax({
-                        url: dataUrl,
-                        async: false
-                        }).responseText;
-
-    cj( fname ).html( response );
+  cj('#billing-payment-block').load(dataUrl);
 }
 
 cj( function() {

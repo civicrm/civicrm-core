@@ -91,7 +91,6 @@ function buildStringOverrideRow( curInstance )
    var prevInstRowId = '#string_override_row_' + previousInstance;
 
    cj.ajax({ url     : dataUrl,
-             async   : false,
              success : function( html ) {
        cj( prevInstRowId ).after( html );
        cj('#old_'+currentInstance).TextAreaResizer();

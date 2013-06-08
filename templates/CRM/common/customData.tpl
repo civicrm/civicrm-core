@@ -97,7 +97,6 @@ CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMult
   cj.ajax({
     url: dataUrl,
     dataType: 'html',
-    async: false,
     success: function(response) {
       var target = cj(fname);
       var storage = {};

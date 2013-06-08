@@ -64,7 +64,6 @@
     
     cj.ajax({ 
       url     : dataUrl,   
-      async   : false,
       success : function(html){
         //fixme for showing address in div
         htmlText = html.split( '|' , 2);
