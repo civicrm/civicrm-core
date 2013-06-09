@@ -37,7 +37,7 @@
  * This class previews the uploaded file and returns summary
  * statistics
  */
-class CRM_Contact_Import_Form_Preview extends CRM_Core_Form {
+class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Function to set variables up before form is built
@@ -232,16 +232,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Core_Form {
     $self->assign('invalidGroupName', $invalidGroupName);
 
     return empty($errors) ? TRUE : $errors;
-  }
-
-  /**
-   * Return a descriptive name for the page, used in wizard header
-   *
-   * @return string
-   * @access public
-   */
-  public function getTitle() {
-    return ts('Preview');
   }
 
   /**

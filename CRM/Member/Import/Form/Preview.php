@@ -37,7 +37,7 @@
  * This class previews the uploaded file and returns summary
  * statistics
  */
-class CRM_Member_Import_Form_Preview extends CRM_Core_Form {
+class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Function to set variables up before form is built
@@ -101,43 +101,6 @@ class CRM_Member_Import_Form_Preview extends CRM_Core_Form {
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }
-  }
-
-  /**
-   * Function to actually build the form
-   *
-   * @return None
-   * @access public
-   */
-  public function buildQuickForm() {
-
-    $this->addButtons(array(
-        array(
-          'type' => 'back',
-          'name' => ts('<< Previous'),
-        ),
-        array(
-          'type' => 'next',
-          'name' => ts('Import Now >>'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
-  }
-
-  /**
-   * Return a descriptive name for the page, used in wizard header
-   *
-   * @return string
-   * @access public
-   */
-  public function getTitle() {
-    return ts('Preview');
   }
 
   /**
