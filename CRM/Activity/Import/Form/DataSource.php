@@ -36,7 +36,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
+class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Function to set variables up before form is built

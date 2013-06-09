@@ -36,7 +36,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Contribute_Import_Form_UploadFile extends CRM_Core_Form {
+class CRM_Member_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Function to set variables up before form is built
@@ -46,7 +46,7 @@ class CRM_Contribute_Import_Form_UploadFile extends CRM_Core_Form {
    */
   public function preProcess() {
     $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/contribute/import', 'reset=1'));
+    $session->pushUserContext(CRM_Utils_System::url('civicrm/member/import', 'reset=1'));
   }
 
   /**
@@ -79,33 +79,32 @@ class CRM_Contribute_Import_Form_UploadFile extends CRM_Core_Form {
 
     $duplicateOptions = array();
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Insert new contributions'), CRM_Import_Parser::DUPLICATE_SKIP
+      NULL, NULL, ts('Insert new Membership'), CRM_Import_Parser::DUPLICATE_SKIP
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update existing contributions'), CRM_Import_Parser::DUPLICATE_UPDATE
+      NULL, NULL, ts('Update existing Membership'), CRM_Import_Parser::DUPLICATE_UPDATE
     );
+
     $this->addGroup($duplicateOptions, 'onDuplicate',
       ts('Import mode')
     );
+    $this->setDefaults(array(
+      'onDuplicate' =>
+        CRM_Import_Parser::DUPLICATE_SKIP,
+      ));
 
     //get the saved mapping details
     $mappingArray = CRM_Core_BAO_Mapping::getMappings(CRM_Core_OptionGroup::getValue('mapping_type',
-        'Import Contribution',
+        'Import Membership',
         'name'
       ));
     $this->assign('savedMapping', $mappingArray);
     $this->add('select', 'savedMapping', ts('Mapping Option'), array('' => ts('- select -')) + $mappingArray);
-    $this->addElement('submit', 'loadMapping', ts('Load Mapping'), NULL, array('onclick' => 'checkSelect()'));
 
     if ($loadeMapping = $this->get('loadedMapping')) {
       $this->assign('loadedMapping', $loadeMapping);
       $this->setDefaults(array('savedMapping' => $loadeMapping));
     }
-
-    $this->setDefaults(array(
-      'onDuplicate' =>
-        CRM_Import_Parser::DUPLICATE_SKIP,
-      ));
 
     //contact types option
     $contactOptions = array();
@@ -181,7 +180,7 @@ class CRM_Contribute_Import_Form_UploadFile extends CRM_Core_Form {
 
     $mapper = array();
 
-    $parser = new CRM_Contribute_Import_Parser_Contribution($mapper);
+    $parser = new CRM_Member_Import_Parser_Membership($mapper);
     $parser->setMaxLinesToProcess(100);
     $parser->run($fileName, $seperator,
       $mapper,

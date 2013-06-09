@@ -50,7 +50,7 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
 
     $classType = str_replace('_Controller', '', get_class($controller));
     $this->_pages = array(
-      $classType . '_Form_UploadFile' => NULL,
+      $classType . '_Form_DataSource' => NULL,
       $classType . '_Form_MapField' => NULL,
       $classType . '_Form_Preview' => NULL,
       $classType . '_Form_Summary' => NULL,
