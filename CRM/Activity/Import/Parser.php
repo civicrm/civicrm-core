@@ -69,8 +69,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     $seperator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
-    $mode             = self::MODE_PREVIEW,
-    $onDuplicate      = self::DUPLICATE_SKIP
+    $mode = self::MODE_PREVIEW,
+    $onDuplicate = self::DUPLICATE_SKIP
   ) {
     if (!is_array($fileName)) {
       CRM_Core_Error::fatal();
@@ -92,8 +92,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     $this->_invalidRowCount = $this->_validCount = 0;
     $this->_totalCount = $this->_conflictCount = 0;
 
-    $this->_errors    = array();
-    $this->_warnings  = array();
+    $this->_errors = array();
+    $this->_warnings = array();
     $this->_conflicts = array();
 
     $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);

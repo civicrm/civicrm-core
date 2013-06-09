@@ -36,7 +36,7 @@
 /**
  * This class summarizes the import results
  */
-class CRM_Activity_Import_Form_Summary extends CRM_Core_Form {
+class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
 
   /**
    * Function to set variables up before form is built
@@ -101,31 +101,5 @@ class CRM_Activity_Import_Form_Summary extends CRM_Core_Form {
     }
   }
 
-  /**
-   * Function to actually build the form
-   *
-   * @return None
-   * @access public
-   */
-  public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
-  }
-
-  /**
-   * Return a descriptive name for the page, used in wizard header
-   *
-   * @return string
-   * @access public
-   */
-  public function getTitle() {
-    return ts('Summary');
-  }
 }
 

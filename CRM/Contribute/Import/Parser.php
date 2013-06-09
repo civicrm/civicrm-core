@@ -119,9 +119,9 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
     $seperator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
-    $mode             = self::MODE_PREVIEW,
-    $contactType      = self::CONTACT_INDIVIDUAL,
-    $onDuplicate      = self::DUPLICATE_SKIP
+    $mode = self::MODE_PREVIEW,
+    $contactType = self::CONTACT_INDIVIDUAL,
+    $onDuplicate = self::DUPLICATE_SKIP
   ) {
     if (!is_array($fileName)) {
       CRM_Core_Error::fatal();

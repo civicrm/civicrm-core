@@ -89,16 +89,16 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
   function run($tableName,
     &$mapper,
-    $mode              = self::MODE_PREVIEW,
-    $contactType       = self::CONTACT_INDIVIDUAL,
-    $primaryKeyName    = '_id',
-    $statusFieldName   = '_status',
-    $onDuplicate       = self::DUPLICATE_SKIP,
-    $statusID          = NULL,
-    $totalRowCount     = NULL,
-    $doGeocodeAddress  = FALSE,
-    $timeout           = CRM_Contact_Import_Parser::DEFAULT_TIMEOUT,
-    $contactSubType    = NULL,
+    $mode = self::MODE_PREVIEW,
+    $contactType = self::CONTACT_INDIVIDUAL,
+    $primaryKeyName = '_id',
+    $statusFieldName = '_status',
+    $onDuplicate = self::DUPLICATE_SKIP,
+    $statusID = NULL,
+    $totalRowCount = NULL,
+    $doGeocodeAddress = FALSE,
+    $timeout = CRM_Contact_Import_Parser::DEFAULT_TIMEOUT,
+    $contactSubType = NULL,
     $dedupeRuleGroupID = NULL
   ) {
 
@@ -158,9 +158,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     if ($statusID) {
       $skip = 50;
       // $skip = 1;
-      $config     = CRM_Core_Config::singleton();
+      $config = CRM_Core_Config::singleton();
       $statusFile = "{$config->uploadDir}status_{$statusID}.txt";
-      $status     = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
+      $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
 
       //do not force the browser to display the save dialog, CRM-7640
       $contents = json_encode(array(0, $status));
@@ -175,8 +175,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     if ($mode == self::MODE_IMPORT) {
       $query .= " WHERE $statusFieldName = 'NEW'";
     }
-    $dao    = new CRM_Core_DAO();
-    $db     = $dao->getDatabaseConnection();
+    $dao = new CRM_Core_DAO();
+    $db = $dao->getDatabaseConnection();
     $result = $db->query($query);
 
     while ($values = $result->fetchRow(DB_FETCHMODE_ORDERED)) {
@@ -208,14 +208,14 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
         $returnCode = $this->import($onDuplicate, $values, $doGeocodeAddress);
         if ($statusID && (($this->_rowCount % $skip) == 0)) {
           $currTimestamp = time();
-          $totalTime     = ($currTimestamp - $startTimestamp);
-          $time          = ($currTimestamp - $prevTimestamp);
-          $recordsLeft   = $totalRowCount - $this->_rowCount;
+          $totalTime = ($currTimestamp - $startTimestamp);
+          $time = ($currTimestamp - $prevTimestamp);
+          $recordsLeft = $totalRowCount - $this->_rowCount;
           if ($recordsLeft < 0) {
             $recordsLeft = 0;
           }
           $estimatedTime = ($recordsLeft / $skip) * $time;
-          $estMinutes    = floor($estimatedTime / 60);
+          $estMinutes = floor($estimatedTime / 60);
           $timeFormatted = '';
           if ($estMinutes > 1) {
             $timeFormatted = $estMinutes . ' ' . ts('minutes') . ' ';
@@ -733,9 +733,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       $db = $dao->getDatabaseConnection();
 
       $query = "UPDATE $this->_tableName
-                      SET    $statusFieldName      = ?,
+                      SET    $statusFieldName = ?,
                              ${statusFieldName}Msg = ?
-                      WHERE  $primaryKeyName       = ?";
+                      WHERE  $primaryKeyName = ?";
       $args = array(
         $params[$statusFieldName],
         CRM_Utils_Array::value("${statusFieldName}Msg", $params),
