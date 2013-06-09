@@ -59,135 +59,12 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   protected $_lineCount;
 
   /**
-   * total number of non empty lines
-   */
-  protected $_totalCount;
-
-  /**
-   * running total number of valid lines
-   */
-  protected $_validCount;
-
-  /**
-   * running total number of invalid rows
-   */
-  protected $_invalidRowCount;
-
-  /**
-   * maximum number of invalid rows to store
-   */
-  protected $_maxErrorCount;
-
-  /**
-   * array of error lines, bounded by MAX_ERROR
-   */
-  protected $_errors;
-
-  /**
-   * total number of conflict lines
-   */
-  protected $_conflictCount;
-
-  /**
-   * array of conflict lines
-   */
-  protected $_conflicts;
-
-  /**
-   * total number of duplicate (from database) lines
-   */
-  protected $_duplicateCount;
-
-  /**
-   * array of duplicate lines
-   */
-  protected $_duplicates;
-
-  /**
-   * running total number of warnings
-   */
-  protected $_warningCount;
-
-  /**
-   * maximum number of warnings to store
-   */
-  protected $_maxWarningCount = self::MAX_WARNINGS;
-
-  /**
-   * array of warning lines, bounded by MAX_WARNING
-   */
-  protected $_warnings;
-
-  /**
-   * array of all the fields that could potentially be part
-   * of this import process
-   * @var array
-   */
-  protected $_fields;
-
-  /**
-   * array of the fields that are actually part of the import process
-   * the position in the array also dictates their position in the import
-   * file
-   * @var array
-   */
-  protected $_activeFields;
-
-  /**
-   * cache the count of active fields
-   *
-   * @var int
-   */
-  protected $_activeFieldCount;
-
-  /**
-   * maximum number of non-empty/comment lines to process
-   *
-   * @var int
-   */
-  protected $_maxLinesToProcess;
-
-  /**
-   * cache of preview rows
-   *
-   * @var array
-   */
-  protected $_rows;
-
-  /**
-   * filename of error data
-   *
-   * @var string
-   */
-  protected $_errorFileName;
-
-  /**
-   * filename of conflict data
-   *
-   * @var string
-   */
-  protected $_conflictFileName;
-
-  /**
-   * filename of duplicate data
-   *
-   * @var string
-   */
-  protected $_duplicateFileName;
-
-  /**
    * whether the file has a column header or not
    *
    * @var boolean
    */
   protected $_haveColumnHeader;
 
-  function __construct() {
-    $this->_maxLinesToProcess = 0;
-    $this->_maxErrorCount = self::MAX_ERRORS;
-  }
-
-  abstract function init();
   function run($fileName,
     $seperator = ',',
     &$mapper,
@@ -386,13 +263,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     return $this->fini();
   }
 
-  abstract function mapField(&$values);
-  abstract function preview(&$values);
-  abstract function summary(&$values);
-  abstract function import($onDuplicate, &$values);
-
-  abstract function fini();
-
   /**
    * Given a list of the importable field keys that the user has selected
    * set the active fields array to this list
@@ -412,43 +282,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         $this->_activeFields[] = clone($this->_fields[$key]);
       }
     }
-  }
-
-  /*function setActiveFieldLocationTypes( $elements )
-    {
-        for ($i = 0; $i < count( $elements ); $i++) {
-            $this->_activeFields[$i]->_hasLocationType = $elements[$i];
-        }
-    }
-
-    function setActiveFieldPhoneTypes( $elements )
-    {
-        for ($i = 0; $i < count( $elements ); $i++) {
-            $this->_activeFields[$i]->_phoneType = $elements[$i];
-        }
-    }*/
-  function setActiveFieldValues($elements, &$erroneousField) {
-    $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
-    for ($i = 0; $i < $maxCount; $i++) {
-      $this->_activeFields[$i]->setValue($elements[$i]);
-    }
-
-    // reset all the values that we did not have an equivalent import element
-    for (; $i < $this->_activeFieldCount; $i++) {
-      $this->_activeFields[$i]->resetValue();
-    }
-
-    // now validate the fields and return false if error
-    $valid = self::VALID;
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if (!$this->_activeFields[$i]->validate()) {
-        // no need to do any more validation
-        $erroneousField = $i;
-        $valid = self::ERROR;
-        break;
-      }
-    }
-    return $valid;
   }
 
   /**
@@ -471,40 +304,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     return $params;
   }
 
-  function getSelectValues() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_title;
-    }
-    return $values;
-  }
-
-  function getSelectTypes() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      if (isset($field->_hasLocationType)) {
-        $values[$name] = $field->_hasLocationType;
-      }
-    }
-    return $values;
-  }
-
-  function getHeaderPatterns() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_headerPattern;
-    }
-    return $values;
-  }
-
-  function getDataPatterns() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_dataPattern;
-    }
-    return $values;
-  }
-
   function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     if (empty($name)) {
       $this->_fields['doNotImport'] = new CRM_Activity_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
@@ -519,18 +318,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern, CRM_Utils_Array::value('hasLocationType', $tempField[$name]));
       }
     }
-  }
-
-  /**
-   * setter function
-   *
-   * @param int $max
-   *
-   * @return void
-   * @access public
-   */
-  function setMaxLinesToProcess($max) {
-    $this->_maxLinesToProcess = $max;
   }
 
   /**
@@ -606,34 +393,5 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     fclose($fd);
   }
 
-  /**
-   * Remove single-quote enclosures from a value array (row)
-   *
-   * @param array $values
-   * @param string $enclosure
-   *
-   * @return void
-   * @static
-   * @access public
-   */
-  static function encloseScrub(&$values, $enclosure = "'") {
-    if (empty($values)) {
-      return;
-    }
-
-    foreach ($values as $k => $v) {
-      $values[$k] = preg_replace("/^$enclosure(.*)$enclosure$/", '$1', $v);
-    }
-  }
-
-  function errorFileName($type) {
-    $fileName = CRM_Contact_Import_Parser::errorFileName($type);
-    return $fileName;
-  }
-
-  function saveFileName($type) {
-    $fileName = CRM_Contact_Import_Parser::saveFileName($type);
-    return $fileName;
-  }
 }
 

@@ -276,7 +276,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @access public
    */
   function summary(&$values) {
-    $response = $this->setActiveFieldValues($values);
+    $erroneousField = NULL;
+    $response = $this->setActiveFieldValues($values, $erroneousField);
 
     $errorMessage = NULL;
     $errorRequired = FALSE;

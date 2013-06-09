@@ -49,56 +49,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   protected $_rowCount;
 
   /**
-   * total number of non empty lines
-   */
-  protected $_totalCount;
-
-  /**
-   * running total number of valid lines
-   */
-  protected $_validCount;
-
-  /**
-   * running total number of invalid rows
-   */
-  protected $_invalidRowCount;
-
-  /**
-   * maximum number of invalid rows to store
-   */
-  protected $_maxErrorCount;
-
-  /**
-   * array of error lines, bounded by MAX_ERROR
-   */
-  protected $_errors;
-
-  /**
-   * total number of conflict lines
-   */
-  protected $_conflictCount;
-
-  /**
-   * array of conflict lines
-   */
-  protected $_conflicts;
-
-  /**
-   * total number of duplicate (from database) lines
-   */
-  protected $_duplicateCount;
-
-  /**
-   * array of duplicate lines
-   */
-  protected $_duplicates;
-
-  /**
-   * running total number of warnings
-   */
-  protected $_warningCount;
-
-  /**
    * running total number of un matched Conact
    */
   protected $_unMatchCount;
@@ -109,76 +59,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   protected $_unMatch;
 
   /**
-   * maximum number of warnings to store
-   */
-  protected $_maxWarningCount = self::MAX_WARNINGS;
-
-  /**
    * total number of contacts with unparsed addresses
    */
   protected $_unparsedAddressCount;
-
-  /**
-   * array of warning lines, bounded by MAX_WARNING
-   */
-  protected $_warnings;
-
-  /**
-   * array of all the fields that could potentially be part
-   * of this import process
-   * @var array
-   */
-  protected $_fields;
-
-  /**
-   * array of the fields that are actually part of the import process
-   * the position in the array also dictates their position in the import
-   * file
-   * @var array
-   */
-  protected $_activeFields;
-
-  /**
-   * cache the count of active fields
-   *
-   * @var int
-   */
-  protected $_activeFieldCount;
-
-  /**
-   * maximum number of non-empty/comment lines to process
-   *
-   * @var int
-   */
-  protected $_maxLinesToProcess;
-
-  /**
-   * cache of preview rows
-   *
-   * @var array
-   */
-  protected $_rows;
-
-  /**
-   * filename of error data
-   *
-   * @var string
-   */
-  protected $_errorFileName;
-
-  /**
-   * filename of conflict data
-   *
-   * @var string
-   */
-  protected $_conflictFileName;
-
-  /**
-   * filename of duplicate data
-   *
-   * @var string
-   */
-  protected $_duplicateFileName;
 
   /**
    * filename of mismatch data
@@ -189,14 +72,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
   protected $_primaryKeyName;
   protected $_statusFieldName;
-
-  /**
-   * contact type
-   *
-   * @var int
-   */
-
-  public $_contactType;
 
   /**
    * on duplicate
@@ -211,13 +86,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @var int
    */
   public $_dedupeRuleGroupID = NULL;
-
-  function __construct() {
-    $this->_maxLinesToProcess = 0;
-    $this->_maxErrorCount = self::MAX_ERRORS;
-  }
-
-  abstract function init();
 
   function run($tableName,
     &$mapper,
@@ -514,13 +382,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     return $this->fini();
   }
 
-  abstract function mapField(&$values);
-  abstract function preview(&$values);
-  abstract function summary(&$values);
-  abstract function import($onDuplicate, &$values);
-
-  abstract function fini();
-
   /**
    * Given a list of the importable field keys that the user has selected
    * set the active fields array to this list
@@ -540,29 +401,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
         $this->_activeFields[] = clone($this->_fields[$key]);
       }
     }
-  }
-
-  function setActiveFieldValues($elements) {
-    $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
-    for ($i = 0; $i < $maxCount; $i++) {
-      $this->_activeFields[$i]->setValue($elements[$i]);
-    }
-
-    // reset all the values that we did not have an equivalent import element
-    for (; $i < $this->_activeFieldCount; $i++) {
-      $this->_activeFields[$i]->resetValue();
-    }
-
-    // now validate the fields and return false if error
-    $valid = self::VALID;
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if (!$this->_activeFields[$i]->validate()) {
-        // no need to do any more validation
-        $valid = self::ERROR;
-        break;
-      }
-    }
-    return $valid;
   }
 
   function setActiveFieldLocationTypes($elements) {
@@ -747,34 +585,10 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     return $params;
   }
 
-  function getSelectValues() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_title;
-    }
-    return $values;
-  }
-
-  function getSelectTypes() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_hasLocationType;
-    }
-    return $values;
-  }
-
   function getColumnPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_columnPattern;
-    }
-    return $values;
-  }
-
-  function getDataPatterns() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_dataPattern;
     }
     return $values;
   }
@@ -787,18 +601,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     if (empty($name)) {
       $this->_fields['doNotImport'] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern, $hasLocationType);
     }
-  }
-
-  /**
-   * setter function
-   *
-   * @param int $max
-   *
-   * @return void
-   * @access public
-   */
-  function setMaxLinesToProcess($max) {
-    $this->_maxLinesToProcess = $max;
   }
 
   /**
@@ -946,67 +748,5 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     }
   }
 
-  function errorFileName($type) {
-    $fileName = NULL;
-    if (empty($type)) {
-      return $fileName;
-    }
-
-    $config = CRM_Core_Config::singleton();
-    $fileName = $config->uploadDir . "sqlImport";
-    switch ($type) {
-      case CRM_Import_Parser::ERROR:
-        $fileName .= '.errors';
-        break;
-
-      case CRM_Import_Parser::CONFLICT:
-        $fileName .= '.conflicts';
-        break;
-
-      case CRM_Import_Parser::DUPLICATE:
-        $fileName .= '.duplicates';
-        break;
-
-      case CRM_Import_Parser::NO_MATCH:
-        $fileName .= '.mismatch';
-        break;
-
-      case CRM_Import_Parser::UNPARSED_ADDRESS_WARNING:
-        $fileName .= '.unparsedAddress';
-        break;
-    }
-
-    return $fileName;
-  }
-
-  function saveFileName($type) {
-    $fileName = NULL;
-    if (empty($type)) {
-      return $fileName;
-    }
-    switch ($type) {
-      case CRM_Import_Parser::ERROR:
-        $fileName = 'Import_Errors.csv';
-        break;
-
-      case CRM_Import_Parser::CONFLICT:
-        $fileName = 'Import_Conflicts.csv';
-        break;
-
-      case CRM_Import_Parser::DUPLICATE:
-        $fileName = 'Import_Duplicates.csv';
-        break;
-
-      case CRM_Import_Parser::NO_MATCH:
-        $fileName = 'Import_Mismatch.csv';
-        break;
-
-      case CRM_Import_Parser::UNPARSED_ADDRESS_WARNING:
-        $fileName = 'Import_Unparsed_Address.csv';
-        break;
-    }
-
-    return $fileName;
-  }
 }
 
