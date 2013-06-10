@@ -255,7 +255,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       }
       $membershipResult[1] = $result;
     }
-    elseif ($result) {
+    elseif ($result || ($form->_amount == 0.0 && !$form->_params['is_pay_later'])) {
       if ($result) {
         $form->_params = array_merge($form->_params, $result);
       }
