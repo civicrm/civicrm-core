@@ -4,7 +4,7 @@
  
  */
 function activity_get_example(){
-$params = array( 
+$params = array(
   'contact_id' => 17,
   'activity_type_id' => '44',
   'version' => 3,
@@ -22,13 +22,13 @@ $params = array(
  */
 function activity_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'source_contact_id' => '17',
           'id' => '1',
           'activity_type_id' => '44',

@@ -4,7 +4,7 @@
  demonstrates _high filter (at time of writing doesn't work if contact_id is set
  */
 function activity_get_example(){
-$params = array( 
+$params = array(
   'source_contact_id' => 17,
   'version' => 3,
   'filter.activity_date_time_high' => '20120101000000',
@@ -21,13 +21,13 @@ $params = array(
  */
 function activity_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '1',
           'activity_type_id' => '44',
           'subject' => 'Make-it-Happen Meeting',

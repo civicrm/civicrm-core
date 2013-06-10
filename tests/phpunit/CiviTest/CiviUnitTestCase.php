@@ -594,6 +594,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
   }
 
+/**
+ * check that api returned 'is_error' => 0
+ * else provide full message
+ * @param array $apiResult api result
+ * @param string $prefix extra test to add to message
+ */
   function assertAPISuccess($apiResult, $prefix = '') {
     if (!empty($prefix)) {
       $prefix .= ': ';
@@ -601,10 +607,22 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->assertEquals(0, $apiResult['is_error'], $prefix . (empty($apiResult['error_message']) ? '' : $apiResult['error_message']));
   }
 
+  /**
+   * check that api returned 'is_error' => 1
+   * else provide full message
+   * @param array $apiResult api result
+   * @param string $prefix extra test to add to message
+   */
+  function assertAPIFailure($apiResult, $prefix = '') {
+    if (!empty($prefix)) {
+      $prefix .= ': ';
+    }
+    $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
+  }
+
   function assertType($expected, $actual, $message = '') {
     return $this->assertInternalType($expected, $actual, $message);
   }
-
   /**
    * Generic function to create Organisation, to be used in test cases
    *
