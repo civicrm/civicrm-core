@@ -706,7 +706,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
-    if(is_object($field['pseudoconstant'])){
+    if(!empty($field['pseudoconstant'])){
       //ok this is a bit long-winded but it gets there & is consistent with above approach
       $field['pseudoconstant'] = array();
       $validOptions = array(
@@ -719,10 +719,16 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
         'labelColumn',
         'condition',
       );
-      foreach ($validOptions as $pseudoOption){
+      foreach ($validOptions as $pseudoOption) {
         if(!empty($fieldXML->pseudoconstant->$pseudoOption)){
           $field['pseudoconstant'][$pseudoOption] = $this->value($pseudoOption, $fieldXML->pseudoconstant);
         }
+      }
+      // For now, fields that have option lists that are not in the db can simply
+      // declare an empty pseudoconstant tag and we'll add this placeholder.
+      // That field's BAO::buildOptions fn will need to be responsible for generating the option list
+      if (empty($field['pseudoconstant'])) {
+        $field['pseudoconstant'] = 'not in database';
       }
     }
     $fields[$name] = &$field;
