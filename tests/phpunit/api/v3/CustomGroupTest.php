@@ -180,22 +180,21 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['extends'], 'Individual', 'In line ' . __LINE__);
   }
+
   /**
    * check with valid array
    */
   function testCustomGroupGetFields() {
     $params = array(
-        'version' => $this->_apiversion,
+      'version' => $this->_apiversion,
+      'options' => array('get_options' => 'style'),
     );
 
     $result = civicrm_api('custom_group', 'getfields', $params);
     $this->assertAPISuccess($result);
-    $this->assertArrayKeyExists('options', $result['values'], ' check that options are rendered for fieldtype enum');
     $this->assertEquals('Tab', $result['values']['style']['options'][0]);
     $this->assertEquals('Inline', $result['values']['style']['options'][1]);
-
   }
-
 
   /**
    * check with extends array length greater than 1

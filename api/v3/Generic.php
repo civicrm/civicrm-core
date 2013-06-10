@@ -233,7 +233,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * @param array $fieldsToResolve anny field resolutions specifically requested
  */
 function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldname, $fieldSpec, $fieldsToResolve){
-  if(empty($fieldSpec['pseudoconstant'])) {
+  if(empty($fieldSpec['pseudoconstant']) && empty($fieldSpec['enumValues'])) {
     return;
   }
 
