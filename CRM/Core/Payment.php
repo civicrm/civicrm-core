@@ -379,15 +379,5 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     return $newCredit;
   }
 
-  /* Return a static array of available billing modes, in the format:
-   * $array[numeric key] = 'descriptive text'.
-   */
-  static function getBillingModes() {
-    return array(
-      CRM_Core_Payment::BILLING_MODE_FORM => 'form',
-      CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
-      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
-    );
-  }
 }
 

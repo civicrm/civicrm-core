@@ -208,7 +208,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
     return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' doesn't exist.");
   }
 
-  $daoName = _civicrm_api3_get_DAO($apiRequest['entity']);
+  $daoName = _civicrm_api3_get_BAO($apiRequest['entity']);
   $options = $daoName::buildOptions($fieldName);
   if ($options === FALSE) {
     return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");

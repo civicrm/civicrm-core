@@ -706,7 +706,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
-    if(!empty($fieldXML->pseudoconstant)){
+    if(is_object($field['pseudoconstant'])){
       //ok this is a bit long-winded but it gets there & is consistent with above approach
       $field['pseudoconstant'] = array();
       $validOptions = array(
