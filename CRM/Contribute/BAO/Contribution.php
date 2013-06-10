@@ -1204,10 +1204,14 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
     $addressParams = array();
     $addressParams['location_type_id'] = $billingLocationTypeID;
     $addressParams['is_billing'] = 1;
-    $addressParams['address_name'] = "{$params['billing_first_name']}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$params['billing_middle_name']}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$params['billing_last_name']}";
+
+    $billingFirstName = CRM_Utils_Array::value('billing_first_name', $params);
+    $billingMiddleName = CRM_Utils_Array::value('billing_middle_name', $params);
+    $billingLastName = CRM_Utils_Array::value('billing_last_name', $params);
+    $addressParams['address_name'] = "{$billingFirstName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingMiddleName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingLastName}";
 
     foreach ($billingFields as $value) {
-      $addressParams[$value] = $params["billing_{$value}-{$billingLocationTypeID}"];
+      $addressParams[$value] = CRM_Utils_Array::value("billing_{$value}-{$billingLocationTypeID}", $params);
     }
 
     $address = CRM_Core_BAO_Address::add($addressParams, FALSE);
