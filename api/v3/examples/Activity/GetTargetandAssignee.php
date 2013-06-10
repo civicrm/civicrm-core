@@ -4,7 +4,7 @@
  Example demonstrates setting & retrieving the target & source
  */
 function activity__example(){
-$params = array( 
+$params = array(
   'source_contact_id' => 17,
   'subject' => 'Make-it-Happen Meeting',
   'activity_date_time' => '20110316',
@@ -29,13 +29,13 @@ $params = array(
  */
 function activity__expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'source_record_id' => '',
           'activity_type_id' => '1',

@@ -204,11 +204,6 @@ function _civicrm_api3_activity_create_spec(&$params) {
       'api.default' => 'user_contact_id',
   );
 
-  $params['activity_status_id'] = array(
-    'name' => 'status_id',
-    'title' => 'Status Id',
-    'type' => 1,
-  );
 }
 
 /**
@@ -399,26 +394,6 @@ SELECT  count(*)
   ) {
     return civicrm_api3_create_error('Invalid Activity Type ID');
   }
-
-  // check for activity status is passed in
-  // note this should all be removed in favour of wrapper layer validation
-  // needs testing
-  if (isset($params['activity_status_id'])) {
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-
-    if (is_numeric($params['activity_status_id']) && !array_key_exists($params['activity_status_id'], $activityStatus)) {
-      return civicrm_api3_create_error('Invalid Activity Status');
-    }
-    elseif (!is_numeric($params['activity_status_id'])) {
-      $statusId = array_search($params['activity_status_id'], $activityStatus);
-
-      if (!is_numeric($statusId)) {
-        return civicrm_api3_create_error('Invalid Activity Status');
-      }
-    }
-  }
-
-
 
   // check for activity duration minutes
   // this should be validated @ the wrapper layer not here
