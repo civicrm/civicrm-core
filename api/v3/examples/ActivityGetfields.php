@@ -4,7 +4,7 @@
  
  */
 function activity_getfields_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'action' => 'create',
 );
@@ -19,17 +19,17 @@ $params = array(
  */
 function activity_getfields_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 28,
-  'values' => array( 
-      'source_record_id' => array( 
+  'count' => 27,
+  'values' => array(
+      'source_record_id' => array(
           'name' => 'source_record_id',
           'type' => 1,
           'title' => 'Source Record',
         ),
-      'activity_type_id' => array( 
+      'activity_type_id' => array(
           'name' => 'activity_type_id',
           'type' => 1,
           'title' => 'Activity Type ID',
@@ -37,14 +37,14 @@ function activity_getfields_expectedresult(){
           'import' => true,
           'where' => 'civicrm_activity.activity_type_id',
           'headerPattern' => '/(activity.)?type(.id$)/i',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'activity_type',
             ),
-          'api.aliases' => array( 
+          'api.aliases' => array(
               '0' => 'activity_type',
             ),
         ),
-      'activity_date_time' => array( 
+      'activity_date_time' => array(
           'name' => 'activity_date_time',
           'type' => 12,
           'title' => 'Activity Date',
@@ -53,49 +53,49 @@ function activity_getfields_expectedresult(){
           'headerPattern' => '/(activity.)?date(.time$)?/i',
           'export' => true,
         ),
-      'phone_id' => array( 
+      'phone_id' => array(
           'name' => 'phone_id',
           'type' => 1,
           'title' => 'Phone (called) ID',
           'FKClassName' => 'CRM_Core_DAO_Phone',
         ),
-      'phone_number' => array( 
+      'phone_number' => array(
           'name' => 'phone_number',
           'type' => 2,
           'title' => 'Phone (called) Number',
           'maxlength' => 64,
           'size' => 30,
         ),
-      'priority_id' => array( 
+      'priority_id' => array(
           'name' => 'priority_id',
           'type' => 1,
           'title' => 'Priority',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'priority',
             ),
-          'api.aliases' => array( 
+          'api.aliases' => array(
               '0' => 'priority',
             ),
         ),
-      'parent_id' => array( 
+      'parent_id' => array(
           'name' => 'parent_id',
           'type' => 1,
           'title' => 'Parent Activity Id',
           'FKClassName' => 'CRM_Activity_DAO_Activity',
         ),
-      'is_auto' => array( 
+      'is_auto' => array(
           'name' => 'is_auto',
           'type' => 16,
           'title' => 'Auto',
         ),
-      'relationship_id' => array( 
+      'relationship_id' => array(
           'name' => 'relationship_id',
           'type' => 1,
           'title' => 'Relationship Id',
           'default' => 'UL',
           'FKClassName' => 'CRM_Contact_DAO_Relationship',
         ),
-      'is_current_revision' => array( 
+      'is_current_revision' => array(
           'name' => 'is_current_revision',
           'type' => 16,
           'title' => 'Is this activity a current revision in versioning chain?',
@@ -104,18 +104,18 @@ function activity_getfields_expectedresult(){
           'headerPattern' => '/(is.)?(current.)?(revision|version(ing)?)/i',
           'export' => true,
         ),
-      'original_id' => array( 
+      'original_id' => array(
           'name' => 'original_id',
           'type' => 1,
           'title' => 'Original Activity ID ',
           'FKClassName' => 'CRM_Activity_DAO_Activity',
         ),
-      'weight' => array( 
+      'weight' => array(
           'name' => 'weight',
           'type' => 1,
           'title' => 'Weight',
         ),
-      'id' => array( 
+      'id' => array(
           'name' => 'id',
           'type' => 1,
           'title' => 'Activity ID',
@@ -124,11 +124,11 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.id',
           'export' => true,
           'uniqueName' => 'activity_id',
-          'api.aliases' => array( 
+          'api.aliases' => array(
               '0' => 'activity_id',
             ),
         ),
-      'subject' => array( 
+      'subject' => array(
           'name' => 'subject',
           'type' => 2,
           'title' => 'Subject',
@@ -140,7 +140,7 @@ function activity_getfields_expectedresult(){
           'export' => true,
           'uniqueName' => 'activity_subject',
         ),
-      'duration' => array( 
+      'duration' => array(
           'name' => 'duration',
           'type' => 1,
           'title' => 'Duration',
@@ -150,7 +150,7 @@ function activity_getfields_expectedresult(){
           'export' => true,
           'uniqueName' => 'activity_duration',
         ),
-      'location' => array( 
+      'location' => array(
           'name' => 'location',
           'type' => 2,
           'title' => 'Location',
@@ -162,7 +162,7 @@ function activity_getfields_expectedresult(){
           'export' => true,
           'uniqueName' => 'activity_location',
         ),
-      'details' => array( 
+      'details' => array(
           'name' => 'details',
           'type' => 32,
           'title' => 'Details',
@@ -174,22 +174,22 @@ function activity_getfields_expectedresult(){
           'export' => true,
           'uniqueName' => 'activity_details',
         ),
-      'status_id' => array( 
+      'status_id' => array(
           'name' => 'status_id',
           'type' => 1,
           'title' => 'Activity Status Id',
           'import' => true,
           'where' => 'civicrm_activity.status_id',
           'headerPattern' => '/(activity.)?status(.label$)?/i',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'activity_status',
             ),
           'uniqueName' => 'activity_status_id',
-          'api.aliases' => array( 
+          'api.aliases' => array(
               '0' => 'status',
             ),
         ),
-      'is_test' => array( 
+      'is_test' => array(
           'name' => 'is_test',
           'type' => 16,
           'title' => 'Test',
@@ -199,20 +199,20 @@ function activity_getfields_expectedresult(){
           'export' => true,
           'uniqueName' => 'activity_is_test',
         ),
-      'medium_id' => array( 
+      'medium_id' => array(
           'name' => 'medium_id',
           'type' => 1,
           'title' => 'Activity Medium',
           'default' => 'UL',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'encounter_medium',
             ),
           'uniqueName' => 'activity_medium_id',
-          'api.aliases' => array( 
+          'api.aliases' => array(
               '0' => 'medium',
             ),
         ),
-      'result' => array( 
+      'result' => array(
           'name' => 'result',
           'type' => 2,
           'title' => 'Result',
@@ -220,7 +220,7 @@ function activity_getfields_expectedresult(){
           'size' => 45,
           'uniqueName' => 'activity_result',
         ),
-      'is_deleted' => array( 
+      'is_deleted' => array(
           'name' => 'is_deleted',
           'type' => 16,
           'title' => 'Activity is in the Trash',
@@ -230,7 +230,7 @@ function activity_getfields_expectedresult(){
           'export' => true,
           'uniqueName' => 'activity_is_deleted',
         ),
-      'campaign_id' => array( 
+      'campaign_id' => array(
           'name' => 'campaign_id',
           'type' => 1,
           'title' => 'Campaign ID',
@@ -240,41 +240,36 @@ function activity_getfields_expectedresult(){
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'uniqueName' => 'activity_campaign_id',
         ),
-      'engagement_level' => array( 
+      'engagement_level' => array(
           'name' => 'engagement_level',
           'type' => 1,
           'title' => 'Engagement Index',
           'import' => true,
           'where' => 'civicrm_activity.engagement_level',
           'export' => true,
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'engagement_index',
             ),
           'uniqueName' => 'activity_engagement_level',
         ),
-      'source_contact_id' => array( 
+      'source_contact_id' => array(
           'name' => 'source_contact_id',
           'title' => 'Activity Source Contact',
           'type' => 1,
           'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
           'api.default' => 'user_contact_id',
         ),
-      'assignee_contact_id' => array( 
+      'assignee_contact_id' => array(
           'name' => 'assignee_id',
           'title' => 'assigned to',
           'type' => 1,
           'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
         ),
-      'target_contact_id' => array( 
+      'target_contact_id' => array(
           'name' => 'target_id',
           'title' => 'Activity Target',
           'type' => 1,
           'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
-        ),
-      'activity_status_id' => array( 
-          'name' => 'status_id',
-          'title' => 'Status Id',
-          'type' => 1,
         ),
     ),
 );
