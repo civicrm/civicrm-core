@@ -171,5 +171,139 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$honorDisplayName"), "Honoree contact not found.");
 
     }
+
+  function testOnlineContributionWithZeroAmount () {
+    $this->webtestLogin();
+
+    // We need a payment processor
+    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    $processorType = 'Dummy';
+    $pageTitle = substr(sha1(rand()), 0, 7);
+    $rand = 2 * rand(10, 50);
+    $hash = substr(sha1(rand()), 0, 7);
+    $amountSection = TRUE;
+    $payLater = FALSE;
+    $onBehalf = FALSE;
+    $pledges = FALSE;
+    $recurring = FALSE;
+    $memberships = FALSE;
+    $friend = FALSE;
+    $profilePreId = NULL;
+    $profilePostId = NULL;
+    $premiums = FALSE;
+    $widget = FALSE;
+    $pcp = FALSE;
+    $memPriceSetId = NULL;
+
+    // create a new online contribution page
+    // create contribution page with randomized title and default params
+    $pageId = $this->webtestAddContributionPage($hash,
+      $rand,
+      $pageTitle,
+      array($processorName => $processorType),
+      $amountSection,
+      $payLater,
+      $onBehalf,
+      $pledges,
+      $recurring,
+      $memberships,
+      $memPriceSetId,
+      $friend,
+      $profilePreId,
+      $profilePostId,
+      $premiums,
+      $widget,
+      $pcp
+    );
+    
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_cancel-bottom');
+    $this->type('label_1', "Label $hash");
+    $this->type('value_1', 0);
+    $this->clickLink('_qf_Amount_upload_done-top');
+
+    //Contribution using Contribution Options
+    $this->_doContributionAndVerifyData($pageId);
+    
+    //add priceset
+    $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_next-bottom');
+    $this->type('title', "Test Priceset $rand");
+    $this->check('extends_2');
+    $this->select("financial_type_id", "label=Donation");
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
+    $sid = $this->urlArg('sid');
+    //add field
+    $this->type('label', "Testfield");
+    $this->select('html_type', "value=Radio");
+    $this->type('option_label_1', 'test Label');
+    $this->type('option_amount_1', 0.00);
+    $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_cancel-bottom');
+    $this->select('price_set_id', "value=$sid");
+    $this->clickLink('_qf_Amount_upload_done-bottom');
+
+    //Contribution using priceset
+    $this->_doContributionAndVerifyData($pageId, TRUE);   
   }
+
+  function _doContributionAndVerifyData($pageId, $priceSet = FALSE) {
+    //logout
+    $this->webtestLogout();
+    $amountLabel = 'Total Amount';
+    $amountValue = '0.00';
+    //Open Live Contribution Page
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+
+    $this->type("email-5", $firstName . "@example.com");
+
+    if ($priceSet) {
+      $this->click("xpath=//div[@id='priceset']/div/div[2]/div/span/input");
+      $amountLabel = 'Contribution Amount';
+      $amountValue = 'Contribution Total: $ 0.00';
+    }
+
+    //Credit Card Info
+    $this->select("credit_card_type", "value=Visa");
+    $this->type("credit_card_number", "4111111111111111");
+    $this->type("cvv2", "000");
+    $this->select("credit_card_exp_date[M]", "value=1");
+    $this->select("credit_card_exp_date[Y]", "value=2020");
+
+    //Billing Info
+    $this->type("billing_first_name", $firstName);
+    $this->type("billing_last_name", $lastName);
+    $this->type("billing_street_address-5", "15 Main St.");
+    $this->type(" billing_city-5", "San Jose");
+    $this->select("billing_country_id-5", "value=1228");
+    $this->select("billing_state_province_id-5", "value=1004");
+    $this->type("billing_postal_code-5", "94129");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+
+    $this->clickLink("_qf_Confirm_next-bottom", NULL);
+
+      
+    //login to check contribution
+
+    // Log in using webtestLogin() method
+    $this->webtestLogin();
+
+      //Find Contribution
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
+
+    $this->type("sort_name", "$firstName $lastName");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+
+    //View Contribution Record and verify data
+    $expected = array(
+      'From' => "{$firstName} {$lastName}",
+      'Financial Type' => 'Donation',
+      $amountLabel => $amountValue,
+      'Contribution Status' => 'Completed'
+    );
+    $this->webtestVerifyTabularData($expected);
+  }
+}
 
