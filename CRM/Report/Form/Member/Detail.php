@@ -339,16 +339,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     }
     //used when contribution field is selected
     if ($this->_contribField) {
-      $this->_from .= "
-              LEFT JOIN (
-                  SELECT cc.*, cmp.membership_id as membership_id 
-                  FROM civicrm_membership_payment cmp
-                    JOIN civicrm_contribution cc 
-                      ON cc.id = cmp.contribution_id 
-                  ORDER BY cc.receive_date DESC
-                  ) {$this->_aliases['civicrm_contribution']} 
-                ON {$this->_aliases['civicrm_membership']}.id = 
-                  {$this->_aliases['civicrm_contribution']}.membership_id\n";
+      $this->_from .= " 
+             LEFT JOIN civicrm_membership_payment cmp 
+                 ON {$this->_aliases['civicrm_membership']}.id = cmp.membership_id
+             LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+                 ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";
     }
   }
 
@@ -402,6 +397,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
   function orderBy() {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
+
+    if ($this->_contribField) {
+      $this->_orderBy .= ", {$this->_aliases['civicrm_contribution']}.receive_date DESC";
+    } 
   }
 
   function postProcess() {
