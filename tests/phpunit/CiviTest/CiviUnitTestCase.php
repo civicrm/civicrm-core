@@ -908,12 +908,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params['version'] = API_LATEST_VERSION;
 
     $result = civicrm_api('payment_processor_type', 'create', $params);
-
-    if (civicrm_error($params) || CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not create payment processor type');
-    }
-
-    require_once 'CRM/Core/PseudoConstant.php';
+    $this->assertAPISuccess($result);
     CRM_Core_PseudoConstant::flush('paymentProcessorType');
 
     return $result['id'];

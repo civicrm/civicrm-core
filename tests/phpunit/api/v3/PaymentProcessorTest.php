@@ -99,6 +99,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   function testPaymentProcessorCreate() {
     $params = $this->_params;
     $result = civicrm_api('payment_processor', 'create', $params);
+    $this->assertAPISuccess($result);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'in line ' . __LINE__);
 
