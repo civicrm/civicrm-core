@@ -32,3 +32,6 @@ VALUES (@bounceTypeID, 'X-HmXmrOriginalRecipient');
 -- CRM-12716
 UPDATE civicrm_custom_field SET text_length = NULL WHERE html_type = 'TextArea' AND text_length = 255;
 
+-- CRM-12689
+ALTER TABLE civicrm_action_schedule
+  ADD COLUMN limit_to tinyint(4) DEFAULT '1' COMMENT 'Is this the recipient criteria limited to OR in addition to?'  AFTER recipient;
