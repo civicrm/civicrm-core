@@ -145,7 +145,7 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
    * @return mixed SID on success or PEAR_Error object
    * @access public
    */
-  function send($recipients, $header, $message, $jobID = NULL) {
+  function send($recipients, $header, $message, $jobID = NULL, $userID = NULL) {
     if ($this->_apiType == 'http') {
       $from = '';
       if (array_key_exists('From', $this->_providerInfo['api_params'])) {
@@ -170,7 +170,7 @@ class org_civicrm_sms_twilio extends CRM_SMS_Provider {
       }
 
       $sid = $twilioMessage->sid;
-      $this->createActivity($sid, $message, $header, $jobID);
+      $this->createActivity($sid, $message, $header, $jobID, $userID);
       return $sid;
     }
   }

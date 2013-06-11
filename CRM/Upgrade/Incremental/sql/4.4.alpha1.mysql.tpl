@@ -32,3 +32,22 @@ VALUES (@bounceTypeID, 'X-HmXmrOriginalRecipient');
 -- CRM-12716
 UPDATE civicrm_custom_field SET text_length = NULL WHERE html_type = 'TextArea' AND text_length = 255;
 
+-- CRM-12288
+
+SELECT @option_group_id_activity_type := max(id) from civicrm_option_group where name = 'activity_type';
+SELECT @max_val    := MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.option_group_id  = @option_group_id_activity_type;
+SELECT @max_wt     := max(weight) from civicrm_option_value where option_group_id=@option_group_id_activity_type;
+
+INSERT INTO civicrm_option_value
+   (option_group_id, {localize field='label'}label{/localize}, {localize field='description'}description{/localize}, value, name, weight, filter, component_id)
+VALUES
+   (@option_group_id_activity_type, {localize}'Inbound SMS'{/localize},{localize}'Inbound SMS'{/localize}, (SELECT @max_val := @max_val+1), 'Inbound SMS', (SELECT @max_wt := @max_wt+1), 1, NULL),
+   (@option_group_id_activity_type, {localize}'SMS delivery'{/localize},{localize}'SMS delivery'{/localize}, (SELECT @max_val := @max_val+1), 'SMS delivery', (SELECT @max_wt := @max_wt+1), 1, NULL);
+
+{if $multilingual}
+  {foreach from=$locales item=locale}
+    UPDATE civicrm_option_value SET label_{$locale} ='Outbound SMS' WHERE name = 'SMS' and option_group_id = @option_group_id_activity_type;
+  {/foreach}
+{else}
+  UPDATE civicrm_option_value SET label ='Outbound SMS' WHERE name = 'SMS' and option_group_id = @option_group_id_activity_type;
+{/if}
