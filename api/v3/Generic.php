@@ -208,7 +208,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
     return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' doesn't exist.");
   }
 
-  $daoName = _civicrm_api3_get_DAO($apiRequest['entity']);
+  $daoName = _civicrm_api3_get_BAO($apiRequest['entity']);
   $options = $daoName::buildOptions($fieldName);
   if ($options === FALSE) {
     return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");
@@ -233,7 +233,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * @param array $fieldsToResolve anny field resolutions specifically requested
  */
 function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldname, $fieldSpec, $fieldsToResolve){
-  if(empty($fieldSpec['pseudoconstant'])) {
+  if(empty($fieldSpec['pseudoconstant']) && empty($fieldSpec['enumValues'])) {
     return;
   }
 
