@@ -233,6 +233,41 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           array('title' => ts('Event Type'), 'default_weight' => '2', 'default_order' => 'ASC'),
         ),
       ),
+      'civicrm_contribution' => array(
+        'dao' => 'CRM_Contribute_DAO_Contribution',
+        'fields' => array(
+          'contribution_id' => array(
+            'name' => 'id',
+            'no_display' => true,
+            'required' => true, 
+            'csv_display' => TRUE,
+            'title' => ts('Contribution ID'),
+          ),
+          'financial_type_id' => array('title' => ts('Financial Type')),
+          'receive_date' => array('title' => ts('Payment Date')),
+          'contribution_status_id' => array('title' => ts('Contribution Status')),
+          'payment_instrument_id' => array('title' => ts('Payment Type')),
+          'contribution_source' => array(
+            'name' => 'source',
+            'title' => ts('Contribution Source'),
+          ),
+          'currency' => array(
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'trxn_id' => NULL,
+          'honor_type_id' => array('title' => ts('Honor Type')),
+          'fee_amount' => array('title' => ts('Transaction Fee')),
+          'net_amount' => NULL,
+        ), 
+        'grouping' => 'contrib-fields',
+        'filters' => array(
+          'receive_date' => array(
+            'title' => 'Payment Date',
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+        ),
+      ),
     );
     $this->_options = array('blank_column_begin' => array('title' => ts('Blank column at the Begining'),
         'type' => 'checkbox',
@@ -333,6 +368,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                          {$this->_aliases['civicrm_phone']}.is_primary = 1
+             LEFT JOIN civicrm_participant_payment pp
+                    ON ({$this->_aliases['civicrm_participant']}.id  = pp.participant_id  )
+             LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} 
+                    ON (pp.contribution_id  = {$this->_aliases['civicrm_contribution']}.id  )
       ";
   }
 
