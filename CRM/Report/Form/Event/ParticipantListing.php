@@ -35,6 +35,8 @@
 class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
 
   protected $_summary = NULL;
+  
+  protected $_contribField = FALSE;
 
   protected $_customGroupExtends = array(
     'Participant');
@@ -322,6 +324,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           if (CRM_Utils_Array::value('required', $field) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
+          
+            if ($tableName == 'civicrm_contribution') {
+              $this->_contribField = TRUE;
+            }
 
             $alias = "{$tableName}_{$fieldName}";
             $select[] = "{$field['dbAlias']} as $alias";
@@ -368,11 +374,15 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                          {$this->_aliases['civicrm_phone']}.is_primary = 1
+      ";
+    if ($this->_contribField) {
+      $this->_from .= "
              LEFT JOIN civicrm_participant_payment pp
                     ON ({$this->_aliases['civicrm_participant']}.id  = pp.participant_id  )
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} 
                     ON (pp.contribution_id  = {$this->_aliases['civicrm_contribution']}.id  )
       ";
+    }
   }
 
   function where() {
