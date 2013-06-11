@@ -122,7 +122,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
 
     if (!array_key_exists($versionName, $incrementalPhpObject)) {
       $className = "CRM_Upgrade_Incremental_php_{$versionName}";
-      $incrementalPhpObject['$versionName'] = new $className();
+      $incrementalPhpObject[$versionName] = new $className();
     }
     return $incrementalPhpObject[$versionName];
   }
