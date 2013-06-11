@@ -1530,7 +1530,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
 function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $fieldInfo) {
   $options = CRM_Utils_Array::value('options', $fieldInfo);
   if (!$options) {
-    $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldInfo['name']));
+    $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldInfo['name'], 'context' => 'validate'));
     $options = CRM_Utils_Array::value('values', $options, array());
   }
 

@@ -90,9 +90,14 @@ function civicrm_api3_generic_getfields($apiRequest) {
 
     case 'getoptions':
       $metadata = array(
-        'field' => array('title' => 'Field to retrieve options for',
-        'api.required' => 1,
-      ));
+        'field' => array(
+          'title' => 'Field to retrieve options for',
+          'api.required' => 1,
+        ),
+        'context' => array(
+          'title' => 'Context string',
+        ),
+      );
         break;
     default:
       // oddballs are on their own
@@ -207,9 +212,11 @@ function civicrm_api3_generic_getoptions($apiRequest) {
   if (!$fieldName) {
     return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' doesn't exist.");
   }
+  $context = CRM_Utils_Array::value('context', $apiRequest['params']);
+  CRM_Core_DAO::buildOptionsContext($context);
 
-  $daoName = _civicrm_api3_get_BAO($apiRequest['entity']);
-  $options = $daoName::buildOptions($fieldName);
+  $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
+  $options = $baoName::buildOptions($fieldName, $context);
   if ($options === FALSE) {
     return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");
   }

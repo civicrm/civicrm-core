@@ -1764,13 +1764,33 @@ EOS;
    * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
    *
    * @param String $fieldName
-   * @param String $context: e.g. "search" "edit" "create" "view"
+   * @param String $context: e.g. "search" "get" "create" "validate"
    * @param Array  $props: whatever is known about this bao object
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     // If a given bao does not override this function
     $baoName = get_called_class();
-    return CRM_Core_PseudoConstant::get($baoName, $fieldName);
+    return CRM_Core_PseudoConstant::get($baoName, $fieldName, array(), $context);
   }
+
+  /**
+   * Provides documentation and validation for the buildOptions $context param
+   *
+   * @param String $context
+   */
+  public static function buildOptionsContext($context = NULL) {
+    $contexts = array(
+      'get' => "All options are returned, even if they are disabled. Labels are translated.",
+      'create' => "Options are filtered appropriately for the object being created/updated. Labels are translated.",
+      'search' => "Searchable options are returned. Labels are translated.",
+      'validate' => "All options are returned, even if they are disabled. Machine names are used in place of labels.",
+    );
+    // Validation: enforce uniformity of this param
+    if ($context !== NULL && !isset($contexts[$context])) {
+      throw new exception("'$context' is not a valid context for buildOptions.");
+    }
+    return $contexts;
+  }
+
 }
 

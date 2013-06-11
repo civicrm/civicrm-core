@@ -193,13 +193,15 @@ WHERE  v.option_group_id = g.id
    * @static
    * @void
    */
-  static function &valuesByID($id, $flip = FALSE, $grouping = FALSE, $localize = FALSE, $labelColumnName = 'label') {
-    $cacheKey = "CRM_OG_ID_{$id}_{$flip}_{$grouping}_{$localize}_{$labelColumnName}";
+  static function &valuesByID($id, $flip = FALSE, $grouping = FALSE, $localize = FALSE, $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE) {
+    $cacheKey = self::createCacheKey($id, $flip, $grouping, $localize, $labelColumnName, $onlyActive);
 
     $cache = CRM_Utils_Cache::singleton();
-    $var = $cache->get($cacheKey);
-    if ($var) {
-      return $var;
+    if (!$fresh) {
+      $var = $cache->get($cacheKey);
+      if ($var) {
+        return $var;
+      }
     }
     $query = "
 SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.value as value, v.grouping as grouping
@@ -207,10 +209,13 @@ FROM   civicrm_option_value v,
        civicrm_option_group g
 WHERE  v.option_group_id = g.id
   AND  g.id              = %1
-  AND  v.is_active       = 1
   AND  g.is_active       = 1
-  ORDER BY v.weight, v.label;
 ";
+    if ($onlyActive) {
+      $query .= " AND  v.is_active = 1 ";
+    }
+    $query .= " ORDER BY v.weight, v.label";
+
     $p = array(1 => array($id, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $p);
 

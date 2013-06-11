@@ -234,7 +234,7 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
           CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
         );
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params);
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 }
 

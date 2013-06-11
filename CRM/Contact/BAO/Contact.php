@@ -3011,7 +3011,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
         }
         break;
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params);
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
   /**
