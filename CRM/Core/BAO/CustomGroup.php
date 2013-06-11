@@ -593,11 +593,11 @@ ORDER BY civicrm_custom_group.weight,
         }
       }
       if ($entityID && !empty($singleFieldTables)) {
-        self::buildEntityTreeSingleFields(&$groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
+        self::buildEntityTreeSingleFields($groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
       }
       $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
       if(!empty($multipleFieldTablesWithEntityData)){
-        self::buildEntityTreeMultipleFields(&$groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData);
+        self::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData);
       }
 
    }
@@ -647,7 +647,7 @@ ORDER BY civicrm_custom_group.weight,
       FROM $fromSQL
       WHERE first.entity_id = $entityID
     ";
-    self::buildTreeEntityDataFromQuery(&$groupTree, $query, $singleFieldTablesWithEntityData);
+    self::buildTreeEntityDataFromQuery($groupTree, $query, $singleFieldTablesWithEntityData);
   }
 
   /**
@@ -668,7 +668,7 @@ ORDER BY civicrm_custom_group.weight,
         FROM $table
         WHERE entity_id = $entityID
       ";
-      self::buildTreeEntityDataFromQuery(&$groupTree, $query, array($table));
+      self::buildTreeEntityDataFromQuery($groupTree, $query, array($table));
     }
   }
 
