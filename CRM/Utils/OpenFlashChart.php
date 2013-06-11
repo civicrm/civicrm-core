@@ -473,11 +473,11 @@ class CRM_Utils_OpenFlashChart {
     return self::buildChart($chartData, $chart);
   }
 
-  function buildChart(&$params, $chart) {
+  static function buildChart(&$params, $chart) {
     $openFlashChart = array();
     if ($chart && is_array($params) && !empty($params)) {
       // build the chart objects.
-      eval("\$chartObj = CRM_Utils_OpenFlashChart::" . $chart . '( $params );');
+      $chartObj = CRM_Utils_OpenFlashChart::$chart($params);
 
       $openFlashChart = array();
       if ($chartObj) {

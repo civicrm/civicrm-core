@@ -141,12 +141,13 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
       else {
         require_once (str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php');
       }
-      eval('$this->_search = new ' . $customSearchClass . '( $formValues );');
+      $this->_search = new $customSearchClass( $formValues );
     }
     else {
-      $customSearchFile = $ext->keyToPath($customSearchClass, 'search');
-      require_once ($customSearchFile);
-      eval('$this->_search = new ' . $ext->keyToClass($customSearchClass, 'search') . '( $formValues );');
+      $fnName = $ext->keyToPath;
+      $customSearchFile = $fnName($customSearchClass, 'search');
+      $className = $ext->keyToClass($customSearchClass, 'search');
+      $this->_search = new $className($formValues);
     }
   }
   //end of constructor

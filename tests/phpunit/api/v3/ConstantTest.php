@@ -121,7 +121,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
    */
   public function testLocationTypeGet() {
     // needed to get rid of cached values from previous tests
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
 
 
 
@@ -130,6 +130,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
     $result = civicrm_api('constant', 'get', $params);
+    $this->assertAPISuccess($result);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
     $this->assertTrue($result['count'] > 3, "In line " . __LINE__);
     $this->assertContains('Home', $result['values'], "In line " . __LINE__);
@@ -150,6 +151,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
       'name' => 'phoneType',
         'version' => $this->_apiversion,
       ));
+    $this->assertAPISuccess($result);
 
     $this->assertEquals(5, $result['count'], "In line " . __LINE__);
     $this->assertContains('Phone', $result['values'], "In line " . __LINE__);
@@ -175,6 +177,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
       'name' => 'mailProtocol',
         'version' => $this->_apiversion,
       ));
+    $this->assertAPISuccess($result);
 
     $this->assertEquals(4, $result['count'], "In line " . __LINE__);
     $this->assertContains('IMAP', $result['values'], "In line " . __LINE__);

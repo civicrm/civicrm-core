@@ -170,11 +170,6 @@ define( 'CIVICRM_UF_BASEURL'      , '%%baseURL%%' );
  */
 define( 'CIVICRM_SITE_KEY', '%%siteKey%%' );
 
-/*
- * If you want to disable IDS, set this to 0.
- */
-define( 'CIVICRM_IDS_ENABLE', 1);
-
 /**
  * Enable this constant, if you want to send your email through the smarty
  * templating engine(allows you to do conditional and more complex logic)
@@ -184,18 +179,13 @@ define( 'CIVICRM_MAIL_SMARTY', 0 );
 
 /**
  * This setting logs all emails to a file. Useful for debugging any mail (or civimail) issues.
- * This will not send any email, so ensure this is commented out in production
+ * Enabling this setting will not send any email, ensure this is commented out in production
+ * The CIVICRM_MAIL_LOG is a debug option which disables MTA (mail transport agent) interaction.
+ * You must disable CIVICRM_MAIL_LOG before CiviCRM will talk to your MTA.
  */
 // define( 'CIVICRM_MAIL_LOG', '%%templateCompileDir%%/mail.log' );
 
 define( 'CIVICRM_DOMAIN_ID'      , 1 );
-
-/**
- * For Wordpress users if your public pages are using a different template than the home page
- * you should set the name of the template with the below constant
- * This will be moved to a DB setting in a future version, check CRM-10682
- */
-// define( 'CIVICRM_UF_WP_BASEPAGE', 'YOUR TEMPLATE NAME HERE');
 
 /**
  * Settings to enable external caching using a Memcache server.  This is an

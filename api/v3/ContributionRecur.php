@@ -33,8 +33,6 @@
  * @copyright CiviCRM LLC (c) 2004-2013
  */
 
-require_once 'CRM/Contribute/BAO/ContributionRecur.php';
-
 /**
  * Create or update a contribution_recur
  *
@@ -52,7 +50,7 @@ function civicrm_api3_contribution_recur_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */

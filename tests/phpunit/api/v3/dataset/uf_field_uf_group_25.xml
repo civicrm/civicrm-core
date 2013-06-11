@@ -151,6 +151,6 @@
       <value>Postal Code</value>  <!--  label  -->
       <value>Contact</value>  <!--  field_type  -->
       <value>0</value>  <!--  is_reserved  -->
-    </row>	
+    </row>
   </table>
 </dataset>

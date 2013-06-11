@@ -98,17 +98,17 @@
         <table class="form-layout-compressed">
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
             <td class="label">{$form.repetition_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.repetition_frequency_interval.html}</td>
-    	    <td>{$form.repetition_frequency_unit.html}</td>
+          <td>{$form.repetition_frequency_unit.html}</td>
           </tr>
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
              <td class="label">{$form.end_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.end_frequency_interval.html}
-    	     <td>{$form.end_frequency_unit.html}&nbsp;&nbsp;&nbsp;{$form.end_action.html}&nbsp;&nbsp;&nbsp;{$form.end_date.html}</td>
+           <td>{$form.end_frequency_unit.html}&nbsp;&nbsp;&nbsp;{$form.end_action.html}&nbsp;&nbsp;&nbsp;{$form.end_date.html}</td>
           </tr>
         </table>
      </td>
     </tr>
     <tr class="crm-scheduleReminder-form-block-recipient">
-        <td id="recipientLabel" class="right">{$form.recipient.label}</td><td colspan="3">{$form.recipient.html}</td>
+    	<td id="recipientLabel" class="right">{$form.recipient.label}</td><td colspan="3">{$form.limit_to.html}&nbsp;&nbsp;{$form.recipient.html}&nbsp;&nbsp;{help id="recipient" title=$form.recipient.label}</td>
     </tr>
     <tr id="recipientList" class="crm-scheduleReminder-form-block-recipientListing">
         <td class="right">{$form.recipient_listing.label}</td><td colspan="3">{$form.recipient_listing.html}</td>
@@ -122,7 +122,6 @@
         <td class="label">{$form.group_id.label}</td>
         <td>{$form.group_id.html}</td>
     </tr>
-
   </table>
   <fieldset id="compose_id"><legend>{ts}Email{/ts}</legend>
      <table id="email-field-table" class="form-layout-compressed">
@@ -246,7 +245,7 @@
     if (entityMapping[entity] == 'civicrm_activity') {
        cj("#recipientLabel").text("Recipient(s)");
     } else {
-        cj("#recipientLabel").text("Additional Recipient(s)");
+        cj("#recipientLabel").text("Limit Recipients");
     }
      }
      function buildSelect( selectID ) {

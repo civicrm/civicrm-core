@@ -46,6 +46,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public $_contactID;
 
+
+  /**
+   * The id of the contribution object that is created when the form is submitted
+   *
+   * @var int
+   * @public
+   */
+  public $_contributionID;
+
   /**
    * Function to set variables up before form is built
    *
@@ -352,6 +361,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['campaign_id'] = $this->_params['contribution_campaign_id'];
     }
 
+    // assign contribution page id to the template so we can add css class for it
+    $this->assign('contributionPageID', $this->_id);
+
     $this->set('params', $this->_params);
   }
 
@@ -375,8 +387,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->assign('honor_block_is_active', $honor_block_is_active);
       $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
 
-      $prefix = CRM_Core_PseudoConstant::individualPrefix();
-      $honor = CRM_Core_PseudoConstant::honor();
+      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
       $this->assign('honor_type', CRM_Utils_Array::value($params['honor_type_id'], $honor));
       $this->assign('honor_prefix', CRM_Utils_Array::value($params['honor_prefix_id'], $prefix));
       $this->assign('honor_first_name', $params['honor_first_name']);
@@ -761,7 +773,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
 
-      $contactID = &CRM_Contact_BAO_Contact::createProfileContact($params,
+      $contactID = CRM_Contact_BAO_Contact::createProfileContact(
+        $params,
         $fields,
         $contact_id,
         $addToGroups,
@@ -772,7 +785,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     else {
       $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'contact_type');
-      $contactID = CRM_Contact_BAO_Contact::createProfileContact($params,
+      $contactID = CRM_Contact_BAO_Contact::createProfileContact(
+        $params,
         $fields,
         $contactID,
         $addToGroups,
@@ -1081,7 +1095,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return CRM_Contribute_DAO_Contribution
    * @access public
    */
-  static function processContribution(&$form,
+  static function processContribution(
+    &$form,
     $params,
     $result,
     $contactID,
@@ -1250,7 +1265,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $ids = array();
     if (isset($contribParams['invoice_id'])) {
-      $contribID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
+      $contribID = CRM_Core_DAO::getFieldValue(
+        'CRM_Contribute_DAO_Contribution',
         $contribParams['invoice_id'],
         'id',
         'invoice_id'
@@ -1263,9 +1279,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
 
     //create an contribution address
-    if ($form->_contributeMode != 'notify'
-      && !CRM_Utils_Array::value('is_pay_later', $params)
-      && CRM_Utils_Array::value('is_monetary', $form->_values)
+    if (
+      $form->_contributeMode != 'notify' &&
+      !CRM_Utils_Array::value('is_pay_later', $params) &&
+      CRM_Utils_Array::value('is_monetary', $form->_values)
     ) {
       $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
     }
@@ -1300,6 +1317,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contribParams['line_item'] = $form->_lineItem;
       //add contribution record
       $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
+      if (is_a($contribution, 'CRM_Core_Error')) {
+        $message = CRM_Core_Error::getMessages($contribution);
+        CRM_Core_Error::fatal($message);
+      }
+
+      // lets store it in the form variable so postProcess hook can get to this and use it
+      $form->_contributionID = $contribution->id;
     }
 
     // process soft credit / pcp pages
@@ -1444,7 +1468,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // create an activity record
     if ($contribution) {
-    CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
+      CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
     }
 
     $transaction->commit();
@@ -1550,8 +1574,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->assign('honor_block_is_active', $honor_block_is_active);
     $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
 
-    $prefix = CRM_Core_PseudoConstant::individualPrefix();
-    $honorType = CRM_Core_PseudoConstant::honor();
+    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+    $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
     $this->assign('honor_type', CRM_Utils_Array::value(CRM_Utils_Array::value('honor_type_id', $params), $honorType));
     $this->assign('honor_prefix', CRM_Utils_Array::value(CRM_Utils_Array::value('honor_prefix_id', $params), $prefix));
     $this->assign('honor_first_name', CRM_Utils_Array::value('honor_first_name', $params));

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -41,14 +40,16 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   protected $_locationType;
   protected $_params;
   public $_eNoticeCompliant = TRUE;
-  protected $_entity; function setUp() {
+  protected $_entity;
+
+  function setUp() {
     $this->_apiversion = 3;
     $this->_entity = 'Address';
     parent::setUp();
 
     $this->_contactID = $this->organizationCreate();
     $this->_locationType = $this->locationTypeCreate();
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
 
     $this->_params = array(
       'contact_id' => $this->_contactID,

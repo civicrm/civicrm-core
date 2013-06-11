@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -46,16 +44,16 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = array('Membership');
-  protected $_customGroupGroupBy = FALSE; 
+  protected $_customGroupGroupBy = FALSE;
   public $_drilldownReport = array('member/detail' => 'Link to Detail Report');
 
-  function __construct() {  
-	  
+  function __construct() {
+
     // UI for selecting columns to appear in the report list
     // Array containing the columns, group_bys and filters build and provided to Form
 
-  	// Check if CiviCampaign is a) enabled and b) has active campaigns
-	$config = CRM_Core_Config::singleton();
+    // Check if CiviCampaign is a) enabled and b) has active campaigns
+  $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
@@ -174,7 +172,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       ),
     );
     $this->_tagFilter = TRUE;
-    
+
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_membership']['fields']['campaign_id'] = array(
@@ -188,8 +186,8 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       $this->_columns['civicrm_membership']['grouping']['campaign_id'] = 'contri-fields';
       $this->_columns['civicrm_membership']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
     }
-    
-    
+
+
     $this->_groupFilter = TRUE;
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
@@ -326,14 +324,14 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   function from() {
     $this->_from = "
         FROM  civicrm_membership {$this->_aliases['civicrm_membership']}
-               
-              LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']} ON ( {$this->_aliases['civicrm_membership']}.contact_id = {$this->_aliases['civicrm_contact']}.id )  
-               
-              LEFT JOIN civicrm_membership_status 
+
+              LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']} ON ( {$this->_aliases['civicrm_membership']}.contact_id = {$this->_aliases['civicrm_contact']}.id )
+
+              LEFT JOIN civicrm_membership_status
                         ON ({$this->_aliases['civicrm_membership']}.status_id = civicrm_membership_status.id  )
               LEFT JOIN civicrm_membership_payment payment
                         ON ( {$this->_aliases['civicrm_membership']}.id = payment.membership_id )
-              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} 
+              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                          ON payment.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
   }
   // end of from
@@ -432,11 +430,11 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
         ";
 
     $sql = "{$select} {$this->_from} {$this->_where}
-GROUP BY    {$this->_aliases['civicrm_contribution']}.currency 
+GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
 ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-    
+
     $totalAmount = $average = array();
     $count = $memberCount = 0;
     while ($dao->fetch()) {
@@ -639,8 +637,8 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
         $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>SubTotal</b>';
         $entryFound = TRUE;
       }
-      
-      
+
+
       // If using campaigns, convert campaign_id to campaign title
       if (array_key_exists('civicrm_membership_campaign_id', $row)) {
         if ($value = $row['civicrm_membership_campaign_id']) {

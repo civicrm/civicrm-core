@@ -140,6 +140,21 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->_testSearchbyDate($firstName, $lastName, "this.year");
   }
 
+  function testAjaxCustomGroupLoad() {
+    $this->webtestLogin();
+
+    // Enable CiviCase module if necessary
+    $this->enableComponents("CiviCase");
+
+    $triggerElement = array('name' => 'case_type_id', 'type' => 'select');
+    $customSets = array(
+      array('entity' => 'Case', 'subEntity' => 'Housing Support', 'triggerElement' => $triggerElement),
+    );
+
+    $pageUrl = array('url' => 'case/add', 'args' => "reset=1&action=add&atype=13&context=standalone");
+    $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+
   function _testVerifyCaseSummary($validateStrings, $activityTypes) {
     $this->assertStringsPresent($validateStrings);
     foreach ($activityTypes as $aType) {

@@ -29,7 +29,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
   function get_info() {
     return array(
-                     'name'        => 'FinancialAccount BAOs',
+      'name' => 'FinancialAccount BAOs',
       'description' => 'Test all Contribute_BAO_Contribution methods.',
       'group' => 'CiviCRM BAO Tests',
     );
@@ -37,6 +37,11 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    $this->organizationCreate();
+  }
+  
+  function teardown() {
+    $this->financialAccountDelete('Donations');
   }
 
   /**
@@ -82,7 +87,7 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
    */
   function testSetIsActive() {
     $params = array(
-      'name' => 'testDonations',
+      'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
     );
@@ -103,7 +108,7 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
    */
   function testdel() {
     $params = array(
-      'name' => 'checkDonations',
+      'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
     );

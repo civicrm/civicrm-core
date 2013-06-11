@@ -183,22 +183,22 @@
               <table class="form-layout-compressed fee_block-table">
                   {foreach from=$feeBlock.value name=fees item=value}
                       {assign var=idx value=$smarty.foreach.fees.iteration}
-	                    {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
+                      {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
                       {if $feeBlock.lClass.$idx}
                           {assign var="lClass" value=$feeBlock.lClass.$idx}
                       {else}
                           {assign var="lClass" value="fee_level-label"}
                       {/if}
-	                    {if $isQuickConfig && $lClass EQ "price_set_option_group-label"}
-	                      {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
-	                    {else}
+                      {if $isQuickConfig && $lClass EQ "price_set_option_group-label"}
+                        {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
+                      {else}
                       <tr>
                           <td class="{$lClass} crm-event-label">{$feeBlock.label.$idx}</td>
                           {if $isPriceSet & $feeBlock.isDisplayAmount.$idx}
                           <td class="fee_amount-value right">{$feeBlock.value.$idx|crmMoney}</td>
                           {/if}
                       </tr>
-	                    {/if}
+                      {/if}
                   {/foreach}
               </table>
           </div>
@@ -219,7 +219,7 @@
     {/if}
 
     {if $event.is_share }
-        {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=true fe=1 h=1}{/capture}
+        {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=1 fe=1 h=1}{/capture}
         {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl}
     {/if}
     </div>

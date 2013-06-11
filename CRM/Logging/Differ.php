@@ -82,7 +82,7 @@ class CRM_Logging_Differ {
         $contactIdClause = "AND (contact_id_a = %3 OR contact_id_b = %3)";
         break;
       case 'civicrm_activity':
-        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -229,25 +229,26 @@ WHERE log_conn_id = %1 AND
       if (in_array($table, array_keys($daos))) {
         // FIXME: these should be populated with pseudo constants as they
         // were at the time of logging rather than their current values
+        // FIXME: Use *_BAO:buildOptions() method rather than pseudoconstants & fetch programmatically
         $values[$table] = array(
           'contribution_page_id' => CRM_Contribute_PseudoConstant::contributionPage(),
           'contribution_status_id' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'financial_type_id'              => CRM_Contribute_PseudoConstant::financialType(),
           'country_id' => CRM_Core_PseudoConstant::country(),
-          'gender_id' => CRM_Core_PseudoConstant::gender(),
-          'location_type_id' => CRM_Core_PseudoConstant::locationType(),
+          'gender_id' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          'location_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
           'payment_instrument_id' => CRM_Contribute_PseudoConstant::paymentInstrument(),
-          'phone_type_id' => CRM_Core_PseudoConstant::phoneType(),
-          'preferred_communication_method' => CRM_Core_PseudoConstant::pcm(),
-          'preferred_language' => CRM_Core_PseudoConstant::languages(),
-          'prefix_id' => CRM_Core_PseudoConstant::individualPrefix(),
-          'provider_id' => CRM_Core_PseudoConstant::IMProvider(),
+          'phone_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
+          'preferred_communication_method' => CRM_Contact_BAO_Contact::buildOptions('preferred_communication_method'),
+          'preferred_language' => CRM_Contact_BAO_Contact::buildOptions('preferred_language'),
+          'prefix_id' => CRM_Contact_BAO_Contact::buildOptions('prefix_id'),
+          'provider_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'),
           'state_province_id' => CRM_Core_PseudoConstant::stateProvince(),
-          'suffix_id' => CRM_Core_PseudoConstant::individualSuffix(),
-          'website_type_id' => CRM_Core_PseudoConstant::websiteType(),
+          'suffix_id' => CRM_Contact_BAO_Contact::buildOptions('suffix_id'),
+          'website_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
           'activity_type_id' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           'case_type_id' => CRM_Case_PseudoConstant::caseType('label', FALSE),
-          'priority_id'  => CRM_Core_PseudoConstant::priority(),
+          'priority_id'  => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
         );
 
         // for columns that appear in more than 1 table
@@ -260,8 +261,7 @@ WHERE log_conn_id = %1 AND
             break;
         }
 
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $daos[$table]) . '.php';
-        eval("\$dao = new $daos[$table];");
+        $dao = new $daos[$table];
         foreach ($dao->fields() as $field) {
           $titles[$table][$field['name']] = CRM_Utils_Array::value('title', $field);
 

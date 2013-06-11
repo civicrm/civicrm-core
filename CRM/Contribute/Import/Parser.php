@@ -666,7 +666,7 @@ pppp   * @return void
         $this->_fields[$name] = new CRM_Contribute_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
       }
       else {
-        $this->_fields[$name] = new CRM_Import_Field($name, $title, $type, $headerPattern, $dataPattern,
+        $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern,
           CRM_Utils_Array::value('hasLocationType', $tempField[$name])
         );
       }
@@ -809,7 +809,7 @@ pppp   * @return void
     }
 
     foreach ($values as $k => $v) {
-      $values[$k] = preg_replace("/^$enclosure(.*) $enclosure$/", '$1', $v);
+      $values[$k] = preg_replace("/^$enclosure(.*)$enclosure$/", '$1', $v);
     }
   }
 
@@ -829,18 +829,18 @@ pppp   * @return void
       case CRM_Contribute_Import_Parser::DUPLICATE:
         //here constants get collides.
         if ($type == CRM_Contribute_Import_Parser::ERROR) {
-          $type = CRM_Import_Parser::ERROR;
+          $type = CRM_Contact_Import_Parser::ERROR;
         }
         elseif ($type == CRM_Contribute_Import_Parser::NO_MATCH) {
-          $type = CRM_Import_Parser::NO_MATCH;
+          $type = CRM_Contact_Import_Parser::NO_MATCH;
         }
         elseif ($type == CRM_Contribute_Import_Parser::CONFLICT) {
-          $type = CRM_Import_Parser::CONFLICT;
+          $type = CRM_Contact_Import_Parser::CONFLICT;
         }
         else {
-          $type = CRM_Import_Parser::DUPLICATE;
+          $type = CRM_Contact_Import_Parser::DUPLICATE;
         }
-        $fileName = CRM_Import_Parser::errorFileName($type);
+        $fileName = CRM_Contact_Import_Parser::errorFileName($type);
         break;
 
       case CRM_Contribute_Import_Parser::SOFT_CREDIT_ERROR:
@@ -868,18 +868,18 @@ pppp   * @return void
       case CRM_Contribute_Import_Parser::DUPLICATE:
         //here constants get collides.
         if ($type == CRM_Contribute_Import_Parser::ERROR) {
-          $type = CRM_Import_Parser::ERROR;
+          $type = CRM_Contact_Import_Parser::ERROR;
         }
         elseif ($type == CRM_Contribute_Import_Parser::NO_MATCH) {
-          $type = CRM_Import_Parser::NO_MATCH;
+          $type = CRM_Contact_Import_Parser::NO_MATCH;
         }
         elseif ($type == CRM_Contribute_Import_Parser::CONFLICT) {
-          $type = CRM_Import_Parser::CONFLICT;
+          $type = CRM_Contact_Import_Parser::CONFLICT;
         }
         else {
-          $type = CRM_Import_Parser::DUPLICATE;
+          $type = CRM_Contact_Import_Parser::DUPLICATE;
         }
-        $fileName = CRM_Import_Parser::saveFileName($type);
+        $fileName = CRM_Contact_Import_Parser::saveFileName($type);
         break;
 
       case CRM_Contribute_Import_Parser::SOFT_CREDIT_ERROR:

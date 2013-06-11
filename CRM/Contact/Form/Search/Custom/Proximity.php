@@ -36,7 +36,9 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
 
   protected $_latitude = NULL;
   protected $_longitude = NULL;
-  protected $_distance = NULL; function __construct(&$formValues) {
+  protected $_distance = NULL;
+
+  function __construct(&$formValues) {
     parent::__construct($formValues);
 
     // unset search profile and other search params if set
@@ -134,7 +136,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::group();
     $form->addElement('select', 'group', ts('Group'), $group);
 
-    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::tag();
+    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     $form->addElement('select', 'tag', ts('Tag'), $tag);
 
 

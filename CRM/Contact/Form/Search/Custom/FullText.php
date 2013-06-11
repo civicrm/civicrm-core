@@ -478,21 +478,6 @@ GROUP BY   et.entity_id
     $contactSQL[] = "
 SELECT     distinct ca.id
 FROM       civicrm_activity ca
-INNER JOIN civicrm_contact c ON ca.source_contact_id = c.id
-LEFT JOIN  civicrm_email e ON e.contact_id = c.id
-LEFT JOIN  civicrm_option_group og ON og.name = 'activity_type'
-LEFT JOIN  civicrm_option_value ov ON ( ov.option_group_id = og.id )
-WHERE      ( (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text}) OR
-             (e.email LIKE {$this->_text}    AND
-              ca.activity_type_id = ov.value AND
-              ov.name IN ('Inbound Email', 'Email') ) )
-AND        (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
-AND        (c.is_deleted = 0 OR c.is_deleted IS NULL)
-";
-
-    $contactSQL[] = "
-SELECT     distinct ca.id
-FROM       civicrm_activity ca
 INNER JOIN civicrm_activity_contact cat ON cat.activity_id = ca.id
 INNER JOIN civicrm_contact c ON cat.contact_id = c.id
 LEFT  JOIN civicrm_email e ON cat.contact_id = e.contact_id
@@ -916,9 +901,7 @@ INSERT INTO {$this->_tableName}
 ( table_name, activity_id, subject, details, contact_id, sort_name, record_type,
   activity_type_id, case_id, client_id )
 SELECT    'Activity', ca.id, substr(ca.subject, 1, 50), substr(ca.details, 1, 250),
-           c1.id, c1.sort_name,
-           c2.id, c2.sort_name,
-           c3.id, c3.sort_name,
+           c1.id, c1.sort_name, cac.record_type_id,
            ca.activity_type_id,
            cca.case_id,
            ccc.contact_id as client_id

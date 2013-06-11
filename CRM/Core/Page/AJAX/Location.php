@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
  *
  */
 
@@ -46,7 +45,7 @@ class CRM_Core_Page_AJAX_Location {
    * This method is used by on-behalf-of form to dynamically generate poulate the
    * location field values for selected permissioned contact.
    */
-  function getPermissionedLocation() {
+  static function getPermissionedLocation() {
     $cid = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     if ($_GET['ufId']) {
       $ufId = CRM_Utils_Type::escape($_GET['ufId'], 'Integer');
@@ -220,8 +219,9 @@ class CRM_Core_Page_AJAX_Location {
     CRM_Utils_System::civiExit();
   }
 
-  function jqState($config) {
-    if (!isset($_GET['_value']) ||
+  static function jqState($config) {
+    if (
+      !isset($_GET['_value']) ||
       empty($_GET['_value'])
     ) {
       CRM_Utils_System::civiExit();
@@ -229,9 +229,11 @@ class CRM_Core_Page_AJAX_Location {
 
     $result = CRM_Core_PseudoConstant::stateProvinceForCountry($_GET['_value']);
 
-    $elements = array(array('name' => ts('- select a state -'),
+    $elements = array(
+      array('name' => ts('- select a state -'),
         'value' => '',
-      ));
+      )
+    );
     foreach ($result as $id => $name) {
       $elements[] = array(
         'name' => $name,
@@ -243,19 +245,18 @@ class CRM_Core_Page_AJAX_Location {
     CRM_Utils_System::civiExit();
   }
 
-  function jqCounty($config) {
+  static function jqCounty($config) {
     if (CRM_Utils_System::isNull($_GET['_value'])) {
-      $elements = array(array('name' => ts('- select state -'),
-          'value' => '',
-        ));
+      $elements = array(
+        array('name' => ts('- select state -'), 'value' => '')
+      );
     }
     else {
-
       $result = CRM_Core_PseudoConstant::countyForState($_GET['_value']);
 
-      $elements = array(array('name' => ts('- select -'),
-          'value' => '',
-        ));
+      $elements = array(
+        array('name' => ts('- select -'), 'value' => '')
+      );
       foreach ($result as $id => $name) {
         $elements[] = array(
           'name' => $name,
@@ -265,9 +266,9 @@ class CRM_Core_Page_AJAX_Location {
 
       if ($elements == array(
         array('name' => ts('- select -'), 'value' => ''))) {
-        $elements = array(array('name' => ts('- no counties -'),
-            'value' => '',
-          ));
+        $elements = array(
+          array('name' => ts('- no counties -'), 'value' => '')
+        );
       }
     }
 
@@ -275,7 +276,7 @@ class CRM_Core_Page_AJAX_Location {
     CRM_Utils_System::civiExit();
   }
 
-  function getLocBlock() {
+  static function getLocBlock() {
     // i wish i could retrieve loc block info based on loc_block_id,
     // Anyway, lets retrieve an event which has loc_block_id set to 'lbid'.
     if ($_POST['lbid']) {

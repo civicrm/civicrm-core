@@ -42,6 +42,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   protected $_settings = array(
     'max_attachments' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_undelete' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'versionAlert' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'versionCheck' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'maxFileSize' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -56,53 +57,90 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Undelete, Logging and ReCAPTCHA'));
 
-
     // also check if we can enable triggers
     $validTriggerPermission = CRM_Core_DAO::checkTriggerViewPermission(FALSE);
 
     // FIXME: for now, disable logging for multilingual sites OR if triggers are not permittted
     $domain = new CRM_Core_DAO_Domain;
     $domain->find(TRUE);
-    $attribs = $domain->locales || !$validTriggerPermission ? array(
-      'disabled' => 'disabled') : NULL;
+    $attribs = $domain->locales || !$validTriggerPermission ?
+      array('disabled' => 'disabled') : NULL;
 
     $this->assign('validTriggerPermission', $validTriggerPermission);
     $this->addYesNo('logging', ts('Logging'), NULL, NULL, $attribs);
 
-    $this->addElement('text', 'wkhtmltopdfPath', ts('Path to wkhtmltopdf executable'),
+    $this->addElement(
+      'text',
+      'wkhtmltopdfPath', ts('Path to wkhtmltopdf executable'),
       array('size' => 64, 'maxlength' => 256)
     );
 
-    $this->addElement('text', 'recaptchaPublicKey', ts('Public Key'),
+    $this->addElement(
+      'text', 'recaptchaPublicKey', ts('Public Key'),
       array('size' => 64, 'maxlength' => 64)
     );
-    $this->addElement('text', 'recaptchaPrivateKey', ts('Private Key'),
+    $this->addElement(
+      'text', 'recaptchaPrivateKey', ts('Private Key'),
       array('size' => 64, 'maxlength' => 64)
     );
 
-    $this->addElement('text', 'dashboardCacheTimeout', ts('Dashboard cache timeout'),
+    $this->addElement(
+      'text', 'dashboardCacheTimeout', ts('Dashboard cache timeout'),
       array('size' => 3, 'maxlength' => 5)
     );
-    $this->addElement('text', 'checksumTimeout', ts('CheckSum Lifespan'),
+    $this->addElement(
+      'text', 'checksumTimeout', ts('CheckSum Lifespan'),
       array('size' => 2, 'maxlength' => 8)
     );
-    $this->addElement('text', 'recaptchaOptions', ts('Recaptcha Options'),
+    $this->addElement(
+      'text', 'recaptchaOptions', ts('Recaptcha Options'),
       array('size' => 64, 'maxlength' => 64)
     );
 
     $this->addRule('checksumTimeout', ts('Value should be a positive number'), 'positiveInteger');
 
+    $this->addFormRule(array('CRM_Admin_Form_Setting_Miscellaneous', 'formRule'), $this);
+
     parent::buildQuickForm();
+  }
+
+  /**
+   * global form rule
+   *
+   * @param array $fields  the input form values
+   * @param array $files   the uploaded files if any
+   * @param array $options additional user data
+   *
+   * @return true if no errors, else array of errors
+   * @access public
+   * @static
+   */
+  static function formRule($fields, $files, $options) {
+    $errors = array();
+
+    if (!empty($fields['wkhtmltopdfPath'])) {
+      // check and ensure that thi leads to the wkhtmltopdf binary
+      // and it is a valid executable binary
+      if (
+        !file_exists($fields['wkhtmltopdfPath']) ||
+        !is_executable($fields['wkhtmltopdfPath'])
+      ) {
+        $errors['wkhtmltopdfPath'] = ts('The wkhtmltodfPath does not exist or is not valid');
+      }
+    }
+    return $errors;
   }
 
   function setDefaultValues() {
     parent::setDefaultValues();
 
-    $this->_defaults['checksumTimeout'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'checksum_timeout',
-      NULL,
-      7
-    );
+    $this->_defaults['checksumTimeout'] =
+      CRM_Core_BAO_Setting::getItem(
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'checksum_timeout',
+        NULL,
+        7
+      );
     return $this->_defaults;
   }
 

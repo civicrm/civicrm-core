@@ -40,6 +40,13 @@
        <add>3.4</add>
   </field>
   <field>
+       <name>limit_to</name>
+       <type>boolean</type>
+       <default>1</default>
+       <comment>Is this the recipient criteria limited to OR in addition to?</comment>
+       <add>4.4</add>
+  </field>
+  <field>
        <name>entity_value</name>
        <type>varchar</type>
        <length>64</length>
@@ -189,11 +196,16 @@
        <onDelete>SET NULL</onDelete>
   </foreignKey> 
   <field>
-        <name>group_id</name>
-        <type>int unsigned</type>
-        <comment>FK to Group</comment>
-	<add>3.4</add>
-    </field>
+    <name>group_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Group</comment>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>3.4</add>
+  </field>
     <foreignKey>
         <name>group_id</name>
         <table>civicrm_group</table>
@@ -202,14 +214,14 @@
     </foreignKey>
     <field>
           <name>msg_template_id</name>
-	  <type>int unsigned</type>
-	  <comment>FK to the message template.</comment>
+    <type>int unsigned</type>
+    <comment>FK to the message template.</comment>
     </field>
     <foreignKey>
           <name>msg_template_id</name>
-	  <table>civicrm_msg_template</table>
-	  <key>id</key>
-	  <onDelete>SET NULL</onDelete>
+    <table>civicrm_msg_template</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
     </foreignKey>
     <field>
        <name>absolute_date</name>

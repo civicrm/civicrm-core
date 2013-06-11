@@ -201,7 +201,7 @@ WHERE     cpf.price_set_id = %1";
       switch ($table) {
         case 'civicrm_event':
           $ids = implode(',', $entities);
-          $queryString = "SELECT ce.id as id, ce.title as title, ce.is_public as isPublic, ce.start_date as startDate, ce.end_date as endDate, civicrm_option_value.label as eventType
+          $queryString = "SELECT ce.id as id, ce.title as title, ce.is_public as isPublic, ce.start_date as startDate, ce.end_date as endDate, civicrm_option_value.label as eventType, ce.is_template as isTemplate, ce.template_title as templateTitle
 FROM       civicrm_event ce
 LEFT JOIN  civicrm_option_value ON
            ( ce.event_type_id = civicrm_option_value.value )
@@ -209,16 +209,22 @@ LEFT JOIN  civicrm_option_group ON
            ( civicrm_option_group.id = civicrm_option_value.option_group_id )
 WHERE
          civicrm_option_group.name = 'event_type' AND
-           ( ce.is_template IS NULL OR ce.is_template = 0) AND
            ce.id IN ($ids) AND
            ce.is_active = 1;";
           $crmDAO = CRM_Core_DAO::executeQuery($queryString);
           while ($crmDAO->fetch()) {
-            $usedBy[$table][$crmDAO->id]['title'] = $crmDAO->title;
-            $usedBy[$table][$crmDAO->id]['eventType'] = $crmDAO->eventType;
-            $usedBy[$table][$crmDAO->id]['startDate'] = $crmDAO->startDate;
-            $usedBy[$table][$crmDAO->id]['endDate'] = $crmDAO->endDate;
-            $usedBy[$table][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
+            if ($crmDAO->isTemplate) {
+              $usedBy['civicrm_event_template'][$crmDAO->id]['title'] = $crmDAO->templateTitle;
+              $usedBy['civicrm_event_template'][$crmDAO->id]['eventType'] = $crmDAO->eventType;
+              $usedBy['civicrm_event_template'][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
+            }
+            else {
+              $usedBy[$table][$crmDAO->id]['title'] = $crmDAO->title;
+              $usedBy[$table][$crmDAO->id]['eventType'] = $crmDAO->eventType;
+              $usedBy[$table][$crmDAO->id]['startDate'] = $crmDAO->startDate;
+              $usedBy[$table][$crmDAO->id]['endDate'] = $crmDAO->endDate;
+              $usedBy[$table][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
+            }
           }
           break;
 
@@ -980,10 +986,8 @@ WHERE  id = %1";
    *
    * @param int $sid the price set id
    */
-  function checkPermission($sid) {
-    if ($sid &&
-      self::eventPriceSetDomainID()
-    ) {
+  static function checkPermission($sid) {
+    if ($sid && self::eventPriceSetDomainID()) {
       $domain_id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $sid, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domain_id) {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
@@ -1178,5 +1182,51 @@ WHERE       ps.id = %1
     return false;
   }
 
+  /*
+   * Copy priceSet when event/contibution page is copied
+   *
+   * @params string $baoName  BAO name
+   * @params int $id old event/contribution page id
+   * @params int $newId newly created event/contribution page id
+   *
+   */
+  static function copyPriceSet($baoName, $id, $newId) {
+    $priceSetId = CRM_Price_BAO_Set::getFor($baoName, $id);
+    if ($priceSetId) {
+      $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $priceSetId, 'is_quick_config');
+      if($isQuickConfig) {
+        $copyPriceSet = &CRM_Price_BAO_Set::copy($priceSetId);
+        CRM_Price_BAO_Set::addTo($baoName, $newId, $copyPriceSet->id);
+      }
+      else {
+        $copyPriceSet = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_SetEntity',
+          array(
+            'entity_id' => $id,
+            'entity_table' => $baoName,
+          ),
+          array('entity_id' => $newId)
+        );
+      }
+      // copy event discount
+      if ($baoName == 'civicrm_event') {
+        $discount = CRM_Core_BAO_Discount::getOptionGroup($id, 'civicrm_event');
+        foreach ($discount as $discountId => $setId) {
+
+          $copyPriceSet = &CRM_Price_BAO_Set::copy($setId);
+
+          $copyDiscount = &CRM_Core_DAO::copyGeneric(
+            'CRM_Core_DAO_Discount',
+            array(
+              'id' => $discountId,
+            ),
+            array(
+              'entity_id' => $newId,
+              'price_set_id' => $copyPriceSet->id,
+            )
+          );
+        }
+      }
+    }
+  }
 }
 

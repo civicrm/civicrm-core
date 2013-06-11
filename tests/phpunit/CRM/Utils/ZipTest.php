@@ -1,4 +1,29 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+| CiviCRM version 4.3                                                |
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC (c) 2004-2013                                |
++--------------------------------------------------------------------+
+| This file is a part of CiviCRM.                                    |
+|                                                                    |
+| CiviCRM is free software; you can copy, modify, and distribute it  |
+| under the terms of the GNU Affero General Public License           |
+| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+|                                                                    |
+| CiviCRM is distributed in the hope that it will be useful, but     |
+| WITHOUT ANY WARRANTY; without even the implied warranty of         |
+| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+| See the GNU Affero General Public License for more details.        |
+|                                                                    |
+| You should have received a copy of the GNU Affero General Public   |
+| License and the CiviCRM Licensing Exception along                  |
+| with this program; if not, contact CiviCRM LLC                     |
+| at info[AT]civicrm[DOT]org. If you have questions about the        |
+| GNU Affero General Public License or the licensing of CiviCRM,     |
+| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
++--------------------------------------------------------------------+
+*/
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Utils_ZipTest extends CiviUnitTestCase {
   function get_info() {
@@ -13,7 +38,7 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
     parent::setUp();
     $this->file = FALSE;
   }
-  
+
   function tearDown() {
     parent::tearDown();
     if ($this->file) {
@@ -34,7 +59,7 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
       array()
     );
   }
-  
+
   function testFindBaseDirName_plainfile() {
     $this->_doFindBaseDirName(FALSE,
       array(),
@@ -100,7 +125,7 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
       'com.example.foo'
     );
   }
-  
+
   function testGuessBaseDir_plainfile() {
     $this->_doGuessBaseDir(FALSE,
       array(),
@@ -116,7 +141,7 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
       'com.example.foo'
     );
   }
-  
+
   function testGuessBaseDir_weird() {
     $this->_doGuessBaseDir(FALSE,
       array('foo/../'),
@@ -124,20 +149,20 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
       'com.example.foo'
     );
   }
-  
+
   function _doFindBaseDirName($expectedBaseDirName, $dirs, $files) {
     $this->file = tempnam(sys_get_temp_dir(), 'testzip-');
     $this->assertTrue(CRM_Utils_Zip::createTestZip($this->file, $dirs, $files));
-    
+
     $zip = new ZipArchive();
     $this->assertTrue($zip->open($this->file));
     $this->assertEquals($expectedBaseDirName, CRM_Utils_Zip::findBaseDirName($zip));
   }
-  
+
   function _doGuessBaseDir($expectedResult, $dirs, $files, $expectedKey) {
     $this->file = tempnam(sys_get_temp_dir(), 'testzip-');
     $this->assertTrue(CRM_Utils_Zip::createTestZip($this->file, $dirs, $files));
-    
+
     $zip = new ZipArchive();
     $this->assertTrue($zip->open($this->file));
     $this->assertEquals($expectedResult, CRM_Utils_Zip::guessBaseDir($zip, $expectedKey));

@@ -54,6 +54,9 @@
     <default>3</default> 
     <add>4.3</add>
     <comment>pseudo FK into civicrm_option_value.</comment>
+    <pseudoconstant>
+      <optionGroupName>financial_account_type</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>accounting_code</name>
@@ -116,7 +119,7 @@
   <field>
     <name>tax_rate</name>
     <type>decimal</type>
-    <length>9,8</length>
+    <length>10,8</length>
     <comment>The percentage of the total_amount that is due for this tax.</comment>
     <add>4.3</add>
   </field>

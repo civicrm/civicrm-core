@@ -58,7 +58,7 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    */
   public static function create(&$params) {
     $assignment = new CRM_Activity_BAO_ActivityContact();
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $assignment->copyValues($params);
@@ -83,7 +83,7 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
       return $assigneeArray;
     }
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $sql = "
@@ -119,7 +119,7 @@ AND        civicrm_contact.is_deleted = 0
     if (empty($activityID)) {
       return $assigneeNames;
     }
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $whereClause = "";
@@ -134,7 +134,7 @@ INNER JOIN civicrm_activity_contact ON civicrm_activity_contact.contact_id = con
 LEFT JOIN  civicrm_email ce ON ce.contact_id = contact_a.id
 WHERE      civicrm_activity_contact.activity_id = %1
 AND        contact_a.is_deleted = 0
-AND        civicrm_activity_contact.record_type_id = $assigneeID 
+AND        civicrm_activity_contact.record_type_id = $assigneeID
            {$whereClause}
 ";
 

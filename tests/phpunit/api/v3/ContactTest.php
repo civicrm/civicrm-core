@@ -392,6 +392,21 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
+  /**
+   * CRM-12773 - expectation is that civicrm quietly ignores
+   * fields without values
+   */
+  function testCreateWithNULLCustomCRM12773() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params = $this->_params;
+    $params['custom_' . $ids['custom_field_id']] = NULL;
+    $result = civicrm_api('contact', 'create', $params);
+    $this->assertAPISuccess($result, ' in line ' . __LINE__);
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+
   /*
    * Test creating a current employer through API
    */
@@ -1311,7 +1326,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
                         'email'            => 'man2@yahoo.com',
                         'contact_type'     => 'Individual',
                         'location_type_id' => 1,
-                        'version' 				=> $this->_apiversion,
+                        'version'         => $this->_apiversion,
                         'api.contribution.create'    => array(
 
                              'receive_date'           => '2010-01-01',

@@ -43,25 +43,25 @@
 
         callbackURL     = {/literal}"{crmURL p='civicrm/ajax/jqState' h=0}"{literal}
 
-        cj( '#' + countryID ).chainSelect( 
-          '#' + stateProvinceID, 
-          callbackURL, 
-          { 
+        cj( '#' + countryID ).chainSelect(
+          '#' + stateProvinceID,
+          callbackURL,
+          {
             before : function (target) {
               if (typeof(setdefault) === "undefined") { setdefault = new Array(); }
               targetid = cj(target).attr("id");
               eval('setdefault[targetid] = cj(target).val()');
             },
-            after : function(target) { 
+            after : function(target) {
               targetid = cj(target).attr("id");
-              cj(target).val(setdefault[targetid]); 
-            } 
+              cj(target).val(setdefault[targetid]);
+            }
           }
         );
     });
     {/literal}
   {/if}
-  
+
   {if $stateCountryMap.state_province && $stateCountryMap.county}
     {literal}
     cj(function() {
@@ -76,18 +76,18 @@
         }
 
         callbackURL     = {/literal}"{crmURL p='civicrm/ajax/jqCounty' h=0}"{literal}
-        
+
         cj( '#' + stateProvinceID ).chainSelect( '#' + countyID, callbackURL,
-          { 
+          {
             before : function (target) {
               if (typeof(setdefault) === "undefined") { setdefault = new Array(); }
               targetid = cj(target).attr("id");
               eval('setdefault[targetid] = cj(target).val()');
             },
-            after : function(target) { 
+            after : function(target) {
               targetid = cj(target).attr("id");
-              cj(target).val(setdefault[targetid]); 
-            } 
+              cj(target).val(setdefault[targetid]);
+            }
           }
         );
     });

@@ -51,8 +51,7 @@ class CiviDBAssert {
       $testCase->fail('ID not populated. Please fix your assertDBState usage!!!');
     }
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-    eval('$object   = new ' . $daoName . '( );');
+    $object   = new $daoName();
     $object->id = $id;
     $verifiedCount = 0;
 

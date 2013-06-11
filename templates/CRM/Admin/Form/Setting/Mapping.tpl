@@ -54,9 +54,9 @@
 </div>
 {literal}
 <script type="text/javascript">
-showHideMapAPIkey( cj('#mapProvider').val( ) );
-showHideGeoAPIkey( cj('#geoProvider').val( ) );
-
+cj(function() {
+  showHideMapAPIkey( cj('#mapProvider').val( ) );
+});
 function showHideMapAPIkey( mapProvider ) {
   if ( mapProvider && ( mapProvider == 'OpenStreetMaps' ) ) {
     cj('#Mapping tr.crm-map-form-block-mapAPIKey').hide( );

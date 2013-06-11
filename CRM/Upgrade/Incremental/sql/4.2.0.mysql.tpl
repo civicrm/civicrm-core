@@ -14,7 +14,7 @@ AND name = 'BULK SMS' AND option_group_id = @option_group_id_act;
 
 SELECT @newClientSMSValue     := value FROM civicrm_option_value WHERE name = 'BULK SMS' AND option_group_id = @option_group_id_act;
 
-UPDATE civicrm_activity 
+UPDATE civicrm_activity
 INNER JOIN civicrm_mailing ON civicrm_activity.source_record_id = civicrm_mailing.id
 SET   civicrm_activity.activity_type_id = @newClientSMSValue
 WHERE civicrm_activity.activity_type_id = @clientSMSValue;

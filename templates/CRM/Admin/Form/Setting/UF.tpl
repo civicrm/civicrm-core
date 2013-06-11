@@ -33,6 +33,14 @@
             <td class="label">{$form.userFrameworkUsersTableName.label}</td>
             <td>{$form.userFrameworkUsersTableName.html}</td>
         </tr>
+        {if $form.wpBasePage}
+         <tr class="crm-uf-form-block-wpBasePage">
+            <td class="label">{$form.wpBasePage.label}</td>
+            <td>{$config->userFrameworkBaseURL}{$form.wpBasePage.html}
+            <p class="description">{ts 1=$config->userFrameworkBaseURL}By default, CiviCRM will generate front-facing pages using the home page at %1 as its base. If you want to use a different template for CiviCRM pages, set the path here.{/ts}</p>
+            </td>
+        </tr>
+        {/if}
         </table>
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 <div class="spacer"></div>

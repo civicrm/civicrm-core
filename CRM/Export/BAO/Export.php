@@ -83,8 +83,8 @@ class CRM_Export_BAO_Export {
     $allCampaigns = array();
     $exportCampaign = FALSE;
 
-    $phoneTypes = CRM_Core_PseudoConstant::phoneType();
-    $imProviders = CRM_Core_PseudoConstant::IMProvider();
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $contactRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(
       NULL,
       NULL,
@@ -127,7 +127,7 @@ class CRM_Export_BAO_Export {
     }
     if ($fields) {
       //construct return properties
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $locationTypeFields = array(
         'street_address',
         'supplemental_address_1',
@@ -455,11 +455,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           $relIDs = $ids;
         }
         elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
-          $query = "SELECT source_contact_id FROM civicrm_activity
-                              WHERE id IN ( " . implode(',', $ids) . ")";
+          $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+          $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+          $query = "SELECT contact_id FROM civicrm_activity_contact
+                              WHERE activity_id IN ( " . implode(',', $ids) . ") AND
+                              record_type_id = {$sourceID}";
           $dao = CRM_Core_DAO::executeQuery($query);
           while ($dao->fetch()) {
-            $relIDs[] = $dao->source_contact_id;
+            $relIDs[] = $dao->contact_id;
           }
         }
         else {
@@ -994,7 +997,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           foreach (array_keys($paymentHeaders) as $paymentHdr) {
             self::sqlColumnDefn($query, $sqlColumns, $paymentHdr);
           }
-          $addPaymentHeader = FALSE;
         }
 
         if ($setHeader) {
@@ -1007,19 +1009,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         // If specific payment fields have been selected for export, payment
         // data will already be in $row. Otherwise, add payment related
         // information, if appropriate.
-        if (!$selectedPaymentFields) {
-          if ($paymentFields) {
-            $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
-            if (!is_array($paymentData) || empty($paymentData)) {
-              $paymentData = $nullContributionDetails;
+        if ($addPaymentHeader) {
+          if (!$selectedPaymentFields) {
+            if ($paymentFields) {
+              $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
+              if (!is_array($paymentData) || empty($paymentData)) {
+                $paymentData = $nullContributionDetails;
+              }
+              $row = array_merge($row, $paymentData);
             }
-            $row = array_merge($row, $paymentData);
-          }
-        elseif (!empty($paymentDetails)) {
-            $row = array_merge($row, $nullContributionDetails);
+            elseif (!empty($paymentDetails)) {
+              $row = array_merge($row, $nullContributionDetails);
+            }
           }
         }
-
         //remove organization name for individuals if it is set for current employer
         if (CRM_Utils_Array::value('contact_type', $row) &&
           $row['contact_type'] == 'Individual' && array_key_exists('organization_name', $row)
@@ -1093,7 +1096,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv', $mode = CRM_Export_Form_Select::CONTACT_EXPORT) {
+  static function getExportFileName($output = 'csv', $mode = CRM_Export_Form_Select::CONTACT_EXPORT) {
     switch ($mode) {
       case CRM_Export_Form_Select::CONTACT_EXPORT:
         return ts('CiviCRM Contact Search');

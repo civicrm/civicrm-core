@@ -163,7 +163,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     //To check whether start date or join date is provided
     if (!CRM_Utils_Array::value('membership_start_date', $params) && !CRM_Utils_Array::value('join_date', $params)) {
       $errorMessage = 'Membership Start Date is required to create a memberships.';
-      CRM_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
+      CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
     }
     //end
 
@@ -177,33 +177,33 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           case 'join_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
-                CRM_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
               }
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
             }
             break;
 
           case 'membership_start_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
-                CRM_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
               }
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
             }
             break;
 
           case 'membership_end_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
-                CRM_Import_Parser_Contact::addToErrorMsg('End date', $errorMessage);
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('End date', $errorMessage);
               }
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('End date', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('End date', $errorMessage);
             }
             break;
 
@@ -212,19 +212,19 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             if (!CRM_Utils_Array::crmInArray($val, $membershipTypes) &&
               !array_key_exists($val, $membershipTypes)
             ) {
-              CRM_Import_Parser_Contact::addToErrorMsg('Membership Type', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Membership Type', $errorMessage);
             }
             break;
 
           case 'status_id':
             if (!CRM_Utils_Array::crmInArray($val, CRM_Member_PseudoConstant::membershipStatus())) {
-              CRM_Import_Parser_Contact::addToErrorMsg('Membership Status', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Membership Status', $errorMessage);
             }
             break;
 
           case 'email':
             if (!CRM_Utils_Rule::email($val)) {
-              CRM_Import_Parser_Contact::addToErrorMsg('Email Address', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Email Address', $errorMessage);
             }
         }
       }
@@ -234,13 +234,13 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     $params['contact_type'] = 'Membership';
 
     //checking error in custom data
-    CRM_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       array_unshift($values, $tempMsg);
       $errorMessage = NULL;
-      return CRM_Import_Parser::ERROR;
+      return CRM_Contact_Import_Parser::ERROR;
     }
 
     return CRM_Member_Import_Parser::VALID;
@@ -286,33 +286,33 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           case 'join_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
-                CRM_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
               }
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
             }
             break;
 
           case 'membership_start_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
-                CRM_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
               }
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
             }
             break;
 
           case 'membership_end_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
-                CRM_Import_Parser_Contact::addToErrorMsg('End Date', $errorMessage);
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('End Date', $errorMessage);
               }
             }
             else {
-              CRM_Import_Parser_Contact::addToErrorMsg('End Date', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('End Date', $errorMessage);
             }
             break;
 
@@ -336,7 +336,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         }
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
                     if ( $customFields[$customFieldID]['data_type'] == 'Date' ) {
-            CRM_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
+            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
             unset($params[$key]);
                     } else if ( $customFields[$customFieldID]['data_type'] == 'Boolean' ) {
             $params[$key] = CRM_Utils_String::strtoboolstr($val);

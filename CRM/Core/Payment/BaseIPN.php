@@ -164,6 +164,11 @@ class CRM_Core_Payment_BaseIPN {
       $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id);
     }
 
+    //copy initial contribution custom fields for recurring contributions
+    if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
+      $this->copyCustomValues($objects['contributionRecur']->id, $contribution->id);
+    }
+
     if (!CRM_Utils_Array::value('skipComponentSync', $input)) {
       if (!empty($memberships)) {
         foreach ($memberships as $membership) {
@@ -220,6 +225,11 @@ class CRM_Core_Payment_BaseIPN {
     //add lineitems for recurring payments
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id && $addLineItems) {
       $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id);
+    }
+
+    //copy initial contribution custom fields for recurring contributions
+    if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
+      $this->copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
     if (!CRM_Utils_Array::value('skipComponentSync', $input)) {
@@ -468,6 +478,11 @@ LIMIT 1;";
       $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id);
     }
 
+    //copy initial contribution custom fields for recurring contributions
+    if ($recurContrib && $recurContrib->id) {
+      $this->copyCustomValues($recurContrib->id, $contribution->id);
+    }
+
     // next create the transaction record
     $paymentProcessor = $paymentProcessorId = '';
     if (isset($objects['paymentProcessor'])) {
@@ -487,6 +502,7 @@ LIMIT 1;";
         $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)) {
         $input['payment_processor'] = $paymentProcessorId;
       }
+      $input['contribution_status_id'] = array_search('Completed', $contributionStatuses);
       $input['total_amount'] = $input['amount'];
       $input['contribution'] = $contribution;
       $input['financial_type_id'] = $contribution->financial_type_id;
@@ -494,6 +510,7 @@ LIMIT 1;";
       if (CRM_Utils_Array::value('participant', $contribution->_relatedObjects)) {
         $input['contribution_mode'] = 'participant';
         $input['participant_id'] = $contribution->_relatedObjects['participant']->id;
+        $input['skipLineItem'] = 1;
       }
 
       CRM_Contribute_BAO_Contribution::recordFinancialAccounts($input, NULL);
@@ -533,7 +550,7 @@ LIMIT 1;";
 
   function getBillingID(&$ids) {
     // get the billing location type
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     // CRM-8108 remove the ts around the Billing locationtype
     //$ids['billing'] =  array_search( ts('Billing'),  $locationTypes );
     $ids['billing'] = array_search('Billing', $locationTypes);
@@ -767,5 +784,45 @@ LIMIT 1;";
       CRM_Price_BAO_LineItem::processPriceSet($contributionId, $lineSets);
     }
   }
-}
 
+  // function to copy custom data of the
+  // initial contribution into its recurring contributions
+  function copyCustomValues($recurId, $targetContributionId) {
+    if ($recurId && $targetContributionId) {
+      // get the initial contribution id of recur id
+      $sourceContributionId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
+
+      // if the same contribution is being proccessed then return
+      if ($sourceContributionId == $targetContributionId) {
+        return;
+      }
+      // check if proper recurring contribution record is being processed
+      $targetConRecurId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $targetContributionId, 'contribution_recur_id');
+      if ($targetConRecurId != $recurId) {
+        return;
+      }
+
+      // copy custom data
+      $extends = array('Contribution');
+      $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+      if ($groupTree) {
+        foreach ($groupTree as $groupID => $group) {
+          $table[$groupTree[$groupID]['table_name']] = array('entity_id');
+          foreach ($group['fields'] as $fieldID => $field) {
+            $table[$groupTree[$groupID]['table_name']][] = $groupTree[$groupID]['fields'][$fieldID]['column_name'];
+          }
+        }
+
+        foreach ($table as $tableName => $tableColumns) {
+          $insert          = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
+          $tableColumns[0] = $targetContributionId;
+          $select          = 'SELECT ' . implode(', ', $tableColumns);
+          $from            = ' FROM ' . $tableName;
+          $where           = " WHERE {$tableName}.entity_id = {$sourceContributionId}";
+          $query           = $insert . $select . $from . $where;
+          $dao             = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+        }
+      }
+    }
+  }
+}

@@ -122,7 +122,7 @@ class CRM_Event_Import_Field {
     if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($this->_name)) {
       static $customFields = NULL;
       if (!$customFields) {
-        $customFields = CRM_Core_BAO_CustomField::getFields('Membership');
+        $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
       }
       if (!array_key_exists($customFieldID, $customFields)) {
         return FALSE;

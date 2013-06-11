@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -1748,7 +1746,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    AND     civicrm_activity_contact.record_type_id = %3
 ";
 
-      $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
       $params = array(
@@ -2257,11 +2255,11 @@ WHERE  contribution_id = %1 ";
       $honorIds['contribution'] = $this->id;
       $idParams = array('id' => $honorID, 'contact_id' => $honorID);
       CRM_Contact_BAO_Contact::retrieve($idParams, $honorDefault, $honorIds);
-      $honorType = CRM_Core_PseudoConstant::honor();
+      $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
 
       $template->assign('honor_block_is_active', 1);
       if (CRM_Utils_Array::value('prefix_id', $honorDefault)) {
-        $prefix = CRM_Core_PseudoConstant::individualPrefix();
+        $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
         $template->assign('honor_prefix', $prefix[$honorDefault['prefix_id']]);
       }
       $template->assign('honor_first_name', CRM_Utils_Array::value('first_name', $honorDefault));
@@ -2495,6 +2493,9 @@ WHERE  contribution_id = %1 ";
     if (!CRM_Utils_Array::value('prevContribution', $params)) {
       $entityID = NULL;
     }
+    else {
+      $update = TRUE;
+    }
     // build line item array if its not set in $params
     if (!CRM_Utils_Array::value('line_item', $params) || $additionalParticipantId) {
       CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
@@ -2514,7 +2515,9 @@ WHERE  contribution_id = %1 ";
         $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
       }
       else {
-        $params['to_financial_account_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1");
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
+        $queryParams = array(1 => array($relationTypeId, 'Integer'));
+        $params['to_financial_account_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
       }
 
       $totalAmount = CRM_Utils_Array::value('total_amount', $params);
@@ -2532,12 +2535,12 @@ WHERE  contribution_id = %1 ";
         'currency' => $params['contribution']->currency,
         'trxn_id' => $params['contribution']->trxn_id,
         'status_id' => $params['contribution']->contribution_status_id,
-        'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params),
+        'payment_instrument_id' => $params['contribution']->payment_instrument_id,
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
 
       if (CRM_Utils_Array::value('payment_processor', $params)) {
-        $trxnParams['payment_processor_id'] = $params['payment_processor'];
+        $trxnParams['payment_processor_id'] = $params['payment_processor'];  
       }
       $params['trxnParams'] = $trxnParams;
 
@@ -2610,7 +2613,6 @@ WHERE  contribution_id = %1 ";
             self::updateFinancialAccounts($params);
           }
         }
-        $update = TRUE;
       }
 
       if (!$update) {
@@ -2620,7 +2622,6 @@ WHERE  contribution_id = %1 ";
       }
     }
     // record line items and finacial items
-
     if (!CRM_Utils_Array::value('skipLineItem', $params)) {
       CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
     }
@@ -2631,7 +2632,7 @@ WHERE  contribution_id = %1 ";
         'batch_id' => $params['batch_id'],
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $financialTxn->id,
-                            );
+      );
       CRM_Batch_BAO_Batch::addBatchEntity($entityParams);
     }
 
@@ -2688,8 +2689,7 @@ WHERE  contribution_id = %1 ";
           $params['trxnParams']['to_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = - $params['total_amount'];
         }
-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL,
-          " AND v.name LIKE 'Accounts Receivable Account is' "));
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' ")); 
         $params['trxnParams']['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
           $financialTypeID, $relationTypeId);
       }
@@ -2813,6 +2813,12 @@ WHERE  contribution_id = %1 ";
    * @static
    */
   static function checkStatusValidation($values, &$fields, &$errors) {
+    if (CRM_Utils_System::isNull($values) && CRM_Utils_Array::value('id', $fields)) {
+      $values['contribution_status_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $fields['id'], 'contribution_status_id');
+      if ($values['contribution_status_id'] == $fields['contribution_status_id']) {
+        return FALSE;
+      }
+    }
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $checkStatus = array(
       'Cancelled' => array('Completed', 'Refunded'),

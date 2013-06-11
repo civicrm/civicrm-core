@@ -34,8 +34,12 @@
  */
 class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_Form_Search_Interface {
 
-  protected $_formValues; function __construct(&$formValues) {
+  protected $_formValues;
+  public $_permissionedComponent;
+
+  function __construct(&$formValues) {
     $this->_formValues = $formValues;
+    $this->_permissionedComponent = 'CiviContribute';
 
     /**
      * Define the columns for search result rows
@@ -64,7 +68,7 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
 
     $form->addDate('start_date', ts('Contribution Date From'), FALSE, array('formatType' => 'custom'));
     $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
-    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::tag();
+    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     $form->addElement('select', 'tag', ts('Tagged'), $tag);
 
     /**

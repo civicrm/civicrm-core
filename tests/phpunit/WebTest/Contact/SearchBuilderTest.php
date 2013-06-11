@@ -362,16 +362,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
       'is_deductible' => FALSE,
     );
     $this->addeditFinancialType($financialType);
-    $this->select('account_relationship', 'label=Income Account is');
-    $this->select('financial_account_id', 'label=Discounts');
-    $this->click('_qf_FinancialTypeAccount_next-botttom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $financialType['name'] = $financialTypeName2;
     $this->addeditFinancialType($financialType);
-    $this->select('account_relationship', 'label=Income Account is');
-    $this->select('financial_account_id', 'label=Discounts');
-    $this->click('_qf_FinancialTypeAccount_next-botttom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     //create 6 contribution
     $this->openCiviPage("contribute/add", "reset=1&action=add&context=standalone", "_qf_Contribution_upload");
     for ($i = 1; $i <= 6; $i++) {
@@ -408,4 +400,114 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent('6 Contacts'), 'Missing text: ' . '6 Contacts');
   }
+
+  /*
+   * Webtest for CRM-12588
+   *
+   */
+  function testSearchBuilderMembershipType() {
+    $this->webtestLogin();
+
+    // create first contact
+    $firstName1 = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName1, "Memberson", "Memberson{$firstName1}@memberson.name");
+    $contactName1 = "Memberson, $firstName1";
+
+    // create Second contact
+    $firstName2 = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName2, "Memberson", "Memberson{$firstName2}@memberson.name");
+    $contactName2 = "Memberson, $firstName2";
+
+    // add membership type
+    $membershipTypes = $this->webtestAddMembershipType();
+
+    // now add membership
+    $this->openCiviPage("member/add", "reset=1&action=add&context=standalone", "_qf_Membership_upload");
+
+    // select contact
+    $this->webtestFillAutocomplete($firstName1);
+
+    // fill in Membership Organization
+    $this->select("membership_type_id[0]", "label={$membershipTypes['member_of_contact']}");
+
+    // select membership type
+    $this->select("membership_type_id[1]", "label={$membershipTypes['membership_type']}");
+
+    // fill in Source
+    $this->type("source", "Membership StandaloneAddTest Webtest");
+
+    // fill in Start Date
+    $this->webtestFillDate('start_date');
+
+    // Clicking save.
+    $this->clickLink("_qf_Membership_upload");
+
+    // page was loaded
+    $this->waitForTextPresent("Membership StandaloneAddTest Webtest");
+
+    // now add membership for second contact
+    $this->openCiviPage("member/add", "reset=1&action=add&context=standalone", "_qf_Membership_upload");
+    $this->webtestFillAutocomplete($firstName2);
+    $this->select("membership_type_id[0]", "label={$membershipTypes['member_of_contact']}");
+    $this->select("membership_type_id[1]", "label={$membershipTypes['membership_type']}");
+    $this->type("source", "Membership StandaloneAddTest Webtest");
+    $this->webtestFillDate('start_date');
+
+    // fill in Status Override?
+    $this->click("is_override");
+    $this->waitForElementPresent("status_id");
+    $this->select("status_id", "label=Grace");
+
+    // Clicking save.
+    $this->clickLink("_qf_Membership_upload");
+    $this->waitForTextPresent("Membership StandaloneAddTest Webtest");
+
+    // Open the search builder
+    $this->openCiviPage('contact/search/builder', 'reset=1');
+    $this->enterValues(1, 1, 'Membership', 'Membership Type', NULL, '=', array($membershipTypes['membership_type']));
+
+    $this->clickLink('_qf_Builder_refresh');
+    $this->waitForText('search-status', "2 Contacts");
+
+    $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
+    $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, '=', array('New'));
+    $this->clickLink('_qf_Builder_refresh');
+    $this->waitForText('search-status', "1 Contact");
+
+    $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
+    $this->waitForElementPresent("xpath=//span[@id='crm_search_value_1_1']/select");
+    $this->select("xpath=//span[@id='crm_search_value_1_1']/select", "label=Grace");
+    $this->clickLink('_qf_Builder_refresh');
+    $this->waitForText('search-status', "1 Contact");
+
+    $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
+    $this->click("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
+    $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, 'IN', array('New','Grace'));
+    $this->clickLink('_qf_Builder_refresh');
+    $this->waitForText('search-status', "2 Contacts");
+
+    $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
+    $this->click("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
+    $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, 'IN', array('Current','Expired'));
+    $this->clickLink('_qf_Builder_refresh');
+    $this->waitForText("xpath=//form[@id='Builder']/div[3]/div/div", "No matches found for");
+
+    // Find Membership
+    $this->openCiviPage("member/search", "reset=1", "_qf_Search_refresh");
+    $this->click("xpath=//label[text()='{$membershipTypes['membership_type']}']");
+    $this->clickLink('_qf_Search_refresh');
+    $this->waitForText('search-status', "2 Results");
+
+    $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
+    $this->click("xpath=//label[text()='New']");
+    $this->click("xpath=//label[text()='Grace']");
+    $this->clickLink('_qf_Search_refresh');
+    $this->waitForText('search-status', "2 Results");
+
+    $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
+    $this->click("xpath=//label[text()='New']");
+    $this->clickLink('_qf_Search_refresh');
+    $this->waitForText('search-status', "1 Result");
+  }
+
 }

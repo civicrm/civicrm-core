@@ -51,15 +51,19 @@
 
         {* Include the Actions and Edit buttons if user has 'edit' permission and contact is NOT in trash. *}
           {if $permission EQ 'edit' and !$isDeleted}
+	      {if call_user_func(array('CRM_Core_Permission','check'), 'access CiviCRM')}
               <li class="crm-contact-activity crm-summary-block">
                   {include file="CRM/Contact/Page/Inline/Actions.tpl"}
               </li>
+	      {/if}
+	      {if call_user_func(array('CRM_Core_Permission','check'), 'edit my contact')}
               <li>
                   {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
                   <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
                   <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
                   </a>
               </li>
+	      {/if}
           {/if}
 
           {* Check for permissions to provide Restore and Delete Permanently buttons for contacts that are in the trash. *}
@@ -262,7 +266,7 @@
                       <div class="contactCardLeft">
                         <div class="crm-summary-comm-pref-block">
                         <div class="crm-summary-block" id="communication-pref-block" >
-                          {include file="CRM/Contact/Page/Inline/CommunicationPreferences.tpl"} 
+                          {include file="CRM/Contact/Page/Inline/CommunicationPreferences.tpl"}
                         </div>
                         </div>
                       </div> <!-- contactCardLeft -->
@@ -271,7 +275,7 @@
                         <div class="contactCardRight">
                           <div class="crm-summary-demographic-block">
                           <div class="crm-summary-block" id="demographic-block">
-                            {include file="CRM/Contact/Page/Inline/Demographics.tpl"} 
+                            {include file="CRM/Contact/Page/Inline/Demographics.tpl"}
                           </div>
                           </div>
                         </div> <!-- contactCardRight -->
@@ -280,7 +284,7 @@
                       <div class="separator"></div>
                     </div> <!-- contact panel -->
                 </div><!--contact_details-->
-       
+
                 {if $showCustomData}
                   <div id="customFields">
                     <div class="contact_panel">
@@ -295,8 +299,8 @@
                       <div class="clear"></div>
                     </div>
                   </div>
-                {/if}         
-       
+                {/if}
+
                 {if !empty($hookContent) and isset($hookContentPlacement) and $hookContentPlacement eq 1}
                   {include file="CRM/Contact/Page/View/SummaryHook.tpl"}
                 {/if}

@@ -92,6 +92,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   protected $_membershipIDs = array( );
 
+  /**
+   * An array to hold a list of datefields on the form
+   * so that they can be converted to ISO in a consistent manner
+   *
+   * @var array
+   */
+  protected $_dateFields = array(
+    'receive_date' => array('default' => 'now'),
+  );
+
   public function preProcess() {
     //custom data related code
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
@@ -167,7 +177,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       // also check for billing information
       // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       // CRM-8108 remove ts around Billing location type
       //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
       $this->_bltID = array_search('Billing', $locationTypes);
@@ -235,7 +245,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/Membership.js');
         }
       }
-      else { 
+      else {
         $resources = CRM_Core_Resources::singleton();
         $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/MembershipStandalone.js');
         $statuses = array();
@@ -719,7 +729,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->add('text', 'total_amount', ts('Amount'));
       $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
 
-      $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDate'));
+      $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
 
       $this->add('select', 'payment_instrument_id',
         ts('Paid By'),
@@ -766,7 +776,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       // causes a conflict in standalone mode so skip in standalone for now
       $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
       $this->add( 'select', 'honor_type_id', ts('Membership payment is : '),
-                        array( '' => ts( '-') ) + CRM_Core_PseudoConstant::honor() );
+                        array( '' => ts( '-') ) + CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id') );
       CRM_Contact_Form_NewContact::buildQuickForm($this,1, null, false,'contribution_');
     }
 
@@ -1063,6 +1073,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $config = CRM_Core_Config::singleton();
     // get the submitted form values.
     $this->_params = $formValues = $this->controller->exportValues($this->_name);
+    $this->convertDateFieldsToMySQL($formValues);
 
     $params = $ids = array();
 
@@ -1168,12 +1179,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $$dateVariable = CRM_Utils_Date::processDate($formValues[$dateField]);
     }
 
-    $dates = array(
-      'join_date',
-      'start_date',
-      'end_date',
-    );
-
     $num_terms = CRM_Utils_Array::value('num_terms', $formValues, 1);
 
     $calcDates = array();
@@ -1185,7 +1190,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     foreach ($calcDates as $memType => $calcDate) {
-      foreach ($dates as $d) {
+      foreach (array_keys($dateTypes) as $d) {
         //first give priority to form values then calDates.
         $date = CRM_Utils_Array::value($d, $formValues);
         if (!$date) {
@@ -1276,11 +1281,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $this->assign('is_pay_later', 1);
       }
 
-      if (CRM_Utils_Array::value('receive_date', $params)) {
-        $formValues['receive_date'] = $params['receive_date'] = CRM_Utils_Date::processDate($params['receive_date']);
-      }
       if (CRM_Utils_Array::value('send_receipt', $formValues)) {
-        $params['receipt_date'] = CRM_Utils_Array::value('receive_date', $params);
+        $params['receipt_date'] = CRM_Utils_Array::value('receive_date', $formValues);
       }
 
       //insert financial type name in receipt.
@@ -1511,25 +1513,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $count++;
       }
 
-      if (!CRM_Utils_Array::value('is_recur', $params) && $params['total_amount'] > 0.0) {
-        $contribution = new CRM_Contribute_BAO_Contribution();
-        $contribution->trxn_id = CRM_Utils_Array::value('trxn_id', $result);
-        if ($contribution->find(TRUE)) {
-          // next create the transaction record
-          $trxnParams = array(
-            'contribution_id' => $contribution->id,
-            'trxn_date' => $now,
-            'trxn_type' => 'Debit',
-            'total_amount' => $params['total_amount'],
-            'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-            'net_amount' => CRM_Utils_Array::value('net_amount', $result, $params['total_amount']),
-            'currency' => $config->defaultCurrency,
-            'payment_processor' => $this->_paymentProcessor['payment_processor_type'],
-            'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-          );
-          $trxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
-        }
-      }
     }
     else {
       $params['action'] = $this->_action;

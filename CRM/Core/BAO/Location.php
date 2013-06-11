@@ -198,8 +198,8 @@ WHERE e.id = %1";
     $locBlock->delete();
     foreach ($store as $daoName => $id) {
       if ($id) {
-        $daoName = substr($daoName, 0, -2);
-        eval('$dao = new CRM_Core_DAO_' . $daoName . '( );');
+        $daoName = 'CRM_Core_DAO_' . substr($daoName, 0, -2);
+        $dao = new $daoName();
         $dao->id = $id;
         $dao->find(TRUE);
         $dao->delete();
@@ -245,7 +245,7 @@ WHERE e.id = %1";
     if (empty($entityBlock)) {
       return NULL;
     }
-
+    $blocks = array();
     $name_map = array(
       'im' => 'IM',
       'openid' => 'OpenID',
@@ -259,7 +259,7 @@ WHERE e.id = %1";
       else {
         $name = ucfirst($block);
       }
-      $baoString = 'CRM_Core_BAO_' . $name ;
+      $baoString = 'CRM_Core_BAO_' . $name;
       $blocks[$block] = $baoString::getValues( $entityBlock, $microformat );
     }
     return $blocks;

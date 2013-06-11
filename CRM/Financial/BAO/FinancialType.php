@@ -101,12 +101,17 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, false);
 
     // action is taken depending upon the mode
-    $financialType = new CRM_Financial_DAO_FinancialType( );
-    $financialType->copyValues( $params );;
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->copyValues($params);
     if (CRM_Utils_Array::value('financialType', $ids)) {
       $financialType->id = CRM_Utils_Array::value('financialType', $ids);
     }
-    $financialType->save( );
+    $financialType->save();
+    // CRM-12470
+    if (!CRM_Utils_Array::value('financialType', $ids)) {
+      $titles = CRM_Financial_BAO_FinancialTypeAccount::createDefaultFinancialAccounts($financialType);
+      $financialType->titles = $titles;
+    }
     return $financialType;
   }
 
@@ -120,6 +125,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $financialType = new CRM_Financial_DAO_FinancialType( );
     $financialType->id = $financialTypeId;
     $financialType->find(true);
+    // tables to ingore checks for financial_type_id
+    $ignoreTables = array('CRM_Financial_DAO_EntityFinancialAccount');
+    
     //TODO: if (!$financialType->find(true)) {
 
     // ensure that we have no objects that have an FK to this financial type id TODO: that cannot be null
@@ -127,14 +135,19 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if ($occurrences) {
       $tables = array();
       foreach ($occurrences as $occurence) {
-        $tables[] = get_class($occurence);
+        $className = get_class($occurence);
+        if (!in_array($className, $ignoreTables)) {
+        $tables[] = $className;
+        }
       }
-      $message = ts('The following tables have an entry for this financial type: %1', array( '%1' => implode(', ', $tables) ));
+      if (!empty($tables)) {
+        $message = ts('The following tables have an entry for this financial type: %1', array('%1' => implode(', ', $tables)));
 
-      $errors = array();
-      $errors['is_error'] = 1;
-      $errors['error_message'] = $message;
-      return $errors;
+        $errors = array();
+        $errors['is_error'] = 1;
+        $errors['error_message'] = $message;
+        return $errors;
+      }
     }
 
     //delete from financial Type table

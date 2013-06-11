@@ -53,7 +53,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
 
 
   // docs inherited from interface
-  public function getPermissions() {
+  public function getPermissions($getAllUnconditionally = FALSE) {
     return array(
       'access CiviMember',
       'edit memberships',
@@ -111,7 +111,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
               'query' => "reset=1&action=add&context=standalone&mode=live",
               'ref' => 'new-membership-cc',
               'title' => $title,
-            )));        
+            )));
       }
     }
   }

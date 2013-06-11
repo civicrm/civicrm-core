@@ -255,8 +255,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
         }
       }
 
-      $total = $cancel = 0;
-
       $permission = CRM_Core_Permission::getPermission();
 
       $tasks = array('' => ts('- actions -')) + CRM_Activity_Task::permissionedTaskTitles($permission);
@@ -328,17 +326,12 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       // if we are editing / running a saved search and the form has not been posted
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
-    if (CRM_Utils_Array::value('activity_survey_id', $this->_formValues)) {
-      // if the user has choosen a survey but not any activity type, we force the activity type
-      $sid = CRM_Utils_Array::value('activity_survey_id', $this->_formValues);
-      $activity_type_id = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $sid, 'activity_type_id');
 
-      $this->_formValues['activity_type_id'][$activity_type_id] = 1;
-    }
-
-    if (!CRM_Utils_Array::value('activity_test', $this->_formValues)) {
+    // We don't show test records in summaries or dashboards
+    if (empty($this->_formValues['activity_test']) && $this->_force) {
       $this->_formValues["activity_test"] = 0;
     }
+
     if (!CRM_Utils_Array::value('activity_contact_name', $this->_formValues) && !CRM_Utils_Array::value('contact_id', $this->_formValues)) {
       $this->_formValues['activity_role'] = NULL;
     }
@@ -399,66 +392,31 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
     $controller->run();
   }
 
-  /**
-   * This function is used to add the rules (mainly global rules) for form.
-   * All local rules are added near the element
-   *
-   * @return None
-   * @access public
-   * @see valid_date
-   */
-  function addRules() {
-    $this->addFormRule(array('CRM_Activity_Form_Search', 'formRule'));
-  }
-
-  /**
-   * global validation rules for the form
-   *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
-   *
-   * @return void
-   * @static
-   * @access public
-   */
-  static function formRule($fields) {
-    $errors = array();
-
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Set the default form values
-   *
-   * @access protected
-   *
-   * @return array the default array reference
-   */
-  function setDefaultValues() { // TODO test?
-    $defaults = array();
-    $defaults = $this->_formValues;
-    return $defaults;
-  }
-
   function fixFormValues() {
     if (!$this->_force) {
       return;
     }
+
+    $this->_formValues['activity_role'] = 1;
+    $this->_formValues['activity_contact_name'] = '';
+    $this->_defaults['activity_role'] = 1;
+    $this->_defaults['activity_contact_name'] = '';
+
     $status = CRM_Utils_Request::retrieve('status', 'String', $this);
     if ($status) {
       $this->_formValues['activity_status'] = $status;
       $this->_defaults['activity_status'] = $status;
     }
 
-    $survey = CRM_Utils_Request::retrieve('survey', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $survey = CRM_Utils_Request::retrieve('survey', 'Positive', CRM_Core_DAO::$_nullObject);
+
     if ($survey) {
-      $this->_formValues['activity_survey_id'] = $survey;
+      $this->_formValues['activity_survey_id'] = $this->_defaults['activity_survey_id'] = $survey;
+      $sid = CRM_Utils_Array::value('activity_survey_id', $this->_formValues);
+      $activity_type_id = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $sid, 'activity_type_id');
+
+      $this->_formValues['activity_type_id'][$activity_type_id] = 1;
+      $this->_defaults['activity_type_id'][$activity_type_id] = 1;
     }
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
@@ -473,12 +431,74 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
           $this->_formValues['activity_role'] = $activity_role;
         }
         else {
-          list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
           $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'sort_name');
         }
         // also assign individual mode to the template
         $this->_single = TRUE;
       }
+    }
+        
+    // Added for membership search
+    
+    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive',
+      CRM_Core_DAO::$_nullObject
+    );
+    
+    if ($signupType) {
+      //$this->_formValues['activity_type_id'] = array();
+    
+      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
+
+      $renew = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
+      $signup = CRM_Utils_Array::key('Membership Signup', $activityTypes);
+      
+      switch ($signupType) {
+        case 3: // signups and renewals
+          $this->_formValues['activity_type_id'][$renew] = 1;
+          $this->_defaults['activity_type_id'][$renew] = 1;
+        case 1: // signups only
+          $this->_formValues['activity_type_id'][$signup] = 1;
+          $this->_defaults['activity_type_id'][$signup] = 1;
+          break;
+          
+        case 2: // renewals only
+          $this->_formValues['activity_type_id'][$renew] = 1;
+          $this->_defaults['activity_type_id'][$renew] = 1;
+          break;
+      }
+    }
+    
+    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String',
+      CRM_Core_DAO::$_nullObject
+    );
+    
+    if ($dateLow) {
+      $dateLow = date('m/d/Y', strtotime($dateLow));
+      $this->_formValues['activity_date_relative'] = 0;
+      $this->_defaults['activity_date_relative'] = 0;
+      $this->_formValues['activity_date_low'] = $dateLow;
+      $this->_defaults['activity_date_low'] = $dateLow;
+    }
+    
+    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String',
+      CRM_Core_DAO::$_nullObject
+    );
+    
+    if ($dateHigh) {
+      // Activity date time assumes midnight at the beginning of the date
+      // This sets it to almost midnight at the end of the date
+   /*   if ($dateHigh <= 99999999) {
+        $dateHigh = 1000000 * $dateHigh + 235959;
+      } */
+      $dateHigh = date('m/d/Y', strtotime($dateHigh));
+      $this->_formValues['activity_date_relative'] = 0;
+      $this->_defaults['activity_date_relative'] = 0;
+      $this->_formValues['activity_date_high'] = $dateHigh;
+      $this->_defaults['activity_date_high'] = $dateHigh;
+    } 
+
+    if (!empty($this->_defaults)) {
+      $this->setDefaults($this->_defaults);
     }
   }
 

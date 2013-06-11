@@ -81,7 +81,7 @@ for ($i = 1; $i <= $numGroups; $i++) {
   $job->status         = 'Complete';
   $job->save();
 
-  $group               = new CRM_Mailing_DAO_Group();
+  $group               = new CRM_Mailing_DAO_MailingGroup();
   $group->mailing_id   = $mailing->id;
   $group->group_type   = 'Include';
   $group->entity_table = 'civicrm_group';

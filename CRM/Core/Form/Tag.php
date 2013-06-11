@@ -123,7 +123,7 @@ class CRM_Core_Form_Tag {
               if (!empty($form->_submitValues['activity_taglist']) &&
                 CRM_Utils_Array::value($parentId, $form->_submitValues['activity_taglist'])
               ) {
-                $allTags = CRM_Core_PseudoConstant::tag();
+                $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
                 $tagIds = explode(',', $form->_submitValues['activity_taglist'][$parentId]);
                 foreach ($tagIds as $tagId) {
                   if (is_numeric($tagId)) {
@@ -144,7 +144,7 @@ class CRM_Core_Form_Tag {
               if (!empty($form->_submitValues['case_taglist']) &&
                 CRM_Utils_Array::value($parentId, $form->_submitValues['case_taglist'])
               ) {
-                $allTags = CRM_Core_PseudoConstant::tag();
+                $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
                 $tagIds = explode(',', $form->_submitValues['case_taglist'][$parentId]);
                 foreach ($tagIds as $tagId) {
                   if (is_numeric($tagId)) {
@@ -169,7 +169,7 @@ class CRM_Core_Form_Tag {
                 if (!empty($form->_submitValues["attachment_taglist_$i"]) &&
                   CRM_Utils_Array::value($parentId, $form->_submitValues["attachment_taglist_$i"])
                 ) {
-                  $allTags = CRM_Core_PseudoConstant::tag();
+                  $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
                   $tagIds = explode(',', $form->_submitValues["attachment_taglist_$i"][$parentId]);
                   foreach ($tagIds as $tagId) {
                     if (is_numeric($tagId)) {

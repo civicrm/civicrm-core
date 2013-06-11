@@ -35,4 +35,4 @@
 
     showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert);
 
-</script>  
+</script>

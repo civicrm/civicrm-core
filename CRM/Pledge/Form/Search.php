@@ -21,7 +21,7 @@
  | with this program; if not, contact CiviCRM LLC                     |
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing   
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing
  +--------------------------------------------------------------------+
 */
 
@@ -144,9 +144,9 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form {
     $this->_done = FALSE;
     $this->defaults = array();
 
-    /* 
-     * we allow the controller to set force/reset externally, useful when we are being 
-     * driven by the wizard framework 
+    /*
+     * we allow the controller to set force/reset externally, useful when we are being
+     * driven by the wizard framework
      */
     $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
     $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
@@ -225,9 +225,9 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form {
 
     CRM_Pledge_BAO_Query::buildSearchForm($this);
 
-    /* 
-     * add form checkboxes for each row. This is needed out here to conform to QF protocol 
-     * of all elements being declared in builQuickForm 
+    /*
+     * add form checkboxes for each row. This is needed out here to conform to QF protocol
+     * of all elements being declared in builQuickForm
      */
     $rows = $this->get('rows');
     if (is_array($rows)) {
@@ -308,11 +308,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form {
 
     $this->fixFormValues();
 
-    // we don't show test contributions in Contact Summary / User Dashboard
-    // in Search mode by default we hide test contributions
-    if (!CRM_Utils_Array::value('pledge_test',
-        $this->_formValues
-      )) {
+    // We don't show test records in summaries or dashboards
+    if (empty($this->_formValues['pledge_test']) && $this->_force) {
       $this->_formValues["pledge_test"] = 0;
     }
 

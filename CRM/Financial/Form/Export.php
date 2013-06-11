@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -96,7 +95,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       $this->_batchIds = $this->_id;
     }
 
-    $allBatchStatus = CRM_Core_PseudoConstant::accountOptionValues('batch_status');
+    $allBatchStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $this->_exportStatusId = CRM_Utils_Array::key('Exported', $allBatchStatus);
 
     //check if batch status is valid, do not allow exported batches to export again
@@ -112,7 +111,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/financial/financialbatches',
       "reset=1&batchStatus=5"));
   }
-  
+
   /**
    * Build the form
    *
@@ -152,7 +151,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       )
     );
   }
-  
+
   /**
    * process the form after the input has been submitted and validated
    *

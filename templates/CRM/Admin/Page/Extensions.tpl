@@ -107,7 +107,7 @@
     {if $selectedChild}selectedTab = "{$selectedChild}";{/if}
 
     {literal}
- 
+
     //explicitly stop spinner
     function stopSpinner( ) {
       cj('li.crm-tab-button').each(function(){ cj(this).find('span').text(' ');})
@@ -128,14 +128,14 @@
       cj('.crm-extensions-refresh').click(function(event){
         event.stopPropagation();
         CRM.alert('', '{/literal}{ts escape="js"}Refreshing...{/ts}{literal}', 'crm-msg-loading', {expires: 0});
-        CRM.api('Extension', 'refresh', {}, { 
+        CRM.api('Extension', 'refresh', {}, {
           'callBack' : function(result){
             if (result.is_error) {
               CRM.alert(result.error_message, '{/literal}{ts escape="js"}Refresh Error{/ts}{literal}', 'error');
             } else {
               window.location.reload();
             }
-          } 
+          }
         });
         return false;
       }); // .click

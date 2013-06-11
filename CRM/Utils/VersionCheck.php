@@ -177,7 +177,8 @@ class CRM_Utils_VersionCheck {
    * Show the message once a day
    */
   public function versionAlert() {
-    if (CRM_Core_Permission::check('administer CiviCRM') && $this->newerVersion()) {
+    if (CRM_Core_Permission::check('administer CiviCRM') && $this->newerVersion()
+    && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, TRUE)) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('version_alert', 24 * 60 * 60)) {
         $msg = ts('A newer version of CiviCRM is available: %1', array(1 => $this->latestVersion))

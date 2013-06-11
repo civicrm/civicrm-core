@@ -22,9 +22,9 @@ UPDATE `civicrm_navigation` SET `label` = '{ts escape="sql"}Participant Listing 
 --CRM--7197
 {if $dropMailingIndex}
 ALTER TABLE civicrm_mailing_job
-DROP FOREIGN KEY parent_id, 
+DROP FOREIGN KEY parent_id,
 DROP INDEX parent_id ,
-ADD CONSTRAINT FK_civicrm_mailing_job_parent_id 
+ADD CONSTRAINT FK_civicrm_mailing_job_parent_id
 FOREIGN KEY (parent_id) REFERENCES civicrm_mailing_job (id) ON DELETE CASCADE;
 {/if}
 -- CRM-7206
@@ -60,11 +60,11 @@ SELECT @option_group_id_approvalStatus := max(id) from civicrm_option_group wher
 {else}
     INSERT INTO civicrm_option_value
     (option_group_id, label, name, value, weight, is_active, component_id, is_default )
- 
+
     VALUES
         (@option_group_id_approvalStatus , '{ts escape="sql"}Approved{/ts}', 'Approved', 1,  1,   1, @mailCompId, 1 ),
         (@option_group_id_approvalStatus , '{ts escape="sql"}Rejected{/ts}', 'Rejected', 2,  2,   1, @mailCompId, 0 ),
-	(@option_group_id_approvalStatus , '{ts escape="sql"}None{/ts}',     'None',    3,  3,   1, @mailCompId, 0 );
+  (@option_group_id_approvalStatus , '{ts escape="sql"}None{/ts}',     'None',    3,  3,   1, @mailCompId, 0 );
 {/if}
 
 -- CRM-7170
@@ -79,12 +79,12 @@ UPDATE civicrm_report_instance SET form_values = '{literal}a:37:{s:6:"fields";a:
 -- CRM-7115
 UPDATE  civicrm_payment_processor
    SET  is_recur = 1,
-   	payment_processor_type =  'AuthNet'
+     payment_processor_type =  'AuthNet'
  WHERE  payment_processor_type = 'AuthNet_AIM';
 
 UPDATE  civicrm_payment_processor_type
-   SET  is_recur = 1, 
-        name = 'AuthNet', 
+   SET  is_recur = 1,
+        name = 'AuthNet',
         title = '{ts escape="sql"}Authorize.Net{/ts}'
  WHERE  name = 'AuthNet_AIM';
 
@@ -96,8 +96,8 @@ ALTER TABLE `civicrm_contribution_recur` ADD CONSTRAINT `FK_civicrm_contribution
     UPDATE  civicrm_contribution_recur recur
 INNER JOIN  civicrm_contribution contrib ON ( contrib.contribution_recur_id = recur.id )
 INNER JOIN  civicrm_entity_financial_trxn eft ON ( eft.entity_id = contrib.id AND entity_table = 'civicrm_contribution' )
-INNER JOIN  civicrm_financial_trxn trxn ON ( trxn.id = eft.financial_trxn_id )  
-INNER JOIN  civicrm_payment_processor processor ON ( processor.payment_processor_type = trxn.payment_processor 
+INNER JOIN  civicrm_financial_trxn trxn ON ( trxn.id = eft.financial_trxn_id )
+INNER JOIN  civicrm_payment_processor processor ON ( processor.payment_processor_type = trxn.payment_processor
                                                      AND  processor.is_test = recur.is_test )
        SET  recur.payment_processor_id = processor.id;
 
@@ -108,11 +108,11 @@ INNER JOIN  civicrm_payment_processor processor ON ( processor.payment_processor
    ADD `contribution_recur_id` int(10) unsigned default NULL COMMENT 'Conditional foreign key to civicrm_contribution_recur.id.',
    ADD CONSTRAINT `FK_civicrm_membership_contribution_recur_id` FOREIGN KEY (`contribution_recur_id`) REFERENCES `civicrm_contribution_recur` (`id`) ON DELETE SET NULL;
 
- ALTER TABLE `civicrm_membership_type` 
+ ALTER TABLE `civicrm_membership_type`
    ADD `auto_renew` TINYINT (4) NULL DEFAULT '0',
    ADD `autorenewal_msg_id` int(10) unsigned default NULL COMMENT 'FK to civicrm_msg_template.id',
    ADD CONSTRAINT `FK_civicrm_membership_autorenewal_msg_id` FOREIGN KEY (`autorenewal_msg_id`) REFERENCES `civicrm_msg_template` (`id`) ON DELETE SET NULL;
 
 -- CRM-7137
- 
+
   {include file='../CRM/Upgrade/3.3.2.msg_template/civicrm_msg_template.tpl'}

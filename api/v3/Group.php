@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -35,11 +34,6 @@
  * @copyright CiviCRM LLC (c) 2004-2013
  * @version $Id: Group.php 30171 2010-10-14 09:11:27Z mover $
  */
-
-/**
- * Include utility functions
- */
-require_once 'CRM/Contact/BAO/Group.php';
 
 /**
  * create/update group

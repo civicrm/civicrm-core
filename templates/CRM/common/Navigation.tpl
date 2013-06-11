@@ -119,7 +119,7 @@ cj(function( ) {
   });
 });
 
-{/literal}{if $config->userFramework neq 'Joomla'}{literal}
+{/literal}{if $config->userFramework neq 'Joomla' and $config->userFrameworkFrontend ne 1}{literal}
   cj('body').prepend( cj("#menu-container").html() );
 
   //Track Scrolling
@@ -132,7 +132,7 @@ cj(function( ) {
   if ( cj('#edit-shortcuts').length > 0 ) {
      cj('#civicrm-menu').css({ 'width': '97%' });
   }
-{/literal}{else}{* Special menu hacks for Joomla *}{literal}
+{/literal}{elseif $config->userFrameworkFrontend ne 1}{* Special menu hacks for Joomla *}{literal}
   // below div is present in older version of joomla 2.5.x
   var elementExists = cj('div#toolbar-box div.m').length;
   if ( elementExists > 0 ) {

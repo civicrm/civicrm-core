@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -46,7 +44,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   protected $lifeTime_from = NULL;
-  protected $lifeTime_where = NULL; function __construct() {
+  protected $lifeTime_where = NULL;
+
+  function __construct() {
     $yearsInPast   = 10;
     $yearsInFuture = 1;
     $date          = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, $yearsInFuture);
@@ -63,7 +63,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
-    } 
+    }
 
     $this->_columns = array(
       'civicrm_contact' =>
@@ -77,9 +77,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'default' => TRUE,
             'required' => TRUE,
           ),
-		  'first_name' => array('title' => ts('First Name'),
+      'first_name' => array('title' => ts('First Name'),
           ),
-		  'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Last Name'),
           ),
         ),
         'filters' =>

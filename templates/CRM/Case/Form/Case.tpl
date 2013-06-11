@@ -103,7 +103,7 @@
       <td class="label">{$form.duration.label}</td>
       <td class="view-value">
         {$form.duration.html}
-         <span class="description">{ts}Total time spent on this activity (in minutes).{/ts}
+         <span class="description">{ts}Total time spent on this activity (in minutes).{/ts}</span>
       </td>
     </tr>
 {/if}

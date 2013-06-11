@@ -129,7 +129,43 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      return array(self::STATUS_DL_ERROR . $data);
+      return array(self::STATUS_DL_ERROR, $data);
+    }
+    else {
+      curl_close($ch);
+    }
+
+    return array(self::STATUS_OK, $data);
+  }
+
+  /**
+   * Send an HTTP POST for a remote resource
+   *
+   * @param string $remoteFile URL of a .zip file
+   * @param string $localFile path at which to store the .zip file
+   * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
+   */
+  public function post($remoteFile, $params) {
+    // Download extension zip file ...
+    if (!function_exists('curl_init')) {
+      //CRM_Core_Error::fatal('Cannot install this extension - curl is not installed!');
+      return array(self::STATUS_DL_ERROR, NULL);
+    }
+
+    list($ch, $caConfig) = $this->createCurl($remoteFile);
+
+    if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
+      //CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
+      return array(self::STATUS_DL_ERROR, NULL);
+    }
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POST,count($params));
+    curl_setopt($ch, CURLOPT_POSTFIELDS,$params);
+    $data = curl_exec($ch);
+    if (curl_errno($ch)) {
+      return array(self::STATUS_DL_ERROR, $data);
     }
     else {
       curl_close($ch);

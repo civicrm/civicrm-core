@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -127,6 +126,8 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
 
   // get instance count for a template
   static function getInstanceCount($optionVal) {
+    if (empty($optionVal)) return 0;
+
     $sql = "
 SELECT count(inst.id)
 FROM   civicrm_report_instance inst

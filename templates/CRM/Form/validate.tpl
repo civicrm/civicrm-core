@@ -73,10 +73,10 @@ cj(function($) {
     $("#{$form.formName}").validate(params);
     {literal}
     // Call any post-initialization callbacks
-    if (CRM.validate && CRM.validate.functions) {
-      for (var i in CRM.validate.functions) {
-        CRM.validate.functions[i]();
-      }
+    if (CRM.validate && CRM.validate.functions.length) {
+      $.each(CRM.validate.functions, function(i, func) {
+        func();
+      });
     }
     {/literal}
   {/if}

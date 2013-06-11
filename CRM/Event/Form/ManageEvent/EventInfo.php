@@ -334,21 +334,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     // now that we have the event’s id, do some more template-based stuff
     if (CRM_Utils_Array::value('template_id', $params)) {
       CRM_Event_BAO_Event::copy($params['template_id'], $event, TRUE);
-      // copy price sets if any
-      $priceSetId = CRM_Price_BAO_Set::getFor('civicrm_event', $params['template_id']);
-      if ($priceSetId) {
-        $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set',
-          $priceSetId,
-          'is_quick_config'
-        );
-        if ($isQuickConfig) {
-          $copyPriceSet = &CRM_Price_BAO_Set::copy($priceSetId);
-          $priceSetId = $copyPriceSet->id;
-        }
-        CRM_Price_BAO_Set::addTo('civicrm_event', $event->id, $priceSetId);
-      }
     }
-    
+
     $this->set('id', $event->id);
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -380,7 +367,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     return ts('Event Information and Settings');
   }
 
-  /* Retrieve event template custom data values 
+  /* Retrieve event template custom data values
      * and set as default values for current new event.
      *
      * @params int $tempId event template id.

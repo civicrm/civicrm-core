@@ -42,7 +42,9 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   protected $ids = array();
   protected $_entity = 'contribution_recur';
   public $_eNoticeCompliant = TRUE;
-  public $DBResetRequired = FALSE; function setUp() {
+  public $DBResetRequired = FALSE;
+
+  function setUp() {
     parent::setUp();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->params = array(

@@ -358,7 +358,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @return None
    * @access public
    */
-  function buildPCPForm($form) {
+  public static function buildPCPForm($form) {
     $form->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages?'), NULL, array('onclick' => "return showHideByValue('pcp_active',true,'pcpFields','block','radio',false);"));
 
     $form->addElement('checkbox', 'is_approval_needed', ts('Approval required'));
@@ -452,7 +452,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     $approvedId = CRM_Core_OptionGroup::getValue('pcp_status', 'Approved', 'name');
 
-    $pcpStatus = CRM_PCP_PseudoConstant::pcpStatus();
+    $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
 
     $params = array('id' => $pcpId);
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
@@ -564,7 +564,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
     $pcpTitle  = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $id, 'title');
     $pcpPageType = CRM_Core_DAO::getFieldValue( 'CRM_PCP_DAO_PCP', $id, 'page_type' );
 
-    $pcpStatus = CRM_PCP_PseudoConstant::pcpStatus();
+    $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
     $pcpStatus = $pcpStatus[$is_active];
 
     CRM_Core_Session::setStatus(ts("%1 status has been updated to %2.", array(1 => $pcpTitle, 2 => $pcpStatus)), 'Status Updated', 'success');
@@ -592,7 +592,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    */
   static function sendStatusUpdate($pcpId, $newStatus, $isInitial = FALSE, $component = 'contribute') {
-    $pcpStatus = CRM_PCP_PseudoConstant::pcpStatus();
+    $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
     $config = CRM_Core_Config::singleton();
 
     if (!isset($pcpStatus[$newStatus])) {

@@ -72,8 +72,8 @@
       // param in : a dom object that contains the field name as a class crmf-xxx
       var getFieldName = function (field) {
         if ($(field).data('field')) {
-           return $(field).data('field');   
-        }  
+           return $(field).data('field');
+        }
         var fieldName=field.className.match(/crmf-(\S*)/)[1];
         if (!fieldName) {
           console && console.log && console.log("Couldn't get the crm-editable field name to modify. You need to set crmf-{field_name} or data-{field_name}");
@@ -160,13 +160,13 @@
                  console && console.log && console.log("Couldn't get the entity id. You need to set class='crm-entity' id='{entityName}-{id}'");
               formSettings.entity=e[1];
               formSettings.id=e[2];
-            } 
+            }
             if ($i.hasClass('crm-dialog')) {
               $i.click (function () {
                 var $n=$('<div>Loading</div>').appendTo('body');
                 $n.dialog ({modal:true,width:500});
                 $n.crmForm (formSettings);
-                return false; 
+                return false;
               });
             } else {
               $i.click (function () {
@@ -178,7 +178,7 @@
                   return false;
                 };
                 $n.crmForm (formSettings);
-                return false; 
+                return false;
               });
             }
             return;
@@ -297,7 +297,7 @@
             $this.html("<div class='crm-editable-saving'>Saving...</div>");
             return true;
           },
-          success:function(response) { 
+          success:function(response) {
             if (response.indexOf('crm-error') >= 0) { // we got an error, re-display the page
               $this.html(response);
               formLoaded(target);
@@ -308,7 +308,7 @@
                 settings.success(response);
             }
           }
-        }).append('<input type="hidden" name="snippet" value="1"/>'+destination).trigger('load'); 
+        }).append('<input type="hidden" name="snippet" value="1"/>'+destination).trigger('load');
 
         settings.load(target);
       };

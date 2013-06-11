@@ -209,11 +209,13 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       elseif ($activityTypeName == 'Print PDF Letter') {
         $updateUrl = 'civicrm/activity/pdf/add';
       }
-      $actionLinks += array(CRM_Core_Action::UPDATE => array('name' => ts('Edit'),
-        'url' => $updateUrl,
-        'qs' => $qsUpdate,
-        'title' => ts('Update Activity'),
-      ));
+      if ( CRM_Activity_BAO_Activity::checkPermission($activityId, CRM_Core_Action::UPDATE) ) {
+        $actionLinks += array(CRM_Core_Action::UPDATE => array('name' => ts('Edit'),
+          'url' => $updateUrl,
+          'qs' => $qsUpdate,
+          'title' => ts('Update Activity'),
+        ));
+      }
     }
 
     if (

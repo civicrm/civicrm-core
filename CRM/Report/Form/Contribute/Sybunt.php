@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -43,7 +41,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   );
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
-  protected $_add2groupSupported = FALSE; function __construct() {
+  protected $_add2groupSupported = FALSE;
+
+  function __construct() {
     $yearsInPast   = 10;
     $yearsInFuture = 1;
     $date          = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, $yearsInFuture);
@@ -60,7 +60,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
-    } 
+    }
 
     $this->_columns = array(
       'civicrm_contact' =>
@@ -73,9 +73,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           array('title' => ts('Donor Name'),
             'required' => TRUE,
           ),
-		  'first_name' => array('title' => ts('First Name'),
+      'first_name' => array('title' => ts('First Name'),
           ),
-		  'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Last Name'),
           ),
         ),
         'filters' =>
@@ -466,7 +466,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contribution Details for this Contact.");
       }
-      
+
       // convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_campaign_id']) {

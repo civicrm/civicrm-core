@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
   +--------------------------------------------------------------------+
   | CiviCRM version 4.3                                                |
@@ -51,7 +49,7 @@ require_once 'api/v3/utils.php';
  * @param array  $values       The reformatted properties that we can use internally
  *
  * @param array  $create       Is the formatted Values array going to
- *                             be used for CRM_Event_BAO_Participant:create()
+ *                             be used for CRM_vent_BAO_Participant:create()
  *
  * @return array|CRM_Error
  * @access public
@@ -774,8 +772,6 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
 
 
   /* Cache the various object fields */
-
-
   static $fields = NULL;
 
   if ($fields == NULL) {
@@ -801,7 +797,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
   if (isset($values['individual_prefix'])) {
     if (CRM_Utils_Array::value('prefix_id', $params)) {
       $prefixes         = array();
-      $prefixes         = CRM_Core_PseudoConstant::individualPrefix();
+      $prefixes         = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
       $params['prefix'] = $prefixes[$params['prefix_id']];
     }
     else {
@@ -813,7 +809,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
   if (isset($values['individual_suffix'])) {
     if (CRM_Utils_Array::value('suffix_id', $params)) {
       $suffixes         = array();
-      $suffixes         = CRM_Core_PseudoConstant::individualSuffix();
+      $suffixes         = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
       $params['suffix'] = $suffixes[$params['suffix_id']];
     }
     else {
@@ -872,7 +868,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
   if (isset($values['gender'])) {
     if (CRM_Utils_Array::value('gender_id', $params)) {
       $genders          = array();
-      $genders          = CRM_Core_PseudoConstant::gender();
+      $genders          = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
       $params['gender'] = $genders[$params['gender_id']];
     }
     else {
@@ -885,7 +881,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
     $comm      = array();
     $preffComm = array();
     $pcm       = array();
-    $pcm       = array_change_key_case(array_flip(CRM_Core_PseudoConstant::pcm()), CASE_LOWER);
+    $pcm       = array_change_key_case(array_flip(CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method')), CASE_LOWER);
 
     $preffComm = explode(',', $values['preferred_communication_method']);
     foreach ($preffComm as $v) {
@@ -1008,8 +1004,8 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
     }
 
     if (!array_key_exists($block, $fields)) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, "CRM_Core_DAO_" . $block) . ".php");
-      eval('$fields[$block] =& CRM_Core_DAO_' . $block . '::fields( );');
+      $className = "CRM_Core_DAO_$block";
+      $fields[$block] =& $className::fields( );
     }
 
     $blockCnt = count($params[$name]);
@@ -1488,7 +1484,12 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
   }
 }
 
-function _civicrm_api3_deprecated_contact_check_params(&$params, $dupeCheck = TRUE, $dupeErrorArray = FALSE, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
+function _civicrm_api3_deprecated_contact_check_params(
+  &$params,
+  $dupeCheck = TRUE,
+  $dupeErrorArray = FALSE,
+  $requiredCheck = TRUE,
+  $dedupeRuleGroupID = NULL) {
   if (isset($params['id']) && is_numeric($params['id'])) {
     $requiredCheck = FALSE;
   }
@@ -1609,4 +1610,41 @@ function _civicrm_api3_deprecated_contact_check_params(&$params, $dupeCheck = TR
   return NULL;
 }
 
-// @codeCoverageIgnoreEnd
+/**
+ *
+ * @param <type> $result
+ * @param <type> $activityTypeID
+ *
+ * @return <type> $params
+ */
+function _civicrm_api3_deprecated_activity_buildmailparams($result, $activityTypeID) {
+  // get ready for collecting data about activity to be created
+  $params = array();
+
+  $params['activity_type_id'] = $activityTypeID;
+
+  $params['status_id'] = 2;
+  $params['source_contact_id'] = $params['assignee_contact_id'] = $result['from']['id'];
+  $params['target_contact_id'] = array();
+  $keys = array('to', 'cc', 'bcc');
+  foreach ($keys as $key) {
+    if (is_array($result[$key])) {
+      foreach ($result[$key] as $key => $keyValue) {
+        if (!empty($keyValue['id'])) {
+          $params['target_contact_id'][] = $keyValue['id'];
+        }
+      }
+    }
+  }
+  $params['subject'] = $result['subject'];
+  $params['activity_date_time'] = $result['date'];
+  $params['details'] = $result['body'];
+
+  for ($i = 1; $i <= 5; $i++) {
+    if (isset($result["attachFile_$i"])) {
+      $params["attachFile_$i"] = $result["attachFile_$i"];
+    }
+  }
+
+  return $params;
+}

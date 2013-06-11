@@ -115,7 +115,16 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     }
     return $entities;
   }
-
+  /**
+   * Mailing Contact Just doesn't support id. We have always insisted on finding a way to
+   * support id in API but in this case the underlying tables are crying out for a restructue
+   * & it just doesn't make sense
+   * @param unknown_type $sequential
+   * @return multitype:string |multitype:multitype:string
+   */
+  public static function toBeSkipped_getByID($sequential = FALSE) {
+    return array('MailingContact');
+  }
 
   public static function toBeSkipped_create($sequential = FALSE) {
     $entitiesWithoutCreate = array('MailingGroup', 'Constant', 'Entity', 'Location', 'Profile', 'MailingRecipients');
@@ -146,7 +155,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
  * @return multitype:string |multitype:multitype:string
  */
   public static function toBeSkipped_automock($sequential = FALSE) {
-    $entitiesWithoutGet = array('EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
+    $entitiesWithoutGet = array('MailingContact', 'EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
     }
@@ -224,6 +233,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       'PaymentProcessor',
       'MailSettings',
       'Setting',
+      'MailingContact',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -390,7 +400,9 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
   public function testAcceptsOnlyID_get($Entity) {
     // big random number. fun fact: if you multiply it by pi^e, the result is another random number, but bigger ;)
     $nonExistantID = 30867307034;
-    if (in_array($Entity, $this->toBeImplemented['get'])) {
+    if (in_array($Entity, $this->toBeImplemented['get'])
+        || in_array($Entity, $this->toBeSkipped_getByID())
+    ) {
       return;
     }
 
@@ -399,7 +411,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     // we'll fix this once beta1 is released
     //        return;
 
-    $result = civicrm_api($Entity, 'Get', array( 'debug' => 1, 'version' => 3, 'id' => $nonExistantID));
+    $result = civicrm_api($Entity, 'Get', array('version' => 3, 'id' => $nonExistantID));
 
     if ($result['is_error']) {
       // just to get a clearer message in the log
@@ -708,7 +720,6 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
         'version' => 3,
         'id' => $entity['id'],
         $field => $entity[$field],
-        'debug' => 1,
       );
 
       $update = civicrm_api($entityName, 'create', $updateParams);

@@ -42,8 +42,8 @@
       </tr>
       <tr>
          <td>
-            {$form.gender.label}<br />
-            {$form.gender.html}<span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('gender', 'Advanced'); return false;" >{ts}clear{/ts}</a>)</span>
+            {$form.gender_id.label}<br />
+            {$form.gender_id.html}<span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('gender_id', 'Advanced'); return false;" >{ts}clear{/ts}</a>)</span>
          </td>
       </tr>
     </table>

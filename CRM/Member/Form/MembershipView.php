@@ -190,11 +190,11 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         $relTypeIds = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ",", $membershipType['relationship_type_id']);
         $sql = "
 SELECT relationship_type_id,
-  CASE    
+  CASE
   WHEN  contact_id_a = {$values['owner_contact_id']} AND contact_id_b = {$values['contact_id']} THEN 'b_a'
   WHEN  contact_id_b = {$values['owner_contact_id']} AND contact_id_a = {$values['contact_id']} THEN 'a_b'
 END AS 'relType'
-  FROM civicrm_relationship 
+  FROM civicrm_relationship
  WHERE relationship_type_id IN ($relTypeIds)";
         $dao = CRM_Core_DAO::executeQuery($sql);
         $values['relationship'] = NULL;
@@ -290,7 +290,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
 
       $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
       $this->assign('displayName', $displayName);
-      
+
       // Check if this is default domain contact CRM-10482
       if (CRM_Contact_BAO_Contact::checkDomainContact($values['contact_id'])) {
         $displayName .= ' (' . ts('default organization') . ')';
@@ -298,7 +298,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
 
       // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
       CRM_Utils_System::setTitle(ts('View Membership for') .  ' ' . $displayName);
-      
+
       // add viewed membership to recent items list
       $recentTitle = $displayName . ' - ' . ts('Membership Type:') . ' ' . $values['membership_type'];
       $url = CRM_Utils_System::url('civicrm/contact/view/membership',

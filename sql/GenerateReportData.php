@@ -1116,7 +1116,7 @@ class CRM_GCD {
     $contactDAO->find();
 
     $count = 0;
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
 
     while ($contactDAO->fetch()) {
       if ($count++ > 2) {
@@ -1233,11 +1233,11 @@ class CRM_GCD {
     $membershipTypeNames = array('Student', 'General');
     $statuses            = array(3, 4);
 
-    $membership = " 
-INSERT INTO civicrm_membership
+    $membership = "
+ INSERT INTO civicrm_membership
         (contact_id, membership_type_id, join_date, start_date, end_date, source, status_id)
-VALUES 
-";
+VALUES
+ ";
     $activity = "
 INSERT INTO civicrm_activity
         (source_contact_id, source_record_id, activity_type_id, subject, activity_date_time, duration, location, phone_id, phone_number, details, priority_id,parent_id, is_test, status_id)
@@ -1530,8 +1530,8 @@ VALUES
 
   function addPledge() {
     $pledge = "INSERT INTO civicrm_pledge
-        (contact_id, financial_type_id, contribution_page_id, amount, frequency_unit, frequency_interval, frequency_day, installments, start_date, create_date, acknowledge_date, modified_date, cancel_date, end_date, honor_contact_id, honor_type_id, status_id, is_test) 
-        VALUES 
+        (contact_id, financial_type_id, contribution_page_id, amount, frequency_unit, frequency_interval, frequency_day, installments, start_date, create_date, acknowledge_date, modified_date, cancel_date, end_date, honor_contact_id, honor_type_id, status_id, is_test)
+        VALUES
        (71, 1, 1, 500.00, 'month', 1, 1, 1, '2010-07-01 21:19:02', '2010-06-26 00:00:00', NULL, NULL, NULL,'2010-07-01 00:00:00', NULL, NULL, 1, 0),
        (43, 1, 1, 800.00, 'month', 3, 1, 4, '2010-07-01 10:11:09', '2010-06-23 10:11:14', '2010-06-23 10:11:18', NULL, NULL, '2010-04-01 10:11:40', NULL, NULL, 5, 0),
        (32, 1, 1, 600.00, 'month', 1, 1, 3, '2010-06-01 10:12:35', '2010-05-14 10:12:44', '2010-05-14 10:12:52', NULL, NULL, '2010-08-01 10:13:11', NULL, NULL, 5, 0);
@@ -1540,9 +1540,9 @@ VALUES
   }
 
   function addPledgePayment() {
-    $pledgePayment = "INSERT INTO civicrm_pledge_payment 
-        ( pledge_id, contribution_id, scheduled_amount, scheduled_date, reminder_date, reminder_count, status_id) 
-       VALUES 
+    $pledgePayment = "INSERT INTO civicrm_pledge_payment
+        ( pledge_id, contribution_id, scheduled_amount, scheduled_date, reminder_date, reminder_count, status_id)
+       VALUES
          (1, 10, 500.00, '2010-07-01 13:03:45', null, 0, 1),
          (2, 11, 200.00, '2010-07-01 10:59:35', null, 0, 1),
          (2, null, 200.00, '2010-10-01 10:59:35',null, 0, 2),
@@ -1572,7 +1572,7 @@ VALUES
     for ($i = 0; $i < 3; $i++) {
       $contributionsArray = $membershipArray = array();
       $contributionSQL = "
-            SELECT  id 
+            SELECT  id
                 FROM    civicrm_contribution
                 WHERE   contribution_page_id IS NULL AND
                         total_amount = {$amount[$i]} limit 0, 50 ";
@@ -1584,8 +1584,8 @@ VALUES
       }
       $j = $i + 1;
       $membershipSQL = "
-            SELECT  id  
-                FROM  civicrm_membership 
+            SELECT  id
+                FROM  civicrm_membership
                 WHERE civicrm_membership.membership_type_id = {$j} limit 0, 50";
       $membershipDAO = CRM_Core_DAO::executeQuery($membershipSQL, CRM_Core_DAO::$_nullArray);
 

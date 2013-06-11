@@ -33,4 +33,4 @@
 <div id="help">
 {ts}Allow constituents to create their own personal fundraising pages linked to this contribution page.{/ts} {help id="id-pcp_intro_help"}
 </div>
-{include file="CRM/PCP/Form/PCP.tpl" context="Contribute"}
+{include file="CRM/PCP/Form/PCP.tpl" context="contribute"}

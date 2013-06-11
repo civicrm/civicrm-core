@@ -4,8 +4,8 @@
 -- *
 -- *************************************************************************/
 
--- Please add script for all the schema / fixed-data related modifications to 
--- this sql script as you resolve 2.1 issues. Include the issue number which 
+-- Please add script for all the schema / fixed-data related modifications to
+-- this sql script as you resolve 2.1 issues. Include the issue number which
 -- is the source of the change, as part of the comment.
 
 
@@ -29,9 +29,9 @@ ALTER TABLE `civicrm_relationship`
 
 -- Add 'My Contacts / Organizations' option in user dashboard options
 
-UPDATE civicrm_preferences SET user_dashboard_options  = CONCAT(user_dashboard_options, '56'), 
+UPDATE civicrm_preferences SET user_dashboard_options  = CONCAT(user_dashboard_options, '56'),
                                contact_view_options    = CONCAT(contact_view_options, '1113'),
-			       advanced_search_options = CONCAT(advanced_search_options, '121315');
+       advanced_search_options = CONCAT(advanced_search_options, '121315');
 
 
 -- make the dates in civicrm_contribution_recur optional
@@ -45,7 +45,7 @@ ALTER TABLE `civicrm_contribution_recur`
 
 -- extend civicrm_dedupe_rule_group to the current schema
 
-ALTER TABLE civicrm_dedupe_rule_group 
+ALTER TABLE civicrm_dedupe_rule_group
   ADD level enum('Strict', 'Fuzzy'),
   ADD is_default tinyint;
 
@@ -57,14 +57,14 @@ UPDATE civicrm_dedupe_rule_group SET level = 'Fuzzy', is_default = true;
 
 -- insert the new strict dedupe_rule_group dupe rules
 
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, level, is_default) 
+INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, level, is_default)
 VALUES ('Individual', 10, 'Strict', true);
 
 SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
 INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
 VALUES (@drgid, 'civicrm_email', 'email', 10);
 
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, level, is_default) 
+INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, level, is_default)
 VALUES ('Organization', 10, 'Strict', true);
 
 SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
@@ -72,7 +72,7 @@ INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, r
 VALUES (@drgid, 'civicrm_contact', 'organization_name', 10),
        (@drgid, 'civicrm_email'  , 'email',             10);
 
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, level, is_default) 
+INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, level, is_default)
 VALUES ('Household', 10, 'Strict', true);
 
 SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
@@ -83,7 +83,7 @@ VALUES (@drgid, 'civicrm_contact', 'household_name', 10),
 
 -- Edited indexing of custom group table
 
-ALTER TABLE `civicrm_custom_group` 
+ALTER TABLE `civicrm_custom_group`
   DROP INDEX `UI_title_domain_id` ,
   ADD UNIQUE `UI_title_extends` ( `title` , `extends` ),
   DROP INDEX `UI_name_domain_id` ,
@@ -100,7 +100,7 @@ ALTER TABLE `civicrm_event_page`
 
 -- CRM-2488
 
-ALTER TABLE `civicrm_contribution_page` 
+ALTER TABLE `civicrm_contribution_page`
     ADD `is_recur_interval` tinyint(4) NULL DEFAULT '0' AFTER is_recur,
     ADD `recur_frequency_unit` varchar(128) NULL DEFAULT NULL AFTER is_recur;
 
@@ -118,43 +118,43 @@ UPDATE civicrm_country SET name = 'Moldova' WHERE id = 1143;
 
 ALTER TABLE `civicrm_mapping` ADD `mapping_type_id` int(10) unsigned NULL DEFAULT NULL AFTER mapping_type;
 
-SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Export Contact';
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group
+WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Export Contact';
 UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Export';
 
-SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Export Contribution';
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group
+WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Export Contribution';
 UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Export Contributions';
 
-SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Activity';
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group
+WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Activity';
 UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import Activity';
 
-SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Contact';
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group
+WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Contact';
 UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import';
 
-SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Contribution';
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group
+WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Contribution';
 UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import Contributions';
 
-SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Membership';
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group
+WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Membership';
 UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import Memberships';
 
-SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Participant';
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group
+WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Import Participant';
 UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Import Participants';
 
-SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group 
-	WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Search Builder';
+SELECT @mapvalue := value FROM civicrm_option_value, civicrm_option_group
+WHERE civicrm_option_group.name = 'mapping_type' && civicrm_option_value.name = 'Search Builder';
 UPDATE civicrm_mapping SET mapping_type_id = @mapvalue WHERE civicrm_mapping.mapping_type = 'Search Builder';
 
 ALTER TABLE `civicrm_mapping` DROP `mapping_type`;
 
 -- CRM-2964
 
-ALTER TABLE `civicrm_contribution_page` 
+ALTER TABLE `civicrm_contribution_page`
     ADD `for_organization` text NULL DEFAULT NULL AFTER thankyou_footer,
     ADD `is_for_organization` tinyint(4) NULL DEFAULT '0' AFTER thankyou_footer;
 
@@ -168,23 +168,23 @@ ALTER TABLE civicrm_uf_match ADD language VARCHAR(5) COMMENT 'UI language prefer
 
 ALTER TABLE `civicrm_custom_field` MODIFY `label` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Text for form field label (also friendly name for administering this custom property).';
 
-ALTER TABLE `civicrm_price_set` 
+ALTER TABLE `civicrm_price_set`
    MODIFY `title` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Displayed title for Price Set.',
    MODIFY `name` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Variable name/programmatic handle for this set of price fields.';
 
-ALTER TABLE `civicrm_price_field` 
+ALTER TABLE `civicrm_price_field`
    MODIFY `label` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Text for form field label (also friendly name for administering this field).',
    MODIFY `name` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Variable name/programmatic handle for this field.';
 
 
 -- Modify civicrm_acl_cache
 
-ALTER TABLE civicrm_acl_cache 
+ALTER TABLE civicrm_acl_cache
     DROP FOREIGN KEY FK_civicrm_acl_cache_contact_id,
     DROP FOREIGN KEY FK_civicrm_acl_cache_acl_id;
 
 ALTER TABLE civicrm_acl_cache
-    ADD CONSTRAINT FK_civicrm_acl_cache_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id) ON DELETE CASCADE,      
+    ADD CONSTRAINT FK_civicrm_acl_cache_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id) ON DELETE CASCADE,
     ADD CONSTRAINT FK_civicrm_acl_cache_acl_id FOREIGN KEY (acl_id) REFERENCES civicrm_acl(id) ON DELETE CASCADE;
 
 
@@ -197,23 +197,23 @@ UPDATE civicrm_relationship_type SET is_reserved = 1 WHERE id IN (4,6,7);
 
 UPDATE civicrm_state_province SET name = "Frederiksberg"   WHERE id = 2261;
 UPDATE civicrm_state_province SET name = "Copenhagen City" WHERE id = 2262;
-UPDATE civicrm_state_province SET name = "Vestsjælland"    WHERE id = 2266;
+UPDATE civicrm_state_province SET name = "VestsjÃ¦lland"    WHERE id = 2266;
 UPDATE civicrm_state_province SET name = "Fyn"             WHERE id = 2269;
 UPDATE civicrm_state_province SET name = "South Jutland"   WHERE id = 2270;
-UPDATE civicrm_state_province SET name = "Ringkjøbing"     WHERE id = 2273;
-UPDATE civicrm_state_province SET name = "Århus"           WHERE id = 2274;
+UPDATE civicrm_state_province SET name = "RingkjÃ¸bing"     WHERE id = 2273;
+UPDATE civicrm_state_province SET name = "Ã…rhus"           WHERE id = 2274;
 UPDATE civicrm_state_province SET name = "North Jutland"   WHERE id = 2276;
 
-INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES 
-(5196, 1016, "13", "Al Manāmah (Al ‘Āşimah)"),
-(5197, 1016, "14", "Al Janūbīyah"),
-(5199, 1016, "16", "Al Wusţá"),
-(5200, 1016, "17", "Ash Shamālīyah");
+INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
+(5196, 1016, "13", "Al ManÄ�mah (Al â€˜Ä€ÅŸimah)"),
+(5197, 1016, "14", "Al JanÅ«bÄ«yah"),
+(5199, 1016, "16", "Al WusÅ£Ã¡"),
+(5200, 1016, "17", "Ash ShamÄ�lÄ«yah");
 
 
 -- CRM-3435
 
-INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES 
+INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (5201, 1165, "_A", "Jenin"),
 (5202, 1165, "_B", "Tubas"),
 (5203, 1165, "_C", "Tulkarm"),
@@ -234,13 +234,13 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 
 -- CRM-3441
 
-INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES 
+INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (10000, 1107, "CI", "Carbonia-Iglesias"),
 (10001, 1107, "OT", "Olbia-Tempio"),
 (10002, 1107, "VS", "Medio Campidano"),
 (10003, 1107, "OG", "Ogliastra");
 
-UPDATE civicrm_state_province SET name = "Forlì-Cesena" WHERE id = 3206;
+UPDATE civicrm_state_province SET name = "ForlÃ¬-Cesena" WHERE id = 3206;
 UPDATE civicrm_state_province SET abbreviation = "FC"   WHERE id = 3206;
 UPDATE civicrm_state_province SET abbreviation = "MC"   WHERE id = 3221;
 UPDATE civicrm_state_province SET abbreviation = "PU"   WHERE id = 3237;
@@ -570,7 +570,7 @@ ALTER TABLE `civicrm_case`
     DROP FOREIGN KEY `FK_civicrm_case_contact_id`;
 ALTER TABLE `civicrm_case`
     DROP `contact_id`;
-	
+
 ALTER TABLE `civicrm_case_activity`
     DROP FOREIGN KEY `FK_civicrm_case_activity_case_id`;
 ALTER TABLE `civicrm_case_activity`
@@ -582,15 +582,15 @@ ALTER TABLE `civicrm_case_activity`
 SELECT @relTypeId := id FROM civicrm_relationship_type WHERE name_a_b='Employee of';
 
 UPDATE civicrm_relationship cr
-INNER JOIN civicrm_contact cci ON (cr.contact_id_a=cci.id)  
-INNER JOIN civicrm_contact cco ON (cr.contact_id_b=cco.id)  
-SET   cci.employer_id = cr.contact_id_b, 
+INNER JOIN civicrm_contact cci ON (cr.contact_id_a=cci.id)
+INNER JOIN civicrm_contact cco ON (cr.contact_id_b=cco.id)
+SET   cci.employer_id = cr.contact_id_b,
       cci.organization_name = cco.organization_name
 WHERE cr.relationship_type_id=@relTypeId AND cr.is_active=1 AND IF(cr.end_date IS NULL, 1, (DATEDIFF(CURDATE( ), cr.end_date) <= 0));
 
 -- table civicrm_mailing_event_forward, adding on delete set null
 
-ALTER TABLE `civicrm_mailing_event_forward`	
+ALTER TABLE `civicrm_mailing_event_forward`
     MODIFY dest_queue_id   int(10) unsigned DEFAULT NULL COMMENT 'FK to EventQueue for destination',
     DROP FOREIGN KEY `FK_civicrm_mailing_event_forward_dest_queue_id`;
 ALTER TABLE `civicrm_mailing_event_forward`
@@ -598,9 +598,9 @@ ALTER TABLE `civicrm_mailing_event_forward`
 
 -- table civicrm_payment_processor_type, insert ebay record
 
-INSERT INTO `civicrm_payment_processor_type` 
+INSERT INTO `civicrm_payment_processor_type`
  (name, title, description, is_active, is_default, user_name_label, password_label, signature_label, subject_label, class_name, url_site_default, url_api_default, url_recur_default, url_button_default, url_site_test_default, url_api_test_default, url_recur_test_default, url_button_test_default, billing_mode, is_recur )
-VALUES 
+VALUES
 ('eWAY', 'eWAY (Single Currency)',NULL,1,0,'Customer ID',NULL,NULL,NULL,'Payment_eWAY','https://www.eway.com.au/gateway_cvn/xmlpayment.asp',NULL,NULL,NULL,'https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp',NULL,NULL,NULL,1,0);
 
 UPDATE `civicrm_payment_processor_type`

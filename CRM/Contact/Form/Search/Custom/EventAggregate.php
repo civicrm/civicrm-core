@@ -34,8 +34,12 @@
  */
 class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
-  protected $_formValues; function __construct(&$formValues) {
+  protected $_formValues;
+  public $_permissionedComponent;
+
+  function __construct(&$formValues) {
     $this->_formValues = $formValues;
+    $this->_permissionedComponent = array('CiviContribute', 'CiviEvent');
 
     /**
      * Define the columns for search result rows

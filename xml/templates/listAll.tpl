@@ -38,7 +38,7 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
 
   static $tables = array(
 {foreach from=$tables key=tableName item=table}
-    '{$tableName}',
+    '{$tableName}' => '{$table.className}',
 {/foreach} {* tables *}
   );
 
@@ -57,8 +57,20 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
     return FALSE !== array_search($tableName, self::$tables);
   {rdelim}
 
+  static public function getClasses() {ldelim}
+    return array_values(self::$daoToClass);
+  {rdelim}
+
+  static public function getClassForTable($tableName) {ldelim}
+    return CRM_Utils_Array::value($tableName, self::$tables);
+  {rdelim}
+
   static public function getFullName($daoName) {ldelim}
     return CRM_Utils_Array::value($daoName, self::$daoToClass);
+  {rdelim}
+
+  static public function getBriefName($className) {ldelim}
+    return CRM_Utils_Array::value($className, array_flip(self::$daoToClass));
   {rdelim}
 
 {rdelim}

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -37,7 +36,7 @@
 class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
 
   protected $_exposeContactID = FALSE;
-  
+
   function __construct() {
     $this->_columns = array();
 
@@ -328,17 +327,17 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
         FROM civicrm_contact {$this->_aliases['civicrm_contact']}";
 
     $this->_from .= "
-				INNER JOIN civicrm_mailing_event_queue
-					ON civicrm_mailing_event_queue.contact_id = {$this->_aliases['civicrm_contact']}.id
-				INNER JOIN civicrm_email {$this->_aliases['civicrm_email']}
-					ON civicrm_mailing_event_queue.email_id = {$this->_aliases['civicrm_email']}.id";
+        INNER JOIN civicrm_mailing_event_queue
+          ON civicrm_mailing_event_queue.contact_id = {$this->_aliases['civicrm_contact']}.id
+        INNER JOIN civicrm_email {$this->_aliases['civicrm_email']}
+          ON civicrm_mailing_event_queue.email_id = {$this->_aliases['civicrm_email']}.id";
 
     if (array_key_exists('delivery_id', $this->_params['fields'])) {
       $this->_from .= "
                 LEFT JOIN  civicrm_mailing_event_delivered {$this->_aliases['civicrm_mailing_event_delivered']}
                     ON  {$this->_aliases['civicrm_mailing_event_delivered']}.event_queue_id = civicrm_mailing_event_queue.id
-				LEFT JOIN civicrm_mailing_event_bounce {$this->_aliases['civicrm_mailing_event_bounce']}
-					ON {$this->_aliases['civicrm_mailing_event_bounce']}.event_queue_id = civicrm_mailing_event_queue.id";
+        LEFT JOIN civicrm_mailing_event_bounce {$this->_aliases['civicrm_mailing_event_bounce']}
+          ON {$this->_aliases['civicrm_mailing_event_bounce']}.event_queue_id = civicrm_mailing_event_queue.id";
       if (CRM_Utils_Array::value('delivery_status_value', $this->_params) == 'bounced') {
         $this->_columns['civicrm_mailing_event_delivered']['filters']['delivery_status']['clause'] = "{$this->_aliases['civicrm_mailing_event_bounce']}.id IS NOT NULL";
       }
@@ -425,16 +424,16 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     }
 
     $this->_from .= "
-				INNER JOIN civicrm_mailing_job
-					ON civicrm_mailing_event_queue.job_id = civicrm_mailing_job.id
-				INNER JOIN civicrm_mailing {$this->_aliases['civicrm_mailing']}
-					ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
-					AND civicrm_mailing_job.is_test = 0";
+        INNER JOIN civicrm_mailing_job
+          ON civicrm_mailing_event_queue.job_id = civicrm_mailing_job.id
+        INNER JOIN civicrm_mailing {$this->_aliases['civicrm_mailing']}
+          ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
+          AND civicrm_mailing_job.is_test = 0";
 
     if ($this->_phoneField) {
       $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']} 
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND 
+            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                       {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
     }
   }

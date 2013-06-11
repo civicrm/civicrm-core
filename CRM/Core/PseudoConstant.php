@@ -50,88 +50,20 @@
 class CRM_Core_PseudoConstant {
 
   /**
-   * location type
+   * static cache for pseudoconstant arrays
    * @var array
    * @static
    */
-  private static $locationType;
+  private static $cache;
 
   /**
-   * location vCard name
-   * @var array
-   * @static
-   */
-  private static $locationVcardName;
-
-  /**
-   * location display name
-   * @var array
-   * @static
-   */
-  private static $locationDisplayName;
-
-  /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * activity type
    * @var array
    * @static
    */
   private static $activityType;
-
-  /**
-   * payment processor billing modes
-   * @var array
-   * @static
-   */
-  private static $billingMode;
-
-  /**
-   * component
-   * @var array
-   * @static
-   */
-  private static $component;
-
-  /**
-   * individual prefix
-   * @var array
-   * @static
-   */
-  private static $individualPrefix;
-
-  /**
-   * individual suffix
-   * @var array
-   * @static
-   */
-  private static $individualSuffix;
-
-  /**
-   * gender
-   * @var array
-   * @static
-   */
-  private static $gender;
-
-  /**
-   * im protocols
-   * @var array
-   * @static
-   */
-  private static $imProvider;
-
-  /**
-   * website protocols
-   * @var array
-   * @static
-   */
-  private static $websiteType;
-
-  /**
-   * im protocols
-   * @var array
-   * @static
-   */
-  private static $fromEmailAddress;
 
   /**
    * states, provinces
@@ -169,13 +101,8 @@ class CRM_Core_PseudoConstant {
   private static $countryIsoCode;
 
   /**
-   * tag
-   * @var array
-   * @static
-   */
-  private static $tag;
-
-  /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * group
    * @var array
    * @static
@@ -204,46 +131,11 @@ class CRM_Core_PseudoConstant {
   private static $staticGroup;
 
   /**
-   * user framework groups
-   * @var array
-   * @static
-   */
-  private static $ufGroup;
-
-  /**
-   * custom groups
-   * @var array
-   * @static
-   */
-  private static $customGroup;
-
-  /**
    * currency codes
    * @var array
    * @static
    */
   private static $currencyCode;
-
-  /**
-   * currency Symbols
-   * @var array
-   * @static
-   */
-  private static $currencySymbols;
-
-  /**
-   * project tasks
-   * @var array
-   * @static
-   */
-  private static $tasks;
-
-  /**
-   * preferred communication methods
-   * @var array
-   * @static
-   */
-  private static $pcm;
 
   /**
    * payment processor
@@ -267,13 +159,8 @@ class CRM_Core_PseudoConstant {
   private static $worldRegions;
 
   /**
-   * honorType
-   * @var array
-   * @static
-   */
-  private static $honorType;
-
-  /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * activity status
    * @var array
    * @static
@@ -281,46 +168,11 @@ class CRM_Core_PseudoConstant {
   private static $activityStatus;
 
   /**
-   * priority
-   * @var array
-   * @static
-   */
-  private static $priority;
-
-  /**
-   * wysiwyg Editor
-   * @var array
-   * @static
-   */
-  private static $wysiwygEditor;
-
-  /**
-   * Mapping Types
-   * @var array
-   * @static
-   */
-  private static $mappingType;
-
-  /**
-   * Phone Types
-   * @var array
-   * @static
-   */
-  private static $phoneType;
-
-  /**
    * Visibility
    * @var array
    * @static
    */
   private static $visibility;
-
-  /**
-   * Mail Protocols
-   * @var array
-   * @static
-   */
-  private static $mailProtocol;
 
   /**
    * Greetings
@@ -344,55 +196,6 @@ class CRM_Core_PseudoConstant {
   private static $extensions;
 
   /**
-   * activity contacts
-   * @var array
-   * @static
-   */
-  private static $activityContacts;
-
-  /**
-   * event contacts
-   * @var array
-   * @static
-   */
-  private static $eventContacts;
-
-  /**
-   * auto renew options
-   * @var array
-   * @static
-   */
-  private static $autoRenew;
-
-  /**
-   * batch mode options
-   * @var array
-   * @static
-   */
-  private static $batchModes;
-
-  /**
-   * batch type options
-   * @var array
-   * @static
-   */
-  private static $batchTypes;
-
-  /**
-   * batch status options
-   * @var array
-   * @static
-   */
-  private static $batchStatues;
-
-  /**
-   * contact Type
-   * @var array
-   * @static
-   */
-  private static $contactType;
-
-  /**
    * Financial Account Type
    * @var array
    * @static
@@ -400,8 +203,232 @@ class CRM_Core_PseudoConstant {
   private static $accountOptionValues;
 
   /**
-   * populate the object from the database. generic populate
-   * method
+   * Low-level option getter, rarely accessed directly.
+   * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
+   *
+   * @param String $daoName
+   * @param String $fieldName
+   * @param Array $params
+   * - name       string  name of the option group
+   * - flip       boolean results are return in id => label format if false
+   *                            if true, the results are reversed
+   * - grouping   boolean if true, return the value in 'grouping' column (currently unsupported for tables other than option_value)
+   * - localize   boolean if true, localize the results before returning
+   * - condition  string|array add condition(s) to the sql query - will be concatenated using 'AND'
+   * - keyColumn  string the column to use for 'id'
+   * - labelColumn string the column to use for 'label'
+   * - orderColumn string the column to use for sorting, defaults to 'weight' column if one exists, else defaults to labelColumn
+   * - onlyActive boolean return only the action option values
+   * - fresh      boolean ignore cache entries and go back to DB
+   * @param String $context: Context string
+   *
+   * @return Array on success, FALSE on error.
+   *
+   * @static
+   */
+  public static function get($daoName, $fieldName, $params = array(), $context = NULL) {
+    CRM_Core_DAO::buildOptionsContext($context);
+    $flip = !empty($params['flip']);
+    // Merge params with defaults
+    $params += array(
+      'grouping' => FALSE,
+      'localize' => FALSE,
+      'onlyActive' => ($context == 'validate' || $context == 'create') ? FALSE : TRUE,
+      'fresh' => FALSE,
+    );
+
+    // Custom fields are not in the schema
+    if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
+      $customFieldID = (int) substr($fieldName, 7);
+      $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customFieldID, 'option_group_id');
+
+      $options = CRM_Core_OptionGroup::valuesByID($optionGroupID,
+        $flip,
+        $params['grouping'],
+        $params['localize'],
+        // Note: for custom fields the 'name' column is NULL
+        CRM_Utils_Array::value('labelColumn', $params, 'label'),
+        $params['onlyActive'],
+        $params['fresh']
+      );
+  
+      CRM_Utils_Hook::customFieldOptions($customFieldID, $options, FALSE);
+      return $options;
+    }
+
+    // Core field: load schema
+    $dao = new $daoName;
+    $fields = $dao->fields();
+    $fieldKeys = $dao->fieldKeys();
+    $fieldKey = $fieldKeys[$fieldName];
+    $dao->free();
+    if (empty($fields[$fieldKey])) {
+      return FALSE;
+    }
+    $fieldSpec = $fields[$fieldKey];
+
+    // If the field is an enum, explode the enum definition and return the array.
+    if (isset($fieldSpec['enumValues'])) {
+      // use of a space after the comma is inconsistent in xml
+      $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
+      $output = explode(',', $enumStr);
+      return $flip ? array_flip($output) : $output;
+    }
+
+    elseif (!empty($fieldSpec['pseudoconstant'])) {
+      $pseudoconstant = $fieldSpec['pseudoconstant'];
+      // Merge params with schema defaults
+      $params += array(
+        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, array()),
+        'keyColumn' => CRM_Utils_Array::value('keyColumn', $pseudoconstant),
+        'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
+      );
+
+      // Fetch option group from option_value table
+      if(!empty($pseudoconstant['optionGroupName'])) {
+        if ($context == 'validate') {
+          $params['labelColumn'] = 'name';
+        }
+        // Call our generic fn for retrieving from the option_value table
+        return CRM_Core_OptionGroup::values(
+          $pseudoconstant['optionGroupName'],
+          $flip,
+          $params['grouping'],
+          $params['localize'],
+          $params['condition'] ? ' AND ' . implode(' AND ', (array) $params['condition']) : NULL,
+          $params['labelColumn'] ? $params['labelColumn'] : 'label',
+          $params['onlyActive'],
+          $params['fresh'],
+          $params['keyColumn'] ? $params['keyColumn'] : 'value'
+        );
+      }
+
+      // Fetch options from other tables
+      if (!empty($pseudoconstant['table'])) {
+        // Normalize params so the serialized cache string will be consistent.
+        CRM_Utils_Array::remove($params, 'flip', 'fresh');
+        ksort($params);
+        $cacheKey = $daoName . $fieldName . serialize($params);
+
+        // Retrieve cached options
+        if (isset(self::$cache[$cacheKey]) && empty($params['fresh'])) {
+          $output = self::$cache[$cacheKey];
+        }
+        else {
+          $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($pseudoconstant['table']);
+          if (!class_exists($daoName)) {
+            return FALSE;
+          }
+          // Get list of fields for the option table
+          $dao = new $daoName;
+          $availableFields = array_keys($dao->fieldKeys());
+          $dao->free();
+
+          $select = "SELECT %1 AS id, %2 AS label";
+          $from = "FROM %3";
+          $wheres = array();
+          $order = "ORDER BY %2";
+
+          // Use name field instead of label in validate context
+          if ($context == 'validate' && in_array('name', $availableFields)) {
+            $params['labelColumn'] = 'name';
+          }
+          // Condition param can be passed as an sql clause string or an array of clauses
+          if (!empty($params['condition'])) {
+            $wheres[] = implode(' AND ', (array) $params['condition']);
+          }
+          // onlyActive param will automatically filter on common flags
+          if (!empty($params['onlyActive'])) {
+            foreach (array('is_active' => 1, 'is_deleted' => 0, 'is_test' => 0) as $flag => $val) {
+              if (in_array($flag, $availableFields)) {
+                $wheres[] = "$flag = $val";
+              }
+            }
+          }
+          // Filter domain specific options
+          if (in_array('domain_id', $availableFields)) {
+            $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID();
+          }
+          $queryParams = array(
+             1 => array($params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+             2 => array($params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+             3 => array($pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+          );
+          // Add orderColumn param
+          if (!empty($params['orderColumn'])) {
+            $queryParams[4] = array($params['orderColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES);
+            $order = "ORDER BY %4";
+          }
+          // Support no sorting if $params[orderColumn] is FALSE
+          elseif (isset($params['orderColumn']) && $params['orderColumn'] === FALSE) {
+            $order = '';
+          }
+          // Default to 'weight' if that column exists
+          elseif (in_array('weight', $availableFields)) {
+            $order = "ORDER BY weight";
+          }
+
+          $output = array();
+          $query = "$select $from";
+          if ($wheres) {
+            $query .= " WHERE " . implode($wheres, ' AND ');
+          }
+          $query .= ' ' . $order;
+          $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+          while ($dao->fetch()) {
+            $output[$dao->id] = $dao->label;
+          }
+          $dao->free();
+          if (!empty($params['localize'])) {
+            $i18n = CRM_Core_I18n::singleton();
+            $i18n->localizeArray($output);
+            // Maintain sort by label
+            if ($order == "ORDER BY %2") {
+              CRM_Utils_Array::asort($output);
+            }
+          }
+          self::$cache[$cacheKey] = $output;
+        }
+        return $flip ? array_flip($output) : $output;
+      }
+    }
+    // If we're still here, it's an error. Return FALSE.
+    return FALSE;
+  }
+
+  /**
+   * Fetch the label (or other value) for a field given its key
+   *
+   * @param String $daoName
+   * @param String $fieldName
+   * @param String|Int $key
+   * @param Array $params will be passed into self::get
+   *
+   * @return string
+   */
+  static function getValue($daoName, $fieldName, $key, $params = array()) {
+     $values = self::get($daoName, $fieldName, $params);
+     return CRM_Utils_Array::value($key, $values);
+   }
+
+  /**
+   * Fetch the key for a field option given its label/name
+   *
+   * @param String $daoName
+   * @param String $fieldName
+   * @param String|Int $value
+   * @param Array $params will be passed into self::get
+   *
+   * @return string
+   */
+  static function getKey($daoName, $fieldName, $value, $params = array()) {
+     $values = self::get($daoName, $fieldName, $params);
+     return CRM_Utils_Array::key($value, $values);
+   }
+
+  /**
+   * DEPRECATED generic populate method
+   * All pseudoconstant functions that use this method are also deprecated.
    *
    * The static array $var is populated from the db
    * using the <b>$name DAO</b>.
@@ -475,71 +502,18 @@ class CRM_Core_PseudoConstant {
    * @param boolean $name pseudoconstant to be flushed
    *
    */
-  public static function flush($name) {
-    self::$$name = NULL;
-  }
-
-  /**
-   * Get all location types.
-   *
-   * The static array locationType is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All location types - default is to get only active ones.
-   *
-   * @return array - array reference of all location types.
-   *
-   */
-  public static function &locationType($all = FALSE) {
-    if (!self::$locationType) {
-      self::populate(self::$locationType, 'CRM_Core_DAO_LocationType', $all);
+  public static function flush($name = 'cache') {
+    if (isset(self::$$name)) {
+      self::$$name = NULL;
     }
-    return self::$locationType;
-  }
-
-  /**
-   * Get all location vCard names.
-   *
-   * The static array locationVcardName is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All location vCard names - default is to get only active ones.
-   *
-   * @return array - array reference of all location vCard names.
-   *
-   */
-  public static function &locationVcardName($all = FALSE) {
-    if (!self::$locationVcardName) {
-      self::populate(self::$locationVcardName, 'CRM_Core_DAO_LocationType', $all, 'vcard_name');
+    if ($name == 'cache') {
+      CRM_Core_OptionGroup::flushAll();
     }
-    return self::$locationVcardName;
   }
 
   /**
-   * Get all location Display names.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
-   * The static array locationDisplayName is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All location display names - default is to get only active ones.
-   *
-   * @return array - array reference of all location display names.
-   *
-   */
-  public static function &locationDisplayName($all = FALSE) {
-    if (!self::$locationDisplayName) {
-      self::populate(self::$locationDisplayName, 'CRM_Core_DAO_LocationType', $all, 'display_name');
-    }
-    return self::$locationDisplayName;
-  }
-
-  /**
    * Get all Activty types.
    *
    * The static array activityType is returned
@@ -610,208 +584,6 @@ class CRM_Core_PseudoConstant {
       self::$activityType[$index] = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition, $returnColumn);
     }
     return self::$activityType[$index];
-  }
-
-  /**
-   * Get all payment-processor billing modes
-   *
-   * @access public
-   * @static
-   *
-   * @return array ($id => $name)
-   */
-  public static function billingMode() {
-    if (!self::$billingMode) {
-      self::$billingMode = array(
-        CRM_Core_Payment::BILLING_MODE_FORM => 'form',
-        CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
-        CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
-      );
-    }
-    return self::$billingMode;
-  }
-
-  /**
-   * Get all component names
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all location display names.
-   *
-   */
-  public static function &component() {
-    if (!self::$component) {
-      self::populate(self::$component, 'CRM_Core_DAO_Component', TRUE, 'name');
-    }
-    return self::$component;
-  }
-
-
-  /**
-   * Get all Individual Prefix.
-   *
-   * The static array individualPrefix is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All Individual Prefix - default is to get only active ones.
-   *
-   * @return array - array reference of all individual prefix.
-   *
-   */
-  public static function &individualPrefix() {
-    if (!self::$individualPrefix) {
-      self::$individualPrefix = CRM_Core_OptionGroup::values('individual_prefix');
-    }
-    return self::$individualPrefix;
-  }
-
-  /**
-   * Get all phone type
-   * The static array phoneType is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All phone type - default is to get
-   * only active ones.
-   *
-   * @return array - array reference of all phone types.
-   *
-   */
-  public static function &phoneType() {
-    if (!self::$phoneType) {
-      self::$phoneType = CRM_Core_OptionGroup::values('phone_type');
-    }
-    return self::$phoneType;
-  }
-
-  /**
-   * Get all Individual Suffix.
-   *
-   * The static array individualSuffix is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All Individual Suffix - default is to get only active ones.
-   *
-   * @return array - array reference of all individual suffix.
-   *
-   */
-  public static function &individualSuffix() {
-    if (!self::$individualSuffix) {
-      self::$individualSuffix = CRM_Core_OptionGroup::values('individual_suffix');
-    }
-    return self::$individualSuffix;
-  }
-
-  /**
-   * Get all Gender.
-   *
-   * The static array gender is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All Gender - default is to get only active ones.
-   *
-   * @return array - array reference of all gender.
-   *
-   */
-  public static function &gender($localize = FALSE) {
-    if (!self::$gender) {
-      self::$gender = CRM_Core_OptionGroup::values('gender', FALSE, FALSE, $localize);
-    }
-    return self::$gender;
-  }
-
-  /**
-   * Get all the IM Providers from database.
-   *
-   * The static array imProvider is returned, and if it's
-   * called the first time, the <b>IM DAO</b> is used
-   * to get all the IM Providers.
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all IM providers.
-   *
-   */
-  public static function &IMProvider($localize = FALSE) {
-    if (!self::$imProvider) {
-      self::$imProvider = CRM_Core_OptionGroup::values('instant_messenger_service', FALSE, FALSE, $localize);
-    }
-    return self::$imProvider;
-  }
-
-  /**
-   * Get all the website types from database.
-   *
-   * The static array websiteType is returned, and if it's
-   * called the first time, the <b>Website DAO</b> is used
-   * to get all the Website Types.
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all Website types.
-   *
-   */
-  public static function &websiteType() {
-    if (!self::$websiteType) {
-      self::$websiteType = CRM_Core_OptionGroup::values('website_type');
-    }
-    return self::$websiteType;
-  }
-
-  /**
-   * Get the all From Email Address from database.
-   *
-   * The static array $fromEmailAddress is returned, and if it's
-   * called the first time, DAO is used
-   * to get all the From Email Address
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all From Email Address.
-   */
-  public static function &fromEmailAddress() {
-    if (!self::$fromEmailAddress) {
-      self::$fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address');
-    }
-    return self::$fromEmailAddress;
-  }
-
-  /**
-   * Get the all Mail Protocols from database.
-   *
-   * The static array mailProtocol is returned, and if it's
-   * called the first time, the DAO is used
-   * to get all the Mail Protocol.
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all Mail Protocols.
-   */
-  public static function &mailProtocol() {
-    if (!self::$mailProtocol) {
-      self::$mailProtocol = CRM_Core_OptionGroup::values('mail_protocol');
-    }
-    return self::$mailProtocol;
   }
 
   /**
@@ -1006,7 +778,7 @@ WHERE  id = %1";
         return self::$country[$id];
       }
       else {
-        return NULL;
+        return CRM_Core_DAO::$_nullObject;
       }
     }
     return self::$country;
@@ -1036,35 +808,15 @@ WHERE  id = %1";
         return self::$countryIsoCode[$id];
       }
       else {
-        return NULL;
+        return CRM_Core_DAO::$_nullObject;
       }
     }
     return self::$countryIsoCode;
   }
 
   /**
-   * Get all the categories from database.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
-   * The static array tag is returned, and if it's
-   * called the first time, the <b>Tag DAO</b> is used
-   * to get all the categories.
-   *
-   * Note: any database errors will be trapped by the DAO.
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all categories.
-   *
-   */
-  public static function &tag() {
-    if (!self::$tag) {
-      self::populate(self::$tag, 'CRM_Core_DAO_Tag', TRUE);
-    }
-    return self::$tag;
-  }
-
-  /**
    * Get all groups from database
    *
    * The static array group is returned, and if it's
@@ -1124,6 +876,8 @@ WHERE  id = %1";
   }
 
   /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   *
    * Get all permissioned groups from database
    *
    * The static array group is returned, and if it's
@@ -1182,51 +936,6 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all the custom groups
-   *
-   * @access public
-   *
-   * @return array - array reference of all groups.
-   * @static
-   */
-  public static function &customGroup($reset = FALSE) {
-    if (!self::$customGroup || $reset) {
-      self::populate(self::$customGroup, 'CRM_Core_DAO_CustomGroup', FALSE, 'title', 'is_active', NULL, 'title');
-    }
-    return self::$customGroup;
-  }
-
-  /**
-   * Get all the user framework groups
-   *
-   * @access public
-   *
-   * @return array - array reference of all groups.
-   * @static
-   */
-  public static function &ufGroup() {
-    if (!self::$ufGroup) {
-      self::populate(self::$ufGroup, 'CRM_Core_DAO_UFGroup', FALSE, 'title', 'is_active', NULL, 'title');
-    }
-    return self::$ufGroup;
-  }
-
-  /**
-   * Get all the project tasks
-   *
-   * @access public
-   *
-   * @return array - array reference of all tasks
-   * @static
-   */
-  public static function &tasks() {
-    if (!self::$tasks) {
-      self::populate(self::$tasks, 'CRM_Project_DAO_Task', FALSE, 'title', 'is_active', NULL, 'title');
-    }
-    return self::$tasks;
-  }
-
-  /**
    * Get all Relationship Types  from database.
    *
    * The static array group is returned, and if it's
@@ -1270,23 +979,6 @@ WHERE  id = %1";
     }
 
     return self::$relationshipType[$valueColumnName];
-  }
-
-  /**
-   * Get all the Currency Symbols from Database
-   *
-   * @access public
-   *
-   * @return array - array reference of all Currency Symbols
-   * @static
-   */
-  public static function &currencySymbols($name = 'symbol', $key = 'id') {
-    $cacheKey = "{$name}_{$key}";
-    if (!isset(self::$currencySymbols[$cacheKey])) {
-      self::populate(self::$currencySymbols[$cacheKey], 'CRM_Financial_DAO_Currency', TRUE, $name, NULL, NULL, 'name', $key);
-    }
-
-    return self::$currencySymbols[$cacheKey];
   }
 
   /**
@@ -1603,36 +1295,14 @@ WHERE  id = %1";
         return self::$county[$id];
       }
       else {
-        return NULL;
+        return CRM_Core_DAO::$_nullObject;
       }
     }
     return self::$county;
   }
 
   /**
-   * Get all the Preferred Communication Methods from database.
-   *
-   * @access public
-   * @static
-   *
-   * @return array self::pcm - array reference of all preferred communication methods.
-   *
-   */
-  public static function &pcm($localize = FALSE) {
-    if (!self::$pcm) {
-      self::$pcm = CRM_Core_OptionGroup::values('preferred_communication_method', FALSE, FALSE, $localize);
-    }
-    return self::$pcm;
-  }
-
-  /**
-   * Alias of pcm
-   */
-  public static function preferredCommunicationMethod($localize = FALSE) {
-    return self::pcm($localize);
-  }
-
-  /**
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    * Get all active payment processors
    *
    * The static array paymentProcessor is returned
@@ -1667,7 +1337,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all active payment processors
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * The static array paymentProcessorType is returned
    *
@@ -1708,7 +1378,7 @@ WHERE  id = %1";
         return self::$worldRegions[$id];
       }
       else {
-        return NULL;
+        return CRM_Core_DAO::$_nullObject;
       }
     }
 
@@ -1716,26 +1386,8 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all Honor Type.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
-   * The static array honorType is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param boolean $all - get All Honor Type.
-   *
-   * @return array - array reference of all Honor Types.
-   *
-   */
-  public static function &honor() {
-    if (!self::$honorType) {
-      self::$honorType = CRM_Core_OptionGroup::values('honor_type');
-    }
-    return self::$honorType;
-  }
-
-  /**
    * Get all Activity Statuses.
    *
    * The static array activityStatus is returned
@@ -1759,41 +1411,8 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all Priorities
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
-   * The static array Priority is returned
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all Priority
-   */
-  public static function &priority() {
-    if (!self::$priority) {
-      self::$priority = CRM_Core_OptionGroup::values('priority');
-    }
-
-    return self::$priority;
-  }
-
-  /**
-   * Get all WYSIWYG Editors.
-   *
-   * The static array wysiwygEditor is returned
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all wysiwygEditors
-   */
-  public static function &wysiwygEditor() {
-    if (!self::$wysiwygEditor) {
-      self::$wysiwygEditor = CRM_Core_OptionGroup::values('wysiwyg_editor');
-    }
-    return self::$wysiwygEditor;
-  }
-
-  /**
    * Get all Visibility levels.
    *
    * The static array visibility is returned
@@ -1814,20 +1433,6 @@ WHERE  id = %1";
   }
 
     return self::$visibility[$column];
-  }
-
-  /**
-   * Get all mapping types
-   *
-   * @return array - array reference of all mapping types
-   * @access public
-   * @static
-   */
-  public static function &mappingTypes() {
-    if (!self::$mappingType) {
-      self::$mappingType = CRM_Core_OptionGroup::values('mapping_type');
-    }
-    return self::$mappingType;
   }
 
   public static function &stateProvinceForCountry($countryID, $field = 'name') {
@@ -1944,7 +1549,7 @@ ORDER BY name";
    */
   static function countryIDForStateID($stateID) {
     if (empty($stateID)) {
-      return NULL;
+      return CRM_Core_DAO::$_nullObject;
     }
 
     $query = "
@@ -2021,13 +1626,9 @@ WHERE  id = %1
   public static function &greetingDefaults() {
     if (!self::$greetingDefaults) {
       $defaultGreetings = array();
-      $contactTypes = array(
-        'Individual' => 1,
-        'Household' => 2,
-        'Organization' => 3,
-      );
+      $contactTypes = self::get('CRM_Contact_DAO_Contact', 'contact_type', array('keyColumn' => 'id', 'labelColumn' => 'name'));
 
-      foreach ($contactTypes as $contactType => $filter) {
+      foreach ($contactTypes as $filter => $contactType) {
         $filterCondition = " AND (v.filter = 0 OR v.filter = $filter) AND v.is_default = 1 ";
 
         foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
@@ -2040,26 +1641,6 @@ WHERE  id = %1
     }
 
     return self::$greetingDefaults;
-  }
-
-  /**
-   * Get all the Languages from database.
-   *
-   * @access public
-   * @static
-   *
-   * @return array self::languages - array reference of all languages
-   *
-   */
-  public static function &languages() {
-    return CRM_Core_I18n_PseudoConstant::languages();
-  }
-
-  /**
-   * Alias of above
-   */
-  public static function &preferredLanguage() {
-    return CRM_Core_I18n_PseudoConstant::languages();
   }
 
   /**
@@ -2093,59 +1674,6 @@ WHERE  id = %1
   }
 
   /**
-   * Fetch the list of active extensions of type 'module'
-   *
-   * @param $fresh bool whether to forcibly reload extensions list from canonical store
-   * @access public
-   * @static
-   *
-   * @return array - array(array('prefix' => $, 'file' => $))
-   */
-  public static function getModuleExtensions($fresh = FALSE) {
-    return CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles($fresh);
-  }
-
-  /**
-   * Get all Activity Contacts
-   *
-   * The static array activityContacts is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param string $column db column name/label.
-   *
-   * @return array - array reference of all  activity Contacts
-   *
-   */
-  public static function &activityContacts($column = 'label') {
-    if (!self::$activityContacts) {
-      self::$activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, $column);
-    }
-    return self::$activityContacts;
-  }
-
-  /**
-   * Get all Event Contacts
-   *
-   * The static array eventContacts is returned
-   *
-   * @access public
-   * @static
-   *
-   * @param string $column db column name/label.
-   *
-   * @return array - array reference of all  event Contacts
-   *
-   */
-  public static function &eventContacts($column = 'label') {
-    if (!self::$eventContacts) {
-      self::$eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, $column);
-    }
-    return self::$eventContacts;
-  }
-
-  /**
    * Get all options values
    *
    * The static array option values is returned
@@ -2171,91 +1699,16 @@ WHERE  id = %1
   }
 
   /**
-   * Get all batch modes
+   * Fetch the list of active extensions of type 'module'
    *
-   * The static array batchModes
-   *
+   * @param $fresh bool whether to forcibly reload extensions list from canonical store
    * @access public
    * @static
    *
-   * @return array - array reference of all batch modes
+   * @return array - array(array('prefix' => $, 'file' => $))
    */
-  public static function &getBatchMode($columnName = 'label') {
-    if (!self::$batchModes) {
-      self::$batchModes = CRM_Core_OptionGroup::values('batch_mode', false, false, false, null, $columnName);
-    }
-
-    return self::$batchModes;
-  }
-
-  /**
-   * Get all batch types
-   *
-   * The static array batchTypes
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all batch types
-   */
-  public static function &getBatchType() {
-    if (!self::$batchTypes) {
-      self::$batchTypes = CRM_Core_OptionGroup::values('batch_type');
-    }
-
-    return self::$batchTypes;
-  }
-
-  /**
-   * Get all batch statuses
-   *
-   * The static array batchStatues
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array reference of all batch statuses
-   */
-  public static function &getBatchStatus() {
-    if (!self::$batchStatues) {
-      self::$batchStatues = CRM_Core_OptionGroup::values('batch_status');
-    }
-
-    return self::$batchStatues;
-  }
-
-  /*
-  * The static array contactType is returned
-  *
-  * @access public
-  * @static
-  * @param string $column db column name/label.
-  *
-  * @return array - array reference of all Types
-  *
-     */
-
-  public static function &contactType($column = 'label') {
-    if (!self::$contactType) {
-      self::$contactType = CRM_Contact_BAO_ContactType::basicTypePairs(TRUE);
-    }
-    return self::$contactType;
-  }
-
-  /**
-   * Get all the auto renew options
-   *
-   * @access public
-   * @static
-   *
-   * @return array self::autoRenew - array reference of all autoRenew
-   *
-   */
-  public static function &autoRenew() {
-      if (!self::$autoRenew) {
-          self::$autoRenew = CRM_Core_OptionGroup::values('auto_renew_options', FALSE, FALSE);
-      }
-      return self::$autoRenew;
+  public static function getModuleExtensions($fresh = FALSE) {
+    return CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles($fresh);
   }
 }
 

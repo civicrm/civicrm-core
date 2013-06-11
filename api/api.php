@@ -205,7 +205,6 @@ function _civicrm_api_resolve($apiRequest) {
     'api/v' . $apiRequest['version'] . '/' . $camelName . '/' . $actionCamelName . '.php',
   );
   foreach ($stdFiles as $stdFile) {
-    require_once 'CRM/Utils/File.php';
     if (CRM_Utils_File::isIncludable($stdFile)) {
       require_once $stdFile;
       if (function_exists($stdFunction)) {
@@ -225,7 +224,6 @@ function _civicrm_api_resolve($apiRequest) {
     'api/v' . $apiRequest['version'] . '/Generic/' . $actionCamelName . '.php',
   );
   foreach ($genericFiles as $genericFile) {
-    require_once 'CRM/Utils/File.php';
     if (CRM_Utils_File::isIncludable($genericFile)) {
       require_once $genericFile;
       if (function_exists($genericFunction)) {
@@ -261,7 +259,6 @@ function _civicrm_api_loadEntity($entity, $version = 3) {
   $camelName = _civicrm_api_get_camel_name($entity, $version);
 
   // Check for master entity file; to match _civicrm_api_resolve(), only load the first one
-  require_once 'CRM/Utils/File.php';
   $stdFile = 'api/v' . $version . '/' . $camelName . '.php';
   if (CRM_Utils_File::isIncludable($stdFile)) {
     require_once $stdFile;
@@ -534,7 +531,7 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
  */
 function _civicrm_api_get_entity_name_from_dao($bao){
   $daoName = str_replace("BAO", "DAO", get_class($bao));
-  return _civicrm_api_get_entity_name_from_camel(CRM_Core_DAO_AllCoreTables::getFullName($daoName));
+  return _civicrm_api_get_entity_name_from_camel(CRM_Core_DAO_AllCoreTables::getBriefName($daoName));
 }
 
 /**

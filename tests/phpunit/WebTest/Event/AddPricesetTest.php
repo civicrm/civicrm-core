@@ -651,6 +651,74 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     );
   }
 
+
+  function testDeletePriceSetforEventTemplate() {
+    // Log in using webtestLogin() method
+    $this->webtestLogin();
+    
+    $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
+    $usedFor = 'Event';
+    $setHelp = 'Select your conference options.';
+    $this->_testAddSet($setTitle, $usedFor, $setHelp);
+    
+    // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
+    // which is where we are after adding Price Set.
+    $sid = $this->urlArg('sid');
+    $this->assertType('numeric', $sid);
+    
+    $validStrings = array();
+    $fields = array(
+      'Test Field' => 'Text',
+    );
+    $this->_testAddPriceFields($fields, $validateStrings);
+
+    // load the Price Set Preview and check for expected values
+    $this->_testVerifyPriceSet($validateStrings, $sid);
+    $this->openCiviPage('admin/eventTemplate', 'reset=1');
+    $this->clickLink('newEventTemplate');
+    $this->select("template_id", "value=6");
+    // Wait for event type to be filled in (since page reloads)
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // Enter Event Title, Summary and Description
+    $this->type('template_title', "Test Template");
+    $this->type("title", "Test Event");
+    $this->type("summary", "This is a great conference. Sign up now!");
+    $this->clickLink("_qf_EventInfo_upload-bottom");
+    
+    // Go to Fees tab
+    $this->click('link=Fees');
+    $this->waitForElementPresent('_qf_Fee_upload-bottom');
+    $this->click('CIVICRM_QFID_1_is_monetary');
+    $this->select('financial_type_id','label=Event Fee');
+    $this->select('price_set_id', 'label=' . $setTitle);
+    $templateId = $this->urlArg('id');
+    $this->clickLink('_qf_Fee_upload-bottom');
+    
+    //check the delete for price field
+    $this->openCiviPage("admin/price/field", "reset=1&action=browse&sid={$sid}");
+    $this->click("xpath=//table[@id='option11']/tbody/tr/td[9]/span[2]/ul/li[2]/a");
+    // Check confirmation alert.
+    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this price field?/",
+      $this->getConfirmation()
+    ));
+    $this->chooseOkOnNextConfirmation();
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    //assert the message
+    $this->waitForText('price_set_used_by', "it is currently in use by one or more active events or contribution pages or contributions or event templates. If you no longer want to use this price set, click the event template title below, and modify the fees for that event.");
+    
+    //check the delete for priceset
+    $this->openCiviPage("admin/price", "reset=1");
+    $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/span[2]/ul/li[3]/a");
+    // Check confirmation alert.
+    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this price set?/",
+      $this->getConfirmation()
+    ));
+    $this->chooseOkOnNextConfirmation();
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    //assert the message
+    $this->waitForText('price_set_used_by', "it is currently in use by one or more active events or contribution pages or contributions or event templates. If you no longer want to use this price set, click the event template title below, and modify the fees for that event. ");
+  }
+ 
   function _checkLineItems($expectedLineItems) {
     foreach ($expectedLineItems as $lineKey => $lineValue) {
 

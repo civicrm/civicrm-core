@@ -121,7 +121,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $defaults['campaign_id'] = $mailing->campaign_id;
       $defaults['dedupe_email'] = $mailing->dedupe_email;
 
-      $dao = new CRM_Mailing_DAO_Group();
+      $dao = new CRM_Mailing_DAO_MailingGroup();
 
       $mailingGroups = array(
         'civicrm_group' => array( ),
@@ -449,7 +449,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
       // delete previous includes/excludes, if mailing already existed
       foreach (array('groups', 'mailings') as $entity) {
-        $mg               = new CRM_Mailing_DAO_Group();
+        $mg               = new CRM_Mailing_DAO_MailingGroup();
         $mg->mailing_id   = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;
         $mg->find();

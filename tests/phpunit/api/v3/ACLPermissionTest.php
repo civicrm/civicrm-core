@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -43,7 +42,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   public $_eNoticeCompliant = TRUE;
 
-  protected $_entity; function setUp() {
+  protected $_entity;
+
+  function setUp() {
     $this->_apiversion = 3;
 
     parent::setUp();
@@ -59,7 +60,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
  * @see CiviUnitTestCase::tearDown()
  */
   function tearDown() {
-    $this->hookClass->reset();
+    CRM_Utils_Hook::singleton()->reset();
     $tablesToTruncate = array(
         'civicrm_contact',
     );

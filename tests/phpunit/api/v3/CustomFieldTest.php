@@ -1,5 +1,30 @@
 <?php
-// $Id$
+
+/*
+ +--------------------------------------------------------------------+
+| CiviCRM version 4.3                                                |
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC (c) 2004-2013                                |
++--------------------------------------------------------------------+
+| This file is a part of CiviCRM.                                    |
+|                                                                    |
+| CiviCRM is free software; you can copy, modify, and distribute it  |
+| under the terms of the GNU Affero General Public License           |
+| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+|                                                                    |
+| CiviCRM is distributed in the hope that it will be useful, but     |
+| WITHOUT ANY WARRANTY; without even the implied warranty of         |
+| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+| See the GNU Affero General Public License for more details.        |
+|                                                                    |
+| You should have received a copy of the GNU Affero General Public   |
+| License and the CiviCRM Licensing Exception along                  |
+| with this program; if not, contact CiviCRM LLC                     |
+| at info[AT]civicrm[DOT]org. If you have questions about the        |
+| GNU Affero General Public License or the licensing of CiviCRM,     |
+| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
++--------------------------------------------------------------------+
+*/
 
 /**
  *  Include class definitions
@@ -195,6 +220,88 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * check with data type - Options with option_values
    */
+  function testCustomFieldCreateWithEmptyOptionGroup() {
+    $customGroup = $this->customGroupCreate('Contact', 'select_test_group', 3);
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Country',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'weight' => 4,
+      'is_required' => 1,
+      'is_searchable' => 0,
+      'is_active' => 1,
+      'version' => $this->_apiversion,
+    );
+
+    $customField = civicrm_api('custom_field', 'create', $params);
+    $this->assertAPISuccess($customField);
+    $this->assertNotNull($customField['id']);
+    $optionGroupID = civicrm_api('custom_field', 'getvalue', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => 'option_group_id',
+    ));
+
+    $this->assertTrue(is_numeric($optionGroupID) && ($optionGroupID > 0));
+    $optionGroup = civicrm_api('option_group', 'getsingle', array(
+      'version' => 3, 'id' => $optionGroupID));
+    $this->assertEquals($optionGroup['title'],'Country');
+    $optionValueCount = civicrm_api('option_value', 'getcount', array(
+      'version' => 3, 'option_group_id' => $optionGroupID));
+    $this->assertEquals(0, $optionValueCount);
+  }
+
+
+  /**
+   * Test custom field get works & return param works
+   */
+  function testCustomFieldGetReturnOptions(){
+    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+
+    $result = civicrm_api('custom_field', 'getsingle', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => 'data_type',
+    ));
+    $this->assertTrue(array_key_exists('data_type', $result));
+    $this->assertFalse(array_key_exists('custom_group_id', $result));
+  }
+
+  /**
+   * Test custom field get works & return param works
+   */
+  function testCustomFieldGetReturnArray(){
+    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+
+    $result = civicrm_api('custom_field', 'getsingle', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => array('data_type'),
+    ));
+    $this->assertTrue(array_key_exists('data_type', $result));
+    $this->assertFalse(array_key_exists('custom_group_id', $result));
+  }
+
+  /**
+   * Test custom field get works & return param works
+   */
+  function testCustomFieldGetReturnTwoOptions(){
+    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+
+    $result = civicrm_api('custom_field', 'getsingle', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => 'data_type, custom_group_id',
+    ));
+    $this->assertTrue(array_key_exists('data_type', $result));
+    $this->assertTrue(array_key_exists('custom_group_id', $result));
+    $this->assertFalse(array_key_exists('label', $result));
+  }
+
   function testCustomFieldCreateWithOptionValues() {
     $customGroup = $this->customGroupCreate('Contact', 'select_test_group', 3);
 
@@ -214,7 +321,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $params = array(
       'custom_group_id' => $customGroup['id'],
-      'label' => 'Country',
+      'label' => 'Our special field',
       'html_type' => 'Select',
       'data_type' => 'String',
       'weight' => 4,
@@ -227,14 +334,14 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $customField = civicrm_api('custom_field', 'create', $params);
 
-    $this->assertEquals($customField['is_error'], 0);
+    $this->assertAPISuccess($customField);
     $this->assertNotNull($customField['id']);
     $getFieldsParams = array(
       'options' => array('get_options' => 'custom_' . $customField['id']),
       'version' => 3,
       'action' => 'create',
     );
-    $description  = "Demonstrate retrieving custom field options";
+    $description  = "Demonstrate retrieving metadata with custom field options";
     $subfile = "GetFieldsOptions";
     $fields = civicrm_api('contact', 'getfields', $getFieldsParams);
     $this->documentMe($getFieldsParams, $fields, __FUNCTION__, 'ContactTest.php', $description,$subfile,'GetFields');
@@ -304,7 +411,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     );
 
     $customField = civicrm_api('custom_field', 'delete', $customOptionValueFields);
-    $this->assertEquals($customField['is_error'], 0);
+    $this->assertAPISuccess($customField);
   }
 }
 

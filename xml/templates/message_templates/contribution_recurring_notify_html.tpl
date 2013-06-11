@@ -67,7 +67,7 @@
        </tr>
        <tr>
         <td {$labelStyle}>
-	 {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
+   {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
         </td>
        </tr>
      {/if}
@@ -77,7 +77,7 @@
      {if $auto_renew_membership}
       <tr>
        <td>
-        <p>{ts}Your auto renew membership sign-up has ended and your membership will not be automatically renewed.{/ts}</p>   
+        <p>{ts}Your auto renew membership sign-up has ended and your membership will not be automatically renewed.{/ts}</p>
        </td>
       </tr>
      {else}

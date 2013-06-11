@@ -123,7 +123,7 @@
                                 <span class="nowrap">{$row.$field|crmMoney:$row.$currencyColumn}</span>
                             {else}
                                 <span class="nowrap">{$row.$field|crmMoney}</span>
-				                   {/if}
+                           {/if}
                         {else}
                             {$row.$field}
                         {/if}

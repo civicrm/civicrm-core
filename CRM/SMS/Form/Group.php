@@ -83,7 +83,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
         $this->set('mailing_id', $mailingID);
       }
 
-      $dao = new CRM_Mailing_DAO_Group();
+      $dao = new CRM_Mailing_DAO_MailingGroup();
 
       $mailingGroups = array();
       $dao->mailing_id = $mailingID;
@@ -269,7 +269,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       // delete previous includes/excludes, if mailing already existed
       foreach (array(
         'groups', 'mailings') as $entity) {
-        $mg               = new CRM_Mailing_DAO_Group();
+        $mg               = new CRM_Mailing_DAO_MailingGroup();
         $mg->mailing_id   = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;
         $mg->find();

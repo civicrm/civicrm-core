@@ -62,6 +62,9 @@
     <length>255</length>
     <comment>name of the protocol to use for polling (like IMAP, POP3 or Maildir)</comment>
     <add>2.2</add>
+    <pseudoconstant>
+      <optionGroupName>mail_protocol</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>server</name>

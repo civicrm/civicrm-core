@@ -6,7 +6,7 @@
      <title>Import</title>
      <access_arguments>import contacts,access CiviCRM</access_arguments>
      <page_type>1</page_type>
-     <page_callback>CRM_Import_Controller</page_callback>
+     <page_callback>CRM_Contact_Import_Controller</page_callback>
      <weight>400</weight>
   </item>
   <item>
@@ -14,7 +14,7 @@
      <title>Import Contacts</title>
      <access_arguments>import contacts,access CiviCRM</access_arguments>
      <page_type>1</page_type>
-     <page_callback>CRM_Import_Controller</page_callback>
+     <page_callback>CRM_Contact_Import_Controller</page_callback>
      <weight>410</weight>
   </item>
   <item>
@@ -27,7 +27,7 @@
   </item>
   <item>
     <path>civicrm/ajax/status</path>
-    <page_callback>CRM_Import_Page_AJAX::status</page_callback>
+    <page_callback>CRM_Contact_Import_Page_AJAX::status</page_callback>
     <access_arguments>import contacts,access CiviCRM</access_arguments>
   </item>
 </menu>

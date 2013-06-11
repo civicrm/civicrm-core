@@ -47,7 +47,9 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    */
   static $_links = NULL;
   public $_permission = NULL;
-  public $_contactId = NULL; function preProcess() {
+  public $_contactId = NULL;
+
+  function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 

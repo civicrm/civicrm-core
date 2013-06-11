@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -37,13 +36,6 @@
  * @version $Id: UFField.php 30171 2010-10-14 09:11:27Z mover $
  *
  */
-
-/**
- * Include common API util functions
- */
-
-require_once 'CRM/Core/BAO/UFField.php';
-require_once 'CRM/Core/BAO/UFGroup.php';
 
 /**
  * Defines 'uf field' within a group.
@@ -168,7 +160,7 @@ function civicrm_api3_uf_field_delete($params) {
 
   return civicrm_api3_create_success($result, $params);
 }
-/* 
+/*
  * field id accepted for backward compat - unset required on id
  */
 function _civicrm_api3_uf_field_delete_spec(&$params) {

@@ -52,9 +52,9 @@
     </tr>
     {if $action eq 2}
       <tr class="crm-contribution-form-block-contact">
-      	<td class="label">{ts}Created By{/ts}</td>
-      	<td class="html-adjust">{$contactName}</td>
-      </tr>   
+        <td class="label">{ts}Created By{/ts}</td>
+        <td class="html-adjust">{$contactName}</td>
+      </tr>
       <tr class="crm-contribution-form-block-open_date">
         <td class="label">{ts}Opened Date{/ts}</td>
         <td class="html-adjust">{$created_date|crmDate}</td>

@@ -105,8 +105,8 @@ class CRM_Upgrade_TwoTwo_Form_Step3 extends CRM_Upgrade_Form {
    */
   function upgradeDomainFromEmail() {
     $query = "
-SELECT id 
-  FROM civicrm_option_group 
+SELECT id
+  FROM civicrm_option_group
  WHERE name = 'from_Email_address'";
 
     $fmaGroup = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
@@ -125,7 +125,7 @@ VALUES ('from_email_address', 'From Email Address', 0, 1)";
       //get the group id.
       $query = "
 SELECT id
-  FROM civicrm_option_group 
+  FROM civicrm_option_group
  WHERE name = 'from_email_address'";
       $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
       if ($dao->fetch()) {
@@ -159,8 +159,8 @@ SELECT id
 
         //make existing is_default = 0
         $query = "
-UPDATE  civicrm_option_value 
-   SET  is_default = 0 
+UPDATE  civicrm_option_value
+   SET  is_default = 0
  WHERE  option_group_id = %1";
 
         $params = array(1 => array($fmaGroupId, 'Integer'));
@@ -217,7 +217,7 @@ UPDATE  civicrm_option_value
         //get the max value and wt.
         if ($insertEmailAddress) {
           $query = "
-SELECT   max(ROUND(civicrm_option_value.value)) as maxVal, 
+SELECT   max(ROUND(civicrm_option_value.value)) as maxVal,
          max(civicrm_option_value.weight) as maxWt
     FROM civicrm_option_value, civicrm_option_group
    WHERE civicrm_option_group.name = 'from_Email_address'
@@ -236,9 +236,9 @@ GROUP BY civicrm_option_group.id";
 
         //insert domain from email address and name.
         $query = "
-INSERT INTO  `civicrm_option_value` 
-             (`option_group_id`, `label`, `value`, `name` , `grouping`, `filter`, `is_default`, 
-              `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
+INSERT INTO  `civicrm_option_value`
+             (`option_group_id`, `label`, `value`, `name` , `grouping`, `filter`, `is_default`,
+              `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
      VALUES  ( %1, %2, %3, %2, NULL, 0, 1, %4, 'Default domain email address and from name.', 0, 0, 1, NULL)";
 
         $params = array(1 => array($fmaGroupId, 'Integer'),
@@ -251,7 +251,7 @@ INSERT INTO  `civicrm_option_value`
 
       //drop civicrm_domain.email_name and
       //civicrm_domain.email_address.
-      $query = " 
+      $query = "
 ALTER TABLE `civicrm_domain`
        DROP `email_name`,
        DROP `email_address`";
@@ -261,7 +261,7 @@ ALTER TABLE `civicrm_domain`
   }
 
   /* preserve the mailer preferences from config backend to
-     * civicrm_preferences and unset these from config backend. 
+     * civicrm_preferences and unset these from config backend.
      */
   function mailerPreferences() {
 

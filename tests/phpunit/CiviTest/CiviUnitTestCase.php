@@ -319,7 +319,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // FIXME: look at it closer in second stage
 
     // initialize the object once db is loaded
-    require_once 'CRM/Core/Config.php';
     $config = CRM_Core_Config::singleton();
 
     // when running unit tests, use mockup user framework
@@ -429,8 +428,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $this->fail('ID not populated. Please fix your assertDBState usage!!!');
     }
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-    eval('$object   = new ' . $daoName . '( );');
+    $object = new $daoName();
     $object->id = $id;
     $verifiedCount = 0;
 
@@ -596,6 +594,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
   }
 
+/**
+ * check that api returned 'is_error' => 0
+ * else provide full message
+ * @param array $apiResult api result
+ * @param string $prefix extra test to add to message
+ */
   function assertAPISuccess($apiResult, $prefix = '') {
     if (!empty($prefix)) {
       $prefix .= ': ';
@@ -603,10 +607,22 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->assertEquals(0, $apiResult['is_error'], $prefix . (empty($apiResult['error_message']) ? '' : $apiResult['error_message']));
   }
 
+  /**
+   * check that api returned 'is_error' => 1
+   * else provide full message
+   * @param array $apiResult api result
+   * @param string $prefix extra test to add to message
+   */
+  function assertAPIFailure($apiResult, $prefix = '') {
+    if (!empty($prefix)) {
+      $prefix .= ': ';
+    }
+    $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
+  }
+
   function assertType($expected, $actual, $message = '') {
     return $this->assertInternalType($expected, $actual, $message);
   }
-
   /**
    * Generic function to create Organisation, to be used in test cases
    *
@@ -676,19 +692,23 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   private function _contactCreate($params) {
     $params['version'] = API_LATEST_VERSION;
-    $result = civicrm_api('Contact', 'create', $params);
+    $params['debug'] = 1;
+    $result = civicrm_api('contact', 'create', $params);
     if (CRM_Utils_Array::value('is_error', $result) ||
       !CRM_Utils_Array::value('id', $result)
     ) {
-      throw new Exception('Could not create test contact, with message: ' . CRM_Utils_Array::value('error_message', $result));
+      throw new Exception('Could not create test contact, with message: ' . CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . CRM_Utils_Array::value('trace', $result));
     }
     return $result['id'];
   }
 
   function contactDelete($contactID) {
-    $params['id'] = $contactID;
-    $params['version'] = API_LATEST_VERSION;
-    $params['skip_undelete'] = 1;
+    $params = array(
+      'id' => $contactID,
+      'version' => API_LATEST_VERSION,
+      'skip_undelete' => 1,
+      'debug' => 1,
+    );
     $domain = new CRM_Core_BAO_Domain;
     $domain->contact_id = $contactID;
     if ($domain->find(TRUE)) {
@@ -696,9 +716,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       //since this is mainly for cleanup lets put a safeguard here
       return;
     }
-    $result = civicrm_api('Contact', 'delete', $params);
+    $result = civicrm_api('contact', 'delete', $params);
     if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not delete contact, with message: ' . CRM_Utils_Array::value('error_message', $result));
+      throw new Exception('Could not delete contact, with message: ' . CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . CRM_Utils_Array::value('trace', $result));
     }
     return;
   }
@@ -888,12 +908,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params['version'] = API_LATEST_VERSION;
 
     $result = civicrm_api('payment_processor_type', 'create', $params);
-
-    if (civicrm_error($params) || CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not create payment processor type');
-    }
-
-    require_once 'CRM/Core/PseudoConstant.php';
+    $this->assertAPISuccess($result);
     CRM_Core_PseudoConstant::flush('paymentProcessorType');
 
     return $result['id'];
@@ -1438,12 +1453,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       );
     }
 
-    require_once 'CRM/Core/DAO/LocationType.php';
     $locationType = new CRM_Core_DAO_LocationType();
     $locationType->copyValues($params);
     $locationType->save();
     // clear getfields cache
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
     civicrm_api('phone', 'getfields', array('version' => 3, 'cache_clear' => 1));
     return $locationType;
   }
@@ -1791,7 +1805,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     $customGroup = $this->CustomGroupCreate($entity, $function);
     $customField = $this->customFieldCreate($customGroup['id'], $function);
-    CRM_Core_PseudoConstant::flush('customGroup');
+    CRM_Core_PseudoConstant::flush();
 
     return array('custom_group_id' => $customGroup['id'], 'custom_field_id' => $customField['id']);
   }
@@ -2303,6 +2317,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if ($this->origExtensionSystem !== NULL) {
       CRM_Extension_System::setSingleton($this->origExtensionSystem);
       $this->origExtensionSystem = NULL;
+    }
+  }
+
+  function financialAccountDelete($name) {
+    $financialAccount = new CRM_Financial_DAO_FinancialAccount();
+    $financialAccount->name = $name;
+    if($financialAccount->find(TRUE)) {
+      $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount();
+      $entityFinancialType->financial_account_id = $financialAccount->id;
+      $entityFinancialType->delete();
+      $financialAccount->delete();
     }
   }
 }

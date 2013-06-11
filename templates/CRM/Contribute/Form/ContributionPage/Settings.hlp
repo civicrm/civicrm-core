@@ -81,6 +81,6 @@
 {/htxt}
 {htxt id="id-is_share"}
 <p>{ts}When enabled, links allowing people to share this online contribution page with their social network will be displayed (e.g. Facebook "Like", Google+, and Twitter).{/ts}</p>
-<p>{ts}Social media links will be included on the Contribution page, Thank-you page, Tell-a-Friend page (if enabled), and in contribution receipt emails.{/ts}</p>
+<p>{ts}Social media links will be included on the Contribution Thank-you page, Tell-a-Friend page (if enabled), and in contribution receipt emails.{/ts}</p>
 {/htxt}
 

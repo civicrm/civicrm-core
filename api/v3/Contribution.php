@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -57,12 +56,25 @@ function civicrm_api3_contribution_create(&$params) {
   _civicrm_api3_custom_format_params($params, $values, 'Contribution');
   $values["contact_id"] = CRM_Utils_Array::value('contact_id', $params);
   $values["source"] = CRM_Utils_Array::value('source', $params);
-
+  //legacy soft credit handling
+  if(!empty($params['soft_credit_to'])){
+    $values['soft_credit'] = array(array(
+      'contact_id' => $params['soft_credit_to'],
+      'amount' => $params['total_amount']));
+  }
   $ids = array();
   if (CRM_Utils_Array::value('id', $params)) {
     $ids['contribution'] = $params['id'];
+    // CRM-12498
+    if (CRM_Utils_Array::value('contribution_status_id', $params)) {
+      $error = array(); 
+      //throw error for invalid status change
+      CRM_Contribute_BAO_Contribution::checkStatusValidation(NULL, $params, $error);
+      if (array_key_exists('contribution_status_id', $error)) {
+        return civicrm_api3_create_error($error['contribution_status_id']);
+      }
+    }
   }
-
   $contribution = CRM_Contribute_BAO_Contribution::create($values, $ids);
 
   if (is_a($contribution, 'CRM_Core_Error')) {
@@ -175,8 +187,6 @@ function civicrm_api3_contribution_get($params) {
   $smartGroupCache  = CRM_Utils_Array::value('smartGroupCache', $params);
   $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
   $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
-  require_once 'CRM/Contribute/BAO/Query.php';
-  require_once 'CRM/Contact/BAO/Query.php';
   if (empty($returnProperties)) {
     $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
   }
@@ -201,7 +211,9 @@ function civicrm_api3_contribution_get($params) {
     $contribution_details = $query->store($dao);
     $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dao->contribution_id , TRUE);
     $contribution[$dao->contribution_id] = array_merge($contribution_details, $softContribution);
-
+    if(isset($contribution[$dao->contribution_id]['financial_type_id'])){
+      $contribution[$dao->contribution_id]['financial_type_id'] = $contribution[$dao->contribution_id]['financial_type_id'];
+    }
     // format soft credit for backward compatibility
     _civicrm_api3_format_soft_credit($contribution[$dao->contribution_id]);
   }
@@ -271,13 +283,6 @@ function _civicrm_api3_contribute_format_params($params, &$values, $create = FAL
         }
         break;
 
-      case 'soft_credit_to':// should be dealt with by validate integer
-        if (!CRM_Utils_Rule::integer($value)) {
-          return civicrm_api3_create_error("$key not a valid Id: $value");
-        }
-        $values['soft_credit_to'] = $value;
-        break;
-
       default:
         break;
     }
@@ -325,13 +330,11 @@ function civicrm_api3_contribution_transact($params) {
     $params['invoiceID'] = $params['invoice_id'];
   }
 
-  require_once 'CRM/Financial/BAO/PaymentProcessor.php';
   $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor_id'], $params['payment_processor_mode']);
   if (civicrm_error($paymentProcessor)) {
     return $paymentProcessor;
   }
 
-  require_once 'CRM/Core/Payment.php';
   $payment = &CRM_Core_Payment::singleton($params['payment_processor_mode'], $paymentProcessor);
   if (civicrm_error($payment)) {
     return $payment;

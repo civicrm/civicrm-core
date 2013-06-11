@@ -28,44 +28,18 @@
     <p>{ts}Enter values for the fields you wish to update. Leave fields blank to preserve existing values.{/ts}</p>
     <table class="form-layout-compressed">
         {* Loop through all defined search criteria fields (defined in the buildForm() function). *}
-     <tr class="crm-contact-custom-search-form-row-status_id">
-       <td class="label">{$form.status_id.label}</td>
-       <td>{$form.status_id.html}</td>
-    </tr>
-    <tr class="crm-contact-custom-search-form-row-radio_ts">
-       <td class="label">{$form.radio_ts.amount_granted.label}</td>
-       <td>{$form.radio_ts.amount_granted.html}</td>
-    </tr>
-    <tr class="crm-contact-custom-search-form-row-radio_ts">
-       <td class="label"></td>
-       <td>{$form.amount_granted.html}</td>
-    </tr>
-    <tr class="crm-contact-custom-search-form-row-radio_ts">
-       <td class="label">{$form.radio_ts.amount_total.label}</td>
-       <td>{$form.radio_ts.amount_total.html}</td>
-    </tr>
-
-    <tr class="crm-contact-custom-search-form-row-decision_date">
-       <td class="label">{$form.decision_date.label}</td>
+        {foreach from=$elements item=element}
+            <tr class="crm-contact-custom-search-form-row-{$element}">
+                <td class="label">{$form.$element.label}</td>
+                {if $element eq 'decision_date'}
                     <td>{include file="CRM/common/jcalendar.tpl" elementName=decision_date}<br />
                     <span class="description">{ts}Date on which the grant decision was finalized.{/ts}</span></td>
+                {else}
+                    <td>{$form.$element.html}</td>
+                {/if}
             </tr>
+        {/foreach}
     </table>
     <p>{ts 1=$totalSelectedGrants}Number of selected grants: %1{/ts}</p>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div><!-- /.crm-form-block -->
-
-<script type="text/javascript">
-    {literal} 
-
-cj("#CIVICRM_QFID_amount_total_4").click(function() {
-   cj("#amount_total").show();
-   cj("#amount_granted").hide();
-   cj("#amount_granted").val(null);
-});
-
-cj("#CIVICRM_QFID_amount_granted_2").click(function() {
-   cj("#amount_granted").show();
-});
-    {/literal}
-</script>

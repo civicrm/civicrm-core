@@ -27,6 +27,11 @@
 {if $paid} {* We retrieve this tpl when event is selected - keep it empty if event is not paid *}
     <table class="form-layout">
     {if $priceSet}
+      {if $discount and $hasPayment}
+        <tr class="crm-event-eventfees-form-block-discount"><td class="label">&nbsp;&nbsp;{ts}Discount Set{/ts}</td><td class="view-value">{$discount}</td></tr>
+      {elseif $form.discount_id.label}
+        <tr class="crm-event-eventfees-form-block-discount_id"><td class="label">&nbsp;&nbsp;{$form.discount_id.label}</td><td>{$form.discount_id.html}</td></tr>
+      {/if}
       {if $action eq 2 and $hasPayment} {* Updating *}
             {if $lineItem}
                 <tr class="crm-event-eventfees-form-block-line_items">
@@ -48,7 +53,7 @@
        </fieldset>
         {else}
       {assign var=isRecordPayment value=0 }
-            <div class='messages status'>{ts}No any active price fields found for this event!{/ts}</div>
+            <div class='messages status'>{ts}No active price fields found for this event!{/ts}</div>
           {/if}
     </table>
     {/if}
@@ -56,7 +61,7 @@
     </tr>
  {/if}
 
-    { if $accessContribution and ! $participantMode and ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId) and $isRecordPayment }
+    { if $accessContribution and ! $participantMode and ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId) and $isRecordPayment and ! $registeredByParticipantId }
         <tr class="crm-event-eventfees-form-block-record_contribution">
             <td class="label">{$form.record_contribution.label}</td>
             <td>{$form.record_contribution.html}<br />

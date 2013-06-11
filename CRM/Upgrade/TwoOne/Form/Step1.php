@@ -277,7 +277,7 @@ class CRM_Upgrade_TwoOne_Form_Step1 extends CRM_Upgrade_Form {
 
       $query = "
 ALTER TABLE {$dao->table_name}
-ADD UNIQUE unique_entity_id (entity_id), 
+ADD UNIQUE unique_entity_id (entity_id),
 DROP domain_id;";
       CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     }

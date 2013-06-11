@@ -280,7 +280,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     $this->assign('noSearchable', $noSearchable);
 
-    $this->_location_types = CRM_Core_PseudoConstant::locationType();
+    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
     /**
@@ -331,7 +331,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
     $sel3[''] = NULL;
-    $phoneTypes = CRM_Core_PseudoConstant::phoneType();
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     ksort($phoneTypes);
 
     foreach ($sel1 as $k => $sel) {
@@ -407,6 +407,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
 
+    // CRM_Core_Error::debug(array($sel1, $sel2, $sel3, $sel4));
     $sel->setOptions(array($sel1, $sel2, $sel3, $sel4));
 
     // proper interpretation of spec in CRM-8732
@@ -768,7 +769,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     //adding group field, email field should be present in the group
     //fixed for  issue CRM-2861 & CRM-4153
     if (CRM_Core_BAO_UFGroup::isProfileDoubleOptin()) {
-      if ($fields['field_name'][1] == 'group') {
+      if (CRM_Utils_Array::value(1, $fields['field_name']) == 'group') {
         $dao = new CRM_Core_BAO_UFField();
         $dao->uf_group_id = $fields['group_id'];
         $dao->find();
@@ -873,7 +874,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         if (in_array('Membership', $groupType) || in_array('Contribution', $groupType)
           || in_array('Organization', $groupType) || in_array('Household', $groupType) || in_array('Activity', $groupType)
         ) {
-          $errors['field_name'] = ts('Cannot add or update profile field type Participant with combination of Activity or Membership or Contribution or Household or Organization or Activity');
+          $errors['field_name'] = ts('Cannot add or update profile field type Participant with combination of Activity or Membership or Contribution or Household or Organization.');
         }
         else {
           self::formRuleSubType($fieldType, $groupType, $errors);
@@ -930,9 +931,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
             }
           }
         }
-        elseif ($fields['field_name'][1] == 'contact_sub_type' &&
-          !in_array($profileType, array(
-            'Individual', 'Household', 'Organization')) &&
+        elseif (
+          CRM_Utils_Array::value(1, $fields['field_name']) == 'contact_sub_type' &&
+          !in_array($profileType, array('Individual', 'Household', 'Organization')) &&
           !in_array($profileType, CRM_Contact_BAO_ContactType::subTypes())
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field Contact Subtype as profile type is not one of Individual, Household or Organization.');

@@ -27,8 +27,16 @@
 {if $form.template.html}
 <table class="form-layout-compressed">
     <tr>
-        <td class="label-left">{$form.template.label}</td>
+      <td class="label-left">{$form.template.label}</td>
       <td>{$form.template.html}</td>
+    </tr>
+    <tr>
+      <td class="label-left">{$form.subject.label}</td>
+      <td>{$form.subject.html}</td>
+    </tr>
+    <tr>
+      <td class="label-left">{$form.campaign_id.label}</td>
+      <td>{$form.campaign_id.html}</td>
     </tr>
 </table>
 {/if}

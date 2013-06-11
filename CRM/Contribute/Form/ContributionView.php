@@ -64,12 +64,12 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($values['contribution_id'], 'DESC');
     $values['to_financial_account'] = '';
     if (CRM_Utils_Array::value('financialTrxnId', $financialTrxnId)) {
-      $values['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $financialTrxnId['financialTrxnId'], 'to_financial_account_id');   
+      $values['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $financialTrxnId['financialTrxnId'], 'to_financial_account_id');
       if ($values['to_financial_account_id']) {
-        $values['to_financial_account'] = CRM_Contribute_PseudoConstant::financialAccount($values['to_financial_account_id']);        
+        $values['to_financial_account'] = CRM_Contribute_PseudoConstant::financialAccount($values['to_financial_account_id']);
       }
     }
-        
+
     if (CRM_Utils_Array::value('honor_contact_id', $values)) {
       $sql    = "SELECT display_name FROM civicrm_contact WHERE id = %1";
       $params = array(1 => array($values['honor_contact_id'], 'Integer'));
@@ -78,7 +78,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$values[honor_contact_id]");
         $values['honor_display'] = "<A href = $url>" . $dao->display_name . "</A>";
       }
-      $honor = CRM_Core_PseudoConstant::honor();
+      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
       $values['honor_type'] = CRM_Utils_Array::value(CRM_Utils_Array::value('honor_type_id', $values), $honor);
     }
 
@@ -150,7 +150,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
     $this->assign('displayName', $displayName);
-    
+
     // Check if this is default domain contact CRM-10482
     if (CRM_Contact_BAO_Contact::checkDomainContact($values['contact_id'])) {
       $displayName .= ' (' . ts('default organization') . ')';

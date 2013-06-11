@@ -32,12 +32,10 @@ $config = CRM_Core_Config::singleton();
 require_once 'CRM/Utils/REST.php';
 $rest = new CRM_Utils_REST();
 
-$rest->loadCMSBootstrap();
-
 if (isset($_GET['json']) && $_GET['json']) {
   header('Content-Type: text/javascript');
 }
 else {
   header('Content-Type: text/xml');
 }
-echo $rest->run();
+echo $rest->bootAndRun();

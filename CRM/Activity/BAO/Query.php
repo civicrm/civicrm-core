@@ -153,26 +153,15 @@ class CRM_Activity_BAO_Query {
    * @access public
    */
   static function where(&$query) {
-    $grouping = $testCondition = NULL;
+    $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (substr($query->_params[$id][0], 0, 9) == 'activity_') {
         if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
-        if ($query->_params[$id][0] == 'activity_test') {
-          $testCondition = $id;
-          continue;
-        }
         $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
-    }
-    // Only add test condition if other fields are selected
-    if ($grouping !== NULL && $testCondition &&
-      // we dont want to include all tests for sql OR CRM-7827
-      $query->getOperator() != 'OR'
-    ) {
-      self::whereClauseSingle($query->_params[$testCondition], $query);
     }
   }
 
@@ -242,11 +231,11 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_role':
         CRM_Contact_BAO_Query::$_activityRole = $values[2];
-        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
         if ($values[2]) {
           $query->_tables['civicrm_activity_contact'] = $query->_whereTables['civicrm_activity_contact'] = 1;
           if ($values[2] == 1) {
@@ -303,9 +292,12 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'activity_test':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.is_test", $op, $value, "Boolean");
-        if ($value) {
-          $query->_qill[$grouping][] = ts('Activity is a Test');
+        // We dont want to include all tests for sql OR CRM-7827
+        if (!$value || $query->getOperator() != 'OR') {
+            $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.is_test", $op, $value, "Boolean");
+          if ($value) {
+            $query->_qill[$grouping][] = ts('Activity is a Test');
+          }
         }
         break;
 
@@ -350,7 +342,7 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_tags':
         $value = array_keys($value);
-        $activityTags = CRM_Core_PseudoConstant::tag();
+        $activityTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
 
         $names = array();
         $val = array();
@@ -478,8 +470,8 @@ class CRM_Activity_BAO_Query {
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_activity');
     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_activity', NULL, TRUE, FALSE, TRUE);
 
-    $surveys = CRM_Campaign_BAO_Survey::getSurveys();
-    if ($surveys) $form->add('select', 'activity_survey_id', ts('Survey'),
+    $surveys = CRM_Campaign_BAO_Survey::getSurveys(TRUE, FALSE, FALSE, TRUE);
+    if ($surveys) $form->add('select', 'activity_survey_id', ts('Survey / Petition'),
       array(
         '' => ts('- none -')) + $surveys, FALSE
     );

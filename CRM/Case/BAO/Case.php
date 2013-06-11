@@ -974,7 +974,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   static function getCaseActivity($caseID, &$params, $contactID, $context = NULL, $userID = NULL, $type = NULL) {
     $values = array();
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
@@ -1017,7 +1017,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
                     AND ca.is_current_revision = 1';
 
     if (CRM_Utils_Array::value('reporter_id', $params)) {
-      $where .= " AND ca.source_contact_id = " . CRM_Utils_Type::escape($params['reporter_id'], 'Integer');
+      $where .= " AND cac.contact_id = " . CRM_Utils_Type::escape($params['reporter_id'], 'Integer');
     }
 
     if (CRM_Utils_Array::value('status_id', $params)) {
@@ -1104,7 +1104,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
     $activityTypes    = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
     $activityStatus   = CRM_Core_PseudoConstant::activityStatus();
-    $activityPriority = CRM_Core_PseudoConstant::priority();
+    $activityPriority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
 
     $url = CRM_Utils_System::url("civicrm/case/activity",
       "reset=1&cid={$contactID}&caseid={$caseID}", FALSE, NULL, FALSE
@@ -1391,7 +1391,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     $session = CRM_Core_Session::singleton();
     // CRM-8926 If user is not logged in, use the activity creator as userID
     if (!($userID = $session->get('userID'))) {
-      $userID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityId, 'source_contact_id');
+      $userID = CRM_Activity_BAO_Activity::getSourceContactID($activityId);
     }
 
     //also create activities simultaneously of this copy.
@@ -2256,7 +2256,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
 
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name');
     $activityStatuses = CRM_Core_PseudoConstant::activityStatus('name');
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -2369,10 +2369,6 @@ SELECT  id
         $mainActivity->copyValues($mainActVals);
         $mainActivity->id = NULL;
         $mainActivity->activity_date_time = CRM_Utils_Date::isoToMysql($otherActivity->activity_date_time);
-        //do check for merging contact,
-        if ($mainActivity->source_contact_id == $otherContactId) {
-          $mainActivity->source_contact_id = $mainContactId;
-        }
         $mainActivity->source_record_id = CRM_Utils_Array::value($mainActivity->source_record_id,
           $activityMappingIds
         );
@@ -2391,7 +2387,7 @@ SELECT  id
         }
 
         $activityMappingIds[$otherActivityId] = $mainActivityId;
-        // insert log of all activites
+        // insert log of all activities
         CRM_Activity_BAO_Activity::logActivityAction($mainActivity);
 
         $otherActivity->free();
@@ -2404,6 +2400,27 @@ SELECT  id
         $mainCaseActivity->activity_id = $mainActivityId;
         $mainCaseActivity->save();
         $mainCaseActivity->free();
+
+        //migrate source activity.
+        $otherSourceActivity = new CRM_Activity_DAO_ActivityContact();
+        $otherSourceActivity->activity_id = $otherActivityId;
+        $otherSourceActivity->record_type_id = $sourceID;
+        $otherSourceActivity->find();
+        while ($otherSourceActivity->fetch()) {
+          $mainActivitySource = new CRM_Activity_DAO_ActivityContact();
+          $mainActivitySource->record_type_id = $sourceID;
+          $mainActivitySource->activity_id = $mainActivityId;
+          $mainActivitySource->contact_id = $otherSourceActivity->contact_id;
+          if ($mainActivitySource->contact_id == $otherContactId) {
+            $mainActivitySource->contact_id = $mainContactId;
+          }
+          //avoid duplicate object.
+          if (!$mainActivitySource->find(TRUE)) {
+            $mainActivitySource->save();
+          }
+          $mainActivitySource->free();
+        }
+        $otherSourceActivity->free();
 
         //migrate target activities.
         $otherTargetActivity = new CRM_Activity_DAO_ActivityContact();
@@ -2446,6 +2463,13 @@ SELECT  id
           $mainAssigneeActivity->free();
         }
         $otherAssigneeActivity->free();
+
+        // copy custom fields and attachments
+        $aparams = array(
+          'activityID' => $otherActivityId,
+          'mainActivityId' => $mainActivityId,
+        );
+        CRM_Activity_BAO_Activity::copyExtendedActivityData($aparams);
       }
 
       //copy case relationship.
@@ -2730,6 +2754,10 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
               //edit - contact must be source or assignee
               //view - contact must be source/assignee/target
               $isTarget = $isAssignee = $isSource = FALSE;
+              $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+              $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+              $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+              $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
               $target = new CRM_Activity_DAO_ActivityContact();
               $target->record_type_id = $targetID;
@@ -2747,10 +2775,11 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
                 $isAssignee = TRUE;
               }
 
-              $activity = new CRM_Activity_DAO_Activity();
-              $activity->id = $activityId;
-              $activity->source_contact_id = $contactId;
-              if ($activity->find(TRUE)) {
+              $source = new CRM_Activity_DAO_ActivityContact();
+              $source->activity_id = $activityId;
+              $source->record_type_id = $sourceID;
+              $source->contact_id = $contactId;
+              if ($source->find(TRUE)) {
                 $isSource = TRUE;
               }
 

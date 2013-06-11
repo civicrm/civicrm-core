@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -239,6 +238,10 @@ class CRM_Report_Utils_Get {
     if (is_array($reportFields)) {
       if ($urlFields = CRM_Utils_Array::value("fld", $_GET)) {
         $urlFields = explode(',', $urlFields);
+      }
+      if (CRM_Utils_Array::value("ufld", $_GET) == 1) {
+        // unset all display columns
+        $defaults['fields'] = array();
       }
       if (!empty($urlFields)) {
         foreach ($reportFields as $tableName => $fields) {

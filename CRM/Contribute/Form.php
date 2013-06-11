@@ -51,7 +51,9 @@ class CRM_Contribute_Form extends CRM_Core_Form {
    *
    * @var string
    */
-  protected $_BAOName; function preProcess() {
+  protected $_BAOName;
+
+  function preProcess() {
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
   }
@@ -71,8 +73,8 @@ class CRM_Contribute_Form extends CRM_Core_Form {
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
       if (!empty( $this->_BAOName)) {
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $this->_BAOName) . ".php");
-        eval($this->_BAOName . '::retrieve( $params, $defaults );');
+        $baoName = $this->_BAOName;
+        $baoName::retrieve($params, $defaults);
       }
     }
     if ($this->_action == CRM_Core_Action::DELETE && CRM_Utils_Array::value('name', $defaults)) {
@@ -95,7 +97,7 @@ class CRM_Contribute_Form extends CRM_Core_Form {
       if ($parentId = CRM_Utils_Array::value('parent_id', $defaults)) {
         $this->assign('parentId', $parentId);
       }
-    }   
+    }
     return $defaults;
   }
 

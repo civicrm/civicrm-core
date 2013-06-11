@@ -141,7 +141,7 @@ class CRM_Queue_Runner {
       // setRaiseException should't be necessary here, but there's a bug
       // somewhere which causes this setting to be lost.  Observed while
       // upgrading 4.0=>4.2.  This preference really shouldn't be a global
-      // setting -- it should be more of a contextual/stack-based setting. 
+      // setting -- it should be more of a contextual/stack-based setting.
       // This should be appropriate because queue-runners are not used with
       // basic web pages -- they're used with CLI/REST/AJAX.
       $errorScope = CRM_Core_TemporaryErrorScope::useException();

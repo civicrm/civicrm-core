@@ -163,17 +163,16 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               break;
 
             case 'textarea':
-              $this->addElement('textarea',
+            case 'checkbox':
+              $this->add($fieldValue['html_type'],
                 $fieldName,
                 $fieldValue['title']
               );
               break;
 
-            case 'checkbox':
-              $this->addElement('checkbox',
-                $fieldName,
-                $fieldValue['title']
-              );
+            case 'radio':
+              $options = CRM_Core_OptionGroup::values($fieldName, FALSE, FALSE, TRUE);
+              $this->addRadio($fieldName, $fieldValue['title'], $options, NULL, '&nbsp;&nbsp;');
               break;
 
             case 'checkboxes':
@@ -264,6 +263,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
           case 'text':
           case 'select':
+          case 'radio':
             $this->_config->$settingName = CRM_Utils_Array::value($settingName, $this->_params);
             break;
 

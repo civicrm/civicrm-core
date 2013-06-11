@@ -99,14 +99,14 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
       if ($navName = CRM_Utils_Array::value('name', $params)) {
         $params['name'] = $navName;
       }
-      else {
-        $params['name'] = $params['label'];
+      elseif ($navLabel = CRM_Utils_Array::value('label', $params)) {
+        $params['name'] = $navLabel;
       }
 
       $params['weight'] = self::calculateWeight(CRM_Utils_Array::value('parent_id', $params));
     }
 
-    if (is_array($params['permission'])) {
+    if (array_key_exists('permission', $params) && is_array($params['permission'])) {
       $params['permission'] = implode(',', $params['permission']);
     }
 

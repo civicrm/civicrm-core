@@ -454,6 +454,11 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $wkhtmltopdfPath = FALSE;
 
   /**
+   * Allow second-degree relations permission to edit contacts
+   */
+  public $wpBasePage = NULL;
+
+  /**
    * Provide addressSequence
    *
    * @param
@@ -479,8 +484,8 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
     static $cachedSymbol = NULL;
     if (!$cachedSymbol || $defaultCurrency) {
       if ($this->defaultCurrency || $defaultCurrency) {
-        $currencySymbolName = CRM_Core_PseudoConstant::currencySymbols('name');
-        $currencySymbol = CRM_Core_PseudoConstant::currencySymbols();
+        $currencySymbolName = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'));
+        $currencySymbol = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency');
 
         $this->currencySymbols = array_combine($currencySymbolName, $currencySymbol);
         $currency = $defaultCurrency ? $defaultCurrency : $this->defaultCurrency;

@@ -179,8 +179,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     // create any option group & values if required
     if ($params['html_type'] != 'Text' &&
       in_array($params['data_type'], array(
-        'String', 'Int', 'Float', 'Money')) &&
-      !empty($params['option_value']) && is_array($params['option_value'])
+        'String', 'Int', 'Float', 'Money'))
     ) {
 
       $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
@@ -197,35 +196,34 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $optionGroup->is_active = 1;
         $optionGroup->save();
         $params['option_group_id'] = $optionGroup->id;
+          if(!empty($params['option_value']) && is_array($params['option_value'])){
+          foreach ($params['option_value'] as $k => $v) {
+            if (strlen(trim($v))) {
+              $optionValue = new CRM_Core_DAO_OptionValue();
+              $optionValue->option_group_id = $optionGroup->id;
+              $optionValue->label = $params['option_label'][$k];
+              $optionValue->name = CRM_Utils_String::titleToVar($params['option_label'][$k]);
+              switch ($params['data_type']) {
+                case 'Money':
+                  $optionValue->value = CRM_Utils_Rule::cleanMoney($v);
+                  break;
 
+                case 'Int':
+                  $optionValue->value = intval($v);
+                  break;
 
+                case 'Float':
+                  $optionValue->value = floatval($v);
+                  break;
 
-        foreach ($params['option_value'] as $k => $v) {
-          if (strlen(trim($v))) {
-            $optionValue = new CRM_Core_DAO_OptionValue();
-            $optionValue->option_group_id = $optionGroup->id;
-            $optionValue->label = $params['option_label'][$k];
-            $optionValue->name = CRM_Utils_String::titleToVar($params['option_label'][$k]);
-            switch ($params['data_type']) {
-              case 'Money':
-                $optionValue->value = CRM_Utils_Rule::cleanMoney($v);
-                break;
+                default:
+                  $optionValue->value = trim($v);
+              }
 
-              case 'Int':
-                $optionValue->value = intval($v);
-                break;
-
-              case 'Float':
-                $optionValue->value = floatval($v);
-                break;
-
-              default:
-                $optionValue->value = trim($v);
+              $optionValue->weight = $params['option_weight'][$k];
+              $optionValue->is_active = CRM_Utils_Array::value($k, $params['option_status'], FALSE);
+              $optionValue->save();
             }
-
-            $optionValue->weight = $params['option_weight'][$k];
-            $optionValue->is_active = CRM_Utils_Array::value($k, $params['option_status'], FALSE);
-            $optionValue->save();
           }
         }
       }
@@ -762,12 +760,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         else {
           $attributes .= 'rows=4';
         }
-
         if ($field->note_columns) {
           $attributes .= ' cols=' . $field->note_columns;
         }
         else {
           $attributes .= ' cols=60';
+        }
+        if ($field->text_length) {
+          $attributes .= ' maxlength=' . $field->text_length;
         }
         $element = &$qf->add(strtolower($field->html_type),
           $elementName,
@@ -958,7 +958,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'RichTextEditor':
-        $qf->addWysiwyg($elementName, $label, array('rows' => $field->note_rows, 'cols' => $field->note_columns), $search);
+        $attributes = array('rows' => $field->note_rows, 'cols' => $field->note_columns);
+        if ($field->text_length) {
+          $attributes['maxlength'] = $field->text_length;
+        }
+        $qf->addWysiwyg($elementName, $label, $attributes, $search);
         break;
 
       case 'Autocomplete-Select':
@@ -2161,6 +2165,8 @@ ORDER BY html_type";
   }
 
   static function buildOption($field, &$options) {
+    // Fixme - adding anything but options to the $options array is a bad idea
+    // What if an option had the key 'attributes'?
     $options['attributes'] = array(
       'label' => $field['label'],
       'data_type' => $field['data_type'],

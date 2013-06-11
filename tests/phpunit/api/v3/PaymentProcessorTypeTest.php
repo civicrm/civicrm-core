@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -71,7 +70,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('payment_processor_type', 'create', $payProcParams);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'],
       'Mandatory key(s) missing from params array: name, title, class_name, billing_mode'
     );
@@ -92,6 +91,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('payment_processor_type', 'create', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $this->assertAPISuccess($result);
     $this->assertNotNull($result['values'][0]['id'], 'in line ' . __LINE__);
 
     // mutate $params to match expected return value
@@ -109,7 +109,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     require_once 'api/v3/examples/PaymentProcessorTypeCreate.php';
     $result = payment_processor_type_create_example();
     $expectedResult = payment_processor_type_create_expectedresult();
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
   }
 
   ///////////////// civicrm_payment_processor_type_delete methods
@@ -120,8 +120,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   function testPaymentProcessorTypeDeleteEmpty() {
     $params = array();
     $result = civicrm_api('payment_processor_type', 'delete', $params);
-
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**
@@ -129,8 +128,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
    */
   function testPaymentProcessorTypeDeleteParamsNotArray() {
     $result = civicrm_api('payment_processor_type', 'delete', 'string');
-
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**
@@ -145,7 +143,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
     $result = civicrm_api('payment_processor_type', 'delete', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: version, id');
   }
 
@@ -160,7 +158,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
     $result = civicrm_api('payment_processor_type', 'delete', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Invalid value for payment processor type ID');
   }
 
@@ -177,7 +175,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
     $result = civicrm_api('payment_processor_type', 'delete', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
   }
 
   ///////////////// civicrm_payment_processor_type_update
@@ -189,7 +187,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $params = array();
     $result = civicrm_api('payment_processor_type', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: version, name, title, class_name, billing_mode');
   }
 
@@ -199,7 +197,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   function testPaymentProcessorTypeUpdateParamsNotArray() {
     $result = civicrm_api('payment_processor_type', 'create', 'string');
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -258,20 +256,12 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
     $second = civicrm_api('PaymentProcessorType', 'Create', $secondRelTypeParams);
-    $results = civicrm_api('payment_processor_type', 'get', array(
+    $result = civicrm_api('payment_processor_type', 'get', array(
       'version' => $this->_apiversion,
     ));
 
-    $this->assertEquals($baselineCount + 2, $results['count']);
-    $this->assertEquals(0, $results['is_error']);
-  }
-
-  /**
-   * check with params Not Array.
-   */
-  function testPaymentProcessorTypesGetParamsNotArray() {
-    $results = civicrm_api('payment_processor_type', 'get', 'string');
-    $this->assertEquals(1, $results['is_error']);
+    $this->assertEquals($baselineCount + 2, $result['count']);
+    $this->assertAPISuccess($result);
   }
 
   /**
@@ -303,11 +293,11 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'name' => 'API_Test_PP_12',
       'version' => $this->_apiversion,
     );
-    $results = civicrm_api('payment_processor_type', 'get', $params);
+    $result = civicrm_api('payment_processor_type', 'get', $params);
 
-    $this->assertEquals(0, $results['is_error'], ' in line ' . __LINE__);
-    $this->assertEquals(1, $results['count'], ' in line ' . __LINE__);
-    $this->assertEquals('CRM_Core_Payment_APITest_12', $results['values'][$results['id']]['class_name'], ' in line ' . __LINE__);
+    $this->assertAPISuccess($result);
+    $this->assertEquals(1, $result['count'], ' in line ' . __LINE__);
+    $this->assertEquals('CRM_Core_Payment_APITest_12', $result['values'][$result['id']]['class_name'], ' in line ' . __LINE__);
   }
 }
 

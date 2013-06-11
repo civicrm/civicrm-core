@@ -45,7 +45,8 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     $ssID = CRM_Utils_Request::retrieve('ssID', 'Integer', $this);
     $gID = CRM_Utils_Request::retrieve('gid', 'Integer', $this);
 
-    list($this->_customSearchID,
+    list(
+      $this->_customSearchID,
       $this->_customSearchClass,
       $formValues
     ) = CRM_Contact_BAO_SearchCustom::details($csID, $ssID, $gID);
@@ -53,6 +54,10 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     if (!$this->_customSearchID) {
       CRM_Core_Error::fatal('Could not get details for custom search.');
     }
+
+    // stash this as a hidden element so we can potentially go there if the session
+    // is reset but this is available in the POST
+    $this->addElement('hidden', 'csid', $csID);
 
     if (!empty($formValues)) {
       $this->_formValues = $formValues;
@@ -75,7 +80,13 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     parent::preProcess();
 
     // instantiate the new class
-    eval('$this->_customClass = new ' . $this->_customSearchClass . '( $this->_formValues );');
+    $this->_customClass = new $this->_customSearchClass( $this->_formValues );
+
+    // CRM-12747
+    if (isset($this->_customClass->_permissionedComponent) &&
+      !self::isPermissioned($this->_customClass->_permissionedComponent)) {
+      CRM_Utils_System::permissionDenied();
+    }
   }
 
   function setDefaultValues() {
@@ -127,5 +138,23 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
   public function getTitle() {
     return ts('Custom Search');
   }
-}
 
+  function isPermissioned($components) {
+    if (empty($components)) {
+      return TRUE;
+    }
+    if (is_array($components)) {
+      foreach ($components as $component) {
+        if (!CRM_Core_Permission::access($component)) {
+          return FALSE;
+        }
+      }
+    }
+    else {
+      if (!CRM_Core_Permission::access($components)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+}

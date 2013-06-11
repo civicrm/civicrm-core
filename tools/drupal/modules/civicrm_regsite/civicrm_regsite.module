@@ -178,7 +178,7 @@ function _civicrm_regsite_civicrm_postProcess_Profile_RegSite(&$form) {
 
   $dedupeParams = CRM_Dedupe_Finder::formatParams($orgContactParams, 'Individual');
   $dedupeParams['check_permission'] = FALSE;
-  $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Strict');
+  $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
 
   $contactID = NULL;
   if (is_array($dupeIDs) && !empty($dupeIDs)) {

@@ -33,10 +33,15 @@
         <onDelete>CASCADE</onDelete>
     </foreignKey>
     <field>
-        <name>group_id</name>
-        <type>int unsigned</type>
-        <comment>Group Id</comment>
-       <add>1.1</add>
+      <name>group_id</name>
+      <type>int unsigned</type>
+      <comment>Group Id</comment>
+      <add>1.1</add>
+      <pseudoconstant>
+        <table>civicrm_group</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>title</labelColumn>
+      </pseudoconstant>
     </field>
     <foreignKey>
        <name>group_id</name>

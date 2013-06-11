@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -55,7 +53,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
 
 
   // docs inherited from interface
-  public function getPermissions() {
+  public function getPermissions($getAllUnconditionally = FALSE) {
     return array('access CiviReport', 'access Report Criteria', 'administer reserved reports', 'administer Reports');
   }
 

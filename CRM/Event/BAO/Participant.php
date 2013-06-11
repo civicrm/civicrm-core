@@ -1765,7 +1765,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
    *
    * CRM-12155
    *
-   * @param integer $contactId contact id 
+   * @param integer $contactId contact id
    *
    * @access public
    * @static

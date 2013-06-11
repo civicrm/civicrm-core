@@ -45,7 +45,9 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   protected $_contributionTypeId;
   protected $_entity = 'PledgePayment';
 
-  public $DBResetRequired = TRUE; function setUp() {
+  public $DBResetRequired = TRUE;
+
+  function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
     $tablesToTruncate = array(
@@ -232,7 +234,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $params['scheduled_date'] = '20131212';
     $resultcreatenew = civicrm_api('pledge_payment', 'create', $params);
     $this->assertAPISuccess($resultcreatenew);
-    
+
     $this->assertEquals(0, $resultcreatenew['is_error'], "in line " . __LINE__);
     $result = civicrm_api('PledgePayment', 'Get', array(
       'version' => 3,

@@ -52,7 +52,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   public $debug = 0;
   protected $_params;
   public $_eNoticeCompliant = TRUE;
-  
+
   function setUp() {
     parent::setUp();
 
@@ -61,7 +61,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->_softIndividual1Id = $this->individualCreate();
     $this->_softIndividual2Id = $this->individualCreate();
     $this->_contributionId = $this->contributionCreate($this->_individualId);
-    
+
     $paymentProcessor = $this->processorCreate();
     $this->_params = array(
       'contact_id' => $this->_individualId,
@@ -141,7 +141,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'version' => $this->_apiversion,
     );
-    
+
     $this->_softcontribution = civicrm_api('contribution_soft', 'create', $p);
     $this->assertEquals($this->_softcontribution['is_error'], 0, 'In line ' . __LINE__);
     $params = array(
@@ -151,7 +151,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $softcontribution = civicrm_api('contribution_soft', 'get', $params);
     $this->assertAPISuccess($softcontribution, 'In line ' . __LINE__);
     $this->assertEquals(1,$softcontribution['count']);
-    
+
     $this->documentMe($params, $softcontribution, __FUNCTION__, __FILE__);
     $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['contribution_id'], $this->_contributionId, 'In line ' . __LINE__);
     $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['contact_id'], $this->_softIndividual1Id, 'In line ' . __LINE__);
@@ -170,7 +170,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $softcontribution = civicrm_api('contribution_soft', 'getcount', array(
       'version' => $this->_apiversion,
     ));
-    
+
     $this->assertEquals(2, $softcontribution);
    //test id only format
     $softcontribution = civicrm_api('contribution_soft', 'get', array
@@ -236,7 +236,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($softcontribution['is_error'], 1);
     $this->assertEquals($softcontribution['error_message'], 'Mandatory key(s) missing from params array: contribution_id, amount, contact_id');
   }
-  
+
   function testCreateContributionSoftInvalidContact() {
 
     $params = array(
@@ -250,7 +250,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $softcontribution = civicrm_api('contribution_soft', 'create', $params);
     $this->assertEquals($softcontribution['error_message'], 'contact_id is not valid : 999', 'In line ' . __LINE__);
   }
-  
+
   function testCreateContributionSoftInvalidContributionId() {
 
     $params = array(
@@ -284,7 +284,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['amount'], '10.00', 'In line ' . __LINE__);
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['currency'], 'USD', 'In line ' . __LINE__);
   }
-  
+
   /**
    *  Test  using example code
    */
@@ -315,7 +315,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
     $softcontribution = civicrm_api('contribution_soft', 'create', $params);
     $softcontributionID = $softcontribution['id'];
-    
+
     $old_params = array(
       'contribution_soft_id' => $softcontributionID,
       'version' => $this->_apiversion,
@@ -356,13 +356,13 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($softcontribution['values'][$softcontributionID]['contact_id'], $this->_softIndividual1Id, 'In line ' . __LINE__);
     $this->assertEquals($softcontribution['values'][$softcontributionID]['amount'], 7.00, 'In line ' . __LINE__);
     $this->assertEquals($softcontribution['values'][$softcontributionID]['currency'], 'CAD', 'In line ' . __LINE__);
-   
+
     $params = array(
       'id' => $softcontributionID,
       'version' => $this->_apiversion,
     );
     $result = civicrm_api('contribution_soft', 'delete', $params);
-    $this->assertEquals($result['is_error'], 0, 'in line' . __LINE__);
+    $this->assertAPISuccess($result, 'in line' . __LINE__);
   }
 
   ///////////////// civicrm_contribution_soft_delete methods

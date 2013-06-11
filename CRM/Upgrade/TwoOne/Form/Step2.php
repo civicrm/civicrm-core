@@ -66,8 +66,8 @@ SELECT id FROM civicrm_option_group WHERE name = 'safe_file_extension'";
       $dao->fetch();
       if ($dao->id) {
         $query = "
-INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`) 
-VALUES 
+INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`)
+VALUES
 ( %1, 'jpg',  1, NULL, NULL, 0, 0,  1, NULL, 0, 0, 1, NULL),
 ( %1, 'jpeg', 2, NULL, NULL, 0, 0,  2, NULL, 0, 0, 1, NULL),
 ( %1, 'png',  3, NULL, NULL, 0, 0,  3, NULL, 0, 0, 1, NULL),
@@ -89,8 +89,8 @@ VALUES
       //delete records from db.
 
       $query = "
-DELETE 
-FROM   `civicrm_option_value` 
+DELETE
+FROM   `civicrm_option_value`
 WHERE  `option_group_id` = %1
 AND    `label` IN ('html', 'htm')
 ";

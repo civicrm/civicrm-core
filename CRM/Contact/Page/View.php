@@ -157,15 +157,9 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     $this->assign($navContacts);
 
     $path = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
-    CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('View Contact'),
-          'url' => $path,
-        )));
-    CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('Search Results'),
-          'url' => self::getSearchURL(),
-        )));
+    CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('View Contact'), 'url' => $path,)));
 
     if ($image_URL = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'image_URL')) {
-
       //CRM-7265 --time being fix.
       $config = CRM_Core_Config::singleton();
       $image_URL = str_replace('https://', 'http://', $image_URL);
@@ -234,12 +228,12 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // set page title
     $title = self::setTitle($this->_contactId, $isDeleted);
     $this->assign('title', $title);
-    
+
     // Check if this is default domain contact CRM-10482
     if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactId)) {
       $this->assign('domainContact', TRUE);
     } else {
-      $this->assign('domainContact', FALSE);      
+      $this->assign('domainContact', FALSE);
     }
 
     // Add links for actions menu
@@ -278,62 +272,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       TRUE,
       TRUE
     );
-  }
-
-  function getSearchURL() {
-    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-    $this->assign('context', $context);
-
-    //validate the qfKey
-    if (!CRM_Utils_Rule::qfKey($qfKey)) {
-      $qfKey = NULL;
-    }
-
-    $urlString = NULL;
-    $urlParams = 'force=1';
-
-    switch ($context) {
-      case 'custom':
-        $urlString = 'civicrm/contact/search/custom';
-        break;
-
-      case 'fulltext':
-        $urlString = 'civicrm/contact/search/custom';
-        if ( $qfKey ) {
-          $urlParams = '_qf_Custom_display=true';
-        }
-        break;
-
-      case 'advanced':
-        $urlString = 'civicrm/contact/search/advanced';
-        break;
-
-      case 'builder':
-        $urlString = 'civicrm/contact/search/builder';
-        break;
-
-      case 'basic':
-        $urlString = 'civicrm/contact/search/basic';
-        break;
-
-      case 'search':
-        $urlString = 'civicrm/contact/search';
-        break;
-
-      case 'smog':
-      case 'amtg':
-        $urlString = 'civicrm/group/search';
-        break;
-    }
-    if ($qfKey) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-    if (!$urlString) {
-      $urlString = 'civicrm/contact/search/basic';
-    }
-
-    return CRM_Utils_System::url($urlString, $urlParams);
   }
 
   static function checkUserPermission($page, $contactID = NULL) {
@@ -402,14 +340,14 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * Add urls for display in the actions menu
    */
   static function addUrls(&$obj, $cid) {
+    // TODO rewrite without so many hard-coded CMS bits; use abstractions like CRM_Core_Permission::check('cms:...') and CRM_Utils_System
+
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
     if ($uid) {
-      // To do: we should also allow drupal users with CRM_Core_Permission::check( 'view user profiles' ) true to access $userRecordUrl
-      // but this is currently returning false regardless of permission set for the role. dgg
       if ($config->userSystem->is_drupal == '1' &&
-        ($session->get('userID') == $cid || CRM_Core_Permission::check('administer users'))
+        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account')))
       ) {
         $userRecordUrl = CRM_Utils_System::url('user/' . $uid);
       }

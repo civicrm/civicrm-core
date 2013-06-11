@@ -201,7 +201,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   static function where(&$query) {
-    $testCondition = $grouping = NULL;
+    $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (!CRM_Utils_Array::value(0, $query->_params[$id])) {
         continue;
@@ -209,10 +209,6 @@ class CRM_Contribute_BAO_Query {
       if (substr($query->_params[$id][0], 0, 13) == 'contribution_' || substr($query->_params[$id][0], 0, 10) == 'financial_') {
         if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
-        }
-        if ($query->_params[$id][0] == 'contribution_test') {
-          $testCondition = $id;
-          continue;
         }
         // CRM-12065
         if (
@@ -227,26 +223,18 @@ class CRM_Contribute_BAO_Query {
           continue;
         }
 
-
         $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
-    }
-    // Only add test condition if other fields are selected
-    if ($grouping !== NULL && $testCondition &&
-      // we dont want to include all tests for sql OR CRM-7827
-      $query->getOperator() != 'OR'
-    ) {
-      self::whereClauseSingle($query->_params[$testCondition], $query);
     }
   }
 
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    $fields = array();
     $fields = self::getFields();
-    if (!empty($value)) {
+
+    if (!empty($value) && !is_array($value)) {
       $quoteValue = "\"$value\"";
     }
 
@@ -437,11 +425,14 @@ class CRM_Contribute_BAO_Query {
 
       case 'contribution_is_test':
       case 'contribution_test':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.is_test", $op, $value, "Boolean");
-        if ($value) {
-          $query->_qill[$grouping][] = ts("Only Display Test Contributions");
+        // We dont want to include all tests for sql OR CRM-7827
+        if (!$value || $query->getOperator() != 'OR') {
+          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.is_test", $op, $value, "Boolean");
+          if ($value) {
+            $query->_qill[$grouping][] = ts("Only Display Test Contributions");
+          }
+          $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         }
-        $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
       case 'contribution_is_pay_later':
@@ -518,7 +509,7 @@ class CRM_Contribute_BAO_Query {
       // Supporting search for currency type -- CRM-4711
 
       case 'contribution_currency_type':
-        $currencySymbol = CRM_Core_PseudoConstant::currencySymbols('name');
+        $currencySymbol = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'));
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.currency",
           $op, $currencySymbol[$value], "String"
         );
@@ -547,6 +538,15 @@ class CRM_Contribute_BAO_Query {
       default:
         //all other elements are handle in this case
         $fldName    = substr($name, 13);
+        if (!isset($fields[$fldName])) {
+          // CRM-12597
+          CRM_Core_Session::setStatus(ts(
+              'We did not recognize the search field: %1. Please check and fix your contribution related smart groups.',
+              array(1 => $fldName)
+            )
+          );
+          return;
+        }
         $whereTable = $fields[$fldName];
         $value      = trim($value);
 
@@ -767,7 +767,7 @@ class CRM_Contribute_BAO_Query {
       ts('Currency Type'),
       array(
         '' => ts('- any -')) +
-      CRM_Core_PseudoConstant::currencySymbols('name')
+      CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'))
     );
 
     $form->add('select', 'financial_type_id',

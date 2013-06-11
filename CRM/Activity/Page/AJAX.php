@@ -142,9 +142,8 @@ class CRM_Activity_Page_AJAX {
     foreach ($clientRelationships as $key => $row) {
       $sortArray[$key]  = $row[$sort];
     }
-    $sort_type = "SORT_".strtoupper($sortOrder);
-    $sort_function = "array_multisort(\$sortArray, ".$sort_type.", \$clientRelationships);";
-    eval($sort_function);
+    $sort_type = "SORT_" . strtoupper($sortOrder);
+    array_multisort($sortArray, constant($sort_type), $clientRelationships);
 
     //limit the rows
     $allClientRelationships = $clientRelationships;
@@ -239,10 +238,8 @@ class CRM_Activity_Page_AJAX {
       $sortArray[$key]  = $row[$sort];
     }
 
-    $sort_type = "SORT_".strtoupper($sortOrder);
-
-    $sort_function = "array_multisort(\$sortArray, ".$sort_type.", \$caseRelationships);";
-    eval($sort_function);
+    $sort_type = "SORT_" . strtoupper($sortOrder);
+    array_multisort($sortArray, constant($sort_type), $caseRelationships);
 
     //limit rows display
     $allCaseRelationships = $caseRelationships;
@@ -361,8 +358,8 @@ class CRM_Activity_Page_AJAX {
     if (!empty($params['targetContactIds'])) {
       $targetContacts = array_unique(explode(',', $params['targetContactIds']));
     }
-    
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);

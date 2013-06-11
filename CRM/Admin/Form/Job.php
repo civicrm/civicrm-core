@@ -37,7 +37,9 @@
  *
  */
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
-  protected $_id = NULL; function preProcess() {
+  protected $_id = NULL;
+
+  function preProcess() {
 
     parent::preProcess();
 
@@ -191,7 +193,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $dao->is_active     = CRM_Utils_Array::value('is_active', $values, 0);
 
     $dao->save();
-    
+
     // CRM-11143 - Give warning message if update_greetings is Enabled (is_active) since it generally should not be run automatically via execute action or runjobs url.
     if ($values['api_action'] == 'update_greeting' && CRM_Utils_Array::value('is_active', $values) == 1) {
       // pass "wiki" as 6th param to docURL2 if you are linking to a page in wiki.civicrm.org
@@ -200,7 +202,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');
     }
 
-    
+
   }
   //end of function
 }

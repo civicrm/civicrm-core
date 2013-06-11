@@ -111,7 +111,7 @@ class CRM_Upgrade_ThreeZero_ThreeZero extends CRM_Upgrade_Form {
     //Run the SQL file (1)
     $upgrade->processSQL($rev);
     //replace  with ; in report instance
-    $sql = "UPDATE civicrm_report_instance 
+    $sql = "UPDATE civicrm_report_instance
                        SET form_values = REPLACE(form_values,'#',';') ";
     CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
 
@@ -121,11 +121,11 @@ class CRM_Upgrade_ThreeZero_ThreeZero extends CRM_Upgrade_Form {
     if ($bulkEmailID) {
 
       $mailingActivityIds = array();
-      $query = " 
-            SELECT max( ca.id ) as aid, 
+      $query = "
+            SELECT max( ca.id ) as aid,
                    ca.source_record_id sid
             FROM civicrm_activity ca
-            WHERE ca.activity_type_id = %1 
+            WHERE ca.activity_type_id = %1
             GROUP BY ca.source_record_id";
 
       $params = array(1 => array($bulkEmailID, 'Integer'));
@@ -133,23 +133,23 @@ class CRM_Upgrade_ThreeZero_ThreeZero extends CRM_Upgrade_Form {
 
       while ($dao->fetch()) {
         $updateQuery = "
-                UPDATE civicrm_activity_target cat, civicrm_activity ca 
-                    SET cat.activity_id = {$dao->aid}  
+                UPDATE civicrm_activity_target cat, civicrm_activity ca
+                    SET cat.activity_id = {$dao->aid}
                 WHERE ca.source_record_id IS NOT NULL   AND
-                      ca.activity_type_id = %1          AND 
-                      ca.id <> {$dao->aid}              AND 
-                      ca.source_record_id = {$dao->sid} AND 
+                      ca.activity_type_id = %1          AND
+                      ca.id <> {$dao->aid}              AND
+                      ca.source_record_id = {$dao->sid} AND
                       ca.id = cat.activity_id";
 
         $updateParams = array(1 => array($bulkEmailID, 'Integer'));
         CRM_Core_DAO::executeQuery($updateQuery, $updateParams);
 
-        $deleteQuery = " 
-                DELETE ca.* 
-                FROM civicrm_activity ca 
-                WHERE ca.source_record_id IS NOT NULL  AND 
-                      ca.activity_type_id = %1         AND 
-                      ca.id <> {$dao->aid}             AND 
+        $deleteQuery = "
+                DELETE ca.*
+                FROM civicrm_activity ca
+                WHERE ca.source_record_id IS NOT NULL  AND
+                      ca.activity_type_id = %1         AND
+                      ca.id <> {$dao->aid}             AND
                       ca.source_record_id = {$dao->sid}";
 
         $deleteParams = array(1 => array($bulkEmailID, 'Integer'));
@@ -160,27 +160,27 @@ class CRM_Upgrade_ThreeZero_ThreeZero extends CRM_Upgrade_Form {
     //CRM-4453
     //lets insert column in civicrm_aprticipant table
     $query = "
-        ALTER TABLE `civicrm_participant` 
+        ALTER TABLE `civicrm_participant`
             ADD `fee_currency` VARCHAR( 64 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL COMMENT '3 character string, value derived from config setting.' AFTER `discount_id`";
     CRM_Core_DAO::executeQuery($query);
 
     //get currency from contribution table if exists/default
     //insert currency when fee_amount != NULL or event is paid.
     $query = "
-        SELECT  civicrm_participant.id 
+        SELECT  civicrm_participant.id
         FROM    civicrm_participant
-            LEFT JOIN  civicrm_event 
+            LEFT JOIN  civicrm_event
                    ON ( civicrm_participant.event_id = civicrm_event.id )
-        WHERE  civicrm_participant.fee_amount IS NOT NULL OR 
+        WHERE  civicrm_participant.fee_amount IS NOT NULL OR
                civicrm_event.is_monetary = 1";
 
     $participant = CRM_Core_DAO::executeQuery($query);
     while ($participant->fetch()) {
       $query = "
-            SELECT civicrm_contribution.currency 
-            FROM   civicrm_contribution, 
+            SELECT civicrm_contribution.currency
+            FROM   civicrm_contribution,
                    civicrm_participant_payment
-            WHERE  civicrm_contribution.id = civicrm_participant_payment.contribution_id AND  
+            WHERE  civicrm_contribution.id = civicrm_participant_payment.contribution_id AND
                    civicrm_participant_payment.participant_id = {$participant->id}";
 
       $currencyID = CRM_Core_DAO::singleValueQuery($query);
@@ -251,8 +251,8 @@ class CRM_Upgrade_ThreeZero_ThreeZero extends CRM_Upgrade_Form {
 
     //replace contact.contact_name with contact.addressee in civicrm_preference.mailing_format
     $updateQuery = "
-        UPDATE civicrm_preferences 
-               SET `mailing_format` = 
+        UPDATE civicrm_preferences
+               SET `mailing_format` =
                     replace(`mailing_format`, '{contact.contact_name}','{contact.addressee}')";
 
     CRM_Core_DAO::executeQuery($updateQuery);

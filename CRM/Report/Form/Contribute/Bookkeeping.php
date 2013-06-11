@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -42,8 +41,8 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   protected $_summary = NULL;
 
   protected $_customGroupExtends = array(
-    'Membership'); 
-  
+    'Membership');
+
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -124,7 +123,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'alias' => 'financial_account_civireport_debit',
           ),
           'credit_accounting_code' => array(
-            'title' => ts('Financial Account Code - Credit'), 
+            'title' => ts('Financial Account Code - Credit'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialAccount(NULL, NULL, 'accounting_code', 'accounting_code'),
           ),
@@ -136,12 +135,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'alias' => 'financial_account_civireport_debit',
           ),
           'credit_name' => array(
-            'title' => ts('Financial Account Name - Credit'), 
+            'title' => ts('Financial Account Name - Credit'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialAccount(),
           ),
         ),
-      ),     
+      ),
       'civicrm_line_item' => array(
         'dao' => 'CRM_Price_DAO_LineItem',
         'fields' => array(
@@ -150,13 +149,13 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'financial_type_id' => array( 
-            'title' => ts('Financial Type'), 
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
         ),
-      ),  
+      ),
       'civicrm_contribution' =>
       array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -202,7 +201,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'currency' => array(
              'required' => TRUE,
              'no_display' => TRUE,
-          ), 
+          ),
           'trxn_date' => array(
             'title' => ts('Transaction Date'),
             'default' => TRUE,
@@ -227,13 +226,13 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
              'default' => NULL,
              'type' => CRM_Utils_Type::T_STRING,
           ),
-          'trxn_date' => array( 
+          'trxn_date' => array(
             'title' => ts('Transaction Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
-      ), 
+      ),
       'civicrm_entity_financial_trxn' => array(
         'dao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
         'fields' => array(
@@ -248,7 +247,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'amount' =>
           array('title' => ts('Amount')),
         ),
-      ),   
+      ),
     );
     parent::__construct();
   }
@@ -269,21 +268,21 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           ) {
             switch ($fieldName) {
             case 'credit_accounting_code' :
-              $select[] = " CASE 
+              $select[] = " CASE
                             WHEN {$this->_aliases['civicrm_financial_trxn']}.from_financial_account_id IS NOT NULL
                             THEN  {$this->_aliases['civicrm_financial_account']}_credit_1.accounting_code
                             ELSE  {$this->_aliases['civicrm_financial_account']}_credit_2.accounting_code
                             END AS civicrm_financial_account_credit_accounting_code ";
               break;
-            case 'amount' : 
-              $select[] = " CASE 
+            case 'amount' :
+              $select[] = " CASE
                             WHEN  {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id IS NOT NULL
                             THEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.amount
                             ELSE {$this->_aliases['civicrm_entity_financial_trxn']}.amount
                             END AS civicrm_entity_financial_trxn_amount ";
               break;
             case 'credit_name' :
-              $select[] = " CASE 
+              $select[] = " CASE
                             WHEN {$this->_aliases['civicrm_financial_trxn']}.from_financial_account_id IS NOT NULL
                             THEN  {$this->_aliases['civicrm_financial_account']}_credit_1.name
                             ELSE  {$this->_aliases['civicrm_financial_account']}_credit_2.name
@@ -291,7 +290,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
               break;
             default :
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              break; 
+              break;
             }
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
@@ -308,14 +307,14 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
 
     $this->_from = "FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND 
+                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
                          {$this->_aliases['civicrm_contribution']}.is_test = 0
               LEFT JOIN civicrm_membership_payment payment
                     ON ( {$this->_aliases['civicrm_contribution']}.id = payment.contribution_id )
               LEFT JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
-                    ON payment.membership_id = {$this->_aliases['civicrm_membership']}.id 
+                    ON payment.membership_id = {$this->_aliases['civicrm_membership']}.id
               LEFT JOIN civicrm_entity_financial_trxn {$this->_aliases['civicrm_entity_financial_trxn']}
-                    ON ({$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_entity_financial_trxn']}.entity_id AND 
+                    ON ({$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_entity_financial_trxn']}.entity_id AND
                         {$this->_aliases['civicrm_entity_financial_trxn']}.entity_table = 'civicrm_contribution')
               LEFT JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn']}
                     ON {$this->_aliases['civicrm_financial_trxn']}.id = {$this->_aliases['civicrm_entity_financial_trxn']}.financial_trxn_id
@@ -324,7 +323,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
               LEFT JOIN civicrm_financial_account {$this->_aliases['civicrm_financial_account']}_credit_1
                     ON {$this->_aliases['civicrm_financial_trxn']}.from_financial_account_id = {$this->_aliases['civicrm_financial_account']}_credit_1.id
               LEFT JOIN civicrm_entity_financial_trxn {$this->_aliases['civicrm_entity_financial_trxn']}_item
-                    ON ({$this->_aliases['civicrm_financial_trxn']}.id = {$this->_aliases['civicrm_entity_financial_trxn']}_item.financial_trxn_id AND 
+                    ON ({$this->_aliases['civicrm_financial_trxn']}.id = {$this->_aliases['civicrm_entity_financial_trxn']}_item.financial_trxn_id AND
                         {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_table = 'civicrm_financial_item')
               LEFT JOIN civicrm_financial_item fitem
                     ON fitem.id = {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id
@@ -347,14 +346,14 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             $field['dbAlias'] = "CASE
               WHEN financial_trxn_civireport.from_financial_account_id IS NOT NULL
               THEN  financial_account_civireport_credit_1.accounting_code
-              ELSE  financial_account_civireport_credit_2.accounting_code 
+              ELSE  financial_account_civireport_credit_2.accounting_code
               END";
           }
           else if ($fieldName == 'credit_name') {
             $field['dbAlias'] = "CASE
               WHEN financial_trxn_civireport.from_financial_account_id IS NOT NULL
               THEN  financial_account_civireport_credit_1.id
-              ELSE  financial_account_civireport_credit_2.id 
+              ELSE  financial_account_civireport_credit_2.id
               END";
           }
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
@@ -400,14 +399,14 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
 
     $select = " SELECT COUNT({$this->_aliases['civicrm_financial_trxn']}.id ) as count,
                 {$this->_aliases['civicrm_contribution']}.currency,
-                SUM(CASE 
+                SUM(CASE
                   WHEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id IS NOT NULL
                   THEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.amount
                   ELSE {$this->_aliases['civicrm_entity_financial_trxn']}.amount
-                END) as amount 
+                END) as amount
 ";
 
-    $sql = "{$select} {$this->_from} {$this->_where} 
+    $sql = "{$select} {$this->_from} {$this->_where}
             GROUP BY {$this->_aliases['civicrm_contribution']}.currency
 ";
 
@@ -457,7 +456,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
       if ($value = CRM_Utils_Array::value('civicrm_financial_trxn_payment_instrument_id', $row)) {
         $rows[$rowNum]['civicrm_financial_trxn_payment_instrument_id'] = $paymentInstruments[$value];
       }
-      
+
       // handle financial type id
       if ($value = CRM_Utils_Array::value('civicrm_line_item_financial_type_id', $row)) {
         $rows[$rowNum]['civicrm_line_item_financial_type_id'] = $contributionTypes[$value];

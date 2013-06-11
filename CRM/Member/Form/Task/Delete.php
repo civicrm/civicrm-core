@@ -53,7 +53,7 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
    *
    * @return void
    * @access public
-   */ 
+   */
   function preProcess() {
     //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::DELETE)) {
