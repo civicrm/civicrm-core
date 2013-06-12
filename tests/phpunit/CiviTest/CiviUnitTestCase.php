@@ -653,9 +653,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $function - pass this in to create a generated example
    * @param string $file - pass this in to create a generated example
    */
-  function callApiWithSuccessAndDocument($entity, $action, $params){
+  function callApiWithSuccessAndDocument($entity, $action, $params, $function, $filename, $description = "", $subfile = NULL, $action = NULL){
     $result = $this->callAPISuccess($entity, $action, $params);
-    $this->documentMe($params, $result, $function, $file);
+    $this->documentMe($params, $result, $function, $filename, $description, $subfile, $action);
     return $result;
   }
 
