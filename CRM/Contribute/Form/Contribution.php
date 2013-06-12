@@ -170,8 +170,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
 
+    $config = CRM_Core_Config::singleton();
     $resources = CRM_Core_Resources::singleton();
     $resources->addScriptFile('civicrm', 'templates/CRM/Contribute/Form/SoftCredit.js');
+    $resources->addSetting(array('monetaryThousandSeparator' => $config->monetaryThousandSeparator));
 
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
@@ -232,7 +234,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
 
-    $config = CRM_Core_Config::singleton();
     if (in_array('CiviPledge', $config->enableComponents) && !$this->_formType) {
       $this->preProcessPledge();
     }
@@ -1092,7 +1093,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         foreach ($submittedValues['soft_credit_contact_select_id'] as $key => $val) {
           if ($val && $submittedValues['soft_credit_amount'][$key]) {
             $softParams[$key]['contact_id'] = $val;
-            $softParams[$key]['amount'] = $submittedValues['soft_credit_amount'][$key];
+            $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($submittedValues['soft_credit_amount'][$key]);
             if (!empty($submittedValues['soft_credit_id'][$key])) {
               $softIDs[] = $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
             }
