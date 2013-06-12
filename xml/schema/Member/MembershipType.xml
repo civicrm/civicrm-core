@@ -173,7 +173,6 @@
     <add>1.5</add>
     <pseudoconstant>
       <optionGroupName>visibility</optionGroupName>
-      <labelColumn>label</labelColumn>
     </pseudoconstant>
   </field>
   <field>  

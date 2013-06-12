@@ -1588,13 +1588,13 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
 
 /**
  * Returns the canonical name of a field
- * @param $entity: api entity
+ * @param $entity: api entity name (string should already be standardized - no camelCase)
  * @param $fieldName: any variation of a field's name (name, unique_name, api.alias)
  *
  * @return (string|bool) fieldName or FALSE if the field does not exist
  */
 function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
-  if (strpos($fieldName, 'custom') === 0 && is_numeric($fieldName[7])) {
+  if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
     return $fieldName;
   }
   if ($fieldName == "{$entity}_id") {

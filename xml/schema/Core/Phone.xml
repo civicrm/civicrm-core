@@ -39,7 +39,7 @@
       <pseudoconstant>
         <table>civicrm_location_type</table>
         <keyColumn>id</keyColumn>
-        <labelColumn>name</labelColumn>
+        <labelColumn>display_name</labelColumn>
       </pseudoconstant>
       <add>2.0</add>
   </field>

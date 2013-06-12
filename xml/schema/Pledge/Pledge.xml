@@ -111,7 +111,8 @@
     <pseudoconstant>
       <table>civicrm_currency</table>
       <keyColumn>name</keyColumn>
-      <labelColumn>symbol</labelColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
   </field>
   <field>

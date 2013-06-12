@@ -69,7 +69,7 @@
       <pseudoconstant>
         <table>civicrm_participant_status_type</table>
         <keyColumn>id</keyColumn>
-        <labelColumn>name</labelColumn>
+        <labelColumn>label</labelColumn>
       </pseudoconstant>
   </field>
   <foreignKey>
@@ -215,7 +215,8 @@
       <pseudoconstant>
         <table>civicrm_currency</table>
         <keyColumn>name</keyColumn>
-        <labelColumn>symbol</labelColumn>
+        <labelColumn>full_name</labelColumn>
+        <nameColumn>numeric_code</nameColumn>
       </pseudoconstant>
   </field>
   <field> 
