@@ -245,10 +245,6 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldn
     return;
   }
 
-  if(substr($fieldname, -3) == '_id'){
-    $metadata[$fieldname]['api.aliases'][] = substr($fieldname, 0, -3);
-  }
-
   if (!empty($metadata[$fieldname]['options']) || !in_array($fieldname, $fieldsToResolve)) {
     return;
   }
