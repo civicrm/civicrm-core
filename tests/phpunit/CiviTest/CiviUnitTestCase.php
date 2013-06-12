@@ -624,18 +624,51 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $this->assertInternalType($expected, $actual, $message);
   }
   /**
-   * This function exists to wrap api functions used to set up tests but not part of the test
+
+  /**
+   * This function exists to wrap api functions
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    * @param string $entity
    * @param string $action
    * @param array $params
+   * @param string $function - pass this in to create a generated example
+   * @param string $file - pass this in to create a generated example
    */
-  function apiSetup($entity, $action, $params){
+  function callAPISuccess($entity, $action, $params){
     if(!isset($params['version'])){
       $params['version'] = API_LATEST_VERSION;
     }
     $result = civicrm_api($entity, $action, $params);
-    $this->assertAPISuccess($result, "Failure in test setup for $entity $action");
+    $this->assertAPISuccess($result, "Failure in api call for $entity $action");
+    return $result;
+  }
+
+  /**
+   * This function exists to wrap api functions
+   * so we can ensure they succeed, generate and example & throw exceptions without litterering the test with checks
+   *
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @param string $function - pass this in to create a generated example
+   * @param string $file - pass this in to create a generated example
+   */
+  function callApiWithSuccessAndDocument($entity, $action, $params){
+    $result = $this->callAPISuccess($entity, $action, $params);
+    $this->documentMe($params, $result, $function, $file);
+    return $result;
+  }
+
+  /**
+   * This function exists to wrap api functions
+   * so we can ensure they fail where expected & throw exceptions without litterering the test with checks
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   */
+  function callAPIFailure($entity, $action, $params){
+    $result = civicrm_api($entity, $action, $params);
+    $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success");
     return $result;
   }
   /**

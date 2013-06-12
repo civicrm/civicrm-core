@@ -174,11 +174,9 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   public function testGetUFFieldSuccess() {
 
-    $this->apiSetup($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $params = array('version' => 3);
-    $result = civicrm_api($this->_entity, 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'in line' . __LINE__);
+    $result = $this->callApiWithSuccessAndDocument($this->_entity, 'get', $params);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
 
