@@ -78,10 +78,7 @@ class CRM_Utils_Money {
     }
 
     if (!self::$_currencySymbols) {
-      $currencySymbolName = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'));
-      $currencySymbol = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency');
-
-      self::$_currencySymbols = array_intersect_key($currencySymbol, $currencySymbolName);
+      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('keyColumn' => 'name', 'labelColumn' => 'symbol'));
     }
 
     if (!$currency) {
