@@ -100,13 +100,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   function testMembershipDeleteEmpty() {
     $params = array();
     $result = civicrm_api('membership', 'delete', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testMembershipDeleteInvalidID() {
     $params = array('version' => $this->_apiversion, 'id' => 'blah');
     $result = civicrm_api('membership', 'delete', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**
@@ -115,7 +115,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   function testMembershipDeleteWithInvalidMembershipId() {
     $membershipId = 'membership';
     $result = civicrm_api('membership', 'delete', $membershipId);
-    $this->assertEquals($result['is_error'], 1,
+    $this->assertAPIFailure($result,
       "In line " . __LINE__
     );
   }
@@ -207,7 +207,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
         'version' => $this->_apiversion,
       ));
 
-    $this->assertEquals($result['is_error'], 0, "In line " . __LINE__);
+    $this->assertAPISuccess($result, "In line " . __LINE__);
     $this->assertEquals($result['count'], 0, "In line " . __LINE__);
     civicrm_api('Membership', 'Delete', array(
       'id' => $this->_membershipID,
@@ -435,7 +435,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   function testCreateWithEmptyParams() {
     $params = array();
     $result = civicrm_api('membership', 'create', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**
@@ -445,7 +445,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   function testCreateWithParamsString() {
     $params = 'a string';
     $result = civicrm_api('membership', 'create', $params);
-    $this->assertEquals($result['is_error'], 1,
+    $this->assertAPIFailure($result,
       "In line " . __LINE__
     );
   }
@@ -456,7 +456,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $params = $this->_params;
     unset($params['status_id']);
     $result = civicrm_api('membership', 'create', $params);
-    $this->assertEquals($result['is_error'], 1,
+    $this->assertAPIFailure($result,
         "In line " . __LINE__
     );
   }
@@ -473,7 +473,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
 
     $result = civicrm_api('membership', 'create', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testMembershipCreate() {
@@ -492,7 +492,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = civicrm_api('membership', 'create', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
     $this->getAndCheck($params, $result['id'], $this->_entity);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertNotNull($result['id']);
     $this->assertEquals($this->_contactID, $result['values'][$result['id']]['contact_id'], " in line " . __LINE__);
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id'], " in line " . __LINE__);
@@ -583,7 +583,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $result['id'],
         'version' => $this->_apiversion,
       ));
-    $this->assertEquals($result['is_error'], 0, "in line " . __LINE__);
+    $this->assertAPISuccess($result, "in line " . __LINE__);
     $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
   }
 
@@ -612,7 +612,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $result['id'],
         'version' => $this->_apiversion,
       ));
-    $this->assertEquals($result['is_error'], 0, "in line " . __LINE__);
+    $this->assertAPISuccess($result, "in line " . __LINE__);
     $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
   }
 
@@ -638,7 +638,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $result['id'],
         'version' => $this->_apiversion,
       ));
-    $this->assertEquals($result['is_error'], 0, "in line " . __LINE__);
+    $this->assertAPISuccess($result, "in line " . __LINE__);
     $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
   }
 
@@ -663,7 +663,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $result['id'],
         'version' => $this->_apiversion,
       ));
-    $this->assertEquals($result['is_error'], 0, "in line " . __LINE__);
+    $this->assertAPISuccess($result, "in line " . __LINE__);
     $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
   }
 
@@ -684,7 +684,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'skipStatusCal' => 1,
     );
     $result = civicrm_api('membership', 'create', $params);
-    $this->assertEquals($result['is_error'], 0, "in line " . __LINE__);
+    $this->assertAPISuccess($result, "in line " . __LINE__);
     $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
     civicrm_api('Membership', 'Delete', array(
       'id' => $result['id'],
@@ -737,18 +737,18 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
 
     $result = civicrm_api('membership', 'create', $params);
-    $this->assertEquals($result['is_error'], 1, "in line " . __LINE__);
+    $this->assertAPIFailure($result, "in line " . __LINE__);
 
     //membership_contact_id which is no in contact table
     $params['membership_contact_id'] = 999;
     $result = civicrm_api('membership', 'create', $params);
-    $this->assertEquals($result['is_error'], 1, "in line " . __LINE__);
+    $this->assertAPIFailure($result, "in line " . __LINE__);
 
     //invalid join date
     unset($params['membership_contact_id']);
     $params['join_date'] = "invalid";
     $result = civicrm_api('Membership', 'Create', $params);
-    $this->assertEquals($result['is_error'], 1, "in line " . __LINE__);
+    $this->assertAPIFailure($result, "in line " . __LINE__);
   }
 
   /**

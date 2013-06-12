@@ -98,7 +98,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $result = civicrm_api('entity_tag', 'create', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
 
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['added'], 1);
   }
 
@@ -114,7 +114,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
     $result = civicrm_api('entity_tag', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['added'], 1);
 
     $params = array(
@@ -125,7 +125,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     );
 
     $result = civicrm_api('entity_tag', 'create', $params);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['added'], 1);
     $this->assertEquals($result['not_added'], 1);
   }
@@ -246,7 +246,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     );
 
     $result = civicrm_api('entity_tag', 'delete', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'tag_id is a required field');
   }
 
@@ -268,7 +268,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
     $result = civicrm_api('entity_tag', 'delete', $params);
 
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['removed'], 2);
   }
 
@@ -392,7 +392,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     );
 
     $result = _civicrm_api3_entity_tag_common($params, 'remove');
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'contact_id is a required field');
   }
 
@@ -412,7 +412,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     );
 
     $result = _civicrm_api3_entity_tag_common($params, 'remove');
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'tag_id is a required field');
   }
 
@@ -434,7 +434,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
     $result = _civicrm_api3_entity_tag_common($params, 'remove');
 
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['removed'], 2);
   }
 

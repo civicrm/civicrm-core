@@ -624,6 +624,21 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $this->assertInternalType($expected, $actual, $message);
   }
   /**
+   * This function exists to wrap api functions used to set up tests but not part of the test
+   * so we can ensure they succeed & throw exceptions without litterering the test with checks
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   */
+  function apiSetup($entity, $action, $params){
+    if(!isset($params['version'])){
+      $params['version'] = API_LATEST_VERSION;
+    }
+    $result = civicrm_api($entity, $action, $params);
+    $this->assertAPISuccess($result, "Failure in test setup for $entity $action");
+    return $result;
+  }
+  /**
    * Generic function to create Organisation, to be used in test cases
    *
    * @param array   parameters for civicrm_contact_add api function call

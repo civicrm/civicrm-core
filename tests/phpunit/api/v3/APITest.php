@@ -96,7 +96,7 @@ class api_v3_APITest extends CiviUnitTestCase {
 
 
     $result = civicrm_api('RandomFile', 'get', array('version' => 3));
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'API (RandomFile,get) does not exist (join the API team and implement it!)');
   }
 

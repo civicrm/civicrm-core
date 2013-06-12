@@ -76,7 +76,7 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
    */
   public function testGetSurveyRespondants() {
     $result = civicrm_api("SurveyRespondant","get", $this->params );
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
   }
