@@ -70,7 +70,8 @@
         {if ( $fields.$n.data_type eq 'Date') or ( in_array( $n, array( 'thankyou_date', 'cancel_date', 'receipt_date', 'receive_date', 'join_date', 'membership_start_date', 'membership_end_date' ) ) ) }
             <div class="compressed crm-grid-cell"><span class="crm-batch-{$n}-{$rowNumber}">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$rowNumber batchUpdate=1}</span></div>
         {elseif $n eq 'soft_credit'}
-            <div class="compressed crm-grid-cell">{include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="soft_credit_"}</div>
+            <div class="compressed crm-grid-cell">{include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="soft_credit_"}
+            {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}</div>
         {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
         {else}
@@ -94,6 +95,13 @@
 
           // validate rows
           checkColumns( cj(this) );
+      });
+      
+      cj('input[name^="soft_credit_contact["]').change(function(){
+        var rowNum = cj(this).attr('id').replace('soft_credit_contact_','');
+        var totalAmount = Number(cj('#field_'+rowNum+'_total_amount').val().replace(',',''));
+        //assign total amount as default soft credit amount
+    	cj('#soft_credit_amount_'+ rowNum).val(totalAmount);
       });
 
       // validate rows

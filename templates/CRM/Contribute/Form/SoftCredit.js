@@ -59,7 +59,7 @@ cj(function($) {
 
   $('input[name^="soft_credit_contact["]').change(function(){
     var rowNum = $(this).attr('id').replace('soft_credit_contact_','');
-    var totalAmount = Number($('#total_amount').val());
+    var totalAmount = Number($('#total_amount').val().replace(',',''));
     //assign total amount as default soft credit amount
     $('#soft_credit_amount_'+ rowNum).val(totalAmount);
     if (rowNum > 1) {
