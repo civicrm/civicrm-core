@@ -180,7 +180,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('participant', 'get', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['values'][$this->_participantID]['event_id'], $this->_eventID);
     $this->assertEquals($result['values'][$this->_participantID]['participant_register_date'], '2007-02-19 00:00:00');
     $this->assertEquals($result['values'][$this->_participantID]['participant_source'], 'Wimbeldon');
@@ -205,7 +205,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('participant', 'get', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['values'][$this->_participantID]['event_id'], $this->_eventID);
     $this->assertEquals($result['values'][$this->_participantID]['participant_register_date'], '2007-02-19 00:00:00');
     $this->assertEquals($result['values'][$this->_participantID]['participant_source'], 'Wimbeldon');
@@ -785,13 +785,13 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
    );
    $result = civicrm_api('participant','get', $params);
-   $this->assertEquals($result['is_error'], 0);
+   $this->assertAPISuccess($result);
    $this->assertEquals($result['count'], 3);
 
    $params['participant_role_id'] =2;
    $result =  civicrm_api('participant','get', $params);
 
-   $this->assertEquals($result['is_error'], 0,  "in line " . __LINE__);
+   $this->assertAPISuccess($result,  "in line " . __LINE__);
    $this->assertEquals(2,$result['count'], "in line " . __LINE__);
    $this->documentMe($params,$result ,__FUNCTION__,__FILE__);
    }

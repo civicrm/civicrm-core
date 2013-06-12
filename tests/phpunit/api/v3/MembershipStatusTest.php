@@ -70,7 +70,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $params = 'a string';
     $result = civicrm_api('membership_status', 'get', $params);
 
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 
@@ -124,13 +124,13 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   function testCreateWithEmptyParams() {
     $params = array();
     $result = civicrm_api('membership_status', 'create', $params);
-    $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
+    $this->assertAPIFailure($result, "In line " . __LINE__);
   }
 
   function testCreateWithWrongParamsType() {
     $params = 'a string';
     $result = civicrm_api('membership_status', 'create', $params);
-    $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
+    $this->assertAPIFailure($result, "In line " . __LINE__);
     $params = array('version' =>3, 'id' => 'string');
     $result = civicrm_api('membership_status', 'create', $params);
   }
@@ -147,7 +147,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   function testCreateWithMissingRequired() {
     $params = array('title' => 'Does not make sense');
     $result = civicrm_api('membership_status', 'create', $params);
-    $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
+    $this->assertAPIFailure($result, "In line " . __LINE__);
   }
 
   function testCreate() {
@@ -158,7 +158,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $result = civicrm_api('membership_status', 'create', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
 
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertNotNull($result['id']);
     $this->membershipStatusDelete($result['id']);
   }
@@ -238,19 +238,19 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   function testDeleteEmptyParams() {
     $params = array();
     $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
+    $this->assertAPIFailure($result, "In line " . __LINE__);
   }
 
   function testDeleteWrongParamsType() {
     $params = 'incorrect value';
     $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
+    $this->assertAPIFailure($result, "In line " . __LINE__);
   }
 
   function testDeleteWithMissingRequired() {
     $params = array('title' => 'Does not make sense');
     $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertEquals($result['is_error'], 1, "In line " . __LINE__);
+    $this->assertAPIFailure($result, "In line " . __LINE__);
   }
 
   function testDelete() {
@@ -260,7 +260,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
     $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
   }
   /*
      * Test that trying to delete membership status while membership still exists creates error
@@ -289,7 +289,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
     $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
 
     civicrm_api('Membership', 'Delete', array(
       'id' => $membershipID,
@@ -297,7 +297,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
       ));
 
     $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertEquals($result['is_error'], 0, 'In line ' . __LINE__);
+    $this->assertAPISuccess($result, 'In line ' . __LINE__);
   }
 }
 

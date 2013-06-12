@@ -147,7 +147,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
     $result = civicrm_api('participant_payment', 'create', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0, 'in line ' . __LINE__);
+    $this->assertAPISuccess($result, 'in line ' . __LINE__);
     $this->assertTrue(array_key_exists('id', $result), 'in line ' . __LINE__);
 
     //delete created contribution
@@ -360,7 +360,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
     $result = civicrm_api('participant_payment', 'delete', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
   }
 
   ///////////////// civicrm_participantPayment_get methods

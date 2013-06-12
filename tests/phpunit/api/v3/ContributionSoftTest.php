@@ -406,7 +406,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('contribution_soft', 'delete', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0, 'In line ' . __LINE__);
+    $this->assertAPISuccess($result, 'In line ' . __LINE__);
   }
 
   ///////////////// civicrm_contribution_search methods
@@ -418,7 +418,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $params = 'a string';
     $result = civicrm_api('contribution_soft', 'get', $params);
 
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 
