@@ -101,7 +101,7 @@
         var rowNum = cj(this).attr('id').replace('soft_credit_contact_','');
         var totalAmount = Number(cj('#field_'+rowNum+'_total_amount').val().replace(',',''));
         //assign total amount as default soft credit amount
-    	cj('#soft_credit_amount_'+ rowNum).val(totalAmount);
+        cj('#soft_credit_amount_'+ rowNum).val(totalAmount);
       });
 
       // validate rows
