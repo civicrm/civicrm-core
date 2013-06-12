@@ -65,7 +65,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('job', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'],
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
@@ -87,7 +87,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
     $result = civicrm_api('job', 'create', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**
@@ -123,7 +123,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   function testDeleteEmpty() {
     $params = array();
     $result = civicrm_api('job', 'delete', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**
@@ -131,7 +131,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   function testDeleteParamsNotArray() {
     $result = civicrm_api('job', 'delete', 'string');
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**
@@ -145,7 +145,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     );
 
     $result = civicrm_api('job', 'delete', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: version, id');
   }
 
@@ -160,7 +160,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
     $result = civicrm_api('job', 'delete', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Invalid value for job ID');
   }
 

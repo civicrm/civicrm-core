@@ -78,7 +78,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('activity_type', 'create', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
   }
 
   /**
@@ -115,7 +115,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('activity_type', 'delete', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
   }
 }
 

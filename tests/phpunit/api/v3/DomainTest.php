@@ -198,7 +198,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   public function testCreate() {
     $result = civicrm_api('domain', 'create', $this->params);
     $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['count'], 1);
     $this->assertNotNull($result['id']);
     $this->assertEquals($result['values'][$result['id']]['name'], $this->params['name']);
@@ -212,7 +212,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   public function testCreateWithEmptyParams() {
     $params = array('version' => $this->_apiversion);
     $result = civicrm_api('domain', 'create', $params);
-    $this->assertEquals($result['is_error'], 1,
+    $this->assertAPIFailure($result,
       "In line " . __LINE__
     );
   }
@@ -223,7 +223,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   public function testCreateWithWrongParams() {
     $params = 1;
     $result = civicrm_api('domain', 'create', $params);
-    $this->assertEquals($result['is_error'], 1,
+    $this->assertAPIFailure($result,
       "In line " . __LINE__
     );
   }

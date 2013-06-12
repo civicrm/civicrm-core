@@ -4,7 +4,7 @@
  
  */
 function domain_create_example(){
-$params = array( 
+$params = array(
   'name' => 'A-team domain',
   'description' => 'domain of chaos',
   'version' => 3,
@@ -22,13 +22,13 @@ $params = array(
  */
 function domain_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'name' => 'A-team domain',
           'description' => 'domain of chaos',
