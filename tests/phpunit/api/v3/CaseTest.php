@@ -298,7 +298,10 @@ class api_v3_CaseTest extends CiviUnitTestCase {
    */
   function testCaseUpdate() {
     // Create Case
-    $result = civicrm_api('case', 'create', $this->_params);
+    $params = $this->_params;
+    // Test using name instead of value
+    $params['case_type_id'] = 'housing_support';
+    $result = civicrm_api('case', 'create', $params);
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
     $id = $result['id'];
     $result = civicrm_api('case', 'get', array('version' => $this->_apiversion, 'id' => $id));
