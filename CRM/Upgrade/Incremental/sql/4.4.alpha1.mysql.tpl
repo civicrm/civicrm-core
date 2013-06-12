@@ -51,3 +51,7 @@ VALUES
 {else}
   UPDATE civicrm_option_value SET label ='Outbound SMS' WHERE name = 'SMS' and option_group_id = @option_group_id_activity_type;
 {/if}
+
+-- CRM-12689
+ALTER TABLE civicrm_action_schedule
+  ADD COLUMN limit_to tinyint(4) DEFAULT '1' COMMENT 'Is this the recipient criteria limited to OR in addition to?'  AFTER recipient;
