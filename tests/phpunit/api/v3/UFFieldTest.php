@@ -176,7 +176,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $params = array('version' => 3);
-    $result = $this->callApiWithSuccessAndDocument($this->_entity, 'get', $params);
+    $result = $this->callApiWithSuccessAndDocument($this->_entity, 'get', $params, __FUNCTION__, __FILE__);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
 
