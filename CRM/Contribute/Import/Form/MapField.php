@@ -122,9 +122,9 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
    * @access public
    */
   public function defaultFromData(&$patterns, $index) {
-    $best     = '';
+    $best = '';
     $bestHits = 0;
-    $n        = count($this->_dataValues);
+    $n = count($this->_dataValues);
 
     foreach ($patterns as $key => $re) {
       // Skip empty key/patterns
@@ -277,7 +277,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
     $dataPatterns     = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
 
-
     /* Initialize all field usages to false */
 
     foreach ($mapperKeys as $key) {
@@ -302,7 +301,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
 
     $contactType = $contactTypes[$contactTypeId];
 
-    // get imporatable fields for contact type
+    // get importable fields for contact type
     $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
 
     // get the Dedupe rule for this contact type and build soft credit array
@@ -470,7 +469,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
         CRM_Contribute_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
       );
       $params = array(
-        'used'         => 'Unsupervised',
+        'used' => 'Unsupervised',
         'contact_type' => $contactTypes[$contactTypeId],
       );
       list($ruleFields, $threshold) = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($params);
@@ -488,7 +487,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
       $requiredFields = array(
         'contribution_contact_id' => ts('Contact ID'),
         'total_amount' => ts('Total Amount'),
-        'financial_type'    => ts('Financial Type')
+        'financial_type' => ts('Financial Type')
       );
 
       foreach ($requiredFields as $field => $title) {
@@ -498,7 +497,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
               $self->_onDuplicate != CRM_Contribute_Import_Parser::DUPLICATE_UPDATE
             ) {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-                1 => $threshold)) . '<br />';
+                  1 => $threshold
+                )) . '<br />';
             }
             elseif ($self->_onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_UPDATE &&
               !(in_array('invoice_id', $importKeys) || in_array('trxn_id', $importKeys) ||
@@ -511,7 +511,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
           else {
             if ($self->_onDuplicate != CRM_Contribute_Import_Parser::DUPLICATE_UPDATE) {
               $errors['_qf_default'] .= ts('Missing required field: %1', array(
-                1 => $title)) . '<br />';
+                  1 => $title
+                )) . '<br />';
             }
           }
         }

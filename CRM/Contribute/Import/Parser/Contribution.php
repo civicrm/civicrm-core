@@ -73,18 +73,24 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     $fields = CRM_Contribute_BAO_Contribution::importableFields($this->_contactType, FALSE);
 
     $fields = array_merge($fields,
-      array('soft_credit' => array('title' => ts('Soft Credit'),
-        'softCredit' => TRUE,
-        'headerPattern' => '/Soft Credit/i',
-      ))
+      array(
+        'soft_credit' => array(
+          'title' => ts('Soft Credit'),
+          'softCredit' => TRUE,
+          'headerPattern' => '/Soft Credit/i',
+        )
+      )
     );
 
     // add pledge fields only if its is enabled
     if (CRM_Core_Permission::access('CiviPledge')) {
-      $pledgeFields = array('pledge_payment' => array('title' => ts('Pledge Payment'),
+      $pledgeFields = array(
+        'pledge_payment' => array(
+          'title' => ts('Pledge Payment'),
           'headerPattern' => '/Pledge Payment/i',
         ),
-        'pledge_id' => array('title' => ts('Pledge ID'),
+        'pledge_id' => array(
+          'title' => ts('Pledge ID'),
           'headerPattern' => '/Pledge ID/i',
         ),
       );
@@ -343,8 +349,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     else {
       //fix for CRM-2219 - Update Contribution
       // onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_UPDATE
-      if (CRM_Utils_Array::value('invoice_id',$paramValues) ||
-          CRM_Utils_Array::value('trxn_id', $paramValues) || $paramValues['contribution_id']) {
+      if (CRM_Utils_Array::value('invoice_id', $paramValues) ||
+        CRM_Utils_Array::value('trxn_id', $paramValues) || $paramValues['contribution_id']
+      ) {
         $dupeIds = array(
           'id' => CRM_Utils_Array::value('contribution_id', $paramValues),
           'trxn_id' => CRM_Utils_Array::value('trxn_id', $paramValues),
@@ -387,7 +394,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               'contact_id' => $formatted['soft_credit_to'],
               'contribution_id' => $ids['contribution'],
             );
-            
+
             //FIXE ME: Need to fix this logic
             $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit);
             if (CRM_Utils_Array::value('soft_credit_id', $existingSoftCredit)) {
@@ -396,7 +403,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
 
           $newContribution = CRM_Contribute_BAO_Contribution::create($formatted, $ids);
-
           $this->_newContributions[] = $newContribution->id;
 
           //return soft valid since we need to show how soft credits were added
