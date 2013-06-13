@@ -395,8 +395,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               'contribution_id' => $ids['contribution'],
             );
 
-            //FIXE ME: Need to fix this logic
-            $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit);
+            //FIX ME: Need to fix this logic
+            $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit['contribution_id']);
             if (CRM_Utils_Array::value('soft_credit_id', $existingSoftCredit)) {
               $formatted['softID'] = $existingSoftCredit['soft_credit_id'];
             }
