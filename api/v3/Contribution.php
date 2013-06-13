@@ -94,6 +94,7 @@ function civicrm_api3_contribution_create(&$params) {
 function _civicrm_api3_contribution_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
   $params['total_amount']['api.required'] = 1;
+  $params['payment_instrument_id']['api.aliases'] = array('payment_instrument');
   $params['payment_processor'] = array(
     'name' => 'payment_processor',
     'title' => 'Payment Processor ID',
