@@ -634,10 +634,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $function - pass this in to create a generated example
    * @param string $file - pass this in to create a generated example
    */
-  function callAPISuccess($entity, $action, $params){
-    if(!isset($params['version'])){
-      $params['version'] = API_LATEST_VERSION;
-    }
+  function callAPISuccess($entity, $action, $params) {
+    $params += array(
+      'version' => API_LATEST_VERSION,
+      'debug' => 1,
+    );
     $result = civicrm_api($entity, $action, $params);
     $this->assertAPISuccess($result, "Failure in api call for $entity $action");
     return $result;
@@ -653,9 +654,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $function - pass this in to create a generated example
    * @param string $file - pass this in to create a generated example
    */
-  function callApiWithSuccessAndDocument($entity, $action, $params, $function, $filename, $description = "", $subfile = NULL, $action = NULL){
+  function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
     $result = $this->callAPISuccess($entity, $action, $params);
-    $this->documentMe($params, $result, $function, $filename, $description, $subfile, $action);
+    $this->documentMe($params, $result, $function, $file, $description, $subfile, $actionName);
     return $result;
   }
 
@@ -666,11 +667,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $action
    * @param array $params
    */
-  function callAPIFailure($entity, $action, $params){
+  function callAPIFailure($entity, $action, $params) {
+    if (is_array($params)) {
+      $params += array(
+        'version' => API_LATEST_VERSION,
+      );
+    }
     $result = civicrm_api($entity, $action, $params);
     $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success");
     return $result;
   }
+
   /**
    * Generic function to create Organisation, to be used in test cases
    *
