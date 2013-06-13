@@ -49,7 +49,7 @@
           <div class="crm-grid-cell">&nbsp;</div>
         {/if}
         {foreach from=$fields item=field key=fieldName}
-          <div class="crm-grid-cell"><img src="{$config->resourceBase}i/copy.png" alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}" fname="{$field.name}" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{$field.title}</div>
+          <div class="crm-grid-cell">{if $field.name neq 'soft_credit'}<img src="{$config->resourceBase}i/copy.png" alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}" fname="{$field.name}" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{/if}{$field.title}</div>
         {/foreach}
       </div>
     {section name='i' start=1 loop=$rowCount}
