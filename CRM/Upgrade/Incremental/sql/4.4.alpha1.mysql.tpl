@@ -55,3 +55,13 @@ VALUES
 -- CRM-12689
 ALTER TABLE civicrm_action_schedule
   ADD COLUMN limit_to tinyint(4) DEFAULT '1' COMMENT 'Is this the recipient criteria limited to OR in addition to?'  AFTER recipient;
+
+-- CRM-12653
+SELECT @uf_group_contribution_batch_entry     := max(id) FROM civicrm_uf_group WHERE name = 'contribution_batch_entry';
+SELECT @uf_group_membership_batch_entry       := max(id) FROM civicrm_uf_group WHERE name = 'membership_batch_entry';
+
+INSERT INTO civicrm_uf_field
+       ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, {localize field='label'}label{/localize}, field_type, help_post, phone_type_id )
+VALUES
+      ( @uf_group_contribution_batch_entry, 'soft_credit', 0, 0, 10, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Contribution', NULL, NULL ),
+      ( @uf_group_membership_batch_entry, 'soft_credit', 0, 0, 13, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Membership', NULL, NULL ); 
