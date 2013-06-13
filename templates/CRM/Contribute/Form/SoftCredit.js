@@ -59,11 +59,13 @@ cj(function($) {
 
   $('input[name^="soft_credit_contact["]').change(function(){
     var rowNum = $(this).attr('id').replace('soft_credit_contact_','');
-    var totalAmount = Number($('#total_amount').val());
+    var totalAmount = $('#total_amount').val();
     //assign total amount as default soft credit amount
     $('#soft_credit_amount_'+ rowNum).val(totalAmount);
+    var thousandMarker = CRM.monetaryThousandSeparator;
+    totalAmount = Number(totalAmount.replace(thousandMarker,''));
     if (rowNum > 1) {
-      var scAmount = Number($('#soft_credit_amount_'+ (rowNum - 1)).val());
+      var scAmount = Number($('#soft_credit_amount_'+ (rowNum - 1)).val().replace(thousandMarker,''));
       if (scAmount < totalAmount) {
 	//if user enters less than the total amount and adds another soft credit row, 
 	//the soft credit amount default will be left empty 
