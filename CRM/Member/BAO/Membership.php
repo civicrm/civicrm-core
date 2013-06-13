@@ -2685,7 +2685,7 @@ WHERE      civicrm_membership.is_test = 0";
     $contributionParams['currency'] = $config->defaultCurrency;
     $contributionParams['receipt_date'] = (CRM_Utils_Array::value('receipt_date', $params)) ? $params['receipt_date'] : 'null';
     $contributionParams['source'] = CRM_Utils_Array::value('contribution_source', $params);
-    $contributionParams['soft_credit_to'] = CRM_Utils_Array::value('soft_credit_to', $params);
+    $contributionParams['soft_credit'] = CRM_Utils_Array::value('soft_credit', $params);
     $contributionParams['non_deductible_amount'] = 'null';
     $recordContribution = array(
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',

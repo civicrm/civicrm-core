@@ -2005,6 +2005,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif ($fieldName == 'soft_credit') {
       CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, 'soft_credit_');
+      $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
     }
     elseif ($fieldName == 'product_name') {
       list($products, $options) = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
