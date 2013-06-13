@@ -1456,7 +1456,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
 
     // After swapping options, ensure we have an integer(s)
     foreach ((array) ($params[$fieldName]) as $value) {
-      if (!is_numeric($value) || (int) $value != $value) {
+      if (!is_numeric($value) && $value !== 'null') {
         throw new API_Exception("$fieldName is not a valid integer", 2001, array('error_field' => $fieldName, "type" => "integer"));
       }
     }
