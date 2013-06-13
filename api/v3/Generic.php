@@ -213,6 +213,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
   if (!$fieldName) {
     return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' doesn't exist.");
   }
+  // Validate 'context' from params
   $context = CRM_Utils_Array::value('context', $apiRequest['params']);
   CRM_Core_DAO::buildOptionsContext($context);
 

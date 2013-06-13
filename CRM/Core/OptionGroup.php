@@ -596,6 +596,7 @@ WHERE  v.option_group_id = g.id
   static function flushAll() {
     self::$_values = array();
     self::$_cache = array();
+    CRM_Utils_Cache::singleton()->flush();
   }
 }
 
