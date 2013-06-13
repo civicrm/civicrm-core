@@ -95,6 +95,10 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
+          'owner_membership_id' =>
+          array('title' => ts('Membership Owner ID'),
+            'operatorType' => CRM_Report_Form::OP_INT,
+          ),
           'membership_type_id' =>
           array('title' => ts('Membership Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
