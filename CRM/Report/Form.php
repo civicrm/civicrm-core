@@ -785,7 +785,8 @@ class CRM_Report_Form extends CRM_Core_Form {
           case CRM_Report_FORM::OP_SELECT:
             // assume a select field
             $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations);
-            $this->addElement('select', "{$fieldName}_value", NULL, $field['options']);
+            if (!empty($field['options']))
+              $this->addElement('select', "{$fieldName}_value", NULL, $field['options']);
             break;
 
           case CRM_Report_FORM::OP_DATE:
