@@ -33,9 +33,6 @@
  *  Include class definitions
  */
 require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'api/v3/Constant.php';
-require_once 'CRM/Core/I18n.php';
-require_once 'CRM/Utils/Cache.php';
 
 /**
  *  Test APIv3 civicrm_activity_* functions
@@ -117,19 +114,17 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( 'locationType' )
+   *  Test civicrm_address_getoptions( 'location_type_id' )
    */
   public function testLocationTypeGet() {
     // needed to get rid of cached values from previous tests
     CRM_Core_PseudoConstant::flush();
 
-
-
     $params = array(
-      'name' => 'locationType',
+      'field' => 'location_type_id',
       'version' => $this->_apiversion,
     );
-    $result = civicrm_api('constant', 'get', $params);
+    $result = civicrm_api('address', 'getoptions', $params);
     $this->assertAPISuccess($result);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
     $this->assertTrue($result['count'] > 3, "In line " . __LINE__);
@@ -143,14 +138,14 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( 'phoneType' )
+   *  Test civicrm_phone_getoptions( 'phone_type_id' )
    */
   public function testPhoneType() {
-    $parameters = array(TRUE, FALSE, TRUE);
-    $result = civicrm_api('constant', 'get', array(
-      'name' => 'phoneType',
-        'version' => $this->_apiversion,
-      ));
+    $params = array(
+      'field' => 'phone_type_id',
+      'version' => $this->_apiversion,
+    );
+    $result = civicrm_api('phone', 'getoptions', $params);
     $this->assertAPISuccess($result);
 
     $this->assertEquals(5, $result['count'], "In line " . __LINE__);
@@ -169,14 +164,11 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
    *  Test civicrm_constant_get( 'mailProtocol' )
    */
   public function testmailProtocol() {
-
-
-    $parameters = array(TRUE, FALSE, TRUE);
-
-    $result = civicrm_api('constant', 'get', array(
-      'name' => 'mailProtocol',
-        'version' => $this->_apiversion,
-      ));
+    $params = array(
+      'field' => 'protocol',
+      'version' => $this->_apiversion,
+    );
+    $result = civicrm_api('mail_settings', 'getoptions', $params);
     $this->assertAPISuccess($result);
 
     $this->assertEquals(4, $result['count'], "In line " . __LINE__);
