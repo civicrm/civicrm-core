@@ -156,7 +156,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $params = 'a string';
     $result = civicrm_api('uf_join', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 
@@ -164,7 +164,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $params = array();
     $result = civicrm_api('uf_join', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: version, module, weight, uf_group_id', 'In line ' . __LINE__);
   }
 
@@ -178,7 +178,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
     $result = civicrm_api('uf_join', 'create', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: uf_group_id', 'In line ' . __LINE__);
   }
 
@@ -224,7 +224,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $params = 'a string';
     $result = civicrm_api('uf_join', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 
@@ -232,7 +232,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $params = array();
     $result = civicrm_api('uf_join', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: version, module, weight, uf_group_id', 'In line ' . __LINE__);
   }
 
@@ -247,7 +247,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('uf_join', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: uf_group_id', 'In line ' . __LINE__);
   }
 

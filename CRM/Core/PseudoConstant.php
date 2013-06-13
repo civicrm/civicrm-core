@@ -329,9 +329,14 @@ class CRM_Core_PseudoConstant {
           $wheres = array();
           $order = "ORDER BY %2";
 
-          // Use name field instead of label in validate context
-          if ($context == 'validate' && in_array('name', $availableFields)) {
-            $params['labelColumn'] = 'name';
+          // Use machine name instead of label in validate context
+          if ($context == 'validate') {
+            if (!empty($pseudoconstant['nameColumn'])) {
+              $params['labelColumn'] = $pseudoconstant['nameColumn'];
+            }
+            elseif (in_array('name', $availableFields)) {
+              $params['labelColumn'] = 'name';
+            }
           }
           // Condition param can be passed as an sql clause string or an array of clauses
           if (!empty($params['condition'])) {

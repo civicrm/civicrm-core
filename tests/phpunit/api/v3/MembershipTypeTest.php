@@ -361,7 +361,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
     $result = civicrm_api('membership_type', 'delete', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
   }
 }
 

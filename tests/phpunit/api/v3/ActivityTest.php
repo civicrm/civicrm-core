@@ -212,7 +212,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $result = civicrm_api('activity', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 1,
+    $this->assertAPIFailure($result,
       "In line " . __LINE__
     );
   }

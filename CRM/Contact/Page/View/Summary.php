@@ -179,7 +179,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           CRM_Utils_Array::lookupValue($val, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name')), FALSE);
           if (!CRM_Utils_Array::value('skip', $value)) {
             $daoName = $value['daoName'];
-            $pseudoConst = $daoName::buildOptions($value['fieldName'], 'view');
+            $pseudoConst = $daoName::buildOptions($value['fieldName'], 'get');
             CRM_Utils_Array::lookupValue($val, $value['id'], $pseudoConst, FALSE);
           }
         }

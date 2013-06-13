@@ -395,7 +395,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $result = civicrm_api('custom_field', 'delete', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
 
-    $this->assertEquals($result['is_error'], 0, 'in line ' . __LINE__);
+    $this->assertAPISuccess($result, 'in line ' . __LINE__);
   }
 
   /**

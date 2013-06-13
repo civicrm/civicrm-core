@@ -66,6 +66,8 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     );
     $this->_sethtmlGlobals();
 
+    civicrm_api('uf_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
+
     $this->_params = array(
       'field_name' => 'phone',
       'field_type' => 'Contact',
@@ -102,8 +104,8 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     $this->documentMe($params, $ufField, __FUNCTION__, __FILE__);
     unset($params['version']);
     unset($params['uf_group_id']);
+    $this->assertAPISuccess($ufField, " in line " . __LINE__);
     $this->_ufFieldId = $ufField['id'];
-    $this->assertEquals(0, $ufField['is_error'], " in line " . __LINE__);
     foreach ($params as $key => $value) {
       $this->assertEquals($ufField['values'][$ufField['id']][$key], $params[$key]);
     }
@@ -113,22 +115,16 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     $params = $this->_params; // copy
     $params['field_name'] = 'custom_98789'; // invalid field
     $result = civicrm_api('uf_field', 'create', $params);
-    $this->assertEquals($result['is_error'], 1);
-  }
-
-  function testCreateUFFieldWithEmptyParams() {
-    $params = array();
-    $result = civicrm_api('uf_field', 'create', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testCreateUFFieldWithWrongParams() {
     $result = civicrm_api('uf_field', 'create', array('field_name' => 'test field'));
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $result = civicrm_api('uf_field', 'create', 'a string');
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $result = civicrm_api('uf_field', 'create', array('label' => 'name-less field'));
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
   /**
    * Create a field with 'weight=1' and then a second with 'weight=1'. The second field
@@ -137,6 +133,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   public function testCreateUFFieldWithDefaultAutoWeight() {
     $params1 = $this->_params; // copy
     $ufField1 = civicrm_api('uf_field', 'create', $params1);
+    $this->assertAPISuccess($ufField1, " in line " . __LINE__);
     $this->assertEquals(1, $ufField1['values'][$ufField1['id']]['weight']);
     $this->assertDBQuery(1, 'SELECT weight FROM civicrm_uf_field WHERE id = %1', array(
       1 => array($ufField1['id'], 'Int'),
@@ -173,11 +170,9 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   public function testGetUFFieldSuccess() {
 
-    civicrm_api($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $params = array('version' => 3);
-    $result = civicrm_api($this->_entity, 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 0, 'in line' . __LINE__);
+    $result = $this->callApiWithSuccessAndDocument($this->_entity, 'get', $params, __FUNCTION__, __FILE__);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
 

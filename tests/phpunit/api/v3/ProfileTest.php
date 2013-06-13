@@ -78,7 +78,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'version' => 3,
     );
     $result = civicrm_api('profile', 'get', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: profile_id');
   }
 
@@ -92,7 +92,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'version' => 3,
     );
     $result = civicrm_api('profile', 'get', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**
@@ -131,7 +131,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     unset($params['activity_id']);
     $result = civicrm_api('profile', 'get', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: activity_id');
   }
 
@@ -144,7 +144,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params['activity_id'] = 100001;
     $result = civicrm_api('profile', 'get', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Invalid Activity Id (aid).');
 
     $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
@@ -183,7 +183,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params['activity_id'] = $activityValues['id'];
     $result = civicrm_api('profile', 'get', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'This activity cannot be edited or viewed via this profile.');
 
     $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
@@ -216,7 +216,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   function testProfileSetNoArray() {
     $params = NULL;
     $result = civicrm_api('profile', 'set', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -229,7 +229,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'version' => 3,
     );
     $result = civicrm_api('profile', 'set', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: profile_id');
   }
 
@@ -243,7 +243,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'version' => 3,
     );
     $result = civicrm_api('profile', 'set', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**
@@ -267,7 +267,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     $result = civicrm_api('profile', 'set', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Missing required parameters for profile id 25: email-Primary');
 
     $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_contact'));
@@ -327,7 +327,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     unset($params['activity_id']);
     $result = civicrm_api('profile', 'set', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: activity_id');
 
     $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
@@ -343,7 +343,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params['activity_id'] = 100001;
     $result = civicrm_api('profile', 'set', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Invalid Activity Id (aid).');
 
     $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
@@ -383,7 +383,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params['activity_id'] = $activityValues['id'];
     $result = civicrm_api('profile', 'set', $params);
 
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'This activity cannot be edited or viewed via this profile.');
 
     $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
@@ -439,7 +439,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'version' => 3,
     );
     $result = civicrm_api('profile', 'apply', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: profile_id');
   }
 
@@ -453,7 +453,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'version' => 3,
     );
     $result = civicrm_api('profile', 'apply', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   /**

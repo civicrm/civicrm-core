@@ -40,7 +40,7 @@
       <pseudoconstant>
         <table>civicrm_location_type</table>
         <keyColumn>id</keyColumn>
-        <labelColumn>name</labelColumn>
+        <labelColumn>display_name</labelColumn>
       </pseudoconstant>
   </field>
   <index>
@@ -267,6 +267,7 @@
         <table>civicrm_country</table>
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
+        <nameColumn>iso_code</nameColumn>
       </pseudoconstant>
       <add>1.1</add>
   </field>
