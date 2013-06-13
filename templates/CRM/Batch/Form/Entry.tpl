@@ -49,7 +49,7 @@
           <div class="crm-grid-cell">&nbsp;</div>
         {/if}
         {foreach from=$fields item=field key=fieldName}
-          <div class="crm-grid-cell"><img src="{$config->resourceBase}i/copy.png" alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}" fname="{$field.name}" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{$field.title}</div>
+          <div class="crm-grid-cell">{if $field.name neq 'soft_credit'}<img src="{$config->resourceBase}i/copy.png" alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}" fname="{$field.name}" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{/if}{$field.title}</div>
         {/foreach}
       </div>
     {section name='i' start=1 loop=$rowCount}
@@ -70,7 +70,8 @@
         {if ( $fields.$n.data_type eq 'Date') or ( in_array( $n, array( 'thankyou_date', 'cancel_date', 'receipt_date', 'receive_date', 'join_date', 'membership_start_date', 'membership_end_date' ) ) ) }
             <div class="compressed crm-grid-cell"><span class="crm-batch-{$n}-{$rowNumber}">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$rowNumber batchUpdate=1}</span></div>
         {elseif $n eq 'soft_credit'}
-            <div class="compressed crm-grid-cell">{include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="soft_credit_"}</div>
+            <div class="compressed crm-grid-cell">{include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="soft_credit_"}
+            {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}</div>
         {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
         {else}
@@ -94,6 +95,13 @@
 
           // validate rows
           checkColumns( cj(this) );
+      });
+      
+      cj('input[name^="soft_credit_contact["]').change(function(){
+        var rowNum = cj(this).attr('id').replace('soft_credit_contact_','');
+        var totalAmount = cj('#field_'+rowNum+'_total_amount').val();
+        //assign total amount as default soft credit amount
+        cj('#soft_credit_amount_'+ rowNum).val(totalAmount);
       });
 
       // validate rows

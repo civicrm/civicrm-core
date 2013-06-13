@@ -234,6 +234,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     foreach ($params['field'] as $key => $value) {
       $batchTotal += $value['total_amount'];
 
+      //validate for soft credit fields
+      if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && !CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+        $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount');
+      }
+      if (CRM_Utils_Array::value($key, $params['soft_credit_amount']) 
+        && CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value($key, $params['soft_credit_amount'])) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
+        $errors["soft_credit_amount[$key]"] = ts('Soft credit amount should not be greater than the total amount');
+      }
+      
       //membership type is required for membership batch entry
       if ( $self->_batchInfo['type_id'] == 2 ) {
         if ( !CRM_Utils_Array::value( 1, $value['membership_type'] ) ) {
@@ -378,9 +387,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // update contact information
         $this->updateContactInfo($value);
 
-        // handle soft credit
-        if (CRM_Utils_Array::value('soft_credit_contact_select_id', $params) && CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id'])) {
-          $value['soft_credit_to'] = $params['soft_credit_contact_select_id'][$key];
+        //build soft credit params
+        if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+          $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
+          $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
         }
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
@@ -592,8 +602,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         // handle soft credit
-        if (CRM_Utils_Array::value('soft_credit_contact_select_id', $params) && CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id'])) {
-          $value['soft_credit_to'] = $params['soft_credit_contact_select_id'][$key];
+        if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+          $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
+          $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
         }
 
         if ( CRM_Utils_Array::value('receive_date', $value) ) {
