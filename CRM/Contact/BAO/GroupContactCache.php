@@ -385,7 +385,7 @@ WHERE  id = %1
     // done
     // we allow hidden groups here since we dont know if the caller wants to evaluate an
     // hidden group
-    if (!$force && !self::shouldGroupBeRefreshed($groupID, FALSE, TRUE)) {
+    if (!$force && !self::shouldGroupBeRefreshed($groupID, TRUE)) {
       $lock->release();
       return;
     }
