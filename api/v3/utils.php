@@ -1566,7 +1566,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $
  */
 function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName) {
   // If option is a key, no need to translate
-  if (isset($options[$value])) {
+  if (array_key_exists($value, $options)) {
     return;
   }
 

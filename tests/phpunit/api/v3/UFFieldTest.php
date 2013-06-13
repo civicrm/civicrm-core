@@ -66,6 +66,8 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     );
     $this->_sethtmlGlobals();
 
+    civicrm_api('uf_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
+
     $this->_params = array(
       'field_name' => 'phone',
       'field_type' => 'Contact',
@@ -112,12 +114,6 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   public function testCreateUFFieldWithBadFieldName() {
     $params = $this->_params; // copy
     $params['field_name'] = 'custom_98789'; // invalid field
-    $result = civicrm_api('uf_field', 'create', $params);
-    $this->assertAPIFailure($result);
-  }
-
-  function testCreateUFFieldWithEmptyParams() {
-    $params = array();
     $result = civicrm_api('uf_field', 'create', $params);
     $this->assertAPIFailure($result);
   }
