@@ -192,30 +192,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_membership_get with params not array.
-   * Gets treated as contact_id, memberships expected.
-   */
-  function testGetWithNonExistantMemberShipTypeId() {
-    $this->_membershipID = $this->contactMembershipCreate($this->_params);
-    $params = array(
-      'membership_type_id' => 465653,
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('membership', 'get', $params);
-    civicrm_api('Membership', 'Delete', array(
-      'id' => $this->_membershipID,
-        'version' => $this->_apiversion,
-      ));
-
-    $this->assertAPISuccess($result, "In line " . __LINE__);
-    $this->assertEquals($result['count'], 0, "In line " . __LINE__);
-    civicrm_api('Membership', 'Delete', array(
-      'id' => $this->_membershipID,
-        'version' => $this->_apiversion,
-      ));
-  }
-
-  /**
    * check with complete array + custom field
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
@@ -521,7 +497,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $params['status_id'] = 999;
 
     $result = civicrm_api('membership', 'create', $params);
-    $this->assertEquals('status_id is not valid : 999', $result['error_message']);
+    $this->assertEquals("'999' is not a valid option for field status_id", $result['error_message']);
   }
 
   function testMembershipCreateWithInvalidType() {
@@ -529,7 +505,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $params['membership_type_id'] = 999;
 
     $result = civicrm_api('membership', 'create', $params);
-    $this->assertEquals('membership_type_id is not valid : 999', $result['error_message']);
+    $this->assertEquals("'999' is not a valid option for field membership_type_id", $result['error_message']);
   }
 
   /**
