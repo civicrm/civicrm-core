@@ -171,9 +171,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'contact_type' => 'Does not Exist',
       'version' => $this->_apiversion,
     );
-    $contact = civicrm_api('contact', 'create', $params);
-    $this->assertEquals($contact['is_error'], 1, "In line " . __LINE__);
-    $this->assertEquals('contact_type `Does not Exist` is not valid.', $contact['error_message']);
+    $result = civicrm_api('contact', 'create', $params);
+    $this->assertApiFailure($result);
+    $this->assertEquals("'Does not Exist' is not a valid option for field contact_type", $result['error_message']);
   }
 
   /**
