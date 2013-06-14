@@ -106,6 +106,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     //custom group id
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
 
+    if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
+      CRM_Core_Error::fatal("You cannot add or edit fields of a Reserved Custom Group");
+    }
+
     if ($this->_gid) {
       $url = CRM_Utils_System::url('civicrm/admin/custom/group/field',
         "reset=1&action=browse&gid={$this->_gid}"
