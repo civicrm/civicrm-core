@@ -298,11 +298,11 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         require_once 'CRM/Contact/DAO/Contact.php';
         $contactType = new CRM_Contact_DAO_Contact();
         //when insert mode check contact id or external identifier
-        if (CRM_Utils_Array::value('contribution_contact_id', $params) || $params['external_identifier']) {
-          if (CRM_Utils_Array::value('contribution_contact_id', $params)) {
+        if (!empty($params['contribution_contact_id']) || !empty($params['external_identifier'])) {
+          if (!empty($params['contribution_contact_id'])) {
             $contactType->id = CRM_Utils_Array::value('contribution_contact_id', $params);
           }
-          elseif ($params['external_identifier']) {
+          elseif (!empty($params['external_identifier'])) {
             $contactType->external_identifier = $params['external_identifier'];
           }
           if ($contactType->find(TRUE)) {
