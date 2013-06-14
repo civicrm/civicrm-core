@@ -653,6 +653,7 @@ ALTER TABLE `civicrm_membership_log`
 ADD COLUMN `max_related` INT(10) unsigned DEFAULT NULL COMMENT 'Maximum number of related memberships.' AFTER `membership_type_id`;
 
 -- CRM-11358
+DELETE FROM civicrm_dashboard_contact WHERE contact_id NOT IN (SELECT id FROM civicrm_contact);
 INSERT INTO `civicrm_dashboard`
 (`domain_id`, {localize field='label'}`label`{/localize}, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`)
 SELECT id, {localize}'{ts escape="sql"}CiviCRM News{/ts}'{/localize}, 'civicrm/dashlet/blog&reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/blog&reset=1&snippet=5&context=dashletFullscreen', 1, 1
