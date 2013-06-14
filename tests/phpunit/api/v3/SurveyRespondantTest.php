@@ -64,14 +64,6 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test surveyRespondent get with empty params.
-   */
-  public function testGetEmptyParams() {
-    $params = array();
-    $GetEmptyParams = civicrm_api("SurveyRespondant","get", $params );
-    $this->assertEquals($GetEmptyParams['error_message'], 'Mandatory key(s) missing from params array: version');
-  }
-  /**
    * Test survey respondent get.
    */
   public function testGetSurveyRespondants() {

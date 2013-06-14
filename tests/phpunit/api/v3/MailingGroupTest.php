@@ -70,8 +70,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'time_stamp' => '20111111010101',
       'hash' => 'sasa',
     );
-    $result = civicrm_api('mailing_event_subscribe', 'create', $params);
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('mailing_event_subscribe', 'create', $params);
     if ($result['error_message'] != 'Subscription failed') {
       $this->assertEquals($result['error_message'], 'Invalid Group id', 'In line ' . __LINE__);
     }
@@ -123,8 +122,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'time_stamp' => '20101212121212',
     );
 
-    $result = civicrm_api('mailing_event_unsubscribe', 'create', $params);
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
     $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
   }
 
@@ -143,8 +141,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'time_stamp' => '20101212121212',
     );
 
-    $result = civicrm_api('mailing_event_unsubscribe', 'create', $params);
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
     $this->assertEquals($result['error_message'], 'Domain Queue event could not be found', 'In line ' . __LINE__);
   }
 
@@ -167,8 +164,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
       'time_stamp' => '20101212121212',
     );
-    $result = civicrm_api('mailing_event_resubscribe', 'create', $params);
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('mailing_event_resubscribe', 'create', $params);
     $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
   }
 

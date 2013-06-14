@@ -118,17 +118,9 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     ));
   }
 
-  function testGetEmptyParamsContributionSoft() {
-    $params = array();
-    $contribution = civicrm_api('contribution_soft', 'get', $params);
-    $this->assertEquals($contribution['is_error'], 1);
-    $this->assertEquals($contribution['error_message'], 'Mandatory key(s) missing from params array: version');
-  }
-
   function testGetParamsNotArrayContributionSoft() {
     $params = 'contact_id= 1';
-    $contribution = civicrm_api('contribution', 'get', $params);
-    $this->assertEquals($contribution['is_error'], 1);
+    $contribution = $this->callAPIFailure('contribution', 'get', $params);
     $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -217,23 +209,20 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
 
     $params = array('version' => $this->_apiversion);
-    $softcontribution = civicrm_api('contribution_soft', 'create', $params);
-    $this->assertEquals($softcontribution['is_error'], 1, 'In line ' . __LINE__);
+    $softcontribution = $this->callAPIFailure('contribution_soft', 'create', $params);
     $this->assertEquals($softcontribution['error_message'], 'Mandatory key(s) missing from params array: contribution_id, amount, contact_id', 'In line ' . __LINE__);
   }
 
   function testCreateParamsNotArrayContributionSoft() {
 
     $params = 'contact_id= 1';
-    $softcontribution = civicrm_api('contribution_soft', 'create', $params);
-    $this->assertEquals($softcontribution['is_error'], 1);
+    $softcontribution = $this->callAPIFailure('contribution_soft', 'create', $params);
     $this->assertEquals($softcontribution['error_message'], 'Input variable `params` is not an array');
   }
 
   function testCreateParamsWithoutRequiredKeysContributionSoft() {
     $params = array('version' => 3);
-    $softcontribution = civicrm_api('contribution_soft', 'create', $params);
-    $this->assertEquals($softcontribution['is_error'], 1);
+    $softcontribution = $this->callAPIFailure('contribution_soft', 'create', $params);
     $this->assertEquals($softcontribution['error_message'], 'Mandatory key(s) missing from params array: contribution_id, amount, contact_id');
   }
 
@@ -368,14 +357,12 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   ///////////////// civicrm_contribution_soft_delete methods
   function testDeleteEmptyParamsContributionSoft() {
     $params = array('version' => $this->_apiversion);
-    $softcontribution = civicrm_api('contribution_soft', 'delete', $params);
-    $this->assertEquals($softcontribution['is_error'], 1);
+    $softcontribution = $this->callAPIFailure('contribution_soft', 'delete', $params);
   }
 
   function testDeleteParamsNotArrayContributionSoft() {
     $params = 'id= 1';
-    $softcontribution = civicrm_api('contribution_soft', 'delete', $params);
-    $this->assertEquals($softcontribution['is_error'], 1);
+    $softcontribution = $this->callAPIFailure('contribution_soft', 'delete', $params);
     $this->assertEquals($softcontribution['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -384,8 +371,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'contribution_source' => 'SSF',
       'version' => $this->_apiversion,
     );
-    $softcontribution = civicrm_api('contribution_soft', 'delete', $params);
-    $this->assertEquals($softcontribution['is_error'], 1);
+    $softcontribution = $this->callAPIFailure('contribution_soft', 'delete', $params);
   }
 
   function testDeleteContributionSoft() {
@@ -416,9 +402,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    */
   function testSearchWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('contribution_soft', 'get', $params);
-
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('contribution_soft', 'get', $params);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 

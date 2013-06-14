@@ -67,8 +67,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   function testCustomFieldCreateNoArray() {
     $fieldParams = NULL;
 
-    $customField = civicrm_api('custom_field', 'create', $fieldParams);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'create', $fieldParams);
     $this->assertEquals($customField['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -90,8 +89,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $customField = civicrm_api('custom_field', 'create', $params);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'create', $params);
     $this->assertEquals($customField['error_message'], 'Mandatory key(s) missing from params array: label');
   }
 
@@ -139,8 +137,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $customField = civicrm_api('custom_field', 'create', $fieldParams);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'create', $fieldParams);
     $this->assertEquals($customField['error_message'], 'Mandatory key(s) missing from params array: custom_group_id');
   }
 
@@ -365,8 +362,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   function testCustomFieldDeleteNoArray() {
     $params = NULL;
-    $customField = civicrm_api('custom_field', 'delete', $params);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'delete', $params);
     $this->assertEquals($customField['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -375,8 +371,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   function testCustomFieldDeleteWithoutFieldID() {
     $params = array('version' => $this->_apiversion);
-    $customField = civicrm_api('custom_field', 'delete', $params);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'delete', $params);
     $this->assertEquals($customField['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 

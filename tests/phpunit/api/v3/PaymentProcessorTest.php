@@ -88,9 +88,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'is_active' => 1,
       'version' => $this->_apiversion,
     );
-    $result = civicrm_api('payment_processor', 'create', $payProcParams);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('payment_processor', 'create', $payProcParams);
   }
 
   /**

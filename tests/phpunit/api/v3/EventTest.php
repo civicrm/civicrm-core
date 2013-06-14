@@ -129,19 +129,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_event_get methods
-  function testGetWrongParamsType() {
-    $params = 'Annual CiviCRM meet';
-    $result = civicrm_api('Event', 'Get', $params);
-
-    $this->assertAPIFailure($result);
-  }
-
-  function testGetEventEmptyParams() {
-    $params = array();
-    $result = civicrm_api('event', 'get', $params);
-
-    $this->assertAPIFailure($result);
-  }
 
   function testGetEventById() {
     $params = array(
@@ -263,8 +250,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = $this->_params[0];
     $params['sequential'] =1;
     $params['loc_block_id'] =100;
-    $result = civicrm_api('event', 'create', $params);
-    $this->assertEquals(1, $result['is_error']);
+    $result = $this->callAPIFailure('event', 'create', $params);
 
   }
 
@@ -346,14 +332,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   function testCreateEventParamsNotArray() {
     $params = NULL;
-    $result = civicrm_api('event', 'create', $params);
-    $this->assertEquals(1, $result['is_error']);
+    $result = $this->callAPIFailure('event', 'create', $params);
   }
 
   function testCreateEventEmptyParams() {
     $params = array();
-    $result = civicrm_api('event', 'create', $params);
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('event', 'create', $params);
   }
 
   function testCreateEventParamsWithoutTitle() {
@@ -430,15 +414,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
   ///////////////// civicrm_event_delete methods
   function testDeleteWrongParamsType() {
     $params = 'Annual CiviCRM meet';
-    $result = civicrm_api('Event', 'Delete', $params);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('Event', 'Delete', $params);
   }
 
   function testDeleteEmptyParams() {
     $params = array();
-    $result = civicrm_api('Event', 'Delete', $params);
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('Event', 'Delete', $params);
   }
 
   function testDelete() {
@@ -481,8 +462,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = civicrm_api('Event', 'Delete', $params);
     // try to delete again - there's no such event anymore
     $params = array('event_id' => $this->_eventIds[0]);
-    $result = civicrm_api('Event', 'Delete', $params);
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('Event', 'Delete', $params);
   }
 
   ///////////////// civicrm_event_search methods
@@ -492,9 +472,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
   function testSearchWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('event', 'get', $params);
-
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('event', 'get', $params);
   }
 
   /**
@@ -569,8 +547,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     );
     $config = &CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
-    $result = civicrm_api('event', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], 'lacking permissions should not be enough to create an event');
+    $result = $this->callAPIFailure('event', 'create', $params);
     $this->assertEquals('API permission check failed for event/create call; missing permission: access CiviEvent.', $result['error_message'], 'lacking permissions should not be enough to create an event');
 
     $config->userPermissionClass->permissions = array('access CiviEvent', 'edit all events', 'access CiviCRM');

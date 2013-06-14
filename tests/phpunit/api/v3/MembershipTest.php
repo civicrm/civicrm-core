@@ -99,14 +99,12 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   function testMembershipDeleteEmpty() {
     $params = array();
-    $result = civicrm_api('membership', 'delete', $params);
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('membership', 'delete', $params);
   }
 
   function testMembershipDeleteInvalidID() {
     $params = array('version' => $this->_apiversion, 'id' => 'blah');
-    $result = civicrm_api('membership', 'delete', $params);
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('membership', 'delete', $params);
   }
 
   /**
@@ -410,8 +408,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   function testCreateWithEmptyParams() {
     $params = array();
-    $result = civicrm_api('membership', 'create', $params);
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('membership', 'create', $params);
   }
 
   /**
@@ -448,8 +445,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('membership', 'create', $params);
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('membership', 'create', $params);
   }
 
   function testMembershipCreate() {
@@ -712,19 +708,16 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('membership', 'create', $params);
-    $this->assertAPIFailure($result, "in line " . __LINE__);
+    $result = $this->callAPIFailure('membership', 'create', $params);
 
     //membership_contact_id which is no in contact table
     $params['membership_contact_id'] = 999;
-    $result = civicrm_api('membership', 'create', $params);
-    $this->assertAPIFailure($result, "in line " . __LINE__);
+    $result = $this->callAPIFailure('membership', 'create', $params);
 
     //invalid join date
     unset($params['membership_contact_id']);
     $params['join_date'] = "invalid";
-    $result = civicrm_api('Membership', 'Create', $params);
-    $this->assertAPIFailure($result, "in line " . __LINE__);
+    $result = $this->callAPIFailure('Membership', 'Create', $params);
   }
 
   /**

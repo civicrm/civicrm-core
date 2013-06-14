@@ -506,15 +506,13 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   function testDeleteEmptyParamsPledge() {
 
     $params = array('version' => $this->_apiversion);
-    $pledge = civicrm_api('pledge', 'delete', $params);
-    $this->assertEquals($pledge['is_error'], 1);
+    $pledge = $this->callAPIFailure('pledge', 'delete', $params);
     $this->assertEquals($pledge['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 
   function testDeleteParamsNotArrayPledge() {
     $params = 'pledge_id= 1';
-    $pledge = civicrm_api('pledge', 'delete', $params);
-    $this->assertEquals($pledge['is_error'], 1);
+    $pledge = $this->callAPIFailure('pledge', 'delete', $params);
     $this->assertEquals($pledge['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -523,8 +521,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'pledge_source' => 'SSF',
       'version' => $this->_apiversion,
     );
-    $pledge = civicrm_api('pledge', 'delete', $params);
-    $this->assertEquals($pledge['is_error'], 1);
+    $pledge = $this->callAPIFailure('pledge', 'delete', $params);
     $this->assertEquals($pledge['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 

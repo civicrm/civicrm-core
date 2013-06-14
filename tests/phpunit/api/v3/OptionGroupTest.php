@@ -132,8 +132,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
         'debug' => 0,
       ),
     );
-    $result = civicrm_api('OptionGroup', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], 'Error should be passed up to top level In line ' . __LINE__);
+    $result = $this->callAPIFailure('OptionGroup', 'create', $params);
     $countAfter = civicrm_api('OptionGroup', 'getcount', array(
         'version' => 3,
         'options' => array('limit' => 5000),

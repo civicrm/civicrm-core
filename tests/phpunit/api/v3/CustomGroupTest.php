@@ -83,8 +83,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $params = array(
       'version' => $this->_apiversion,
     );
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertAPIFailure($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'],
       'Mandatory key(s) missing from params array: title, extends', 'In line ' . __LINE__
     );
@@ -130,8 +129,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertAPIFailure($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: extends', 'In line ' . __LINE__);
   }
 
@@ -213,8 +211,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('custom_group', 'create', $params);
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($result['error_message'], 'implode(): Invalid arguments passed', 'In line ' . __LINE__);
   }
 
@@ -245,8 +242,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    */
   function testCustomGroupCreateNotArray() {
     $params = NULL;
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertAPIFailure($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 
@@ -366,11 +362,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    * check without GroupID
    */
   function testCustomGroupDeleteWithoutGroupID() {
-    $params = array(
-      'version' => $this->_apiversion,
-    );
-    $customGroup = civicrm_api('custom_group', 'delete', $params);
-    $this->assertAPIFailure($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'delete', array());
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: id', 'In line ' . __LINE__);
   }
 
@@ -379,8 +371,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    */
   function testCustomGroupDeleteNoArray() {
     $params = NULL;
-    $customGroup = civicrm_api('custom_group', 'delete', $params);
-    $this->assertEquals($customGroup['is_error'], 1, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'delete', $params);
     $this->assertEquals($customGroup['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 

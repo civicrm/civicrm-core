@@ -111,17 +111,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_contribution_get methods
-  function testGetEmptyParamsContribution() {
-    $params = array();
-    $contribution = civicrm_api('contribution', 'get', $params);
-    $this->assertAPIFailure($contribution);
-    $this->assertEquals($contribution['error_message'], 'Mandatory key(s) missing from params array: version');
-  }
 
   function testGetParamsNotArrayContribution() {
     $params = 'contact_id= 1';
-    $contribution = civicrm_api('contribution', 'get', $params);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'get', $params);
     $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -354,23 +347,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
 
     $params = array('version' => $this->_apiversion);
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'create', $params);
     $this->assertEquals($contribution['error_message'], 'Mandatory key(s) missing from params array: financial_type_id, total_amount, contact_id', 'In line ' . __LINE__);
   }
 
   function testCreateParamsNotArrayContribution() {
 
     $params = 'contact_id= 1';
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'create', $params);
     $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
   }
 
   function testCreateParamsWithoutRequiredKeys() {
     $params = array('version' => 3);
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'create', $params);
     $this->assertEquals($contribution['error_message'], 'Mandatory key(s) missing from params array: financial_type_id, total_amount, contact_id');
   }
 
@@ -1042,8 +1032,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'contribution_status_id' => 2,
       )
     );
-    $contribution = civicrm_api('contribution', 'update', $newParams);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'update', $newParams);
     $this->assertEquals($contribution['error_message'], ts('Cannot change contribution status from Completed to Pending.'), 'In line ' . __LINE__);
 
   }
@@ -1173,14 +1162,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   ///////////////// civicrm_contribution_delete methods
   function testDeleteEmptyParamsContribution() {
     $params = array('version' => $this->_apiversion);
-    $contribution = civicrm_api('contribution', 'delete', $params);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'delete', $params);
   }
 
   function testDeleteParamsNotArrayContribution() {
     $params = 'contribution_id= 1';
-    $contribution = civicrm_api('contribution', 'delete', $params);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'delete', $params);
     $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -1189,8 +1176,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_source' => 'SSF',
       'version' => $this->_apiversion,
     );
-    $contribution = civicrm_api('contribution', 'delete', $params);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'delete', $params);
   }
 
   function testDeleteContribution() {

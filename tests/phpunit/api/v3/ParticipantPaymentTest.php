@@ -104,8 +104,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   function testPaymentCreateWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('participant_payment', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -113,8 +112,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   function testPaymentCreateEmptyParams() {
     $params = array();
-    $result = civicrm_api('participant_payment', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -127,8 +125,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $participantPayment = civicrm_api('participant_payment', 'create', $params);
-    $this->assertEquals($participantPayment['is_error'], 1);
+    $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -162,9 +159,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   function testPaymentUpdateWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('participant_payment', 'create', $params);
-
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('participant_payment', 'create', $params);
     $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
   }
 
@@ -173,8 +168,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   function testPaymentUpdateEmpty() {
     $params = array();
-    $participantPayment = civicrm_api('participant_payment', 'create', $params);
-    $this->assertEquals($participantPayment['is_error'], 1);
+    $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -187,8 +181,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $participantPayment = civicrm_api('participant_payment', 'create', $params);
-    $this->assertEquals($participantPayment['is_error'], 1);
+    $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -199,8 +192,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'participant_id' => $this->_participantID,
       'version' => $this->_apiversion,
     );
-    $participantPayment = civicrm_api('participant_payment', 'create', $params);
-    $this->assertEquals($participantPayment['is_error'], 1);
+    $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -316,8 +308,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   function testPaymentDeleteWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('participant_payment', 'delete', $params);
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('participant_payment', 'delete', $params);
   }
 
   /**
@@ -325,8 +316,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   function testPaymentDeleteWithEmptyParams() {
     $params = array('version' => $this->_apiversion);
-    $deletePayment = civicrm_api('participant_payment', 'delete', $params);
-    $this->assertEquals(1, $deletePayment['is_error']);
+    $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
     $this->assertEquals('Mandatory key(s) missing from params array: id', $deletePayment['error_message']);
   }
 
@@ -338,8 +328,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'id' => 0,
       'version' => $this->_apiversion,
     );
-    $deletePayment = civicrm_api('participant_payment', 'delete', $params);
-    $this->assertEquals($deletePayment['is_error'], 1);
+    $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
     $this->assertEquals($deletePayment['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 
@@ -372,15 +361,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = 'eeee';
     $GetWrongParamsType = civicrm_api('participant_payment', 'get', $params);
     $this->assertEquals($GetWrongParamsType['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
-   * Test civicrm_participantPayment_get with empty params.
-   */
-  public function testGetEmptyParams() {
-    $params = array();
-    $GetEmptyParams = civicrm_api('participant_payment', 'get', $params);
-    $this->assertEquals($GetEmptyParams['error_message'], 'Mandatory key(s) missing from params array: version');
   }
 
   /**

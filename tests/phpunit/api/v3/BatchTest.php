@@ -85,19 +85,8 @@ class api_v3_BatchTest extends CiviUnitTestCase {
    */
   public function testGetWrongParamsType() {
     $params = 'is_string';
-    $result = civicrm_api('batch', 'get', $params);
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('batch', 'get', $params);
     $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
-  }
-
-  /**
-   * Test civicrm_batch_get with empty params.
-   */
-  public function testGetEmptyParams() {
-    $params = array();
-    $result = civicrm_api('batch', 'get', $params);
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertEquals('Mandatory key(s) missing from params array: version', $result['error_message'], 'In line ' . __LINE__);
   }
 
   /**
@@ -118,21 +107,10 @@ class api_v3_BatchTest extends CiviUnitTestCase {
   ///////////////// civicrm_batch_create methods
 
   /**
-   * Test civicrm_batch_create with wrong params type.
-   */
-  function testCreateWrongParamsType() {
-    $params = 'a string';
-    $result = civicrm_api('batch', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], "In line " . __LINE__);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
-  }
-
-  /**
    * Test civicrm_batch_create with empty params.
    */
   function testCreateEmptyParams() {
-    $result = civicrm_api('batch', 'create', $this->_params);
-    $this->assertEquals(1, $result['is_error'], "In line " . __LINE__);
+    $this->callAPIFailure('batch', 'create', $this->_params);
   }
 
   /**
@@ -204,8 +182,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
    * Test civicrm_batch_delete with wrong batch id type.
    */
   function testDeleteWrongParams() {
-    $result = civicrm_api('batch', 'delete', 'tyttyd');
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('batch', 'delete', 'tyttyd');
     $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
   }
 

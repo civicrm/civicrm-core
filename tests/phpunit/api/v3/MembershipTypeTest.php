@@ -62,13 +62,6 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     );
   }
 
-  function testGetWithEmptyParams() {
-    $params = array();
-    $membershiptype = civicrm_api('membership_type', 'get', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
-    $this->assertEquals($membershiptype['error_message'], 'Mandatory key(s) missing from params array: version');
-  }
-
   function testGetWithoutId() {
     $params = array(
       'name' => '60+ Membership',
@@ -107,9 +100,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   ///////////////// civicrm_membership_type_create methods
   function testCreateWithEmptyParams() {
-    $params = array('version' => $this->_apiversion);
-    $membershiptype = civicrm_api('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'create', array());
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: domain_id, member_of_contact_id, financial_type_id, duration_unit, duration_interval, name'
     );
@@ -137,8 +128,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $membershiptype = civicrm_api('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'], 'Mandatory key(s) missing from params array: member_of_contact_id');
   }
 
@@ -155,8 +145,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
       'version' => $this->_apiversion,
     );
-    $membershiptype = civicrm_api('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: financial_type_id'
     );
@@ -175,8 +164,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $membershiptype = civicrm_api('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: duration_unit'
     );
@@ -194,8 +182,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
       'version' => $this->_apiversion,
     );
-    $membershiptype = civicrm_api('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: financial_type_id, duration_interval'
     );
@@ -213,8 +200,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $membershiptype = civicrm_api('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: domain_id, duration_unit, name'
     );
@@ -234,8 +220,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $membershiptype = civicrm_api('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'], 'Mandatory key(s) missing from params array: name');
   }
 
@@ -272,10 +257,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   function testUpdateWithEmptyParams() {
     $params = array();
-    $membershiptype = civicrm_api('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
-      'Mandatory key(s) missing from params array: version, domain_id, member_of_contact_id, financial_type_id, duration_unit, duration_interval, name'
+      'Mandatory key(s) missing from params array: domain_id, member_of_contact_id, financial_type_id, duration_unit, duration_interval, name'
     );
   }
 
@@ -293,8 +277,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $membershiptype = civicrm_api('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'], 'Mandatory key(s) missing from params array: domain_id');
   }
 
@@ -336,9 +319,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   function testDeleteWithEmptyParams() {
     $params = array();
-    $membershiptype = civicrm_api('membership_type', 'delete', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
-    $this->assertEquals($membershiptype['error_message'], 'Mandatory key(s) missing from params array: version, id');
+    $membershiptype = $this->callAPIFailure('membership_type', 'delete', $params);
+    $this->assertEquals($membershiptype['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 
   function testDeleteNotExists() {
@@ -346,8 +328,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'id' => 'doesNotExist',
       'version' => $this->_apiversion,
     );
-    $membershiptype = civicrm_api('membership_type', 'delete', $params);
-    $this->assertEquals($membershiptype['is_error'], 1);
+    $membershiptype = $this->callAPIFailure('membership_type', 'delete', $params);
     $this->assertEquals($membershiptype['error_message'], 'Error while deleting membership type. id : ' . $params['id']);
   }
 

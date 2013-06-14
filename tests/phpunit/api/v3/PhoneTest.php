@@ -154,8 +154,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
    */
   public function testCreateWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('Phone', 'Create', $params);
-    $this->assertEquals(1, $result['is_error'], "In line " . __LINE__);
+    $result = $this->callAPIFailure('Phone', 'Create', $params);
   }
 
   /**

@@ -75,8 +75,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    */
 
     public function testMailingNullParams() {
-        $result = civicrm_api('MailingContact', 'get', null);
-        $this->assertAPIFailure($result, "In line " . __LINE__);
+        $result = $this->callAPIFailure('MailingContact', 'get', null);
     }
     public function testMailingContactGetFields() {
       $result = civicrm_api('MailingContact', 'getfields', array(
@@ -99,8 +98,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('MailingContact', 'get', $params);
-    $this->assertAPIFailure($result, "In line " . __LINE__);
+    $result = $this->callAPIFailure('MailingContact', 'get', $params);
   }
 
   /*
@@ -112,8 +110,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
             'version' => $this->_apiversion,
         );
 
-        $result = civicrm_api('MailingContact', 'get', $params);
-        $this->assertAPIFailure($result, "In line " . __LINE__);
+        $result = $this->callAPIFailure('MailingContact', 'get', $params);
    }
 
    /*
@@ -126,8 +123,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
             'version' => $this->_apiversion,
         );
 
-        $result = civicrm_api('MailingContact', 'get', $params);
-        $this->assertAPIFailure($result, "In line " . __LINE__);
+        $result = $this->callAPIFailure('MailingContact', 'get', $params);
     }
 
 

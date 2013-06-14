@@ -100,9 +100,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    * Error expected
    */
   function testGetWithEmptyParams() {
-    $params = array();
-    $note = civicrm_api('note', 'get', $params);
-    $this->assertEquals($note['is_error'], 1);
+    $this->callAPISuccess('note', 'get', array());
   }
 
   /**
@@ -261,8 +259,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    */
   function testUpdateWithEmptyParams() {
     $params = array();
-    $note = civicrm_api('note', 'create', $params);
-    $this->assertEquals($note['is_error'], 1);
+    $note = $this->callAPIFailure('note', 'create', $params);
   }
 
   /**
@@ -275,8 +272,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contact',
       'version' => $this->_apiversion,
     );
-    $note = civicrm_api('note', 'create', $params);
-    $this->assertEquals($note['is_error'], 1);
+    $note = $this->callAPIFailure('note', 'create', $params);
     $this->assertEquals($note['error_message'], 'Mandatory key(s) missing from params array: note');
   }
 
@@ -323,9 +319,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    */
   function testDeleteWithEmptyParams() {
     $params = array();
-    $deleteNote = civicrm_api('note', 'delete', $params);
-    $this->assertEquals($deleteNote['is_error'], 1);
-    $this->assertEquals($deleteNote['error_message'], 'Mandatory key(s) missing from params array: version, id');
+    $deleteNote = $this->callAPIFailure('note', 'delete', $params);
+    $this->assertEquals($deleteNote['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 
   /**
@@ -337,8 +332,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'id' => 0,
       'version' => $this->_apiversion,
     );
-    $deleteNote = civicrm_api('note', 'delete', $params);
-    $this->assertEquals($deleteNote['is_error'], 1);
+    $deleteNote = $this->callAPIFailure('note', 'delete', $params);
     $this->assertEquals($deleteNote['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 

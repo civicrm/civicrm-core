@@ -63,9 +63,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'is_active' => 1,
       'version' => $this->_apiVersion,
     );
-    $result = civicrm_api('job', 'create', $params);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('job', 'create', $params);
     $this->assertEquals($result['error_message'],
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
@@ -86,8 +84,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     );
-    $result = civicrm_api('job', 'create', $params);
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('job', 'create', $params);
   }
 
   /**
@@ -122,16 +119,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   function testDeleteEmpty() {
     $params = array();
-    $result = civicrm_api('job', 'delete', $params);
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('job', 'delete', $params);
   }
 
   /**
    * check with No array
    */
   function testDeleteParamsNotArray() {
-    $result = civicrm_api('job', 'delete', 'string');
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('job', 'delete', 'string');
   }
 
   /**
@@ -144,9 +139,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'class_name' => 'CRM_Core_Payment_APITest',
     );
 
-    $result = civicrm_api('job', 'delete', $params);
-    $this->assertAPIFailure($result);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: version, id');
+    $result = $this->callAPIFailure('job', 'delete', $params);
+    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 
   /**
@@ -158,9 +152,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'version' => $this->_apiVersion,
     );
 
-    $result = civicrm_api('job', 'delete', $params);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('job', 'delete', $params);
     $this->assertEquals($result['error_message'], 'Invalid value for job ID');
   }
 

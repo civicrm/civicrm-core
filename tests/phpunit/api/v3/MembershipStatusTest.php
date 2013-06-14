@@ -68,9 +68,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
    */
   function testGetWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('membership_status', 'get', $params);
-
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('membership_status', 'get', $params);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 
@@ -123,14 +121,12 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   ///////////////// civicrm_membership_status_create methods
   function testCreateWithEmptyParams() {
     $params = array();
-    $result = civicrm_api('membership_status', 'create', $params);
-    $this->assertAPIFailure($result, "In line " . __LINE__);
+    $result = $this->callAPIFailure('membership_status', 'create', $params);
   }
 
   function testCreateWithWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('membership_status', 'create', $params);
-    $this->assertAPIFailure($result, "In line " . __LINE__);
+    $result = $this->callAPIFailure('membership_status', 'create', $params);
     $params = array('version' =>3, 'id' => 'string');
     $result = civicrm_api('membership_status', 'create', $params);
   }
@@ -146,8 +142,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   function testCreateWithMissingRequired() {
     $params = array('title' => 'Does not make sense');
-    $result = civicrm_api('membership_status', 'create', $params);
-    $this->assertAPIFailure($result, "In line " . __LINE__);
+    $result = $this->callAPIFailure('membership_status', 'create', $params);
   }
 
   function testCreate() {
@@ -237,20 +232,17 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   ///////////////// civicrm_membership_status_delete methods
   function testDeleteEmptyParams() {
     $params = array();
-    $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertAPIFailure($result, "In line " . __LINE__);
+    $result = $this->callAPIFailure('membership_status', 'delete', $params);
   }
 
   function testDeleteWrongParamsType() {
     $params = 'incorrect value';
-    $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertAPIFailure($result, "In line " . __LINE__);
+    $result = $this->callAPIFailure('membership_status', 'delete', $params);
   }
 
   function testDeleteWithMissingRequired() {
     $params = array('title' => 'Does not make sense');
-    $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertAPIFailure($result, "In line " . __LINE__);
+    $result = $this->callAPIFailure('membership_status', 'delete', $params);
   }
 
   function testDelete() {
@@ -288,8 +280,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
       'id' => $membershipStatusID,
       'version' => $this->_apiversion,
     );
-    $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('membership_status', 'delete', $params);
 
     civicrm_api('Membership', 'Delete', array(
       'id' => $membershipID,

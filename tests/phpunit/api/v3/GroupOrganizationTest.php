@@ -138,9 +138,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    */
   public function testGroupOrganizationGetWithWrongParams() {
     $params = 'groupOrg';
-    $result = civicrm_api('group_organization', 'get', $params);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('group_organization', 'get', $params);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -180,9 +178,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
     $params = array(
       'version' => $this->_apiversion,
     );
-    $result = civicrm_api('group_organization', 'create', $params);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('group_organization', 'create', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: group_id, organization_id');
   }
 
@@ -191,9 +187,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    */
   public function testGroupOrganizationCreateParamsNotArray() {
     $params = 'group_org';
-    $result = civicrm_api('group_organization', 'create', $params);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('group_organization', 'create', $params);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -205,9 +199,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
       'invalid_key' => 1,
       'version' => $this->_apiversion,
     );
-    $result = civicrm_api('group_organization', 'create', $params);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('group_organization', 'create', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: group_id, organization_id');
   }
 
@@ -218,9 +210,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    */
   public function testGroupOrganizationDeleteParamsNotArray() {
     $params = 'delete';
-    $result = civicrm_api('group_organization', 'delete', $params);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('group_organization', 'delete', $params);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -231,9 +221,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
     $params = array(
       'version' => $this->_apiversion,
     );
-    $result = civicrm_api('group_organization', 'delete', $params);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('group_organization', 'delete', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 
@@ -265,9 +253,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
       'invalid_key' => 1,
       'version' => $this->_apiversion,
     );
-    $result = civicrm_api('group_organization', 'delete', $paramsDelete);
-
-    $this->assertAPIFailure($result);
+    $result = $this->callAPIFailure('group_organization', 'delete', $paramsDelete);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 }

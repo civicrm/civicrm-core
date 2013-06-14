@@ -366,8 +366,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_get to be implemented");
       return;
     }
-    $result = civicrm_api($Entity, 'Get', 'string');
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure($Entity, 'Get', 'string');
     $this->assertEquals(2000, $result['error_code']);
     $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
