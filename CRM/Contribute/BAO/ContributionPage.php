@@ -60,7 +60,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object             DAO object on success, null otherwise
    * @static
    */
   static function setIsActive($id, $is_active) {
@@ -210,21 +210,21 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         0,
       );
     }
-    
+
     if (!$returnMessageText && !empty($gIds)) {
       //send notification email if field values are set (CRM-1941)
       foreach ($gIds as $key => $gId) {
         if ($gId) {
           $email = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gId, 'notify');
           if ($email) {
-            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, CRM_Utils_Array::value($key, $params), true );
+            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, CRM_Utils_Array::value($key, $params), TRUE);
             CRM_Core_BAO_UFGroup::commonSendMail($contactID, $val);
           }
         }
       }
     }
 
-    if ( CRM_Utils_Array::value('is_email_receipt', $values) ||
+    if (CRM_Utils_Array::value('is_email_receipt', $values) ||
       CRM_Utils_Array::value('onbehalf_dupe_alert', $values) ||
       $returnMessageText
     ) {
@@ -301,10 +301,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'isShare' => CRM_Utils_Array::value('is_share', $values),
       );
 
-            if ( $contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values ) ) {
+      if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {
         $tplParams['contributionTypeId'] = $contributionTypeId;
-                $tplParams['contributionTypeName'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType',
-                                                                                  $contributionTypeId );
+        $tplParams['contributionTypeName'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
+          $contributionTypeId);
       }
 
       if ($contributionPageId = CRM_Utils_Array::value('id', $values)) {
@@ -340,8 +340,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           'entity_id' => $values['id'],
         );
         $OnBehalfProfile = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-        $profileId       = $OnBehalfProfile[0];
-        $userID          = $contactID;
+        $profileId = $OnBehalfProfile[0];
+        $userID = $contactID;
         self::buildCustomDisplay($profileId, 'onBehalfProfile', $userID, $template, $params['onbehalf_profile'], $fieldTypes);
       }
 
@@ -391,11 +391,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
     }
   }
-  
+
   /*
-     * Construct the message to be sent by the send function
-     *
-     */
+   * Construct the message to be sent by the send function
+   *
+   */
   function composeMessage($tplParams, $contactID, $isTest) {
     $sendTemplateParams = array(
       'groupName' => $tplParams['membershipID'] ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
@@ -433,13 +433,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     $value = array();
     if ($pageID) {
       CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id', $pageID, $value, array(
-          'title',
-          'is_email_receipt',
-          'receipt_from_name',
-          'receipt_from_email',
-          'cc_receipt',
-          'bcc_receipt',
-        ));
+        'title',
+        'is_email_receipt',
+        'receipt_from_name',
+        'receipt_from_email',
+        'cc_receipt',
+        'bcc_receipt',
+      ));
     }
 
     $isEmailReceipt = CRM_Utils_Array::value('is_email_receipt', $value[$pageID]);
@@ -455,9 +455,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $receiptFromEmail = $value[$pageID]['receipt_from_email'];
       }
       else {
-        $domainValues     = CRM_Core_BAO_Domain::getNameAndEmail();
-        $receiptFrom      = "$domainValues[0] <$domainValues[1]>";
-        $receiptFromName  = $domainValues[0];
+        $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
+        $receiptFrom = "$domainValues[0] <$domainValues[1]>";
+        $receiptFromName = $domainValues[0];
         $receiptFromEmail = $domainValues[1];
       }
 
@@ -487,9 +487,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       if ($recur->id) {
         // in some cases its just recurringNotify() thats called for the first time and these urls don't get set.
         // like in PaypalPro, & therefore we set it here additionally.
-        $template         = CRM_Core_Smarty::singleton();
+        $template = CRM_Core_Smarty::singleton();
         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($recur->id, 'recur', 'obj');
-        $url              = $paymentProcessor->subscriptionURL($recur->id, 'recur');
+        $url = $paymentProcessor->subscriptionURL($recur->id, 'recur');
         $template->assign('cancelSubscriptionUrl', $url);
 
         $url = $paymentProcessor->subscriptionURL($recur->id, 'recur', 'billing');
@@ -525,9 +525,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
     if ($gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
-        $values     = array();
+        $values = array();
         $groupTitle = NULL;
-        $fields     = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
+        $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
         foreach ($fields as $k => $v) {
           if (!$groupTitle) {
             $groupTitle = $v["groupTitle"];
@@ -575,61 +575,61 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'title' => ts('Copy of') . ' ',
       ),
     );
-    $copy = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', array(
-        'id' => $id,
-      ), NULL, $fieldsFix);
+    $copy = & CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', array(
+      'id' => $id,
+    ), NULL, $fieldsFix);
 
     //copying all the blocks pertaining to the contribution page
-    $copyPledgeBlock = &CRM_Core_DAO::copyGeneric('CRM_Pledge_DAO_PledgeBlock', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+    $copyPledgeBlock = & CRM_Core_DAO::copyGeneric('CRM_Pledge_DAO_PledgeBlock', array(
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
-    $copyMembershipBlock = &CRM_Core_DAO::copyGeneric('CRM_Member_DAO_MembershipBlock', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+    $copyMembershipBlock = & CRM_Core_DAO::copyGeneric('CRM_Member_DAO_MembershipBlock', array(
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
-    $copyUFJoin = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+    $copyUFJoin = & CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin', array(
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
-    $copyWidget = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Widget', array(
-        'contribution_page_id' => $id,
-      ), array(
-        'contribution_page_id' => $copy->id,
-      ));
+    $copyWidget = & CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Widget', array(
+      'contribution_page_id' => $id,
+    ), array(
+      'contribution_page_id' => $copy->id,
+    ));
 
     //copy price sets
     CRM_Price_BAO_Set::copyPriceSet('civicrm_contribution_page', $id, $copy->id);
 
-    $copyTellFriend = &CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+    $copyTellFriend = & CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', array(
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
-    $copyPersonalCampaignPages = &CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+    $copyPersonalCampaignPages = & CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock', array(
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
-    $copyPremium = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Premium', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+    $copyPremium = & CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Premium', array(
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
     $premiumQuery = "
 SELECT id
 FROM civicrm_premiums
@@ -639,11 +639,11 @@ WHERE entity_table = 'civicrm_contribution_page'
     $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery, CRM_Core_DAO::$_nullArray);
     while ($premiumDao->fetch()) {
       if ($premiumDao->id) {
-        $copyPremiumProduct = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
-            'premiums_id' => $premiumDao->id,
-          ), array(
-            'premiums_id' => $copyPremium->id,
-          ));
+        $copyPremiumProduct = & CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
+          'premiums_id' => $premiumDao->id,
+        ), array(
+          'premiums_id' => $copyPremium->id,
+        ));
       }
     }
 
@@ -689,8 +689,7 @@ WHERE entity_table = 'civicrm_contribution_page'
    * @access public
    * @static
    */
-  static function getSectionInfo($contribPageIds = array(
-    )) {
+  static function getSectionInfo($contribPageIds = array()) {
     $info = array();
     $whereClause = NULL;
     if (is_array($contribPageIds) && !empty($contribPageIds)) {
