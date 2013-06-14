@@ -82,6 +82,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // current set id
     $this->_id = $this->get('id');
 
+    if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
+      CRM_Core_Error::fatal("You cannot edit the settings of a Reserved Custom Group");
+    }
     // setting title for html page
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $title = CRM_Core_BAO_CustomGroup::getTitle($this->_id);

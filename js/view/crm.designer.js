@@ -328,7 +328,7 @@
               items.push({data: paletteFieldModel.getLabel(), attr: {'class': 'crm-designer-palette-field', 'data-plm-cid': paletteFieldModel.cid}});
             });
           }
-          if (section.is_addable) {
+          if (section.is_addable && !section.is_reserved) {
             items.push({data: 'placeholder', attr: {'class': 'crm-designer-palette-add', 'data-entity': ufEntityModel.get('entity_name'), 'data-section': sectionKey}});
           }
           if (items.length > 0) {

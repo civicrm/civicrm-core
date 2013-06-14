@@ -64,4 +64,8 @@ INSERT INTO civicrm_uf_field
        ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, {localize field='label'}label{/localize}, field_type, help_post, phone_type_id )
 VALUES
       ( @uf_group_contribution_batch_entry, 'soft_credit', 0, 0, 10, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Contribution', NULL, NULL ),
-      ( @uf_group_membership_batch_entry, 'soft_credit', 0, 0, 13, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Membership', NULL, NULL ); 
+      ( @uf_group_membership_batch_entry, 'soft_credit', 0, 0, 13, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Membership', NULL, NULL );
+
+-- CRM-12809
+ALTER TABLE `civicrm_custom_group`
+  ADD COLUMN `is_reserved` tinyint(4) DEFAULT '0' COMMENT 'Is this a reserved Custom Group?';
