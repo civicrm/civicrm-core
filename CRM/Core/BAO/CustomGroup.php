@@ -1412,7 +1412,7 @@ SELECT $select
       }
       foreach ($group['fields'] as $key => $field) {
         $fieldName = 'custom_' . $key;
-        $value = CRM_Utils_Request::retrieve($fieldName, 'String', $form);
+        $value = CRM_Utils_Request::retrieve($fieldName, 'String', $form, FALSE, NULL, 'GET');
 
         if ($value) {
           $valid = FALSE;
@@ -1461,7 +1461,7 @@ SELECT $select
             if (!empty($value)) {
               $time = NULL;
               if (CRM_Utils_Array::value('time_format', $field)) {
-                $time = CRM_Utils_Request::retrieve($fieldName . '_time', 'String', $form);
+                $time = CRM_Utils_Request::retrieve($fieldName . '_time', 'String', $form, FALSE, NULL, 'GET');
               }
               list($value, $time) = CRM_Utils_Date::setDateDefaults($value . ' ' . $time);
               if (CRM_Utils_Array::value('time_format', $field)) {
