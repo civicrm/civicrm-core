@@ -279,7 +279,7 @@ ORDER BY weight, label
     );
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
-      CRM_Core_Error::fatal("You cannot add or edit muliple choice options of a Reserved Custom Group Field");
+      CRM_Core_Error::fatal("You cannot add or edit muliple choice options in a reserved custom field-set.");
     }
 
     //as url contain $gid so append breadcrumb dynamically.

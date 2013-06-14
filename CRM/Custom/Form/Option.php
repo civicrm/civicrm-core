@@ -81,7 +81,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
-      CRM_Core_Error::fatal("You cannot add or edit muliple choice options of a Reserved Custom Group Field");
+      CRM_Core_Error::fatal("You cannot add or edit muliple choice options in a reserved custom field-set.");
     }
     if (!isset($this->_gid) && $this->_fid) {
       $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
