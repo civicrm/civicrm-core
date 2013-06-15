@@ -808,7 +808,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
         'relationship_type_id' => array('IN' => array($relationType2, $relationType3))
     );
 
-
     $description = "demonstrates use of IN filter";
     $subfile = 'INRelationshipType';
 

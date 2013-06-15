@@ -1255,9 +1255,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   function testActivitiesContactGetWithInvalidContactId() {
     $params = array('contact_id' => 'contact');
     $result = $this->callAPIFailure('activity', 'get', $params);
-
-    $params = array('contact_id' => 2.4);
-    $result = $this->callAPIFailure('activity', 'get', $params);
   }
 
   /**

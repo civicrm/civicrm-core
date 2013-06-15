@@ -1456,7 +1456,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
 
     // After swapping options, ensure we have an integer(s)
     foreach ((array) ($params[$fieldName]) as $value) {
-      if (!is_numeric($value) && $value !== 'null') {
+      if ($value && !is_numeric($value) && $value !== 'null' && !is_array($value)) {
         throw new API_Exception("$fieldName is not a valid integer", 2001, array('error_field' => $fieldName, "type" => "integer"));
       }
     }
@@ -1543,7 +1543,9 @@ function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $
   // If passed multiple options, validate each
   if (is_array($params[$fieldName])) {
     foreach ($params[$fieldName] as &$value) {
-      _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName);
+      if (!is_array($value)) {
+        _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName);
+      }
     }
     // TODO: unwrap the call to implodePadded from the conditional and do it always
     // need to verify that this is safe and doesn't break anything though.

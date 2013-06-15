@@ -58,12 +58,6 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->groupDelete($this->_groupID);
   }
 
-  function testgroupCreateEmptyParams() {
-    $params = array();
-    $group = civicrm_api('group', 'create', $params);
-    $this->assertEquals($group['error_message'], 'Mandatory key(s) missing from params array: title');
-  }
-
   function testgroupCreateNoTitle() {
     $params = array(
       'name' => 'Test Group No title ',
@@ -77,7 +71,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       ),
     );
 
-    $group = $this->callAPISuccess('group', 'create', $params);
+    $group = $this->callAPIFailure('group', 'create', $params);
     $this->assertEquals($group['error_message'], 'Mandatory key(s) missing from params array: title');
   }
 
