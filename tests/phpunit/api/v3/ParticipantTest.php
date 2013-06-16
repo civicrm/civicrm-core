@@ -717,7 +717,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'version' => 3,
     );
     require_once 'CRM/Event/Import/Parser.php';
-    $onDuplicate = CRM_Event_Import_Parser::DUPLICATE_NOCHECK;
+    $onDuplicate = CRM_Import_Parser::DUPLICATE_NOCHECK;
     $participant = _civicrm_api3_deprecated_create_participant_formatted($params, $onDuplicate);
     $this->assertEquals($participant['is_error'], 0);
   }

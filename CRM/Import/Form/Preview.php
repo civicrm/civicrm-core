@@ -34,30 +34,46 @@
  */
 
 /**
- * State machine for managing different states of the Import process.
- *
+ * This class previews the uploaded file and returns summary statistics
+ * TODO: CRM-11254 - if preProcess and postProcess functions can be reconciled between the 5 child classes,
+ * those classes can be removed entirely and this class will not need to be abstract
  */
-class CRM_Contact_Import_StateMachine extends CRM_Core_StateMachine {
+abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
+  /**
+   * Return a descriptive name for the page, used in wizard header
+   *
+   * @return string
+   * @access public
+   */
+  public function getTitle() {
+    return ts('Preview');
+  }
 
   /**
-   * class constructor
+   * Function to actually build the form
    *
-   * @param object  CRM_Contact_Import_Controller
-   * @param int     $action
-   *
-   * @return object CRM_Contact_Import_StateMachine
+   * @return None
+   * @access public
    */
-  function __construct(&$controller, $action = CRM_Core_Action::NONE) {
-    parent::__construct($controller, $action);
+  public function buildQuickForm() {
 
-    $this->_pages = array(
-      'CRM_Contact_Import_Form_DataSource' => NULL,
-      'CRM_Contact_Import_Form_MapField' => NULL,
-      'CRM_Contact_Import_Form_Preview' => NULL,
-      'CRM_Contact_Import_Form_Summary' => NULL,
+    $this->addButtons(array(
+        array(
+          'type' => 'back',
+          'name' => ts('<< Previous'),
+        ),
+        array(
+          'type' => 'next',
+          'name' => ts('Import Now >>'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
     );
-
-    $this->addSequentialPages($this->_pages, $action);
   }
-}
 
+}

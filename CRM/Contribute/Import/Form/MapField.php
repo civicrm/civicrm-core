@@ -36,122 +36,10 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
+class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
-  /**
-   * cache of preview data values
-   *
-   * @var array
-   * @access protected
-   */
-  protected $_dataValues;
 
-  /**
-   * mapper fields
-   *
-   * @var array
-   * @access protected
-   */
-  protected $_mapperFields;
 
-  /**
-   * loaded mapping ID
-   *
-   * @var int
-   * @access protected
-   */
-  protected $_loadedMappingId;
-
-  /**
-   * number of columns in import file
-   *
-   * @var int
-   * @access protected
-   */
-  protected $_columnCount;
-
-  /**
-   * column headers, if we have them
-   *
-   * @var array
-   * @access protected
-   */
-  protected $_columnHeaders;
-
-  /**
-   * an array of booleans to keep track of whether a field has been used in
-   * form building already.
-   *
-   * @var array
-   * @access protected
-   */
-  protected $_fieldUsed;
-
-  /**
-   * Attempt to match header labels with our mapper fields
-   *
-   * @param header
-   * @param mapperFields
-   *
-   * @return string
-   * @access public
-   */
-  public function defaultFromHeader($header, &$patterns) {
-    foreach ($patterns as $key => $re) {
-      // Skip empty key/patterns
-      if (!$key || !$re || strlen("$re") < 5) {
-        continue;
-      }
-
-      // Scan through the headerPatterns defined in the schema for a match
-      if (preg_match($re, $header)) {
-        $this->_fieldUsed[$key] = TRUE;
-        return $key;
-      }
-    }
-    return '';
-  }
-
-  /**
-   * Guess at the field names given the data and patterns from the schema
-   *
-   * @param patterns
-   * @param index
-   *
-   * @return string
-   * @access public
-   */
-  public function defaultFromData(&$patterns, $index) {
-    $best     = '';
-    $bestHits = 0;
-    $n        = count($this->_dataValues);
-
-    foreach ($patterns as $key => $re) {
-      // Skip empty key/patterns
-      if (!$key || !$re || strlen("$re") < 5) {
-        continue;
-      }
-
-      /* Take a vote over the preview data set */
-
-      $hits = 0;
-      for ($i = 0; $i < $n; $i++) {
-        if (preg_match($re, $this->_dataValues[$i][$index])) {
-          $hits++;
-        }
-      }
-
-      if ($hits > $bestHits) {
-        $bestHits = $hits;
-        $best = $key;
-      }
-    }
-
-    if ($best != '') {
-      $this->_fieldUsed[$best] = TRUE;
-    }
-    return $best;
-  }
 
   /**
    * Function to set variables up before form is built
@@ -185,7 +73,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
     $highlightedFields[] = 'financial_type';
     //CRM-2219 removing other required fields since for updation only
     //invoice id or trxn id or contribution id is required.
-    if ($this->_onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_UPDATE) {
+    if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
       $remove = array('contribution_contact_id', 'email', 'first_name', 'last_name', 'external_identifier');
       foreach ($remove as $value) {
         unset($this->_mapperFields[$value]);
@@ -198,7 +86,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
         $highlightedFields[] = $key;
       }
     }
-    elseif ($this->_onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_SKIP) {
+    elseif ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
       unset($this->_mapperFields['contribution_id']);
       $highlightedFieldsArray = array('contribution_contact_id', 'email', 'first_name', 'last_name', 'external_identifier', 'total_amount');
       foreach ($highlightedFieldsArray as $name) {
@@ -295,9 +183,9 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
     // get contact type for this import
     $contactTypeId = $this->get('contactType');
     $contactTypes = array(
-      CRM_Contribute_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-      CRM_Contribute_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-      CRM_Contribute_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+      CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
+      CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
+      CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
     );
 
     $contactType = $contactTypes[$contactTypeId];
@@ -465,9 +353,9 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
 
       $contactTypeId = $self->get('contactType');
       $contactTypes = array(
-        CRM_Contribute_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-        CRM_Contribute_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-        CRM_Contribute_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
+        CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
+        CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
+        CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
       );
       $params = array(
         'used'         => 'Unsupervised',
@@ -495,12 +383,12 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
         if (!in_array($field, $importKeys)) {
           if ($field == 'contribution_contact_id') {
             if (!($weightSum >= $threshold || in_array('external_identifier', $importKeys)) &&
-              $self->_onDuplicate != CRM_Contribute_Import_Parser::DUPLICATE_UPDATE
+              $self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE
             ) {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
                 1 => $threshold)) . '<br />';
             }
-            elseif ($self->_onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_UPDATE &&
+            elseif ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE &&
               !(in_array('invoice_id', $importKeys) || in_array('trxn_id', $importKeys) ||
                 in_array('contribution_id', $importKeys)
               )
@@ -509,7 +397,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
             }
           }
           else {
-            if ($self->_onDuplicate != CRM_Contribute_Import_Parser::DUPLICATE_UPDATE) {
+            if ($self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
               $errors['_qf_default'] .= ts('Missing required field: %1', array(
                 1 => $title)) . '<br />';
             }
@@ -518,7 +406,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
       }
 
       //at least one field should be mapped during update.
-      if ($self->_onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_UPDATE) {
+      if ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
         $atleastOne = FALSE;
         foreach ($self->_mapperFields as $key => $field) {
           if (in_array($key, $importKeys) &&
@@ -659,21 +547,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Core_Form {
 
     $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeysMain, $mapperSoftCredit, $mapperPhoneType);
     $parser->run($fileName, $seperator, $mapper, $skipColumnHeader,
-      CRM_Contribute_Import_Parser::MODE_PREVIEW, $this->get('contactType')
+      CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
     );
 
     // add all the necessary variables to the form
     $parser->set($this);
-  }
-
-  /**
-   * Return a descriptive name for the page, used in wizard header
-   *
-   * @return string
-   * @access public
-   */
-  public function getTitle() {
-    return ts('Match Fields');
   }
 }
 
