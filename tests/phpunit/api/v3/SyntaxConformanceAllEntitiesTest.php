@@ -704,16 +704,12 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_URL:
           $entity[$field] = 'warm.beer.com';
       }
-      $constant = CRM_Utils_Array::value('pseudoconstant', $specs);
-      if (!empty($constant)) {
-        $constantOptions = array_reverse(array_keys(CRM_Utils_PseudoConstant::getConstant($constant['name'])));
-        $entity[$field] = (string) $constantOptions[0];
-      }
-      $enum = CRM_Utils_Array::value('enumValues', $specs);
-      if (!empty($enum)) {
-        // reverse so we 'change' value
-        $options = array_reverse(explode(',', $enum));
-        $entity[$fieldName] = $options[0];
+      if (!empty($specs['pseudoconstant']) || !empty($specs['enumValues'])) {
+        $options = civicrm_api($entityName, 'getoptions', array('context' => 'create', 'field' => $field, 'version' => 3));
+        if (empty($options['values'])) {
+          print_r($options);
+        }
+        $entity[$field] = array_rand($options['values']);
       }
       $updateParams = array(
         'version' => 3,
@@ -738,7 +734,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       );
 
       $checkEntity = civicrm_api($entityName, 'getsingle', $checkParams);
-      $this->assertEquals($entity, $checkEntity, "changing field $fieldName" . print_r($entity,TRUE) );//. print_r($checkEntity,true) .print_r($checkParams,true) . print_r($update,true) . print_r($updateParams, TRUE));
+      $this->assertEquals($entity, $checkEntity, "changing field $fieldName\n" . print_r($entity,TRUE) );//. print_r($checkEntity,true) .print_r($checkParams,true) . print_r($update,true) . print_r($updateParams, TRUE));
     }
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();

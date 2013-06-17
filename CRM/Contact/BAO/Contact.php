@@ -2998,7 +2998,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * TODO: In context of chainselect, what to return if e.g. a country has no states?
    *
    * @param String $fieldName
-   * @param String $context: e.g. "search" "edit" "create" "view"
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
    * @param Array  $props: whatever is known about this dao object
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {

@@ -272,7 +272,7 @@ class CRM_Core_PseudoConstant {
       // use of a space after the comma is inconsistent in xml
       $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
       $output = explode(',', $enumStr);
-      return $flip ? array_flip($output) : $output;
+      return array_combine($output, $output);
     }
 
     elseif (!empty($fieldSpec['pseudoconstant'])) {
