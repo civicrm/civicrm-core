@@ -82,7 +82,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // current set id
     $this->_id = $this->get('id');
 
-    if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
+    if ($this->_id && $isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
       CRM_Core_Error::fatal("You cannot edit the settings of a reserved custom field-set.");
     }
     // setting title for html page
@@ -528,7 +528,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   /*
    * Function to return a formatted list of relationship name.
    * @param $list array array of relationship name.
-   * @static
+   * @static 
    * return array array of relationship name.
    */
   static function getFormattedList(&$list) {
