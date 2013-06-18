@@ -73,7 +73,7 @@
 {htxt id="id-is_organization"}
 <p>{ts}When enabled, this feature allows users to identify an organization as the donor or member. Logged in users will be given a choice of selecting from a list of organizations that they have a permissioned relationship with OR entering a new organization. Anonymous users are prompted to enter the organization name. If a matching organization is found using your site's configured unsupervised duplicate matching rules for Organizations, the contribution or membership will be linked to that organization. Otherwise a new organization contact record is created.{/ts}</p>
 {capture assign="profileURL"}{crmURL p='civicrm/admin/uf/group' q='reset=1'}{/capture}
-<p>{ts 1=$profileURL}The organization data collected from users is controlled by the Organization Profile selected below. You can use the default "On Behalf Of Organization" profile, or any other profile with type 'Contact' and/or 'Organization' (<a href="%1">Administer > Customize > CiviCRM Profile</a>). The profile must include Organization Name and Email Address.{/ts}</p>
+<p>{ts 1=$profileURL}The organization data collected from users is controlled by the Organization Profile selected below. You can use the default "On Behalf Of Organization" profile, or any other profile with type 'Contact' and/or 'Organization' (<a href="%1">Administer > Customize Data and Screens > Profiles</a>). The profile must include Organization Name and Email Address.{/ts}</p>
 {/htxt}
 
 {htxt id="id-is_share-title"}
