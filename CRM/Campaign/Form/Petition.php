@@ -86,7 +86,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $session->pushUserContext($url);
 
     $this->_values = $this->get('values');
-    
+
     if (!is_array($this->_values)) {
       $this->_values = array();
       if ($this->_surveyId) {
@@ -140,7 +140,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     if ($ufGroupId = CRM_Core_BAO_UFJoin::findUFGroupId($ufJoinParams)) {
       $defaults['contact_profile_id'] = $ufGroupId;
     }
-    
+
     if (!isset($defaults['is_active'])) {
       $defaults['is_active'] = 1;
     }
@@ -205,7 +205,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     // thank you title and text (html allowed in text)
     $this->add('text', 'thankyou_title', ts('Thank-you Page Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'thankyou_title'));
     $this->addWysiwyg('thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'thankyou_text'));
-    
+
     // bypass email confirmation?
     $this->add('checkbox', 'bypass_confirm', ts('Bypass email confirmation'));
 

@@ -330,7 +330,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             ),
           ),
         'grouping' => 'activity-fields',
-      ), 
+      ),
       'civicrm_group' =>
       array(
         'dao' => 'CRM_Contact_DAO_Group',
@@ -499,7 +499,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
                             {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id AND                                                                      civicrm_activity_assignment.record_type_id = {$assigneeID}
                         LEFT JOIN civicrm_activity_contact civicrm_activity_source
                             ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_source.activity_id AND
-                            civicrm_activity_source.record_type_id = {$sourceID} 
+                            civicrm_activity_source.record_type_id = {$sourceID}
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_target']} ON
                             civicrm_activity_target.contact_id = {$this->_aliases['civicrm_activity_target']}.id
 

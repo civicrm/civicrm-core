@@ -16,32 +16,32 @@
     <name>id</name>
     <autoincrement>true</autoincrement>
   </primaryKey>
-  <field> 
-      <name>contact_id1</name> 
+  <field>
+      <name>contact_id1</name>
       <title>First Dupe Contact ID</title>
-      <type>int unsigned</type> 
-      <comment>FK to Contact ID</comment> 
-      <add>3.3</add> 
-  </field> 
-  <foreignKey> 
-       <name>contact_id1</name> 
-       <table>civicrm_contact</table> 
-       <key>id</key> 
-       <add>3.3</add> 
+      <type>int unsigned</type>
+      <comment>FK to Contact ID</comment>
+      <add>3.3</add>
+  </field>
+  <foreignKey>
+       <name>contact_id1</name>
+       <table>civicrm_contact</table>
+       <key>id</key>
+       <add>3.3</add>
        <onDelete>CASCADE</onDelete>
   </foreignKey>
-  <field> 
-      <name>contact_id2</name> 
+  <field>
+      <name>contact_id2</name>
       <title>Second Dupe Contact ID</title>
-      <type>int unsigned</type> 
-      <comment>FK to Contact ID</comment> 
-      <add>3.3</add> 
-  </field> 
-  <foreignKey> 
-       <name>contact_id2</name> 
-       <table>civicrm_contact</table> 
-       <key>id</key> 
-       <add>3.3</add> 
+      <type>int unsigned</type>
+      <comment>FK to Contact ID</comment>
+      <add>3.3</add>
+  </field>
+  <foreignKey>
+       <name>contact_id2</name>
+       <table>civicrm_contact</table>
+       <key>id</key>
+       <add>3.3</add>
        <onDelete>CASCADE</onDelete>
   </foreignKey>
   <index>

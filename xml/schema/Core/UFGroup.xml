@@ -106,15 +106,15 @@
        <comment>Redirect to URL.</comment>
        <add>1.4</add>
   </field>
-  <field> 
-      <name>add_to_group_id</name> 
-      <type>int unsigned</type> 
-      <comment>foreign key to civicrm_group_id</comment> 
-  </field> 
+  <field>
+      <name>add_to_group_id</name>
+      <type>int unsigned</type>
+      <comment>foreign key to civicrm_group_id</comment>
+  </field>
   <foreignKey>
-       <name>add_to_group_id</name> 
-       <table>civicrm_group</table> 
-       <key>id</key> 
+       <name>add_to_group_id</name>
+       <table>civicrm_group</table>
+       <key>id</key>
        <onDelete>SET NULL</onDelete>
   </foreignKey>
    <field>

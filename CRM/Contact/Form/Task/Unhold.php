@@ -20,7 +20,7 @@ class CRM_Contact_Form_Task_Unhold extends CRM_Contact_Form_Task {
     $num = count($this->_contactIds);
     if ($num >= 1) {
       $queryString = "
-UPDATE civicrm_email SET on_hold = 0, hold_date = null 
+UPDATE civicrm_email SET on_hold = 0, hold_date = null
 WHERE on_hold = 1 AND hold_date is not null AND contact_id in (" . implode(",", $this->_contactIds) . ")";
       CRM_Core_DAO::executeQuery($queryString);
       $sql = "SELECT ROW_COUNT( )";

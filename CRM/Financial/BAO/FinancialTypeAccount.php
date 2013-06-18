@@ -214,10 +214,10 @@ WHERE cog.name = 'payment_instrument' ";
   /**
    * Function to create default entity financial accounts
    * for financial type
-   * CRM-12470 
+   * CRM-12470
    *
    * @param int $financialTypeId financial type id
-   * 
+   *
    * @static
    */
   static function createDefaultFinancialAccounts($financialType) {
@@ -250,7 +250,7 @@ WHERE cog.name = 'payment_instrument' ";
           $titles[] = 'Accounts Receivable';
         }
         else {
-          $query = "SELECT financial_account_id, name FROM civicrm_entity_financial_account 
+          $query = "SELECT financial_account_id, name FROM civicrm_entity_financial_account
             LEFT JOIN civicrm_financial_account ON civicrm_financial_account.id = civicrm_entity_financial_account.financial_account_id
             WHERE account_relationship = {$key} AND entity_table = 'civicrm_financial_type' LIMIT 1";
           $dao = CRM_Core_DAO::executeQuery($query);
@@ -270,7 +270,7 @@ WHERE cog.name = 'payment_instrument' ";
         $titles[] = $dao->name;
       }
       $params['account_relationship'] = $key;
-      self::add($params);      
+      self::add($params);
     }
     return $titles;
   }

@@ -23,95 +23,95 @@
       <type>int unsigned</type>
       <add>2.0</add>
   </field>
-  <foreignKey> 
-       <name>address_id</name> 
-       <table>civicrm_address</table> 
-       <key>id</key> 
-       <add>2.0</add> 
+  <foreignKey>
+       <name>address_id</name>
+       <table>civicrm_address</table>
+       <key>id</key>
+       <add>2.0</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
       <name>email_id</name>
       <type>int unsigned</type>
       <add>2.0</add>
   </field>
-  <foreignKey> 
-       <name>email_id</name> 
-       <table>civicrm_email</table> 
-       <key>id</key> 
-       <add>2.0</add> 
+  <foreignKey>
+       <name>email_id</name>
+       <table>civicrm_email</table>
+       <key>id</key>
+       <add>2.0</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
       <name>phone_id</name>
       <type>int unsigned</type>
       <add>2.0</add>
   </field>
-  <foreignKey> 
-       <name>phone_id</name> 
-       <table>civicrm_phone</table> 
-       <key>id</key> 
-       <add>2.0</add> 
+  <foreignKey>
+       <name>phone_id</name>
+       <table>civicrm_phone</table>
+       <key>id</key>
+       <add>2.0</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
       <name>im_id</name>
       <type>int unsigned</type>
       <add>2.0</add>
   </field>
-  <foreignKey> 
-       <name>im_id</name> 
-       <table>civicrm_im</table> 
-       <key>id</key> 
-       <add>2.0</add> 
+  <foreignKey>
+       <name>im_id</name>
+       <table>civicrm_im</table>
+       <key>id</key>
+       <add>2.0</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
       <name>address_2_id</name>
       <type>int unsigned</type>
       <add>2.0</add>
   </field>
-  <foreignKey> 
-       <name>address_2_id</name> 
-       <table>civicrm_address</table> 
-       <key>id</key> 
-       <add>2.0</add> 
+  <foreignKey>
+       <name>address_2_id</name>
+       <table>civicrm_address</table>
+       <key>id</key>
+       <add>2.0</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
       <name>email_2_id</name>
       <type>int unsigned</type>
       <add>2.0</add>
   </field>
-  <foreignKey> 
-       <name>email_2_id</name> 
-       <table>civicrm_email</table> 
-       <key>id</key> 
-       <add>2.0</add> 
+  <foreignKey>
+       <name>email_2_id</name>
+       <table>civicrm_email</table>
+       <key>id</key>
+       <add>2.0</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
       <name>phone_2_id</name>
       <type>int unsigned</type>
       <add>2.0</add>
   </field>
-  <foreignKey> 
-       <name>phone_2_id</name> 
-       <table>civicrm_phone</table> 
-       <key>id</key> 
-       <add>2.0</add> 
+  <foreignKey>
+       <name>phone_2_id</name>
+       <table>civicrm_phone</table>
+       <key>id</key>
+       <add>2.0</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
       <name>im_2_id</name>
       <type>int unsigned</type>
       <add>2.0</add>
   </field>
-  <foreignKey> 
-       <name>im_2_id</name> 
-       <table>civicrm_im</table> 
-       <key>id</key> 
-       <add>2.0</add> 
+  <foreignKey>
+       <name>im_2_id</name>
+       <table>civicrm_im</table>
+       <key>id</key>
+       <add>2.0</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
 </table>

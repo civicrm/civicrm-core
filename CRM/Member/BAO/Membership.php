@@ -41,11 +41,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @static
    */
   static $_importableFields = NULL;
-  
+
   static $_renewalActType = NULL;
-  
+
   static $_signupActType = NULL;
-   
+
   function __construct() {
     parent::__construct();
   }
@@ -1087,7 +1087,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * Function to get membership joins/renewals for a specified membership
    * type.  Specifically, retrieves a count of memberships whose "Membership
    * Signup" or "Membership Renewal" activity falls in the given date range.
-   * Dates match the pattern "yyyy-mm-dd". 
+   * Dates match the pattern "yyyy-mm-dd".
    *
    * @param int    $membershipTypeId  membership type id
    * @param int    $startDate         date on which to start counting
@@ -1100,16 +1100,16 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    */
   //LCD
   public static function getMembershipStarts($membershipTypeId, $startDate, $endDate, $isTest = 0, $isOwner = 0) {
-  
+
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
       $testClause = '( membership.is_test IS NULL OR membership.is_test = 0 )';
     }
-  
+
     if (!self::$_signupActType || !self::$_renewalActType) {
       self::_getActTypes();
     }
-    
+
     if (!self::$_signupActType || !self::$_renewalActType) {
       return 0;
     }
@@ -1123,22 +1123,22 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
      WHERE  membership.membership_type_id = %3
        AND  activity.activity_date_time >= '$startDate' AND activity.activity_date_time <= '$endDate 23:59:59'
        AND  {$testClause}";
-     
+
     $query .= ($isOwner) ? ' AND owner_membership_id IS NULL' : '';
 
     $params = array(
       1 => array(self::$_signupActType, 'Integer'),
       2 => array(self::$_renewalActType, 'Integer'),
-      3 => array($membershipTypeId, 'Integer'), 
+      3 => array($membershipTypeId, 'Integer'),
     );
-    
+
     $memberCount = CRM_Core_DAO::singleValueQuery($query, $params);
     return (int)$memberCount;
   }
 
   /**
    * Function to get a count of membership for a specified membership type,
-   * optionally for a specified date.  The date must have the form yyyy-mm-dd. 
+   * optionally for a specified date.  The date must have the form yyyy-mm-dd.
    *
    * If $date is omitted, this function counts as a member anyone whose
    * membership status_id indicates they're a current member.
@@ -2318,7 +2318,7 @@ LEFT JOIN civicrm_membership mem ON ( cr.id = mem.contribution_recur_id )
    * Function to get membership joins for a specified membership
    * type.  Specifically, retrieves a count of still current memberships whose
    * join_date and start_date are within a specified date range.  Dates match
-   * the pattern "yyyy-mm-dd". 
+   * the pattern "yyyy-mm-dd".
    *
    * @param int    $membershipTypeId  membership type id
    * @param int    $startDate         date on which to start counting
@@ -2337,15 +2337,15 @@ LEFT JOIN civicrm_membership mem ON ( cr.id = mem.contribution_recur_id )
     if (!self::$_signupActType) {
       self::_getActTypes();
     }
-    
+
     if (!self::$_signupActType) {
       return 0;
     }
 
     $query = "
-    SELECT  COUNT(DISTINCT membership.id) as member_count 
+    SELECT  COUNT(DISTINCT membership.id) as member_count
       FROM  civicrm_membership membership
-INNER JOIN civicrm_activity activity ON (activity.source_record_id = membership.id AND activity.activity_type_id = %1) 
+INNER JOIN civicrm_activity activity ON (activity.source_record_id = membership.id AND activity.activity_type_id = %1)
 INNER JOIN  civicrm_membership_status status ON ( membership.status_id = status.id AND status.is_current_member = 1 )
 INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND contact.is_deleted = 0 )
      WHERE  membership.membership_type_id = %2
@@ -2365,7 +2365,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   /**
    * Function to get membership renewals for a specified membership
    * type.  Specifically, retrieves a count of still current memberships
-   * whose join_date is before and start_date is within a specified date 
+   * whose join_date is before and start_date is within a specified date
    * range.  Dates match the pattern "yyyy-mm-dd".
    *
    * @param int    $membershipTypeId  membership type id
@@ -2385,19 +2385,19 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     if (!self::$_renewalActType) {
       self::_getActTypes();
     }
-    
+
     if (!self::$_renewalActType) {
       return 0;
     }
 
     $query = "
-    SELECT  COUNT(DISTINCT membership.id) as member_count 
+    SELECT  COUNT(DISTINCT membership.id) as member_count
       FROM  civicrm_membership membership
 INNER JOIN civicrm_activity activity ON (activity.source_record_id = membership.id AND activity.activity_type_id = %1)
 INNER JOIN  civicrm_membership_status status ON ( membership.status_id = status.id AND status.is_current_member = 1 )
 INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND contact.is_deleted = 0 )
      WHERE  membership.membership_type_id = %2
-       AND  activity.activity_date_time >= '$startDate' AND activity.activity_date_time <= '$endDate 23:59:59' 
+       AND  activity.activity_date_time >= '$startDate' AND activity.activity_date_time <= '$endDate 23:59:59'
        AND  {$testClause}";
 
     $params = array(
@@ -2780,7 +2780,7 @@ WHERE      civicrm_membership.is_test = 0";
     $fieldID = key($qf->_priceSet['fields']);
     $qf->_params['price_' . $fieldID] = CRM_Utils_Array::value('id', $editedResults);
   }
-  
+
   static function _getActTypes() {
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
     self::$_renewalActType = CRM_Utils_Array::key('Membership Renewal', $activityTypes);

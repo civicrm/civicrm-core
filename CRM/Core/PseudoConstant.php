@@ -251,7 +251,7 @@ class CRM_Core_PseudoConstant {
         $params['onlyActive'],
         $params['fresh']
       );
-  
+
       CRM_Utils_Hook::customFieldOptions($customFieldID, $options, FALSE);
       return $options;
     }

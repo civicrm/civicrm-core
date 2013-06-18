@@ -24,26 +24,26 @@
       <comment>FK to Membership table</comment>
       <add>1.5</add>
   </field>
-  <foreignKey> 
-    <name>membership_id</name> 
-    <table>civicrm_membership</table> 
-    <key>id</key> 
+  <foreignKey>
+    <name>membership_id</name>
+    <table>civicrm_membership</table>
+    <key>id</key>
     <add>1.5</add>
     <onDelete>CASCADE</onDelete>
-  </foreignKey>   
+  </foreignKey>
   <field>
       <name>contribution_id</name>
       <type>int unsigned</type>
       <comment>FK to contribution table.</comment>
       <add>2.0</add>
   </field>
-  <foreignKey> 
-    <name>contribution_id</name> 
-    <table>civicrm_contribution</table> 
-    <key>id</key> 
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
     <add>2.0</add>
     <onDelete>CASCADE</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <index>
     <name>UI_contribution_membership</name>
     <unique>true</unique>

@@ -146,7 +146,7 @@ class civicrm_api3 {
           $res->is_error = 1;
           $res->error = array('cURL error' => curl_error($ch));
           return $res;
-      }      
+      }
       curl_close($ch);
       return json_decode($result);
       // not good, all in get when should be in post.

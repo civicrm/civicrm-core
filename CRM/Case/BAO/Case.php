@@ -1010,7 +1010,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
                   LEFT OUTER JOIN civicrm_option_group og ON og.name="activity_status"
                   LEFT OUTER JOIN civicrm_option_value ov ON ov.option_group_id=og.id AND ov.name="Scheduled"
                   LEFT JOIN civicrm_activity_contact caa
-                                ON caa.activity_id = ca.id AND caa.record_type_id = "$assigneeID"                  
+                                ON caa.activity_id = ca.id AND caa.record_type_id = "$assigneeID"
                   LEFT JOIN civicrm_contact acc ON acc.id = caa.contact_id  ';
 
     $where = 'WHERE cca.case_id= %1
@@ -2260,7 +2260,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     $processCaseIds = array($otherCaseId);
     if ($duplicateContacts && !$duplicateCases) {
       if ($changeClient) {

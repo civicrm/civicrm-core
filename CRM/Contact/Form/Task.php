@@ -93,7 +93,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    *
    * @return void
    * @access public
-   */ 
+   */
   function preProcess() {
     self::preProcessCommon($this);
   }
@@ -154,7 +154,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     ) {
       $sortByCharacter = $form->get('sortByCharacter');
       $cacheKey        = ($sortByCharacter && $sortByCharacter != 'all') ? "{$cacheKey}_alphabet" : $cacheKey;
- 
+
       if ($form->_action == CRM_Core_Action::COPY) {
         $allCids[$cacheKey] = $form->getContactIds( );
       }
@@ -227,7 +227,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
         }
       }
       }
-      
+
       if (!empty($insertString)) {
         $string = implode(',', $insertString);
         $sql = "REPLACE INTO {$form->_componentTable} ( contact_id ) VALUES $string";
@@ -252,7 +252,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       }
     }
 
-   
+
     if (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel'
     && ($form->_action != CRM_Core_Action::COPY) ) {
       $params = array();
@@ -261,7 +261,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       $result = CRM_Core_BAO_PrevNextCache::getSelectedContacts();
       $form->assign("value", $result);
     }
-    
+
     if (!empty($form->_contactIds)) {
       $form->_componentClause = ' contact_a.id IN ( ' . implode(',', $form->_contactIds) . ' ) ';
       $form->assign('totalSelectedContacts', count($form->_contactIds));

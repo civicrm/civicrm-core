@@ -49,7 +49,7 @@
     <title>Activity Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
-    <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment> 
+    <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment>
     <import>true</import>
     <add>3.3</add>
     <pseudoconstant>
