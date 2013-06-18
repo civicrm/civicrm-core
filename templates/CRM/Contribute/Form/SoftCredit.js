@@ -67,8 +67,8 @@ cj(function($) {
     if (rowNum > 1) {
       var scAmount = Number($('#soft_credit_amount_'+ (rowNum - 1)).val().replace(thousandMarker,''));
       if (scAmount < totalAmount) {
-	//if user enters less than the total amount and adds another soft credit row, 
-	//the soft credit amount default will be left empty 
+     //if user enters less than the total amount and adds another soft credit row, 
+     //the soft credit amount default will be left empty 
         $('#soft_credit_amount_'+ rowNum).val(''); 
       }
     }
