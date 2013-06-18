@@ -106,10 +106,10 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
 
     // find ids in this table that were affected in the given connection (based on connection id and a ±10 s time period around the date)
     $sql = "
-SELECT DISTINCT lt.id FROM `{$this->db}`.`log_$table` lt 
-{$join} 
-WHERE log_conn_id = %1 AND 
-      log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval}) 
+SELECT DISTINCT lt.id FROM `{$this->db}`.`log_$table` lt
+{$join}
+WHERE log_conn_id = %1 AND
+      log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval})
       {$contactIdClause}";
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -159,7 +159,7 @@ WHERE log_conn_id = %1 AND
           $originalSQL = "SELECT * FROM `{$this->db}`.`log_$table` WHERE log_conn_id != %1 AND log_date < %2 AND id = %3 ORDER BY log_date DESC LIMIT 1";
           $original = $this->sqlToArray($originalSQL, $params);
           if (empty($original)) {
-            // A blank original array is not possible for Update action, otherwise we 'll end up displaying all information 
+            // A blank original array is not possible for Update action, otherwise we 'll end up displaying all information
             // in $changed variable as updated-info
             $original = $changed;
           }
@@ -177,8 +177,8 @@ WHERE log_conn_id = %1 AND
         if (CRM_Utils_Array::value($diff, $original) === CRM_Utils_Array::value($diff, $changed)) {
           continue;
         }
-        
-        // hack: case_type_id column is a varchar with separator. For proper mapping to type labels, 
+
+        // hack: case_type_id column is a varchar with separator. For proper mapping to type labels,
         // we need to make sure separators are trimmed
         if ($diff == 'case_type_id') {
           foreach (array('original', 'changed') as $var)  {

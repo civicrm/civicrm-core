@@ -40,7 +40,7 @@ class CRM_Core_BAO_CustomValueTable {
     ) {
       return;
     }
-     
+
     foreach ($customParams as $tableName => $tables) {
       foreach ($tables as $index => $fields) {
         $sqlOP      = NULL;

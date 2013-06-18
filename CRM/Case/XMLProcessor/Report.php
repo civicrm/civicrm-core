@@ -228,7 +228,7 @@ AND    ac.case_id = %1
       $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
       $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-      
+
       $query = "
 SELECT     a.*, aa.contact_id as assigneeID, at.contact_id as targetID
 {$selectCaseActivity}

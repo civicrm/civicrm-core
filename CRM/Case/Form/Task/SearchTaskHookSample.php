@@ -54,7 +54,7 @@ class CRM_Case_Form_Task_SearchTaskHookSample extends CRM_Case_Form_Task {
 SELECT ct.display_name as display_name,
        cs.start_date   as start_date,
        ov.label as status
-             
+
 FROM  civicrm_case cs
 INNER JOIN civicrm_case_contact cc ON ( cs.id = cc.case_id)
 INNER JOIN civicrm_contact ct ON ( cc.contact_id = ct.id)

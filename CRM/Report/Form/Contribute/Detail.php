@@ -904,7 +904,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         foreach ($totals as $key => $total) {
           $totalandsum[$key] = ts("%1 %2: %3", array(
             1 => $total,
-            2 => $title, 
+            2 => $title,
             3 => CRM_Utils_Money::format($sumcontribs[$key])
           ));
         }

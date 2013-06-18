@@ -399,7 +399,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     foreach ($form->_contactIds as $contactId) {
       $activityTargetParams = array(
         'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,
