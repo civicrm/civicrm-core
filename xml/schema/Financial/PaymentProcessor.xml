@@ -28,7 +28,7 @@
     <table>civicrm_domain</table>
     <key>id</key>
     <add>3.0</add>
-  </foreignKey>  
+  </foreignKey>
   <field>
     <name>name</name>
     <title>Payment Processor</title>
@@ -63,7 +63,7 @@
     <table>civicrm_payment_processor_type</table>
     <key>id</key>
     <add>4.3</add>
-  </foreignKey>  
+  </foreignKey>
   <field>
     <name>is_active</name>
     <type>boolean</type>
@@ -169,7 +169,7 @@
   <field>
     <name>payment_type</name>
     <type>int unsigned</type>
-    <default>1</default> 
+    <default>1</default>
     <comment>Payment Type: Credit or Debit</comment>
     <add>3.0</add>
   </field>

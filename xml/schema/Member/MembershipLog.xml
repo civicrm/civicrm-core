@@ -24,13 +24,13 @@
       <comment>FK to Membership table</comment>
       <add>1.5</add>
   </field>
-  <foreignKey> 
-    <name>membership_id</name> 
-    <table>civicrm_membership</table> 
-    <key>id</key> 
+  <foreignKey>
+    <name>membership_id</name>
+    <table>civicrm_membership</table>
+    <key>id</key>
     <add>1.5</add>
     <onDelete>CASCADE</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
       <name>status_id</name>
       <title>Membership Status</title>
@@ -39,26 +39,26 @@
       <comment>New status assigned to membership by this action. FK to Membership Status</comment>
       <add>1.5</add>
   </field>
-  <foreignKey> 
-      <name>status_id</name> 
-      <table>civicrm_membership_status</table> 
+  <foreignKey>
+      <name>status_id</name>
+      <table>civicrm_membership_status</table>
       <key>id</key>
       <add>1.5</add>
       <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
-      <name>start_date</name>  
-      <type>date</type>   
-      <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>               
-      <comment>New membership period start date</comment>  
-      <add>1.5</add>  
-  </field>
-  <field> 
-      <name>end_date</name>  
+      <name>start_date</name>
       <type>date</type>
-      <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>                 
-      <comment>New membership period expiration date.</comment>  
-      <add>1.5</add>  
+      <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
+      <comment>New membership period start date</comment>
+      <add>1.5</add>
+  </field>
+  <field>
+      <name>end_date</name>
+      <type>date</type>
+      <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
+      <comment>New membership period expiration date.</comment>
+      <add>1.5</add>
   </field>
   <field>
        <name>modified_id</name>
@@ -75,11 +75,11 @@
   </foreignKey>
   <field>
       <name>modified_date</name>
-      <title>Membership Change Date</title>  
-      <type>date</type>   
-      <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>               
-      <comment>Date this membership modification action was logged.</comment>  
-      <add>1.5</add>  
+      <title>Membership Change Date</title>
+      <type>date</type>
+      <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
+      <comment>Date this membership modification action was logged.</comment>
+      <add>1.5</add>
   </field>
   <field>
        <name>membership_type_id</name>
