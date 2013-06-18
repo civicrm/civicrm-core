@@ -275,7 +275,7 @@ class CRM_Core_Resources {
    * Add translated string to the js CRM object.
    * It can then be retrived from the client-side ts() function
    * Variable substitutions can happen from client-side
-   * 
+   *
    * Note: this function rarely needs to be called directly and is mostly for internal use.
    * @see CRM_Core_Resources::addScriptFile which automatically adds translated strings from js files
    *

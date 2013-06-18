@@ -437,21 +437,21 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
         $this->_single = TRUE;
       }
     }
-        
+
     // Added for membership search
-    
+
     $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive',
       CRM_Core_DAO::$_nullObject
     );
-    
+
     if ($signupType) {
       //$this->_formValues['activity_type_id'] = array();
-    
+
       $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
 
       $renew = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
       $signup = CRM_Utils_Array::key('Membership Signup', $activityTypes);
-      
+
       switch ($signupType) {
         case 3: // signups and renewals
           $this->_formValues['activity_type_id'][$renew] = 1;
@@ -460,18 +460,18 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
           $this->_formValues['activity_type_id'][$signup] = 1;
           $this->_defaults['activity_type_id'][$signup] = 1;
           break;
-          
+
         case 2: // renewals only
           $this->_formValues['activity_type_id'][$renew] = 1;
           $this->_defaults['activity_type_id'][$renew] = 1;
           break;
       }
     }
-    
+
     $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String',
       CRM_Core_DAO::$_nullObject
     );
-    
+
     if ($dateLow) {
       $dateLow = date('m/d/Y', strtotime($dateLow));
       $this->_formValues['activity_date_relative'] = 0;
@@ -479,11 +479,11 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       $this->_formValues['activity_date_low'] = $dateLow;
       $this->_defaults['activity_date_low'] = $dateLow;
     }
-    
+
     $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String',
       CRM_Core_DAO::$_nullObject
     );
-    
+
     if ($dateHigh) {
       // Activity date time assumes midnight at the beginning of the date
       // This sets it to almost midnight at the end of the date
@@ -495,7 +495,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       $this->_defaults['activity_date_relative'] = 0;
       $this->_formValues['activity_date_high'] = $dateHigh;
       $this->_defaults['activity_date_high'] = $dateHigh;
-    } 
+    }
 
     if (!empty($this->_defaults)) {
       $this->setDefaults($this->_defaults);

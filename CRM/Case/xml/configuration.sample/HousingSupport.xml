@@ -30,7 +30,7 @@
     </ActivityType>
     <ActivityType>
       <name>Change Case Status</name>
-    </ActivityType> 
+    </ActivityType>
     <ActivityType>
       <name>Change Case Start Date</name>
     </ActivityType>
@@ -104,6 +104,6 @@
     </RelationshipType>
     <RelationshipType>
         <name>Benefits Specialist</name>
-    </RelationshipType>    
+    </RelationshipType>
  </CaseRoles>
 </CaseType>

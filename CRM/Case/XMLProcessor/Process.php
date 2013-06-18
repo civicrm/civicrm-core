@@ -255,7 +255,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   function deleteEmptyActivity(&$params) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     $query = "
 DELETE a
 FROM   civicrm_activity a
