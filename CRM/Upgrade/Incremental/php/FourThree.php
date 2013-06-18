@@ -190,6 +190,10 @@ WHERE     ceft.entity_id IS NULL;
       $postUpgradeMessage .= '<br />' . ts('System Administrator Alert: If you are running scheduled jobs using CLI.php, you will need to reconfigure cron tasks to include a password. Scheduled jobs will no longer run if the password is not provided (<a href="%1" target="_blank">learn more</a>).',
       array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Managing+Scheduled+Jobs'));
     }
+    if ($rev == '4.3.5') {
+      $postUpgradeMessage .= '<br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li><li>Events - Registration Confirmation and Receipt (off-line)</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
+    }
+
   }
 
   function upgrade_4_3_alpha1($rev) {
