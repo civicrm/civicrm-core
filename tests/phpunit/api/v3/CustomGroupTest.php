@@ -188,10 +188,12 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'options' => array('get_options' => 'style'),
     );
 
-    $result = civicrm_api('custom_group', 'getfields', $params);
-    $this->assertAPISuccess($result);
-    $this->assertEquals('Tab', $result['values']['style']['options'][0]);
-    $this->assertEquals('Inline', $result['values']['style']['options'][1]);
+    $result = $this->callAPISuccess('custom_group', 'getfields', $params);
+    $expected = array(
+      'Tab' => 'Tab',
+      'Inline' => 'Inline',
+    );
+    $this->assertEquals($expected, $result['values']['style']['options']);
   }
 
   /**
