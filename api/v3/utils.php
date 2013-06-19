@@ -550,19 +550,21 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
     $options['return']['id'] = TRUE;// ensure 'id' is included
     $allfields =  _civicrm_api3_get_unique_name_array($dao);
     $returnMatched = array_intersect(array_keys($options['return']), $allfields);
-    $returnUniqueMatched = array_intersect(
-      array_diff(// not already matched on the field names
-        $options['return'],
-        $returnMatched),
-        array_flip($allfields)// but a match for the field keys
+    foreach ($returnMatched as $returnValue) {
+      $dao->selectAdd($returnValue);
+    }
+
+    $unmatchedFields = array_diff(// not already matched on the field names
+      array_keys($options['return']),
+      $returnMatched
     );
 
-    foreach ($returnMatched as $returnValue) {
-        $dao->selectAdd($returnValue);
-    }
+    $returnUniqueMatched = array_intersect(
+      $unmatchedFields,
+      array_flip($allfields)// but a match for the field keys
+    );
     foreach ($returnUniqueMatched as $uniqueVal){
       $dao->selectAdd($allfields[$uniqueVal]);
-
     }
   }
 }
