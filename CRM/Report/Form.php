@@ -1724,7 +1724,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                     $select[] = "$stat({$field['dbAlias']}) as $alias";
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = $field['type'];
-                    $this->_statFields[] = $alias;
+                    $this->_statFields[$label] = $alias;
                     $this->_selectAliases[] = $alias;
                     break;
 
@@ -1732,7 +1732,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                     $select[] = "COUNT({$field['dbAlias']}) as $alias";
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = CRM_Utils_Type::T_INT;
-                    $this->_statFields[] = $alias;
+                    $this->_statFields[$label] = $alias;
                     $this->_selectAliases[] = $alias;
                     break;
 
@@ -1740,7 +1740,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                     $select[] = "ROUND(AVG({$field['dbAlias']}),2) as $alias";
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = $field['type'];
-                    $this->_statFields[] = $alias;
+                    $this->_statFields[$label] = $alias;
                     $this->_selectAliases[] = $alias;
                     break;
                 }
