@@ -197,6 +197,7 @@ abstract class CRM_Core_Payment {
       'PaymentNotification',
       array(
         'processor_name' => @$_GET['processor_name'],
+        'processor_id' => @$_GET['processor_id'],
         'mode' => @$_GET['mode'],
       )
     );
@@ -209,32 +210,37 @@ abstract class CRM_Core_Payment {
    * @public
    */
   static function handlePaymentMethod($method, $params = array( )) {
-
-    if (!isset($params['processor_name'])) {
-      CRM_Core_Error::fatal("Missing 'processor_name' param for payment callback");
+    if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
+      CRM_Core_Error::fatal("Either 'processor_id' or 'processor_name' param is required for payment callback");
     }
 
     // Query db for processor ..
     $mode = @$params['mode'];
 
-    $dao = CRM_Core_DAO::executeQuery("
-             SELECT ppt.class_name, ppt.name as processor_name, pp.id AS processor_id
-               FROM civicrm_payment_processor_type ppt
-         INNER JOIN civicrm_payment_processor pp
-                 ON pp.payment_processor_type_id = ppt.id
-                AND pp.is_active
-                AND pp.is_test = %1
-              WHERE ppt.name = %2
-        ",
-      array(
-        1 => array($mode == 'test' ? 1 : 0, 'Integer'),
-        2 => array($params['processor_name'], 'String'),
-      )
-    );
+    $sql = "SELECT ppt.class_name, ppt.name as processor_name, pp.id AS processor_id
+              FROM civicrm_payment_processor_type ppt
+        INNER JOIN civicrm_payment_processor pp
+                ON pp.payment_processor_type_id = ppt.id
+               AND pp.is_active
+               AND pp.is_test = %1";
+    $args[1] = array($mode == 'test' ? 1 : 0, 'Integer');
+
+    if (isset($params['processor_id'])) {
+      $sql .= " WHERE pp.id = %2";
+      $args[2] = array($params['processor_id'], 'Integer');
+      $notfound = "No active instances of payment processor ID#'{$params['processor_id']}'  were found.";
+    }
+    else {
+      $sql .= " WHERE ppt.name = %2";
+      $args[2] = array($params['processor_name'], 'String');
+      $notfound = "No active instances of the '{$params['processor_name']}' payment processor were found.";
+    }
+
+    $dao = CRM_Core_DAO::executeQuery($sql, $args);
 
     // Check whether we found anything at all ..
     if (!$dao->N) {
-      CRM_Core_Error::fatal("No active instances of the '{$params['processor_name']}' payment processor were found.");
+      CRM_Core_Error::fatal($notfound);
     }
 
     $method = 'handle' . $method;
@@ -380,4 +386,3 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
   }
 
 }
-
