@@ -477,6 +477,21 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when rendering the tabs for an event (q=civicrm/event/manage)
+   *
+   * @param array $tabs      - the array of tabs that will be displayed 
+   * @param int   $eventID   - the eventID for whom the dashboard is being rendered
+   *
+   * @return null 
+   * @access public
+   */
+  static function eventTabs(&$tabs, $eventID) {
+    return self::singleton()->invoke(2, $tabs, $eventID,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_eventTabs'
+    );
+  }
+
+  /**
    * This hook is called when sending an email / printing labels
    *
    * @param array $tokens    - the list of tokens that can be used for the contact
