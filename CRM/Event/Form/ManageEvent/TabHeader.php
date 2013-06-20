@@ -186,6 +186,10 @@ WHERE      e.id = %1
 
       //calculate if the reminder has been configured for this event
     }
+
+    // see if any other modules want to add any tabs                                                                                                                                                    
+    CRM_Utils_Hook::eventTabs($tabs, $eventID);
+
     return $tabs;
   }
 
