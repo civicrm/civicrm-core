@@ -1736,6 +1736,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                     $this->_selectAliases[] = $alias;
                     break;
 
+                  case 'count_distinct':
+                    $select[] = "COUNT(DISTINCT {$field['dbAlias']}) as $alias";
+                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
+                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = CRM_Utils_Type::T_INT;
+                    $this->_statFields[$label] = $alias;
+                    $this->_selectAliases[] = $alias;
+                    break;
+
                   case 'avg':
                     $select[] = "ROUND(AVG({$field['dbAlias']}),2) as $alias";
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
