@@ -462,32 +462,18 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when rendering the tabs for a contact (q=civicrm/contact/view)c
+   * This hook is called when rendering the tabs for a contact or an event etc
    *
-   * @param array $tabs      - the array of tabs that will be displayed
-   * @param int   $contactID - the contactID for whom the dashboard is being rendered
+   * @param array $tabs    - the array of tabs that will be displayed
+   * @param int   $entityID - the ID for entity (contact, event,...) which the dashboard is being rendered
+   * @param int   $entity - entity (contact, event,...) which the dashboard is being rendered
    *
    * @return null
    * @access public
    */
-  static function tabs(&$tabs, $contactID) {
-    return self::singleton()->invoke(2, $tabs, $contactID,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_tabs'
-    );
-  }
-
-  /**
-   * This hook is called when rendering the tabs for an event (q=civicrm/event/manage)
-   *
-   * @param array $tabs      - the array of tabs that will be displayed 
-   * @param int   $eventID   - the eventID for whom the dashboard is being rendered
-   *
-   * @return null 
-   * @access public
-   */
-  static function eventTabs(&$tabs, $eventID) {
-    return self::singleton()->invoke(2, $tabs, $eventID,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_eventTabs'
+  static function tabs(&$tabs, $entityID, $entity = 'civicrm_contact') {
+    return self::singleton()->invoke(3, $tabs, $entityID,
+      $entity, self::$_nullObject, self::$_nullObject, 'civicrm_tabs'
     );
   }
 
