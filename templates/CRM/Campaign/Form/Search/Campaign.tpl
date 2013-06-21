@@ -122,7 +122,7 @@
                 {if $context eq 'search'}
                   {$form.buttons.html}
                 {else}
-                  <a class="searchCampaign button" style="float:left;" href="#" title={ts}Search{/ts}
+                  <a class="searchCampaign button" style="float:left;" href="#" title="{ts}Search{/ts}"
                      onClick="searchCampaigns( '{$qfKey}' );return false;">{ts}Search{/ts}</a>
                 {/if}
               </td>
