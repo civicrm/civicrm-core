@@ -635,15 +635,48 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $file - pass this in to create a generated example
    */
   function callAPISuccess($entity, $action, $params) {
-    $params += array(
-      'version' => API_LATEST_VERSION,
-      'debug' => 1,
+    $params = array_merge(array(
+        'version' => API_LATEST_VERSION,
+        'debug' => 1,
+      ),
+      $params
     );
     $result = civicrm_api($entity, $action, $params);
     $this->assertAPISuccess($result, "Failure in api call for $entity $action");
     return $result;
   }
 
+  /**
+   * This function exists to wrap api getValue function & check the result
+   * so we can ensure they succeed & throw exceptions without litterering the test with checks
+   * There is a type check in this
+   * @param string $entity
+   * @param array $params
+   * @param string $type - per http://php.net/manual/en/function.gettype.php possible types
+   *  - boolean
+   *  - integer
+   *  - double
+   *  - string
+   *  - array
+   *  - object
+   */
+  function callAPISuccessGetValue($entity, $params, $type = NULL) {
+    $params += array(
+      'version' => API_LATEST_VERSION,
+      'debug' => 1,
+    );
+    $result = civicrm_api($entity, 'getvalue', $params);
+    if($type){
+      if($type == 'integer'){
+        // api seems to return integers as strings
+        $this->assertTrue(is_numeric($result), "expected a numeric value but got " . print_r($result, 1));
+      }
+      else{
+        $this->assertType($type, $result, "returned result should have been of type $type but was " );
+      }
+    }
+    return $result;
+  }
   /**
    * This function exists to wrap api functions
    * so we can ensure they succeed, generate and example & throw exceptions without litterering the test with checks
@@ -655,6 +688,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $file - pass this in to create a generated example
    */
   function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
+    $params['version'] = API_LATEST_VERSION;
+    if(!isset($params['debug'])){
+      // don't debug by default to keep examples tidy
+      $params['debug'] = 0;
+    }
     $result = $this->callAPISuccess($entity, $action, $params);
     $this->documentMe($params, $result, $function, $file, $description, $subfile, $actionName);
     return $result;
@@ -676,6 +714,18 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $result = civicrm_api($entity, $action, $params);
     $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success");
     return $result;
+  }
+
+  /**
+   * Create required data based on $this->entity & $this->params
+   * This is just a way to set up the test data for delete & get functions
+   * so the distinction between set
+   * up & tested functions is clearer
+   *
+   *  @return array api Result
+   */
+  public function createTestEntity(){
+    return $entity = $this->callAPISuccess($this->entity, 'create', $this->params);
   }
 
   /**
@@ -2040,7 +2090,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $fieldsToChange = array(
       'hash' => '67eac7789eaee00',
       'modified_date' => '2012-11-14 16:02:35',
+      'created_date' => '20120130621222105',
     );
+
     //swap out keys that change too often
     foreach ($fieldsToChange as $changeKey => $changeValue) {
       if (isset($result['values']) && is_array($result['values'])) {
@@ -2219,13 +2271,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
     $result = civicrm_api($entity, 'GetSingle', array(
       'id' => $id,
-      'version' => $this->_apiversion,
+      'version' => API_LATEST_VERSION,
     ));
 
     if ($delete) {
       civicrm_api($entity, 'Delete', array(
         'id' => $id,
-        'version' => $this->_apiversion,
+        'version' => API_LATEST_VERSION,
       ));
     }
     $dateFields = $keys = array();

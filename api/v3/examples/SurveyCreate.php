@@ -4,12 +4,13 @@
  
  */
 function survey_create_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'title' => 'survey title',
-  'activity_type_id' => '30',
+  'activity_type_id' => '35',
   'max_number_of_contacts' => 12,
   'instructions' => 'Call people, ask for money',
+  'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'survey','create',$params );
@@ -22,17 +23,25 @@ $params = array(
  */
 function survey_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
+  'undefined_fields' => array(
+      '0' => 'title',
+      '1' => 'activity_type_id',
+      '2' => 'max_number_of_contacts',
+      '3' => 'instructions',
+      '4' => 'created_id',
+      '5' => 'created_date',
+    ),
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'title' => 'survey title',
           'campaign_id' => '',
-          'activity_type_id' => '30',
+          'activity_type_id' => '35',
           'recontact_interval' => '',
           'instructions' => 'Call people, ask for money',
           'release_frequency' => '',
@@ -41,7 +50,7 @@ function survey_create_expectedresult(){
           'is_active' => '',
           'is_default' => '',
           'created_id' => '',
-          'created_date' => '20130204224326',
+          'created_date' => '20120130621222105',
           'last_modified_id' => '',
           'last_modified_date' => '',
           'result_id' => '',
