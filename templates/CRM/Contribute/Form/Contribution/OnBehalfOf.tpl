@@ -159,8 +159,6 @@ function showOnBehalf(onBehalfRequired) {
     if (cj("#onBehalfOfOrg *").length < 1) {
       cj.ajax({
         url     : urlPath,
-        global  : false,
-        async   : false,
         success : function ( content ) {
           cj( "#onBehalfOfOrg" ).html( content );
         }

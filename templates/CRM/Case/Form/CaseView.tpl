@@ -460,7 +460,6 @@
 
           cj.ajax({
             url     : dataUrl,
-            async   : false,
             success : function(html){
               cj("#related-cases-content" ).html( html );
             }

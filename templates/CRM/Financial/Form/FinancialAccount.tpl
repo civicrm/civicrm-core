@@ -121,7 +121,6 @@ if ( employerId ) {
   var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' h=0 q="className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&org=1&id=" }{literal}" + employerId ;
   cj.ajax({
     url     : dataUrl,
-    async   : false,
     success : function(html){
       //fixme for showing address in div
       htmlText = html.split( '|' , 2);

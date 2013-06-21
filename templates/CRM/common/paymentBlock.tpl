@@ -25,46 +25,36 @@
 *}
 {literal}
 <script type="text/javascript">
-
-function buildPaymentBlock( type ) {
-    if ( type == 0 ) {
-     if (cj("#billing-payment-block").length) {
-           cj("#billing-payment-block").html('');
-   }
-        return;
+cj(function($) {
+  function buildPaymentBlock() {
+    var type = cj(this).val();
+    if (type == 0) {
+      if (cj("#billing-payment-block").length) {
+        cj("#billing-payment-block").html('');
+      }
+      return;
     }
+    var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
 
-  var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
+    {/literal}
+      {if $urlPathVar}
+        dataUrl = dataUrl + '&' + '{$urlPathVar}'
+      {/if}
 
-  {/literal}
-    {if $urlPathVar}
-      dataUrl = dataUrl + '&' + '{$urlPathVar}'
-    {/if}
+      {if $contributionPageID}
+        dataUrl = dataUrl + '&id=' + '{$contributionPageID}'
+      {/if}
 
-    {if $contributionPageID}
-            dataUrl = dataUrl + '&id=' + '{$contributionPageID}'
-        {/if}
+      {if $qfKey}
+        dataUrl = dataUrl + '&qfKey=' + '{$qfKey}'
+      {/if}
+    {literal}
 
-    {if $qfKey}
-      dataUrl = dataUrl + '&qfKey=' + '{$qfKey}'
-    {/if}
-  {literal}
+    cj('#billing-payment-block').load(dataUrl);
+  }
 
-  var fname = '#billing-payment-block';
-  var response = cj.ajax({
-                        url: dataUrl,
-                        async: false
-                        }).responseText;
-
-    cj( fname ).html( response );
-}
-
-cj( function() {
-    cj('.crm-group.payment_options-group').show();
-
-    cj('input[name="payment_processor"]').change( function() {
-        buildPaymentBlock( cj(this).val() );
-    });
+  cj('.crm-group.payment_options-group').show();
+  cj('input[name="payment_processor"]').change(buildPaymentBlock);
 });
 
 </script>

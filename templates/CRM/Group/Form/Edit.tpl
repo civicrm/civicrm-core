@@ -148,7 +148,6 @@ cj('label[for="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
   var dataUrl = "{/literal}{crmURL p='civicrm/ajax/search' h=0 q="org=1&id=$organizationID"}{literal}";
   cj.ajax({
           url     : dataUrl,
-          async   : false,
           success : function(html){
                       //fixme for showing address in div
                       htmlText = html.split( '|' , 2);

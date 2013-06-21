@@ -203,8 +203,6 @@ cj("#memQuickconfig").click(function(){
 
        cj.ajax({
       url: dataUrl,
-      async: false,
-      global: false,
       success: function ( result ) {
         if (result) {
           window.location= redirectUrl+eval(result);
