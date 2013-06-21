@@ -703,17 +703,26 @@ class CRM_Report_Form extends CRM_Core_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
+          $groupTitle = '';
           if (!array_key_exists('no_display', $field)) {
-            if (isset($field['grouping'])) {
-              $tableName = $field['grouping'];
+            foreach ( array('table', 'field') as $var) {
+              if (!empty(${$var}['grouping'])) {
+                if (!is_array(${$var}['grouping'])) {
+                  $tableName = ${$var}['grouping'];
+                } else {
+                  $tableName = array_keys(${$var}['grouping'])[0];
+                  $groupTitle = array_values(${$var}['grouping'])[0];
+                }
+              }
             }
-            elseif (isset($table['grouping'])) {
-              $tableName = $table['grouping'];
-            }
-            $colGroups[$tableName]['fields'][$fieldName] = CRM_Utils_Array::value('title', $field);
 
-            if (isset($table['group_title'])) {
-              $colGroups[$tableName]['group_title'] = $table['group_title'];
+            if (!$groupTitle && isset($table['group_title'])) {
+              $groupTitle = $table['group_title'];
+            }
+
+            $colGroups[$tableName]['fields'][$fieldName] = CRM_Utils_Array::value('title', $field);
+            if ($groupTitle && !CRM_Utils_Array::value('group_title', $colGroups[$tableName])) {
+              $colGroups[$tableName]['group_title'] = $groupTitle;
             }
 
             $options[$fieldName] = CRM_Utils_Array::value('title', $field);
@@ -1730,6 +1739,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
                   case 'count':
                     $select[] = "COUNT({$field['dbAlias']}) as $alias";
+                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
+                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = CRM_Utils_Type::T_INT;
+                    $this->_statFields[$label] = $alias;
+                    $this->_selectAliases[] = $alias;
+                    break;
+
+                  case 'count_distinct':
+                    $select[] = "COUNT(DISTINCT {$field['dbAlias']}) as $alias";
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = CRM_Utils_Type::T_INT;
                     $this->_statFields[$label] = $alias;
