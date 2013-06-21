@@ -786,7 +786,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     //for text field pagination selection save
     $countRow = CRM_Core_BAO_PrevNextCache::getCount("%civicrm search {$cacheKey}%", NULL, "entity_table = 'civicrm_contact'", "LIKE");
 
-    if (!$crmPID && $countRow == 0 && !$sortByCharacter) {
+    if ((!$crmPID || $countRow == 0) && !$sortByCharacter) {
       $this->fillupPrevNextCache($sort);
     }
     elseif ($sortByCharacter) {
