@@ -296,7 +296,8 @@ UNION
       }
     }
 
-    if ($organizationId) {
+    $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
+    if ($organizationId && $organizationId != $previousEmployerID) {
       $cid = array('contact' => $contactID);
 
       // get the relationship type id of "Employee of"
@@ -317,7 +318,6 @@ UNION
 
 
       // In case we change employer, clean prveovious employer related records.
-      $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
       if ($previousEmployerID &&
         $previousEmployerID != $organizationId
       ) {
