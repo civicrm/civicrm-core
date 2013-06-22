@@ -30,6 +30,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $params;
+  public $_eNoticeCompliant = TRUE;
+
   function setUp() {
     $this->_apiversion = 3;
     $phoneBankActivity = civicrm_api('Option_value', 'Get', array('label' => 'PhoneBank', 'version' => $this->_apiversion, 'sequential' => 1));

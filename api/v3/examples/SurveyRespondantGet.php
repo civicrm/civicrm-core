@@ -4,7 +4,7 @@
  
  */
 function survey_respondant_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'sequential' => '1',
   'survey_id' => 1,
@@ -20,7 +20,7 @@ $params = array(
  */
 function survey_respondant_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 0,
