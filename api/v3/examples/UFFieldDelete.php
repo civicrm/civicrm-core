@@ -4,9 +4,10 @@
  
  */
 function uf_field_delete_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'field_id' => 1,
+  'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'uf_field','delete',$params );
@@ -19,7 +20,7 @@ $params = array(
  */
 function uf_field_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

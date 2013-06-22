@@ -4,7 +4,7 @@
  Flush all system caches
  */
 function system_flush_example(){
-$params = array( 
+$params = array(
   'version' => 3,
 );
 
@@ -18,7 +18,7 @@ $params = array(
  */
 function system_flush_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

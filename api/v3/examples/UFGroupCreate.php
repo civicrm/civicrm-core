@@ -4,7 +4,7 @@
  
  */
 function uf_group_create_example(){
-$params = array( 
+$params = array(
   'add_captcha' => 1,
   'add_contact_to_group' => 2,
   'cancel_URL' => 'http://example.org/cancel',
@@ -38,13 +38,13 @@ $params = array(
  */
 function uf_group_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 12,
-  'values' => array( 
-      '12' => array( 
+  'values' => array(
+      '12' => array(
           'id' => '12',
           'is_active' => 0,
           'group_type' => 'Individual,Contact',
@@ -65,7 +65,7 @@ function uf_group_create_expectedresult(){
           'is_reserved' => '1',
           'name' => 'Test_Group_12',
           'created_id' => '69',
-          'created_date' => '20090627000000',
+          'created_date' => '20120130621222105',
           'is_proximity_search' => '',
         ),
     ),
