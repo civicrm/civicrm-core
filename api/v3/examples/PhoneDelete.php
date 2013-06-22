@@ -4,12 +4,13 @@
  
  */
 function phone_delete_example(){
-$params = array( 
+$params = array(
   'contact_id' => 4,
   'location_type_id' => 7,
   'phone' => '(123) 456-7890',
   'is_primary' => 1,
   'version' => 3,
+  'phone_type_id' => 1,
 );
 
   $result = civicrm_api( 'phone','delete',$params );
@@ -22,11 +23,11 @@ $params = array(
  */
 function phone_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'values' => '1',
+  'values' => true,
 );
 
   return $expectedResult  ;

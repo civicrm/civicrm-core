@@ -4,7 +4,7 @@
  
  */
 function line_item_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'entity_table' => 'civicrm_contribution',
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function line_item_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'entity_table' => 'civicrm_contribution',
           'entity_id' => '1',

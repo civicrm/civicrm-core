@@ -4,7 +4,7 @@
  
  */
 function pledge_payment_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
 );
 
@@ -18,53 +18,53 @@ $params = array(
  */
 function pledge_payment_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 5,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2013-02-15 00:00:00',
+          'scheduled_date' => '2013-06-22 00:00:00',
           'reminder_count' => 0,
           'status_id' => '2',
         ),
-      '2' => array( 
+      '2' => array(
           'id' => '2',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2018-02-15 00:00:00',
+          'scheduled_date' => '2018-06-22 00:00:00',
           'reminder_count' => 0,
           'status_id' => '2',
         ),
-      '3' => array( 
+      '3' => array(
           'id' => '3',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2023-02-15 00:00:00',
+          'scheduled_date' => '2023-06-22 00:00:00',
           'reminder_count' => 0,
           'status_id' => '2',
         ),
-      '4' => array( 
+      '4' => array(
           'id' => '4',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2028-02-15 00:00:00',
+          'scheduled_date' => '2028-06-22 00:00:00',
           'reminder_count' => 0,
           'status_id' => '2',
         ),
-      '5' => array( 
+      '5' => array(
           'id' => '5',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2033-02-15 00:00:00',
+          'scheduled_date' => '2033-06-22 00:00:00',
           'reminder_count' => 0,
           'status_id' => '2',
         ),

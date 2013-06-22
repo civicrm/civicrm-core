@@ -22,13 +22,8 @@ function contact_getoptions_expectedresult(){
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 3,
+  'count' => 2,
   'values' => array(
-      'attributes' => array(
-          'label' => 'Country',
-          'data_type' => 'String',
-          'html_type' => 'Select',
-        ),
       '1' => 'Label1',
       '2' => 'Label2',
     ),

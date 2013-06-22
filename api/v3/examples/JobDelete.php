@@ -4,7 +4,7 @@
  
  */
 function job_delete_example(){
-$params = array( 
+$params = array(
   'id' => 1,
   'version' => 3,
 );
@@ -19,7 +19,7 @@ $params = array(
  */
 function job_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

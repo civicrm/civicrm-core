@@ -4,7 +4,7 @@
  use nested get to get an event
  */
 function participant_get_example(){
-$params = array( 
+$params = array(
   'id' => 1,
   'version' => 3,
   'api.event.get' => 1,
@@ -20,13 +20,13 @@ $params = array(
  */
 function participant_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '2',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -53,13 +53,13 @@ function participant_get_expectedresult(){
           'participant_discount_name' => '',
           'participant_campaign_id' => '',
           'id' => '1',
-          'api.event.get' => array( 
+          'api.event.get' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 6,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '6',
                       'title' => 'Annual CiviCRM meet',
                       'event_title' => 'Annual CiviCRM meet',
@@ -89,7 +89,7 @@ function participant_get_expectedresult(){
                       'is_multiple_registrations' => 0,
                       'allow_same_participant_emails' => 0,
                       'is_template' => 0,
-                      'created_date' => '2013-02-04 22:37:53',
+                      'created_date' => '2013-06-22 09:01:44',
                       'is_share' => '1',
                     ),
                 ),

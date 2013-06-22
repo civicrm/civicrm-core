@@ -23,10 +23,6 @@ function survey_get_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
-  'undefined_fields' => array(
-      '0' => 'title',
-      '1' => 'api.survey.delete',
-    ),
   'version' => 3,
   'count' => 1,
   'id' => 1,

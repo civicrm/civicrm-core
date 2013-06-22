@@ -4,7 +4,7 @@
  
  */
 function profile_apply_example(){
-$params = array( 
+$params = array(
   'profile_id' => 25,
   'contact_id' => 1,
   'version' => 3,
@@ -26,11 +26,11 @@ $params = array(
  */
 function profile_apply_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 10,
-  'values' => array( 
+  'values' => array(
       'contact_type' => 'Individual',
       'contact_sub_type' => '',
       'contact_id' => 1,
@@ -38,23 +38,23 @@ function profile_apply_expectedresult(){
       'version' => 3,
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
-      'email' => array( 
-          '1' => array( 
+      'email' => array(
+          '1' => array(
               'location_type_id' => '1',
               'is_primary' => 1,
               'email' => 'abc2.xyz2@gmail.com',
             ),
         ),
-      'phone' => array( 
-          '2' => array( 
+      'phone' => array(
+          '2' => array(
               'location_type_id' => '1',
               'is_primary' => 1,
               'phone_type_id' => '1',
               'phone' => '022 321 826',
             ),
         ),
-      'address' => array( 
-          '1' => array( 
+      'address' => array(
+          '1' => array(
               'location_type_id' => '1',
               'is_primary' => 1,
               'country_id' => '1013',

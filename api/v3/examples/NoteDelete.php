@@ -4,7 +4,7 @@
  
  */
 function note_delete_example(){
-$params = array( 
+$params = array(
   'id' => 2,
   'version' => 3,
 );
@@ -19,7 +19,7 @@ $params = array(
  */
 function note_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

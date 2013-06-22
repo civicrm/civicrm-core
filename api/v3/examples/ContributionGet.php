@@ -4,7 +4,7 @@
  
  */
 function contribution_get_example(){
-$params = array( 
+$params = array(
   'contribution_id' => 1,
   'version' => 3,
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function contribution_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '1',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',

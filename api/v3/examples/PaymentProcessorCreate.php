@@ -4,7 +4,7 @@
  
  */
 function payment_processor_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'name' => 'API Test PP',
   'payment_processor_type_id' => 1,
@@ -23,13 +23,13 @@ $params = array(
  */
 function payment_processor_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'domain_id' => '1',
           'name' => 'API Test PP',

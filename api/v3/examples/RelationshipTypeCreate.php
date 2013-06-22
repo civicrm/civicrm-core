@@ -4,7 +4,7 @@
  
  */
 function relationship_type_create_example(){
-$params = array( 
+$params = array(
   'name_a_b' => 'Relation 1 for relationship type create',
   'name_b_a' => 'Relation 2 for relationship type create',
   'contact_type_a' => 'Individual',
@@ -25,13 +25,13 @@ $params = array(
  */
 function relationship_type_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '1',
           'name_a_b' => 'Relation 1 for relationship type create',
           'label_a_b' => 'Relation 1 for relationship type create',

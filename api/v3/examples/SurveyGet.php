@@ -25,12 +25,6 @@ function survey_get_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
-  'undefined_fields' => array(
-      '0' => 'title',
-      '1' => 'activity_type_id',
-      '2' => 'max_number_of_contacts',
-      '3' => 'instructions',
-    ),
   'version' => 3,
   'count' => 1,
   'id' => 1,

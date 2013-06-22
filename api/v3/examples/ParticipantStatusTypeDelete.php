@@ -4,7 +4,7 @@
  
  */
 function participant_status_type_delete_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'name' => 'test status',
   'label' => 'I am a test',
@@ -26,7 +26,7 @@ $params = array(
  */
 function participant_status_type_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
