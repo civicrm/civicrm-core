@@ -604,7 +604,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
-    $this->assertEquals(0, $apiResult['is_error'], $prefix . (empty($apiResult['error_message']) ? '' : $apiResult['error_message']));
+    $errorMessage = empty($apiResult['error_message']) ? '' : " " . $apiResult['error_message'];
+    if(!empty($apiResult['trace'])){
+      $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
+    }
+    $this->assertEquals(0, $apiResult['is_error'], $prefix . $errorMessage);
   }
 
   /**
