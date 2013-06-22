@@ -4,7 +4,7 @@
  
  */
 function batch_create_example(){
-$params = array( 
+$params = array(
   'name' => 'New_Batch_03',
   'title' => 'New Batch 03',
   'description' => 'This is description for New Batch 03',
@@ -12,6 +12,7 @@ $params = array(
   'item_count' => 3,
   'status_id' => 1,
   'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'batch','create',$params );
@@ -24,19 +25,19 @@ $params = array(
  */
 function batch_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 2,
-  'values' => array( 
-      '2' => array( 
-          'id' => '2',
+  'id' => 1,
+  'values' => array(
+      '1' => array(
+          'id' => '1',
           'name' => 'New_Batch_03',
           'title' => 'New Batch 03',
           'description' => 'This is description for New Batch 03',
           'created_id' => '',
-          'created_date' => '',
+          'created_date' => '20120130621222105',
           'modified_id' => '',
           'modified_date' => '2012-11-14 16:02:35',
           'saved_search_id' => '',

@@ -4,8 +4,8 @@
  
  */
 function constant_get_example(){
-$params = array( 
-  'name' => 'locationType',
+$params = array(
+  'field' => 'location_type_id',
   'version' => 3,
 );
 
@@ -19,11 +19,11 @@ $params = array(
  */
 function constant_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 5,
-  'values' => array( 
+  'values' => array(
       '5' => 'Billing',
       '1' => 'Home',
       '3' => 'Main',

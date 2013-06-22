@@ -4,12 +4,12 @@
  /*this demonstrates setting a custom field through the API 
  */
 function contact_get_example(){
-$params = array( 
+$params = array(
   'first_name' => 'abc1',
   'contact_type' => 'Individual',
   'last_name' => 'xyz1',
   'version' => 3,
-  'custom_2' => 'custom string',
+  'custom_3' => 'custom string',
 );
 
   $result = civicrm_api( 'contact','get',$params );
@@ -22,16 +22,16 @@ $params = array(
  */
 function contact_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '1',
-          'civicrm_value_testgetwithcu_2_id' => '1',
-          'custom_2' => 'custom string',
+          'civicrm_value_testgetwithcu_3_id' => '1',
+          'custom_3' => 'custom string',
           'id' => '1',
         ),
     ),

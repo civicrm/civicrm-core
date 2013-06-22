@@ -4,7 +4,7 @@
  
  */
 function contribution_soft_get_example(){
-$params = array( 
+$params = array(
   'id' => 1,
   'version' => 3,
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function contribution_soft_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contribution_id' => '1',
           'contact_id' => '2',

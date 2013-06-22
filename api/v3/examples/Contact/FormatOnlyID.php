@@ -6,7 +6,7 @@
     /* it will be ignored if there is not exactly 1 result
  */
 function contact_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'id' => 17,
   'format.only_id' => 1,

@@ -4,7 +4,7 @@
  Demonstrates Use of address parsing param
  */
 function address_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'street_parsing' => 1,
   'street_address' => '54A Excelsior Ave. Apt 1C',
@@ -22,13 +22,13 @@ $params = array(
  */
 function address_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'contact_id' => '4',
           'location_type_id' => '7',

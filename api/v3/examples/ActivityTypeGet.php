@@ -4,7 +4,7 @@
  
  */
 function activity_type_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
 );
 
@@ -18,15 +18,15 @@ $params = array(
  */
 function activity_type_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 44,
-  'values' => array( 
+  'count' => 45,
+  'values' => array(
       '1' => 'Meeting',
       '2' => 'Phone Call',
       '3' => 'Email',
-      '4' => 'Text Message (SMS)',
+      '4' => 'Outbound SMS',
       '5' => 'Event Registration',
       '6' => 'Contribution',
       '7' => 'Membership Signup',
@@ -66,7 +66,8 @@ function activity_type_get_expectedresult(){
       '41' => 'Export Accounting Batch',
       '42' => 'Create Batch',
       '43' => 'Edit Batch',
-      '44' => 'Test activity type',
+      '44' => 'SMS delivery',
+      '45' => 'Inbound SMS',
     ),
 );
 

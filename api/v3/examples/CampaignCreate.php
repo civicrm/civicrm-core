@@ -4,7 +4,7 @@
  Create a campaign - Note use of relative dates here http://www.php.net/manual/en/datetime.formats.relative.php
  */
 function campaign_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'title' => 'campaign title',
   'description' => 'Call people, ask for money',
@@ -21,13 +21,13 @@ $params = array(
  */
 function campaign_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'name' => 'campaign_title',
           'title' => 'campaign title',
@@ -40,7 +40,7 @@ function campaign_create_expectedresult(){
           'parent_id' => '',
           'is_active' => '',
           'created_id' => '',
-          'created_date' => '20080705000000',
+          'created_date' => '20120130621222105',
           'last_modified_id' => '',
           'last_modified_date' => '',
           'goal_general' => '',

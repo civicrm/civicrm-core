@@ -29,7 +29,7 @@ function activity_get_expectedresult(){
   'values' => array(
       '0' => array(
           'id' => '1',
-          'activity_type_id' => '44',
+          'activity_type_id' => '46',
           'subject' => 'Make-it-Happen Meeting',
           'activity_date_time' => '2011-01-01 00:00:00',
           'duration' => '120',
