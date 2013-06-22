@@ -34,8 +34,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class api_v3_BatchTest extends CiviUnitTestCase {
   public $_eNoticeCompliant = TRUE;
-  protected $_apiversion;
-  protected $_params;
+  protected $_params = array();
+  protected $_entity = 'batch';
+
   /**
    *  Constructor
    *
@@ -52,10 +53,6 @@ class api_v3_BatchTest extends CiviUnitTestCase {
    * @access protected
    */
   protected function setUp() {
-    $this->_apiversion = 3;
-    $this->_params = array(
-      'version' => $this->_apiversion,
-    );
     parent::setUp();
   }
 
@@ -65,28 +62,20 @@ class api_v3_BatchTest extends CiviUnitTestCase {
    *
    * @access protected
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+    $tablesToTruncate = array('civicrm_batch');
+    $this->quickCleanup($tablesToTruncate);
+  }
 
   /**
    * Create a sample batch
    */
   function batchCreate() {
     $params = $this->_params;
-    $params['name'] = $params['title'] = 'Batch_' . mt_rand(0, 999999);
+    $params['name'] = $params['title'] = 'Batch_433397';
     $params['status_id'] = 1;
-    $result = civicrm_api('batch', 'create', $params);
+    $result = $this->callAPISuccess('batch', 'create', $params);
     return $result['id'];
-  }
-
-  ///////////////// civicrm_batch_get methods
-
-  /**
-   * Test civicrm_batch_get with wrong params type.
-   */
-  public function testGetWrongParamsType() {
-    $params = 'is_string';
-    $result = $this->callAPIFailure('batch', 'get', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
   }
 
   /**
@@ -95,22 +84,9 @@ class api_v3_BatchTest extends CiviUnitTestCase {
   public function testGet() {
     $params = array(
       'id' => $this->batchCreate(),
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('batch', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument('batch', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($params['id'], $result['id'], 'In line ' . __LINE__);
-  }
-
-
-  ///////////////// civicrm_batch_create methods
-
-  /**
-   * Test civicrm_batch_create with empty params.
-   */
-  function testCreateEmptyParams() {
-    $this->callAPIFailure('batch', 'create', $this->_params);
   }
 
   /**
@@ -124,20 +100,11 @@ class api_v3_BatchTest extends CiviUnitTestCase {
       'total' => '300.33',
       'item_count' => 3,
       'status_id' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('batch', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument('batch', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
-
-    // Fetch batch and compare values
-    $saved = civicrm_api('batch', 'getSingle', $result);
-    unset($params['version']);
-    foreach ($params as $key => $value) {
-      $this->assertEquals($value, $saved[$key], 'In line ' . __LINE__);
-    }
+    $this->getAndCheck($params, $result['id'], $this->_entity);
   }
 
   /**
@@ -150,40 +117,12 @@ class api_v3_BatchTest extends CiviUnitTestCase {
       'description' => 'This is description for New Batch 04',
       'total' => '400.44',
       'item_count' => 4,
-      'version' => $this->_apiversion,
       'id' => $this->batchCreate(),
     );
 
-    $result = civicrm_api('batch', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument('batch', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
-
-    // Fetch batch and compare values
-    $saved = civicrm_api('batch', 'getSingle', $result);
-    unset($params['version']);
-    foreach ($params as $key => $value) {
-      $this->assertEquals($value, $saved[$key], 'In line ' . __LINE__);
-    }
-  }
-
-  ///////////////// civicrm_batch_delete methods
-
-  /**
-   * Test civicrm_batch_delete without batch id.
-   */
-  function testDeleteWithoutBatchId() {
-    $result = civicrm_api('batch', 'delete', array('version' => $this->_apiversion));
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertEquals('Mandatory key(s) missing from params array: id', $result['error_message'], 'In line ' . __LINE__);
-  }
-
-  /**
-   * Test civicrm_batch_delete with wrong batch id type.
-   */
-  function testDeleteWrongParams() {
-    $result = $this->callAPIFailure('batch', 'delete', 'tyttyd');
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
+    $this->getAndCheck($params, $result['id'], $this->_entity);
   }
 
   /**
@@ -193,10 +132,8 @@ class api_v3_BatchTest extends CiviUnitTestCase {
     $batchID = $this->batchCreate();
     $params = array(
       'batch_id' => $batchID,
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('batch', 'delete', $params);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPISuccess('batch', 'delete', $params);
   }
 
   /**
@@ -206,11 +143,8 @@ class api_v3_BatchTest extends CiviUnitTestCase {
     $batchID = $this->batchCreate();
     $params = array(
       'id' => $batchID,
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('batch', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument('batch', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
 }
