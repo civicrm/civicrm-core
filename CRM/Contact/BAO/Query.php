@@ -3661,8 +3661,6 @@ WHERE  id IN ( $groupIDs )
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
     $targetGroup = $this->getWhereValues('relation_target_group', $grouping);
-    $start = $this->getWhereValues('relation_date_low', $grouping);
-    $end = $this->getWhereValues('relation_date_high', $grouping);
 
     $nameClause = $name = NULL;
     if ($targetName) {
