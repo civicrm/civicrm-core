@@ -224,6 +224,9 @@
     </table>
   {include file="CRM/common/pager.tpl" location="bottom"}
   {/strip}
+  {if $isSearch eq 0}
+    <div class="status messages">{ts}Don't see your event listed? Try "Search All or by Date Range" above.{/ts}</div>
+  {/if}
 </div>
 {else}
   {if $isSearch eq 1}
@@ -234,6 +237,7 @@
     <div class="spacer"></div>
     <ul>
       <li>{ts}Check your spelling.{/ts}</li>
+      <li>{ts}Try "Search All or by Date Range".{/ts}</li>
       <li>{ts}Try a different spelling or use fewer letters.{/ts}</li>
       <li>{ts}Make sure you have enough privileges in the access control system.{/ts}</li>
     </ul>
