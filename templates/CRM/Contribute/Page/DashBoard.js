@@ -19,22 +19,12 @@ cj(function ($) {
     }
     chartUrl = CRM.url("civicrm/ajax/chart", {snippet : 4});
     chartUrl    += "&year=" + year + "&type=" + charttype;
-    $.ajax({
-      url     : chartUrl,
-      success  : function(html) {
-        $("#chartData").html(html);
-      }
-    });
+    $(chartData).load(chartUrl);
   }
 
   function buildTabularView() {
     var tableUrl = CRM.url("civicrm/contribute/ajax/tableview", {showtable: 1, snippet: 4});
-    $.ajax({
-      url      : tableUrl,
-      success  : function(html) {
-        $("#tableData").html(html);
-      }
-    });
+    $(tableData).load(tableUrl);
   }
 
   getChart();
