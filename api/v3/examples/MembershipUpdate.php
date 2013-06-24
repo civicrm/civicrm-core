@@ -4,15 +4,15 @@
  
  */
 function membership_update_example(){
-$params = array( 
-  'contact_id' => 33,
-  'membership_type_id' => 30,
+$params = array(
+  'contact_id' => 32,
+  'membership_type_id' => 29,
   'join_date' => '2009-01-21',
   'start_date' => '2009-01-21',
   'end_date' => '2009-12-21',
   'source' => 'Payment',
   'is_override' => 1,
-  'status_id' => 36,
+  'status_id' => 35,
   'version' => 3,
   'custom_3' => 'custom string',
 );
@@ -27,21 +27,21 @@ $params = array(
  */
 function membership_update_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
-          'contact_id' => '33',
-          'membership_type_id' => '30',
+          'contact_id' => '32',
+          'membership_type_id' => '29',
           'join_date' => '20090121000000',
           'start_date' => '20090121000000',
           'end_date' => '20091221000000',
           'source' => 'Payment',
-          'status_id' => '36',
+          'status_id' => '35',
           'is_override' => '1',
           'owner_membership_id' => '',
           'max_related' => '',

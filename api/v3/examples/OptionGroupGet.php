@@ -4,7 +4,7 @@
  
  */
 function option_group_get_example(){
-$params = array( 
+$params = array(
   'name' => 'preferred_communication_method',
   'version' => 3,
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function option_group_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'name' => 'preferred_communication_method',
           'title' => 'Preferred Communication Method',

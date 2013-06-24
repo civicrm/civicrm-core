@@ -4,8 +4,9 @@
  
  */
 function uf_field_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'uf_field','get',$params );
@@ -18,13 +19,13 @@ $params = array(
  */
 function uf_field_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'uf_group_id' => '11',
           'field_name' => 'phone',

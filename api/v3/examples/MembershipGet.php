@@ -4,9 +4,9 @@
  
  */
 function membership_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
-  'membership_type_id' => 9,
+  'membership_type_id' => 8,
 );
 
   $result = civicrm_api( 'membership','get',$params );
@@ -19,21 +19,21 @@ $params = array(
  */
 function membership_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
-          'contact_id' => '11',
-          'membership_type_id' => '9',
+          'contact_id' => '10',
+          'membership_type_id' => '8',
           'join_date' => '2009-01-21',
           'start_date' => '2009-01-21',
           'end_date' => '2009-12-21',
           'source' => 'Payment',
-          'status_id' => '16',
+          'status_id' => '15',
           'is_override' => '1',
           'is_test' => 0,
           'is_pay_later' => 0,

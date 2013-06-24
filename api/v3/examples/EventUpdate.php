@@ -4,8 +4,8 @@
  
  */
 function event_update_example(){
-$params = array( 
-  '0' => array( 
+$params = array(
+  '0' => array(
       'title' => 'Annual CiviCRM meet',
       'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
       'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
@@ -23,7 +23,7 @@ $params = array(
       'is_show_location' => 0,
       'version' => 3,
     ),
-  '1' => array( 
+  '1' => array(
       'title' => 'Annual CiviCRM meet 2',
       'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
       'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
@@ -53,13 +53,13 @@ $params = array(
  */
 function event_update_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'title' => 'Annual CiviCRM meet 2',
           'event_title' => 'Annual CiviCRM meet 2',
@@ -89,7 +89,7 @@ function event_update_expectedresult(){
           'is_multiple_registrations' => 0,
           'allow_same_participant_emails' => 0,
           'is_template' => 0,
-          'created_date' => '2013-02-04 22:31:28',
+          'created_date' => '20120130621222105',
           'is_share' => '1',
         ),
     ),

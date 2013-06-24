@@ -5,7 +5,6 @@
  */
 function loc_block_createentities_example(){
 $params = array(
-  'version' => 3,
   'email' => array(
       'location_type_id' => 1,
       'email' => 'test2@loc.block',
@@ -22,6 +21,8 @@ $params = array(
       'location_type_id' => 1,
       'street_address' => '987654321',
     ),
+  'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'loc_block','createEntities',$params );

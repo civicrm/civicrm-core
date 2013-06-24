@@ -4,12 +4,12 @@
  
  */
 function uf_field_replace_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'uf_group_id' => 11,
   'option.autoweight' => '',
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'field_name' => 'first_name',
           'field_type' => 'Contact',
           'visibility' => 'Public Pages and Listings',
@@ -18,7 +18,7 @@ $params = array(
           'is_searchable' => 1,
           'is_active' => 1,
         ),
-      '1' => array( 
+      '1' => array(
           'field_name' => 'country',
           'field_type' => 'Contact',
           'visibility' => 'Public Pages and Listings',
@@ -28,7 +28,7 @@ $params = array(
           'is_active' => 1,
           'location_type_id' => 1,
         ),
-      '2' => array( 
+      '2' => array(
           'field_name' => 'phone',
           'field_type' => 'Contact',
           'visibility' => 'Public Pages and Listings',
@@ -52,12 +52,12 @@ $params = array(
  */
 function uf_field_replace_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 3,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'uf_group_id' => '11',
           'field_name' => 'first_name',
@@ -77,7 +77,7 @@ function uf_field_replace_expectedresult(){
           'is_reserved' => '',
           'is_multi_summary' => '',
         ),
-      '2' => array( 
+      '2' => array(
           'id' => '2',
           'uf_group_id' => '11',
           'field_name' => 'country',
@@ -97,7 +97,7 @@ function uf_field_replace_expectedresult(){
           'is_reserved' => '',
           'is_multi_summary' => '',
         ),
-      '3' => array( 
+      '3' => array(
           'id' => '3',
           'uf_group_id' => '11',
           'field_name' => 'phone',

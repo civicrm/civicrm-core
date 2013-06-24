@@ -4,13 +4,13 @@
  shows getting a variable for specified domains
  */
 function setting_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
-  'domain_id' => array( 
+  'domain_id' => array(
       '0' => 1,
       '1' => 2,
     ),
-  'return' => array( 
+  'return' => array(
       '0' => 'uniq_email_per_site',
     ),
 );
@@ -25,15 +25,15 @@ $params = array(
  */
 function setting_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 2,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'uniq_email_per_site' => 0,
         ),
-      '2' => array( 
+      '2' => array(
           'uniq_email_per_site' => '1',
         ),
     ),

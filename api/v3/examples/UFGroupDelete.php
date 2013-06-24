@@ -4,7 +4,7 @@
  
  */
 function uf_group_delete_example(){
-$params = array( 
+$params = array(
   'add_captcha' => 1,
   'add_contact_to_group' => 2,
   'cancel_URL' => 'http://example.org/cancel',
@@ -38,7 +38,7 @@ $params = array(
  */
 function uf_group_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

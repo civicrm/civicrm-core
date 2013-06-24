@@ -4,7 +4,7 @@
  
  */
 function setting_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'domain_id' => 2,
   'return' => 'uniq_email_per_site',
@@ -20,13 +20,13 @@ $params = array(
  */
 function setting_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'uniq_email_per_site' => '1',
         ),
     ),

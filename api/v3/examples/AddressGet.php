@@ -4,7 +4,7 @@
  
  */
 function address_get_example(){
-$params = array( 
+$params = array(
   'contact_id' => 9,
   'street_name' => 'Ambachtstraat',
   'version' => 3,
@@ -20,13 +20,13 @@ $params = array(
  */
 function address_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 7,
-  'values' => array( 
-      '7' => array( 
+  'values' => array(
+      '7' => array(
           'id' => '7',
           'contact_id' => '9',
           'location_type_id' => '12',

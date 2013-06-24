@@ -6,7 +6,7 @@
     /* it will be ignored if there is not exactly 1 result
  */
 function contact_getsingle_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'id' => 17,
 );
@@ -21,7 +21,7 @@ $params = array(
  */
 function contact_getsingle_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'contact_id' => '17',
   'contact_type' => 'Individual',
   'contact_sub_type' => '',
@@ -50,12 +50,6 @@ function contact_getsingle_expectedresult(){
   'organization_name' => '',
   'sic_code' => '',
   'contact_is_deleted' => 0,
-  'gender_id' => '',
-  'gender' => '',
-  'prefix_id' => '',
-  'prefix' => '',
-  'suffix_id' => '',
-  'suffix' => '',
   'current_employer' => '',
   'address_id' => '',
   'street_address' => '',

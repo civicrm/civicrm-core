@@ -4,7 +4,7 @@
  
  */
 function tag_create_example(){
-$params = array( 
+$params = array(
   'name' => 'New Tag3',
   'description' => 'This is description for New Tag 02',
   'version' => 3,
@@ -20,13 +20,13 @@ $params = array(
  */
 function tag_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 8,
-  'values' => array( 
-      '8' => array( 
+  'values' => array(
+      '8' => array(
           'id' => '8',
           'name' => 'New Tag3',
           'description' => 'This is description for New Tag 02',
@@ -36,7 +36,7 @@ function tag_create_expectedresult(){
           'is_tagset' => '',
           'used_for' => 'civicrm_contact',
           'created_id' => '',
-          'created_date' => '20130204224540',
+          'created_date' => '20120130621222105',
         ),
     ),
 );

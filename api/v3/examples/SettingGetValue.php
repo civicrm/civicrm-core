@@ -4,7 +4,7 @@
  Demonstrates getvalue action - intended for runtime use as better caching than get
  */
 function setting_getvalue_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'name' => 'petition_contacts',
   'group' => 'Campaign Preferences',

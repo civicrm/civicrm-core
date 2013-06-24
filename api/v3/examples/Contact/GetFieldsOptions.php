@@ -1,7 +1,7 @@
 <?php
 
 /*
- Demonstrate retrieving custom field options
+ Demonstrate retrieving metadata with custom field options
  */
 function contact_getfields_example(){
 $params = array(
@@ -247,11 +247,6 @@ function contact_getfields_expectedresult(){
           'export' => true,
           'default' => 'Both',
           'enumValues' => 'Text, HTML, Both',
-          'options' => array(
-              '0' => 'Text',
-              '1' => 'HTML',
-              '2' => 'Both',
-            ),
         ),
       'hash' => array(
           'name' => 'hash',
@@ -317,9 +312,6 @@ function contact_getfields_expectedresult(){
           'pseudoconstant' => array(
               'optionGroupName' => 'individual_prefix',
             ),
-          'api.aliases' => array(
-              '0' => 'prefix',
-            ),
         ),
       'suffix_id' => array(
           'name' => 'suffix_id',
@@ -332,9 +324,6 @@ function contact_getfields_expectedresult(){
           'export' => true,
           'pseudoconstant' => array(
               'optionGroupName' => 'individual_suffix',
-            ),
-          'api.aliases' => array(
-              '0' => 'suffix',
             ),
         ),
       'email_greeting_id' => array(
@@ -422,9 +411,6 @@ function contact_getfields_expectedresult(){
           'export' => true,
           'pseudoconstant' => array(
               'optionGroupName' => 'gender',
-            ),
-          'api.aliases' => array(
-              '0' => 'gender',
             ),
         ),
       'birth_date' => array(
@@ -570,6 +556,7 @@ function contact_getfields_expectedresult(){
           'option_group_id' => '97',
           'date_format' => '',
           'time_format' => '',
+          'name' => 'custom_1',
           'options' => array(
               '1' => 'Label1',
               '2' => 'Label2',

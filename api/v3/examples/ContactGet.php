@@ -4,7 +4,7 @@
  
  */
 function contact_get_example(){
-$params = array( 
+$params = array(
   'email' => 'man2@yahoo.com',
   'version' => 3,
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function contact_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '1',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -54,12 +54,6 @@ function contact_get_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'contact_is_deleted' => 0,
-          'gender_id' => '',
-          'gender' => '',
-          'prefix_id' => '',
-          'prefix' => '',
-          'suffix_id' => '',
-          'suffix' => '',
           'current_employer' => '',
           'address_id' => '',
           'street_address' => '',

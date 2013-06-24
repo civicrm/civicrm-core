@@ -4,14 +4,15 @@
  demonstrates use of Not BETWEEN filter
  */
 function relationship_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
-  'relationship_type_id' => array( 
-      'NOT BETWEEN' => array( 
-          '0' => 34,
-          '1' => 36,
+  'relationship_type_id' => array(
+      'NOT BETWEEN' => array(
+          '0' => 33,
+          '1' => 35,
         ),
     ),
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'relationship','get',$params );
@@ -24,28 +25,22 @@ $params = array(
  */
 function relationship_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
-          'contact_id_a' => '72',
-          'contact_id_b' => '73',
-          'relationship_type_id' => '33',
+          'contact_id_a' => '66',
+          'contact_id_b' => '67',
+          'relationship_type_id' => '32',
           'start_date' => '2008-12-20',
           'is_active' => '1',
           'description' => '',
           'is_permission_a_b' => 0,
           'is_permission_b_a' => 0,
-          'custom_1' => 'xyz',
-          'custom_1_-1' => 'xyz',
-          'custom_3' => '07/11/2009',
-          'custom_3_-1' => '07/11/2009',
-          'custom_4' => 'http://civicrm.org',
-          'custom_4_-1' => 'http://civicrm.org',
         ),
     ),
 );

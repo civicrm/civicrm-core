@@ -4,7 +4,7 @@
  
  */
 function group_nesting_get_example(){
-$params = array( 
+$params = array(
   'parent_group_id' => 1,
   'child_group_id' => 2,
   'version' => 3,
@@ -20,13 +20,13 @@ $params = array(
  */
 function group_nesting_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'child_group_id' => '2',
           'parent_group_id' => '1',

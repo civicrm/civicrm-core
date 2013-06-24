@@ -4,7 +4,7 @@
  
  */
 function email_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 3,
   'location_type_id' => 6,
   'email' => 'api@a-team.com',
@@ -22,13 +22,13 @@ $params = array(
  */
 function email_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'contact_id' => '3',
           'location_type_id' => '6',

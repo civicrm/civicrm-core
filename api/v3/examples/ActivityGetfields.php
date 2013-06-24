@@ -40,9 +40,6 @@ function activity_getfields_expectedresult(){
           'pseudoconstant' => array(
               'optionGroupName' => 'activity_type',
             ),
-          'api.aliases' => array(
-              '0' => 'activity_type',
-            ),
         ),
       'activity_date_time' => array(
           'name' => 'activity_date_time',
@@ -72,9 +69,6 @@ function activity_getfields_expectedresult(){
           'title' => 'Priority',
           'pseudoconstant' => array(
               'optionGroupName' => 'priority',
-            ),
-          'api.aliases' => array(
-              '0' => 'priority',
             ),
         ),
       'parent_id' => array(
@@ -185,9 +179,6 @@ function activity_getfields_expectedresult(){
               'optionGroupName' => 'activity_status',
             ),
           'uniqueName' => 'activity_status_id',
-          'api.aliases' => array(
-              '0' => 'status',
-            ),
         ),
       'is_test' => array(
           'name' => 'is_test',
@@ -208,9 +199,6 @@ function activity_getfields_expectedresult(){
               'optionGroupName' => 'encounter_medium',
             ),
           'uniqueName' => 'activity_medium_id',
-          'api.aliases' => array(
-              '0' => 'medium',
-            ),
         ),
       'result' => array(
           'name' => 'result',

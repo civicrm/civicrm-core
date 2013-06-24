@@ -4,7 +4,7 @@
  demonstrates get + delete in the same call
  */
 function mail_settings_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'title' => 'MailSettings title',
   'api.MailSettings.delete' => 1,
@@ -20,25 +20,25 @@ $params = array(
  */
 function mail_settings_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 2,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'domain_id' => '1',
           'name' => 'default',
           'is_default' => '1',
           'domain' => 'EXAMPLE.ORG',
-          'api.MailSettings.delete' => array( 
+          'api.MailSettings.delete' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'values' => 1,
             ),
         ),
-      '3' => array( 
+      '3' => array(
           'id' => '3',
           'domain_id' => '1',
           'name' => 'my mail setting',
@@ -48,7 +48,7 @@ function mail_settings_get_expectedresult(){
           'username' => 'sue',
           'password' => 'pass',
           'is_ssl' => 0,
-          'api.MailSettings.delete' => array( 
+          'api.MailSettings.delete' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
