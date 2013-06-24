@@ -188,7 +188,8 @@ WHERE      e.id = %1
     }
 
     // see if any other modules want to add any tabs                                                                                                                                                    
-    CRM_Utils_Hook::eventTabs($tabs, $eventID);
+    CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs, 
+      array('event_id' => $eventID));
 
     return $tabs;
   }

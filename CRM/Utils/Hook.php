@@ -485,9 +485,9 @@ abstract class CRM_Utils_Hook {
    * @return null 
    * @access public
    */
-  static function eventTabs(&$tabs, $eventID) {
-    return self::singleton()->invoke(2, $tabs, $eventID,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_eventTabs'
+  static function tabset($tabsetName, &$tabs, $context) {
+    return self::singleton()->invoke(3, $tabsetName, $tabs,
+      $context, self::$_nullObject, self::$_nullObject, 'civicrm_tabset'
     );
   }
 
