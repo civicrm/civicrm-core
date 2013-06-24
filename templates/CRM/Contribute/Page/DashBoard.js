@@ -6,17 +6,18 @@ cj(function ($) {
   'use strict';
 
   function getChart() {
-    var year        = $('#select_year').val();
-    var charttype   = $('#chart_type').val();
-    var date        = new Date();
-    var currentYear = date.getFullYear();
+    var year, charttype, date, currentYear, chartUrl;
+    year        = $('#select_year').val();
+    charttype   = $('#chart_type').val();
+    date        = new Date();
+    currentYear = date.getFullYear();
     if (!charttype) {
       charttype = 'bvg';
     }
     if (!year) {
       year = currentYear;
     }
-    var chartUrl = CRM.url("civicrm/ajax/chart", {snippet : 4});
+    chartUrl = CRM.url("civicrm/ajax/chart", {snippet : 4});
     chartUrl    += "&year=" + year + "&type=" + charttype;
     $.ajax({
       url     : chartUrl,
