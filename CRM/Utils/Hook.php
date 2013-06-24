@@ -477,10 +477,11 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when rendering the tabs for an event (q=civicrm/event/manage)
-   *
-   * @param array $tabs      - the array of tabs that will be displayed 
-   * @param int   $eventID   - the eventID for whom the dashboard is being rendered
+   * This hook is called when rendering the tabs
+   * used for events and potentially contribution pages, etc
+   * @param string $tabset   - name of the screen or visual element
+   * @param array $tabs      - the array of tabs that will be displayed   
+   * @param array $context   - extra data about the screen or context in which the tab is used
    *
    * @return null 
    * @access public
