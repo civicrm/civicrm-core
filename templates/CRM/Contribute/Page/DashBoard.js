@@ -18,19 +18,20 @@ cj(function ($) {
       year = currentYear;
     }
     chartUrl = CRM.url("civicrm/ajax/chart", {
-      'snippet' : 4,
-      'year' : year,
-      'type' : charttype
+      'snippet': 4,
+      'year': year,
+      'type': charttype
     });
-    $(chartData).load(chartUrl);
+    $("#chartData").load(chartUrl, function() {
+      $("select", "#chartData").change(getChart);
+    });
   }
 
   function buildTabularView() {
     var tableUrl = CRM.url("civicrm/contribute/ajax/tableview", {showtable: 1, snippet: 4});
-    $(tableData).load(tableUrl);
+    $("#tableData").load(tableUrl);
   }
 
-  getChart();
   $('#chart_view').click(function() {
     if ($('#chart_view').hasClass('ui-state-default')) {
       $('#chart_view').removeClass('ui-state-default').addClass('ui-state-active ui-tabs-selected');
@@ -47,5 +48,13 @@ cj(function ($) {
       $('#chartData').children().html('');
     }
   });
+
+  // Initialize chart or table based on url hash
+  if (window.location.hash === '#table_layout') {
+    $('#table_view').click();
+  }
+  else {
+    getChart();
+  }
 });
 
