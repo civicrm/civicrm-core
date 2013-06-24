@@ -4,7 +4,7 @@
  
  */
 function price_set_delete_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'id' => 17,
 );
@@ -19,7 +19,7 @@ $params = array(
  */
 function price_set_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

@@ -149,32 +149,40 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $indexExist = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
     }
 
-    if (($params['html_type'] == 'CheckBox' ||
-        $params['html_type'] == 'AdvMulti-Select' ||
-        $params['html_type'] == 'Multi-Select'
-      ) &&
-      isset($params['default_checkbox_option'])
-    ) {
-      $tempArray = array_keys($params['default_checkbox_option']);
-      $defaultArray = array();
-      foreach ($tempArray as $k => $v) {
-        if ($params['option_value'][$v]) {
-          $defaultArray[] = $params['option_value'][$v];
+    switch (CRM_Utils_Array::value('html_type', $params)){
+      case 'Select Date':
+        if(empty($params['date_format'])){
+          $config = CRM_Core_Config::singleton();
+          $params['date_format'] = $config->dateInputFormat;
         }
-      }
+        break;
+      case 'CheckBox':
+      case 'AdvMulti-Select':
+      case 'Multi-Select':
+        if (isset($params['default_checkbox_option'])) {
+          $tempArray = array_keys($params['default_checkbox_option']);
+          $defaultArray = array();
+          foreach ($tempArray as $k => $v) {
+            if ($params['option_value'][$v]) {
+              $defaultArray[] = $params['option_value'][$v];
+            }
+          }
 
-      if (!empty($defaultArray)) {
-        // also add the seperator before and after the value per new conventio (CRM-1604)
-        $params['default_value'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultArray) . CRM_Core_DAO::VALUE_SEPARATOR;
-      }
+          if (!empty($defaultArray)) {
+            // also add the seperator before and after the value per new conventio (CRM-1604)
+            $params['default_value'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultArray) . CRM_Core_DAO::VALUE_SEPARATOR;
+          }
+        }
+        else {
+          if (CRM_Utils_Array::value('default_option', $params)
+            && isset($params['option_value'][$params['default_option']])
+          ) {
+            $params['default_value'] = $params['option_value'][$params['default_option']];
+          }
+        }
+       break;
     }
-    else {
-      if (CRM_Utils_Array::value('default_option', $params)
-        && isset($params['option_value'][$params['default_option']])
-      ) {
-        $params['default_value'] = $params['option_value'][$params['default_option']];
-      }
-    }
+
     $transaction = new CRM_Core_Transaction();
     // create any option group & values if required
     if ($params['html_type'] != 'Text' &&

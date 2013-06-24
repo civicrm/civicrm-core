@@ -4,7 +4,7 @@
  
  */
 function contribution_soft_delete_example(){
-$params = array( 
+$params = array(
   'id' => 1,
   'version' => 3,
 );

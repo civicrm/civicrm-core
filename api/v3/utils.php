@@ -188,8 +188,8 @@ function civicrm_api3_create_success($values = 1, $params = array(
       }
     }
   }
-  //if ( array_key_exists ('debug',$params) && is_object ($dao)) {
-  if (is_array($params) && array_key_exists('debug', $params)) {
+
+  if (is_array($params) && !empty($params['debug'])) {
     if (is_string($action) && $action != 'getfields') {
       $apiFields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => $action) + $params);
     }

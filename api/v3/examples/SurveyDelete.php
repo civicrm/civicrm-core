@@ -4,12 +4,10 @@
  
  */
 function survey_delete_example(){
-$params = array( 
+$params = array(
+  'id' => 1,
   'version' => 3,
-  'title' => 'survey title',
-  'activity_type_id' => '30',
-  'max_number_of_contacts' => 12,
-  'instructions' => 'Call people, ask for money',
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'survey','delete',$params );
@@ -22,7 +20,7 @@ $params = array(
  */
 function survey_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

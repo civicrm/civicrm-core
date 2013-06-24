@@ -4,11 +4,11 @@
  demonstrates use of Return as an array
  */
 function tag_get_example(){
-$params = array( 
+$params = array(
   'id' => 7,
-  'name' => 'New Tag330036',
+  'name' => 'New Tag325818',
   'version' => 3,
-  'return' => array( 
+  'return' => array(
       '0' => 'name',
     ),
 );
@@ -23,15 +23,15 @@ $params = array(
  */
 function tag_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 7,
-  'values' => array( 
-      '7' => array( 
+  'values' => array(
+      '7' => array(
           'id' => '7',
-          'name' => 'New Tag330036',
+          'name' => 'New Tag325818',
         ),
     ),
 );

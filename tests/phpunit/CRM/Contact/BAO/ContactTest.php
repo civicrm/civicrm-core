@@ -3,6 +3,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
 class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
+  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Contact BAOs',

@@ -4,7 +4,7 @@
  
  */
 function price_field_value_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'price_field_id' => 13,
   'membership_type_id' => 5,
@@ -26,13 +26,13 @@ $params = array(
  */
 function price_field_value_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 10,
-  'values' => array( 
-      '10' => array( 
+  'values' => array(
+      '10' => array(
           'id' => '10',
           'price_field_id' => '13',
           'name' => 'memType1',
@@ -48,6 +48,7 @@ function price_field_value_create_expectedresult(){
           'is_active' => '1',
           'financial_type_id' => '2',
           'deductible_amount' => '',
+          'contribution_type_id' => '2',
         ),
     ),
 );

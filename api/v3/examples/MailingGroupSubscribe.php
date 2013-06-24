@@ -4,7 +4,7 @@
  
  */
 function mailing_group_subscribe_example(){
-$params = array( 
+$params = array(
   'email' => 'test@test.test',
   'group_id' => 2,
   'contact_id' => 3,
@@ -23,14 +23,14 @@ $params = array(
  */
 function mailing_group_subscribe_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 4,
-  'values' => array( 
+  'values' => array(
       'contact_id' => '3',
       'subscribe_id' => '1',
-      'hash' => '36e4a45e541c4aa3',
+      'hash' => '5b056fa32d2d56c6',
       'is_error' => 0,
     ),
 );

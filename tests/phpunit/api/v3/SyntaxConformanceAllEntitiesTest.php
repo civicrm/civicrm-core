@@ -45,7 +45,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
 
   /** This test case doesn't require DB reset */
   public $DBResetRequired = FALSE;
-
+  public $_eNoticeCompliant = FALSE;
   /* they are two types of missing APIs:
        - Those that are to be implemented
          (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]

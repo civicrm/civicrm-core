@@ -4,11 +4,10 @@
  
  */
 function participant_payment_get_example(){
-$params = array( 
+$params = array(
   'participant_id' => 4,
   'contribution_id' => 1,
   'version' => 3,
-  'debug' => 1,
 );
 
   $result = civicrm_api( 'participant_payment','get',$params );
@@ -21,26 +20,17 @@ $params = array(
  */
 function participant_payment_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
-  'undefined_fields' => array( 
-      '0' => 'participant_id',
-      '1' => 'contribution_id',
-    ),
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'participant_id' => '4',
           'contribution_id' => '1',
         ),
-    ),
-  'xdebug' => array( 
-      'peakMemory' => 34740680,
-      'memory' => 33998960,
-      'timeIndex' => '79.778831005096',
     ),
 );
 

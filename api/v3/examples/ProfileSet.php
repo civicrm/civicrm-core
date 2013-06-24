@@ -4,7 +4,7 @@
  
  */
 function profile_set_example(){
-$params = array( 
+$params = array(
   'profile_id' => 25,
   'contact_id' => 1,
   'version' => 3,
@@ -26,13 +26,13 @@ $params = array(
  */
 function profile_set_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -61,13 +61,13 @@ function profile_set_expectedresult(){
           'suffix_id' => '',
           'email_greeting_id' => '1',
           'email_greeting_custom' => '',
-          'email_greeting_display' => 'Dear abc1',
+          'email_greeting_display' => 'Dear',
           'postal_greeting_id' => '1',
           'postal_greeting_custom' => '',
-          'postal_greeting_display' => 'Dear abc1',
+          'postal_greeting_display' => 'Dear',
           'addressee_id' => '1',
           'addressee_custom' => '',
-          'addressee_display' => 'abc1 xyz1',
+          'addressee_display' => '',
           'job_title' => '',
           'gender_id' => '',
           'birth_date' => '',
@@ -78,7 +78,7 @@ function profile_set_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'user_unique_id' => '',
-          'created_date' => '2013-02-05 11:40:49',
+          'created_date' => '20120130621222105',
           'modified_date' => '2012-11-14 16:02:35',
         ),
     ),

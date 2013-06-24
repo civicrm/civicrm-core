@@ -4,7 +4,7 @@
  
  */
 function mail_settings_delete_example(){
-$params = array( 
+$params = array(
   'domain_id' => 1,
   'name' => 'my mail setting',
   'domain' => 'setting.com',
@@ -25,7 +25,7 @@ $params = array(
  */
 function mail_settings_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

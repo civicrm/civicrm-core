@@ -4,7 +4,7 @@
  
  */
 function contribution_delete_example(){
-$params = array( 
+$params = array(
   'id' => 1,
   'version' => 3,
 );
@@ -19,12 +19,12 @@ $params = array(
  */
 function contribution_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
+  'values' => array(
       '1' => 1,
     ),
 );

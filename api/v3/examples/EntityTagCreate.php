@@ -4,7 +4,7 @@
  
  */
 function entity_tag_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 12,
   'tag_id' => 1,
   'version' => 3,
@@ -20,7 +20,7 @@ $params = array(
  */
 function entity_tag_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'not_added' => 0,
   'added' => 1,

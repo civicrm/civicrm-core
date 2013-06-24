@@ -4,7 +4,7 @@
  demonstrates use of return is_full 
  */
 function event_getsingle_example(){
-$params = array( 
+$params = array(
   'id' => 1,
   'version' => 3,
   'return.is_full' => 1,
@@ -20,7 +20,7 @@ $params = array(
  */
 function event_getsingle_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'id' => '1',
   'title' => 'Annual CiviCRM meet',
   'event_title' => 'Annual CiviCRM meet',
@@ -42,7 +42,7 @@ function event_getsingle_expectedresult(){
   'is_multiple_registrations' => 0,
   'allow_same_participant_emails' => 0,
   'is_template' => 0,
-  'created_date' => '2013-02-04 22:31:24',
+  'created_date' => '2013-06-22 08:49:03',
   'is_share' => '1',
   'available_places' => 0,
   'is_full' => '1',

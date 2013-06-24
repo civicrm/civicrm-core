@@ -36,7 +36,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   protected $_groupID;
   protected $_email;
   protected $_apiversion;
-
+  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Mailer Group',

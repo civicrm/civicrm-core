@@ -4,8 +4,8 @@
  
  */
 function activity_type_delete_example(){
-$params = array( 
-  'activity_type_id' => 725,
+$params = array(
+  'activity_type_id' => 722,
   'version' => 3,
 );
 
@@ -19,7 +19,7 @@ $params = array(
  */
 function activity_type_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 1,
   'error_message' => 'Undefined index: activity_type_id',
 );

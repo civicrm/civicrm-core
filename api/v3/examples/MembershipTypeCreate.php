@@ -4,7 +4,7 @@
  
  */
 function membership_type_create_example(){
-$params = array( 
+$params = array(
   'name' => '40+ Membership',
   'description' => 'people above 40 are given health instructions',
   'member_of_contact_id' => 1,
@@ -28,13 +28,13 @@ $params = array(
  */
 function membership_type_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
           'domain_id' => '1',
           'name' => '40+ Membership',
@@ -50,12 +50,13 @@ function membership_type_create_expectedresult(){
           'relationship_type_id' => '',
           'relationship_direction' => '',
           'max_related' => '',
-          'visibility' => 'public',
+          'visibility' => '1',
           'weight' => '',
           'receipt_text_signup' => '',
           'receipt_text_renewal' => '',
           'auto_renew' => '',
           'is_active' => '',
+          'contribution_type_id' => '1',
         ),
     ),
 );

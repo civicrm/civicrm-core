@@ -4,7 +4,7 @@
  
  */
 function participant_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 4,
   'event_id' => 1,
   'status_id' => 1,
@@ -25,13 +25,13 @@ $params = array(
  */
 function participant_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 4,
-  'values' => array( 
-      '4' => array( 
+  'values' => array(
+      '4' => array(
           'id' => '4',
           'contact_id' => '4',
           'event_id' => '1',

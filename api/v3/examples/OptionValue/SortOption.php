@@ -4,10 +4,10 @@
  demonstrates use of Sort param (available in many api functions). Also, getsingle
  */
 function option_value_getsingle_example(){
-$params = array( 
+$params = array(
   'option_group_id' => 1,
   'version' => 3,
-  'options' => array( 
+  'options' => array(
       'sort' => 'label DESC',
       'limit' => 1,
     ),
@@ -23,7 +23,7 @@ $params = array(
  */
 function option_value_getsingle_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'id' => '4',
   'option_group_id' => '1',
   'label' => 'SMS',

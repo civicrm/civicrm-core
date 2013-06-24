@@ -4,7 +4,7 @@
  
  */
 function grant_delete_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'contact_id' => 5,
   'application_received_date' => 'now',
@@ -26,7 +26,7 @@ $params = array(
  */
 function grant_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
