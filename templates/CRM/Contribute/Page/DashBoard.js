@@ -17,8 +17,11 @@ cj(function ($) {
     if (!year) {
       year = currentYear;
     }
-    chartUrl = CRM.url("civicrm/ajax/chart", {snippet : 4});
-    chartUrl    += "&year=" + year + "&type=" + charttype;
+    chartUrl = CRM.url("civicrm/ajax/chart", {
+      'snippet' : 4,
+      'year' : year,
+      'type' : charttype
+    });
     $(chartData).load(chartUrl);
   }
 
