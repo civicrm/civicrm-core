@@ -710,8 +710,10 @@ class CRM_Report_Form extends CRM_Core_Form {
                 if (!is_array(${$var}['grouping'])) {
                   $tableName = ${$var}['grouping'];
                 } else {
-                  $tableName = array_keys(${$var}['grouping'])[0];
-                  $groupTitle = array_values(${$var}['grouping'])[0];
+                  $tableName = array_keys(${$var}['grouping']);
+                  $tableName = $tableName[0];
+                  $groupTitle = array_values(${$var}['grouping']);
+                  $groupTitle = $groupTitle[0];
                 }
               }
             }
