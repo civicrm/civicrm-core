@@ -47,6 +47,11 @@
 class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
   /**
+   * @var array ($cacheKey => $cacheValue)
+   */
+  static $_cache = NULL;
+
+  /**
    * Retrieve an item from the DB cache
    *
    * @param string $group (required) The group name of the item
@@ -58,16 +63,15 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @access public
    */
   static function &getItem($group, $path, $componentID = NULL) {
-    static $_cache = NULL;
-    if ($_cache === NULL) {
-      $_cache = array();
+    if (self::$_cache === NULL) {
+      self::$_cache = array();
     }
 
     $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
-    if (!array_key_exists($argString, $_cache)) {
+    if (!array_key_exists($argString, self::$_cache)) {
       $cache = CRM_Utils_Cache::singleton();
-      $_cache[$argString] = $cache->get($argString);
-      if (!$_cache[$argString]) {
+      self::$_cache[$argString] = $cache->get($argString);
+      if (!self::$_cache[$argString]) {
         $dao = new CRM_Core_DAO_Cache();
 
         $dao->group_name   = $group;
@@ -79,11 +83,11 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
           $data = unserialize($dao->data);
         }
         $dao->free();
-        $_cache[$argString] = $data;
-        $cache->set($argString, $_cache[$argString]);
+        self::$_cache[$argString] = $data;
+        $cache->set($argString, self::$_cache[$argString]);
       }
     }
-    return $_cache[$argString];
+    return self::$_cache[$argString];
   }
 
   /**
@@ -97,16 +101,15 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @access public
    */
   static function &getItems($group, $componentID = NULL) {
-    static $_cache = NULL;
-    if ($_cache === NULL) {
-      $_cache = array();
+    if (self::$_cache === NULL) {
+      self::$_cache = array();
     }
 
     $argString = "CRM_CT_CI_{$group}_{$componentID}";
-    if (!array_key_exists($argString, $_cache)) {
+    if (!array_key_exists($argString, self::$_cache)) {
       $cache = CRM_Utils_Cache::singleton();
-      $_cache[$argString] = $cache->get($argString);
-      if (!$_cache[$argString]) {
+      self::$_cache[$argString] = $cache->get($argString);
+      if (!self::$_cache[$argString]) {
         $dao = new CRM_Core_DAO_Cache();
 
         $dao->group_name   = $group;
@@ -119,12 +122,12 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         }
         $dao->free();
 
-        $_cache[$argString] = $result;
-        $cache->set($argString, $_cache[$argString]);
+        self::$_cache[$argString] = $result;
+        $cache->set($argString, self::$_cache[$argString]);
       }
     }
 
-    return $_cache[$argString];
+    return self::$_cache[$argString];
   }
 
   /**
@@ -140,9 +143,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @access public
    */
   static function setItem(&$data, $group, $path, $componentID = NULL) {
-    static $_cache = NULL;
-    if ($_cache === NULL) {
-      $_cache = array();
+    if (self::$_cache === NULL) {
+      self::$_cache = array();
     }
 
     $dao = new CRM_Core_DAO_Cache();
@@ -174,9 +176,11 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
     $cache = CRM_Utils_Cache::singleton();
     $data = unserialize($dao->data);
+    self::$_cache[$argString] = $data;
     $cache->set($argString, $data);
 
     $argString = "CRM_CT_CI_{$group}_{$componentID}";
+    unset(self::$_cache[$argString]);
     $cache->delete($argString);
   }
 
