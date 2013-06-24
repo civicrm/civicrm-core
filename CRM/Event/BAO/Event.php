@@ -339,8 +339,8 @@ WHERE      civicrm_event.is_active = 1 AND
     }
 
     //get the participant status type values.
-    $query        = 'SELECT id, name, class FROM civicrm_participant_status_type';
-    $status       = CRM_Core_DAO::executeQuery($query);
+    $query = 'SELECT id, name, class FROM civicrm_participant_status_type';
+    $status = CRM_Core_DAO::executeQuery($query);
     $statusValues = array();
     while ($status->fetch()) {
       $statusValues[$status->id]['id'] = $status->id;
@@ -380,10 +380,15 @@ LIMIT      0, 10
     $eventParticipant = array();
 
     $properties = array(
-      'eventTitle' => 'event_title', 'isPublic' => 'is_public',
-      'maxParticipants' => 'max_participants', 'startDate' => 'start_date',
-      'endDate' => 'end_date', 'eventType' => 'event_type',
-      'isMap' => 'is_map', 'participants' => 'participants',
+      'id' => 'id',
+      'eventTitle' => 'event_title',
+      'isPublic' => 'is_public',
+      'maxParticipants' => 'max_participants',
+      'startDate' => 'start_date',
+      'endDate' => 'end_date',
+      'eventType' => 'event_type',
+      'isMap' => 'is_map',
+      'participants' => 'participants',
       'notCountedDueToRole' => 'notCountedDueToRole',
       'notCountedDueToStatus' => 'notCountedDueToStatus',
       'notCountedParticipants' => 'notCountedParticipants',
@@ -408,9 +413,9 @@ LIMIT      0, 10
 
           case 'is_map':
             if ($dao->$name && $config->mapAPIKey) {
-              $values             = array();
-              $ids                = array();
-              $params             = array('entity_id' => $dao->id, 'entity_table' => 'civicrm_event');
+              $values = array();
+              $ids = array();
+              $params = array('entity_id' => $dao->id, 'entity_table' => 'civicrm_event');
               $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
               if (is_numeric(CRM_Utils_Array::value('geo_code_1', $values['location']['address'][1])) ||
                 ($config->mapGeoCoding &&
@@ -514,9 +519,9 @@ LIMIT      0, 10
       }
     }
 
-    $countedRoles     = CRM_Event_PseudoConstant::participantRole(NULL, 'filter = 1');
-    $nonCountedRoles  = CRM_Event_PseudoConstant::participantRole(NULL, '( filter = 0 OR filter IS NULL )');
-    $countedStatus    = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
+    $countedRoles = CRM_Event_PseudoConstant::participantRole(NULL, 'filter = 1');
+    $nonCountedRoles = CRM_Event_PseudoConstant::participantRole(NULL, '( filter = 0 OR filter IS NULL )');
+    $countedStatus = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
     $nonCountedStatus = CRM_Event_PseudoConstant::participantStatus(NULL, '( is_counted = 0 OR is_counted IS NULL )');
 
     $countedStatusANDRoles = array_merge($countedStatus, $countedRoles);
