@@ -245,8 +245,10 @@ class CRM_Report_Form_Instance {
     $instanceID = $form->getVar('_id');
 
     if ($isNew = $form->getVar('_createNew')) {
-      // unset $instanceID so a new copy would be created
-      $instanceID = NULL;
+      // set the report_id since base template is going to be same, and we going to unset $instanceID
+      // which will make it difficult later on, to compute report_id
+      $params['report_id'] = CRM_Report_Utils_Report::getValueFromUrl($instanceID);
+      $instanceID = NULL; //unset $instanceID so a new copy would be created
     }
     $params['instance_id'] = $instanceID;
     if (CRM_Utils_Array::value('is_navigation', $params)) {
