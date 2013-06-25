@@ -36,6 +36,199 @@
 class CRM_Report_BAO_Instance extends CRM_Report_DAO_Instance {
 
   /**
+   * takes an associative array and creates an instance object
+   *
+   * the function extract all the params it needs to initialize the create a
+   * instance object. the params array could contain additional unused name/value
+   * pairs
+   *
+   * @param array  $params (reference ) an assoc array of name/value pairs
+   *
+   * @return object CRM_Report_DAO_Instance object
+   * @access public
+   * @static
+   */
+  static function add(&$params) {
+    $instance = new CRM_Report_DAO_Instance();
+    if (empty($params)) {
+      return NULL;
+    }
+
+    $config = CRM_Core_Config::singleton();
+    $params['domain_id'] = CRM_Core_Config::domainID();
+
+    // convert roles array to string
+    if (isset($params['grouprole']) && is_array($params['grouprole'])) {
+      $grouprole_array = array();
+      foreach ($params['grouprole'] as $key => $value) {
+        $grouprole_array[$value] = $value;
+      }
+      $params['grouprole'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
+        array_keys($grouprole_array)
+      );
+    }
+
+    $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
+
+    $instanceID = CRM_Utils_Array::value('id', $params);
+    if (CRM_Utils_Array::value('instance_id', $params)) {
+      $instanceID = CRM_Utils_Array::value('instance_id', $params);
+    }
+
+    if ($instanceID) {
+      CRM_Utils_Hook::pre('edit', 'ReportInstance', $instanceID, $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'ReportInstance', NULL, $params);
+    }
+
+    $instance = new CRM_Report_DAO_Instance();
+    $instance->copyValues($params);
+
+    if ($config->userFramework == 'Joomla') {
+      $instance->permission = 'null';
+    }
+
+    // explicitly set to null if params value is empty
+    if (empty($params['grouprole'])) {
+      $instance->grouprole = 'null';
+    }
+
+    if ($instanceID) {
+      $instance->id = $instanceID;
+    }
+
+    if ($reportID = CRM_Utils_Array::value('report_id', $params)) {
+      $instance->report_id = $reportID;
+    } else if ($instanceID) {
+      $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl($instanceID);
+    } else {
+      // just take it from current url
+      $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl();
+    }
+
+    // unset params that doesn't match with DB columns, and also not required in form-values for sure
+    $fields = array(
+      'title', 'to_emails', 'cc_emails', 'header', 'footer',
+      'qfKey', '_qf_default', 'report_header', 'report_footer', 'grouprole',
+    );
+    foreach ($fields as $field) {
+      unset($params[$field]);
+    }
+    $instance->form_values = serialize($params);
+    $instance->save();
+    
+    if ($instanceID) {
+      CRM_Utils_Hook::pre('edit', 'ReportInstance', $instance->id, $instance);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'ReportInstance', $instance->id, $instance);
+    }
+    return $instance;
+  }
+
+  /**
+   * Function to create instance
+   * takes an associative array and creates a instance object and does any related work like permissioning, adding to dashboard etc.
+   *
+   * This function is invoked from within the web form layer and also from the api layer
+   *
+   * @param array   $params      (reference ) an assoc array of name/value pairs
+   *
+   * @return object CRM_Report_BAO_Instance object
+   * @access public
+   * @static
+   */
+  static function &create(&$params) {
+    $params['header']    = CRM_Utils_Array::value('report_header',$params);
+    $params['footer']    = CRM_Utils_Array::value('report_footer',$params);
+
+    // build navigation parameters
+    if (CRM_Utils_Array::value('is_navigation', $params)) {
+      if (!array_key_exists('navigation', $params)) {
+        $params['navigation'] = array();
+      }
+      $navigationParams =& $params['navigation'];
+
+      $navigationParams['permission'] = array();
+      $navigationParams['label'] = $params['title'];
+      $navigationParams['name']  = $params['title'];
+
+      $navigationParams['current_parent_id'] = CRM_Utils_Array::value('parent_id', $navigationParams);
+      $navigationParams['parent_id'] = CRM_Utils_Array::value('parent_id', $params);
+      $navigationParams['is_active'] = 1;
+
+      if ($permission = CRM_Utils_Array::value('permission', $params)) {
+        $navigationParams['permission'][] = $permission;
+      }
+
+      // unset the navigation related elements, not used in report form values
+      unset($params['parent_id']);
+      unset($params['is_navigation']);
+    }
+
+    // add to dashboard
+    $dashletParams = array();
+    if (CRM_Utils_Array::value('addToDashboard', $params)) {
+      $dashletParams = array(
+        'label' => $params['title'],
+        'is_active' => 1,
+      );
+      if ($permission = CRM_Utils_Array::value('permission', $params)) {
+        $dashletParams['permission'][] = $permission;
+      }
+    }
+
+    $transaction = new CRM_Core_Transaction();
+
+    $instance = self::add($params);
+    if (is_a($instance, 'CRM_Core_Error')) {
+      $transaction->rollback();
+      return $instance;
+    }
+
+    // add / update navigation as required
+    if (!empty($navigationParams)) {
+      if (!CRM_Utils_Array::value('id',$params) && 
+        !CRM_Utils_Array::value('instance_id',$params) && 
+        CRM_Utils_Array::value('id', $navigationParams)) {
+        unset($navigationParams['id']);
+      }
+      $navigationParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1";
+      $navigation = CRM_Core_BAO_Navigation::add($navigationParams);
+
+      if (CRM_Utils_Array::value('is_active', $navigationParams)) {
+        //set the navigation id in report instance table
+        CRM_Core_DAO::setFieldValue('CRM_Report_DAO_Instance', $instance->id, 'navigation_id', $navigation->id);
+      }
+      else {
+        // has been removed from the navigation bar
+        CRM_Core_DAO::setFieldValue('CRM_Report_DAO_Instance', $instance->id, 'navigation_id', 'NULL');
+      }
+      //reset navigation
+      CRM_Core_BAO_Navigation::resetNavigation();
+    }
+
+    // add to dashlet
+    if (!empty($dashletParams)) {
+      $section = 2;
+      $chart  = '';
+      if (CRM_Utils_Array::value('charts', $params)) {
+        $section = 1;
+        $chart   = "&charts=" . $params['charts'];
+      }
+
+      $dashletParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashlet";
+      $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashletFullscreen";
+      $dashletParams['instanceURL'] = "civicrm/report/instance/{$instance->id}";
+      CRM_Core_BAO_Dashboard::addDashlet($dashletParams);
+    }
+    $transaction->commit();
+
+    return $instance;
+  }
+
+  /**
    * Delete the instance of the Report
    *
    * @return $results no of deleted Instance on success, false otherwise
@@ -60,4 +253,3 @@ class CRM_Report_BAO_Instance extends CRM_Report_DAO_Instance {
     return NULL;
   }
 }
-
