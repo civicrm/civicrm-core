@@ -1,26 +1,14 @@
 // http://civicrm.org/licensing
-//http://wiki.civicrm.org/confluence/display/CRMDOC43/Javascript+Reference
 /*jslint indent: 2 */
 /*global CRM, cj */
 cj(function ($) {
   'use strict';
 
   function getChart() {
-    var year, charttype, date, currentYear, chartUrl;
-    year        = $('#select_year').val();
-    charttype   = $('#chart_type').val();
-    date        = new Date();
-    currentYear = date.getFullYear();
-    if (!charttype) {
-      charttype = 'bvg';
-    }
-    if (!year) {
-      year = currentYear;
-    }
-    chartUrl = CRM.url("civicrm/ajax/chart", {
+    var chartUrl = CRM.url("civicrm/ajax/chart", {
       'snippet': 4,
-      'year': year,
-      'type': charttype
+      'year': $('#select_year').val() || new Date().getFullYear(),
+      'type': $('#chart_type').val() || 'bvg'
     });
     $("#chartData").load(chartUrl, function() {
       $("select", "#chartData").change(getChart);
