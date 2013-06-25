@@ -359,7 +359,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->assign('contact_id', $contactID);
     $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
 
-    $config = CRM_Core_Config::singleton();
     $this->add('hidden', 'scriptFee', NULL);
     $this->add('hidden', 'scriptArray', NULL);
 
@@ -858,7 +857,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
       // return if this is express mode
-      $config = CRM_Core_Config::singleton();
       if ($self->_paymentProcessor &&
         $self->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
       ) {
