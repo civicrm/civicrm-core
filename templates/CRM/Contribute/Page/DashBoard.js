@@ -4,36 +4,28 @@
 cj(function ($) {
   'use strict';
 
-  function getChart() {
-    var chartUrl = CRM.url("civicrm/ajax/chart", {
-      'snippet': 4,
-      'year': $('#select_year').val() || new Date().getFullYear(),
-      'type': $('#chart_type').val() || 'bvg'
-    });
-    $("#chartData").load(chartUrl, function() {
-      $("select", "#chartData").change(getChart);
-    });
-  }
-
-  function buildTabularView() {
-    var tableUrl = CRM.url("civicrm/contribute/ajax/tableview", {showtable: 1, snippet: 4});
-    $("#tableData").load(tableUrl);
-  }
-
-  $('#chart_view').click(function() {
-    if ($('#chart_view').hasClass('ui-state-default')) {
-      $('#chart_view').removeClass('ui-state-default').addClass('ui-state-active ui-tabs-selected');
-      $('#table_view').removeClass('ui-state-active ui-tabs-selected').addClass('ui-state-default');
-      getChart();
-      $('#tableData').children().html('');
+  var load = {
+    chart_view: function()  {
+      var chartUrl = CRM.url("civicrm/ajax/chart", {
+        'snippet': 4,
+        'year': $('#select_year').val() || new Date().getFullYear(),
+        'type': $('#chart_type').val() || 'bvg'
+      });
+      $("#chartData").load(chartUrl, function() {
+        $("select", "#chartData").change(load.chart_view);
+      });
+    },
+    table_view: function() {
+      var tableUrl = CRM.url("civicrm/contribute/ajax/tableview", {showtable: 1, snippet: 4});
+      $("#chartData").load(tableUrl);
     }
-  });
-  $('#table_view').click(function() {
-    if ($('#table_view').hasClass('ui-state-default')) {
-      $('#table_view').removeClass('ui-state-default').addClass('ui-state-active ui-tabs-selected');
-      $('#chart_view').removeClass('ui-state-active ui-tabs-selected').addClass('ui-state-default');
-      buildTabularView();
-      $('#chartData').children().html('');
+  };
+
+  $('#chart_view, #table_view').click(function() {
+    if ($(this).hasClass('ui-state-default')) {
+      $('.ui-tabs-selected', '#mainTabContainer').removeClass('ui-state-active ui-tabs-selected').addClass('ui-state-default');
+      $(this).removeClass('ui-state-default').addClass('ui-state-active ui-tabs-selected');
+      load[this.id]();
     }
   });
 
@@ -42,7 +34,7 @@ cj(function ($) {
     $('#table_view').click();
   }
   else {
-    getChart();
+    load.chart_view();
   }
 });
 

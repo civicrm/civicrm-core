@@ -80,7 +80,7 @@
 {/if}
 </ul>
 <div id="chartData"></div>
-<div id="tableData"></div></div>
+</div>
 <div class="spacer"></div>
 
 {if $pager->_totalItems}
