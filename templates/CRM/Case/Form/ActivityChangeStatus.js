@@ -62,6 +62,6 @@ cj(function($) {
     );
     return false;
   });
-});
+}
 
 
