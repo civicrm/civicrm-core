@@ -376,7 +376,8 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   /**
    * normalize default values for multiselect plugins
    *
-   * @return void
+   * @param $defaults array
+   * @return array
    * @access private
    */
   function normalizeDefaultValues(&$defaults) {

@@ -1231,13 +1231,12 @@ class CRM_Contact_BAO_Query {
       $this->filterRelatedContacts($from, $where, $having);
     }
 
-    // CRM_Core_Error::debug($this);
     return array($select, $from, $where, $having);
   }
 
   function &getWhereValues($name, $grouping) {
     $result = NULL;
-    foreach ($this->_params as $id => $values) {
+    foreach ($this->_params as $values) {
       if ($values[0] == $name && $values[3] == $grouping) {
         return $values;
       }
@@ -4054,7 +4053,7 @@ civicrm_relationship.start_date > {$today}
 
     $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
 
-    // if we’re explicitely looking for a certain contact’s contribs, events, etc.
+    // if we’re explicitly looking for a certain contact’s contribs, events, etc.
     // and that contact happens to be deleted, set $onlyDeleted to true
     foreach ($this->_params as $values) {
       $name = CRM_Utils_Array::value(0, $values);
