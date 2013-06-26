@@ -1136,7 +1136,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     switch ($html_type) {
       case 'Radio':
         if ($data_type == 'Boolean') {
-          $display = $value ? ts('Yes') : ts('No');
+          // Do not assume that if not yes means no.
+          $display = '';
+          if ($value) {
+            $display = ts('Yes');
+          }
+          elseif ($value === '0') {
+            $display = ts('No');
+          }
         }
         else {
           $display = CRM_Utils_Array::value($value, $option);
