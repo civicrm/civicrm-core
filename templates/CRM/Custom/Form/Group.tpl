@@ -87,49 +87,50 @@
 <script type="text/Javascript">
 
 showHideStyle( );
-
+cj('#extends_0').change(function() {
+  showHideStyle();
+});
 var  isGroupEmpty = "{/literal}{$isGroupEmpty}{literal}";
 
 if ( isGroupEmpty ) {
      showRange( true );
 }
 
-function showHideStyle()
-{
-  var isShow          = false;
-  var extend          = document.getElementById("extends_0").value;
-    var contactTypes    = {/literal}'{$contactTypes}'{literal};
-    var showStyle       = "{/literal}{$showStyle}{literal}";
-    var showMultiple    = "{/literal}{$showMultiple}{literal}";
-    var showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}";
+function showHideStyle() {
+  var isShow  = false;
+  var extend  = cj('#extends_0 :selected').val();
 
-    eval('var contactTypes = ' + contactTypes);
+  var contactTypes    = {/literal}{$contactTypes}{literal};
+  var showStyle       = "{/literal}{$showStyle}{literal}";
+  var showMultiple    = "{/literal}{$showMultiple}{literal}";
+  var showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}";
 
-    if ( cj.inArray(extend, contactTypes) >= 0 ) {
-        isShow  = true;
-    }
-  if( isShow  ) {
-        cj("tr#style").show();
-        cj("tr#is_multiple").show();
+  if (cj.inArray(extend, contactTypes) >= 0) {
+    isShow  = true;
+  }
+  if (isShow) {
+    cj("tr#style").show();
+    cj("tr#is_multiple").show();
   } else {
-        cj("tr#style").hide();
-        cj("tr#is_multiple").hide();
-     }
+    cj("tr#style").hide();
+    cj("tr#is_multiple").hide();
+    cj("tr#multiple").hide();
+  }
 
-    if ( showStyle ) {
-        cj("tr#style").show();
-    }
+  if (showStyle) {
+    cj("tr#style").show();
+  }
 
-    if ( showMultiple ) {
-        cj("tr#style").show();
-        cj("tr#is_multiple").show();
-    }
+  if (showMultiple) {
+    cj("tr#style").show();
+    cj("tr#is_multiple").show();
+  }
 
-    if ( !showMaxMultiple ) {
-         cj("tr#multiple").hide();
-    } else if( cj( '#is_multiple').attr('checked') ) {
-         cj("tr#multiple").show();
-    }
+  if (!showMaxMultiple) {
+    cj("tr#multiple").hide();
+  } else if(cj( '#is_multiple').attr('checked')) {
+    cj("tr#multiple").show();
+  }
 }
 
 function showRange( onFormLoad )
