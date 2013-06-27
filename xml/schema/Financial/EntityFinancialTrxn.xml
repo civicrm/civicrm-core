@@ -23,7 +23,7 @@
     <required>true</required>
     <import>true</import>
     <add>3.2</add>
-    <comment>May contain civicrm_order, civicrm_order_line_itme, civicrm_order_line_sub_item, civicrm_grant, civicrm_credit_adjustment</comment>
+    <comment>May contain civicrm_financial_item, civicrm_contribution, civicrm_financial_trxn, civicrm_grant, etc</comment>
   </field>
   <field>
     <name>entity_id</name>
