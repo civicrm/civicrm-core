@@ -252,4 +252,7 @@ VALUES
     (@priceFieldID,'tenor','Tenor','40',2,1,0,2),
     (@priceFieldID,'soprano','Soprano','50',3,1,0,2);
 
+INSERT INTO civicrm_print_label (title, name, description, label_format_id, label_type_id, is_default, is_reserved, is_active)
+VALUES
+  ('Annual Conference Hanging Badge (Avery 5395)', 'Annual_Conference_Hanging_Badge', 'For our annual conference', 1, 1, 1, 1, 1 );
 
