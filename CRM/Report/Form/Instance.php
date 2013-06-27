@@ -49,7 +49,7 @@ class CRM_Report_Form_Instance {
       );
     }
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Report_DAO_Instance');
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Report_DAO_ReportInstance');
 
     $form->add('text',
       'title',
@@ -255,7 +255,7 @@ class CRM_Report_Form_Instance {
       $params['navigation'] = $form->_navigation;
     }
 
-    $instance = CRM_Report_BAO_Instance::create($params);
+    $instance = CRM_Report_BAO_ReportInstance::create($params);
     $form->set('id', $instance->id);
 
     if ($instanceID && !$isNew) {
