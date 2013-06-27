@@ -201,9 +201,10 @@ VALUES
    ('batch_status'                  , '{ts escape="sql"}Batch Status{/ts}'                       , 1, 1),
    ('sms_api_type'                  , '{ts escape="sql"}Api Type{/ts}'                           , 1, 1),
    ('sms_provider_name'             , '{ts escape="sql"}Sms Provider Internal Name{/ts}'         , 1, 1),
-   ('auto_renew_options'            , '{ts escape="sql"}Auto Renew Options{/ts}'                , 1, 1),
+   ('auto_renew_options'            , '{ts escape="sql"}Auto Renew Options{/ts}'                 , 1, 1),
    ('financial_account_type'        , '{ts escape="sql"}Financial Account Type{/ts}'             , 1, 1),
-   ('financial_item_status'         , '{ts escape="sql"}Financial Item Status{/ts}'              , 1, 1);
+   ('financial_item_status'         , '{ts escape="sql"}Financial Item Status{/ts}'              , 1, 1),
+   ('label_type'                    , '{ts escape="sql"}Label Type{/ts}'                         , 1, 1);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -276,6 +277,7 @@ SELECT @option_group_id_sms_provider_name := max(id) from civicrm_option_group w
 SELECT @option_group_id_aro := max(id) from civicrm_option_group where name = 'auto_renew_options';
 SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
 SELECT @option_group_id_financial_item_status := max(id) from civicrm_option_group where name = 'financial_item_status';
+SELECT @option_group_id_label_type := max(id) from civicrm_option_group where name = 'label_type';
 
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
@@ -863,9 +865,12 @@ VALUES
    (@option_group_id_sms_api_type, 'smtp', 3, 'smtp', NULL, NULL, 0, 3, NULL, 0, 1, 1, NULL, NULL),
 
 -- auto renew options
-   (@option_group_id_aro, 'Renewal Reminder (non-auto-renew memberships only)', 1, 'Renewal Reminder (non-auto-renew memberships only)', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_aro, 'Auto-renew Memberships Only', 2, 'Auto-renew Memberships Only', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_aro, 'Reminder for Both', 3, 'Reminder for Both', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_aro, '{ts escape="sql"}Renewal Reminder (non-auto-renew memberships only){/ts}', 1, 'Renewal Reminder (non-auto-renew memberships only)', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_aro, '{ts escape="sql"}Auto-renew Memberships Only{/ts}', 2, 'Auto-renew Memberships Only', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_aro, '{ts escape="sql"}Reminder for Both{/ts}', 3, 'Reminder for Both', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
+
+-- Label Type
+   (@option_group_id_label_type, '{ts escape="sql"}Event Badge{/ts}', 1, 'Event Badge', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
 
 -- Label Formats
   (@option_group_id_label, '{ts escape="sql"}Avery 3475{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"helvetica","font-size":10,"font-style":"","metric":"mm","lMargin":0,"tMargin":5,"NX":3,"NY":8,"SpaceX":0,"SpaceY":0,"width":70,"height":36,"lPadding":5.08,"tPadding":5.08}{/literal}',                   '3475',  'Avery', NULL, 0, 1,  NULL, 0, 1, 1, NULL, NULL),

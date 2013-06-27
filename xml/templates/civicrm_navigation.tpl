@@ -529,7 +529,7 @@ VALUES
     ( @domainID, 'civicrm/admin/participant_status&reset=1',                   '{ts escape="sql" skip="true"}Participant Statuses{/ts}', 'Participant Statuses',       'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 8 ),
     ( @domainID, 'civicrm/admin/options/participant_role&group=participant_role&reset=1', '{ts escape="sql" skip="true"}Participant Roles{/ts}', 'Participant Roles',  'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/admin/options/participant_listing&group=participant_listing&reset=1', '{ts escape="sql" skip="true"}Participant Listing Options{/ts}', 'Participant Listing Options', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 10 ),
-    ( @domainID, 'civicrm/admin/options/event_badge&group=event_badge&reset=1', '{ts escape="sql" skip="true"}Event Badge Formats{/ts}', 'Event Badge Formats', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 11 ),
+    ( @domainID, 'civicrm/admin/badgelayout&reset=1',                       '{ts escape="sql" skip="true"}Event Name Badge Layouts{/ts}', 'Event Name Badge Layouts', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 11 ),
     ( @domainID, 'civicrm/admin/paymentProcessor&reset=1',                  '{ts escape="sql" skip="true"}Payment Processors{/ts}', 'Payment Processors',              'administer CiviCRM', '',                     @adminEventlastID, '1', NULL, 12),
     ( @domainID, 'civicrm/admin/setting/preferences/event&reset=1',         '{ts escape="sql" skip="true"}CiviEvent Component Settings{/ts}', 'CiviEvent Component Settings','access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 13 );
 
