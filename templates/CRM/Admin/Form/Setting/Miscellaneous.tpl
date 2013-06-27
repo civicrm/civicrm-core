@@ -93,6 +93,12 @@
             <td>{$form.maxFileSize.html}<br />
                 <span class="description">{$maxFileSize_description}</span></td>
         </tr>
+        <tr class="crm-miscellaneous-form-block-secondDegRelPermissions">
+            <td class="label">{$form.secondDegRelPermissions.label}</td>
+            <td>{$form.secondDegRelPermissions.html}<br />
+                <p class="description">{ts}If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts.{/ts}</p>
+            </td>
+        </tr>
     </table>
 <h3>{ts}reCAPTCHA Keys{/ts}</h3>
     <div class="description">
