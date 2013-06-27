@@ -510,11 +510,7 @@ WHERE id={$contactId}; ";
           $form->assign('relatedOrganizationFound', TRUE);
         }
 
-        $isRequired = FALSE;
-        if (CRM_Utils_Array::value('is_for_organization', $form->_values) == 2) {
-          $isRequired = TRUE;
-        }
-        $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name'], $isRequired);
+        $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name'], TRUE);
         break;
 
       case 'Household':

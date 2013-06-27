@@ -310,7 +310,7 @@ class CRM_Core_BAO_Block {
 
               if ($blockName == 'phone') {
                 $phoneTypeBlockValue = CRM_Utils_Array::value('phoneTypeId', $blockValue);
-                if ($phoneTypeBlockValue == $value['phone_type_id']) {
+                if ($phoneTypeBlockValue == CRM_Utils_Array::value('phone_type_id', $value)) {
                   $valueId = TRUE;
                 }
               }
