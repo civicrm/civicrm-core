@@ -492,7 +492,7 @@ function civicrm_check_permission($args) {
   if (in_array('CiviContribute', $config->enableComponents)) {
     if (
       $arg1 == 'contribute' &&
-      in_array($arg2, array('transact', 'campaign', 'pcp'))
+      in_array($arg2, array('transact', 'campaign', 'pcp', 'updaterecur', 'updatebilling', 'unsubscribe'))
     ) {
       return TRUE;
     }
