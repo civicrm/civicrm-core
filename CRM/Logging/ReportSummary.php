@@ -85,26 +85,27 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       array( 'fk'  => 'contact_id_a',
         'bracket_info'  => array('entity_column' => 'relationship_type_id', 'table' => 'log_civicrm_relationship_type', 'column' => 'label_a_b'),
       ),
-      'log_civicrm_activity_for_target' =>
-      array( 'fk'  => 'target_contact_id',
-        'table_name'  => 'log_civicrm_activity',
-        'joins' => array('table' => 'log_civicrm_activity_target', 'join' => 'entity_log_civireport.id = fk_table.activity_id'),
-        'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)),
-        'log_type'      => 'Activity',
-      ),
-      'log_civicrm_activity_for_assignee' =>
-      array( 'fk'  => 'assignee_contact_id',
-        'table_name'  => 'log_civicrm_activity',
-        'joins' => array('table' => 'log_civicrm_activity_assignment', 'join' => 'entity_log_civireport.id = fk_table.activity_id'),
-        'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)),
-        'log_type'      => 'Activity',
-      ),
-      'log_civicrm_activity_for_source' =>
-      array( 'fk'  => 'source_contact_id',
-        'table_name'  => 'log_civicrm_activity',
-        'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)),
-        'log_type'      => 'Activity',
-      ),
+      // FIXME: activity table structure has changed. Below activity code needs to be fixed based on new structure - CRM-12274
+      /* 'log_civicrm_activity_for_target' => */
+      /* array( 'fk'  => 'target_contact_id', */
+      /*   'table_name'  => 'log_civicrm_activity', */
+      /*   'joins' => array('table' => 'log_civicrm_activity_target', 'join' => 'entity_log_civireport.id = fk_table.activity_id'), */
+      /*   'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)), */
+      /*   'log_type'      => 'Activity', */
+      /* ), */
+      /* 'log_civicrm_activity_for_assignee' => */
+      /* array( 'fk'  => 'assignee_contact_id', */
+      /*   'table_name'  => 'log_civicrm_activity', */
+      /*   'joins' => array('table' => 'log_civicrm_activity_assignment', 'join' => 'entity_log_civireport.id = fk_table.activity_id'), */
+      /*   'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)), */
+      /*   'log_type'      => 'Activity', */
+      /* ), */
+      /* 'log_civicrm_activity_for_source' => */
+      /* array( 'fk'  => 'source_contact_id', */
+      /*   'table_name'  => 'log_civicrm_activity', */
+      /*   'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)), */
+      /*   'log_type'      => 'Activity', */
+      /* ), */
       'log_civicrm_case' =>
       array( 'fk'  => 'contact_id',
         'joins' => array('table' => 'log_civicrm_case_contact', 'join' => 'entity_log_civireport.id = fk_table.case_id'),
