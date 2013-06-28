@@ -62,6 +62,8 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       $this->rel_types[$relid] = $v['label_b_a'];
     }
 
+    $this->deleted_labels = array('' => ts('- select -'), 0 => ts('No'), 1 => ts('Yes'));
+
     $this->caseActivityTypes = array();
     foreach (CRM_Case_PseudoConstant::caseActivityType() as $typeDetail) {
       $this->caseActivityTypes[$typeDetail['id']] = $typeDetail['label'];
@@ -88,6 +90,10 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           ),
           'status_id' => array('title' => ts('Case Status')),
           'case_type_id' => array('title' => ts('Case Type')),
+          'is_deleted' => array('title' => ts('Deleted?'),
+            'default' => FALSE,
+            'type' => CRM_Utils_Type::T_INT,
+          ),
         ),
         'filters' =>
         array(
@@ -106,6 +112,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           'case_type_id' => array('title' => ts('Case Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->case_types,
+          ),
+          'is_deleted' => array('title' => ts('Deleted?'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => $this->deleted_labels,
+            'default' => 0,
           ),
         ),
       ),
@@ -636,6 +648,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           }
           $rows[$rowNum]['case_activity_all_dates'] = implode('; ', $activityDates);
         }
+        $entryFound = TRUE;
+      }
+
+      if (array_key_exists('civicrm_case_is_deleted', $row)) {
+        $value = $row['civicrm_case_is_deleted'];
+        $rows[$rowNum]['civicrm_case_is_deleted'] = $this->deleted_labels[$value];
         $entryFound = TRUE;
       }
 
