@@ -414,6 +414,11 @@ function civicrm_wp_frontend($shortcode = FALSE) {
       CRM_Utils_Array::value(2, $args) == 'ical' &&
       // skip the html page since that is rendered in the CMS theme
       CRM_Utils_Array::value('html', $_GET) != 1
+    ) ||
+    // skip the html when outputting a file
+    (
+      CRM_Utils_Array::value(0, $args) == 'civicrm' &&
+      CRM_Utils_Array::value(1, $args) == 'file'
     )
   ) {
     add_filter('init', 'civicrm_wp_invoke');
