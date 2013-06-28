@@ -161,8 +161,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array   array of page orientations
    * @access public
+   * @static
    */
-  function getPageOrientations() {
+  public static function getPageOrientations() {
     return array(
       'portrait' => ts('Portrait'),
       'landscape' => ts('Landscape'),
@@ -176,8 +177,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array   array of font names
    * @access public
+   * @static
    */
-  function getFontNames() {
+  public static function getFontNames() {
     $label = new CRM_Utils_PDF_Label(self::getDefaultValues());
     return $label->getFontNames();
   }
@@ -189,8 +191,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array   array of font sizes
    * @access public
+   * @static
    */
-  function getFontSizes() {
+  public static function getFontSizes() {
     return array(
       6 => ts('6 pt'),
       7 => ts('7 pt'),
@@ -212,8 +215,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array   array of measurement units
    * @access public
+   * @static
    */
-  function getUnits() {
+  public static function getUnits() {
     return array(
       'in' => ts('Inches'),
       'cm' => ts('Centimeters'),
