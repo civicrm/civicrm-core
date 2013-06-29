@@ -176,7 +176,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::COPY) {
       // make a copy of the Label Format
       $labelFormat = CRM_Core_BAO_LabelFormat::getById($this->_id, $this->_group);
-      $list = CRM_Core_BAO_LabelFormat::getList(TRUE);
+      $list = CRM_Core_BAO_LabelFormat::getList(TRUE, $this->_group);
       $count = 1;
       $prefix = ts('Copy of ');
       while (in_array($prefix . $labelFormat['label'], $list)) {
@@ -188,7 +188,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
       $labelFormat['is_reserved'] = 0;
 
       $bao = new CRM_Core_BAO_LabelFormat();
-      $bao->saveLabelFormat($values, NULL, $this->_group);
+      $bao->saveLabelFormat($labelFormat, NULL, $this->_group);
       CRM_Core_Session::setStatus($labelFormat['label'] . ts(' has been created.'), ts('Saved'), 'success');
       return;
     }

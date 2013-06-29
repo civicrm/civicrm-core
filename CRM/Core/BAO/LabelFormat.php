@@ -263,31 +263,31 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * Retrieve list of Label Formats.
    *
    * @param bool    $namesOnly    return simple list of names
-   * @param string  $name         name of the option group
+   * @param string  $groupName    group name of the label format option group
    *
    * @return array  (reference)   label format list
    * @static
    * @access public
    */
-  static function &getList($namesOnly = FALSE, $name='label_format') {
+  static function &getList($namesOnly = FALSE, $groupName='label_format') {
     static $list = array();
-    if (self::_getGid($name)) {
+    if (self::_getGid($groupName)) {
       // get saved label formats from Option Value table
       $dao = new CRM_Core_DAO_OptionValue();
-      $dao->option_group_id = self::_getGid($name);
+      $dao->option_group_id = self::_getGid($groupName);
       $dao->is_active = 1;
       $dao->orderBy('weight');
       $dao->find();
       while ($dao->fetch()) {
         if ($namesOnly) {
-          $list[$name][$dao->name] = $dao->label;
+          $list[$groupName][$dao->name] = $dao->label;
         }
         else {
-          CRM_Core_DAO::storeValues($dao, $list[$name][$dao->id]);
+          CRM_Core_DAO::storeValues($dao, $list[$groupName][$dao->id]);
         }
       }
     }
-    return $list[$name];
+    return $list[$groupName];
   }
 
   /**
@@ -433,7 +433,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @return void
    * @access public
    */
-  function customGroupName() {
+  public static function customGroupName() {
     return ts('Custom');
   }
 
