@@ -87,6 +87,18 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     $this->add('text', 'label', ts('Name'), $attributes['label'] + $disabled, $required);
     $this->add('text', 'description', ts('Description'), array('size' => CRM_Utils_Type::HUGE));
     $this->add('checkbox', 'is_default', ts('Is this Label Format the default?'));
+
+    $options = array(
+      'label_format' => ts('Mailing Label'),
+      'name_badge'   => ts('Name Badge'),
+    );
+
+    $labelType = $this->addRadio('label_type', ts('Used For'), $options, null, '&nbsp;&nbsp;');
+
+    if ($this->_action != CRM_Core_Action::ADD) {
+      $labelType->freeze();
+    }
+
     $this->add('select', 'paper_size', ts('Sheet Size'),
       array(
         0 => ts('- default -')
@@ -156,6 +168,8 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
       $defaults['italic'] = (stripos($defaults['font-style'], 'I') !== FALSE);
       unset($defaults['font-style']);
     }
+
+    $defaults['label_type'] = $this->_group;
     return $defaults;
   }
 
@@ -220,7 +234,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     $values['font-style'] = $style;
 
     $bao = new CRM_Core_BAO_LabelFormat();
-    $bao->saveLabelFormat($values, $this->_id, $this->_group);
+    $bao->saveLabelFormat($values, $this->_id, $values['label_type']);
 
     $status = ts('Your new Label Format titled <strong>%1</strong> has been saved.', array(1 => $values['label']));
     if ($this->_action & CRM_Core_Action::UPDATE) {
