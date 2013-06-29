@@ -1399,15 +1399,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'event_full_text' => 'Sorry! We are already full',
       'is_monetory' => 0,
       'is_active' => 1,
-      'version' => API_LATEST_VERSION,
       'is_show_location' => 0,
     ), $params);
 
-    $result = civicrm_api('Event', 'create', $params);
-    if ($result['is_error'] == 1) {
-      throw new Exception($result['error_message']);
-    }
-    return $result;
+    return $this->callAPISuccess('Event', 'create', $params);
   }
 
   /**
@@ -1418,9 +1413,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function eventDelete($id) {
     $params = array(
       'event_id' => $id,
-      'version' => API_LATEST_VERSION,
     );
-    civicrm_api('event', 'delete', $params);
+    return $this->callAPISuccess('event', 'delete', $params);
   }
 
   /**
@@ -1431,14 +1425,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function participantDelete($participantID) {
     $params = array(
       'id' => $participantID,
-      'version' => API_LATEST_VERSION,
     );
-    $result = civicrm_api('Participant', 'delete', $params);
-
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not delete participant');
-    }
-    return;
+    return $this->callAPISuccess('Participant', 'delete', $params);
   }
 
   /**
