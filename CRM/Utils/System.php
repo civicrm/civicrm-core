@@ -641,7 +641,7 @@ class CRM_Utils_System {
   }
 
   /** parse php modules from phpinfo */
-  function parsePHPModules() {
+  public static function parsePHPModules() {
     ob_start();
     phpinfo(INFO_MODULES);
     $s = ob_get_contents();
@@ -675,7 +675,7 @@ class CRM_Utils_System {
   }
 
   /** get a module setting */
-  function getModuleSetting($pModuleName, $pSetting) {
+  public static function getModuleSetting($pModuleName, $pSetting) {
     $vModules = self::parsePHPModules();
     return $vModules[$pModuleName][$pSetting];
   }
