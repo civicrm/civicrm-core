@@ -134,6 +134,8 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
       if (CRM_Utils_Array::value('is_reserved', $format)) {
         $action -= CRM_Core_Action::DELETE;
       }
+
+      $format['groupName'] = ts('Mailing Label');
       $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
         array('id' => $format['id'], 'group' => 'label_format'));
     }
@@ -144,6 +146,8 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
       if (CRM_Utils_Array::value('is_reserved', $format)) {
         $action -= CRM_Core_Action::DELETE;
       }
+
+      $format['groupName'] = ts('Name Badge');
       $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
         array('id' => $format['id'], 'group' => 'name_badge'));
     }
