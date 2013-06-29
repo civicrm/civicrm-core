@@ -3,8 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
- | Copyright (C) 2011 Marty Wright                                    |
- | Licensed to CiviCRM under the Academic Free License version 3.0.   |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,9 +34,9 @@
  */
 
 /**
- * Page for displaying list of Label Formats
+ * Page for list page badges
  */
-class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
+class CRM_Badge_Page_Layout extends CRM_Core_Page_Basic {
 
   /**
    * The action links that we need to display for the browse screen
@@ -53,7 +52,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    * @return string Classname of BAO.
    */
   function getBAOName() {
-    return 'CRM_Core_BAO_LabelFormat';
+    return 'CRM_Core_DAO_PrintLabel';
   }
 
   /**
@@ -63,29 +62,33 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    */
   function &links() {
     if (!(self::$_links)) {
-      // helper variable for nicer formatting
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/labelFormats',
-          'qs' => 'action=update&id=%%id%%&group=%%group%%&reset=1',
-          'title' => ts('Edit Label Format'),
+          'url' => 'civicrm/admin/badgelayout',
+          'qs' => 'action=update&id=%%id%%&reset=1',
+          'title' => ts('Edit Badge Layout'),
         ),
-        CRM_Core_Action::COPY => array(
-          'name' => ts('Copy'),
-          'url' => 'civicrm/admin/labelFormats',
-          'qs' => 'action=copy&id=%%id%%&group=%%group%%&reset=1',
-          'title' => ts('Copy Label Format'),
+        CRM_Core_Action::DISABLE => array(
+          'name' => ts('Disable'),
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_DAO_PrintLabel' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
+          'title' => ts('Disable Badge Layout'),
+        ),
+        CRM_Core_Action::ENABLE => array(
+          'name' => ts('Enable'),
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_DAO_PrintLabel' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
+          'title' => ts('Enable Badge Layout'),
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/labelFormats',
-          'qs' => 'action=delete&id=%%id%%&group=%%group%%&reset=1',
-          'title' => ts('Delete Label Format'),
+          'url' => 'civicrm/admin/badgelayout',
+          'qs' => 'action=delete&id=%%id%%',
+          'title' => ts('Delete Badge Layout'),
         ),
       );
     }
-
     return self::$_links;
   }
 
@@ -95,7 +98,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    * @return string Classname of edit form.
    */
   function editForm() {
-    return 'CRM_Admin_Form_LabelFormats';
+    return 'CRM_Badge_Form_Layout';
   }
 
   /**
@@ -104,7 +107,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    * @return string name of this page.
    */
   function editName() {
-    return 'Mailing Label Formats';
+    return 'Badge Layout';
   }
 
   /**
@@ -113,52 +116,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    * @return string user context.
    */
   function userContext($mode = NULL) {
-    return 'civicrm/admin/labelFormats';
-  }
-
-  /**
-   * Browse all Label Format settings.
-   *
-   * @return void
-   * @access public
-   * @static
-   */
-  function browse($action = NULL) {
-    // Get list of configured Label Formats
-    $labelFormatList= CRM_Core_BAO_LabelFormat::getList();
-    $nameFormatList= CRM_Core_BAO_LabelFormat::getList(false, 'name_badge');
-
-    // Add action links to each of the Label Formats
-    foreach ($labelFormatList as & $format) {
-      $action = array_sum(array_keys($this->links()));
-      if (CRM_Utils_Array::value('is_reserved', $format)) {
-        $action -= CRM_Core_Action::DELETE;
-      }
-
-      $format['groupName'] = ts('Mailing Label');
-      $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $format['id'], 'group' => 'label_format'));
-    }
-
-    // Add action links to each of the Label Formats
-    foreach ($nameFormatList as & $format) {
-      $action = array_sum(array_keys($this->links()));
-      if (CRM_Utils_Array::value('is_reserved', $format)) {
-        $action -= CRM_Core_Action::DELETE;
-      }
-
-      $format['groupName'] = ts('Name Badge');
-      $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $format['id'], 'group' => 'name_badge'));
-    }
-
-    $labelFormatList = array_merge($labelFormatList, $nameFormatList);
-
-    // Order Label Formats by weight
-    $returnURL = CRM_Utils_System::url(self::userContext());
-    CRM_Core_BAO_LabelFormat::addOrder($labelFormatList, $returnURL);
-
-    $this->assign('rows', $labelFormatList);
+    return 'civicrm/admin/badgelayout';
   }
 }
 
