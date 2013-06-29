@@ -38,9 +38,9 @@
  */
 class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_Form_ContributionPage {
 
-  static $_products;
+  protected $_products;
 
-  static $_pid;
+  protected $_pid;
 
   /**
    * Function to pre  process the form
