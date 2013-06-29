@@ -339,13 +339,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['error_message'], 'Mandatory key(s) missing from params array: financial_type_id, total_amount, contact_id', 'In line ' . __LINE__);
   }
 
-  function testCreateParamsNotArrayContribution() {
-
-    $params = 'contact_id= 1';
-    $contribution = $this->callAPIFailure('contribution', 'create', $params);
-    $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
-  }
-
   function testCreateParamsWithoutRequiredKeys() {
     $params = array('version' => 3);
     $contribution = $this->callAPIFailure('contribution', 'create', $params);
