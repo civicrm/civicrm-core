@@ -330,7 +330,7 @@ function _civicrm_api3_separate_values(&$values) {
 }
 
 /**
- * This is a wrapper for api_store_values which will check the suitable fields using getfields
+ * This is a legacy wrapper for api_store_values which will check the suitable fields using getfields
  * rather than DAO->fields
  *
  * Getfields has handling for how to deal with uniquenames which dao->fields doesn't

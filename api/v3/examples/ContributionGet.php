@@ -7,6 +7,7 @@ function contribution_get_example(){
 $params = array(
   'contribution_id' => 1,
   'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'contribution','get',$params );
