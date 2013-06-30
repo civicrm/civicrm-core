@@ -28,7 +28,7 @@
       <title>Contact ID</title>
       <headerPattern>/contact(.?id)?/i</headerPattern>
       <import>true</import>
-      <default>0</default>
+      <required>true</required>
       <comment>FK to Contact ID</comment>
       <add>1.7</add>
   </field>
@@ -44,7 +44,7 @@
       <title>Event</title>
       <import>true</import>
       <headerPattern>/event id$/i</headerPattern>
-      <default>0</default>
+      <required>true</required>
       <comment>FK to Event ID</comment>
       <add>1.7</add>
   </field>
