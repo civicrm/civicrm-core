@@ -77,7 +77,7 @@
             <div class="premium-full-content">
               <div class="premium-full-title">{$row.name}</div>
               <div class="premium-full-disabled">
-                {ts 1=$row.min_contribution}You must contribute at least $%1 to get this item{/ts}<br/>
+                {ts 1=$row.min_contribution|crmMoney}You must contribute at least %1 to get this item{/ts}<br/>
                 <input type="button" value="{ts 1=$row.min_contribution|crmMoney}Contribute %1 Instead{/ts}" amount="{$row.min_contribution}" />
               </div>
               <div class="premium-full-description">
