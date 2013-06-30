@@ -117,6 +117,10 @@ class CRM_Event_Form_ManageEvent_TabHeader {
 
     $eventID = $form->getVar('_id');
 
+    // see if any other modules want to add any tabs
+    CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs,
+      array('event_id' => $eventID));
+
     $fullName  = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
     $new       = '';
@@ -186,10 +190,6 @@ WHERE      e.id = %1
 
       //calculate if the reminder has been configured for this event
     }
-
-    // see if any other modules want to add any tabs                                                                                                                                                    
-    CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs, 
-      array('event_id' => $eventID));
 
     return $tabs;
   }
