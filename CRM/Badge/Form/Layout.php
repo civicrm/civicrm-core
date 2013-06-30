@@ -54,30 +54,82 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    $this->add('text',
-      'name',
-      ts('Name'),
-      CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'name'),
-      TRUE
-    );
-    $this->addRule('name',
-      ts('Name already exists in Database.'),
-      'objectExists',
-      array('CRM_Core_DAO_PrintLabel', $this->_id)
-    );
-    $this->addRule('name',
-      ts('Name can only consist of alpha-numeric characters'),
-      'variable'
-    );
 
-    $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'display_name'));
-    $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'description'));
-    $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'), true);
+
+    $labelStyle = CRM_Core_PseudoConstant::get('CRM_Core_DAO_PrintLabel', 'label_format_id');
+    $this->add('select', 'label_format_id', ts('Label Style'), array('' => ts('- select -')) + $labelStyle, TRUE);
+
+    $this->add('text', 'description', ts('Description'),
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'description'));
+
+    // get the tokens
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    asort($tokens);
+
+    $fontSizes = CRM_Core_BAO_LabelFormat::getFontSizes();
+    $fontNames = CRM_Core_BAO_LabelFormat::getFontNames('name_badge');
+    $textAlignment = CRM_Core_BAO_LabelFormat::getTextAlignments();
+
+    $rowCount = 3;
+    for ( $i =1; $i <= $rowCount; $i++ ) {
+      $this->add('select', "token[$i]", ts('Token'), array('' => ts('- none -')) + $tokens);
+      $this->add('select', "font_name[$i]", ts('Font Name'), $fontNames);
+      $this->add('select', "font_size[$i]", ts('Font Size'), $fontSizes);
+      $this->add('select', "text_alignment[$i]", ts('Alignment'), $textAlignment);
+    }
+    $rowCount++;
+    $this->assign('rowCount', $rowCount);
+
+    $this->add('checkbox', 'add_barcode', ts('Barcode?'));
+    unset($textAlignment['J']);
+    $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
+
     $this->add('checkbox', 'is_default', ts('Default?'));
+    $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
     if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_PrintLabel', $this->_id, 'is_reserved')) {
-      $this->freeze(array('name', 'description', 'is_active'));
+      $this->freeze(array('title', 'description', 'is_active'));
     }
+  }
+
+  /**
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * the default values are retrieved from the database
+   *
+   * @access public
+   *
+   * @return None
+   */
+  function setDefaultValues() {
+    if (isset($this->_id) && empty($this->_values)) {
+      $this->_values = array();
+      $params = array('id' => $this->_id);
+      CRM_Badge_BAO_Layout::retrieve($params, $this->_values );
+    }
+
+    $defaults = $this->_values;
+
+    $data = get_object_vars(json_decode($this->_values['data']));
+
+    $specialFields = array('token', 'font_name', 'font_size', 'text_alignment');
+    foreach($specialFields as $field) {
+      $defaults[$field] = get_object_vars($data[$field]);
+    }
+
+    $defaults['add_barcode'] = $data['add_barcode'];
+    $defaults['barcode_alignment'] = $data['barcode_alignment'];
+    $defaults['label_format_id'] = $data['label_format_id'];
+
+    if ($this->_action == CRM_Core_Action::DELETE && isset($defaults['title'])) {
+      $this->assign('delName', $defaults['title']);
+    }
+
+    // its ok if there is no element called is_active
+    $defaults['is_active'] = ($this->_id) ? CRM_Utils_Array::value('is_active', $defaults) : 1;
+
+    return $defaults;
   }
 
   /**
@@ -88,41 +140,26 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    * @return None
    */
   public function postProcess() {
-    /*
-        if ($this->_action & CRM_Core_Action::DELETE) {
-          CRM_Core_BAO_LocationType::del($this->_id);
-          CRM_Core_Session::setStatus(ts('Selected Location type has been deleted.'), ts('Record Deleted'), 'success');
-          return;
-        }
+    if ($this->_action & CRM_Core_Action::DELETE) {
+      CRM_Badge_BAO_Layout::del($this->_id);
+      CRM_Core_Session::setStatus(ts('Selected badge layout has been deleted.'), ts('Record Deleted'), 'success');
+      return;
+    }
 
-        // store the submitted values in an array
-        $params = $this->exportValues();
-        $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-        $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    $params = $data = $this->controller->exportValues($this->_name);
 
-        // action is taken depending upon the mode
-        $locationType = new CRM_Core_DAO_PrintLabel();
-        $locationType->name = $params['name'];
-        $locationType->display_name = $params['display_name'];
-        $locationType->vcard_name = $params['vcard_name'];
-        $locationType->description = $params['description'];
-        $locationType->is_active = $params['is_active'];
-        $locationType->is_default = $params['is_default'];
+    unset($data['qfKey']);
+    $params['data'] = json_encode($data);
 
-        if ($params['is_default']) {
-          $query = "UPDATE civicrm_location_type SET is_default = 0";
-          CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
-        }
+    if ($this->_id) {
+      $params['id'] = $this->_id;
+    }
 
-        if ($this->_action & CRM_Core_Action::UPDATE) {
-          $locationType->id = $this->_id;
-        }
+    // store the submitted values in an array
+    CRM_Badge_BAO_Layout::create($params);
 
-        $locationType->save();
-
-    CRM_Core_Session::setStatus(ts("The location type '%1' has been saved.",
-        array(1 => $locationType->name)
-      ), ts('Saved'), 'success');
-    */
+    CRM_Core_Session::setStatus(ts("The badge layout '%1' has been saved.",
+      array(1 => $params['title'])
+    ), ts('Saved'), 'success');
   }
 }

@@ -767,11 +767,11 @@
     <path>civicrm/admin/badgelayout</path>
     <title>Badge Layout</title>
     <page_callback>CRM_Badge_Page_Layout</page_callback>
-    <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
+    <access_arguments>administer CiviCRM</access_arguments>
   </item>
   <item>
     <path>civicrm/admin/badgelayout/add</path>
     <page_callback>CRM_Badge_Form_Layout</page_callback>
-    <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
+    <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>

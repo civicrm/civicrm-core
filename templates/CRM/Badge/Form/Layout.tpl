@@ -30,23 +30,54 @@
   {if $action eq 8}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-      {ts}WARNING: Deleting this option will result in the loss of all location type records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
+      {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
     </div>
   {else}
     <table class="form-layout-compressed">
-      <!--tr class="crm-badge-layout-form-block-label">
-        <td class="label">{$form.name.label}</td>
-        <td>{$form.name.html}<br/>
-          <span class="description">{ts}WARNING: Do NOT use spaces in the Location Name.{/ts}</span>
-        </td>
-      </tr-->
       <tr class="crm-badge-layout-form-block-title">
         <td class="label">{$form.title.label}</td>
         <td>{$form.title.html}</td>
       </tr>
+      <tr class="crm-badge-layout-form-block-label_format_id">
+        <td class="label">{$form.label_format_id.label}</td>
+        <td>{$form.label_format_id.html}</td>
+      </tr>
       <tr class="crm-badge-layout-form-block-description">
         <td class="label">{$form.description.label}</td>
         <td>{$form.description.html}</td>
+      </tr>
+      <tr class="crm-badge-layout-form-block-elements">
+        <td class="label">{ts}Elements{/ts}</td>
+        <td>
+          <table class="form-layout-compressed">
+            <tr>
+              <td>{ts}Row{/ts}</td>
+              <td>{ts}Label{/ts}</td>
+              <td>{ts}Font{/ts}</td>
+              <td>{ts}Size{/ts}</td>
+              <td>{ts}Alignment{/ts}</td>
+            </tr>
+            {section name='i' start=1 loop=$rowCount}
+              {assign var='rowNumber' value=$smarty.section.i.index}
+              <tr>
+                <td>#{$rowNumber}</td>
+                <td>{$form.token.$rowNumber.html|crmAddClass:twenty}</td>
+                <td>{$form.font_name.$rowNumber.html}</td>
+                <td>{$form.font_size.$rowNumber.html}</td>
+                <td>{$form.text_alignment.$rowNumber.html}</td>
+              </tr>
+            {/section}
+          </table>
+        </td>
+      </tr>
+      <tr class="crm-badge-layout-form-block-attachment">
+        <td colspan="2">
+
+        </td>
+      </tr>
+      <tr class="crm-badge-layout-form-block-add_barcode">
+        <td class="label">{$form.add_barcode.label}</td>
+        <td>{$form.add_barcode.html}&nbsp;&nbsp;&nbsp;{ts}on{/ts}&nbsp;&nbsp;&nbsp;{$form.barcode_alignment.html}</td>
       </tr>
       <tr class="crm-badge-layout-form-block-is_active">
         <td class="label">{$form.is_active.label}</td>
