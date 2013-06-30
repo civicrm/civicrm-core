@@ -820,6 +820,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * in the interests of removing financial type / contribution type checks from
+   * legacy format function lets test that the api is doing this for us
+   */
+  function testValidNamedFinancialType() {
+    $params = $this->_params;
+    $params['financial_type_id'] = 'Donation';
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+  }
+
+  /**
    * Function tests that additional financial records are created when online contribution with pay later option
    * is created
    */
@@ -1341,28 +1351,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->stop();
   }
 
-  ///////////////  _civicrm_contribute_format_params for $create
-  function testFormatParams() {
-    $params = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => date('Ymd'),
-      'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
-      'contribution_status_id' => 1,
-      'financial_type' => null,
-      'note' => 'note',
-      'contribution_source' => 'test',
-    );
-
-    $values = array();
-    $result = _civicrm_api3_contribute_format_params($params, $values, TRUE);
-    $this->assertEquals($values['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($values['contribution_status_id'], 1, 'In line ' . __LINE__);
-  }
-  /*
-     * This function does a GET & compares the result against the $params
-     * Use as a double check on Creates
-     */
+  /**
+  * This function does a GET & compares the result against the $params
+  * Use as a double check on Creates
+  */
   function contributionGetnCheck($params, $id, $delete = 1) {
 
     $contribution = civicrm_api('Contribution', 'Get', array(
