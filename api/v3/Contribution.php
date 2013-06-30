@@ -261,34 +261,7 @@ function _civicrm_api3_contribution_get_spec(&$params) {
  */
 function _civicrm_api3_contribute_format_params($params, &$values, $create = FALSE) {
 //legacy way of formatting from v2 api - v3 way is to define metadata & do it in the api layer
-    require_once 'api/v3/utils.php';
   _civicrm_api3_filter_fields_for_bao('Contribution', $params, $values);
-
-  foreach ($params as $key => $value) {
-    // ignore empty values or empty arrays etc
-    if (CRM_Utils_System::isNull($value)) {
-      continue;
-    }
-    // note that this is legacy handling - these should be handled at the api layer
-    switch ($key) {
-      case 'financial_type' :// should be dealt with either api pseudoconstant in validate_integer fn
-        $contributionTypeId = CRM_Utils_Array::key ( ucfirst ( $value ), CRM_Contribute_PseudoConstant::financialType() );
-        if ($contributionTypeId) {
-          if (CRM_Utils_Array::value('financial_type_id', $values) && $contributionTypeId != $values['financial_type_id']) {
-            throw new Exception("Mismatched Financial Type and Financial Type Id");
-          }
-          $values ['financial_type_id'] = $contributionTypeId;
-        }
-        else {
-          throw new Exception("Invalid Financial Type");
-        }
-        break;
-
-      default:
-        break;
-    }
-  }
-
   return array();
 }
 

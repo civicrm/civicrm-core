@@ -33,6 +33,7 @@ $params = array(
           'unit_price' => '80',
         ),
     ),
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'contribution','create',$params );
