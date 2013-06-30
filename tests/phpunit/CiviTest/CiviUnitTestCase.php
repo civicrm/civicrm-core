@@ -617,9 +617,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $apiResult api result
    * @param string $prefix extra test to add to message
    */
-  function assertAPIFailure($apiResult, $prefix = '') {
+  function assertAPIFailure($apiResult, $prefix = '', $expectedError = NULL) {
     if (!empty($prefix)) {
       $prefix .= ': ';
+    }
+    if($expectedError && !empty($apiResult['is_error'])){
+      $this->assertEquals($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix );
     }
     $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
   }
@@ -708,8 +711,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $entity
    * @param string $action
    * @param array $params
+   * @param string $expectedErrorMessage error
    */
-  function callAPIFailure($entity, $action, $params) {
+  function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
     if (is_array($params)) {
       $params += array(
         'version' => API_LATEST_VERSION,
