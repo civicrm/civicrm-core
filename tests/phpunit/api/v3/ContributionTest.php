@@ -506,8 +506,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords($contribution, 'offline');
     $this->contributionGetnCheck($params, $contribution['id']);
   }
-  /*
-   *
+  /**
+   * test create with valid payment instument
    */
   function testCreateContributionWithPaymentInstrument() {
     $params = $this->_params + array('payment_instrument' => 'EFT');
@@ -776,7 +776,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
 
-  /*
+  /**
    * Function tests that additional financial records are created when online contribution is created
    */
   function testCreateContributionOnline() {
@@ -809,7 +809,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
-  /*
+  /**
+   * in the interests of removing financial type / contribution type checks from
+   * legacy format function lets test that the api is doing this for us
+   */
+  function testCreateInvalidFinancialType() {
+    $params = $this->_params;
+    $params['financial_type_id'] = 99999;
+    $result = $this->callAPIFailure($this->_entity, 'create', $params, "'99999' is not a valid option for field financial_type_id");
+  }
+
+  /**
    * Function tests that additional financial records are created when online contribution with pay later option
    * is created
    */
