@@ -88,29 +88,6 @@ class CRM_Core_Payment_BaseIPN {
     return TRUE;
   }
 
-  function createContact(&$input, &$ids, &$objects) {
-    $params    = array();
-    $billingID = $ids['billing'];
-    $lookup    = array(
-      'first_name',
-      'last_name',
-      "street_address-{$billingID}",
-      "city-{$billingID}",
-      "state-{$billingID}",
-      "postal_code-{$billingID}",
-      "country-{$billingID}",
-    );
-    foreach ($lookup as $name) {
-      $params[$name] = $input[$name];
-    }
-    if (!empty($params)) {
-      // update contact record
-      $contact = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray, $ids['contact']);
-    }
-
-    return TRUE;
-  }
-
   /**
    * Load objects related to contribution
    *

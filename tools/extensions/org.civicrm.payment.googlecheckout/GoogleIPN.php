@@ -151,18 +151,13 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
     require_once 'CRM/Core/Transaction.php';
     $transaction = new CRM_Core_Transaction();
 
-    // fix for CRM-2842
-    // if ( ! $this->createContact( $input, $ids, $objects ) ) {
-    //     return false;
-    // }
-
     // check if contribution is already completed, if so we ignore this ipn
     if ($contribution->contribution_status_id == 1) {
       CRM_Core_Error::debug_log_message("returning since contribution has already been handled");
       echo "Success: Contribution has already been handled<p>";
     }
     else {
-      /* Since trxn_id hasn't got any use here, 
+      /* Since trxn_id hasn't got any use here,
              * lets make use of it by passing the eventID/membershipTypeID to next level.
              * And change trxn_id to google-order-number before finishing db update */
 
