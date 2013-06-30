@@ -52,7 +52,7 @@ class CRM_Badge_Page_Layout extends CRM_Core_Page_Basic {
    * @return string Classname of BAO.
    */
   function getBAOName() {
-    return 'CRM_Core_DAO_PrintLabel';
+    return 'CRM_Badge_BAO_Layout';
   }
 
   /**
