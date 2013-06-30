@@ -94,6 +94,20 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
     $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
 
+    $params['label_type_id'] = CRM_Core_OptionGroup::getValue('label_type', 'Event Badge', 'name');
+
+    // check if new layout is create, if so set the created_id (if not set)
+    if (empty($params['id'])) {
+      if (empty($params['created_id'])) {
+        $session = CRM_Core_Session::singleton();
+        $params['created_id'] = $session->get('userID');
+      }
+    }
+
+    if (!isset($params['id']) && !isset($params['name'])) {
+      $params['name'] = CRM_Utils_String::munge($params['title'], '_', 64);
+    }
+
     // action is taken depending upon the mode
     $printLabel = new CRM_Core_DAO_PrintLabel();
     $printLabel->copyValues($params);

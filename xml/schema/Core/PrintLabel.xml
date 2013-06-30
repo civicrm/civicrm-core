@@ -41,12 +41,18 @@
   <field>
     <name>label_format_id</name>
     <type>int unsigned</type>
-    <comment>Implicit FK to civicrm_option_value row in label_format option group</comment>
+    <pseudoconstant>
+      <optionGroupName>name_badge</optionGroupName>
+    </pseudoconstant>
+    <comment>Implicit FK to civicrm_option_value row in name_badge option group</comment>
     <add>4.4</add>
   </field>
   <field>
     <name>label_type_id</name>
     <type>int unsigned</type>
+    <pseudoconstant>
+      <optionGroupName>label_type</optionGroupName>
+    </pseudoconstant>
     <comment>Implicit FK to civicrm_option_value row in NEW label_type option group</comment>
     <add>4.4</add>
   </field>

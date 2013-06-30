@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div id="help">
-  {ts}Badge Layout.{/ts}
+  {ts}Badge Layout screen for creating custom labels{/ts}
 </div>
 
 {if $action eq 1 or $action eq 2 or $action eq 8}
