@@ -307,7 +307,14 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
         $values['class'] = 'reserved';
         // check if object is relationship type
         $object_type = get_class($object);
-        if ($object_type == 'CRM_Contact_BAO_RelationshipType' || $object_type == 'CRM_Core_BAO_LocationType') {
+
+        $exceptions = array(
+          'CRM_Contact_BAO_RelationshipType',
+          'CRM_Core_BAO_LocationType',
+          'CRM_Badge_BAO_Layout',
+        );
+
+        if (in_array($object_type, $exceptions)) {
           $newAction = CRM_Core_Action::VIEW + CRM_Core_Action::UPDATE;
         }
         else {
