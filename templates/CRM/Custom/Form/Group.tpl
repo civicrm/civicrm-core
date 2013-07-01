@@ -85,93 +85,105 @@
 {$initHideBlocks}
 {literal}
 <script type="text/Javascript">
+cj(function($) {
 
-showHideStyle( );
+  showHideStyle();
+  cj('#extends_0').change(function() {
+    showHideStyle();
+  });
 
-var  isGroupEmpty = "{/literal}{$isGroupEmpty}{literal}";
+  var  isGroupEmpty = "{/literal}{$isGroupEmpty}{literal}";
+  if (isGroupEmpty) {
+    showRange(true);
+  }
+  cj('#is_multiple').click(function() {
+    showRange();
+  });
 
-if ( isGroupEmpty ) {
-     showRange( true );
-}
+  function showHideStyle() {
+    var isShow  = false;
+    var extend  = cj('#extends_0').val();
 
-function showHideStyle()
-{
-  var isShow          = false;
-  var extend          = document.getElementById("extends_0").value;
-    var contactTypes    = {/literal}'{$contactTypes}'{literal};
+    var contactTypes    = {/literal}{$contactTypes}{literal};
     var showStyle       = "{/literal}{$showStyle}{literal}";
     var showMultiple    = "{/literal}{$showMultiple}{literal}";
     var showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}";
 
-    eval('var contactTypes = ' + contactTypes);
-
-    if ( cj.inArray(extend, contactTypes) >= 0 ) {
-        isShow  = true;
-    }
-  if( isShow  ) {
-        cj("tr#style").show();
-        cj("tr#is_multiple").show();
-  } else {
-        cj("tr#style").hide();
-        cj("tr#is_multiple").hide();
-     }
-
-    if ( showStyle ) {
-        cj("tr#style").show();
+    if (cj.inArray(extend, contactTypes) >= 0) {
+      isShow  = true;
     }
 
-    if ( showMultiple ) {
-        cj("tr#style").show();
-        cj("tr#is_multiple").show();
-    }
-
-    if ( !showMaxMultiple ) {
-         cj("tr#multiple").hide();
-    } else if( cj( '#is_multiple').attr('checked') ) {
-         cj("tr#multiple").show();
-    }
-}
-
-function showRange( onFormLoad )
-{
-    if( cj("#is_multiple :checked").length ) {
+    if (isShow) {
+      cj("tr#style").show();
+      cj("tr#is_multiple").show();
+      if (cj('#is_multiple :checked').length) {
         cj("tr#multiple").show();
-        cj("select#style option[value='Tab']").attr("selected", "selected");
-    } else {
-        cj("tr#multiple").hide();
-        if ( !onFormLoad ) {
-            cj("select#style option[value='Inline']").attr("selected", "selected");
-        }
-    }
-}
-
-// In update mode, when 'extends' is set to an option which doesn't have
-// any options in 2nd selector (for subtypes)  -
-var subtypes = document.getElementById('extends_1');
-if ( subtypes ) {
-     if ( subtypes.options.length <= 0 ) {
-          subtypes.style.display = 'none';
-     } else {
-          subtypes.style.display = 'inline';
-     }
-}
-
-function warnDataLoss( )
-{
-   var submittedSubtypes = cj('#extends_1').val();
-   var defaultSubtypes   = {/literal}{$defaultSubtypes}{literal};
-
-   var warning = false;
-   cj.each(defaultSubtypes, function(index, subtype) {
-      if ( cj.inArray(subtype, submittedSubtypes) < 0 ) {
-         warning = true;
       }
-   });
+    }
+    else {
+      cj("tr#style").hide();
+      cj("tr#is_multiple").hide();
+      cj("tr#multiple").hide();
+    }
 
-   if ( warning ) {
-      return confirm( 'One or more subtypes has been un-selected from the list. Any custom data associated with un-selected subtype would be removed. Click OK to proceed.' );
-   }
-   return true;
+    if (showStyle) {
+      cj("tr#style").show();
+    }
+
+    if (showMultiple) {
+      cj("tr#style").show();
+      cj("tr#is_multiple").show();
+    }
+
+    if (!showMaxMultiple) {
+      cj("tr#multiple").hide();
+    }
+    else if(cj( '#is_multiple').attr('checked')) {
+      cj("tr#multiple").show();
+    }
+  }
+
+  function showRange(onFormLoad) {
+    if(cj("#is_multiple :checked").length) {
+      cj("tr#multiple").show();
+      cj("select#style option[value='Tab']").attr("selected", "selected");
+    }
+    else {
+      cj("tr#multiple").hide();
+      if (!onFormLoad) {
+        cj("select#style option[value='Inline']").attr("selected", "selected");
+      }
+    }
+  }
+
+  // In update mode, when 'extends' is set to an option which doesn't have
+  // any options in 2nd selector (for subtypes)  -
+  var subtypes = document.getElementById('extends_1');
+  if (subtypes) {
+    if (subtypes.options.length <= 0) {
+      subtypes.style.display = 'none';
+    }
+    else {
+      subtypes.style.display = 'inline';
+    }
+  }
+});
+
+function warnDataLoss() {
+  var submittedSubtypes = cj('#extends_1').val();
+  var defaultSubtypes   = {/literal}{$defaultSubtypes}{literal};
+
+  var warning = false;
+  cj.each(defaultSubtypes, function(index, subtype) {
+    if (cj.inArray(subtype, submittedSubtypes) < 0) {
+      warning = true;
+    }
+  });
+
+  if (warning) {
+    return confirm( 'One or more subtypes has been un-selected from the list. Any custom data associated with un-selected subtype would be removed. Click OK to proceed.' );
+  }
+  return true;
 }
 </script>
 {/literal}
