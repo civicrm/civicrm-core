@@ -3,13 +3,12 @@
 /*
  
  */
-function option_group_get_example(){
+function option_group_delete_example(){
 $params = array(
-  'name' => 'preferred_communication_method',
-  'version' => 3,
+  'id' => 89,
 );
 
-  $result = civicrm_api( 'option_group','get',$params );
+  $result = civicrm_api( 'option_group','delete',$params );
 
   return $result;
 }
@@ -17,29 +16,17 @@ $params = array(
 /*
  * Function returns array of result expected from previous function
  */
-function option_group_get_expectedresult(){
+function option_group_delete_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
-  'undefined_fields' => array(
-      '0' => 'name',
-    ),
   'version' => 3,
   'count' => 1,
-  'id' => 1,
-  'values' => array(
-      '1' => array(
-          'id' => '1',
-          'name' => 'preferred_communication_method',
-          'title' => 'Preferred Communication Method',
-          'is_reserved' => '1',
-          'is_active' => '1',
-        ),
-    ),
+  'values' => true,
   'xdebug' => array(
       'peakMemory' => 35887080,
-      'memory' => 30302600,
-      'timeIndex' => '50.701730966568',
+      'memory' => 33229704,
+      'timeIndex' => '51.428074836731',
     ),
 );
 
@@ -50,7 +37,7 @@ function option_group_get_expectedresult(){
 /*
 * This example has been generated from the API test suite. The test that created it is called
 *
-* testGetOptionGroupByName and can be found in
+* testDeleteOptionGroup and can be found in
 * http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/OptionGroupTest.php
 *
 * You can see the outcome of the API tests at
