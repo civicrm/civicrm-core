@@ -7,6 +7,7 @@ function option_group_get_example(){
 $params = array(
   'name' => 'preferred_communication_method',
   'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'option_group','get',$params );

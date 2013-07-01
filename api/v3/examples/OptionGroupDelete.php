@@ -3,24 +3,14 @@
 /*
  
  */
-function option_group_create_example(){
+function option_group_delete_example(){
 $params = array(
+  'id' => 89,
   'version' => 3,
-  'sequential' => 1,
-  'name' => 'civicrm_event.amount.560',
-  'is_reserved' => 1,
-  'is_active' => 1,
-  'api.OptionValue.create' => array(
-      'label' => 'workshop',
-      'value' => 35,
-      'is_default' => 1,
-      'is_active' => 1,
-      'format.only_id' => 1,
-    ),
   'debug' => 0,
 );
 
-  $result = civicrm_api( 'option_group','create',$params );
+  $result = civicrm_api( 'option_group','delete',$params );
 
   return $result;
 }
@@ -28,24 +18,13 @@ $params = array(
 /*
  * Function returns array of result expected from previous function
  */
-function option_group_create_expectedresult(){
+function option_group_delete_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 84,
-  'values' => array(
-      '0' => array(
-          'id' => '84',
-          'name' => 'civicrm_event.amount.560',
-          'title' => '',
-          'description' => '',
-          'is_reserved' => '1',
-          'is_active' => '1',
-          'api.OptionValue.create' => 720,
-        ),
-    ),
+  'values' => true,
 );
 
   return $expectedResult  ;
@@ -55,7 +34,7 @@ function option_group_create_expectedresult(){
 /*
 * This example has been generated from the API test suite. The test that created it is called
 *
-* testGetOptionCreateSuccess and can be found in
+* testDeleteOptionGroup and can be found in
 * http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/OptionGroupTest.php
 *
 * You can see the outcome of the API tests at
