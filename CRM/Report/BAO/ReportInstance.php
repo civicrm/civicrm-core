@@ -33,7 +33,7 @@
  * $Id$
  *
  */
-class CRM_Report_BAO_Instance extends CRM_Report_DAO_Instance {
+class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
   /**
    * takes an associative array and creates an instance object
@@ -44,12 +44,12 @@ class CRM_Report_BAO_Instance extends CRM_Report_DAO_Instance {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Report_DAO_Instance object
+   * @return object CRM_Report_DAO_ReportInstance object
    * @access public
    * @static
    */
   static function add(&$params) {
-    $instance = new CRM_Report_DAO_Instance();
+    $instance = new CRM_Report_DAO_ReportInstance();
     if (empty($params)) {
       return NULL;
     }
@@ -82,7 +82,7 @@ class CRM_Report_BAO_Instance extends CRM_Report_DAO_Instance {
       CRM_Utils_Hook::pre('create', 'ReportInstance', NULL, $params);
     }
 
-    $instance = new CRM_Report_DAO_Instance();
+    $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);
 
     if ($config->userFramework == 'Joomla') {
@@ -135,7 +135,7 @@ class CRM_Report_BAO_Instance extends CRM_Report_DAO_Instance {
    *
    * @param array   $params      (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Report_BAO_Instance object
+   * @return object CRM_Report_BAO_ReportInstance object
    * @access public
    * @static
    */
@@ -199,11 +199,11 @@ class CRM_Report_BAO_Instance extends CRM_Report_DAO_Instance {
 
       if (CRM_Utils_Array::value('is_active', $navigationParams)) {
         //set the navigation id in report instance table
-        CRM_Core_DAO::setFieldValue('CRM_Report_DAO_Instance', $instance->id, 'navigation_id', $navigation->id);
+        CRM_Core_DAO::setFieldValue('CRM_Report_DAO_ReportInstance', $instance->id, 'navigation_id', $navigation->id);
       }
       else {
         // has been removed from the navigation bar
-        CRM_Core_DAO::setFieldValue('CRM_Report_DAO_Instance', $instance->id, 'navigation_id', 'NULL');
+        CRM_Core_DAO::setFieldValue('CRM_Report_DAO_ReportInstance', $instance->id, 'navigation_id', 'NULL');
       }
       //reset navigation
       CRM_Core_BAO_Navigation::resetNavigation();
@@ -235,14 +235,14 @@ class CRM_Report_BAO_Instance extends CRM_Report_DAO_Instance {
    * @access public
    *
    */
-  function delete($id = NULL) {
-    $dao = new CRM_Report_DAO_Instance();
+  static function del($id = NULL) {
+    $dao = new CRM_Report_DAO_ReportInstance();
     $dao->id = $id;
     return $dao->delete();
   }
 
   static function retrieve($params, &$defaults) {
-    $instance = new CRM_Report_DAO_Instance();
+    $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);
 
     if ($instance->find(TRUE)) {
