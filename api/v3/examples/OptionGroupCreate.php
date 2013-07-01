@@ -17,6 +17,7 @@ $params = array(
       'is_active' => 1,
       'format.only_id' => 1,
     ),
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'option_group','create',$params );
@@ -31,14 +32,6 @@ function option_group_create_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
-  'undefined_fields' => array(
-      '0' => 'name',
-      '1' => 'is_reserved',
-      '2' => 'is_active',
-      '3' => 'api.OptionValue.create',
-      '4' => 'id',
-      '5' => 'is_default',
-    ),
   'version' => 3,
   'count' => 1,
   'id' => 84,
@@ -52,11 +45,6 @@ function option_group_create_expectedresult(){
           'is_active' => '1',
           'api.OptionValue.create' => 720,
         ),
-    ),
-  'xdebug' => array(
-      'peakMemory' => 35887080,
-      'memory' => 32901496,
-      'timeIndex' => '50.986313819885',
     ),
 );
 

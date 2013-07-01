@@ -7,6 +7,7 @@ function option_group_get_example(){
 $params = array(
   'name' => 'preferred_communication_method',
   'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'option_group','get',$params );
@@ -21,9 +22,6 @@ function option_group_get_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
-  'undefined_fields' => array(
-      '0' => 'name',
-    ),
   'version' => 3,
   'count' => 1,
   'id' => 1,
@@ -35,11 +33,6 @@ function option_group_get_expectedresult(){
           'is_reserved' => '1',
           'is_active' => '1',
         ),
-    ),
-  'xdebug' => array(
-      'peakMemory' => 35887080,
-      'memory' => 30302600,
-      'timeIndex' => '50.701730966568',
     ),
 );
 

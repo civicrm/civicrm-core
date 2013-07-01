@@ -6,6 +6,8 @@
 function option_group_delete_example(){
 $params = array(
   'id' => 89,
+  'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'option_group','delete',$params );
@@ -23,11 +25,6 @@ function option_group_delete_expectedresult(){
   'version' => 3,
   'count' => 1,
   'values' => true,
-  'xdebug' => array(
-      'peakMemory' => 35887080,
-      'memory' => 33229704,
-      'timeIndex' => '51.428074836731',
-    ),
 );
 
   return $expectedResult  ;
