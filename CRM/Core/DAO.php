@@ -1007,6 +1007,7 @@ FROM   civicrm_domain
     // CRM-11582
     foreach($tr as $key => $value) {
       $key   = preg_quote($key);
+      $value = preg_quote($value);
       $query = preg_replace("/$key\b/", $value, $query);
     }
     return $query;
