@@ -3,15 +3,9 @@
 /**
  * Retrieve a report instance
  *
- * FIXME This is a bare-minimum placeholder
+ * @param  array  $params input parameters
  *
- * @param  array  $ params input parameters
- *
- * {@example OptionValueGet.php 0}
- * @example OptionValueGet.php
- *
- * @return  array details of found Option Values
- * {@getfields OptionValue_get}
+ * @return  array details of found instances
  * @access public
  */
 function civicrm_api3_report_instance_get($params) {
@@ -19,14 +13,9 @@ function civicrm_api3_report_instance_get($params) {
 }
 
 /**
- *  Add a OptionValue. OptionValues are used to classify CRM entities (including Contacts, Groups and Actions).
+ *  Add or update a report instance. 
  *
- * Allowed @params array keys are:
- *
- * {@example OptionValueCreate.php}
- *
- * @return array of newly created option_value property values.
- * {@getfields OptionValue_create}
+ * @return array of newly created report instance property values.
  * @access public
  */
 function civicrm_api3_report_instance_create($params) {
@@ -49,10 +38,7 @@ function _civicrm_api3_report_instance_create_spec(&$params) {
  *
  * @param  array  $params
  *
- * {@example ReportInstanceDelete.php 0}
- *
  * @return array Api result
- * {@getfields ReportInstance_create}
  * @access public
  */
 function civicrm_api3_report_instance_delete($params) {
