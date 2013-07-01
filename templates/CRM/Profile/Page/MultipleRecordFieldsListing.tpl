@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {if $showListing}
-  <h1>{ts}{$customGroupTitle}{/ts}</h1>
+  {if !$tabDisplay}<h1>{ts}{$customGroupTitle}{/ts}</h1>{/if}
   {if $records and $headers}
     {include file="CRM/common/jsortable.tpl"}
     <div id="browseValues">
@@ -94,7 +94,11 @@
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
       &nbsp;
-      {ts}No multi-record entries found. Note: check is Include in multi-record listing property of the fields you want to display in listings{/ts}
+      {if $tabDisplay}
+        {ts 1=$customGroupTitle}No records of type '%1' found.{/ts}
+      {else}
+        {ts}No multi-record entries found. Note: check is Include in multi-record listing property of the fields you want to display in listings{/ts}
+      {/if}
     </div>
   {/if}
 
