@@ -193,10 +193,18 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     if (!$first) {
-      // create a contribution and then get it processed
+      //check if this contribution transaction is already processed
+      //if not create a contribution and then get it processed
       $contribution = new CRM_Contribute_BAO_Contribution();
+      $contribution->trxn_id = $input['trxn_id'];
+      if ($contribution->trxn_id && $contribution->find()) {
+        CRM_Core_Error::debug_log_message("returning since contribution has already been handled");
+        echo "Success: Contribution has already been handled<p>";
+        return TRUE;
+      }
+
       $contribution->contact_id = $ids['contact'];
-            $contribution->financial_type_id  = $objects['contributionType']->id;
+      $contribution->financial_type_id  = $objects['contributionType']->id;
       $contribution->contribution_page_id = $ids['contributionPage'];
       $contribution->contribution_recur_id = $ids['contributionRecur'];
       $contribution->receive_date = $now;
