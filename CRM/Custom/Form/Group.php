@@ -288,9 +288,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       'extends',
       ts('Used For'),
       array(
-        'onClick' => 'showHideStyle();',
         'name' => 'extends[0]',
-        'style' => 'vertical-align: top;',
+        'style' => 'vertical-align: top;'
       ),
       TRUE
     );
@@ -353,12 +352,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $this->addElement('checkbox', 'is_active', ts('Is this Custom Data Set active?'));
 
     // does this set have multiple record?
-    $multiple = $this->addElement('checkbox',
-      'is_multiple',
-      ts('Does this Custom Field Set allow multiple records?'),
-      NULL,
-      array('onclick' => "showRange();")
-    );
+    $multiple = $this->addElement('checkbox', 'is_multiple',
+      ts('Does this Custom Field Set allow multiple records?'), NULL);
 
     // $min_multiple = $this->add('text', 'min_multiple', ts('Minimum number of multiple records'), $attributes['min_multiple'] );
     // $this->addRule('min_multiple', ts('is a numeric field') , 'numeric');
