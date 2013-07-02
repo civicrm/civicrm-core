@@ -299,6 +299,31 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
   function upgrade_4_3_4($rev) {
     $this->addTask(ts('Upgrade DB to 4.3.4: SQL'), 'task_4_3_x_runSql', $rev);
   }
+  
+  function upgrade_4_3_5($rev) {
+    // CRM-12156
+    $config = CRM_Core_Config::singleton();
+    $dbname  = DB::parseDSN($config->dsn);
+    $sql = "SELECT DELETE_RULE
+FROM information_schema.REFERENTIAL_CONSTRAINTS
+WHERE CONSTRAINT_NAME = 'FK_civicrm_financial_item_contact_id'
+AND CONSTRAINT_SCHEMA = %1";
+    $params = array(1 => array($dbname['database'], 'String'));
+    $onDelete = CRM_Core_DAO::singleValueQuery($sql, $params, TRUE, FALSE);
+    
+    if ($onDelete != 'CASCADE') {
+      $query = "ALTER TABLE `civicrm_financial_item`
+DROP FOREIGN KEY FK_civicrm_financial_item_contact_id,
+DROP INDEX FK_civicrm_financial_item_contact_id;";
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+      $query = "
+ALTER TABLE `civicrm_financial_item`
+ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE;
+";
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+    }
+    $this->addTask(ts('Upgrade DB to 4.3.5: SQL'), 'task_4_3_x_runSql', $rev);
+  }
 
   //CRM-11636
   function assignFinancialTypeToPriceRecords() {
