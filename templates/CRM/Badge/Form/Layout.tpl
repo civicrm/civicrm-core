@@ -38,9 +38,9 @@
         <td class="label">{$form.title.label}</td>
         <td>{$form.title.html}</td>
       </tr>
-      <tr class="crm-badge-layout-form-block-label_format_id">
-        <td class="label">{$form.label_format_id.label}</td>
-        <td>{$form.label_format_id.html}</td>
+      <tr class="crm-badge-layout-form-block-label_format_name">
+        <td class="label">{$form.label_format_name.label}</td>
+        <td>{$form.label_format_name.html}</td>
       </tr>
       <tr class="crm-badge-layout-form-block-description">
         <td class="label">{$form.description.label}</td>
