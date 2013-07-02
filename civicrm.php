@@ -671,8 +671,11 @@ class CiviCRM_For_WordPress {
     $config = CRM_Core_Config::singleton();
     $config->userFrameworkFrontend = true;
 
-    if ( isset( $_GET['q'] ) ) {
-      $args = explode( '/', trim( $_GET['q'] ) );
+    $argString = NULL;
+    $args = array();
+    if (isset( $_GET['q'])) {
+      $argString = trim($_GET['q']);
+      $args = explode('/', $argString);
     }
 
     // CMW: hacky procedure for overriding WordPress page/post:
@@ -699,24 +702,25 @@ class CiviCRM_For_WordPress {
     // CMW: why do we need this? Nothing that follows uses it...
     require_once ABSPATH . WPINC . '/pluggable.php';
 
-    // if snippet is set, which means ajax call, we just
-    // output civicrm html and skip the header
+    // output civicrm html only in a few cases and skip the WP header
     if (
+      // snippet is set - i.e. ajax call
       CRM_Utils_Array::value('snippet', $_GET) ||
-      (
-      CRM_Utils_Array::value(0, $args) == 'civicrm' &&
-      CRM_Utils_Array::value(1, $args) == 'ajax'
-      )  ||
-      // we also follow this pattern where civicrm controls the
-      // entire page like an ical feed
-      (
-      CRM_Utils_Array::value(0, $args) == 'civicrm' &&
-      CRM_Utils_Array::value(1, $args) == 'event' &&
-      CRM_Utils_Array::value(2, $args) == 'ical' &&
-      // skip the html page since that is rendered in the CMS theme
-      CRM_Utils_Array::value('html', $_GET) != 1
+      // ical feed
+      ($argString == 'civicrm/event/ical' &&
+        // skip the html page since it is rendered in the CMS theme
+        CRM_Utils_Array::value('html', $_GET) != 1) ||
+      in_array(
+        $argString,
+        // ajax and file download urls
+        array(
+          'civicrm/ajax',
+          'civicrm/file'
+        )
       )
     ) {
+      // from my limited understanding, putting this in the init hook allows civi to
+      // echo all output and exit before the theme code outputs anything - lobo
       add_filter( 'init', array( $this, 'invoke' ) );
       return;
     }
