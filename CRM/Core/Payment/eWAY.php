@@ -143,7 +143,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * eWAY payment process
    **********************************************************/
   function doDirectPayment(&$params) {
-    if ($params['is_recur'] == TRUE) {
+    if (CRM_Utils_Array::value('is_recur', $params) == TRUE) {
       CRM_Core_Error::fatal(ts('eWAY - recurring payments not implemented'));
     }
 
