@@ -169,6 +169,28 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     else {
       $this->addDefaultButtons($label, 'done');
     }
+    
+    $this->addFormRule(array('CRM_Contact_Form_Task_Delete', 'formRule'), $this);
+  }
+
+  /**
+   * global form rule
+   *
+   * @param array $fields  the input form values
+   * @param array $files   the uploaded files if any
+   * @param object $self form object
+   *
+   * @return true if no errors, else array of errors
+   * @access public
+   * @static
+   */
+  static function formRule($fields, $files, $self) {
+    // CRM-12929
+    $error = array();
+    if ($self->_skipUndelete) {
+      CRM_Financial_BAO_FinancialItem::checkContactPresent($self->_contactIds, $error);
+    }
+    return $error;
   }
 
   /**
