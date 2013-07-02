@@ -179,10 +179,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->_defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
     }
 
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
-
     if ($this->_snippet) {
+      // now fix all state country selectors
+      CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
       return $this->_defaults;
     }
 
@@ -213,6 +212,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!empty($fields)) {
       CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $this->_defaults);
     }
+
+    // now fix all state country selectors
+    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
     // Set default payment processor as default payment_processor radio button value
     if (!empty($this->_paymentProcessors)) {
