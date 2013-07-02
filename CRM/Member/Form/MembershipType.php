@@ -440,7 +440,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     }
   }
 
-  function checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, &$optionsIds) {
+  public static function checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, &$optionsIds) {
     if ($previousID) {
       $editedFieldParams = array(
         'price_set_id ' => $priceSetId,
