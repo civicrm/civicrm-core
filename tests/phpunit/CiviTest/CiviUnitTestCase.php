@@ -596,15 +596,134 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
   }
 
+/**
+* check that api returned 'is_error' => 0
+* else provide full message
+* @param array $apiResult api result
+* @param string $prefix extra test to add to message
+*/
   function assertAPISuccess($apiResult, $prefix = '') {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
-    $this->assertEquals(0, $apiResult['is_error'], $prefix . (empty($apiResult['error_message']) ? '' : $apiResult['error_message']));
+    $errorMessage = empty($apiResult['error_message']) ? '' : " " . $apiResult['error_message'];
+    if(!empty($apiResult['trace'])){
+      $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
+    }
+    $this->assertEquals(0, $apiResult['is_error'], $prefix . $errorMessage);
+  }
+
+  /**
+* check that api returned 'is_error' => 1
+* else provide full message
+* @param array $apiResult api result
+* @param string $prefix extra test to add to message
+*/
+  function assertAPIFailure($apiResult, $prefix = '', $expectedError = NULL) {
+    if (!empty($prefix)) {
+      $prefix .= ': ';
+    }
+    if($expectedError && !empty($apiResult['is_error'])){
+      $this->assertEquals($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix );
+    }
+    $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
   }
 
   function assertType($expected, $actual, $message = '') {
     return $this->assertInternalType($expected, $actual, $message);
+  }
+  /**
+
+/**
+* This function exists to wrap api functions
+* so we can ensure they succeed & throw exceptions without litterering the test with checks
+* @param string $entity
+* @param string $action
+* @param array $params
+* @param string $function - pass this in to create a generated example
+* @param string $file - pass this in to create a generated example
+*/
+  function callAPISuccess($entity, $action, $params) {
+    $params = array_merge(array(
+        'version' => API_LATEST_VERSION,
+        'debug' => 1,
+      ),
+      $params
+    );
+    $result = civicrm_api($entity, $action, $params);
+    $this->assertAPISuccess($result, "Failure in api call for $entity $action");
+    return $result;
+  }
+
+  /**
+* This function exists to wrap api getValue function & check the result
+* so we can ensure they succeed & throw exceptions without litterering the test with checks
+* There is a type check in this
+* @param string $entity
+* @param array $params
+* @param string $type - per http://php.net/manual/en/function.gettype.php possible types
+* - boolean
+* - integer
+* - double
+* - string
+* - array
+* - object
+*/
+  function callAPISuccessGetValue($entity, $params, $type = NULL) {
+    $params += array(
+      'version' => API_LATEST_VERSION,
+      'debug' => 1,
+    );
+    $result = civicrm_api($entity, 'getvalue', $params);
+    if($type){
+      if($type == 'integer'){
+        // api seems to return integers as strings
+        $this->assertTrue(is_numeric($result), "expected a numeric value but got " . print_r($result, 1));
+      }
+      else{
+        $this->assertType($type, $result, "returned result should have been of type $type but was " );
+      }
+    }
+    return $result;
+  }
+  /**
+* This function exists to wrap api functions
+* so we can ensure they succeed, generate and example & throw exceptions without litterering the test with checks
+*
+* @param string $entity
+* @param string $action
+* @param array $params
+* @param string $function - pass this in to create a generated example
+* @param string $file - pass this in to create a generated example
+*/
+  function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
+    $params['version'] = API_LATEST_VERSION;
+    if(!isset($params['debug'])){
+      // don't debug by default to keep examples tidy
+      $params['debug'] = 0;
+    }
+    $result = $this->callAPISuccess($entity, $action, $params);
+    $this->documentMe($params, $result, $function, $file, $description, $subfile, $actionName);
+    return $result;
+  }
+
+  /**
+* This function exists to wrap api functions
+* so we can ensure they fail where expected & throw exceptions without litterering the test with checks
+* @param string $entity
+* @param string $action
+* @param array $params
+* @param string $expectedErrorMessage error
+*/
+  function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
+    if (is_array($params)) {
+      $params += array(
+        'version' => API_LATEST_VERSION,
+      );
+    }
+    $result = civicrm_api($entity, $action, $params);
+    $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success");
+    return $result;
   }
 
   /**
@@ -907,21 +1026,27 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int $id of participant created
    */
   function participantCreate($params) {
+    if(empty($params['contact_id'])){
+      $params['contact_id'] = $this->individualCreate();
+    }
+    if(empty($params['event_id'])){
+      $event = $this->eventCreate();
+      $params['event_id'] = $event['id'];
+    }
     $defaults = array(
-      'contact_id' => $params['contactID'],
-      'event_id' => $params['eventID'],
       'status_id' => 2,
       'role_id' => 1,
       'register_date' => 20070219,
       'source' => 'Wimbeldon',
       'event_level' => 'Payment',
       'version' => API_LATEST_VERSION,
+      'debug' => 1,
     );
 
     $params = array_merge($defaults, $params);
     $result = civicrm_api('Participant', 'create', $params);
     if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not create participant ' . $result['error_message']);
+      throw new Exception('Could not create participant ' . $result['error_message'] . print_r($result,1));
     }
     return $result['id'];
   }
