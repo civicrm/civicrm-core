@@ -149,6 +149,9 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'access CiviContribute',
       'delete in CiviContribute',
     ),
+    'completetransaction' => array(
+      'edit contributions',
+    ),
     'default' => array(
       'access CiviCRM',
       'access CiviContribute',
