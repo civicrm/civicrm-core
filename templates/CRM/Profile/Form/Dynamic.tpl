@@ -28,13 +28,14 @@
 {if ($context eq 'multiProfileDialog')}
 {literal}
 <script type="text/javascript">
-cj(function() {
+cj(function($) {
+  $('#profile-dialog .crm-container-snippet #Edit').validate(CRM.validate.params);
   var formOptions = {
     beforeSubmit:  proccessMultiRecordForm //pre-submit callback
   };
 
   //binding the callback to snippet profile form
-  cj('.crm-container-snippet #Edit').ajaxForm(formOptions);
+  $('.crm-container-snippet #Edit').ajaxForm(formOptions);
 });
 
 // pre-submit callback
@@ -55,10 +56,7 @@ function proccessMultiRecordForm(formData, jqForm, options) {
 
     //if there is any form error show the dialog
     //else redirect to post url
-    if (cj(response).find('.crm-error').html()) {
-      cj('#profile-dialog').show().html(response);
-    }
-    else {
+    if (!cj(response).find('.crm-error').html()) {
       window.location = '{/literal}{$postUrl}{literal}';
     }
 
@@ -69,6 +67,7 @@ function proccessMultiRecordForm(formData, jqForm, options) {
 }
 </script>
 {/literal}
+{include file="CRM/Form/validate.tpl"}
 {/if}
 {if $deleteRecord}
 <div class="messages status no-popup">
