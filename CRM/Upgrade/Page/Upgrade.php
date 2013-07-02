@@ -54,8 +54,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $template->assign('pageTitle', ts('Upgrade CiviCRM to Version %1',
       array(1 => $latestVer)
     ));
-    $template->assign('menuRebuildURL',
-      CRM_Utils_System::url('civicrm/menu/rebuild', 'reset=1')
+    $template->assign('returnHomeURL',
+      CRM_Utils_System::url('civicrm/dashboard', 'reset=1')
     );
     $template->assign('cancelURL',
       CRM_Utils_System::url('civicrm/dashboard', 'reset=1')
