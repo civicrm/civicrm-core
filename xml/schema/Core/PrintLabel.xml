@@ -39,12 +39,13 @@
     <add>4.4</add>
   </field>
   <field>
-    <name>label_format_id</name>
-    <type>int unsigned</type>
+    <name>label_format_name</name>
+    <type>varchar</type>
+    <length>255</length>
     <pseudoconstant>
       <optionGroupName>name_badge</optionGroupName>
     </pseudoconstant>
-    <comment>Implicit FK to civicrm_option_value row in name_badge option group</comment>
+    <comment>This refers to name column of civicrm_option_value row in name_badge option group</comment>
     <add>4.4</add>
   </field>
   <field>
@@ -60,12 +61,6 @@
     <name>data</name>
     <type>longtext</type>
     <comment>contains json encode configurations options</comment>
-    <add>4.4</add>
-  </field>
-  <field>
-    <name>html</name>
-    <type>longtext</type>
-    <comment>Label contents in HTML format with tokens and image file references</comment>
     <add>4.4</add>
   </field>
   <field>
