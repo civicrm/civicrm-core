@@ -39,7 +39,7 @@ class CRM_Extension_Browser {
   /**
    * An URL for public extensions repository
    */
-  const DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
+  const DEFAULT_EXTENSIONS_REPOSITORY = 'https://civicrm.org/extdir/ver={ver}|cms={uf}';
 
   /**
    * @param string $repoUrl URL of the remote repository
@@ -217,9 +217,8 @@ class CRM_Extension_Browser {
       return array();
     }
 
-    $extdir = file_get_contents($this->getRepositoryUrl() . $this->indexPath);
-
-    if ($extdir === FALSE) {
+    list ($status, $extdir) = CRM_Utils_HttpClient::singleton()->get($this->getRepositoryUrl() . $this->indexPath);
+    if ($extdir === FALSE || $status !== CRM_Utils_HttpClient::STATUS_OK) {
       CRM_Core_Session::setStatus(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests or contact CiviCRM team on <a href="http://forum.civicrm.org/">CiviCRM forum</a>.<br />', array(1 => $this->getRepositoryUrl())), ts('Connection Error'), 'error');
     }
 
@@ -267,7 +266,10 @@ class CRM_Extension_Browser {
     $url      = $this->getRepositoryUrl() . '/' . $key . '.xml';
 
     if (!$cached || !file_exists($filename)) {
-      file_put_contents($filename, file_get_contents($url));
+      $fetchStatus = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
+      if ($fetchStatus != CRM_Utils_HttpClient::STATUS_OK) {
+        return NULL;
+      }
     }
 
     if (file_exists($filename)) {
