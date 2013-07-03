@@ -4,8 +4,8 @@
  /*this demonstrates setting a custom field through the API 
  */
 function contact_get_example(){
-$params = array( 
-  'return' => 'custom_3',
+$params = array(
+  'return' => 'custom_4',
   'version' => 3,
   'id' => 1,
 );
@@ -20,16 +20,16 @@ $params = array(
  */
 function contact_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '1',
-          'civicrm_value_testgetwithcu_3_id' => '1',
-          'custom_3' => 'custom string',
+          'civicrm_value_testgetwithcu_4_id' => '1',
+          'custom_4' => 'custom string',
           'id' => '1',
         ),
     ),

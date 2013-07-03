@@ -44,7 +44,7 @@
   </field>
   <index>
       <name>index_household_name</name>
-      <fieldName>household_name</fieldName>      
+      <fieldName>household_name</fieldName>
       <add>1.8</add>
   </index>
   <field>

@@ -170,8 +170,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
         'domain_id' => $this->_domainID2,
         'invalid_key' => 1,
     );
-    $result = civicrm_api('setting', 'create', $params);
-    $this->assertEquals(1, $result['is_error']);
+    $result = $this->callAPIFailure('setting', 'create', $params);
    }
 
    /**
@@ -184,8 +183,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
          'domain_id' => $this->_domainID2,
          'userFrameworkResourceURL' => 'dfhkdhfd',
      );
-     $result = civicrm_api('setting', 'create', $params);
-     $this->assertEquals(1, $result['is_error']);
+     $result = $this->callAPIFailure('setting', 'create', $params);
      $params = array('version' => $this->_apiversion,
          'domain_id' => $this->_domainID2,
          'userFrameworkResourceURL' => 'http://blah.com',
@@ -204,8 +202,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
          'domain_id' => $this->_domainID2,
          'track_civimail_replies' => 'dfhkdhfd',
      );
-     $result = civicrm_api('setting', 'create', $params);
-     $this->assertEquals(1, $result['is_error']);
+     $result = $this->callAPIFailure('setting', 'create', $params);
 
      $params = array('version' => $this->_apiversion,
          'track_civimail_replies' => '0',

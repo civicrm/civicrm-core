@@ -194,9 +194,9 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
 
   function testUFGroupCreateWithWrongParams() {
     $result = civicrm_api('uf_group', 'create', 'a string');
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $result = civicrm_api('uf_group', 'create', array('name' => 'A title-less group'));
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testUFGroupUpdate() {
@@ -266,14 +266,14 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
 
   function testUFGroupUpdateWithEmptyParams() {
     $result = civicrm_api('uf_group', 'create', array(), $this->_ufGroupId);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testUFGroupUpdateWithWrongParams() {
     $result = civicrm_api('uf_group', 'create', 'a string', $this->_ufGroupId);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $result = civicrm_api('uf_group', 'create', array('title' => 'Title'), 'a string');
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testUFGroupDelete() {

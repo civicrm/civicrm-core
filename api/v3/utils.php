@@ -188,8 +188,8 @@ function civicrm_api3_create_success($values = 1, $params = array(
       }
     }
   }
-  //if ( array_key_exists ('debug',$params) && is_object ($dao)) {
-  if (is_array($params) && array_key_exists('debug', $params)) {
+
+  if (is_array($params) && !empty($params['debug'])) {
     if (is_string($action) && $action != 'getfields') {
       $apiFields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => $action) + $params);
     }
@@ -330,7 +330,7 @@ function _civicrm_api3_separate_values(&$values) {
 }
 
 /**
- * This is a wrapper for api_store_values which will check the suitable fields using getfields
+ * This is a legacy wrapper for api_store_values which will check the suitable fields using getfields
  * rather than DAO->fields
  *
  * Getfields has handling for how to deal with uniquenames which dao->fields doesn't
@@ -550,19 +550,21 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
     $options['return']['id'] = TRUE;// ensure 'id' is included
     $allfields =  _civicrm_api3_get_unique_name_array($dao);
     $returnMatched = array_intersect(array_keys($options['return']), $allfields);
-    $returnUniqueMatched = array_intersect(
-      array_diff(// not already matched on the field names
-        $options['return'],
-        $returnMatched),
-        array_flip($allfields)// but a match for the field keys
+    foreach ($returnMatched as $returnValue) {
+      $dao->selectAdd($returnValue);
+    }
+
+    $unmatchedFields = array_diff(// not already matched on the field names
+      array_keys($options['return']),
+      $returnMatched
     );
 
-    foreach ($returnMatched as $returnValue) {
-        $dao->selectAdd($returnValue);
-    }
+    $returnUniqueMatched = array_intersect(
+      $unmatchedFields,
+      array_flip($allfields)// but a match for the field keys
+    );
     foreach ($returnUniqueMatched as $uniqueVal){
       $dao->selectAdd($allfields[$uniqueVal]);
-
     }
   }
 }
@@ -1456,7 +1458,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
 
     // After swapping options, ensure we have an integer(s)
     foreach ((array) ($params[$fieldName]) as $value) {
-      if (!is_numeric($value) || (int) $value != $value) {
+      if ($value && !is_numeric($value) && $value !== 'null' && !is_array($value)) {
         throw new API_Exception("$fieldName is not a valid integer", 2001, array('error_field' => $fieldName, "type" => "integer"));
       }
     }
@@ -1530,7 +1532,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
 function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $fieldInfo) {
   $options = CRM_Utils_Array::value('options', $fieldInfo);
   if (!$options) {
-    $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldInfo['name']));
+    $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldInfo['name'], 'context' => 'validate'));
     $options = CRM_Utils_Array::value('values', $options, array());
   }
 
@@ -1543,7 +1545,9 @@ function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $
   // If passed multiple options, validate each
   if (is_array($params[$fieldName])) {
     foreach ($params[$fieldName] as &$value) {
-      _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName);
+      if (!is_array($value)) {
+        _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName);
+      }
     }
     // TODO: unwrap the call to implodePadded from the conditional and do it always
     // need to verify that this is safe and doesn't break anything though.
@@ -1566,7 +1570,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $
  */
 function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName) {
   // If option is a key, no need to translate
-  if (isset($options[$value])) {
+  if (array_key_exists($value, $options)) {
     return;
   }
 
@@ -1588,13 +1592,13 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
 
 /**
  * Returns the canonical name of a field
- * @param $entity: api entity
+ * @param $entity: api entity name (string should already be standardized - no camelCase)
  * @param $fieldName: any variation of a field's name (name, unique_name, api.alias)
  *
  * @return (string|bool) fieldName or FALSE if the field does not exist
  */
 function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
-  if (strpos($fieldName, 'custom') === 0 && is_numeric($fieldName[7])) {
+  if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
     return $fieldName;
   }
   if ($fieldName == "{$entity}_id") {

@@ -36,9 +36,9 @@
       <typeColumn>entity_table</typeColumn>
       <add>2.2</add>
   </dynamicForeignKey>
-  <foreignKey> 
-      <name>entity_id</name> 
-      <table>civicrm_contribution_page</table> 
+  <foreignKey>
+      <name>entity_id</name>
+      <table>civicrm_contribution_page</table>
       <key>id</key>
       <add>2.2</add>
       <drop>4.1</drop>
@@ -65,40 +65,40 @@
       <typeColumn>target_entity_type</typeColumn>
       <add>4.1</add>
   </dynamicForeignKey>
-  <field>  
-      <name>supporter_profile_id</name>  
-      <type>int unsigned</type>                  
+  <field>
+      <name>supporter_profile_id</name>
+      <type>int unsigned</type>
       <comment>FK to civicrm_uf_group.id. Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>
       <default>NULL</default>
-      <add>2.2</add>  
+      <add>2.2</add>
   </field>
-  <foreignKey> 
-      <name>supporter_profile_id</name> 
-      <table>civicrm_uf_group</table> 
+  <foreignKey>
+      <name>supporter_profile_id</name>
+      <table>civicrm_uf_group</table>
       <key>id</key>
       <add>3.1</add>
       <onDelete>SET NULL</onDelete>
   </foreignKey>
-  <field>  
-      <name>is_approval_needed</name>  
-      <type>boolean</type>                  
-      <comment>Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>  
+  <field>
+      <name>is_approval_needed</name>
+      <type>boolean</type>
+      <comment>Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>
       <default>NULL</default>
-      <add>2.2</add>  
+      <add>2.2</add>
   </field>
-  <field>  
-      <name>is_tellfriend_enabled</name>  
-      <type>boolean</type>                  
-      <comment>Does Personal Campaign Page allow using tell a friend?</comment>  
+  <field>
+      <name>is_tellfriend_enabled</name>
+      <type>boolean</type>
+      <comment>Does Personal Campaign Page allow using tell a friend?</comment>
       <default>NULL</default>
-      <add>2.2</add>  
+      <add>2.2</add>
   </field>
-  <field>    
-      <name>tellfriend_limit</name> 
-      <type>int unsigned</type> 
+  <field>
+      <name>tellfriend_limit</name>
+      <type>int unsigned</type>
       <default>NULL</default>
-      <comment>Maximum recipient fields allowed in tell a friend</comment> 
-      <add>2.2</add> 
+      <comment>Maximum recipient fields allowed in tell a friend</comment>
+      <add>2.2</add>
   </field>
   <field>
        <name>link_text</name>
@@ -108,20 +108,20 @@
        <localizable>true</localizable>
        <comment>Link text for PCP.</comment>
        <add>2.2</add>
-  </field> 
-  <field>  
-      <name>is_active</name>  
-      <type>boolean</type>                  
-      <comment>Is Personal Campaign Page Block enabled/active?</comment>  
-      <default>1</default>
-      <add>2.2</add>  
   </field>
-  <field>  
-      <name>notify_email</name>  
+  <field>
+      <name>is_active</name>
+      <type>boolean</type>
+      <comment>Is Personal Campaign Page Block enabled/active?</comment>
+      <default>1</default>
+      <add>2.2</add>
+  </field>
+  <field>
+      <name>notify_email</name>
       <type>varchar</type>
-      <length>255</length>            
+      <length>255</length>
       <comment>If set, notification is automatically emailed to this email-address on create/update Personal Campaign Page</comment>
       <default>NULL</default>
-      <add>2.2</add>  
+      <add>2.2</add>
   </field>
 </table>

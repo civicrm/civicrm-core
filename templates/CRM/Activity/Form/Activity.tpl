@@ -150,7 +150,7 @@
       </td>
     {/if}
   </tr>
-  
+
   {if $action neq 4}
     <tr class="crm-activity-form-block-swap_target_assignee">
       <td class="label"></td>

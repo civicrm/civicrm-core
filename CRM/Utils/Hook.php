@@ -477,6 +477,22 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when rendering the tabs
+   * used for events and potentially contribution pages, etc
+   * @param string $tabset   - name of the screen or visual element
+   * @param array $tabs      - the array of tabs that will be displayed   
+   * @param array $context   - extra data about the screen or context in which the tab is used
+   *
+   * @return null 
+   * @access public
+   */
+  static function tabset($tabsetName, &$tabs, $context) {
+    return self::singleton()->invoke(3, $tabsetName, $tabs,
+      $context, self::$_nullObject, self::$_nullObject, 'civicrm_tabset'
+    );
+  }
+
+  /**
    * This hook is called when sending an email / printing labels
    *
    * @param array $tokens    - the list of tokens that can be used for the contact

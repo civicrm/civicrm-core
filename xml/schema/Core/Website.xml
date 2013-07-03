@@ -54,7 +54,7 @@
   </field>
   <index>
     <name>UI_website_type_id</name>
-    <fieldName>website_type_id</fieldName>    
+    <fieldName>website_type_id</fieldName>
     <add>3.2</add>
   </index>
 </table>

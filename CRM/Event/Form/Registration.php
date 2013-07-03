@@ -690,8 +690,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     else {
       $price = CRM_Price_BAO_Set::initSet($form, $eventID, 'civicrm_event', TRUE);
     }
-    
-    if (property_exists($form, '_context') && ($form->_context == 'standalone' 
+
+    if (property_exists($form, '_context') && ($form->_context == 'standalone'
       || $form->_context == 'participant')) {
       $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($eventID, 'civicrm_event');
       if (is_array( $discountedEvent)) {

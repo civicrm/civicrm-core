@@ -63,7 +63,7 @@
  * @access public
  */
 function civicrm_api3_custom_group_create($params) {
-  if (is_string($params['extends'])) {
+  if (isset($params['extends']) && is_string($params['extends'])) {
     $extends = explode(",", $params['extends']);
     unset($params['extends']);
     $params['extends'] = $extends;

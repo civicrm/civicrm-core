@@ -220,26 +220,40 @@ class CRM_Core_PseudoConstant {
    * - orderColumn string the column to use for sorting, defaults to 'weight' column if one exists, else defaults to labelColumn
    * - onlyActive boolean return only the action option values
    * - fresh      boolean ignore cache entries and go back to DB
+   * @param String $context: Context string
    *
    * @return Array on success, FALSE on error.
    *
    * @static
    */
-  public static function get($daoName, $fieldName, $params = array()) {
+  public static function get($daoName, $fieldName, $params = array(), $context = NULL) {
+    CRM_Core_DAO::buildOptionsContext($context);
     $flip = !empty($params['flip']);
+    // Merge params with defaults
+    $params += array(
+      'grouping' => FALSE,
+      'localize' => FALSE,
+      'onlyActive' => ($context == 'validate' || $context == 'create') ? FALSE : TRUE,
+      'fresh' => FALSE,
+    );
 
     // Custom fields are not in the schema
-    if (strpos($fieldName, 'custom') === 0 && is_numeric($fieldName[7])) {
-      $dao = new CRM_Core_DAO_CustomField;
-      $dao->id = (int) substr($fieldName, 7);
-      $dao->find(TRUE);
-      $customField = (array) $dao;
-      $dao->free();
-      $output = array();
-      CRM_Core_BAO_CustomField::buildOption($customField, $output);
-      // @see FIXME note in CRM_Core_BAO_CustomField::buildOption()
-      unset($output['attributes']);
-      return $flip ? array_flip($output) : $output;
+    if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
+      $customFieldID = (int) substr($fieldName, 7);
+      $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customFieldID, 'option_group_id');
+
+      $options = CRM_Core_OptionGroup::valuesByID($optionGroupID,
+        $flip,
+        $params['grouping'],
+        $params['localize'],
+        // Note: for custom fields the 'name' column is NULL
+        CRM_Utils_Array::value('labelColumn', $params, 'label'),
+        $params['onlyActive'],
+        $params['fresh']
+      );
+
+      CRM_Utils_Hook::customFieldOptions($customFieldID, $options, FALSE);
+      return $options;
     }
 
     // Core field: load schema
@@ -258,24 +272,23 @@ class CRM_Core_PseudoConstant {
       // use of a space after the comma is inconsistent in xml
       $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
       $output = explode(',', $enumStr);
-      return $flip ? array_flip($output) : $output;
+      return array_combine($output, $output);
     }
 
     elseif (!empty($fieldSpec['pseudoconstant'])) {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
-      // Merge params with defaults
+      // Merge params with schema defaults
       $params += array(
-        'grouping' => FALSE,
-        'localize' => FALSE,
-        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant),
+        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, array()),
         'keyColumn' => CRM_Utils_Array::value('keyColumn', $pseudoconstant),
         'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
-        'onlyActive' => TRUE,
-        'fresh' => FALSE,
       );
 
       // Fetch option group from option_value table
       if(!empty($pseudoconstant['optionGroupName'])) {
+        if ($context == 'validate') {
+          $params['labelColumn'] = 'name';
+        }
         // Call our generic fn for retrieving from the option_value table
         return CRM_Core_OptionGroup::values(
           $pseudoconstant['optionGroupName'],
@@ -309,15 +322,22 @@ class CRM_Core_PseudoConstant {
           // Get list of fields for the option table
           $dao = new $daoName;
           $availableFields = array_keys($dao->fieldKeys());
-          if (in_array('is_active', $availableFields)) {
-            $wheres[] = 'is_active = 1';
-          }
           $dao->free();
 
           $select = "SELECT %1 AS id, %2 AS label";
           $from = "FROM %3";
           $wheres = array();
           $order = "ORDER BY %2";
+
+          // Use machine name instead of label in validate context
+          if ($context == 'validate') {
+            if (!empty($pseudoconstant['nameColumn'])) {
+              $params['labelColumn'] = $pseudoconstant['nameColumn'];
+            }
+            elseif (in_array('name', $availableFields)) {
+              $params['labelColumn'] = 'name';
+            }
+          }
           // Condition param can be passed as an sql clause string or an array of clauses
           if (!empty($params['condition'])) {
             $wheres[] = implode(' AND ', (array) $params['condition']);

@@ -94,7 +94,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'time_stamp' => '20111109212100',
     );
     $result = civicrm_api('mailing_event', 'bounce', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
   }
 
@@ -113,7 +113,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'version' => 3,
     );
     $result = civicrm_api('mailing_event', 'confirm', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Confirmation failed', 'In line ' . __LINE__);
   }
 
@@ -133,7 +133,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'version' => 3,
     );
     $result = civicrm_api('mailing_event', 'reply', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
   }
 
@@ -153,7 +153,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'version' => 3,
     );
     $result = civicrm_api('mailing_event', 'forward', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($result, 'In line ' . __LINE__);
     $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
   }
 

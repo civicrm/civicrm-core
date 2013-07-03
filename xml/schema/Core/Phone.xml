@@ -39,7 +39,7 @@
       <pseudoconstant>
         <table>civicrm_location_type</table>
         <keyColumn>id</keyColumn>
-        <labelColumn>name</labelColumn>
+        <labelColumn>display_name</labelColumn>
       </pseudoconstant>
       <add>2.0</add>
   </field>
@@ -81,7 +81,7 @@
   </field>
   <index>
       <name>UI_mobile_provider_id</name>
-      <fieldName>mobile_provider_id</fieldName>      
+      <fieldName>mobile_provider_id</fieldName>
       <add>1.6</add>
   </index>
   <field>
@@ -138,5 +138,5 @@
         <optionGroupName>phone_type</optionGroupName>
       </pseudoconstant>
       <add>2.2</add>
-  </field> 
+  </field>
 </table>

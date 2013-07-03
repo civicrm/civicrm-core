@@ -4,7 +4,7 @@
  
  */
 function line_item_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'price_field_value_id' => 1,
   'price_field_id' => 1,
@@ -25,9 +25,9 @@ $params = array(
  */
 function line_item_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
-  'undefined_fields' => array( 
+  'undefined_fields' => array(
       '0' => 'label',
       '1' => 'price_field_value_id',
       '2' => 'price_field_id',
@@ -40,8 +40,8 @@ function line_item_create_expectedresult(){
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'entity_table' => 'civicrm_contribution',
           'entity_id' => '1',
@@ -56,10 +56,10 @@ function line_item_create_expectedresult(){
           'deductible_amount' => '',
         ),
     ),
-  'xdebug' => array( 
-      'peakMemory' => 116918264,
-      'memory' => 108682632,
-      'timeIndex' => '804.56360793114',
+  'xdebug' => array(
+      'peakMemory' => 144948640,
+      'memory' => 131358352,
+      'timeIndex' => '1877.7615101337',
     ),
 );
 

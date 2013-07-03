@@ -24,40 +24,48 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
+
+require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
+ * This class is intended to test ACL permission using the multisite module
  *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ *  @package CiviCRM_APIv3
+ *  @subpackage API_Contact
  */
-class CRM_Report_BAO_Instance extends CRM_Report_DAO_Instance {
 
-  /**
-   * Delete the instance of the Report
-   *
-   * @return $results no of deleted Instance on success, false otherwise
-   * @access public
-   *
-   */
-  function delete($id = NULL) {
-    $dao = new CRM_Report_DAO_Instance();
-    $dao->id = $id;
-    return $dao->delete();
+class api_v3_ACLCachingTest extends CiviUnitTestCase {
+  protected $_apiversion;
+  protected $_params;
+
+  public $_eNoticeCompliant = TRUE;
+
+  function setUp() {
+    $this->_apiversion = 3;
+
+    parent::setUp();
+
+  }
+/**
+ * (non-PHPdoc)
+ * @see CiviUnitTestCase::tearDown()
+ */
+  function tearDown() {
+    $tablesToTruncate = array(
+      'civicrm_activity',
+    );
+    $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
-  static function retrieve($params, &$defaults) {
-    $instance = new CRM_Report_DAO_Instance();
-    $instance->copyValues($params);
-
-    if ($instance->find(TRUE)) {
-      CRM_Core_DAO::storeValues($instance, $defaults);
-      $instance->free();
-      return $instance;
-    }
-    return NULL;
+  function testActivityCreateCustomBefore() {
+    $values = civicrm_api('custom_field', 'getoptions', array('field' => 'custom_group_id', 'version' => 3));
+    $this->assertTrue($values['count'] == 0);
+    $this->CustomGroupCreate('Activity', 'cachingtest');
+    $groupCount = civicrm_api('custom_group', 'getcount', array('version' => 3, 'extends' => 'activity'));
+    $this->assertEquals($groupCount, 1, 'one group should now exist');
+    $values = civicrm_api('custom_field', 'getoptions', array('field' => 'custom_group_id', 'version' => 3));
+    $this->assertTrue($values['count'] == 1, 'check that cached value is not retained for custom_group_id');
   }
 }
 

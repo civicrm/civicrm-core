@@ -46,10 +46,10 @@ class CRM_Core_ScheduledJob {
 
   /*
      * Class constructor
-     * 
+     *
      * @param string $namespace namespace prefix for component's files
      * @access public
-     * 
+     *
      */
 
   public function __construct($params) {

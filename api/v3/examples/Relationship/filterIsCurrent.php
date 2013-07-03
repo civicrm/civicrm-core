@@ -4,11 +4,12 @@
  demonstrates is_current filter
  */
 function relationship_get_example(){
-$params = array( 
-  'version' => 3,
-  'filters' => array( 
+$params = array(
+  'filters' => array(
       'is_current' => 1,
     ),
+  'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'relationship','get',$params );
@@ -21,28 +22,22 @@ $params = array(
  */
 function relationship_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
-          'contact_id_a' => '69',
-          'contact_id_b' => '70',
-          'relationship_type_id' => '32',
+          'contact_id_a' => '63',
+          'contact_id_b' => '64',
+          'relationship_type_id' => '31',
           'start_date' => '2008-12-20',
           'is_active' => '1',
           'description' => '',
           'is_permission_a_b' => 0,
           'is_permission_b_a' => 0,
-          'custom_1' => 'xyz',
-          'custom_1_-1' => 'xyz',
-          'custom_3' => '07/11/2009',
-          'custom_3_-1' => '07/11/2009',
-          'custom_4' => 'http://civicrm.org',
-          'custom_4_-1' => 'http://civicrm.org',
         ),
     ),
 );

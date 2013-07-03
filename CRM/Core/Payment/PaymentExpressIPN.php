@@ -159,11 +159,6 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
 
     $transaction = new CRM_Core_Transaction();
 
-    // fix for CRM-2842
-    // if ( ! $this->createContact( $input, $ids, $objects ) ) {
-    //     return false;
-    // }
-
     // check if contribution is already completed, if so we ignore this ipn
 
     if ($contribution->contribution_status_id == 1) {

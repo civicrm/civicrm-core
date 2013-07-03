@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -28,18 +27,36 @@
 
 /**
  *
- * @package CiviCRM_Hook
+ * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
- * $Id: $
+ * $Id$
  *
  */
-class CRM_Utils_Hook_Soap extends CRM_Utils_Hook {
-  function invoke($numParams,
-    &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
-    $fnSuffix
-  ) {
-    // suppress all hok calls during soap
-    return;
+
+/**
+ * State machine for managing different states of the Import process.
+ */
+class CRM_Import_StateMachine extends CRM_Core_StateMachine {
+
+  /**
+   * Class constructor
+   *
+   * @param object  CRM_*_Import_Controller
+   * @param int     $action
+   *
+   */
+  function __construct($controller, $action = CRM_Core_Action::NONE) {
+    parent::__construct($controller, $action);
+
+    $classType = str_replace('_Controller', '', get_class($controller));
+    $this->_pages = array(
+      $classType . '_Form_DataSource' => NULL,
+      $classType . '_Form_MapField' => NULL,
+      $classType . '_Form_Preview' => NULL,
+      $classType . '_Form_Summary' => NULL,
+    );
+
+    $this->addSequentialPages($this->_pages, $action);
   }
 }
 

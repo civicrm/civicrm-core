@@ -1,7 +1,6 @@
 <?php
 
 function civicrm_api3_option_group_get($params) {
-
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -12,26 +11,15 @@ function civicrm_api3_option_group_get($params) {
  * In case of updating existing survey, id of that particular survey must
  * be in $params array.
  *
- * @param array $params  (referance) Associative array of property
- *                       name/value pairs to insert in new 'survey'
+ * @param array $params  (reference) Associative array of property
+ *   name/value pairs to insert in new 'survey'
  *
  * @return array   survey array
  *
  * @access public
  */
 function civicrm_api3_option_group_create($params) {
-
-  $ids = array();
-  $bao = CRM_Core_BAO_OptionGroup::add($params, $ids);
-
-  if (is_null($bao)) {
-    return civicrm_api3_create_error('Entity not created');
-  }
-  else {
-    $values = array();
-    _civicrm_api3_object_to_array($bao, $values[$bao->id]);
-    return civicrm_api3_create_success($values, $params, 'option_group', 'create', $bao);
-  }
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -42,4 +30,22 @@ function civicrm_api3_option_group_create($params) {
  */
 function _civicrm_api3_option_group_create_spec(&$params) {
   $params['name']['api.unique'] = 1;
+}
+
+/**
+ * delete an existing Option Group
+ *
+ * This method is used to delete any existing Option Group. id of the group
+ * to be deleted is required field in $params array
+ *
+ * @param array $params  (reference) array containing id of the group
+ *                       to be deleted
+ *
+ * @return array  (reference) returns flag true if successfull, error
+ *                message otherwise
+ * {@getfields OptionGroup_delete}
+ * @access public
+ */
+function civicrm_api3_option_group_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

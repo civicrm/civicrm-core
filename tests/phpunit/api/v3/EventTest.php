@@ -32,7 +32,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   protected $_params;
   protected $_apiversion;
   protected $_entity;
-
+  public $_eNoticeCompliant = TRUE;
   function get_info() {
     return array(
       'name' => 'Event Create',
@@ -102,7 +102,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->events = array();
     $this->eventIds = array();
     foreach ($params as $event) {
-      $result            = civicrm_api('Event', 'Create', $event);
+      $result            = $this->callAPISuccess('Event', 'Create', $event);
       $this->_events[]   = $result;
       $this->_eventIds[] = $result['id'];
     }
@@ -129,19 +129,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_event_get methods
-  function testGetWrongParamsType() {
-    $params = 'Annual CiviCRM meet';
-    $result = civicrm_api('Event', 'Get', $params);
-
-    $this->assertEquals($result['is_error'], 1);
-  }
-
-  function testGetEventEmptyParams() {
-    $params = array();
-    $result = civicrm_api('event', 'get', $params);
-
-    $this->assertEquals($result['is_error'], 1);
-  }
 
   function testGetEventById() {
     $params = array(
@@ -156,13 +143,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
     $params = array(
       'event_title' => 'Annual CiviCRM meet',
-      'version' => $this->_apiversion,
+      'sequential' => TRUE,
     );
 
-    $result = civicrm_api('event', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('event', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals($result['values'][0]['id'], $this->_eventIds[0]['id']);
+    $this->assertEquals($result['values'][0]['id'], $this->_eventIds[0]);
   }
 
   function testGetEventByWrongTitle() {
@@ -227,21 +213,18 @@ class api_v3_EventTest extends CiviUnitTestCase {
      */
   function testGetIsCurrent() {
     $params = array(
-      'version' => $this->_apiversion,
       'isCurrent' => 1,
     );
     $currentEventParams = array('start_date' => date('Y-m-d', strtotime('+ 1 day')),
       'end_date' => date('Y-m-d', strtotime('+ 1 week')),
     );
     $currentEventParams = array_merge($this->_params[1], $currentEventParams);
-    $currentEvent       = civicrm_api('Event', 'Create', $currentEventParams);
+    $currentEvent       = $this->callAPISuccess('Event', 'Create', $currentEventParams);
     $description        = "demonstrates use of is.Current option";
     $subfile            = "IsCurrentOption";
-    $result             = civicrm_api('Event', 'Get', $params);
-
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__, $description, $subfile);
-    $allEvents = civicrm_api('Event', 'Get', array('version' => 3));
-    civicrm_api('Event', 'Delete', array('version' => 3, 'id' => $currentEventParams['id']));
+    $result             = $this->callAPIAndDocument('Event', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $allEvents = $this->callAPISuccess('Event', 'Get', array('version' => 3));
+    $this->callAPISuccess('Event', 'Delete', array('version' => 3, 'id' => $currentEvent['id']));
     $this->assertEquals(1, $result['count'], 'confirm only one event found in line ' . __LINE__);
     $this->assertEquals(3, $allEvents['count'], 'confirm three events exist (ie. two not found) ' . __LINE__);
     $this->assertEquals($currentEvent['id'], $result['id'], '');
@@ -263,8 +246,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = $this->_params[0];
     $params['sequential'] =1;
     $params['loc_block_id'] =100;
-    $result = civicrm_api('event', 'create', $params);
-    $this->assertEquals(1, $result['is_error']);
+    $result = $this->callAPIFailure('event', 'create', $params);
 
   }
 
@@ -332,9 +314,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = $this->_params[0];
     $params['custom_' . $ids['custom_field_id']] = "custom string";
 
-    $result = civicrm_api($this->_entity, 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertNotEquals($result['is_error'], 1, $result['error_message'] . ' in line ' . __LINE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
 
     $check = civicrm_api($this->_entity, 'get', array('version' => 3, 'return.custom_' . $ids['custom_field_id'] => 1, 'id' => $result['id']));
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
@@ -346,38 +326,36 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   function testCreateEventParamsNotArray() {
     $params = NULL;
-    $result = civicrm_api('event', 'create', $params);
-    $this->assertEquals(1, $result['is_error']);
+    $result = $this->callAPIFailure('event', 'create', $params);
   }
 
   function testCreateEventEmptyParams() {
     $params = array();
-    $result = civicrm_api('event', 'create', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $result = $this->callAPIFailure('event', 'create', $params);
   }
 
   function testCreateEventParamsWithoutTitle() {
     unset($this->_params['title']);
     $result = civicrm_api('event', 'create', $this->_params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testCreateEventParamsWithoutEventTypeId() {
     unset($this->_params['event_type_id']);
     $result = civicrm_api('event', 'create', $this->_params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testCreateEventParamsWithoutStartDate() {
     unset($this->_params['start_date']);
     $result = civicrm_api('event', 'create', $this->_params);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testCreateEventSuccess() {
     $result = civicrm_api('Event', 'Create', $this->_params[0]);
     $this->documentMe($this->_params[0], $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->assertArrayHasKey('id', $result['values'][$result['id']], 'In line ' . __LINE__);
     $result = civicrm_api($this->_entity, 'Get', array('version' => 3, 'id' => $result['id']));
     civicrm_api($this->_entity, 'Delete', array('version' => 3, 'id' => $result['id']));
@@ -414,7 +392,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   function testUpdateEvent() {
     $result = civicrm_api('event', 'create', $this->_params[1]);
 
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $params = array(
       'id' => $result['id'], 'version' => 3, 'max_participants' => 150,
     );
@@ -430,15 +408,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
   ///////////////// civicrm_event_delete methods
   function testDeleteWrongParamsType() {
     $params = 'Annual CiviCRM meet';
-    $result = civicrm_api('Event', 'Delete', $params);
-
-    $this->assertEquals($result['is_error'], 1);
+    $result = $this->callAPIFailure('Event', 'Delete', $params);
   }
 
   function testDeleteEmptyParams() {
     $params = array();
-    $result = civicrm_api('Event', 'Delete', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $result = $this->callAPIFailure('Event', 'Delete', $params);
   }
 
   function testDelete() {
@@ -481,8 +456,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = civicrm_api('Event', 'Delete', $params);
     // try to delete again - there's no such event anymore
     $params = array('event_id' => $this->_eventIds[0]);
-    $result = civicrm_api('Event', 'Delete', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $result = $this->callAPIFailure('Event', 'Delete', $params);
   }
 
   ///////////////// civicrm_event_search methods
@@ -492,9 +466,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
   function testSearchWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('event', 'get', $params);
-
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('event', 'get', $params);
   }
 
   /**
@@ -569,8 +541,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     );
     $config = &CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
-    $result = civicrm_api('event', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], 'lacking permissions should not be enough to create an event');
+    $result = $this->callAPIFailure('event', 'create', $params);
     $this->assertEquals('API permission check failed for event/create call; missing permission: access CiviEvent.', $result['error_message'], 'lacking permissions should not be enough to create an event');
 
     $config->userPermissionClass->permissions = array('access CiviEvent', 'edit all events', 'access CiviCRM');

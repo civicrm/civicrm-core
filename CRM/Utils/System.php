@@ -1255,6 +1255,7 @@ class CRM_Utils_System {
       CRM_Pledge_BAO_Pledge::$_exportableFields =
       CRM_Contribute_BAO_Query::$_contributionFields =
       CRM_Core_BAO_CustomField::$_importFields =
+      CRM_Core_BAO_Cache::$_cache =
       CRM_Core_DAO::$_dbColumnValueCache = NULL;
 
     CRM_Core_OptionGroup::flushAll();

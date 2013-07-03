@@ -467,14 +467,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       $csRelationships = array();
 
       if ($mappingType == 'Export') {
-        $subTypeRelationshipTypes = 
+        $subTypeRelationshipTypes =
           CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $val['parent'],
                                                                    FALSE, 'label', TRUE, $subType);
-        
+
         foreach ($subTypeRelationshipTypes as $key => $var) {
           if (!array_key_exists($key, $fields[$val['parent']])) {
             list($type) = explode('_', $key);
-            
+
             $csRelationships[$key]['title'] = $var;
             $csRelationships[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
             $csRelationships[$key]['export'] = TRUE;
@@ -1024,7 +1024,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             }
           }
 
-          if ($v[0] == 'Contribution' && substr($fldName, 0, 7) != 'custom_' 
+          if ($v[0] == 'Contribution' && substr($fldName, 0, 7) != 'custom_'
             && substr($fldName, 0, 10) != 'financial_') {
             if (substr($fldName, 0, 13) != 'contribution_') {
               $fldName = 'contribution_' . $fldName;
@@ -1173,7 +1173,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
 
           if (CRM_Utils_Array::value('operator', $params)) {
-            $saveMappingFields->operator = CRM_Utils_Array::value($k, $params['operator'][$key]);            
+            $saveMappingFields->operator = CRM_Utils_Array::value($k, $params['operator'][$key]);
           }
           if (CRM_Utils_Array::value('value', $params)) {
             $saveMappingFields->value = CRM_Utils_Array::value($k, $params['value'][$key]);

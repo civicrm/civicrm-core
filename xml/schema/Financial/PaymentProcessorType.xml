@@ -153,6 +153,7 @@
       <type>int unsigned</type>
       <required>true</required>
       <comment>Billing Mode</comment>
+      <pseudoconstant>true</pseudoconstant>
       <add>1.8</add>
   </field>
   <field>

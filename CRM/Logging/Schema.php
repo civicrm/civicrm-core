@@ -255,7 +255,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     // add report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao             = new CRM_Report_DAO_Instance;
+      $dao             = new CRM_Report_DAO_ReportInstance;
       $dao->domain_id  = $domain_id;
       $dao->report_id  = $report;
       $dao->title      = $titles[$report];
@@ -342,7 +342,7 @@ COLS;
     // delete report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao            = new CRM_Report_DAO_Instance;
+      $dao            = new CRM_Report_DAO_ReportInstance;
       $dao->domain_id = $domain_id;
       $dao->report_id = $report;
       $dao->delete();

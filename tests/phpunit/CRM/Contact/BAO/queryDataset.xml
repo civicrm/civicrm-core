@@ -10,8 +10,8 @@
         sort_name="Test Contact 9"
         first_name="Test"
         last_name="Contact 9"
-	gender_id="1"
-	prefix_id="1"
+        gender_id="1"
+        prefix_id="1"
         suffix_id="1"
     />
     <!--  Groups: none  Tags: 9  -->
@@ -23,8 +23,8 @@
         sort_name="Test Contact 10"
         first_name="Test"
         last_name="Contact 10"
-	gender_id="2"
-	prefix_id="2"
+        gender_id="2"
+        prefix_id="2"
         suffix_id="2"
     />
     <!--  Groups: none  Tags: 7  -->
@@ -36,8 +36,8 @@
         sort_name="Test Contact 11"
         first_name="Test"
         last_name="Contact 11"
-	gender_id="3"
-	prefix_id="3"
+        gender_id="3"
+        prefix_id="3"
         suffix_id="3"
     />
     <!--  Groups: none  Tags: 7, 9  -->
@@ -49,8 +49,8 @@
         sort_name="Test Contact 12"
         first_name="Test"
         last_name="Contact 12"
-	gender_id="3"
-	prefix_id="4"
+        gender_id="3"
+        prefix_id="4"
         suffix_id="4"
     />
     <!--  Groups: 5  Tags: none  -->
@@ -62,8 +62,8 @@
         sort_name="Test Contact 13"
         first_name="Test"
         last_name="Contact 13"
-	gender_id="2"
-	prefix_id="2"
+        gender_id="2"
+        prefix_id="2"
         suffix_id="2"
     />
     <!--  Groups: 5  Tags: 9  -->
@@ -75,8 +75,8 @@
         sort_name="Test Contact 14"
         first_name="Test"
         last_name="Contact 14"
-	gender_id="3"
-	prefix_id="4"
+        gender_id="3"
+        prefix_id="4"
         suffix_id="4"
     />
     <!--  Groups: 5  Tags: 7  -->
@@ -88,8 +88,8 @@
         sort_name="Test Contact 15"
         first_name="Test"
         last_name="Contact 15"
-	gender_id="3"
-	prefix_id="4"
+        gender_id="3"
+        prefix_id="4"
         suffix_id="5"
     />
     <!--  Groups: 5  Tags: 7, 9  -->
@@ -101,8 +101,8 @@
         sort_name="Test Contact 16"
         first_name="Test"
         last_name="Contact 16"
-	gender_id="3"
-	prefix_id="4"
+        gender_id="3"
+        prefix_id="4"
         suffix_id="6"
     />
     <!--  Groups: 3  Tags: none  -->
@@ -114,8 +114,8 @@
         sort_name="Test Contact 17"
         first_name="Test"
         last_name="Contact 17"
-	gender_id="2"
-	prefix_id="4"
+        gender_id="2"
+        prefix_id="4"
         suffix_id="7"
     />
     <!--  Groups: 3  Tags: 9  -->
@@ -127,8 +127,8 @@
         sort_name="Test Contact 18"
         first_name="Test"
         last_name="Contact 18"
-	gender_id="2"
-	prefix_id="4"
+        gender_id="2"
+        prefix_id="4"
         suffix_id="4"
     />
     <!--  Groups: 3  Tags: 7  -->
@@ -140,8 +140,8 @@
         sort_name="Test Contact 19"
         first_name="Test"
         last_name="Contact 19"
-	gender_id="2"
-	prefix_id="4"
+        gender_id="2"
+        prefix_id="4"
         suffix_id="6"
     />
     <!--  Groups: 3  Tags: 7, 9  -->
@@ -153,8 +153,8 @@
         sort_name="Test Contact 20"
         first_name="Test"
         last_name="Contact 20"
-	gender_id="1"
-	prefix_id="4"
+        gender_id="1"
+        prefix_id="4"
         suffix_id="6"
     />
     <!--  Groups: 3, 5  Tags: none  -->
@@ -166,8 +166,8 @@
         sort_name="Test Contact 21"
         first_name="Test"
         last_name="Contact 21"
-	gender_id="3"
-	prefix_id="1"
+        gender_id="3"
+        prefix_id="1"
         suffix_id="6"
     />
     <!--  Groups: 3, 5  Tags: 9  -->
@@ -179,8 +179,8 @@
         sort_name="Test Contact 22"
         first_name="Test"
         last_name="Contact 22"
-	gender_id="1"
-	prefix_id="1"
+        gender_id="1"
+        prefix_id="1"
         suffix_id="1"
     />
     <!--  Groups: 3, 5  Tags: 7  -->
@@ -192,8 +192,8 @@
         sort_name="Test Contact 23"
         first_name="Test"
         last_name="Contact 23"
-	gender_id="3"
-	prefix_id="1"
+        gender_id="3"
+        prefix_id="1"
         suffix_id="1"
     />
     <!--  Groups: 3, 5  Tags: 7, 9  -->
@@ -205,8 +205,8 @@
         sort_name="Test Contact 24"
         first_name="Test"
         last_name="Contact 24"
-	gender_id="3"
-	prefix_id="3"
+        gender_id="3"
+        prefix_id="3"
         suffix_id="2"
     />
     <civicrm_tag

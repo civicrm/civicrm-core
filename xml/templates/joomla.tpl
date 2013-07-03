@@ -13,10 +13,10 @@
   <version>{$CiviCRMVersion}</version>
   <description>CiviCRM</description>
   <files folder="site">
-	  <filename>civicrm.php</filename>
-	  <filename>civicrm.html.php</filename>
-	  <folder>views</folder>
-	  <folder>elements</folder>
+    <filename>civicrm.php</filename>
+    <filename>civicrm.html.php</filename>
+    <folder>views</folder>
+    <folder>elements</folder>
   </files>
   <install>
     <queries>

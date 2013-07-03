@@ -23,6 +23,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
   if ((CRM_Utils_Array::value('cache_clear', $apiRequest['params']))) {
     $results = array();
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
+    CRM_Core_PseudoConstant::flush();
     if(!empty($apiRequest['params']['fieldname'])){
       CRM_Utils_PseudoConstant::flushConstant($apiRequest['params']['fieldname']);
     }
@@ -90,9 +91,14 @@ function civicrm_api3_generic_getfields($apiRequest) {
 
     case 'getoptions':
       $metadata = array(
-        'field' => array('title' => 'Field to retrieve options for',
-        'api.required' => 1,
-      ));
+        'field' => array(
+          'title' => 'Field to retrieve options for',
+          'api.required' => 1,
+        ),
+        'context' => array(
+          'title' => 'Context string',
+        ),
+      );
         break;
     default:
       // oddballs are on their own
@@ -207,9 +213,12 @@ function civicrm_api3_generic_getoptions($apiRequest) {
   if (!$fieldName) {
     return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' doesn't exist.");
   }
+  // Validate 'context' from params
+  $context = CRM_Utils_Array::value('context', $apiRequest['params']);
+  CRM_Core_DAO::buildOptionsContext($context);
 
-  $daoName = _civicrm_api3_get_DAO($apiRequest['entity']);
-  $options = $daoName::buildOptions($fieldName);
+  $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
+  $options = $baoName::buildOptions($fieldName, $context);
   if ($options === FALSE) {
     return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");
   }
@@ -233,12 +242,8 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * @param array $fieldsToResolve anny field resolutions specifically requested
  */
 function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldname, $fieldSpec, $fieldsToResolve){
-  if(empty($fieldSpec['pseudoconstant'])) {
+  if(empty($fieldSpec['pseudoconstant']) && empty($fieldSpec['enumValues'])) {
     return;
-  }
-
-  if(substr($fieldname, -3) == '_id'){
-    $metadata[$fieldname]['api.aliases'][] = substr($fieldname, 0, -3);
   }
 
   if (!empty($metadata[$fieldname]['options']) || !in_array($fieldname, $fieldsToResolve)) {

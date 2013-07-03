@@ -32,7 +32,7 @@ function activity_get_expectedresult(){
   'values' => array(
       '0' => array(
           'id' => '1',
-          'activity_type_id' => '44',
+          'activity_type_id' => '46',
           'subject' => 'test activity type id',
           'activity_date_time' => '2011-06-02 14:36:13',
           'duration' => '120',
@@ -50,9 +50,6 @@ function activity_get_expectedresult(){
           'source_contact_id' => '17',
           'api.contact.get' => array(
               'is_error' => 0,
-              'undefined_fields' => array(
-                  '0' => 'api.has_parent',
-                ),
               'version' => 3,
               'count' => 1,
               'id' => 17,

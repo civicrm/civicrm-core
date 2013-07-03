@@ -32,3 +32,45 @@ VALUES (@bounceTypeID, 'X-HmXmrOriginalRecipient');
 -- CRM-12716
 UPDATE civicrm_custom_field SET text_length = NULL WHERE html_type = 'TextArea' AND text_length = 255;
 
+-- CRM-12288
+
+SELECT @option_group_id_activity_type := max(id) from civicrm_option_group where name = 'activity_type';
+SELECT @max_val    := MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.option_group_id  = @option_group_id_activity_type;
+SELECT @max_wt     := max(weight) from civicrm_option_value where option_group_id=@option_group_id_activity_type;
+
+INSERT INTO civicrm_option_value
+   (option_group_id, {localize field='label'}label{/localize}, {localize field='description'}description{/localize}, value, name, weight, filter, component_id)
+VALUES
+   (@option_group_id_activity_type, {localize}'Inbound SMS'{/localize},{localize}'Inbound SMS'{/localize}, (SELECT @max_val := @max_val+1), 'Inbound SMS', (SELECT @max_wt := @max_wt+1), 1, NULL),
+   (@option_group_id_activity_type, {localize}'SMS delivery'{/localize},{localize}'SMS delivery'{/localize}, (SELECT @max_val := @max_val+1), 'SMS delivery', (SELECT @max_wt := @max_wt+1), 1, NULL);
+
+{if $multilingual}
+  {foreach from=$locales item=locale}
+    UPDATE civicrm_option_value SET label_{$locale} ='Outbound SMS' WHERE name = 'SMS' and option_group_id = @option_group_id_activity_type;
+  {/foreach}
+{else}
+  UPDATE civicrm_option_value SET label ='Outbound SMS' WHERE name = 'SMS' and option_group_id = @option_group_id_activity_type;
+{/if}
+
+-- CRM-12689
+ALTER TABLE civicrm_action_schedule
+  ADD COLUMN limit_to tinyint(4) DEFAULT '1' COMMENT 'Is this the recipient criteria limited to OR in addition to?'  AFTER recipient;
+
+-- CRM-12653
+SELECT @uf_group_contribution_batch_entry     := max(id) FROM civicrm_uf_group WHERE name = 'contribution_batch_entry';
+SELECT @uf_group_membership_batch_entry       := max(id) FROM civicrm_uf_group WHERE name = 'membership_batch_entry';
+
+INSERT INTO civicrm_uf_field
+       ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, {localize field='label'}label{/localize}, field_type, help_post, phone_type_id )
+VALUES
+      ( @uf_group_contribution_batch_entry, 'soft_credit', 0, 0, 10, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Contribution', NULL, NULL ),
+      ( @uf_group_membership_batch_entry, 'soft_credit', 0, 0, 13, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Membership', NULL, NULL );
+
+-- CRM-12809
+ALTER TABLE `civicrm_custom_group`
+  ADD COLUMN `is_reserved` tinyint(4) DEFAULT '0' COMMENT 'Is this a reserved Custom Group?';
+
+--CRM-12986 fix event_id & contact_id to NOT NULL fields on participant table
+ALTER TABLE `civicrm_participant`
+  CHANGE COLUMN `event_id` `event_id` INT(10) UNSIGNED NOT NULL,
+  CHANGE COLUMN `contact_id` `contact_id` INT(10) UNSIGNED NOT NULL;

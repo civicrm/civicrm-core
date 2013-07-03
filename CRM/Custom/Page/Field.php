@@ -231,6 +231,11 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive',
       $this
     );
+
+    if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
+      CRM_Core_Error::fatal("You cannot add or edit fields in a reserved custom field-set.");
+    }
+
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
       $this, FALSE, 'browse'

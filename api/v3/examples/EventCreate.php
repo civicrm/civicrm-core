@@ -4,7 +4,7 @@
  
  */
 function event_create_example(){
-$params = array( 
+$params = array(
   'title' => 'Annual CiviCRM meet',
   'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
   'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
@@ -33,13 +33,13 @@ $params = array(
  */
 function event_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'title' => 'Annual CiviCRM meet',
           'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
@@ -97,7 +97,7 @@ function event_create_expectedresult(){
           'is_template' => 0,
           'template_title' => '',
           'created_id' => '',
-          'created_date' => '20130204223127',
+          'created_date' => '20120130621222105',
           'currency' => '',
           'campaign_id' => '',
           'is_share' => '',

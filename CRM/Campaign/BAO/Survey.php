@@ -389,7 +389,7 @@ SELECT  survey.id    as id,
     }
     $reportId = CRM_Campaign_BAO_Survey::getReportID($id);
     if($reportId){
-      CRM_Report_BAO_Instance::delete($reportId);
+      CRM_Report_BAO_ReportInstance::del($reportId);
     }
     $dao = new CRM_Campaign_DAO_Survey();
     $dao->id = $id;
@@ -519,7 +519,7 @@ Group By  contact.id";
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     $query = "
     SELECT  activity.id, activity.status_id,
             activityTarget.contact_id as voter_id,

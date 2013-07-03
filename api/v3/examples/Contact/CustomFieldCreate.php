@@ -4,7 +4,7 @@
  /*this demonstrates setting a custom field through the API 
  */
 function contact_create_example(){
-$params = array( 
+$params = array(
   'first_name' => 'abc1',
   'contact_type' => 'Individual',
   'last_name' => 'xyz1',
@@ -22,13 +22,13 @@ $params = array(
  */
 function contact_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -74,7 +74,7 @@ function contact_create_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'user_unique_id' => '',
-          'created_date' => '2013-02-15 16:58:30',
+          'created_date' => '20120130621222105',
           'modified_date' => '2012-11-14 16:02:35',
         ),
     ),

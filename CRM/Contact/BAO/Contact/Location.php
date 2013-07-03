@@ -141,8 +141,8 @@ LEFT JOIN civicrm_address ON civicrm_address.contact_id = civicrm_contact.id
 LEFT JOIN civicrm_state_province ON civicrm_address.state_province_id = civicrm_state_province.id
 LEFT JOIN civicrm_country ON civicrm_address.country_id = civicrm_country.id
 LEFT JOIN civicrm_location_type ON civicrm_location_type.id = civicrm_address.location_type_id
-WHERE civicrm_address.geo_code_1 IS NOT NULL 
-AND civicrm_address.geo_code_2 IS NOT NULL 
+WHERE civicrm_address.geo_code_1 IS NOT NULL
+AND civicrm_address.geo_code_2 IS NOT NULL
 AND civicrm_contact.id IN $idString ";
 
     $params = array();

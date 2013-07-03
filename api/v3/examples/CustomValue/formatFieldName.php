@@ -4,7 +4,7 @@
  utilises field names
  */
 function custom_value_get_example(){
-$params = array( 
+$params = array(
   'id' => 2,
   'version' => 3,
   'entity_id' => 2,
@@ -21,32 +21,32 @@ $params = array(
  */
 function custom_value_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 4,
-  'values' => array( 
-      'mySingleField' => array( 
+  'values' => array(
+      'mySingleField' => array(
           'entity_id' => '2',
           'latest' => 'value 1',
           'id' => 'mySingleField',
           '0' => 'value 1',
         ),
-      'Cust_Field' => array( 
+      'Cust_Field' => array(
           'entity_id' => '2',
           'latest' => 'coffee',
           'id' => 'Cust_Field',
           '1' => '',
           '2' => 'coffee',
         ),
-      'field_2' => array( 
+      'field_2' => array(
           'entity_id' => '2',
           'latest' => 'value 4',
           'id' => 'field_2',
           '1' => '',
           '2' => 'value 4',
         ),
-      'field_3' => array( 
+      'field_3' => array(
           'entity_id' => '2',
           'latest' => '',
           'id' => 'field_3',

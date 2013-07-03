@@ -4,9 +4,9 @@
  Demonstrates use of 'filter' active_only' param
  */
 function membership_get_example(){
-$params = array( 
-  'contact_id' => 14,
-  'filters' => array( 
+$params = array(
+  'contact_id' => 13,
+  'filters' => array(
       'is_current' => 1,
     ),
   'version' => 3,
@@ -22,18 +22,18 @@ $params = array(
  */
 function membership_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'membership_id' => '1',
-          'contact_id' => '14',
-          'membership_contact_id' => '14',
-          'membership_type_id' => '12',
+          'contact_id' => '13',
+          'membership_contact_id' => '13',
+          'membership_type_id' => '11',
           'join_date' => '2009-01-21',
           'start_date' => '2009-01-21',
           'membership_start_date' => '2009-01-21',
@@ -41,7 +41,7 @@ function membership_get_expectedresult(){
           'membership_end_date' => '2009-12-21',
           'source' => 'Payment',
           'membership_source' => 'Payment',
-          'status_id' => '19',
+          'status_id' => '18',
           'is_override' => '1',
           'is_test' => 0,
           'member_is_test' => 0,

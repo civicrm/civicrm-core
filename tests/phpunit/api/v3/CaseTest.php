@@ -252,7 +252,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
   function testCaseCreateEmpty() {
     $params = array('version' => $this->_apiversion);
     $result = civicrm_api('case', 'create', $params);
-    $this->assertEquals($result['is_error'], 1,
+    $this->assertAPIFailure($result,
       "In line " . __LINE__
     );
   }
@@ -268,7 +268,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
     );
 
     $result = civicrm_api('case', 'create', $params);
-    $this->assertEquals($result['is_error'], 1,
+    $this->assertAPIFailure($result,
       "In line " . __LINE__
     );
   }
@@ -298,7 +298,10 @@ class api_v3_CaseTest extends CiviUnitTestCase {
    */
   function testCaseUpdate() {
     // Create Case
-    $result = civicrm_api('case', 'create', $this->_params);
+    $params = $this->_params;
+    // Test using name instead of value
+    $params['case_type_id'] = 'housing_support';
+    $result = civicrm_api('case', 'create', $params);
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
     $id = $result['id'];
     $result = civicrm_api('case', 'get', array('version' => $this->_apiversion, 'id' => $id));
@@ -439,7 +442,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('activity', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 0,
+    $this->assertAPISuccess($result,
       "Error message: " . CRM_Utils_Array::value('error_message', $result) . ' in line ' . __LINE__
     );
     $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject'], 'in line ' . __LINE__);
@@ -494,7 +497,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('activity', 'create', $params);
 
-    $this->assertEquals($result['is_error'], 0,
+    $this->assertAPISuccess($result,
       "Error message: " . CRM_Utils_Array::value('error_message', $result) . ' in line ' . __LINE__
     );
 

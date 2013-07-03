@@ -106,12 +106,12 @@
     <comment>FK to Contact ID. This is specifically not an FK to avoid circular constraints</comment>
     <add>4.3</add>
   </field>
-  <foreignKey> 
-    <name>contact_id</name> 
-    <table>civicrm_contact</table> 
-    <key>id</key> 
-    <add>4.3</add> 
-  </foreignKey> 
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.3</add>
+  </foreignKey>
   <field>
     <name>locales</name>
     <type>text</type>

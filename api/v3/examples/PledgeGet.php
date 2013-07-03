@@ -4,7 +4,7 @@
  
  */
 function pledge_get_example(){
-$params = array( 
+$params = array(
   'pledge_id' => 1,
   'version' => 3,
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function pledge_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '5',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -33,10 +33,10 @@ function pledge_get_expectedresult(){
           'display_name' => 'Mr. Anthony Anderson II',
           'pledge_id' => '1',
           'pledge_amount' => '100.00',
-          'pledge_create_date' => '2013-02-04 00:00:00',
+          'pledge_create_date' => '2013-06-22 00:00:00',
           'pledge_status' => 'Pending',
           'pledge_total_paid' => '',
-          'pledge_next_pay_date' => '2013-02-06 00:00:00',
+          'pledge_next_pay_date' => '2013-06-24 00:00:00',
           'pledge_next_pay_amount' => '20.00',
           'pledge_outstanding_amount' => '',
           'pledge_financial_type' => 'Donation',

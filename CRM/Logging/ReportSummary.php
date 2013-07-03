@@ -85,26 +85,27 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       array( 'fk'  => 'contact_id_a',
         'bracket_info'  => array('entity_column' => 'relationship_type_id', 'table' => 'log_civicrm_relationship_type', 'column' => 'label_a_b'),
       ),
-      'log_civicrm_activity_for_target' =>
-      array( 'fk'  => 'target_contact_id',
-        'table_name'  => 'log_civicrm_activity',
-        'joins' => array('table' => 'log_civicrm_activity_target', 'join' => 'entity_log_civireport.id = fk_table.activity_id'),
-        'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)),
-        'log_type'      => 'Activity',
-      ),
-      'log_civicrm_activity_for_assignee' =>
-      array( 'fk'  => 'assignee_contact_id',
-        'table_name'  => 'log_civicrm_activity',
-        'joins' => array('table' => 'log_civicrm_activity_assignment', 'join' => 'entity_log_civireport.id = fk_table.activity_id'),
-        'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)),
-        'log_type'      => 'Activity',
-      ),
-      'log_civicrm_activity_for_source' =>
-      array( 'fk'  => 'source_contact_id',
-        'table_name'  => 'log_civicrm_activity',
-        'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)),
-        'log_type'      => 'Activity',
-      ),
+      // FIXME: activity table structure has changed. Below activity code needs to be fixed based on new structure - CRM-12274
+      /* 'log_civicrm_activity_for_target' => */
+      /* array( 'fk'  => 'target_contact_id', */
+      /*   'table_name'  => 'log_civicrm_activity', */
+      /*   'joins' => array('table' => 'log_civicrm_activity_target', 'join' => 'entity_log_civireport.id = fk_table.activity_id'), */
+      /*   'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)), */
+      /*   'log_type'      => 'Activity', */
+      /* ), */
+      /* 'log_civicrm_activity_for_assignee' => */
+      /* array( 'fk'  => 'assignee_contact_id', */
+      /*   'table_name'  => 'log_civicrm_activity', */
+      /*   'joins' => array('table' => 'log_civicrm_activity_assignment', 'join' => 'entity_log_civireport.id = fk_table.activity_id'), */
+      /*   'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)), */
+      /*   'log_type'      => 'Activity', */
+      /* ), */
+      /* 'log_civicrm_activity_for_source' => */
+      /* array( 'fk'  => 'source_contact_id', */
+      /*   'table_name'  => 'log_civicrm_activity', */
+      /*   'bracket_info'  => array('entity_column' => 'activity_type_id', 'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)), */
+      /*   'log_type'      => 'Activity', */
+      /* ), */
       'log_civicrm_case' =>
       array( 'fk'  => 'contact_id',
         'joins' => array('table' => 'log_civicrm_case_contact', 'join' => 'entity_log_civireport.id = fk_table.case_id'),
@@ -209,10 +210,36 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       }
     }
 
+    // add computed log_type column so that we can do a group by after that, which will help
+    // alterDisplay() counts sync with pager counts
+    $sql = "SELECT DISTINCT log_type FROM civicrm_temp_civireport_logsummary";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $replaceWith = array();
+    while($dao->fetch()){
+      $type = $this->getLogType($dao->log_type);
+      if (!array_key_exists($type,$replaceWith)) 
+        $replaceWith[$type] = array();
+      $replaceWith[$type][] = $dao->log_type;
+    }
+    foreach ($replaceWith as $type => $tables) {
+      if (!empty($tables)) {
+        $replaceWith[$type] = implode("','", $tables);
+      }
+    }
+    
+    $sql = "ALTER TABLE civicrm_temp_civireport_logsummary ADD COLUMN log_civicrm_entity_log_type_label varchar(64)";
+    CRM_Core_DAO::executeQuery($sql);
+    foreach ($replaceWith as $type => $in) {
+      $sql = "UPDATE civicrm_temp_civireport_logsummary SET log_civicrm_entity_log_type_label='{$type}', log_date=log_date WHERE log_type IN('$in')";
+      CRM_Core_DAO::executeQuery($sql);
+    }
+
+    // note the group by columns are same as that used in alterDisplay as $newRows - $key
     $this->limit();
     $sql = "{$this->_select}
 FROM civicrm_temp_civireport_logsummary entity_log_civireport
-ORDER BY entity_log_civireport.log_date DESC {$this->_limit}";
+GROUP BY log_civicrm_entity_log_date, log_civicrm_entity_log_type_label, log_civicrm_entity_log_conn_id, log_civicrm_entity_log_user_id, log_civicrm_entity_altered_contact_id
+ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
     $sql = str_replace('modified_contact_civireport.display_name', 'entity_log_civireport.altered_contact',   $sql);
     $sql = str_replace('modified_contact_civireport.id',           'entity_log_civireport.altered_contact_id', $sql);
     $sql = str_replace(array('modified_contact_civireport.', 'altered_by_contact_civireport.'), 'entity_log_civireport.', $sql);

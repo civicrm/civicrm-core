@@ -472,7 +472,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         //retrieve pledge details as well as to validate pledge ID
 
         //first need to check for update mode
-        if ($onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_UPDATE &&
+        if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE &&
           ($params['contribution_id'] || $params['trxn_id'] || $params['invoice_id'])
         ) {
           $contribution = new CRM_Contribute_DAO_Contribution();
@@ -1377,7 +1377,7 @@ function _civicrm_api3_deprecated_membership_format_params($params, &$values, $c
  */
 function _civicrm_api3_deprecated_create_participant_formatted($params, $onDuplicate) {
   require_once 'CRM/Event/Import/Parser.php';
-  if ($onDuplicate != CRM_Event_Import_Parser::DUPLICATE_NOCHECK) {
+  if ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK) {
     CRM_Core_Error::reset();
     $error = _civicrm_api3_deprecated_participant_check_params($params, TRUE);
     if (civicrm_error($error)) {

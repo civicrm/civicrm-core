@@ -5,7 +5,7 @@
     /*  This param causes the count of the only function to be returned as an integer
  */
 function contact_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'id' => 17,
 );

@@ -136,11 +136,11 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $result = civicrm_api('Contact', 'getfields', array('version' => 3));
     $this->assertAPISuccess($result);
     $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'If This fails there is probably a cachine issue - failure in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
-    $result = civicrm_api('Contact', 'getfields', array('version' => 3, 'action' => 'create', 'contact_type' => 'Individual'), 'in line' . __LINE__);;
+    $result = civicrm_api('Contact', 'getfields', array('version' => 3, 'action' => 'create', 'contact_type' => 'Individual'), 'in line' . __LINE__);
     $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values']);
     $result = civicrm_api('Contact', 'getfields', array('version' => 3, 'action' => 'create', 'contact_type' => 'Organization'));
     $this->assertArrayNotHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
-    $result = civicrm_api('Relationship', 'getfields', array('version' => 3, 'action' => 'create'), 'in line' . __LINE__);;
+    $result = civicrm_api('Relationship', 'getfields', array('version' => 3, 'action' => 'create'), 'in line' . __LINE__);
     $this->assertArrayNotHasKey("custom_{$this->IndividualField['id']}", $result['values']);
   }
 
@@ -170,8 +170,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $params = array(
       'version' => 3,
     );
-    $contact = civicrm_api('contact', 'create', $params);
-    $this->assertEquals($contact['is_error'], 1);
+    $contact = $this->callAPIFailure('contact', 'create', $params);
     $this->assertEquals($contact['error_message'], 'Mandatory key(s) missing from params array: contact_type');
   }
 

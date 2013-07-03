@@ -4,19 +4,20 @@
  
  */
 function option_group_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'sequential' => 1,
   'name' => 'civicrm_event.amount.560',
   'is_reserved' => 1,
   'is_active' => 1,
-  'api.OptionValue.create' => array( 
+  'api.OptionValue.create' => array(
       'label' => 'workshop',
       'value' => 35,
       'is_default' => 1,
       'is_active' => 1,
       'format.only_id' => 1,
     ),
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'option_group','create',$params );
@@ -29,20 +30,20 @@ $params = array(
  */
 function option_group_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 86,
-  'values' => array( 
-      '0' => array( 
-          'id' => '86',
+  'id' => 84,
+  'values' => array(
+      '0' => array(
+          'id' => '84',
           'name' => 'civicrm_event.amount.560',
           'title' => '',
           'description' => '',
           'is_reserved' => '1',
           'is_active' => '1',
-          'api.OptionValue.create' => 723,
+          'api.OptionValue.create' => 720,
         ),
     ),
 );

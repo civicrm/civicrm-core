@@ -62,6 +62,9 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
 
+    $this->_tabDisplay = CRM_Utils_Request::retrieve('tabDisplay', 'String', $this);
+    $this->assign('tabDisplay', $this->_tabDisplay);
+
     //set the context for the profile
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
@@ -213,6 +216,12 @@ SELECT module
         //passing the post url to template so the popup form does
         //proper redirection and proccess form errors if any
         $popupRedirect = CRM_Utils_System::url('civicrm/profile/edit', $urlParams, FALSE, NULL, FALSE);
+
+        if ($this->_tabDisplay) {
+          $popupRedirect = CRM_Utils_System::url('civicrm/contact/view', 
+            "reset=1&cid={$this->_id}&selectedChild=custom_{$this->_customGroupId}", FALSE, NULL, FALSE);
+        }
+
         $this->assign('urlParams', $urlParams);
         $this->assign('postUrl', $popupRedirect);
       }

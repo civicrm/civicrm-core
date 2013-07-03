@@ -4,7 +4,7 @@
  
  */
 function uf_match_get_example(){
-$params = array( 
+$params = array(
   'contact_id' => 69,
   'version' => 3,
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function uf_match_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'domain_id' => '1',
           'uf_id' => '42',

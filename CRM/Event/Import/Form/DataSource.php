@@ -36,7 +36,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
+class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Function to set variables up before form is built
@@ -46,7 +46,7 @@ class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
    */
   public function preProcess() {
     $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/import/activity', 'reset=1'));
+    $session->pushUserContext(CRM_Utils_System::url('civicrm/event/import', 'reset=1'));
   }
 
   /**
@@ -79,22 +79,25 @@ class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
 
     $duplicateOptions = array();
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Skip'), CRM_Activity_Import_Parser::DUPLICATE_SKIP
+      NULL, NULL, ts('Skip'), CRM_Import_Parser::DUPLICATE_SKIP
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update'), CRM_Activity_Import_Parser::DUPLICATE_UPDATE
+      NULL, NULL, ts('Update'), CRM_Import_Parser::DUPLICATE_UPDATE
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Fill'), CRM_Activity_Import_Parser::DUPLICATE_FILL
+      NULL, NULL, ts('No Duplicate Checking'), CRM_Import_Parser::DUPLICATE_NOCHECK
     );
+    // for contributions NOCHECK == SKIP
+    //      $duplicateOptions[] = $this->createElement('radio',
+    //          null, null, ts('No Duplicate Checking'), CRM_Import_Parser::DUPLICATE_NOCHECK);
 
     $this->addGroup($duplicateOptions, 'onDuplicate',
-      ts('On duplicate entries')
+      ts('On Duplicate Entries')
     );
 
     //get the saved mapping details
     $mappingArray = CRM_Core_BAO_Mapping::getMappings(CRM_Core_OptionGroup::getValue('mapping_type',
-        'Import Activity',
+        'Import Participant',
         'name'
       ));
     $this->assign('savedMapping', $mappingArray);
@@ -107,8 +110,33 @@ class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
 
     $this->setDefaults(array(
       'onDuplicate' =>
-        CRM_Activity_Import_Parser::DUPLICATE_SKIP,
+        CRM_Import_Parser::DUPLICATE_SKIP,
       ));
+
+    //contact types option
+    $contactOptions = array();
+    if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
+      $contactOptions[] = $this->createElement('radio',
+        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL
+      );
+    }
+    if (CRM_Contact_BAO_ContactType::isActive('Household')) {
+      $contactOptions[] = $this->createElement('radio',
+        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD
+      );
+    }
+    if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
+      $contactOptions[] = $this->createElement('radio',
+        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION
+      );
+    }
+    $this->addGroup($contactOptions, 'contactType', ts('Contact Type'));
+
+    $this->setDefaults(array(
+      'contactType' =>
+        CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      )
+    );
 
     //build date formats
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
@@ -140,10 +168,12 @@ class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
     $fileName         = $this->controller->exportValue($this->_name, 'uploadFile');
     $skipColumnHeader = $this->controller->exportValue($this->_name, 'skipColumnHeader');
     $onDuplicate      = $this->controller->exportValue($this->_name, 'onDuplicate');
+    $contactType      = $this->controller->exportValue($this->_name, 'contactType');
     $dateFormats      = $this->controller->exportValue($this->_name, 'dateFormats');
     $savedMapping     = $this->controller->exportValue($this->_name, 'savedMapping');
 
     $this->set('onDuplicate', $onDuplicate);
+    $this->set('contactType', $contactType);
     $this->set('dateFormats', $dateFormats);
     $this->set('savedMapping', $savedMapping);
 
@@ -154,13 +184,12 @@ class CRM_Activity_Import_Form_UploadFile extends CRM_Core_Form {
     $seperator = $config->fieldSeparator;
 
     $mapper = array();
-
-    $parser = new CRM_Activity_Import_Parser_Activity($mapper);
+    $parser = new CRM_Event_Import_Parser_Participant($mapper);
     $parser->setMaxLinesToProcess(100);
     $parser->run($fileName, $seperator,
       $mapper,
       $skipColumnHeader,
-      CRM_Activity_Import_Parser::MODE_MAPFIELD
+      CRM_Import_Parser::MODE_MAPFIELD, $contactType
     );
 
     // add all the necessary variables to the form

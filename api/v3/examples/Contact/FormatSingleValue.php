@@ -6,7 +6,7 @@
     /* it will be ignored if there is not exactly 1 result
  */
 function contact_getvalue_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'id' => 17,
   'return' => 'display_name',

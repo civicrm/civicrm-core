@@ -59,7 +59,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    *
    * @return void
    * @access public
-   */ 
+   */
   function preProcess() {
     // get the controller vars
     $this->_groupId = $this->get('groupId');

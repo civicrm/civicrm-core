@@ -874,7 +874,7 @@ ALTER TABLE civicrm_financial_account
         $saveDao = new CRM_Contact_DAO_SavedSearch();
       }
       else {
-        $saveDao = new CRM_Report_DAO_Instance();
+        $saveDao = new CRM_Report_DAO_ReportInstance();
       }
       $saveDao->id = $dao->id;
 

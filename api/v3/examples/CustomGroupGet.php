@@ -4,7 +4,7 @@
  
  */
 function custom_group_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
 );
 
@@ -18,13 +18,13 @@ $params = array(
  */
 function custom_group_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'name' => 'test_group_1',
           'title' => 'Test_Group_1',

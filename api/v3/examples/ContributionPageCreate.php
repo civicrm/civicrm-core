@@ -4,7 +4,7 @@
  
  */
 function contribution_page_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'title' => 'Test Contribution Page',
   'financial_type_id' => 1,
@@ -22,13 +22,13 @@ $params = array(
  */
 function contribution_page_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'title' => 'Test Contribution Page',
           'intro_text' => '',
@@ -73,7 +73,7 @@ function contribution_page_create_expectedresult(){
           'start_date' => '',
           'end_date' => '',
           'created_id' => '',
-          'created_date' => '',
+          'created_date' => '20120130621222105',
           'currency' => 'NZD',
           'campaign_id' => '',
           'is_share' => '',

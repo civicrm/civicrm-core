@@ -48,6 +48,8 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
   static $_links = NULL;
 
+  static $_tabLinks = NULL;
+
   protected $_pager = NULL;
 
   protected $_sortByCharacter;
@@ -95,6 +97,65 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       );
     }
     return self::$_actionLinks;
+  }
+
+  /**
+   * Get tab  Links for events
+   *
+   * @return array (reference) of tab links
+   */
+  function &tabs($enableCart) {
+    if (!(self::$_tabLinks)) {
+      self::$_tabLinks = array(
+        'settings' => array(
+          'title' => ts('Info and Settings'),
+          'url' => 'civicrm/event/manage/settings',
+          'field' => 'id'
+        ),
+        'location' => array(
+          'title' => ts('Location'),
+          'url' => 'civicrm/event/manage/location',
+          'field' => 'is_show_location',
+        ),
+        'fee' => array(
+          'title' => ts('Fees'),
+          'url' => 'civicrm/event/manage/fee',
+          'field' => 'is_monetary',
+        ),
+        'registration' => array(
+          'title' => ts('Online Registration'),
+          'url' => 'civicrm/event/manage/registration',
+          'field' => 'is_online_registration',
+        ),
+        'reminder' => array(
+          'title' => ts('Schedule Reminders'),
+          'url' => 'civicrm/event/manage/reminder',
+          'field' => 'reminder',
+        ),
+        'conference' => array(
+          'title' => ts('Conference Slots'),
+          'url' => 'civicrm/event/manage/conference',
+          'field' => 'slot_label_id',
+        ),
+        'friend' => array(
+          'title' => ts('Tell a Friend'),
+          'url' => 'civicrm/event/manage/friend',
+          'field' => 'friend',
+        ),
+        'pcp' => array(
+          'title' => ts('Personal Campaign Pages'),
+          'url' => 'civicrm/event/manage/pcp',
+          'field' => 'is_pcp_enabled',
+        ),
+      );
+    }
+
+    if (!$enableCart) {
+      unset(self::$_tabLinks['conference']);
+    }
+
+    CRM_Utils_Hook::tabset('civicrm/event/manage', self::$_tabLinks, array());
+    return self::$_tabLinks;
   }
 
   /**
@@ -181,8 +242,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
     $this->search();
 
-    $config = CRM_Core_Config::singleton();
-
     $params = array();
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean',
       $this, FALSE
@@ -227,6 +286,12 @@ ORDER BY start_date desc
     while ($pcpDao->fetch()) {
       $eventPCPS[$pcpDao->entity_id] = $pcpDao->entity_id;
     }
+    // check if we're in shopping cart mode for events
+    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
+      'enable_cart'
+    );
+    $this->assign('eventCartEnabled', $enableCart);
+    $mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'civicrm_event', 'id', 'entity_value');
 
     while ($dao->fetch()) {
       if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
@@ -276,11 +341,11 @@ ORDER BY start_date desc
 
         //show campaigns on selector.
         $manageEvent[$dao->id]['campaign'] = CRM_Utils_Array::value($dao->campaign_id, $allCampaigns);
-        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, 3);
-
+        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
         $manageEvent[$dao->id]['is_pcp_enabled'] = CRM_Utils_Array::value($dao->id, $eventPCPS);
       }
     }
+    $manageEvent['tab'] = self::tabs($enableCart);
     $this->assign('rows', $manageEvent);
 
     $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
@@ -288,12 +353,6 @@ ORDER BY start_date desc
     $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));
     $findParticipants['statusNotCounted'] = implode(', ', array_values($statusTypesPending));
     $this->assign('findParticipants', $findParticipants);
-
-    // check if we're in shopping cart mode for events
-    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'enable_cart'
-    );
-    $this->assign('eventCartEnabled', $enableCart);
   }
 
   /**
@@ -401,15 +460,15 @@ ORDER BY start_date desc
       $clauses[] = "title LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
-    $campainIds = $this->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campainIds)) {
-      if (!is_array($campainIds)) {
+    $campaignIds = $this->get('campaign_id');
+    if (!CRM_Utils_System::isNull($campaignIds)) {
+      if (!is_array($campaignIds)) {
         $campaignIds = array($campaignIds);
       }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campaignIds)) . ' ) )';
     }
 
-    // dont do a the below assignment when doing a
+    // don't do a the below assignment when doing a
     // AtoZ pager clause
     if ($sortBy) {
       if (count($clauses) > 1 || $eventsByDates) {

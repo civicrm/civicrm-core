@@ -173,7 +173,7 @@
       <name>override_verp</name>
       <type>boolean</type>
       <default>0</default>
-      <add>2.2</add>    
+      <add>2.2</add>
       <comment>Should we overrite VERP address in Reply-To</comment>
   </field>
   <field>
@@ -254,42 +254,42 @@
        <comment>Is this mailing archived?</comment>
        <add>2.2</add>
   </field>
-  <field> 
-       <name>visibility</name> 
-       <type>enum</type> 
-       <values>User and User Admin Only,Public Pages</values> 
-       <default>'User and User Admin Only'</default> 
-       <comment>In what context(s) is the mailing contents visible (online viewing)</comment> 
-       <add>3.3</add> 
+  <field>
+       <name>visibility</name>
+       <type>enum</type>
+       <values>User and User Admin Only,Public Pages</values>
+       <default>'User and User Admin Only'</default>
+       <comment>In what context(s) is the mailing contents visible (online viewing)</comment>
+       <add>3.3</add>
   </field>
-  <field> 
-       <name>campaign_id</name> 
-       <type>int unsigned</type>                 
-       <comment>The campaign for which this mailing has been initiated.</comment> 
-       <add>3.4</add> 
-  </field> 
-  <foreignKey> 
-       <name>campaign_id</name> 
-       <table>civicrm_campaign</table> 
-       <key>id</key> 
+  <field>
+       <name>campaign_id</name>
+       <type>int unsigned</type>
+       <comment>The campaign for which this mailing has been initiated.</comment>
+       <add>3.4</add>
+  </field>
+  <foreignKey>
+       <name>campaign_id</name>
+       <table>civicrm_campaign</table>
+       <key>id</key>
        <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
       <name>dedupe_email</name>
       <type>boolean</type>
       <default>0</default>
-      <add>4.1</add>    
+      <add>4.1</add>
       <comment>Remove duplicate emails?</comment>
   </field>
-  <field> 
-       <name>sms_provider_id</name> 
-       <type>int unsigned</type>                 
-       <add>4.2</add> 
-  </field> 
-  <foreignKey> 
-       <name>sms_provider_id</name> 
-       <table>civicrm_sms_provider</table> 
-       <key>id</key> 
+  <field>
+       <name>sms_provider_id</name>
+       <type>int unsigned</type>
+       <add>4.2</add>
+  </field>
+  <foreignKey>
+       <name>sms_provider_id</name>
+       <table>civicrm_sms_provider</table>
+       <key>id</key>
        <onDelete>SET NULL</onDelete>
        <add>4.2</add>
   </foreignKey>
