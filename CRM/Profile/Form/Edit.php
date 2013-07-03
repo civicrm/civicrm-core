@@ -214,9 +214,10 @@ SELECT module
 
         //passing the post url to template so the popup form does
         //proper redirection and proccess form errors if any
-        $popupRedirect = CRM_Utils_System::url('civicrm/profile/edit', $urlParams, FALSE, NULL, FALSE);
-
-        if ($this->_onPopupClose == 'redirectToTab') {
+        if (!isset($this->_onPopupClose) || $this->_onPopupClose == 'redirectToProfile') {
+          $popupRedirect = CRM_Utils_System::url('civicrm/profile/edit', $urlParams, FALSE, NULL, FALSE);
+        }
+        elseif ($this->_onPopupClose == 'redirectToTab') {
           $popupRedirect = CRM_Utils_System::url('civicrm/contact/view', 
             "reset=1&cid={$this->_id}&selectedChild=custom_{$this->_customGroupId}", FALSE, NULL, FALSE);
         }
