@@ -50,9 +50,9 @@ class CRM_Utils_HttpClient {
   protected static $singleton;
 
   /**
-   * @var int
+   * @var int|NULL seconds; or NULL to use system default
    */
-  protected $timeout;
+  protected $connectionTimeout;
 
   public static function singleton() {
     if (!self::$singleton) {
@@ -61,8 +61,8 @@ class CRM_Utils_HttpClient {
     return self::$singleton;
   }
 
-  public function __construct($timeout = 10) {
-    $this->timeout = $timeout;
+  public function __construct($connectionTimeout = NULL) {
+    $this->connectionTimeout = $connectionTimeout;
   }
 
   /**
@@ -190,6 +190,9 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
     curl_setopt($ch, CURLOPT_VERBOSE, 0);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+    if ($this->connectionTimeout !== NULL) {
+      curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->connectionTimeout);
+    }
     if (preg_match('/^https:/', $remoteFile) && $caConfig->isEnableSSL()) {
       curl_setopt_array($ch, $caConfig->toCurlOptions());
     }
