@@ -67,6 +67,6 @@
         <h3>Important Notes</h3>
         <p>{$afterUpgradeMessage}</p>
       {/if}
-      <p><a href="{$menuRebuildURL}" title="{ts}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
+      <p><a href="{crmURL p='civicrm/dashboard' q='reset=1'}" title="{ts}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
     </div>
 {/if}
