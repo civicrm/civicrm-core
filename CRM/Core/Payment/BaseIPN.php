@@ -161,7 +161,7 @@ class CRM_Core_Payment_BaseIPN {
 
     //add lineitems for recurring payments
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id);
+      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, CRM_Core_DAO::$_nullArray);
     }
 
     if (!CRM_Utils_Array::value('skipComponentSync', $input)) {
@@ -219,7 +219,7 @@ class CRM_Core_Payment_BaseIPN {
 
     //add lineitems for recurring payments
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id);
+      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, CRM_Core_DAO::$_nullArray);
     }
 
     if (!CRM_Utils_Array::value('skipComponentSync', $input)) {
@@ -465,7 +465,7 @@ LIMIT 1;";
 
     //add lineitems for recurring payments
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id);
+      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, $input);
     }
 
     // next create the transaction record
@@ -483,8 +483,8 @@ LIMIT 1;";
 
     if ($contribution->id) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      if (!$input['prevContribution']->is_pay_later &&
-        $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)) {
+      if ((!$input['prevContribution'] && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later &&
+           $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses))) {
         $input['payment_processor'] = $paymentProcessorId;
       }
       $input['contribution_status_id'] = array_search('Completed', $contributionStatuses);
@@ -750,7 +750,7 @@ LIMIT 1;";
     );
   }
 
-  function addrecurLineItems($recurId, $contributionId) {
+  function addrecurLineItems($recurId, $contributionId, &$input) {
     $lineSets = $lineItems = array();
 
     //Get the first contribution id with recur id
@@ -765,8 +765,12 @@ LIMIT 1;";
           $lineSets[$pricesetID->price_set_id][] = $value;
         }
       }
-
-      CRM_Price_BAO_LineItem::processPriceSet($contributionId, $lineSets);
+      if (!empty($input)) {
+        $input['line_item'] = $lineSets;
+      }
+      else {
+        CRM_Price_BAO_LineItem::processPriceSet($contributionId, $lineSets);
+      }
     }
   }
 }
