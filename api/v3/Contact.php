@@ -295,6 +295,13 @@ function civicrm_api3_contact_delete($params) {
   }
   $restore = CRM_Utils_Array::value('restore', $params) ? $params['restore'] : FALSE;
   $skipUndelete = CRM_Utils_Array::value('skip_undelete', $params) ? $params['skip_undelete'] : FALSE;
+
+  // CRM-12929
+  // restrict permanent delete if a contact has financial trxn associated with it
+  $error = NULL;
+  if ($skipUndelete && CRM_Financial_BAO_FinancialItem::checkContactPresent(array($contactID), $error)) {
+    return civicrm_api3_create_error($error['_qf_default']);  
+  }
   if (CRM_Contact_BAO_Contact::deleteContact($contactID, $restore, $skipUndelete)) {
     return civicrm_api3_create_success();
   }
