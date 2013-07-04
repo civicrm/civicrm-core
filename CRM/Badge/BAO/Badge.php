@@ -36,24 +36,7 @@
  *
  * parent class for building name badges
  */
-class CRM_Badge_Format_Badge {
-  function printImage($img) {
-    $x = $this->pdf->GetAbsX();
-    $y = $this->pdf->GetY();
-
-    $this->imgRes = 300;
-
-    if ($img) {
-      $imgsize = getimagesize($img);
-      // mm
-      $f = $this->imgRes / 25.4;
-      $w = $imgsize[0] / $f;
-      $h = $imgsize[1] / $f;
-      $this->pdf->Image($img, $this->pdf->GetAbsX(), $this->pdf->GetY(), $w, $h, '', '', '', FALSE, 72, '', FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
-    }
-    $this->pdf->SetXY($x, $y);
-  }
-
+class CRM_Badge_BAO_Badge {
   /**
    *  This function is called to create name label pdf
    *
@@ -63,7 +46,7 @@ class CRM_Badge_Format_Badge {
    * @return  void
    * @access  public
    */
-  function createLabels(&$participants, &$layoutInfo) {
+   public function createLabels(&$participants, &$layoutInfo) {
     $this->pdf = new CRM_Utils_PDF_Label($layoutInfo['format'], 'mm');
     $this->pdf->Open();
     $this->pdf->setPrintHeader(FALSE);
@@ -91,7 +74,8 @@ class CRM_Badge_Format_Badge {
    * @return array $formattedRow row with meta data
    */
   static function formatLabel(&$row, &$layout) {
-    $formattedRow = array();
+    $formattedRow = array('labelFormat' => $layout['label_format_name']);
+
     if (CRM_Utils_Array::value('rowElements', $layout['data'])) {
       foreach($layout['data']['rowElements'] as $key => $element) {
         $formattedRow['token'][$key] = array(
@@ -116,6 +100,63 @@ class CRM_Badge_Format_Badge {
     }
 
     return $formattedRow;
+  }
+
+  public function generateLabel($formattedRow) {
+    switch ($formattedRow['labelFormat']) {
+      case 'Avery5395':
+        self::labelAvery5395($formattedRow);
+        break;
+    }
+  }
+
+  public function labelAvery5395(&$formattedRow) {
+    $this->lMarginLogo = 20;
+    $this->tMarginName = 20;
+
+    $x = $this->pdf->GetAbsX();
+    $y = $this->pdf->GetY();
+
+    $this->printImage($formattedRow['image_1']);
+
+    $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,2', 'color' => array(0, 0, 200)));
+
+    $this->pdf->SetFontSize(9);
+    $this->pdf->MultiCell($this->pdf->width - $this->lMarginLogo, 0, $formattedRow['token'][1]['value'], $this->border, "L", 0, 1, $x + $this->lMarginLogo, $y);
+
+    $this->pdf->SetFontSize(20);
+    $this->pdf->MultiCell($this->pdf->width, 10, $formattedRow['token'][2]['value'], $this->border, "C", 0, 1, $x, $y + $this->tMarginName);
+    $this->pdf->SetFontSize(15);
+    $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][3]['value'], $this->border, "C", 0, 1, $x, $this->pdf->getY());
+
+    $this->pdf->SetFontSize(9);
+    $this->pdf->SetXY($x, $y + $this->pdf->height - 5);
+    $date = CRM_Utils_Date::customFormat($formattedRow['token'][4]['value'], "%e %b");
+    $this->pdf->Cell($this->pdf->width, 0, $date, $this->border, 2, "R");
+  }
+
+  /**
+   * Helper function to print images
+   * @param string $img image url
+   *
+   * @return void
+   * @access public
+   */
+  function printImage($img) {
+    $x = $this->pdf->GetAbsX();
+    $y = $this->pdf->GetY();
+
+    $this->imgRes = 300;
+
+    if ($img) {
+      $imgsize = getimagesize($img);
+      // mm
+      $f = $this->imgRes / 25.4;
+      $w = $imgsize[0] / $f;
+      $h = $imgsize[1] / $f;
+      $this->pdf->Image($img, $this->pdf->GetAbsX(), $this->pdf->GetY(), $w, $h, '', '', '', FALSE, 72, '', FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+    }
+    $this->pdf->SetXY($x, $y);
   }
 }
 

@@ -130,19 +130,12 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
           }
         }
 
-        // build returnproperties
+        // build returnproperties for query
         $returnProperties[$element] = 1;
 
         // add actual field name to row element
         $layoutInfo['data']['rowElements'][$index] = $element;
       }
-    }
-
-    // check if name label format class exists
-    $classFile = 'CRM/Badge/Format/' . $layoutInfo['label_format_name'] . '.php';
-    $error = include_once($classFile);
-    if ($error == FALSE) {
-      CRM_Core_Error::fatal('Event Badge code file: ' . $classFile . ' does not exist. Please verify your custom event badge settings in CiviCRM administrative panel.');
     }
 
     // add additional required fields for query execution
@@ -188,9 +181,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
       }
     }
 
-    // create badge class
-    $className = 'CRM_Badge_Format_' . $layoutInfo['label_format_name'];
-    $eventBadgeClass = new $className();
+    $eventBadgeClass = new CRM_Badge_BAO_Badge();
     $eventBadgeClass->createLabels($rows, $layoutInfo);
   }
 }
