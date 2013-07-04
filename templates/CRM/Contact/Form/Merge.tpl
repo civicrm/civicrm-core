@@ -115,7 +115,12 @@
     </tr>
     {else}
     <tr class="{cycle values="even-row,odd-row"}">
-      <th>{ts}Move related...{/ts}</th><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
+      {if $rel_tables.$paramName.other_url}
+         <th>{ts}Move related...{/ts}</th><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
+      {else}
+        {* Show title with link only on right side if other_url is not set, CRM-12695 *}
+        <th>{ts}Move related...{/ts}</th><td></td><td style='white-space: nowrap;'>=={$form.$paramName.html}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
+      {/if}
     </tr>
     {/if}
   {/foreach}

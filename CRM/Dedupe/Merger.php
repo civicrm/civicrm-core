@@ -193,7 +193,7 @@ class CRM_Dedupe_Merger {
       // foreign keys referencing civicrm_contact(id)
       $cidRefs = array(
         'civicrm_acl_cache' => array('contact_id'),
-        'civicrm_activity' => array('source_contact_id'),
+        'civicrm_activity' => array('source_record_id'),
         'civicrm_activity_contact' => array('contact_id'),
         'civicrm_case_contact' => array('contact_id'),
         'civicrm_contact' => array('primary_contact_id'),
@@ -347,7 +347,10 @@ INNER JOIN  civicrm_participant participant ON ( participant.id = payment.partic
 
     switch ($tableName) {
       case 'civicrm_membership':
-        if (array_key_exists($tableName, $tableOperations) && $tableOperations[$tableName]['add'])
+        if (array_key_exists($tableName, $tableOperations) && $tableOperations[$tableName]['add']) {
+          // CRM-12695
+          $sqls['add_membership'] = TRUE;
+        }
         break;
       if ($mode == 'add') {
         $sqls[] = "
@@ -388,6 +391,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $eidRefs = self::eidRefs();
     $cpTables = self::cpTables();
     $paymentTables = self::paymentTables();
+    $addMembership = FALSE;
 
     $affected = array_merge(array_keys($cidRefs), array_keys($eidRefs));
     if ($tables !== FALSE) {
@@ -446,6 +450,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
     }
 
+    // check if add_membership key is set
+    // to add new membership after merging contact, CRM-12695
+    if (array_key_exists('add_membership', $sqls)) {
+      $addMembership = TRUE;
+      unset($sqls['add_membership']);
+    }
     // Allow hook_civicrm_merge() to add SQL statements for the merge operation.
     CRM_Utils_Hook::merge('sqls', $sqls, $mainId, $otherId, $tables);
 
@@ -454,7 +464,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     foreach ($sqls as $sql) {
       CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE);
     }
-    $transaction->commit();
+    // CRM-12695
+    if ($addMembership) {
+      CRM_Dedupe_Merger::addMembershipToRealtedContacts($mainId);
+    }
+    $transactionCommit = $transaction->commit();
   }
 
   /**
@@ -1004,9 +1018,20 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $relTables = CRM_Dedupe_Merger::relTables();
     $activeRelTables = CRM_Dedupe_Merger::getActiveRelTables($otherId);
     $activeMainRelTables = CRM_Dedupe_Merger::getActiveRelTables($mainId);
+    // fetch related contacts, CRM-12695
+    $relatedContacts = CRM_Contact_BAO_Relationship::getRelationship($otherId);
     foreach ($relTables as $name => $null) {
+      // CRM-12695
+      $unset[$name] = TRUE;
+      if ($name == 'rel_table_memberships'
+        && in_array('rel_table_memberships', $activeMainRelTables)
+        && !empty($relatedContacts)) {
+        $unset[$name] = FALSE;
+      }
+
       if (!in_array($name, $activeRelTables) &&
         !(($name == 'rel_table_users') && in_array($name, $activeMainRelTables))
+        && (isset($unset[$name]) && $unset[$name])
       ) {
         unset($relTables[$name]);
         continue;
@@ -1033,6 +1058,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if ($name == 'rel_table_memberships') {
         $elements[] = array('checkbox', "operation[move_{$name}][add]", NULL, ts('add new'));
         $migrationInfo["operation"]["move_{$name}"]['add'] = 1;
+        // unset other_url to show Membership title & link on right side only
+        // if there is/are membership(s) only in the original contact, CRM-12695
+        if (in_array($name, $activeMainRelTables) && !in_array($name, $activeRelTables) && !empty($relatedContacts)) {
+          unset($relTables[$name]['other_url']);
+        }
       }
     }
     foreach ($relTables as $name => $null) {
@@ -1478,6 +1508,34 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     unset($contactFields['id']);
 
     return array_keys($contactFields);
+  }
+
+  /**
+   * Added for CRM-12695
+   * Based on the contactId provided
+   * add/update membership(s) to related contacts
+   *
+   * @param contactId
+   */
+  function addMembershipToRealtedContacts($contactID) {
+    $dao = new CRM_Member_DAO_Membership();
+    $dao->contact_id = $contactID;
+    $dao->is_test = 0;
+    $dao->find();
+
+    //checks membership of contact itself
+    while ($dao->fetch()) {
+      $relationshipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $dao->membership_type_id, 'relationship_type_id', 'id');
+      $relationshipDirection = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $dao->membership_type_id, 'relationship_direction', 'id');
+      if ($relationshipTypeId) {
+        $membershipParams = array(
+          'contact_id' => $contactID,
+          'membership_type_id' => $dao->membership_type_id
+        );
+        // create/update membership(s) for related contact(s) 
+        CRM_Member_BAO_Membership::createRelatedMemberships($membershipParams, $dao);
+      } // end of if relationshipTypeId
+    }
   }
 }
 
