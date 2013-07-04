@@ -205,6 +205,15 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
       13 => ts('13 pt'),
       14 => ts('14 pt'),
       15 => ts('15 pt'),
+      16 => ts('16 pt'),
+      17 => ts('17 pt'),
+      18 => ts('18 pt'),
+      19 => ts('19 pt'),
+      20 => ts('20 pt'),
+      21 => ts('21 pt'),
+      22 => ts('22 pt'),
+      23 => ts('23 pt'),
+      24 => ts('24 pt'),
     );
   }
 
@@ -239,7 +248,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
     return array(
       'R' => ts('Right'),
       'L' => ts('Left'),
-      'J' => ts('Justify'),
+      'C' => ts('Center'),
     );
   }
 
