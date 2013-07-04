@@ -52,8 +52,6 @@ class CRM_Badge_BAO_Badge {
     $this->pdf->setPrintHeader(FALSE);
     $this->pdf->setPrintFooter(FALSE);
     $this->pdf->AddPage();
-    $this->pdf->AddFont('DejaVu Sans', '', 'DejaVuSans.php');
-    $this->pdf->SetFont('DejaVu Sans');
     $this->pdf->SetGenerator($this, "generateLabel");
 
     // this is very useful for debugging, by default set to FALSE
@@ -128,20 +126,19 @@ class CRM_Badge_BAO_Badge {
 
     $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,2', 'color' => array(0, 0, 200)));
 
-    $this->pdf->SetFontSize($formattedRow['token'][1]['font_size']);
-    //$this->pdf->MultiCell($this->pdf->width - $this->lMarginLogo, 0, $formattedRow['token'][1]['value'], $this->border, "L", 0, 1, $x + $this->lMarginLogo, $y);
+    $this->pdf->SetFont($formattedRow['token'][1]['font_name'], '', $formattedRow['token'][1]['font_size']);
     $this->pdf->MultiCell($this->pdf->width - $this->lMarginLogo, 0, $formattedRow['token'][1]['value'],
       $this->border, $formattedRow['token'][1]['text_alignment'], 0, 1, $x + $this->lMarginLogo, $y);
 
-    $this->pdf->SetFontSize($formattedRow['token'][2]['font_size']);
+    $this->pdf->SetFont($formattedRow['token'][2]['font_name'], '', $formattedRow['token'][2]['font_size']);
     $this->pdf->MultiCell($this->pdf->width, 10, $formattedRow['token'][2]['value'],
       $this->border, $formattedRow['token'][2]['text_alignment'], 0, 1, $x, $y + $this->tMarginName);
 
-    $this->pdf->SetFontSize($formattedRow['token'][3]['font_size']);
+    $this->pdf->SetFont($formattedRow['token'][3]['font_name'], '', $formattedRow['token'][3]['font_size']);
     $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][3]['value'],
       $this->border, $formattedRow['token'][3]['text_alignment'], 0, 1, $x, $this->pdf->getY());
 
-    $this->pdf->SetFontSize($formattedRow['token'][4]['font_size']);
+    $this->pdf->SetFont($formattedRow['token'][4]['font_name'], '', $formattedRow['token'][4]['font_size']);
     $this->pdf->SetXY($x, $y + $this->pdf->height - 5);
     $date = CRM_Utils_Date::customFormat($formattedRow['token'][4]['value'], "%e %b");
     $this->pdf->Cell($this->pdf->width, 0, $date, $this->border, 2, $formattedRow['token'][4]['text_alignment']);
