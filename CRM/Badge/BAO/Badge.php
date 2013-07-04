@@ -86,10 +86,13 @@ class CRM_Badge_BAO_Badge {
 
     if (CRM_Utils_Array::value('rowElements', $layout['data'])) {
       foreach($layout['data']['rowElements'] as $key => $element) {
-        $value = $row[$element];
-        // hack to fix date field display format
-        if (strpos($element,'_date')) {
-          $value = CRM_Utils_Date::customFormat($value, "%e %b");
+        $value = '';
+        if ($element) {
+          $value = $row[$element];
+          // hack to fix date field display format
+          if (strpos($element, '_date')) {
+            $value = CRM_Utils_Date::customFormat($value, "%e %b");
+          }
         }
 
         $formattedRow['token'][$key] = array(
@@ -131,8 +134,13 @@ class CRM_Badge_BAO_Badge {
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->GetY();
 
-    $this->printImage($formattedRow['image_1']);
-    //$this->printImage($formattedRow['image_2']);
+    if (CRM_Utils_Array::value('image_1', $formattedRow)) {
+      $this->printImage($formattedRow['image_1']);
+    }
+
+    if (CRM_Utils_Array::value('image_2', $formattedRow)) {
+      //$this->printImage($formattedRow['image_2']);
+    }
 
     $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round',
       'dash' => '2,2', 'color' => array(0, 0, 200)));
