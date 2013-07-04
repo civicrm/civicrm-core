@@ -723,6 +723,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     ) {
       return FALSE;
     }
+    
+    // CRM-12929
+    // Restrict contact to be delete if contact has financial trxns
+    $error = NULL;
+    if ($skipUndelete && CRM_Financial_BAO_FinancialItem::checkContactPresent(array($id), $error)) {
+      return FALSE;
+    }
 
     // make sure this contact_id does not have any membership types
     $membershipTypeID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
