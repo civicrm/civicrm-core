@@ -17,4 +17,9 @@ cj(function ($) {
   $('input[id^="image_"]').click(function(){
     openKCFinder($(this));
   });
+
+  $('.clear-image').click(function(){
+    $('#' + $(this).attr('imgname')).val('');
+    return false;
+  });
 });
