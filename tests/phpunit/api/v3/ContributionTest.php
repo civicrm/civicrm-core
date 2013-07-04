@@ -949,8 +949,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
       'financial_type_id' => $this->_contributionTypeId,
       'payment_instrument_id' => 1,
-      'contribution_status_id' => 2,  
-      'is_pay_later' => 1,                                           
+      'contribution_status_id' => 2,
+      'is_pay_later' => 1,
       'version' => $this->_apiversion,
     );
     $contribution = civicrm_api('contribution', 'create', $contribParams);
@@ -1013,10 +1013,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = civicrm_api('contribution', 'update', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund');
     $this->_checkFinancialItem($contribution['id'], 'refund');
-  } 
+  }
 
   /*
-   * Function tests invalid contribution status change 
+   * Function tests invalid contribution status change
    */
   function testCreateUpdateContributionInValidStatusChange() {
     $contribParams = array(
@@ -1303,7 +1303,57 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->contributionDelete($contribution1['id']);
     $this->contributionDelete($contribution2['id']);
   }
-  /*
+  /**
+   * Test completing a transaction via the API
+   *
+   * Note that we are creating a logged in user because email goes out from
+   * that person
+   */
+  function testCompleteTransaction() {
+    $mut = new CiviMailUtils( $this, true );
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 1,));
+    $contribution = $this->callAPISuccess('contribution','create', $params);
+    $apiResult = $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    )
+    );
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'sequential' => 1,));
+    $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
+    $mut->checkMailLog(array(
+      'Receipt - Contribution',
+      'Please print this confirmation for your records.',
+    ));
+    $mut->stop();
+  }
+
+  /**
+   * Test completing a transaction with an event via the API
+   *
+   * Note that we are creating a logged in user because email goes out from
+   * that person
+   */
+  function testCompleteTransactionWithParticipantRecord() {
+    $mut = new CiviMailUtils( $this, true );
+    $mut->clearMessages();
+    $this->createLoggedInUser();
+    $contributionID = $this->createPendingParticipantContribution();
+    $apiResult = $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contributionID,
+    )
+    );
+    $participantStatus = $this->callAPISuccessGetValue('participant', array('id' => $this->ids['participant'], 'return' => 'participant_status_id'));
+    $this->assertEquals(1, $participantStatus);
+    $mut->checkMailLog(array(
+      'Annual CiviCRM meet',
+      'Event',
+      'This letter is a confirmation that your registration has been received and your status has been updated to registered for the following',
+    ));
+  $mut->stop();
+
+  }
+
+  /**
    * Test sending a mail via the API
    */
   function testSendMail() {
@@ -1424,6 +1474,28 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       }
       $this->assertEquals($value, $values[$key], $key . " value: $value doesn't match " . print_r($values, TRUE) . 'in line' . __LINE__);
     }
+  }
+
+  /**
+   * Create a pending contribution & linked pending participant record
+   * (along with an event)
+   */
+  function createPendingParticipantContribution(){
+    $event = $this->eventCreate(array('is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org',));
+    $participantID = $this->participantCreate(array('event_id' => $event['id'], 'status_id' => 6));
+    $this->ids['participant']  = $participantID;
+    $params = array_merge($this->_params, array('contribution_status_id' => 2, 'financial_type_id' => 'Event Fee'));
+    $contribution = $this->callAPISuccess('contribution','create', $params);
+    $this->callAPISuccess('participant_payment', 'create', array('contribution_id' => $contribution['id'], 'participant_id' => $participantID));
+    $lineItem = $this->callAPISuccess('line_item', 'get', array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'api.line_item.create' => array(
+        'entity_id' => $participantID,
+        'entity_table' => 'civicrm_participant',
+      ),
+    ));
+    return $contribution['id'];
   }
 
  function _getFinancialTrxnAmount($contId) {
