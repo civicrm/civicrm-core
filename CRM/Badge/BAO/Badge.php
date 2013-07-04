@@ -37,6 +37,11 @@
  * parent class for building name badges
  */
 class CRM_Badge_BAO_Badge {
+
+  public $debug = FALSE;
+
+  public $border = 0;
+
   /**
    *  This function is called to create name label pdf
    *
@@ -55,7 +60,6 @@ class CRM_Badge_BAO_Badge {
     $this->pdf->SetGenerator($this, "generateLabel");
 
     // this is very useful for debugging, by default set to FALSE
-    $this->debug = TRUE;
     if ($this->debug) {
       $this->border = "LTRB";
     }
