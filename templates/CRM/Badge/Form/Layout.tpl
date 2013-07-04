@@ -77,11 +77,23 @@
       </tr>
       <tr class="crm-badge-layout-form-block-image_1">
         <td class="label">{$form.image_1.label}</td>
-        <td>{$form.image_1.html}<br/><span class="description">{ts}This image will displayed on top left{/ts}</span></td>
+        <td>
+          {$form.image_1.html}
+          <span class="crm-clear-link">
+            (<a href="#" class="clear-image" imgname='image_1'>{ts}clear{/ts}</a>)
+          </span>
+          <br/><span class="description">{ts}This image will displayed on top left{/ts}</span>
+        </td>
       </tr>
       <tr class="crm-badge-layout-form-block-image_2">
         <td class="label">{$form.image_2.label}</td>
-        <td>{$form.image_2.html}<br/><span class="description">{ts}This image will displayed on top right{/ts}</span></td>
+        <td>
+          {$form.image_2.html}
+          <span class="crm-clear-link">
+            (<a href="#" class="clear-image" imgname='image_2'>{ts}clear{/ts}</a>)
+          </span>
+          <br/><span class="description">{ts}This image will displayed on top right{/ts}</span>
+        </td>
       </tr>
       <tr class="crm-badge-layout-form-block-add_barcode">
         <td class="label">{$form.add_barcode.label}</td>
