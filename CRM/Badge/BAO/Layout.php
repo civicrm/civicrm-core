@@ -134,5 +134,66 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
     $printLabel->id = $printLabelId;
     $printLabel->delete();
   }
+
+  /**
+   *  get the list of print labels
+   *
+   * @return array list of labels
+   * @access public
+   * @static
+   */
+  static function getList() {
+    $printLabel = new CRM_Core_DAO_PrintLabel();
+    $printLabel->find();
+
+    $labels = array();
+    while($printLabel->fetch()) {
+      $labels[$printLabel->id] = $printLabel->title;
+    }
+    return $labels;
+  }
+
+  /**
+   * build layout structure
+   *
+   * @param array $params associated array of submitted values
+   *
+   * @return array $formattedLayout array formatted array
+   * @access public
+   */
+  static function buildLayout(&$params) {
+    $layoutParams = array('id', $params['badge_id']);
+    CRM_Badge_BAO_Layout::retrieve($layoutParams, $layoutInfo);
+
+    $formatProperties = CRM_Core_OptionGroup::getValue('name_badge', $layoutInfo['label_format_name'], 'name');
+    $layoutInfo['format'] = get_object_vars(json_decode($formatProperties));
+    $layoutInfo['data'] = CRM_Badge_BAO_Layout::getDecodedData($layoutInfo['data']);
+    return $layoutInfo;
+  }
+
+  /**
+   * Function to decode encoded data and return as an array
+   *
+   * @param json $jsonData json object
+   *
+   * @return array $dataValues associated array of decoded elements
+   * @static
+   */
+  static public function getDecodedData($jsonData) {
+    $data = get_object_vars(json_decode($jsonData));
+
+    $specialFields = array('token', 'font_name', 'font_size', 'text_alignment');
+    foreach($specialFields as $field) {
+      $dataValues[$field] = get_object_vars($data[$field]);
+    }
+
+    $dataValues['add_barcode'] = CRM_Utils_Array::value('add_barcode', $data);
+    $dataValues['barcode_alignment'] = CRM_Utils_Array::value('barcode_alignment', $data);
+
+    $dataValues['image_1'] = CRM_Utils_Array::value('image_1', $data);
+    $dataValues['image_2'] = CRM_Utils_Array::value('image_2', $data);
+
+    return $dataValues;
+  }
 }
 

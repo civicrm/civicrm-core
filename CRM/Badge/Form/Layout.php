@@ -46,7 +46,6 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    * @access public
    */
   public function buildQuickForm() {
-
     parent::buildQuickForm();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -123,20 +122,8 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       CRM_Badge_BAO_Layout::retrieve($params, $this->_values );
     }
 
-    $defaults = $this->_values;
-
-    $data = get_object_vars(json_decode($this->_values['data']));
-
-    $specialFields = array('token', 'font_name', 'font_size', 'text_alignment');
-    foreach($specialFields as $field) {
-      $defaults[$field] = get_object_vars($data[$field]);
-    }
-
-    $defaults['add_barcode'] = CRM_Utils_Array::value('add_barcode', $data);
-    $defaults['barcode_alignment'] = CRM_Utils_Array::value('barcode_alignment', $data);
-
-    $defaults['image_1'] = CRM_Utils_Array::value('image_1', $data);
-    $defaults['image_2'] = CRM_Utils_Array::value('image_2', $data);
+    $defaults = array_merge($this->_values,
+      CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
 
     if ($this->_action == CRM_Core_Action::DELETE && isset($defaults['title'])) {
       $this->assign('delName', $defaults['title']);
