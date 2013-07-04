@@ -82,8 +82,14 @@ class CRM_Badge_BAO_Badge {
 
     if (CRM_Utils_Array::value('rowElements', $layout['data'])) {
       foreach($layout['data']['rowElements'] as $key => $element) {
+        $value = $row[$element];
+        // hack to fix date field display format
+        if (strpos($element,'_date')) {
+          $value = CRM_Utils_Date::customFormat($value, "%e %b");
+        }
+
         $formattedRow['token'][$key] = array(
-          'value' => $row[$element],
+          'value' => $value,
           'font_name' => $layout['data']['font_name'][$key],
           'font_size' => $layout['data']['font_size'][$key],
           'text_alignment' => $layout['data']['text_alignment'][$key],
@@ -124,7 +130,8 @@ class CRM_Badge_BAO_Badge {
     $this->printImage($formattedRow['image_1']);
     //$this->printImage($formattedRow['image_2']);
 
-    $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,2', 'color' => array(0, 0, 200)));
+    $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round',
+      'dash' => '2,2', 'color' => array(0, 0, 200)));
 
     $this->pdf->SetFont($formattedRow['token'][1]['font_name'], '', $formattedRow['token'][1]['font_size']);
     $this->pdf->MultiCell($this->pdf->width - $this->lMarginLogo, 0, $formattedRow['token'][1]['value'],
@@ -140,8 +147,8 @@ class CRM_Badge_BAO_Badge {
 
     $this->pdf->SetFont($formattedRow['token'][4]['font_name'], '', $formattedRow['token'][4]['font_size']);
     $this->pdf->SetXY($x, $y + $this->pdf->height - 5);
-    $date = CRM_Utils_Date::customFormat($formattedRow['token'][4]['value'], "%e %b");
-    $this->pdf->Cell($this->pdf->width, 0, $date, $this->border, 2, $formattedRow['token'][4]['text_alignment']);
+    $this->pdf->Cell($this->pdf->width, 0, $formattedRow['token'][4]['value'], $this->border, 2,
+      $formattedRow['token'][4]['text_alignment']);
   }
 
   /**
