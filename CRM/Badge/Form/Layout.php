@@ -53,6 +53,15 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       return;
     }
 
+    $config = CRM_Core_Config::singleton();
+    $resources = CRM_Core_Resources::singleton();
+    $resources->addSetting(
+      array(
+        'kcfinderPath' => $config->userFrameworkResourceURL .'packages' .DIRECTORY_SEPARATOR
+      )
+    );
+    $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js');
+
     $this->applyFilter('__ALL__', 'trim');
 
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'), true);
@@ -87,6 +96,13 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     unset($textAlignment['J']);
     $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
 
+    $attributes = array(
+      'readonly'=> true,
+      'value' => ts('click here and select a file double clicking on it'),
+    );
+    $this->add('text', 'image_1', ts('Image 1'), $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+    $this->add('text', 'image_2', ts('Image 2'), $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+
     $this->add('checkbox', 'is_default', ts('Default?'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_reserved', ts('Reserved?'));
@@ -118,6 +134,9 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
     $defaults['add_barcode'] = CRM_Utils_Array::value('add_barcode', $data);
     $defaults['barcode_alignment'] = CRM_Utils_Array::value('barcode_alignment', $data);
+
+    $defaults['image_1'] = CRM_Utils_Array::value('image_1', $data);
+    $defaults['image_2'] = CRM_Utils_Array::value('image_2', $data);
 
     if ($this->_action == CRM_Core_Action::DELETE && isset($defaults['title'])) {
       $this->assign('delName', $defaults['title']);
