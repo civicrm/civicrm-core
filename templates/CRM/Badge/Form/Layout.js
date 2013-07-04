@@ -19,7 +19,7 @@ cj(function ($) {
   });
 
   $('.clear-image').click(function(){
-    $('#' + cj(this).attr('imgname')).val('');
+    $('#' + $(this).attr('imgname')).val('');
     return false;
   });
 });
