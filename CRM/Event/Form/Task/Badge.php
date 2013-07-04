@@ -118,20 +118,23 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
     $returnProperties = array();
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {
-        $token = CRM_Utils_Token::getTokens($value);
-        if (key($token) == 'contact') {
-          $element = $token['contact'][0];
-        }
-        else {
-          $element = $token['event'][0];
-          //FIX ME - we need to standardize event token names
-          if (!strpos($element, 'event_')) {
-            $element = 'event_' .$element;
+        $element = '';
+        if ($value) {
+          $token = CRM_Utils_Token::getTokens($value);
+          if (key($token) == 'contact') {
+            $element = $token['contact'][0];
           }
-        }
+          else {
+            $element = $token['event'][0];
+            //FIX ME - we need to standardize event token names
+            if (!strpos($element, 'event_')) {
+              $element = 'event_' . $element;
+            }
+          }
 
-        // build returnproperties for query
-        $returnProperties[$element] = 1;
+          // build returnproperties for query
+          $returnProperties[$element] = 1;
+        }
 
         // add actual field name to row element
         $layoutInfo['data']['rowElements'][$index] = $element;
