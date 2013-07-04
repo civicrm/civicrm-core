@@ -204,4 +204,47 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       return null;
     }
   }
+  
+  /**
+   * check if contact is present in financial_item table
+   *
+   * CRM-12929
+   *
+   * @param array $contactIds  an array contact id's
+   *
+   * @param array $error error to display
+   *
+   * @return array
+   * @access public
+   * @static
+   */
+  static function checkContactPresent($contactIds, &$error) {
+    if (empty($contactIds)) {
+      return FALSE;
+    }
+    
+    $allowPermDelete = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'allowPermDeleteFinancial');
+
+    if (!$allowPermDelete) {
+      $sql = 'SELECT DISTINCT(cc.id), cc.display_name FROM civicrm_contact cc
+INNER JOIN civicrm_contribution con ON con.contact_id = cc.id
+WHERE cc.id IN (' . implode (',', $contactIds) . ') AND con.is_test = 0';
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      if ($dao->N) {
+        while ($dao->fetch()) {
+          $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$dao->id");
+          $not_deleted[$dao->id] = "<a href='$url'>$dao->display_name</a>";
+        }
+        
+        $errorStatus = '';
+        if (is_array($error)) {
+          $errorStatus = '<ul><li>' . implode('</li><li>', $not_deleted) . '</li></ul>';
+        }
+        
+        $error['_qf_default'] = $errorStatus .  ts('This contact(s) can not be permanently deleted because the contact record is linked to one or more live financial transactions. Deleting this contact would result in the loss of financial data.');
+        return $error; 
+      }
+    }
+    return FALSE;
+  }
 }
