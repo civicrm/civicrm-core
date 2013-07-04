@@ -255,6 +255,20 @@ class CRM_Report_Form_Instance {
       $params['navigation'] = $form->_navigation;
     }
 
+    // make a copy of params
+    $formValues = $params;
+
+    // unset params from $formValues that doesn't match with DB columns of instance tables, and also not required in form-values for sure
+    $unsetFields = array(
+      'title', 'to_emails', 'cc_emails', 'header', 'footer',
+      'qfKey', 'id', '_qf_default', 'report_header', 'report_footer', 'grouprole',
+    );
+    foreach ($unsetFields as $field) {
+      unset($formValues[$field]);
+    }
+    // pass form_values as string
+    $params['form_values'] = serialize($formValues);
+
     $instance = CRM_Report_BAO_ReportInstance::create($params);
     $form->set('id', $instance->id);
 

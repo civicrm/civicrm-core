@@ -106,16 +106,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       // just take it from current url
       $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl();
     }
-
-    // unset params that doesn't match with DB columns, and also not required in form-values for sure
-    $fields = array(
-      'title', 'to_emails', 'cc_emails', 'header', 'footer',
-      'qfKey', '_qf_default', 'report_header', 'report_footer', 'grouprole',
-    );
-    foreach ($fields as $field) {
-      unset($params[$field]);
-    }
-    $instance->form_values = serialize($params);
     $instance->save();
     
     if ($instanceID) {
