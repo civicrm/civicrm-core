@@ -21,3 +21,16 @@ LEFT JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id
 WHERE cc.contribution_recur_id IS NOT NULL 
 AND cli.entity_table = 'civicrm_contribution' AND cfi.id IS NULL
 AND cps.is_quick_config = 1;
+
+-- Set from_financial_account_id to null
+UPDATE `civicrm_contribution` cc
+LEFT JOIN civicrm_entity_financial_trxn ceft ON ceft.entity_id = cc.id
+LEFT JOIN civicrm_financial_trxn cft ON cft.id = ceft.financial_trxn_id
+LEFT JOIN civicrm_entity_financial_trxn ceft1 ON ceft1.financial_trxn_id = ceft.financial_trxn_id 
+LEFT JOIN civicrm_financial_item cfi ON cfi.id = ceft1.entity_id
+LEFT JOIN civicrm_entity_financial_account cefa ON cefa.entity_id = cft.payment_processor_id
+
+SET cft.from_financial_account_id = NULL
+WHERE ceft.entity_table = 'civicrm_contribution'  AND cc.contribution_recur_id IS NOT NULL
+AND ceft1.entity_table = 'civicrm_financial_item' AND cft.id IS NOT NULL AND cft.payment_instrument_id = 1 AND cfi.entity_table = 'civicrm_line_item' AND cft.from_financial_account_id IS NOT NULL
+AND cefa.entity_table = 'civicrm_payment_processor' AND cefa.financial_account_id = cft.to_financial_account_id
