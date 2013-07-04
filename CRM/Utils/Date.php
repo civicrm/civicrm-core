@@ -984,6 +984,26 @@ class CRM_Utils_Date {
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
             break;
+
+          case 'ending_2':
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            $from    = self::intervalAdd('year', -2, $to);
+            $from    = self::intervalAdd('second', 1, $from);
+            break;
+
+          case 'ending_3':
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            $from    = self::intervalAdd('year', -3, $to);
+            $from    = self::intervalAdd('second', 1, $from);
+            break;
         }
         break;
 
