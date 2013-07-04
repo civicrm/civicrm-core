@@ -171,6 +171,8 @@ Class CRM_Core_Form_Date {
         'current.quarter' => ts('Current Quarter to-date'),
         'current.month' => ts('Current Month to-date'),
         'current.week' => ts('Current Week to-date'),
+        'ending_3.year' => ts('Last 3 Years'),
+        'ending_2.year' => ts('Last 2 Years'),
         'ending.year' => ts('Last 12 Months'),
         'ending.quarter' => ts('Last 3 Months'),
         'ending.month' => ts('Last Month'),
