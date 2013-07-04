@@ -67,10 +67,10 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->_createdParticipants = array();
     $this->_individualId = $this->individualCreate(NULL);
 
-    $this->_participantID = $this->participantCreate(array('contactID' => $this->_contactID, 'eventID' => $this->_eventID));
+    $this->_participantID = $this->participantCreate(array('contact_id' => $this->_contactID, 'event_id' => $this->_eventID));
     $this->_contactID2 = $this->individualCreate(NULL);
-    $this->_participantID2 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID, 'version' => $this->_apiversion));
-    $this->_participantID3 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID, 'version' => $this->_apiversion));
+    $this->_participantID2 = $this->participantCreate(array('contact_id' => $this->_contactID2, 'event_id' => $this->_eventID, 'version' => $this->_apiversion));
+    $this->_participantID3 = $this->participantCreate(array('contact_id' => $this->_contactID2, 'event_id' => $this->_eventID, 'version' => $this->_apiversion));
     $this->_params = array(
       'contact_id' => $this->_contactID,
       'event_id' => $this->_eventID,
