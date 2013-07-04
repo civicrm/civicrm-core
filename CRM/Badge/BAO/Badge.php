@@ -37,6 +37,11 @@
  * parent class for building name badges
  */
 class CRM_Badge_BAO_Badge {
+
+  public $debug = FALSE;
+
+  public $border = 0;
+
   /**
    *  This function is called to create name label pdf
    *
@@ -46,15 +51,18 @@ class CRM_Badge_BAO_Badge {
    * @return  void
    * @access  public
    */
-   public function createLabels(&$participants, &$layoutInfo) {
+  public function createLabels(&$participants, &$layoutInfo) {
     $this->pdf = new CRM_Utils_PDF_Label($layoutInfo['format'], 'mm');
     $this->pdf->Open();
     $this->pdf->setPrintHeader(FALSE);
     $this->pdf->setPrintFooter(FALSE);
     $this->pdf->AddPage();
-    $this->pdf->AddFont('DejaVu Sans', '', 'DejaVuSans.php');
-    $this->pdf->SetFont('DejaVu Sans');
     $this->pdf->SetGenerator($this, "generateLabel");
+
+    // this is very useful for debugging, by default set to FALSE
+    if ($this->debug) {
+      $this->border = "LTRB";
+    }
 
     foreach ($participants as $participant) {
       $formattedRow = self::formatLabel($participant, $layoutInfo);
@@ -78,8 +86,14 @@ class CRM_Badge_BAO_Badge {
 
     if (CRM_Utils_Array::value('rowElements', $layout['data'])) {
       foreach($layout['data']['rowElements'] as $key => $element) {
+        $value = $row[$element];
+        // hack to fix date field display format
+        if (strpos($element,'_date')) {
+          $value = CRM_Utils_Date::customFormat($value, "%e %b");
+        }
+
         $formattedRow['token'][$key] = array(
-          'value' => $row[$element],
+          'value' => $value,
           'font_name' => $layout['data']['font_name'][$key],
           'font_size' => $layout['data']['font_size'][$key],
           'text_alignment' => $layout['data']['text_alignment'][$key],
@@ -104,7 +118,7 @@ class CRM_Badge_BAO_Badge {
 
   public function generateLabel($formattedRow) {
     switch ($formattedRow['labelFormat']) {
-      case 'Avery5395':
+      case 'Avery 5395':
         self::labelAvery5395($formattedRow);
         break;
     }
@@ -118,21 +132,27 @@ class CRM_Badge_BAO_Badge {
     $y = $this->pdf->GetY();
 
     $this->printImage($formattedRow['image_1']);
+    //$this->printImage($formattedRow['image_2']);
 
-    $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,2', 'color' => array(0, 0, 200)));
+    $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round',
+      'dash' => '2,2', 'color' => array(0, 0, 200)));
 
-    $this->pdf->SetFontSize(9);
-    $this->pdf->MultiCell($this->pdf->width - $this->lMarginLogo, 0, $formattedRow['token'][1]['value'], $this->border, "L", 0, 1, $x + $this->lMarginLogo, $y);
+    $this->pdf->SetFont($formattedRow['token'][1]['font_name'], '', $formattedRow['token'][1]['font_size']);
+    $this->pdf->MultiCell($this->pdf->width - $this->lMarginLogo, 0, $formattedRow['token'][1]['value'],
+      $this->border, $formattedRow['token'][1]['text_alignment'], 0, 1, $x + $this->lMarginLogo, $y);
 
-    $this->pdf->SetFontSize(20);
-    $this->pdf->MultiCell($this->pdf->width, 10, $formattedRow['token'][2]['value'], $this->border, "C", 0, 1, $x, $y + $this->tMarginName);
-    $this->pdf->SetFontSize(15);
-    $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][3]['value'], $this->border, "C", 0, 1, $x, $this->pdf->getY());
+    $this->pdf->SetFont($formattedRow['token'][2]['font_name'], '', $formattedRow['token'][2]['font_size']);
+    $this->pdf->MultiCell($this->pdf->width, 10, $formattedRow['token'][2]['value'],
+      $this->border, $formattedRow['token'][2]['text_alignment'], 0, 1, $x, $y + $this->tMarginName);
 
-    $this->pdf->SetFontSize(9);
+    $this->pdf->SetFont($formattedRow['token'][3]['font_name'], '', $formattedRow['token'][3]['font_size']);
+    $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][3]['value'],
+      $this->border, $formattedRow['token'][3]['text_alignment'], 0, 1, $x, $this->pdf->getY());
+
+    $this->pdf->SetFont($formattedRow['token'][4]['font_name'], '', $formattedRow['token'][4]['font_size']);
     $this->pdf->SetXY($x, $y + $this->pdf->height - 5);
-    $date = CRM_Utils_Date::customFormat($formattedRow['token'][4]['value'], "%e %b");
-    $this->pdf->Cell($this->pdf->width, 0, $date, $this->border, 2, "R");
+    $this->pdf->Cell($this->pdf->width, 0, $formattedRow['token'][4]['value'], $this->border, 2,
+      $formattedRow['token'][4]['text_alignment']);
   }
 
   /**
@@ -142,9 +162,14 @@ class CRM_Badge_BAO_Badge {
    * @return void
    * @access public
    */
-  function printImage($img) {
-    $x = $this->pdf->GetAbsX();
-    $y = $this->pdf->GetY();
+  function printImage($img, $x='', $y='') {
+    if (!$x) {
+      $x = $this->pdf->GetAbsX();
+    }
+
+    if (!$y) {
+      $y = $this->pdf->GetY();
+    }
 
     $this->imgRes = 300;
 
@@ -154,7 +179,8 @@ class CRM_Badge_BAO_Badge {
       $f = $this->imgRes / 25.4;
       $w = $imgsize[0] / $f;
       $h = $imgsize[1] / $f;
-      $this->pdf->Image($img, $this->pdf->GetAbsX(), $this->pdf->GetY(), $w, $h, '', '', '', FALSE, 72, '', FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+      $this->pdf->Image($img, $x, $y, $w, $h, '', '', '', FALSE, 72, '', FALSE,
+        FALSE, $this->debug, FALSE, FALSE, FALSE);
     }
     $this->pdf->SetXY($x, $y);
   }
