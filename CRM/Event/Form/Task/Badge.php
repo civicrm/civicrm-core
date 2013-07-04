@@ -87,7 +87,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
     CRM_Utils_System::setTitle(ts('Make Name Badges'));
 
     //add select for label
-    $label = CRM_Core_OptionGroup::values('event_badge');
+    $label = CRM_Badge_BAO_Layout::getList();
 
     $this->add('select',
       'badge_id',
@@ -110,11 +110,43 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $config = CRM_Core_Config::singleton();
 
+    // get name badge layout info
+    $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
 
-    $returnProperties = CRM_Event_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_EVENT);
-    $additionalFields = array('first_name', 'last_name', 'middle_name', 'current_employer');
+    // spit / get actual field names from token
+    $returnProperties = array();
+    if (!empty($layoutInfo['data']['token'])) {
+      foreach ($layoutInfo['data']['token'] as $index => $value) {
+        $token = CRM_Utils_Token::getTokens($value);
+        if (key($token) == 'contact') {
+          $element = $token['contact'][0];
+        }
+        else {
+          $element = $token['event'][0];
+          //FIX ME - we need to standardize event token names
+          if (!strpos($element, 'event_')) {
+            $element = 'event_' .$element;
+          }
+        }
+
+        // build returnproperties
+        $returnProperties[$element] = 1;
+
+        // add actual field name to row element
+        $layoutInfo['data']['rowElements'][$index] = $element;
+      }
+    }
+
+    // check if name label format class exists
+    $classFile = 'CRM/Badge/Format/' . $layoutInfo['label_format_name'] . '.php';
+    $error = include_once($classFile);
+    if ($error == FALSE) {
+      CRM_Core_Error::fatal('Event Badge code file: ' . $classFile . ' does not exist. Please verify your custom event badge settings in CiviCRM administrative panel.');
+    }
+
+    // add additional required fields for query execution
+    $additionalFields = array('participant_register_date', 'participant_id');
     foreach ($additionalFields as $field) {
       $returnProperties[$field] = 1;
     }
@@ -156,25 +188,10 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
       }
     }
 
-    // get the class name from the participantListingID
-    $className = CRM_Core_OptionGroup::getValue('event_badge',
-      $params['badge_id'],
-      'value',
-      'Integer',
-      'name'
-    );
-
-    $classFile = str_replace('_',
-      DIRECTORY_SEPARATOR,
-      $className
-    ) . '.php';
-    $error = include_once ($classFile);
-    if ($error == FALSE) {
-      CRM_Core_Error::fatal('Event Badge code file: ' . $classFile . ' does not exist. Please verify your custom event badge settings in CiviCRM administrative panel.');
-    }
-
+    // create badge class
+    $className = 'CRM_Badge_Format_' . $layoutInfo['label_format_name'];
     $eventBadgeClass = new $className();
-    $eventBadgeClass->run($rows);
+    $eventBadgeClass->createLabels($rows, $layoutInfo);
   }
 }
 
