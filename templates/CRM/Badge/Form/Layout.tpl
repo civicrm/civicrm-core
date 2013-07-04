@@ -75,6 +75,14 @@
 
         </td>
       </tr>
+      <tr class="crm-badge-layout-form-block-image_1">
+        <td class="label">{$form.image_1.label}</td>
+        <td>{$form.image_1.html}<br/><span class="description">{ts}This image will displayed on top left{/ts}</span></td>
+      </tr>
+      <tr class="crm-badge-layout-form-block-image_2">
+        <td class="label">{$form.image_2.label}</td>
+        <td>{$form.image_2.html}<br/><span class="description">{ts}This image will displayed on top right{/ts}</span></td>
+      </tr>
       <tr class="crm-badge-layout-form-block-add_barcode">
         <td class="label">{$form.add_barcode.label}</td>
         <td>{$form.add_barcode.html}&nbsp;&nbsp;&nbsp;{ts}on{/ts}&nbsp;&nbsp;&nbsp;{$form.barcode_alignment.html}</td>

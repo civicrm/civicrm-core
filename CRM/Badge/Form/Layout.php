@@ -53,6 +53,15 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       return;
     }
 
+    $config = CRM_Core_Config::singleton();
+    $resources = CRM_Core_Resources::singleton();
+    $resources->addSetting(
+      array(
+        'kcfinderPath' => $config->userFrameworkResourceURL .'packages' .DIRECTORY_SEPARATOR
+      )
+    );
+    $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js');
+
     $this->applyFilter('__ALL__', 'trim');
 
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'), true);
@@ -64,14 +73,16 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'description'));
 
     // get the tokens
-    $tokens = CRM_Core_SelectValues::contactTokens();
+    $contactTokens = CRM_Core_SelectValues::contactTokens();
+    $eventTokens   = CRM_Core_SelectValues::eventTokens();
+    $tokens = array_merge($contactTokens, $eventTokens);
     asort($tokens);
 
     $fontSizes = CRM_Core_BAO_LabelFormat::getFontSizes();
     $fontNames = CRM_Core_BAO_LabelFormat::getFontNames('name_badge');
     $textAlignment = CRM_Core_BAO_LabelFormat::getTextAlignments();
 
-    $rowCount = 3;
+    $rowCount = 4;
     for ( $i =1; $i <= $rowCount; $i++ ) {
       $this->add('select', "token[$i]", ts('Token'), array('' => ts('- none -')) + $tokens);
       $this->add('select', "font_name[$i]", ts('Font Name'), $fontNames);
@@ -85,13 +96,16 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     unset($textAlignment['J']);
     $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
 
+    $attributes = array(
+      'readonly'=> true,
+      'value' => ts('click here and select a file double clicking on it'),
+    );
+    $this->add('text', 'image_1', ts('Image 1'), $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+    $this->add('text', 'image_2', ts('Image 2'), $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+
     $this->add('checkbox', 'is_default', ts('Default?'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_reserved', ts('Reserved?'));
-
-    if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_PrintLabel', $this->_id, 'is_reserved')) {
-      $this->freeze(array('title', 'description', 'is_active'));
-    }
   }
 
   /**
@@ -118,9 +132,11 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       $defaults[$field] = get_object_vars($data[$field]);
     }
 
-    $defaults['add_barcode'] = $data['add_barcode'];
-    $defaults['barcode_alignment'] = $data['barcode_alignment'];
-    $defaults['label_format_id'] = $data['label_format_id'];
+    $defaults['add_barcode'] = CRM_Utils_Array::value('add_barcode', $data);
+    $defaults['barcode_alignment'] = CRM_Utils_Array::value('barcode_alignment', $data);
+
+    $defaults['image_1'] = CRM_Utils_Array::value('image_1', $data);
+    $defaults['image_2'] = CRM_Utils_Array::value('image_2', $data);
 
     if ($this->_action == CRM_Core_Action::DELETE && isset($defaults['title'])) {
       $this->assign('delName', $defaults['title']);
