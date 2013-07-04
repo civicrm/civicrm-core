@@ -116,6 +116,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       li.price_field_id,
       li.participant_count,
       li.price_field_value_id,
+      li.financial_type_id,
       pfv.description";
 
     $fromClause = "
@@ -158,6 +159,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         'html_type' => $dao->html_type,
         'description' => $dao->description,
         'entity_id' => $entityId,
+        'financial_type_id' => $dao->financial_type_id,
         'membership_type_id' => $dao->membership_type_id,
         'membership_num_terms' => $dao->membership_num_terms,
       );
@@ -225,8 +227,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         'membership_num_terms' => CRM_Utils_Array::value('membership_num_terms', $options[$oid]),
         'auto_renew' => CRM_Utils_Array::value('auto_renew', $options[$oid]),
         'html_type' => $fields['html_type'],
-        'financial_type_id' => CRM_Utils_Array::value( 'financial_type_id', $options[$oid]),
-        
+        'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
       );
       if ($values[$oid]['membership_type_id'] && !isset($values[$oid]['auto_renew'])) {
         $values[$oid]['auto_renew'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values[$oid]['membership_type_id'], 'auto_renew');                                      
