@@ -947,28 +947,62 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
 function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
 
   $args = array(&$params);
-  if(!empty($entity)){
+  if (!empty($entity)) {
     $ids = array($entity => CRM_Utils_Array::value('id', $params));
     $args[] = &$ids;
   }
+
   if (method_exists($bao_name, 'create')) {
     $fct = 'create';
+    $fct_name = $bao_name . '::' . $fct;
+    $bao = call_user_func_array(array($bao_name, $fct), $args);
   }
   elseif (method_exists($bao_name, 'add')) {
     $fct = 'add';
+    $fct_name = $bao_name . '::' . $fct;
+    $bao = call_user_func_array(array($bao_name, $fct), $args);
   }
-  if (!isset($fct)) {
-    return civicrm_api3_create_error('Entity not created, missing create or add method for ' . $bao_name);
+  else {
+    $fct_name = '_civicrm_api3_basic_create_fallback';
+    $bao = _civicrm_api3_basic_create_fallback($bao_name, $params);
   }
-  $bao = call_user_func_array(array($bao_name, $fct), $args);
+
   if (is_null($bao)) {
-    return civicrm_api3_create_error('Entity not created ' . $bao_name . '::' . $fct);
+    return civicrm_api3_create_error('Entity not created (' . $fct_name . ')');
   }
   else {
     $values = array();
     _civicrm_api3_object_to_array($bao, $values[$bao->id]);
     return civicrm_api3_create_success($values, $params, NULL, 'create', $bao);
   }
+}
+
+/**
+ * For BAO's which don't have a create() or add() functions, use this fallback implementation.
+ *
+ * FIXME There's an intuitive sense that this behavior should be defined somehow in the BAO/DAO class
+ * structure. In practice, that requires a fair amount of refactoring and/or kludgery.
+ *
+ * @param string $bao_name
+ * @param array $params
+ * @return CRM_Core_DAO|NULL an instance of the BAO
+ */
+function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
+  $entityName = CRM_Core_DAO_AllCoreTables::getBriefName(get_parent_class($bao_name));
+  if (empty($entityName)) {
+    throw new API_Exception("Class \"$bao_name\" does not map to an entity name", "unmapped_class_to_entity", array(
+      'class_name' => $bao_name,
+    ));
+  }
+  $hook = empty($params['id']) ? 'create' : 'edit';
+
+  CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
+  $instance = new $bao_name();
+  $instance->copyValues($params);
+  $instance->save();
+  CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
+
+  return $instance;
 }
 
 /**
