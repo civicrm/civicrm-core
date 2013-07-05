@@ -139,7 +139,7 @@ class CRM_Badge_BAO_Badge {
     }
 
     if (CRM_Utils_Array::value('image_2', $formattedRow)) {
-      //$this->printImage($formattedRow['image_2']);
+     $this->printImage($formattedRow['image_2'], $x + 68);
     }
 
     $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round',
