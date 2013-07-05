@@ -1218,4 +1218,21 @@ abstract class CRM_Utils_Hook {
       'civicrm_permission'
     );
   }
+
+
+  /**
+   * This hook is called for declaring managed entities via API
+   *
+   * @param array $entities List of entity types; each entity-type is an array with keys:
+   *   - name: string, a unique short name (e.g. "ReportInstance")
+   *   - class: string, a PHP DAO class (e.g. "CRM_Report_DAO_Instance")
+   *   - table: string, a SQL table name (e.g. "civicrm_report_instance")
+   *
+   * @return null the return value is ignored
+   * @access public
+   */
+  static function entityTypes(&$entityTypes) {
+    return self::singleton()->invoke(1, $entityTypes, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_entityTypes'
+    );
+  }
 }
