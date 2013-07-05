@@ -180,7 +180,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       //  install test database
       echo PHP_EOL . "Installing {$dbName} database" . PHP_EOL;
 
-      self::_populateDB(FALSE, $this);
+      static::_populateDB(FALSE, $this);
 
       self::$dbInit = TRUE;
     }
@@ -193,7 +193,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   protected function getDataSet() {
   }
 
-  private static function _populateDB($perClass = FALSE, &$object = NULL) {
+  /**
+   * @param bool $perClass
+   * @param null $object
+   * @return bool TRUE if the populate logic runs; FALSE if it is skipped
+   */
+  protected static function _populateDB($perClass = FALSE, &$object = NULL) {
 
     if ($perClass || $object == NULL) {
       $dbreset = TRUE;
@@ -203,7 +208,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
 
     if (self::$populateOnce || !$dbreset) {
-      return;
+      return FALSE;
     }
     self::$populateOnce = NULL;
 
@@ -287,10 +292,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // Rebuild triggers
     civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
+
+    return TRUE;
   }
 
   public static function setUpBeforeClass() {
-    self::_populateDB(TRUE);
+    static::_populateDB(TRUE);
 
     // also set this global hack
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array();
@@ -374,7 +381,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->DBResetRequired = TRUE;
 
     $this->_dbconn = $this->getConnection();
-    $this->_populateDB();
+    static::_populateDB();
     $this->tempDirs = array();
   }
 
