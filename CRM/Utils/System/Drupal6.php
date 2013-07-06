@@ -634,69 +634,6 @@ SELECT name, mail
     return defined('VERSION') ? VERSION : 'Unknown';
   }
 
-  /**
-   * load drupal bootstrap
-   *
-   * @param $name string  optional username for login
-   * @param $pass string  optional password for login
-   */
-  function loadBootStrap($params = array(
-    ), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
-    $uid  = CRM_Utils_Array::value('uid', $params);
-    $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
-    $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
-
-    //take the cms root path.
-    $cmsPath = $this->cmsRootPath($realPath);
-    if (!file_exists("$cmsPath/includes/bootstrap.inc")) {
-      echo '<br />Sorry, unable to locate bootstrap.inc.';
-      exit();
-    }
-
-    chdir($cmsPath);
-    require_once 'includes/bootstrap.inc';
-    @drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-
-    if (!function_exists('module_exists') ||
-      !module_exists('civicrm')
-    ) {
-      echo '<br />Sorry, could not able to load drupal bootstrap.';
-      exit();
-    }
-    // lets also fix the clean url setting
-    // CRM-6948
-    $config->cleanURL = (int) variable_get('clean_url', '0');
-
-    // we need to call the config hook again, since we now know
-    // all the modules that are listening on it, does not apply
-    // to J! and WP as yet
-    // CRM-8655
-    CRM_Utils_Hook::config($config);
-
-    if (!$loadUser) {
-      return TRUE;
-    }
-    //load user, we need to check drupal permissions.
-    if ($name) {
-      $user = user_authenticate(array('name' => $name, 'pass' => $pass));
-      if (empty($user->uid)) {
-        echo '<br />Sorry, unrecognized username or password.';
-        exit();
-      }
-    }
-    elseif ($uid) {
-      $account = user_load(array('uid' => $uid));
-      if (empty($account->uid)) {
-        echo '<br />Sorry, unrecognized user id.';
-        exit();
-      }
-      else {
-        global $user;
-        $user = $account;
-      }
-    }
-  }
-
   function cmsRootPath($scriptFilename = NULL) {
     $cmsRoot = $valid = NULL;
 
