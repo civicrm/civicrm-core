@@ -119,9 +119,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_Base {
     if (form_get_errors() || !isset($form_state['user'])) {
       return FALSE;
     }
-
     return $form_state['user']->uid;
-
   }
 
   /*
@@ -158,7 +156,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_Base {
     $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
     _user_edit_validate(NULL, $params);
     $errors = form_get_errors();
-
     if ($errors) {
       if (CRM_Utils_Array::value('name', $errors)) {
         $errors['cms_name'] = $errors['name'];
@@ -170,7 +167,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_Base {
       unset($_SESSION['messages']);
     }
 
-    // drupal api sucks do the name check manually
+    // Do the name check manually.
     $nameError = user_validate_name($params['name']);
     if ($nameError) {
       $errors['cms_name'] = $nameError;
@@ -180,7 +177,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_Base {
 SELECT name, mail
   FROM {$config->userFrameworkUsersTableName}
  WHERE (LOWER(name) = LOWER('$name')) OR (LOWER(mail) = LOWER('$email'))";
-
 
     $db_cms = DB::connect($config->userFrameworkDSN);
     if (DB::isError($db_cms)) {
@@ -426,7 +422,6 @@ SELECT name, mail
    *
    * @return string the url to post the form
    * @access public
-
    */
   function postURL($action) {
     if (!empty($action)) {
@@ -516,6 +511,8 @@ SELECT name, mail
    *
    * @param string $name     the user name
    * @param string $password the password for the above user name
+   * @param boolean $loadCMSBootstrap load cms bootstrap?
+   * @param NULL|string $realPath filename of script
    *
    * @return mixed false if no auth
    *               array(
@@ -557,8 +554,8 @@ SELECT name, mail
           }
           CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath);
         }
-      return array($contactID, $row['uid'], mt_rand());
-    }
+        return array($contactID, $row['uid'], mt_rand());
+      }
     }
     return FALSE;
   }
@@ -641,11 +638,12 @@ SELECT name, mail
   /**
    * load drupal bootstrap
    *
-   * @param $name string  optional username for login
-   * @param $pass string  optional password for login
+   * @param array $params Either uid, or name & pass.
+   * @param boolean $loadUser boolean Require CMS user load.
+   * @param boolean $throwError If true, print error on failure and exit.
+   * @param boolean|string $realPath path to script
    */
-  function loadBootStrap($params = array(
-    ), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     $uid  = CRM_Utils_Array::value('uid', $params);
     $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
     $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
@@ -661,12 +659,11 @@ SELECT name, mail
     require_once 'includes/bootstrap.inc';
     @drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 
-    if (!function_exists('module_exists') ||
-      !module_exists('civicrm')
-    ) {
-      echo '<br />Sorry, could not able to load drupal bootstrap.';
+    if (!function_exists('module_exists') || !module_exists('civicrm')) {
+      echo '<br />Sorry, could not load drupal bootstrap.';
       exit();
     }
+
     // lets also fix the clean url setting
     // CRM-6948
     $config->cleanURL = (int) variable_get('clean_url', '0');
@@ -701,6 +698,9 @@ SELECT name, mail
     }
   }
 
+  /**
+   *
+   */
   function cmsRootPath($scriptFilename = NULL) {
     $cmsRoot = $valid = NULL;
 
@@ -710,6 +710,7 @@ SELECT name, mail
     else {
       $path = $_SERVER['SCRIPT_FILENAME'];
     }
+
     if (function_exists('drush_get_context')) {
       // drush anyway takes care of multisite install etc
       return drush_get_context('DRUSH_DRUPAL_ROOT');
@@ -786,10 +787,7 @@ SELECT name, mail
    * @return string $url, formatted url.
    * @static
    */
-  function languageNegotiationURL($url,
-    $addLanguagePart = TRUE,
-    $removeLanguagePart = FALSE
-  ) {
+  function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
       return $url;
     }
@@ -936,4 +934,3 @@ SELECT name, mail
     drupal_flush_all_caches();
   }
 }
-
