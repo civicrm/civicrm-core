@@ -672,7 +672,8 @@ SELECT name, mail
       }
     }
     require_once 'includes/bootstrap.inc';
-    drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+    // @ to suppress notices eg 'DRUPALFOO already defined'.
+    @drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 
     // explicitly setting error reporting, since we cannot handle drupal related notices
     error_reporting(1);
