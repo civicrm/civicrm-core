@@ -189,7 +189,7 @@ class api_v3_APITest extends CiviUnitTestCase {
       $result = civicrm_api3('contact', 'create', array('debug' => 1));
     }
     catch (CiviCRM_API3_Exception $e){
-      $this->assertEquals('undefined', $e->getErrorCode());
+      $this->assertEquals('mandatory_missing', $e->getErrorCode());
       $this->assertEquals('Mandatory key(s) missing from params array: contact_type', $e->getMessage());
       $extra = $e->getExtraParams();
       $this->assertArrayHasKey('trace', $extra);
