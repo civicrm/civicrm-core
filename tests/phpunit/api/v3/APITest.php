@@ -168,5 +168,35 @@ class api_v3_APITest extends CiviUnitTestCase {
       $this->assertEquals($expected, $actual, sprintf('input=%s expected=%s actual=%s', $input, $expected, $actual));
     }
   }
+/**
+ * Test that calling via wrapper works
+ */
+  function testv3Wrapper() {
+    try{
+      $result = civicrm_api3('contact', 'get', array());
+    }
+    catch (CRM_Exception $e){
+      $this->fail("This should have been a success test");
+    }
+    $this->assertAPISuccess($result);
+  }
+
+  /**
+   * test exception is thrown
+   */
+  function testv3WrapperException(){
+    try{
+      $result = civicrm_api3('contact', 'create', array('debug' => 1));
+    }
+    catch (CiviCRM_API3_Exception $e){
+      $this->assertEquals('undefined', $e->getErrorCode());
+      $this->assertEquals('Mandatory key(s) missing from params array: contact_type', $e->getMessage());
+      $extra = $e->getExtraParams();
+      $this->assertArrayHasKey('trace', $extra);
+      return;
+    }
+    $this->fail('Exception was expected');
+  }
+
 }
 
