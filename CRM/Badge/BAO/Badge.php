@@ -116,6 +116,9 @@ class CRM_Badge_BAO_Badge {
       $formattedRow['barcode'] = $layout['data']['barcode_alignment'];
     }
 
+    // finally assign all the row values, so that we can use it for barcode etc
+    $formattedRow['values'] = $row;
+
     return $formattedRow;
   }
 
@@ -139,7 +142,7 @@ class CRM_Badge_BAO_Badge {
     }
 
     if (CRM_Utils_Array::value('image_2', $formattedRow)) {
-      //$this->printImage($formattedRow['image_2']);
+     $this->printImage($formattedRow['image_2'], $x + 68);
     }
 
     $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round',
@@ -161,6 +164,29 @@ class CRM_Badge_BAO_Badge {
     $this->pdf->SetXY($x, $y + $this->pdf->height - 5);
     $this->pdf->Cell($this->pdf->width, 0, $formattedRow['token'][4]['value'], $this->border, 2,
       $formattedRow['token'][4]['text_alignment']);
+
+    if (CRM_Utils_Array::value('barcode', $formattedRow)) {
+      $style = array(
+        'position' => $formattedRow['barcode'],
+        'align' => $formattedRow['barcode'],
+        'stretch' => FALSE,
+        'fitwidth' => TRUE,
+        'cellfitalign' => '',
+        'border' => FALSE,
+        'hpadding' => 'auto',
+        'vpadding' => 'auto',
+        'fgcolor' => array(0, 0, 0),
+        'bgcolor' => FALSE,
+        'text' => FALSE,
+        'font' => 'helvetica',
+        'fontsize' => 8,
+        'stretchtext' => 0,
+      );
+
+      $payload = $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
+      $this->pdf->SetXY($x, $y + $this->pdf->height - 5);
+      $this->pdf->write1DBarcode($payload, "C128A", $x, $this->pdf->getY() - 6, 50, 10, 0.4, $style, 'B');
+    }
   }
 
   /**
