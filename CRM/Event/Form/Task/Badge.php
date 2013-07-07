@@ -142,7 +142,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
     }
 
     // add additional required fields for query execution
-    $additionalFields = array('participant_register_date', 'participant_id');
+    $additionalFields = array('participant_register_date', 'participant_id', 'event_id', 'contact_id');
     foreach ($additionalFields as $field) {
       $returnProperties[$field] = 1;
     }
