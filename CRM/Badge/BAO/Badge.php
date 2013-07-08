@@ -45,8 +45,8 @@ class CRM_Badge_BAO_Badge {
   /**
    *  This function is called to create name label pdf
    *
-   * @param   array    $participants associated array with participant info
-   * @param   array    $layoutInfo   associated array which contains meta data about format/layout
+   * @param   array $participants associated array with participant info
+   * @param   array $layoutInfo   associated array which contains meta data about format/layout
    *
    * @return  void
    * @access  public
@@ -85,7 +85,7 @@ class CRM_Badge_BAO_Badge {
     $formattedRow = array('labelFormat' => $layout['label_format_name']);
 
     if (CRM_Utils_Array::value('rowElements', $layout['data'])) {
-      foreach($layout['data']['rowElements'] as $key => $element) {
+      foreach ($layout['data']['rowElements'] as $key => $element) {
         $value = '';
         if ($element) {
           $value = $row[$element];
@@ -141,15 +141,22 @@ class CRM_Badge_BAO_Badge {
       $this->printImage($formattedRow['image_1']);
     }
 
+    $titleWidth = $this->lMarginLogo;
     if (CRM_Utils_Array::value('image_2', $formattedRow)) {
-     $this->printImage($formattedRow['image_2'], $x + 68);
+      $this->printImage($formattedRow['image_2'], $x + 68);
+      $titleWidth = 38;
     }
 
-    $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round',
-      'dash' => '2,2', 'color' => array(0, 0, 200)));
+    $this->pdf->SetLineStyle(array(
+      'width' => 0.1,
+      'cap' => 'round',
+      'join' => 'round',
+      'dash' => '2,2',
+      'color' => array(0, 0, 200)
+    ));
 
     $this->pdf->SetFont($formattedRow['token'][1]['font_name'], '', $formattedRow['token'][1]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width - $this->lMarginLogo, 0, $formattedRow['token'][1]['value'],
+    $this->pdf->MultiCell($this->pdf->width - $titleWidth, 0, $formattedRow['token'][1]['value'],
       $this->border, $formattedRow['token'][1]['text_alignment'], 0, 1, $x + $this->lMarginLogo, $y);
 
     $this->pdf->SetFont($formattedRow['token'][2]['font_name'], '', $formattedRow['token'][2]['font_size']);
@@ -196,7 +203,7 @@ class CRM_Badge_BAO_Badge {
    * @return void
    * @access public
    */
-  function printImage($img, $x='', $y='') {
+  function printImage($img, $x = '', $y = '') {
     if (!$x) {
       $x = $this->pdf->GetAbsX();
     }
