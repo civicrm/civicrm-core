@@ -592,4 +592,25 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'description' => "If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts",
     'help_text' => null,
   ),
+
+  'enable_components' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name'  => 'enable_components',
+    'type' => 'Array',
+    'quick_form_type' => 'Element',
+    'html_type' => 'advmultiselect',
+    'html_attributes' => array(
+      'size' => 5,
+      'style' => 'width:150px',
+      'class' => 'advmultiselect',
+    ),
+    'default' => array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviCase'),
+    'add'   => '4.4',
+    'title' => 'Enable Components',
+    'is_domain' => '1',
+    'is_contact' => 0,
+    'description' => null,
+    'help_text'   => null,
+  ),
 );
