@@ -355,7 +355,7 @@ cj(document).ready(function(){
             }
           }
           cj('input[name="' + prefix + 'contact_select_id[' + blockNo +']"]').val( response.contactID );
-          CRM.alert(response.sortName + {/literal}'{ts escape="js"} has been created.{/ts}', '{ts escape="js"}Contact Saved{/ts}'{literal}, 'success');
+          CRM.alert(response.displayName + {/literal}'{ts escape="js"} has been created.{/ts}', '{ts escape="js"}Contact Saved{/ts}'{literal}, 'success');
           cj('#contact-dialog-' + prefix + blockNo ).dialog('close');
         }
       }

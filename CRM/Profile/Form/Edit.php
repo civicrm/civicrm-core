@@ -309,9 +309,11 @@ SELECT module
 
     // this is special case when we create contact using Dialog box
     if ($this->_context == 'dialog') {
+      $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
       $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
       $returnArray = array(
         'contactID' => $this->_id,
+        'displayName' => $displayName,
         'sortName' => $sortName,
         'newContactSuccess' => TRUE,
       );
