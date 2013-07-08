@@ -860,7 +860,10 @@ class CRM_Contact_BAO_Query {
           if (($elementName != 'phone') && ($elementName != 'im')) {
             $cond = self::getPrimaryCondition($elementType);
           }
-          if ((!$cond) && ($elementName == 'phone')) {
+          // CRM-13011 : If location type is primary, do not restrict search to the phone
+          // type id - we want the primary phone, regardless of what type it is.
+          // Otherwise, restrict to the specified phone type for the given field.
+          if ((!$cond) && ($elementName == 'phone') && $elements['location_type'] != 'Primary') {
             $cond = "phone_type_id = '$elementType'";
           }
           elseif ((!$cond) && ($elementName == 'im')) {
