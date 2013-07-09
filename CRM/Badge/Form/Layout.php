@@ -98,9 +98,9 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
 
     $attributes = array('readonly'=> true);
-    $this->add('text', 'image_1', ts('Image 1'),
+    $this->add('text', 'image_1', ts('Image (top right)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
-    $this->add('text', 'image_2', ts('Image 2'),
+    $this->add('text', 'image_2', ts('Image (top left)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
 
     $this->add('checkbox', 'is_default', ts('Default?'));

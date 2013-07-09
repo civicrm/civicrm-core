@@ -46,6 +46,26 @@
         <td class="label">{$form.description.label}</td>
         <td>{$form.description.html}</td>
       </tr>
+      <tr class="crm-badge-layout-form-block-image_1">
+        <td class="label">{$form.image_1.label}</td>
+        <td>
+          {$form.image_1.html}
+          <span class="crm-clear-link">
+            (<a href="#" class="clear-image" imgname='image_1'>{ts}clear{/ts}</a>)
+          </span>
+          <br/><span class="description">{ts}Click above and select a file double clicking on it.{/ts}</span>
+        </td>
+      </tr>
+      <tr class="crm-badge-layout-form-block-image_2">
+        <td class="label">{$form.image_2.label}</td>
+        <td>
+          {$form.image_2.html}
+          <span class="crm-clear-link">
+            (<a href="#" class="clear-image" imgname='image_2'>{ts}clear{/ts}</a>)
+          </span>
+          <br/><span class="description">{ts}Click above and select a file double clicking on it.{/ts}</span>
+        </td>
+      </tr>
       <tr class="crm-badge-layout-form-block-elements">
         <td class="label">{ts}Elements{/ts}</td>
         <td>
@@ -68,31 +88,6 @@
               </tr>
             {/section}
           </table>
-        </td>
-      </tr>
-      <tr class="crm-badge-layout-form-block-attachment">
-        <td colspan="2">
-
-        </td>
-      </tr>
-      <tr class="crm-badge-layout-form-block-image_1">
-        <td class="label">{$form.image_1.label}</td>
-        <td>
-          {$form.image_1.html}
-          <span class="crm-clear-link">
-            (<a href="#" class="clear-image" imgname='image_1'>{ts}clear{/ts}</a>)
-          </span>
-          <br/><span class="description">{ts}Click above and select a file double clicking on it. This image will displayed on top left{/ts}</span>
-        </td>
-      </tr>
-      <tr class="crm-badge-layout-form-block-image_2">
-        <td class="label">{$form.image_2.label}</td>
-        <td>
-          {$form.image_2.html}
-          <span class="crm-clear-link">
-            (<a href="#" class="clear-image" imgname='image_2'>{ts}clear{/ts}</a>)
-          </span>
-          <br/><span class="description">{ts}Click above and select a file double clicking on it. This image will displayed on top right{/ts}</span>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-add_barcode">
