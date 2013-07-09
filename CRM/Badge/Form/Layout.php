@@ -97,12 +97,11 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     unset($textAlignment['J']);
     $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
 
-    $attributes = array(
-      'readonly'=> true,
-      'value' => ts('click here and select a file double clicking on it'),
-    );
-    $this->add('text', 'image_1', ts('Image 1'), $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
-    $this->add('text', 'image_2', ts('Image 2'), $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+    $attributes = array('readonly'=> true);
+    $this->add('text', 'image_1', ts('Image 1'),
+      $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+    $this->add('text', 'image_2', ts('Image 2'),
+      $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
 
     $this->add('checkbox', 'is_default', ts('Default?'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
