@@ -74,7 +74,9 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     // get the tokens
     $contactTokens = CRM_Core_SelectValues::contactTokens();
     $eventTokens   = CRM_Core_SelectValues::eventTokens();
-    $tokens = array_merge($contactTokens, $eventTokens);
+    $participantTokens = CRM_Core_SelectValues::participantTokens();
+
+    $tokens = array_merge($contactTokens, $eventTokens, $participantTokens);
     asort($tokens);
 
     $fontSizes = CRM_Core_BAO_LabelFormat::getFontSizes();
@@ -116,12 +118,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    * @return None
    */
   function setDefaultValues() {
-    if (isset($this->_id) && empty($this->_values)) {
-      $this->_values = array();
-      $params = array('id' => $this->_id);
-      CRM_Badge_BAO_Layout::retrieve($params, $this->_values);
-
-
+    if (isset($this->_id)) {
       $defaults = array_merge($this->_values,
         CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
     }
