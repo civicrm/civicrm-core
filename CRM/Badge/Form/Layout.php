@@ -69,7 +69,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('select', 'label_format_name', ts('Label Style'), array('' => ts('- select -')) + $labelStyle, TRUE);
 
     $this->add('text', 'description', ts('Description'),
-      CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'description'));
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
 
     // get the tokens
     $contactTokens = CRM_Core_SelectValues::contactTokens();
@@ -119,11 +119,12 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     if (isset($this->_id) && empty($this->_values)) {
       $this->_values = array();
       $params = array('id' => $this->_id);
-      CRM_Badge_BAO_Layout::retrieve($params, $this->_values );
-    }
+      CRM_Badge_BAO_Layout::retrieve($params, $this->_values);
 
-    $defaults = array_merge($this->_values,
-      CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
+
+      $defaults = array_merge($this->_values,
+        CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
+    }
 
     if ($this->_action == CRM_Core_Action::DELETE && isset($defaults['title'])) {
       $this->assign('delName', $defaults['title']);
