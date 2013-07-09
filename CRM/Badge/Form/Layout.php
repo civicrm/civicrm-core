@@ -125,6 +125,11 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       $defaults = array_merge($this->_values,
         CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
     }
+    else {
+      for ($i = 1; $i <= 4; $i++) {
+        $defaults['text_alignment'][$i] = "C";
+      }
+    }
 
     if ($this->_action == CRM_Core_Action::DELETE && isset($defaults['title'])) {
       $this->assign('delName', $defaults['title']);
