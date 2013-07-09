@@ -82,7 +82,7 @@
           <span class="crm-clear-link">
             (<a href="#" class="clear-image" imgname='image_1'>{ts}clear{/ts}</a>)
           </span>
-          <br/><span class="description">{ts}This image will displayed on top left{/ts}</span>
+          <br/><span class="description">{ts}Click above and select a file double clicking on it. This image will displayed on top left{/ts}</span>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-image_2">
@@ -92,7 +92,7 @@
           <span class="crm-clear-link">
             (<a href="#" class="clear-image" imgname='image_2'>{ts}clear{/ts}</a>)
           </span>
-          <br/><span class="description">{ts}This image will displayed on top right{/ts}</span>
+          <br/><span class="description">{ts}Click above and select a file double clicking on it. This image will displayed on top right{/ts}</span>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-add_barcode">

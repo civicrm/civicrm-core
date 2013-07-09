@@ -69,12 +69,14 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('select', 'label_format_name', ts('Label Style'), array('' => ts('- select -')) + $labelStyle, TRUE);
 
     $this->add('text', 'description', ts('Description'),
-      CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'description'));
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
 
     // get the tokens
     $contactTokens = CRM_Core_SelectValues::contactTokens();
     $eventTokens   = CRM_Core_SelectValues::eventTokens();
-    $tokens = array_merge($contactTokens, $eventTokens);
+    $participantTokens = CRM_Core_SelectValues::participantTokens();
+
+    $tokens = array_merge($contactTokens, $eventTokens, $participantTokens);
     asort($tokens);
 
     $fontSizes = CRM_Core_BAO_LabelFormat::getFontSizes();
@@ -95,12 +97,11 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     unset($textAlignment['J']);
     $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
 
-    $attributes = array(
-      'readonly'=> true,
-      'value' => ts('click here and select a file double clicking on it'),
-    );
-    $this->add('text', 'image_1', ts('Image 1'), $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
-    $this->add('text', 'image_2', ts('Image 2'), $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+    $attributes = array('readonly'=> true);
+    $this->add('text', 'image_1', ts('Image 1'),
+      $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+    $this->add('text', 'image_2', ts('Image 2'),
+      $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
 
     $this->add('checkbox', 'is_default', ts('Default?'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -116,14 +117,15 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    * @return None
    */
   function setDefaultValues() {
-    if (isset($this->_id) && empty($this->_values)) {
-      $this->_values = array();
-      $params = array('id' => $this->_id);
-      CRM_Badge_BAO_Layout::retrieve($params, $this->_values );
+    if (isset($this->_id)) {
+      $defaults = array_merge($this->_values,
+        CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
     }
-
-    $defaults = array_merge($this->_values,
-      CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
+    else {
+      for ($i = 1; $i <= 4; $i++) {
+        $defaults['text_alignment'][$i] = "C";
+      }
+    }
 
     if ($this->_action == CRM_Core_Action::DELETE && isset($defaults['title'])) {
       $this->assign('delName', $defaults['title']);
