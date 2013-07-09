@@ -124,12 +124,15 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
           if (key($token) == 'contact') {
             $element = $token['contact'][0];
           }
-          else {
+          elseif (key($token) == 'event') {
             $element = $token['event'][0];
             //FIX ME - we need to standardize event token names
             if (!strpos($element, 'event_')) {
               $element = 'event_' . $element;
             }
+          }
+          elseif (key($token) == 'participant') {
+            $element = $token['participant'][0];
           }
 
           // build returnproperties for query

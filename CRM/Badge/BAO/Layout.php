@@ -162,7 +162,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @access public
    */
   static function buildLayout(&$params) {
-    $layoutParams = array('id', $params['badge_id']);
+    $layoutParams = array('id' => $params['badge_id']);
     CRM_Badge_BAO_Layout::retrieve($layoutParams, $layoutInfo);
 
     $formatProperties = CRM_Core_OptionGroup::getValue('name_badge', $layoutInfo['label_format_name'], 'name');
