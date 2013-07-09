@@ -168,9 +168,8 @@ class CRM_Badge_BAO_Badge {
       $this->border, $formattedRow['token'][3]['text_alignment'], 0, 1, $x, $this->pdf->getY());
 
     $this->pdf->SetFont($formattedRow['token'][4]['font_name'], '', $formattedRow['token'][4]['font_size']);
-    $this->pdf->SetXY($x, $y + $this->pdf->height - 5);
-    $this->pdf->Cell($this->pdf->width, 0, $formattedRow['token'][4]['value'], $this->border, 2,
-      $formattedRow['token'][4]['text_alignment']);
+    $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][4]['value'],
+      $this->border, $formattedRow['token'][4]['text_alignment'], 0, 1, $x, $y + $this->pdf->height - 5);
 
     if (CRM_Utils_Array::value('barcode', $formattedRow)) {
       $style = array(
@@ -180,7 +179,7 @@ class CRM_Badge_BAO_Badge {
         'fitwidth' => TRUE,
         'cellfitalign' => '',
         'border' => FALSE,
-        'hpadding' => 'auto',
+        'hpadding' => 13.5,
         'vpadding' => 'auto',
         'fgcolor' => array(0, 0, 0),
         'bgcolor' => FALSE,
@@ -190,9 +189,9 @@ class CRM_Badge_BAO_Badge {
         'stretchtext' => 0,
       );
 
-      $payload = $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
-      $this->pdf->SetXY($x, $y + $this->pdf->height - 5);
-      $this->pdf->write1DBarcode($payload, "C128A", $x, $this->pdf->getY() - 6, 50, 10, 0.4, $style, 'B');
+      $data = array();
+      $data['current_value'] = $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
+      $this->pdf->write1DBarcode($data['current_value'], 'C128', $x, $y  + $this->pdf->height - 10, '', 12, 0.4, $style, 'B');
     }
   }
 
