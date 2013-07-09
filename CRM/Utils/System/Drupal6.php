@@ -584,6 +584,16 @@ SELECT name, mail
   }
 
   /**
+   * Perform any post login activities required by the UF -
+   * e.g. for drupal : records a watchdog message about the new session,
+   * saves the login timestamp, calls hook_user op 'login' and generates a new session.
+   * @param array params Params to be passed to the CMS function. Note there are no require params as drupal instantiates the user global
+   */
+  function userLoginFinalize($params = array()) {
+    user_authenticate_finalize($params);
+  }
+
+  /**
    * Set a message in the UF to display to a user
    *
    * @param string $message the message to set
