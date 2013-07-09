@@ -61,10 +61,10 @@ SELECT @uf_group_contribution_batch_entry     := max(id) FROM civicrm_uf_group W
 SELECT @uf_group_membership_batch_entry       := max(id) FROM civicrm_uf_group WHERE name = 'membership_batch_entry';
 
 INSERT INTO civicrm_uf_field
-       ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, {localize field='label'}label{/localize}, field_type, help_post, phone_type_id )
+       ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, {localize field='label'}label{/localize}, field_type)
 VALUES
-      ( @uf_group_contribution_batch_entry, 'soft_credit', 0, 0, 10, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Contribution', NULL, NULL ),
-      ( @uf_group_membership_batch_entry, 'soft_credit', 0, 0, 13, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Membership', NULL, NULL );
+      ( @uf_group_contribution_batch_entry, 'soft_credit', 0, 0, 10, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Contribution'),
+      ( @uf_group_membership_batch_entry, 'soft_credit', 0, 0, 13, 'User and User Admin Only', 0, 0, NULL, {localize}'Soft Credit'{/localize}, 'Membership');
 
 -- CRM-12809
 ALTER TABLE `civicrm_custom_group`
@@ -74,3 +74,44 @@ ALTER TABLE `civicrm_custom_group`
 ALTER TABLE `civicrm_participant`
   CHANGE COLUMN `event_id` `event_id` INT(10) UNSIGNED NOT NULL,
   CHANGE COLUMN `contact_id` `contact_id` INT(10) UNSIGNED NOT NULL;
+
+-- CRM-12964 civicrm_print_label table creation
+CREATE TABLE IF NOT EXISTS `civicrm_print_label` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'User title for for this label layout',
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'variable name/programmatic handle for this field.',
+  `description` text COLLATE utf8_unicode_ci COMMENT 'Description of this label layout',
+  `label_format_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'This refers to name column of civicrm_option_value row in name_badge option group',
+  `label_type_id` int(10) unsigned DEFAULT NULL COMMENT 'Implicit FK to civicrm_option_value row in NEW label_type option group',
+  `data` longtext COLLATE utf8_unicode_ci COMMENT 'contains json encode configurations options',
+  `is_default` tinyint(4) DEFAULT '1' COMMENT 'Is this default?',
+  `is_active` tinyint(4) DEFAULT '1' COMMENT 'Is this option active?',
+  `is_reserved` tinyint(4) DEFAULT '1' COMMENT 'Is this reserved label?',
+  `created_id` int(10) unsigned DEFAULT NULL COMMENT 'FK to civicrm_contact, who created this label layout',
+  PRIMARY KEY (`id`),
+  KEY `FK_civicrm_print_label_created_id` (`created_id`),
+  CONSTRAINT `FK_civicrm_print_label_created_id` FOREIGN KEY (`created_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+
+-- CRM-12964 adding meta-data
+INSERT INTO
+   `civicrm_option_group` (`name`, {localize field='title'}`title`{/localize}, `is_reserved`, `is_active`)
+VALUES
+   ('label_type', {localize}'{ts escape="sql"}Label Type{/ts}'{/localize}, 1, 1),
+   ('name_badge', {localize}'{ts escape="sql"}Name Badge Format{/ts}'{/localize}, 1, 1);
+
+SELECT @option_group_id_label_type := max(id) from civicrm_option_group where name = 'label_type';
+SELECT @option_group_id_name_badge := max(id) from civicrm_option_group where name = 'name_badge';
+
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES
+ (@option_group_id_label_type, {localize}'{ts escape="sql"}Event Badge{/ts}'{/localize}, 1, 'Event Badge', NULL, 0, NULL, 1, 0, 0, 1, NULL, NULL),
+ (@option_group_id_name_badge, {localize}'{ts escape="sql"}Avery 5395{/ts}'{/localize}, '{literal}{"name":"Avery 5395","paper-size":"a4","metric":"mm","lMargin":13.5,"tMargin":3,"NX":2,"NY":4,"SpaceX":15,"SpaceY":8.5,"width":85.7,"height":59.2,"font-size":12,"orientation":"portrait","font-name":"helvetica","font-style":"","lPadding":0,"tPadding":0}{/literal}', 'Avery 5395', NULL, 0, NULL, 1, 0, 0, 1, NULL, NULL);
+
+-- CRM-12964 adding navigation
+UPDATE civicrm_navigation
+   SET url  = 'civicrm/admin/badgelayout&reset=1',
+       name = 'Event Name Badge Layouts',
+       label= '{ts escape="sql" skip="true"}Event Name Badge Layouts{/ts}'
+ WHERE name = 'Event Badge Formats';
