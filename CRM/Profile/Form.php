@@ -67,6 +67,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_gid;
 
   /**
+   * The group id that we are editing
+   *
+   * @var string
+   */
+  protected $_ufGroupName = 'unknown';
+
+  /**
    * The group id that we are passing in url
    *
    * @var int
@@ -256,16 +263,20 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->_isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($this->_gid);
 
-    //get values for captch and dupe update.
+    //get values for ufGroupName, captch and dupe update.
     if ($this->_gid) {
       $dao = new CRM_Core_DAO_UFGroup();
       $dao->id = $this->_gid;
       if ($dao->find(TRUE)) {
         $this->_isUpdateDupe = $dao->is_update_dupe;
         $this->_isAddCaptcha = $dao->add_captcha;
+        if (!empty($dao->name)) {
+          $this->_ufGroupName = $dao->name;
+        }
       }
       $dao->free();
     }
+    $this->assign('ufGroupName', $this->_ufGroupName);
 
     $gids = empty($this->_profileIds) ? $this->_gid : $this->_profileIds;
 
@@ -573,6 +584,18 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
+    switch ($this->_mode) {
+      case self::MODE_CREATE:
+      case self::MODE_EDIT:
+      case self::MODE_REGISTER:
+        CRM_Utils_Hook::buildProfile($this->_ufGroupName);
+        break;
+      case self::MODE_SEARCH:
+        CRM_Utils_Hook::searchProfile($this->_ufGroupName);
+        break;
+      default:
+    }
+
     //lets have single status message, CRM-4363
     $return = FALSE;
     $statusMessage = NULL;
@@ -868,6 +891,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @static
    */
   static function formRule($fields, $files, $form) {
+    CRM_Utils_Hook::validateProfile($form->_ufGroupName);
+
     $errors = array();
     // if no values, return
     if (empty($fields)) {
@@ -1066,6 +1091,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         return;
       }
     }
+    CRM_Utils_Hook::processProfile($this->_ufGroupName);
     if (CRM_Utils_Array::value('image_URL', $params)) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
