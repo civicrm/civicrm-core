@@ -256,13 +256,17 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->_isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($this->_gid);
 
-    //get values for captch and dupe update.
+    //get values for ufGroupName, captch and dupe update.
+    $this->assign('ufGroupName', 'unknown'); // override later (if possible)
     if ($this->_gid) {
       $dao = new CRM_Core_DAO_UFGroup();
       $dao->id = $this->_gid;
       if ($dao->find(TRUE)) {
         $this->_isUpdateDupe = $dao->is_update_dupe;
         $this->_isAddCaptcha = $dao->add_captcha;
+        if (!empty($dao->name)) {
+          $this->assign('ufGroupName', $dao->name);
+        }
       }
       $dao->free();
     }
