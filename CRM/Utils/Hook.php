@@ -1235,4 +1235,54 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(1, $entityTypes, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_entityTypes'
     );
   }
+
+  /**
+   * This hook is called while preparing a profile form
+   *
+   * @param string $name
+   * @return void
+   */
+  static function buildProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_buildProfile');
+  }
+
+  /**
+   * This hook is called while validating a profile form submission
+   *
+   * @param string $name
+   * @return void
+   */
+  static function validateProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_validateProfile');
+  }
+
+  /**
+   * This hook is called processing a valid profile form submission
+   *
+   * @param string $name
+   * @return void
+   */
+  static function processProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_processProfile');
+  }
+
+  /**
+   * This hook is called while preparing a read-only profile screen
+   *
+   * @param string $name
+   * @return void
+   */
+  static function viewProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_viewProfile');
+  }
+
+  /**
+   * This hook is called while preparing a list of contacts (based on a profile)
+   *
+   * @param string $name
+   * @return void
+   */
+  static function searchProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_searchProfile');
+  }
 }
