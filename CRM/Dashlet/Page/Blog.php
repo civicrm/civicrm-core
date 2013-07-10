@@ -38,7 +38,9 @@
  */
 class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
 
-  const CHECK_TIMEOUT = 5, CACHE_DAYS = 1;
+  const CHECK_TIMEOUT = 5;
+  const CACHE_DAYS = 1;
+  const BLOG_URL = 'https://civicrm.org/blog/feed';
 
   /**
    * List blog articles as dashlet
@@ -85,14 +87,18 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
   /**
    * Parse rss feed and cache results
    *
-   * @return array
+   * @return array|NULL array of blog items; or NULL if not available
    *
    * @access private
    */
   private function _getFeed() {
-    ini_set('default_socket_timeout', self::CHECK_TIMEOUT);
-    $feed = @simplexml_load_file('http://civicrm.org/blog/feed');
-    ini_restore('default_socket_timeout');
+    $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
+    list ($status, $rawFeed) = $httpClient->get(self::BLOG_URL);
+    if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
+      return NULL;
+    }
+    $feed = @simplexml_load_string($rawFeed);
+
     $blog = array();
     if ($feed && !empty($feed->channel->item)) {
       foreach ($feed->channel->item as $item) {

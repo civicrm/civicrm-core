@@ -124,5 +124,14 @@ abstract class CRM_Utils_System_Base {
   function flush() {
     // nullop by default
   }
+
+  /**
+   * Perform an post login activities required by the UF -
+   * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp, calls hook_user op 'login' and generates a new session.
+   * @param array $edit: The array of form values submitted by the user.
+   *
+  function userLoginFinalize($edit = array()){
+  }
+  */
 }
 

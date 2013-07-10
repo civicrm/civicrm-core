@@ -48,3 +48,31 @@ class API_Exception extends Exception
         );
   }
 }
+/**
+ * This api exception returns more information than the default one. We are using it rather than
+ * API_Exception from the api wrapper as the namespace is more generic
+ * @param string $message the human friendly error message
+ * @param string $error_code a computer friendly error code. By convention, no space (but underscore allowed)
+ *  ex: mandatory_missing, duplicate, invalid_format
+ * @param array $data extra params to return. eg an extra array of ids. It is not mandatory, but can help the computer using the api. Keep in mind the api consumer isn't to be trusted. eg. the database password is NOT a good extra data
+ */
+class CiviCRM_API3_Exception extends Exception
+{
+  private $extraParams = array();
+  public function __construct($message, $error_code, $extraParams = array(),Exception $previous = null) {
+    parent::__construct(ts($message));
+    $this->extraParams = $extraParams + array('error_code' => $error_code);
+  }
+
+  // custom string representation of object
+  public function __toString() {
+    return __CLASS__ . ": [{$this->extraParams['error_code']}: {$this->message}\n";
+  }
+
+  public function getErrorCode() {
+    return $this->extraParams['error_code'];
+  }
+  public function getExtraParams() {
+    return $this->extraParams;
+  }
+}

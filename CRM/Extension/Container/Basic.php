@@ -109,7 +109,6 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
       );
     }
     if (empty($this->baseUrl)) {
-      dpm($this);
       $errors[] = array(
         'title' => ts('Invalid Base URL'),
         'message' => ts('An extension container has been defined with a blank URL.'),

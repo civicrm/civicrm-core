@@ -238,6 +238,22 @@ function _civicrm_api_resolve($apiRequest) {
   $cache[$cachekey] = array('function' => FALSE, 'is_generic' => FALSE);
   return $cache[$cachekey];
 }
+/**
+ * Version 3 wrapper for civicrm_api. Throws exception
+ * @param string $entity type of entities to deal with
+ * @param string $action create, get, delete or some special action name.
+ * @param array $params array to be passed to function
+ *
+ * @return array
+ *
+ */
+function civicrm_api3($entity, $action, $params){
+  $params['version'] = 3;
+  $result = civicrm_api($entity, $action, $params);
+  if($result['is_error']){
+    throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
+  }
+}
 
 /**
  * Load/require all files related to an entity.
