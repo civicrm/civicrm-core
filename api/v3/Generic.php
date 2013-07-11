@@ -246,7 +246,7 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldn
     return;
   }
 
-  if (!empty($metadata[$fieldname]['options']) || !in_array($fieldname, $fieldsToResolve)) {
+  if (!empty($metadata[$fieldname]['options']) || (!in_array($fieldname, $fieldsToResolve) && !in_array('all', $fieldsToResolve))) {
     return;
   }
 
