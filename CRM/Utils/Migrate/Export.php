@@ -317,6 +317,43 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
+   * @param array $ufGroupIds list of custom groups to export
+   * @return void
+   */
+  function buildUFGroups($ufGroupIds) {
+    $ufGroupIdsSql = implode(',', array_filter($ufGroupIds, 'is_numeric'));
+    if (empty($ufGroupIdsSql)) {
+      return;
+    }
+
+    $sql = "
+      SELECT cg.*
+      FROM   civicrm_uf_group cg
+      WHERE  cg.id IN ($ufGroupIdsSql)
+
+    ";
+    $this->fetch('profileGroup', 'CRM_Core_DAO_UFGroup', $sql);
+
+    $sql = "
+      SELECT f.*
+      FROM   civicrm_uf_field f,
+             civicrm_uf_group cg
+      WHERE  f.uf_group_id = cg.id
+      AND    cg.id IN ($ufGroupIdsSql)
+    ";
+    $this->fetch('profileField', 'CRM_Core_DAO_UFField', $sql);
+
+    $sql = "
+      SELECT *
+      FROM   civicrm_uf_join
+      WHERE  entity_table IS NULL
+      AND    entity_id    IS NULL
+      AND    uf_group_id  IN ($ufGroupIdsSql)
+    ";
+    $this->fetch('profileJoin', 'CRM_Core_DAO_UFJoin', $sql);
+  }
+
+  /**
    * Render the in-memory representation as XML
    *
    * @return string XML
