@@ -298,6 +298,13 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
         fputcsv($out, $columns, $this->separator, '"');
         $first = false;
       }
+      //handle values returned as arrays (i.e. custom fields that allow multiple selections) by inserting a control character
+      foreach ($row as &$field) {
+        if(is_array($field)) {
+          //convert to string
+          $field = implode($field,"\x01");
+        }
+      }
       fputcsv($out, $row, $this->separator, '"');
     }
     fclose($out);
@@ -359,6 +366,11 @@ class civicrm_cli_csv_file extends civicrm_cli {
   function convertLine($data) {
     $params = array();
     foreach ($this->header as $i => $field) {
+      //split any multiselect data, denoted with \x01
+      if (strpos($data[$i], "\x01") !== FALSE) {
+        $data[$i] = explode("\x01",$data[$i]);
+        $data[$i] = array_combine($data[$i], $data[$i]);
+      }
       $params[$field] = $data[$i];
     }
     $params['version'] = 3;
