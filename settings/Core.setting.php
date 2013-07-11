@@ -605,7 +605,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
       'style' => 'width:150px',
       'class' => 'advmultiselect',
     ),
-    'default' => array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviCase'),
+    'default' => array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'),
     'add'   => '4.4',
     'title' => 'Enable Components',
     'is_domain' => '1',
