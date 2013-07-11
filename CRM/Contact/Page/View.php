@@ -345,6 +345,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
+    $userRecordUrl = NULL;
     if ($uid) {
       if ($config->userSystem->is_drupal == '1' &&
         ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account')))
@@ -361,8 +362,11 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
           $userRecordUrl = $config->userFrameworkBaseURL . "index.php?option=com_admin&view=profile&layout=edit&id=" . $uid;
         }
       }
-      else {
-        $userRecordUrl = NULL;
+      // For WordPress, provide link to user profile is contact belongs to logged in user OR user has administrator role
+      elseif ($config->userFramework == 'WordPress' &&
+        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users')))
+        ) {
+          $userRecordUrl = $config->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
       }
       $obj->assign('userRecordUrl', $userRecordUrl);
       $obj->assign('userRecordId', $uid);
