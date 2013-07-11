@@ -441,6 +441,10 @@ class CRM_Contact_BAO_Query {
       // add activity fields
       $fields = CRM_Activity_BAO_Activity::exportableFields();
       $this->_fields = array_merge($this->_fields, $fields);
+
+      // add any fields supported by extensions
+      $extFields = CRM_Extension_System::singleton()->getManager()->getSearchQueryFields();
+      $this->_fields = array_merge($this->_fields, $extFields);
     }
 
     // basically do all the work once, and then reuse it
@@ -767,6 +771,8 @@ class CRM_Contact_BAO_Query {
 
     //fix for CRM-951
     CRM_Core_Component::alterQuery($this, 'select');
+
+    CRM_Extension_System::singleton()->getManager()->alterSearchQuery($this, 'select');
 
     if (!empty($this->_cfIDs)) {
       $this->_customQuery = new CRM_Core_BAO_CustomQuery($this->_cfIDs, TRUE);
@@ -1626,6 +1632,8 @@ class CRM_Contact_BAO_Query {
       }
 
       CRM_Core_Component::alterQuery($this, 'where');
+
+      CRM_Extension_System::singleton()->getManager()->alterSearchQuery($this, 'where');
     }
 
     if ($this->_customQuery) {
@@ -2350,6 +2358,7 @@ class CRM_Contact_BAO_Query {
 
         default:
           $from .= CRM_Core_Component::from($name, $mode, $side);
+          $from .= CRM_Extension_System::singleton()->getManager()->buildSearchfrom($name, $mode, $side);
           continue;
       }
     }
