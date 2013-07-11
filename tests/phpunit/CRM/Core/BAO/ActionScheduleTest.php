@@ -32,7 +32,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @var object see CiviTest/CiviMailUtils
    */
   var $mut;
-
+  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Action-Schedule BAO',
@@ -72,7 +72,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => '20100610',
       'is_override' => 'NULL',
     );
-    
+
     $this->fixtures['phonecall'] = array( // createTestObject
       'status_id' => 1,
       'activity_type_id' => 2,
@@ -373,7 +373,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'version' => 3,
     ));
     $this->assertAPISuccess($result);
-    
+
     // Add an alternative membership type, and only send messages for that type
     $extraMembershipType = $this->createTestObject('CRM_Member_DAO_MembershipType', array());
     $this->assertTrue(is_numeric($extraMembershipType->id));

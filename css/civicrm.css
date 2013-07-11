@@ -3960,7 +3960,7 @@ span.crm-status-icon {
   text-align: center;
 }
 
-/* Styles for credit card payment logos (FIXME: replace with sprite?) */
+/* Styles for credit card payment logos */
 #crm-container .credit_card_type-section .crm-credit_card_type-icons a {
   display: block;
   float: left;
@@ -3968,31 +3968,41 @@ span.crm-status-icon {
   height: 30px;
   background: url(../i/creditcard-icons.png) no-repeat 0 0 transparent;
   text-indent: -20000px;
+  margin-right: 10px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  border: 1px solid #FFFFFF;
 }
 
 #crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-visa {
-  background-position: 0 0;
-  width: 75px;
+  background-position: -50px 0;
 }
 
 #crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-mastercard {
-  background-position: -75px 0;
+  background-position: -100px 0;
 }
 
 #crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-amex {
-  background-position: -125px 0;
+  background-position: -150px 0;
 }
 
 #crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-discover {
-  background-position: -175px 0;
+  background-position: -200px 0;
 }
 
 #crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-jcb {
-  background-position: -225px 0;
+  background-position: -250px 0;
 }
 
 #crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-unionpay {
-  background-position: -275px 0;
+  background-position: -300px 0;
+}
+
+#crm-container .cvv2-icon {
+  display: inline-block;
+  width: 50px;
+  height: 30px;
+  background: url(../i/creditcard-icons.png) no-repeat 0 0 transparent;
 }
 
 /* Avoid weird border around the images (some themes will add a border around images) */

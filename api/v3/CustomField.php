@@ -65,16 +65,6 @@
  */
 function civicrm_api3_custom_field_create($params) {
 
-  if (!(CRM_Utils_Array::value('option_type', $params))) {
-    if (CRM_Utils_Array::value('id', $params)) {
-      $params['option_type'] = 2;
-    }
-    else {
-      $params['option_type'] = 1;
-    }
-  }
-
-
   // Array created for passing options in params
   if (isset($params['option_values']) && is_array($params['option_values'])) {
     foreach ($params['option_values'] as $key => $value) {
@@ -98,6 +88,14 @@ function civicrm_api3_custom_field_create($params) {
 function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['label']['api.required'] = 1;
   $params['custom_group_id']['api.required'] = 1;
+  $params['is_active']['api.default'] = 1;
+  $params['option_type'] = array(
+    'title' => 'This (boolean) field tells the BAO to create an option group for the field if the field type is appropriate',
+    'api.default' => 1,
+    'type' => CRM_Utils_Type::T_BOOL,
+  );
+  $params['data_type']['api.default'] = 'String';
+  $params['is_active']['api.default'] = 1;
 }
 
 /**

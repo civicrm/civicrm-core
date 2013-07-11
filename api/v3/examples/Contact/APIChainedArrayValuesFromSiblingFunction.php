@@ -5,16 +5,16 @@
     2 child functions - one receives values from the parent (Contact) and the other child (Tag). 
  */
 function contact_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'display_name' => 'batman',
   'contact_type' => 'Individual',
-  'api.tag.create' => array( 
+  'api.tag.create' => array(
       'name' => '$value.id',
       'description' => '$value.display_name',
       'format.only_id' => 1,
     ),
-  'api.entity_tag.create' => array( 
+  'api.entity_tag.create' => array(
       'tag_id' => '$value.api.tag.create',
     ),
 );
@@ -29,13 +29,13 @@ $params = array(
  */
 function contact_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -81,10 +81,10 @@ function contact_create_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'user_unique_id' => '',
-          'created_date' => '2013-02-15 17:06:45',
+          'created_date' => '20120130621222105',
           'modified_date' => '2012-11-14 16:02:35',
           'api.tag.create' => 6,
-          'api.entity_tag.create' => array( 
+          'api.entity_tag.create' => array(
               'is_error' => 0,
               'not_added' => 1,
               'added' => 1,

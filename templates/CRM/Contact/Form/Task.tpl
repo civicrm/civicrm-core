@@ -50,14 +50,14 @@
 {if $searchtype eq 'ts_sel'}
 {literal}
 <script type="text/javascript">
-  cj(function() {
-    cj("#popupContainer").css({
+  cj(function($) {
+    $("#popupContainer").css({
       "background-color":"#E0E0E0",
       'display':'none',
     });
 
-    cj("#popup-button").click(function() {
-      cj("#popupContainer").dialog({
+    $("#popup-button").click(function() {
+      $("#popupContainer").dialog({
         title: "Selected Contacts",
         width:700,
         height:500,
@@ -71,8 +71,8 @@
     });
 
     var count = 0; var columns = ''; var sortColumn = '';
-    cj('#selectedRecords th').each( function( ) {
-      if (cj(this).attr('class') == 'contact_details') {
+    $('#selectedRecords th').each(function() {
+      if ($(this).attr('class') == 'contact_details') {
         sortColumn += '[' + count + ', "asc" ],';
         columns += '{"sClass": "contact_details"},';
       }
@@ -82,19 +82,13 @@
       count++;
     });
 
-    // FIXME
-    var url=location.href.split('&');
-    if (url[3]) {
-      $('#popup-button').click();
-    }
-
     columns    = columns.substring(0, columns.length - 1 );
     sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
     eval('sortColumn =[' + sortColumn + ']');
     eval('columns =[' + columns + ']');
 
     //load jQuery data table.
-    cj('#selectedRecords').dataTable( {
+    $('#selectedRecords').dataTable( {
       "sPaginationType": "full_numbers",
       "bJQueryUI"  : true,
       "aaSorting"  : sortColumn,

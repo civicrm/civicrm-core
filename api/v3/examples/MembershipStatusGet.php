@@ -4,7 +4,7 @@
  
  */
 function membership_status_get_example(){
-$params = array( 
+$params = array(
   'name' => 'test status',
   'version' => 3,
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function membership_status_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 10,
-  'values' => array( 
-      '10' => array( 
+  'values' => array(
+      '10' => array(
           'id' => '10',
           'name' => 'test status',
           'label' => 'test status',

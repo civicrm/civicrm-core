@@ -1084,7 +1084,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
                 civicrm_activity.activity_date_time,
                 civicrm_activity.status_id,
                 civicrm_activity.subject,
-                civicrm_activity.source_contact_id,
+                ac.contact_id,
                 civicrm_activity.source_record_id,
                 civicrm_option_value.value as activity_type_id,
                 civicrm_option_value.label as activity_type,
@@ -1431,7 +1431,8 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
         $tokenText,
         $tokenHtml,
         $smsParams,
-        $activityID
+        $activityID,
+        $userID
       );
 
       if (PEAR::isError($sendResult)) {
@@ -1471,7 +1472,8 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
     &$tokenText,
     &$tokenHtml,
     $smsParams = array(),
-    $activityID
+    $activityID,
+    $userID = null
   ) {
     $toDoNotSms = "";
     $toPhoneNumber = "";
@@ -1507,7 +1509,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
     $smsParams['parent_activity_id'] = $activityID;
 
     $providerObj = CRM_SMS_Provider::singleton(array('provider_id' => $smsParams['provider_id']));
-    $sendResult = $providerObj->send($recipient, $smsParams, $message, NULL);
+    $sendResult = $providerObj->send($recipient, $smsParams, $message, NULL, $userID);
     if (PEAR::isError($sendResult)) {
       return $sendResult;
     }

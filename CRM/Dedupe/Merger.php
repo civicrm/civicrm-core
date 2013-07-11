@@ -193,7 +193,7 @@ class CRM_Dedupe_Merger {
       // foreign keys referencing civicrm_contact(id)
       $cidRefs = array(
         'civicrm_acl_cache' => array('contact_id'),
-        'civicrm_activity' => array('source_contact_id'),
+        'civicrm_activity' => array('source_record_id'),
         'civicrm_activity_contact' => array('contact_id'),
         'civicrm_case_contact' => array('contact_id'),
         'civicrm_contact' => array('primary_contact_id'),

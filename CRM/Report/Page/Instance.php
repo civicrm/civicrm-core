@@ -58,8 +58,8 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
         CRM_Core_Error::statusBounce($statusMessage, $reportUrl);
       }
 
-      $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_Instance', $instanceId, 'navigation_id', 'id');
-      CRM_Report_BAO_Instance::delete($instanceId);
+      $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceId, 'navigation_id', 'id');
+      CRM_Report_BAO_ReportInstance::del($instanceId);
 
       //delete navigation if exists
       if ($navId) {
@@ -88,7 +88,7 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
 
       if (strstr($templateInfo['name'], '_Form') || !is_null($reportClass)) {
         $instanceInfo = array();
-        CRM_Report_BAO_Instance::retrieve(array('id' => $instanceId), $instanceInfo);
+        CRM_Report_BAO_ReportInstance::retrieve(array('id' => $instanceId), $instanceInfo);
 
         if (!empty($instanceInfo['title'])) {
           CRM_Utils_System::setTitle($instanceInfo['title']);

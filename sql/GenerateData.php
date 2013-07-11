@@ -58,7 +58,7 @@
  * Context - 3/domain
  *
  * Contact - 1 to NUM_CONTACT
- *           75% - Individual
+ *           80% - Individual
  *           10% - Household
  *           10% - Organization
  *
@@ -101,7 +101,6 @@ class CRM_GCD {
 
   // Set ADD_TO_DB = FALSE to do a dry run
   CONST ADD_TO_DB = TRUE;
-  CONST DEBUG_LEVEL = 1;
 
   CONST DATA_FILENAME = "sample_data.xml";
   CONST NUM_DOMAIN = 1;
@@ -150,7 +149,7 @@ class CRM_GCD {
    * Provides user feedback
    */
   public function generate($itemName) {
-    echo "Adding $itemName\n";
+    echo "Generating $itemName\n";
     $fn = "add$itemName";
     $this->$fn();
   }
@@ -170,14 +169,13 @@ class CRM_GCD {
    * contact_note uuid
    */
   public function initID() {
-
-    // may use this function in future if needed to get
-    // a consistent pattern of random numbers.
-
     // get the domain and contact id arrays
     $this->domain = range(1, self::NUM_DOMAIN);
     shuffle($this->domain);
-    $this->contact = range(2, self::NUM_CONTACT + 1);
+
+    // Get first contact id
+    $this->startCid = $cid = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_contact");
+    $this->contact = range($cid + 1, $cid + self::NUM_CONTACT);
     shuffle($this->contact);
 
     // get the individual, household  and organizaton contacts
@@ -249,6 +247,7 @@ class CRM_GCD {
   private $sampleData = array();
 
   // private vars
+  private $startCid;
   private $numIndividual = 0;
   private $numHousehold = 0;
   private $numOrganization = 0;
@@ -478,9 +477,10 @@ class CRM_GCD {
    */
   private function addContact() {
     $contact = new CRM_Contact_DAO_Contact();
+    $cid = $this->startCid;
 
-    for ($id = 1; $id <= self::NUM_CONTACT; $id++) {
-      $contact->contact_type = $this->getContactType($id + 1);
+    for ($id = $cid + 1; $id <= $cid + self::NUM_CONTACT; $id++) {
+      $contact->contact_type = $this->getContactType($id);
       $contact->do_not_phone = $this->probability(.2);
       $contact->do_not_email = $this->probability(.2);
       $contact->do_not_post = $this->probability(.2);
@@ -982,7 +982,7 @@ class CRM_GCD {
   }
 
   /**
-   * This method populates the crm_entity_tag table
+   * This method populates the civicrm_entity_tag table
    */
   private function addEntityTag() {
 
@@ -1017,7 +1017,7 @@ class CRM_GCD {
   }
 
   /**
-   * This method populates the crm_entity_tag table
+   * This method populates the civicrm_group_contact table
    */
   private function addGroup() {
     // add the 3 groups first
@@ -1109,7 +1109,7 @@ class CRM_GCD {
   }
 
   /**
-   * This method populates the crm_note table
+   * This method populates the civicrm_note table
    */
   private function addNote() {
     $params = array(
@@ -1126,7 +1126,7 @@ class CRM_GCD {
   }
 
   /**
-   * This method populates the crm_activity_history table
+   * This method populates the civicrm_activity_history table
    */
   private function addActivity() {
     $contactDAO = new CRM_Contact_DAO_Contact();
@@ -1907,31 +1907,31 @@ function module_list() {
 }
 
 echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");
-$obj1 = new CRM_GCD();
-$obj1->initID();
-$obj1->generate('Domain');
-$obj1->generate('Contact');
-$obj1->generate('Individual');
-$obj1->generate('Household');
-$obj1->generate('Organization');
-$obj1->generate('Relationship');
-$obj1->generate('EntityTag');
-$obj1->generate('Group');
-$obj1->generate('Note');
-$obj1->generate('Activity');
-$obj1->generate('Event');
-$obj1->generate('Contribution');
-$obj1->generate('ContributionLineItem');
-$obj1->generate('Membership');
-$obj1->generate('MembershipPayment');
-$obj1->generate('MembershipLog');
-$obj1->generate('PCP');
-$obj1->generate('SoftContribution');
-$obj1->generate('Pledge');
-$obj1->generate('PledgePayment');
-$obj1->generate('ContributionFinancialItem');
-$obj1->generate('Participant');
-$obj1->generate('ParticipantPayment');
-$obj1->generate('LineItemParticipants');
-$obj1->generate('ParticipantFinancialItem');
+$gcd = new CRM_GCD();
+$gcd->initID();
+$gcd->generate('Domain');
+$gcd->generate('Contact');
+$gcd->generate('Individual');
+$gcd->generate('Household');
+$gcd->generate('Organization');
+$gcd->generate('Relationship');
+$gcd->generate('EntityTag');
+$gcd->generate('Group');
+$gcd->generate('Note');
+$gcd->generate('Activity');
+$gcd->generate('Event');
+$gcd->generate('Contribution');
+$gcd->generate('ContributionLineItem');
+$gcd->generate('Membership');
+$gcd->generate('MembershipPayment');
+$gcd->generate('MembershipLog');
+$gcd->generate('PCP');
+$gcd->generate('SoftContribution');
+$gcd->generate('Pledge');
+$gcd->generate('PledgePayment');
+$gcd->generate('ContributionFinancialItem');
+$gcd->generate('Participant');
+$gcd->generate('ParticipantPayment');
+$gcd->generate('LineItemParticipants');
+$gcd->generate('ParticipantFinancialItem');
 echo ("Ending data generation on " . date("F dS h:i:s A") . "\n");

@@ -4,7 +4,7 @@
  
  */
 function grant_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'contact_id' => 3,
   'application_received_date' => 'now',
@@ -26,17 +26,17 @@ $params = array(
  */
 function grant_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id' => '3',
-          'application_received_date' => '20130204223148',
-          'decision_date' => '20130211000000',
+          'application_received_date' => '20130622084947',
+          'decision_date' => '20130624000000',
           'money_transfer_date' => '',
           'grant_due_date' => '',
           'grant_report_received' => '',

@@ -4,7 +4,7 @@
  
  */
 function group_contact_delete_example(){
-$params = array( 
+$params = array(
   'contact_id' => 1,
   'group_id' => 1,
   'version' => 3,
@@ -20,7 +20,7 @@ $params = array(
  */
 function group_contact_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

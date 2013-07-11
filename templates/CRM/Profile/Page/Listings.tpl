@@ -23,6 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+
+<div class="crm-profile-name-{$ufGroupName}">
+{crmRegion name=profile-search-`$ufGroupName`}
+
 {* make sure there are some fields in the selector *}
 {if ! empty( $columnHeaders ) || $isReset }
 
@@ -90,3 +94,6 @@
     </div>
 {/if}
 </div>
+
+{/crmRegion}
+</div>{* crm-profile-name-NAME *}

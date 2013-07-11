@@ -83,8 +83,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $params = array(
       'version' => $this->_apiversion,
     );
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['is_error'], 1, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'],
       'Mandatory key(s) missing from params array: title, extends', 'In line ' . __LINE__
     );
@@ -109,7 +108,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $customGroup = civicrm_api('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: extends', 'In line ' . __LINE__);
-    $this->assertEquals($customGroup['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($customGroup, 'In line ' . __LINE__);
   }
 
   /**
@@ -130,9 +129,8 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
+    $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: extends', 'In line ' . __LINE__);
-    $this->assertEquals($customGroup['is_error'], 1, 'In line ' . __LINE__);
   }
 
   /**
@@ -180,20 +178,23 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['extends'], 'Individual', 'In line ' . __LINE__);
   }
+
   /**
    * check with valid array
    */
   function testCustomGroupGetFields() {
     $params = array(
-        'version' => $this->_apiversion,
+      'version' => $this->_apiversion,
+      'options' => array('get_options' => 'style'),
     );
 
-    $result = civicrm_api('custom_group', 'getfields', $params);
-    $this->assertEquals('Tab', $result['values']['style']['options'][0]);
-    $this->assertEquals('Inline', $result['values']['style']['options'][1]);
-
+    $result = $this->callAPISuccess('custom_group', 'getfields', $params);
+    $expected = array(
+      'Tab' => 'Tab',
+      'Inline' => 'Inline',
+    );
+    $this->assertEquals($expected, $result['values']['style']['options']);
   }
-
 
   /**
    * check with extends array length greater than 1
@@ -212,8 +213,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('custom_group', 'create', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($result['error_message'], 'implode(): Invalid arguments passed', 'In line ' . __LINE__);
   }
 
@@ -234,7 +234,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     );
 
     $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['is_error'], 0, 'In line ' . __LINE__);
+    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['style'], 'Inline', 'In line ' . __LINE__);
   }
@@ -244,8 +244,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    */
   function testCustomGroupCreateNotArray() {
     $params = NULL;
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['is_error'], 1, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 
@@ -264,7 +263,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $customGroup = civicrm_api('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: title', 'In line ' . __LINE__);
-    $this->assertEquals($customGroup['is_error'], 1, 'In line ' . __LINE__);
+    $this->assertAPIFailure($customGroup, 'In line ' . __LINE__);
   }
 
   /**
@@ -284,7 +283,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     );
 
     $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['is_error'], 0, 'In line ' . __LINE__);
+    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Household', 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['style'], 'Tab', 'In line ' . __LINE__);
@@ -308,7 +307,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     );
 
     $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['is_error'], 0, 'In line ' . __LINE__);
+    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Contribution', 'In line ' . __LINE__);
   }
@@ -332,7 +331,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     );
 
     $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['is_error'], 0, 'In line ' . __LINE__);
+    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Group', 'In line ' . __LINE__);
   }
@@ -354,7 +353,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     );
 
     $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['is_error'], 0, 'In line ' . __LINE__);
+    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Activity', 'In line ' . __LINE__);
   }
@@ -365,11 +364,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    * check without GroupID
    */
   function testCustomGroupDeleteWithoutGroupID() {
-    $params = array(
-      'version' => $this->_apiversion,
-    );
-    $customGroup = civicrm_api('custom_group', 'delete', $params);
-    $this->assertEquals($customGroup['is_error'], 1, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'delete', array());
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: id', 'In line ' . __LINE__);
   }
 
@@ -378,8 +373,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    */
   function testCustomGroupDeleteNoArray() {
     $params = NULL;
-    $customGroup = civicrm_api('custom_group', 'delete', $params);
-    $this->assertEquals($customGroup['is_error'], 1, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'delete', $params);
     $this->assertEquals($customGroup['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
   }
 
@@ -394,7 +388,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     );
     $result = civicrm_api('custom_group', 'delete', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0, 'In line ' . __LINE__);
+    $this->assertAPISuccess($result, 'In line ' . __LINE__);
   }
   /*
      * main success get function
@@ -408,7 +402,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $params = array('version' => 3);
     $result = civicrm_api($this->_entity, 'get', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0, 'in line' . __LINE__);
+    $this->assertAPISuccess($result, 'In line ' . __LINE__);
     $values = $result['values'][$result['id']];
     foreach ($this->_params as $key => $value) {
       if ($key == 'version' || $key == 'weight') {

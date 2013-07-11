@@ -33,9 +33,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
   function get_info() {
     return array(
-      'name'    => 'FieldOptions',
+      'name' => 'FieldOptions',
       'description' => 'Tests for field-specific option values',
-      'group'     => 'Core',
+      'group' => 'Core',
     );
   }
 
@@ -83,7 +83,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
         $message = "BAO name: '{$baoName}', field: '{$field['fieldName']}'";
 
         $props = CRM_Utils_Array::value('props', $field, array());
-        $optionValues = $baoName::buildOptions($field['fieldName'], 'test', $props);
+        $optionValues = $baoName::buildOptions($field['fieldName'], 'create', $props);
         $this->assertNotEmpty($optionValues, $message);
 
         // Ensure sample value is contained in the returned optionValues.

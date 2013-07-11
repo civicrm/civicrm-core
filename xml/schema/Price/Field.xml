@@ -152,7 +152,7 @@
       <pseudoconstant>
         <optionGroupName>visibility</optionGroupName>
       </pseudoconstant>
-   </field>   
+   </field>
    <field>
       <name>count</name>
       <type>int unsigned</type>

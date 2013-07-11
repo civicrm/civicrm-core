@@ -785,6 +785,18 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       // delete all notes related to contact
       CRM_Core_BAO_Note::cleanContactNotes($id);
 
+      // delete cases related to contact
+      $contactCases = CRM_Case_BAO_Case::retrieveCaseIdsByContactId($id);
+      if (!empty($contactCases)) {
+        foreach ($contactCases as $caseId) {
+          //check if case is associate with other contact or not.
+          $caseContactId = CRM_Case_BAO_Case::getCaseClients($caseId);
+          if (count($caseContactId) <= 1) {
+            CRM_Case_BAO_Case::deleteCase($caseId);
+          }
+        }
+      }
+
       $contact->delete();
     }
     else {
@@ -2986,7 +2998,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * TODO: In context of chainselect, what to return if e.g. a country has no states?
    *
    * @param String $fieldName
-   * @param String $context: e.g. "search" "edit" "create" "view"
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
    * @param Array  $props: whatever is known about this dao object
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
@@ -2999,7 +3011,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
         }
         break;
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params);
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
   /**

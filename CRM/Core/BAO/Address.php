@@ -1158,7 +1158,7 @@ SELECT is_primary,
    * TODO: In context of chainselect, what to return if e.g. a country has no states?
    *
    * @param String $fieldName
-   * @param String $context: e.g. "search" "edit" "create" "view"
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
    * @param Array  $props: whatever is known about this dao object
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
@@ -1182,9 +1182,11 @@ SELECT is_primary,
         break;
       // Filter country list based on site defaults
       case 'country_id':
-        $config = CRM_Core_Config::singleton();
-        if (!empty($config->countryLimit) && is_array($config->countryLimit)) {
-          $params['condition'] = 'id IN (' . implode(',', $config->countryLimit) . ')';
+        if ($context != 'get' && $context != 'validate') {
+          $config = CRM_Core_Config::singleton();
+          if (!empty($config->countryLimit) && is_array($config->countryLimit)) {
+            $params['condition'] = 'id IN (' . implode(',', $config->countryLimit) . ')';
+          }
         }
         break;
       // Filter county list based on chosen state
@@ -1194,6 +1196,6 @@ SELECT is_primary,
         }
         break;
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params);
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 }

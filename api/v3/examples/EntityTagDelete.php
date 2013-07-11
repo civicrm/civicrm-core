@@ -4,7 +4,7 @@
  
  */
 function entity_tag_delete_example(){
-$params = array( 
+$params = array(
   'contact_id_h' => 46,
   'tag_id' => 1,
   'version' => 3,
@@ -20,7 +20,7 @@ $params = array(
  */
 function entity_tag_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'not_removed' => 0,
   'removed' => 1,

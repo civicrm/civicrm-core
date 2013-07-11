@@ -4,7 +4,7 @@
  
  */
 function price_field_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'price_set_id' => 3,
   'name' => 'grassvariety',
@@ -24,13 +24,13 @@ $params = array(
  */
 function price_field_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
           'price_set_id' => '3',
           'name' => 'grassvariety',

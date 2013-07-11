@@ -477,6 +477,22 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when rendering the tabs
+   * used for events and potentially contribution pages, etc
+   * @param string $tabset   - name of the screen or visual element
+   * @param array $tabs      - the array of tabs that will be displayed   
+   * @param array $context   - extra data about the screen or context in which the tab is used
+   *
+   * @return null 
+   * @access public
+   */
+  static function tabset($tabsetName, &$tabs, $context) {
+    return self::singleton()->invoke(3, $tabsetName, $tabs,
+      $context, self::$_nullObject, self::$_nullObject, 'civicrm_tabset'
+    );
+  }
+
+  /**
    * This hook is called when sending an email / printing labels
    *
    * @param array $tokens    - the list of tokens that can be used for the contact
@@ -1201,5 +1217,72 @@ abstract class CRM_Utils_Hook {
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_permission'
     );
+  }
+
+
+  /**
+   * This hook is called for declaring managed entities via API
+   *
+   * @param array $entities List of entity types; each entity-type is an array with keys:
+   *   - name: string, a unique short name (e.g. "ReportInstance")
+   *   - class: string, a PHP DAO class (e.g. "CRM_Report_DAO_Instance")
+   *   - table: string, a SQL table name (e.g. "civicrm_report_instance")
+   *
+   * @return null the return value is ignored
+   * @access public
+   */
+  static function entityTypes(&$entityTypes) {
+    return self::singleton()->invoke(1, $entityTypes, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_entityTypes'
+    );
+  }
+
+  /**
+   * This hook is called while preparing a profile form
+   *
+   * @param string $name
+   * @return void
+   */
+  static function buildProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_buildProfile');
+  }
+
+  /**
+   * This hook is called while validating a profile form submission
+   *
+   * @param string $name
+   * @return void
+   */
+  static function validateProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_validateProfile');
+  }
+
+  /**
+   * This hook is called processing a valid profile form submission
+   *
+   * @param string $name
+   * @return void
+   */
+  static function processProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_processProfile');
+  }
+
+  /**
+   * This hook is called while preparing a read-only profile screen
+   *
+   * @param string $name
+   * @return void
+   */
+  static function viewProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_viewProfile');
+  }
+
+  /**
+   * This hook is called while preparing a list of contacts (based on a profile)
+   *
+   * @param string $name
+   * @return void
+   */
+  static function searchProfile($name) {
+    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_searchProfile');
   }
 }

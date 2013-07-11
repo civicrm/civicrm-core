@@ -165,7 +165,7 @@ UPDATE civicrm_log
     if ($loggingSchema->isEnabled()) {
       $params = array('report_id' => 'logging/contact/summary');
       $instance = array();
-      CRM_Report_BAO_Instance::retrieve($params, $instance);
+      CRM_Report_BAO_ReportInstance::retrieve($params, $instance);
 
       if (!empty($instance) &&
         (!CRM_Utils_Array::value('permission', $instance) ||

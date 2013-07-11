@@ -4,7 +4,7 @@
  Criteria delete by nesting a GET & a DELETE
  */
 function participant_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'contact_id' => 4,
   'api.participant.delete' => 1,
@@ -20,12 +20,12 @@ $params = array(
  */
 function participant_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'contact_id' => '4',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -52,14 +52,14 @@ function participant_get_expectedresult(){
           'participant_discount_name' => '',
           'participant_campaign_id' => '',
           'id' => '2',
-          'api.participant.delete' => array( 
+          'api.participant.delete' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'values' => 1,
             ),
         ),
-      '3' => array( 
+      '3' => array(
           'contact_id' => '4',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -86,7 +86,7 @@ function participant_get_expectedresult(){
           'participant_discount_name' => '',
           'participant_campaign_id' => '',
           'id' => '3',
-          'api.participant.delete' => array( 
+          'api.participant.delete' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,

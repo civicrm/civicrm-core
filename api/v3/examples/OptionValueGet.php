@@ -4,7 +4,7 @@
  
  */
 function option_value_get_example(){
-$params = array( 
+$params = array(
   'option_group_id' => 1,
   'version' => 3,
 );
@@ -19,12 +19,12 @@ $params = array(
  */
 function option_value_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 5,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'option_group_id' => '1',
           'label' => 'Phone',
@@ -35,7 +35,7 @@ function option_value_get_expectedresult(){
           'is_reserved' => 0,
           'is_active' => '1',
         ),
-      '2' => array( 
+      '2' => array(
           'id' => '2',
           'option_group_id' => '1',
           'label' => 'Email',
@@ -46,7 +46,7 @@ function option_value_get_expectedresult(){
           'is_reserved' => 0,
           'is_active' => '1',
         ),
-      '3' => array( 
+      '3' => array(
           'id' => '3',
           'option_group_id' => '1',
           'label' => 'Postal Mail',
@@ -57,7 +57,7 @@ function option_value_get_expectedresult(){
           'is_reserved' => 0,
           'is_active' => '1',
         ),
-      '4' => array( 
+      '4' => array(
           'id' => '4',
           'option_group_id' => '1',
           'label' => 'SMS',
@@ -68,7 +68,7 @@ function option_value_get_expectedresult(){
           'is_reserved' => 0,
           'is_active' => '1',
         ),
-      '5' => array( 
+      '5' => array(
           'id' => '5',
           'option_group_id' => '1',
           'label' => 'Fax',

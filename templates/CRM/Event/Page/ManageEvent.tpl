@@ -80,8 +80,9 @@
         <th class="hiddenElement"></th>
       </tr>
       </thead>
-      {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="{if NOT $row.is_active} disabled{/if}">
+      {foreach from=$rows key=keys item=row}
+        {if $keys neq 'tab'}
+          <tr id="row_{$row.id}" class="{if NOT $row.is_active} disabled{/if}">
           <td class="crm-event_{$row.id}">
             <a href="{crmURL p='civicrm/event/info' q="id=`$row.id`&reset=1"}"
                title="{ts}View event info page{/ts}" class="bold">{$row.title}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})
@@ -101,56 +102,12 @@
             <div class="crm-configure-actions">
               <span id="event-configure-{$row.id}" class="btn-slide">{ts}Configure{/ts}
                 <ul class="panel" id="panel_info_{$row.id}">
-                  <li>
-                    <a title="{ts}Info and Settings{/ts}" class="action-item-wrap"
-                       href="{crmURL p='civicrm/event/manage/settings'
-                       q="reset=1&action=update&id=`$row.id`"}">{ts}Info and Settings{/ts}
-                    </a>
-                  </li>
-                  <li>
-                    <a title="{ts}Location{/ts}" class="action-item-wrap {if NOT $row.is_show_location} disabled{/if}"
-                       href="{crmURL p='civicrm/event/manage/location'
-                       q="reset=1&action=update&id=`$row.id`"}">{ts}Location{/ts}
-                    </a>
-                  </li>
-                  <li>
-                    <a title="{ts}Fees{/ts}" class="action-item {if NOT $row.is_monetary} disabled{/if}"
-                       href="{crmURL p='civicrm/event/manage/fee' q="reset=1&action=update&id=`$row.id`"}">{ts}Fees{/ts}
-                    </a>
-                  </li>
-                  <li>
-                    <a title="{ts}Online Registration{/ts}" class="action-item-wrap
-                    {if NOT $row.is_online_registration} disabled{/if}" href="{crmURL
-                    p='civicrm/event/manage/registration' q="reset=1&action=update&id=`$row.id`"}">
-                      {ts}Online Registration{/ts}
-                    </a>
-                  </li>
-                  <li>
-                    <a title="{ts}Schedule Reminders{/ts}" class="action-item-wrap
-                    {if NOT $row.reminder} disabled{/if}" href="{crmURL p='civicrm/event/manage/reminder'
-                    q="reset=1&action=update&id=`$row.id`"}">{ts}Schedule Reminders{/ts}
-                    </a>
-                  </li>
-                  {if $eventCartEnabled}
-                    <li>
-                      <a title="{ts}Conference Slots{/ts}" class="action-item-wrap
-                      {if NOT $row.slot_label_id} disabled{/if}" href="{crmURL p='civicrm/event/manage/conference'
-                      q="reset=1&action=update&id=`$row.id`"}">{ts}Conference Slots{/ts}
-                      </a>
-                    </li>
-                  {/if}
-                  <li>
-                    <a title="{ts}Tell a Friend{/ts}" class="action-item-wrap {if NOT $row.friend} disabled{/if}"
-                       href="{crmURL p='civicrm/event/manage/friend'
-                       q="reset=1&action=update&id=`$row.id`"}">{ts}Tell a Friend{/ts}
-                    </a>
-                  </li>
-                  <li>
-                    <a title="{ts}Personal Campaign Pages{/ts}" class="action-item-wrap
-                    {if NOT $row.is_pcp_enabled} disabled{/if}" href="{crmURL p='civicrm/event/manage/pcp'
-                    q="reset=1&action=update&id=`$row.id`"}">{ts}Personal Campaign Pages{/ts}
-                    </a>
-                  </li>
+                  {foreach from=$rows.tab key=k item=v}
+                    {assign var="fld" value=$v.field}
+                    {if NOT $row.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
+                    <li><a title="{$v.title}" class="action-item-wrap {$status}"
+                           href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$row.id`"}">{$v.title}</a></li>
+                  {/foreach}
                 </ul>
               </span>
             </div>
@@ -220,10 +177,14 @@
           <td class="crm-event-start_date hiddenElement">{$row.start_date|crmDate}</td>
           <td class="crm-event-end_date hiddenElement">{$row.end_date|crmDate}</td>
         </tr>
+        {/if}
       {/foreach}
     </table>
   {include file="CRM/common/pager.tpl" location="bottom"}
   {/strip}
+  {if $isSearch eq 0}
+    <div class="status messages">{ts}Don't see your event listed? Try "Search All or by Date Range" above.{/ts}</div>
+  {/if}
 </div>
 {else}
   {if $isSearch eq 1}
@@ -234,6 +195,7 @@
     <div class="spacer"></div>
     <ul>
       <li>{ts}Check your spelling.{/ts}</li>
+      <li>{ts}Try "Search All or by Date Range".{/ts}</li>
       <li>{ts}Try a different spelling or use fewer letters.{/ts}</li>
       <li>{ts}Make sure you have enough privileges in the access control system.{/ts}</li>
     </ul>

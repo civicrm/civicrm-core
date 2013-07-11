@@ -4,7 +4,7 @@
  Demonstrates creating contribution with Note Entity
  */
 function contribution_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 1,
   'receive_date' => '2012-01-01',
   'total_amount' => '100',
@@ -31,13 +31,13 @@ $params = array(
  */
 function contribution_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id' => '1',
           'financial_type_id' => '1',

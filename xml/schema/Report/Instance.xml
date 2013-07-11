@@ -2,12 +2,13 @@
 
 <table>
   <base>CRM/Report</base>
-  <class>Instance</class>
+  <class>ReportInstance</class>
   <name>civicrm_report_instance</name>
   <comment>Users can save their report instance and put in a cron tab etc.</comment>
   <add>2.2</add>
   <field>
       <name>id</name>
+      <title>Report Instance ID</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>Report Instance ID</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
       <name>domain_id</name>
+      <title>Report Instance Domain ID</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>Which Domain is this instance for</comment>
@@ -40,6 +42,7 @@
   </field>
   <field>
       <name>report_id</name>
+      <title>Report template ID</title>
       <type>varchar</type>
       <length>64</length>
       <required>true</required>
@@ -48,6 +51,7 @@
   </field>
   <field>
       <name>name</name>
+      <title>Report instance Name</title>
       <type>varchar</type>
       <length>255</length>
       <comment>when combined with report_id/template uniquely identifies the instance</comment>
@@ -55,6 +59,7 @@
   </field>
   <field>
       <name>args</name>
+      <title>Report Instance Arguments</title>
       <type>varchar</type>
       <length>255</length>
       <comment>arguments that are passed in the url when invoking the instance</comment>
@@ -62,6 +67,7 @@
   </field>
   <field>
        <name>description</name>
+       <title>Report Instance description</title>
        <type>varchar</type>
        <length>255</length>
        <comment>Report Instance description.</comment>
@@ -69,6 +75,7 @@
   </field>
   <field>
        <name>permission</name>
+       <title>Report Instance Permissions</title>
        <type>varchar</type>
        <length>255</length>
        <comment>permission required to be able to run this instance</comment>
@@ -76,6 +83,7 @@
   </field>
   <field>
        <name>grouprole</name>
+       <title>Report Instance Assigned to Roles</title>
        <type>varchar</type>
        <length>1024</length>
        <comment>role required to be able to run this instance</comment>
@@ -91,78 +99,85 @@
   </field>
   <field>
        <name>is_active</name>
+       <title>Report Instance is Active</title>
        <type>boolean</type>
        <comment>Is this entry active?</comment>
        <add>2.2</add>
   </field>
   <field>
        <name>email_subject</name>
+       <title>Report Instance email Subject</title>
        <type>varchar</type>
        <length>255</length>
        <comment>Subject of email</comment>
   </field>
-  <field>        
-      <name>email_to</name>     
-      <type>text</type> 
+  <field>
+      <name>email_to</name>
+      <title>Email Report Instance To</title>
+      <type>text</type>
       <comment>comma-separated list of email addresses to send the report to</comment>
-      <add>2.2</add>     
+      <add>2.2</add>
   </field>
-  <field>        
-      <name>email_cc</name>     
-      <type>text</type> 
+  <field>
+      <name>email_cc</name>
+      <title>cc Email Report Instance To</title>
+      <type>text</type>
       <comment>comma-separated list of email addresses to send the report to</comment>
-      <add>2.2</add>     
+      <add>2.2</add>
   </field>
-  <field>        
-      <name>header</name>     
-      <type>text</type> 
-      <comment>comma-separated list of email addresses to send the report to</comment>
-      <htmlType>textarea</htmlType>
-      <rows>4</rows>
-      <cols>60</cols>
-      <add>2.2</add>     
-  </field>
-  <field>        
-      <name>footer</name>     
-      <type>text</type> 
+  <field>
+      <name>header</name>
+      <title>Report Instance Header</title>
+      <type>text</type>
       <comment>comma-separated list of email addresses to send the report to</comment>
       <htmlType>textarea</htmlType>
       <rows>4</rows>
       <cols>60</cols>
-      <add>2.2</add>     
+      <add>2.2</add>
   </field>
-  <field> 
-      <name>navigation_id</name> 
+  <field>
+      <name>footer</name>
+      <title>Report Instance Footer</title>
+      <type>text</type>
+      <comment>comma-separated list of email addresses to send the report to</comment>
+      <htmlType>textarea</htmlType>
+      <rows>4</rows>
+      <cols>60</cols>
+      <add>2.2</add>
+  </field>
+  <field>
+      <name>navigation_id</name>
       <title>Navigation ID</title>
-      <type>int unsigned</type> 
+      <type>int unsigned</type>
       <import>true</import>
-      <comment>FK to navigation ID</comment> 
-      <add>3.0</add> 
-  </field> 
-  <foreignKey> 
-       <name>navigation_id</name> 
+      <comment>FK to navigation ID</comment>
+      <add>3.0</add>
+  </field>
+  <foreignKey>
+       <name>navigation_id</name>
        <table>civicrm_navigation</table>
-       <key>id</key> 
-       <add>3.0</add> 
+       <key>id</key>
+       <add>3.0</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
-  <field> 
-      <name>drilldown_id</name> 
+  </foreignKey>
+  <field>
+      <name>drilldown_id</name>
       <title>Drilldown Report ID</title>
-      <type>int unsigned</type> 
+      <type>int unsigned</type>
       <import>true</import>
-      <comment>FK to instance ID drilldown to</comment> 
-      <add>4.3</add> 
-  </field> 
-  <foreignKey> 
-       <name>drilldown_id</name> 
+      <comment>FK to instance ID drilldown to</comment>
+      <add>4.3</add>
+  </field>
+  <foreignKey>
+       <name>drilldown_id</name>
        <table>civicrm_report_instance</table>
-       <key>id</key> 
-       <add>4.3</add> 
+       <key>id</key>
+       <add>4.3</add>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
     <name>is_reserved</name>
+    <title>Instance is Reserved</title>
     <type>boolean</type>
     <default>0</default>
     <add>4.2</add>

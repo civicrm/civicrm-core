@@ -4,8 +4,8 @@
  Demonstrates Use of Like
  */
 function address_get_example(){
-$params = array( 
-  'street_address' => array( 
+$params = array(
+  'street_address' => array(
       'LIKE' => '%mb%',
     ),
   'version' => 3,
@@ -22,13 +22,13 @@ $params = array(
  */
 function address_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 10,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '10',
           'contact_id' => '12',
           'location_type_id' => '15',

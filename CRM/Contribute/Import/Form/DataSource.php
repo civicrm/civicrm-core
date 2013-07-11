@@ -36,7 +36,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Contribute_Import_Form_UploadFile extends CRM_Core_Form {
+class CRM_Contribute_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Function to set variables up before form is built
@@ -79,10 +79,10 @@ class CRM_Contribute_Import_Form_UploadFile extends CRM_Core_Form {
 
     $duplicateOptions = array();
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Insert new contributions'), CRM_Contribute_Import_Parser::DUPLICATE_SKIP
+      NULL, NULL, ts('Insert new contributions'), CRM_Import_Parser::DUPLICATE_SKIP
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update existing contributions'), CRM_Contribute_Import_Parser::DUPLICATE_UPDATE
+      NULL, NULL, ts('Update existing contributions'), CRM_Import_Parser::DUPLICATE_UPDATE
     );
     $this->addGroup($duplicateOptions, 'onDuplicate',
       ts('Import mode')
@@ -104,24 +104,24 @@ class CRM_Contribute_Import_Form_UploadFile extends CRM_Core_Form {
 
     $this->setDefaults(array(
       'onDuplicate' =>
-        CRM_Contribute_Import_Parser::DUPLICATE_SKIP,
+        CRM_Import_Parser::DUPLICATE_SKIP,
       ));
 
     //contact types option
     $contactOptions = array();
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Individual'), CRM_Contribute_Import_Parser::CONTACT_INDIVIDUAL
+        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL
       );
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Household'), CRM_Contribute_Import_Parser::CONTACT_HOUSEHOLD
+        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD
       );
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Organization'), CRM_Contribute_Import_Parser::CONTACT_ORGANIZATION
+        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION
       );
     }
 
@@ -131,7 +131,7 @@ class CRM_Contribute_Import_Form_UploadFile extends CRM_Core_Form {
 
     $this->setDefaults(array(
       'contactType' =>
-        CRM_Contribute_Import_Parser::CONTACT_INDIVIDUAL,
+        CRM_Import_Parser::CONTACT_INDIVIDUAL,
       ));
 
     //build date formats
@@ -186,7 +186,7 @@ class CRM_Contribute_Import_Form_UploadFile extends CRM_Core_Form {
     $parser->run($fileName, $seperator,
       $mapper,
       $skipColumnHeader,
-      CRM_Contribute_Import_Parser::MODE_MAPFIELD, $contactType
+      CRM_Import_Parser::MODE_MAPFIELD, $contactType
     );
 
     // add all the necessary variables to the form

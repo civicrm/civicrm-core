@@ -101,6 +101,7 @@ function civicrm_api3_loc_block_get($params) {
   // If a return param has been set then fetch the appropriate fk objects
   // This is a helper because api chaining does not work with a key like 'email_2'
   if (!empty($options['return'])) {
+    unset($params['return']);
     $values = array();
     $items = array('address', 'email', 'phone', 'im');
     $returnAll = !empty($options['return']['all']);

@@ -1,4 +1,3 @@
-
 <?php
 /*
  +--------------------------------------------------------------------+
@@ -125,7 +124,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
         $label = $privacyOptions[$privacy_key];
         $status[] = $privacyValueNew ? ts("Added '%1'", array(1 => $label)) : ts("Removed '%1'", array(1 => $label));
       }
-  
+
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
       if ($count > 1) {
         $title = ts('%1 Contacts Updated', array(1 => $count));
@@ -134,7 +133,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
         $name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contact_id, 'display_name');
         $title = ts('%1 Updated', array(1 => $name));
       }
-  
+
       CRM_Core_Session::setStatus($status, $title, 'success');
     }
   }

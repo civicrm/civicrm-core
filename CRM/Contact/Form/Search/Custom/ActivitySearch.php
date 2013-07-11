@@ -34,7 +34,9 @@
  */
 class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_Search_Interface {
 
-  protected $_formValues; function __construct(&$formValues) {
+  protected $_formValues;
+
+  function __construct(&$formValues) {
     $this->_formValues = $formValues;
 
     /**
@@ -226,16 +228,23 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
   function from() {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+
     return "
-        civicrm_contact contact_a
-            JOIN civicrm_activity activity
-                 ON contact_a.id = activity.source_contact_id
+        civicrm_activity activity
+            LEFT JOIN civicrm_activity_contact target
+                 ON activity.id = target.activity_id AND target.record_type_id = {$targetID}
+            JOIN civicrm_contact contact_a
+                 ON contact_a.id = target.contact_id
             JOIN civicrm_option_value ov1
                  ON activity.activity_type_id = ov1.value AND ov1.option_group_id = 2
             JOIN civicrm_option_value ov2
                  ON activity.status_id = ov2.value AND ov2.option_group_id = {$this->_groupId}
+            LEFT JOIN civicrm_activity_contact sourceContact
+                 ON activity.id = sourceContact.activity_id AND sourceContact.record_type_id = {$sourceID}
             JOIN civicrm_contact contact_b
-                 ON activity.source_contact_id = contact_b.id
+                 ON sourceContact.contact_id = contact_b.id
             LEFT JOIN civicrm_case_activity cca
                  ON activity.id = cca.activity_id
             LEFT JOIN civicrm_activity_contact assignment

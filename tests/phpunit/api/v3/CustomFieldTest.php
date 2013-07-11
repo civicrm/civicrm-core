@@ -67,8 +67,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   function testCustomFieldCreateNoArray() {
     $fieldParams = NULL;
 
-    $customField = civicrm_api('custom_field', 'create', $fieldParams);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'create', $fieldParams);
     $this->assertEquals($customField['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -90,8 +89,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $customField = civicrm_api('custom_field', 'create', $params);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'create', $params);
     $this->assertEquals($customField['error_message'], 'Mandatory key(s) missing from params array: label');
   }
 
@@ -139,8 +137,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $customField = civicrm_api('custom_field', 'create', $fieldParams);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'create', $fieldParams);
     $this->assertEquals($customField['error_message'], 'Mandatory key(s) missing from params array: custom_group_id');
   }
 
@@ -220,6 +217,88 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * check with data type - Options with option_values
    */
+  function testCustomFieldCreateWithEmptyOptionGroup() {
+    $customGroup = $this->customGroupCreate('Contact', 'select_test_group', 3);
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Country',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'weight' => 4,
+      'is_required' => 1,
+      'is_searchable' => 0,
+      'is_active' => 1,
+      'version' => $this->_apiversion,
+    );
+
+    $customField = civicrm_api('custom_field', 'create', $params);
+    $this->assertAPISuccess($customField);
+    $this->assertNotNull($customField['id']);
+    $optionGroupID = civicrm_api('custom_field', 'getvalue', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => 'option_group_id',
+    ));
+
+    $this->assertTrue(is_numeric($optionGroupID) && ($optionGroupID > 0));
+    $optionGroup = civicrm_api('option_group', 'getsingle', array(
+      'version' => 3, 'id' => $optionGroupID));
+    $this->assertEquals($optionGroup['title'],'Country');
+    $optionValueCount = civicrm_api('option_value', 'getcount', array(
+      'version' => 3, 'option_group_id' => $optionGroupID));
+    $this->assertEquals(0, $optionValueCount);
+  }
+
+
+  /**
+   * Test custom field get works & return param works
+   */
+  function testCustomFieldGetReturnOptions(){
+    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+
+    $result = civicrm_api('custom_field', 'getsingle', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => 'data_type',
+    ));
+    $this->assertTrue(array_key_exists('data_type', $result));
+    $this->assertFalse(array_key_exists('custom_group_id', $result));
+  }
+
+  /**
+   * Test custom field get works & return param works
+   */
+  function testCustomFieldGetReturnArray(){
+    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+
+    $result = civicrm_api('custom_field', 'getsingle', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => array('data_type'),
+    ));
+    $this->assertTrue(array_key_exists('data_type', $result));
+    $this->assertFalse(array_key_exists('custom_group_id', $result));
+  }
+
+  /**
+   * Test custom field get works & return param works
+   */
+  function testCustomFieldGetReturnTwoOptions(){
+    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+
+    $result = civicrm_api('custom_field', 'getsingle', array(
+      'version' => 3,
+      'id' => $customField['id'],
+      'return' => 'data_type, custom_group_id',
+    ));
+    $this->assertTrue(array_key_exists('data_type', $result));
+    $this->assertTrue(array_key_exists('custom_group_id', $result));
+    $this->assertFalse(array_key_exists('label', $result));
+  }
+
   function testCustomFieldCreateWithOptionValues() {
     $customGroup = $this->customGroupCreate('Contact', 'select_test_group', 3);
 
@@ -239,7 +318,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $params = array(
       'custom_group_id' => $customGroup['id'],
-      'label' => 'Country',
+      'label' => 'Our special field',
       'html_type' => 'Select',
       'data_type' => 'String',
       'weight' => 4,
@@ -252,14 +331,14 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $customField = civicrm_api('custom_field', 'create', $params);
 
-    $this->assertEquals($customField['is_error'], 0);
+    $this->assertAPISuccess($customField);
     $this->assertNotNull($customField['id']);
     $getFieldsParams = array(
       'options' => array('get_options' => 'custom_' . $customField['id']),
       'version' => 3,
       'action' => 'create',
     );
-    $description  = "Demonstrate retrieving custom field options";
+    $description  = "Demonstrate retrieving metadata with custom field options";
     $subfile = "GetFieldsOptions";
     $fields = civicrm_api('contact', 'getfields', $getFieldsParams);
     $this->documentMe($getFieldsParams, $fields, __FUNCTION__, 'ContactTest.php', $description,$subfile,'GetFields');
@@ -283,8 +362,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   function testCustomFieldDeleteNoArray() {
     $params = NULL;
-    $customField = civicrm_api('custom_field', 'delete', $params);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'delete', $params);
     $this->assertEquals($customField['error_message'], 'Input variable `params` is not an array');
   }
 
@@ -293,8 +371,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   function testCustomFieldDeleteWithoutFieldID() {
     $params = array('version' => $this->_apiversion);
-    $customField = civicrm_api('custom_field', 'delete', $params);
-    $this->assertEquals($customField['is_error'], 1);
+    $customField = $this->callAPIFailure('custom_field', 'delete', $params);
     $this->assertEquals($customField['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 
@@ -313,7 +390,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $result = civicrm_api('custom_field', 'delete', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
 
-    $this->assertEquals($result['is_error'], 0, 'in line ' . __LINE__);
+    $this->assertAPISuccess($result, 'in line ' . __LINE__);
   }
 
   /**
@@ -329,7 +406,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     );
 
     $customField = civicrm_api('custom_field', 'delete', $customOptionValueFields);
-    $this->assertEquals($customField['is_error'], 0);
+    $this->assertAPISuccess($customField);
   }
 }
 

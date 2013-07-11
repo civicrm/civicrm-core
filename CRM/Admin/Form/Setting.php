@@ -50,7 +50,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    *
    * @return None
    */
-   function setDefaultValues() {
+  function setDefaultValues() {
     if (!$this->_defaults) {
       $this->_defaults = array();
       $formArray       = array('Component', 'Localization');
@@ -217,6 +217,16 @@ LIMIT  1
       );
 
       unset($params['autocompleteContactReference']);
+    }
+
+    // save components to be enabled 
+    if (CRM_Utils_Array::value('enableComponents', $params)) {
+      CRM_Core_BAO_Setting::setItem($params['enableComponents'],
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,'enable_components');
+
+      // unset params by emptying the values, so while retrieving we can detect and load from settings table
+      // instead of config-backend for backward compatibility. We could use unset() in later releases.
+      $params['enableComponents'] = $params['enableComponentIDs'] = array();
     }
 
     // save checksum timeout

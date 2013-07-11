@@ -149,6 +149,8 @@
 
   <civicrm_setting />
 
+  <civicrm_print_label />
+
   <civicrm_acl_cache />
 
   <civicrm_group />

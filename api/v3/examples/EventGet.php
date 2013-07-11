@@ -4,9 +4,11 @@
  
  */
 function event_get_example(){
-$params = array( 
+$params = array(
   'event_title' => 'Annual CiviCRM meet',
+  'sequential' => true,
   'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'event','get',$params );
@@ -19,13 +21,13 @@ $params = array(
  */
 function event_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '1',
           'title' => 'Annual CiviCRM meet',
           'event_title' => 'Annual CiviCRM meet',
@@ -46,7 +48,7 @@ function event_get_expectedresult(){
           'is_multiple_registrations' => 0,
           'allow_same_participant_emails' => 0,
           'is_template' => 0,
-          'created_date' => '2013-02-04 22:31:22',
+          'created_date' => '20120130621222105',
           'is_share' => '1',
         ),
     ),

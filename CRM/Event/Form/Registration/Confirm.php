@@ -85,7 +85,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('hookDiscount', $this->_params[0]['discount']);
     }
 
-    $config = CRM_Core_Config::singleton();
     if ($this->_contributeMode == 'express') {
       $params = array();
       // rfp == redirect from paypal
@@ -278,11 +277,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->set('totalAmount', $this->_totalAmount);
     }
 
-    $config = CRM_Core_Config::singleton();
-
-    //$this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
-    //$this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
-
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = array();
       foreach ($this->_lineItem as $key => $value) {
@@ -455,8 +449,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public function postProcess() {
     $now           = date('YmdHis');
-    $config        = CRM_Core_Config::singleton();
-    $session       = CRM_Core_Session::singleton();
+
     $this->_params = $this->get('params');
     if (CRM_Utils_Array::value('contact_id', $this->_params[0])) {
       $contactID = $this->_params[0]['contact_id'];
@@ -564,6 +557,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // transactions etc
       // for things like tell a friend
       if (!$this->getContactID() && CRM_Utils_Array::value('is_primary', $value)) {
+        $session = CRM_Core_Session::singleton();
         $session->set('transaction.userID', $contactID);
       }
 
@@ -894,7 +888,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   ) {
     $transaction = new CRM_Core_Transaction();
 
-    $config      = CRM_Core_Config::singleton();
     $now         = date('YmdHis');
     $receiptDate = NULL;
 

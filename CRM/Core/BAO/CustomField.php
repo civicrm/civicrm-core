@@ -149,38 +149,45 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $indexExist = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
     }
 
-    if (($params['html_type'] == 'CheckBox' ||
-        $params['html_type'] == 'AdvMulti-Select' ||
-        $params['html_type'] == 'Multi-Select'
-      ) &&
-      isset($params['default_checkbox_option'])
-    ) {
-      $tempArray = array_keys($params['default_checkbox_option']);
-      $defaultArray = array();
-      foreach ($tempArray as $k => $v) {
-        if ($params['option_value'][$v]) {
-          $defaultArray[] = $params['option_value'][$v];
+    switch (CRM_Utils_Array::value('html_type', $params)){
+      case 'Select Date':
+        if(empty($params['date_format'])){
+          $config = CRM_Core_Config::singleton();
+          $params['date_format'] = $config->dateInputFormat;
         }
-      }
+        break;
+      case 'CheckBox':
+      case 'AdvMulti-Select':
+      case 'Multi-Select':
+        if (isset($params['default_checkbox_option'])) {
+          $tempArray = array_keys($params['default_checkbox_option']);
+          $defaultArray = array();
+          foreach ($tempArray as $k => $v) {
+            if ($params['option_value'][$v]) {
+              $defaultArray[] = $params['option_value'][$v];
+            }
+          }
 
-      if (!empty($defaultArray)) {
-        // also add the seperator before and after the value per new conventio (CRM-1604)
-        $params['default_value'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultArray) . CRM_Core_DAO::VALUE_SEPARATOR;
-      }
+          if (!empty($defaultArray)) {
+            // also add the seperator before and after the value per new conventio (CRM-1604)
+            $params['default_value'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultArray) . CRM_Core_DAO::VALUE_SEPARATOR;
+          }
+        }
+        else {
+          if (CRM_Utils_Array::value('default_option', $params)
+            && isset($params['option_value'][$params['default_option']])
+          ) {
+            $params['default_value'] = $params['option_value'][$params['default_option']];
+          }
+        }
+       break;
     }
-    else {
-      if (CRM_Utils_Array::value('default_option', $params)
-        && isset($params['option_value'][$params['default_option']])
-      ) {
-        $params['default_value'] = $params['option_value'][$params['default_option']];
-      }
-    }
+
     $transaction = new CRM_Core_Transaction();
     // create any option group & values if required
     if ($params['html_type'] != 'Text' &&
       in_array($params['data_type'], array(
-        'String', 'Int', 'Float', 'Money')) &&
-      !empty($params['option_value']) && is_array($params['option_value'])
+        'String', 'Int', 'Float', 'Money'))
     ) {
 
       $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
@@ -197,35 +204,34 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $optionGroup->is_active = 1;
         $optionGroup->save();
         $params['option_group_id'] = $optionGroup->id;
+          if(!empty($params['option_value']) && is_array($params['option_value'])){
+          foreach ($params['option_value'] as $k => $v) {
+            if (strlen(trim($v))) {
+              $optionValue = new CRM_Core_DAO_OptionValue();
+              $optionValue->option_group_id = $optionGroup->id;
+              $optionValue->label = $params['option_label'][$k];
+              $optionValue->name = CRM_Utils_String::titleToVar($params['option_label'][$k]);
+              switch ($params['data_type']) {
+                case 'Money':
+                  $optionValue->value = CRM_Utils_Rule::cleanMoney($v);
+                  break;
 
+                case 'Int':
+                  $optionValue->value = intval($v);
+                  break;
 
+                case 'Float':
+                  $optionValue->value = floatval($v);
+                  break;
 
-        foreach ($params['option_value'] as $k => $v) {
-          if (strlen(trim($v))) {
-            $optionValue = new CRM_Core_DAO_OptionValue();
-            $optionValue->option_group_id = $optionGroup->id;
-            $optionValue->label = $params['option_label'][$k];
-            $optionValue->name = CRM_Utils_String::titleToVar($params['option_label'][$k]);
-            switch ($params['data_type']) {
-              case 'Money':
-                $optionValue->value = CRM_Utils_Rule::cleanMoney($v);
-                break;
+                default:
+                  $optionValue->value = trim($v);
+              }
 
-              case 'Int':
-                $optionValue->value = intval($v);
-                break;
-
-              case 'Float':
-                $optionValue->value = floatval($v);
-                break;
-
-              default:
-                $optionValue->value = trim($v);
+              $optionValue->weight = $params['option_weight'][$k];
+              $optionValue->is_active = CRM_Utils_Array::value($k, $params['option_status'], FALSE);
+              $optionValue->save();
             }
-
-            $optionValue->weight = $params['option_weight'][$k];
-            $optionValue->is_active = CRM_Utils_Array::value($k, $params['option_status'], FALSE);
-            $optionValue->save();
           }
         }
       }
@@ -962,7 +968,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'RichTextEditor':
         $attributes = array('rows' => $field->note_rows, 'cols' => $field->note_columns);
         if ($field->text_length) {
-          $attributes['maxlength'] = $field->text_length; 
+          $attributes['maxlength'] = $field->text_length;
         }
         $qf->addWysiwyg($elementName, $label, $attributes, $search);
         break;

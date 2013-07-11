@@ -68,19 +68,19 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/labelFormats',
-          'qs' => 'action=update&id=%%id%%&reset=1',
+          'qs' => 'action=update&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Edit Label Format'),
         ),
         CRM_Core_Action::COPY => array(
           'name' => ts('Copy'),
           'url' => 'civicrm/admin/labelFormats',
-          'qs' => 'action=copy&id=%%id%%',
+          'qs' => 'action=copy&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Copy Label Format'),
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/labelFormats',
-          'qs' => 'action=delete&id=%%id%%',
+          'qs' => 'action=delete&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Delete Label Format'),
         ),
       );
@@ -125,7 +125,8 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    */
   function browse($action = NULL) {
     // Get list of configured Label Formats
-    $labelFormatList = CRM_Core_BAO_LabelFormat::getList();
+    $labelFormatList= CRM_Core_BAO_LabelFormat::getList();
+    $nameFormatList= CRM_Core_BAO_LabelFormat::getList(false, 'name_badge');
 
     // Add action links to each of the Label Formats
     foreach ($labelFormatList as & $format) {
@@ -133,8 +134,25 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
       if (CRM_Utils_Array::value('is_reserved', $format)) {
         $action -= CRM_Core_Action::DELETE;
       }
-      $format['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $format['id']));
+
+      $format['groupName'] = ts('Mailing Label');
+      $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
+        array('id' => $format['id'], 'group' => 'label_format'));
     }
+
+    // Add action links to each of the Label Formats
+    foreach ($nameFormatList as & $format) {
+      $action = array_sum(array_keys($this->links()));
+      if (CRM_Utils_Array::value('is_reserved', $format)) {
+        $action -= CRM_Core_Action::DELETE;
+      }
+
+      $format['groupName'] = ts('Name Badge');
+      $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
+        array('id' => $format['id'], 'group' => 'name_badge'));
+    }
+
+    $labelFormatList = array_merge($labelFormatList, $nameFormatList);
 
     // Order Label Formats by weight
     $returnURL = CRM_Utils_System::url(self::userContext());

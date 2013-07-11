@@ -44,10 +44,12 @@ var cj = jQuery;
 function ts(text, params) {
   "use strict";
   text = CRM.strings[text] || text;
-  if (params && typeof(params) === 'object') {
+  if (typeof(params) === 'object') {
     for (var i in params) {
-      // sprintf emulation: escape % characters in the replacements to avoid conflicts
-      text = text.replace(new RegExp('%' + i, 'g'), params[i].replace(/%/g, '%-crmescaped-'));
+      if (typeof(params[i]) === 'string') {
+        // sprintf emulation: escape % characters in the replacements to avoid conflicts
+        text = text.replace(new RegExp('%' + i, 'g'), params[i].replace(/%/g, '%-crmescaped-'));
+      }
     }
     return text.replace(/%-crmescaped-/g, '%');
   }

@@ -45,7 +45,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
 
   /** This test case doesn't require DB reset */
   public $DBResetRequired = FALSE;
-
+  public $_eNoticeCompliant = FALSE;
   /* they are two types of missing APIs:
        - Those that are to be implemented
          (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
@@ -366,8 +366,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_get to be implemented");
       return;
     }
-    $result = civicrm_api($Entity, 'Get', 'string');
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure($Entity, 'Get', 'string');
     $this->assertEquals(2000, $result['error_code']);
     $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
@@ -705,16 +704,12 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_URL:
           $entity[$field] = 'warm.beer.com';
       }
-      $constant = CRM_Utils_Array::value('pseudoconstant', $specs);
-      if (!empty($constant)) {
-        $constantOptions = array_reverse(array_keys(CRM_Utils_PseudoConstant::getConstant($constant['name'])));
-        $entity[$field] = (string) $constantOptions[0];
-      }
-      $enum = CRM_Utils_Array::value('enumValues', $specs);
-      if (!empty($enum)) {
-        // reverse so we 'change' value
-        $options = array_reverse(explode(',', $enum));
-        $entity[$fieldName] = $options[0];
+      if (!empty($specs['pseudoconstant']) || !empty($specs['enumValues'])) {
+        $options = civicrm_api($entityName, 'getoptions', array('context' => 'create', 'field' => $field, 'version' => 3));
+        if (empty($options['values'])) {
+          print_r($options);
+        }
+        $entity[$field] = array_rand($options['values']);
       }
       $updateParams = array(
         'version' => 3,
@@ -739,7 +734,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       );
 
       $checkEntity = civicrm_api($entityName, 'getsingle', $checkParams);
-      $this->assertEquals($entity, $checkEntity, "changing field $fieldName" . print_r($entity,TRUE) );//. print_r($checkEntity,true) .print_r($checkParams,true) . print_r($update,true) . print_r($updateParams, TRUE));
+      $this->assertEquals($entity, $checkEntity, "changing field $fieldName\n" . print_r($entity,TRUE) );//. print_r($checkEntity,true) .print_r($checkParams,true) . print_r($update,true) . print_r($updateParams, TRUE));
     }
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();

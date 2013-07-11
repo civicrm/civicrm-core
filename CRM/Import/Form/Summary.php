@@ -34,30 +34,37 @@
  */
 
 /**
- * State machine for managing different states of the Import process.
- *
+ * This class summarizes the import results
+ * TODO: CRM-11254 - if preProcess and postProcess functions can be reconciled between the 5 child classes,
+ * those classes can be removed entirely and this class will not need to be abstract
  */
-class CRM_Event_Import_StateMachine extends CRM_Core_StateMachine {
+abstract class CRM_Import_Form_Summary extends CRM_Core_Form {
 
   /**
-   * class constructor
+   * Function to actually build the form
    *
-   * @param object  CRM_Member_Import_Controller
-   * @param int     $action
-   *
-   * @return object CRM_Member_Import_StateMachine
+   * @return None
+   * @access public
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
-    parent::__construct($controller, $action);
-
-    $this->_pages = array(
-      'CRM_Event_Import_Form_UploadFile' => NULL,
-      'CRM_Event_Import_Form_MapField' => NULL,
-      'CRM_Event_Import_Form_Preview' => NULL,
-      'CRM_Event_Import_Form_Summary' => NULL,
+  public function buildQuickForm() {
+    $this->addButtons(array(
+        array(
+          'type' => 'next',
+          'name' => ts('Done'),
+          'isDefault' => TRUE,
+        ),
+      )
     );
+  }
 
-    $this->addSequentialPages($this->_pages, $action);
+  /**
+   * Return a descriptive name for the page, used in wizard header
+   *
+   * @return string
+   * @access public
+   */
+  public function getTitle() {
+    return ts('Summary');
   }
 }
 

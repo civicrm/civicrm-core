@@ -44,6 +44,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   protected $_contactId = 69;
   protected $_apiversion;
   protected $params;
+  public $_eNoticeCompliant = TRUE;
 
   protected function setUp() {
     parent::setUp();
@@ -173,7 +174,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
 
     $result = civicrm_api('uf_group', 'create', $this->params);
     $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['values'][$result['id']]['add_to_group_id'], $this->params['add_contact_to_group'], 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $this->params['group'], 'in line ' . __LINE__);
     $this->params['created_date'] = date('YmdHis', strtotime($this->params['created_date']));
@@ -193,9 +194,9 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
 
   function testUFGroupCreateWithWrongParams() {
     $result = civicrm_api('uf_group', 'create', 'a string');
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $result = civicrm_api('uf_group', 'create', array('name' => 'A title-less group'));
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testUFGroupUpdate() {
@@ -265,19 +266,20 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
 
   function testUFGroupUpdateWithEmptyParams() {
     $result = civicrm_api('uf_group', 'create', array(), $this->_ufGroupId);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testUFGroupUpdateWithWrongParams() {
     $result = civicrm_api('uf_group', 'create', 'a string', $this->_ufGroupId);
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
     $result = civicrm_api('uf_group', 'create', array('title' => 'Title'), 'a string');
-    $this->assertEquals($result['is_error'], 1);
+    $this->assertAPIFailure($result);
   }
 
   function testUFGroupDelete() {
 
     $ufGroup = civicrm_api('uf_group', 'create', $this->params);
+    $this->assertAPISuccess($ufGroup);
     $params = array('version' => $this->_apiversion, 'id' => $ufGroup['id']);
     $this->assertEquals(1, civicrm_api('uf_group', 'getcount', $params), "in line " . __LINE__);
     $result = civicrm_api('uf_group', 'delete', $params, "in line " . __LINE__);

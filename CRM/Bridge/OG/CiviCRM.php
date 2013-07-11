@@ -85,7 +85,7 @@ class CRM_Bridge_OG_CiviCRM {
   static function groupContact($groupID, $contactIDs, $op) {
     $config = CRM_Core_Config::singleton();
     $ogID = CRM_Bridge_OG_Utils::ogID($groupID, FALSE);
-    
+
     if (!$ogID) {
       return;
     }

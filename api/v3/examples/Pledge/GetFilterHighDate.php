@@ -4,9 +4,9 @@
  demonstrates high date filter
  */
 function pledge_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
-  'pledge_start_date_high' => '20130202223950',
+  'pledge_start_date_high' => '20130620090530',
 );
 
   $result = civicrm_api( 'pledge','get',$params );
@@ -19,13 +19,13 @@ $params = array(
  */
 function pledge_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'contact_id' => '8',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -33,7 +33,7 @@ function pledge_get_expectedresult(){
           'display_name' => 'Mr. Anthony Anderson II',
           'pledge_id' => '2',
           'pledge_amount' => '100.00',
-          'pledge_create_date' => '2013-02-04 00:00:00',
+          'pledge_create_date' => '2013-06-22 00:00:00',
           'pledge_status' => 'Overdue',
           'pledge_total_paid' => '',
           'pledge_next_pay_date' => '2012-03-02 00:00:00',

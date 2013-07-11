@@ -254,5 +254,17 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $result = civicrm_api('event', 'getfields', array('version' => 3));
     $this->assertArrayHasKey('values', $result);
   }
+
+  function testGetFields_AllOptions() {
+    $result = civicrm_api('contact', 'getfields', array(
+      'options' => array(
+        'get_options' => 'all',
+      ),
+      'version' => 3
+    ));
+    $this->assertAPISuccess($result);
+    $this->assertEquals('Household', $result['values']['contact_type']['options']['Household']);
+    $this->assertEquals('HTML', $result['values']['preferred_mail_format']['options']['HTML']);
+  }
 }
 

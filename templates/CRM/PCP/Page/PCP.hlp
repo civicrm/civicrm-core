@@ -30,5 +30,14 @@
 <p>{ts}Personal Campaign Pages (PCPs) allow your constituents to create their own fundraising page for your organization. This means that a donor, after donating to your organization, can elect to create a page with her own photo, text, and personal information. She can then send a link to the page to her friends, soliciting support for your organization. This is a powerful way to widely and quickly spread the message about your campaign.{/ts}</p>
 
 <p>{ts}When someone donates through a personal campaign page, a soft credit is given to the owner of the page to recognize the role she played in the contribution. CiviContribute has a section that allows you to administer all of the PCPs for your organization. You can require approval before a PCP goes 'live', and disable or delete any campaign pages you don't approve of.{/ts} {docURL page="user/contributions/personal-campaign-pages"}</p>
+
+<p>
+{if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
+  {ts}You can also place additional links (or menu items) allowing constituents to create their own fundraising pages using the following URL:{/ts}<br />
+  <em>{crmURL a=1 fe=1 p='civicrm/contribute/campaign' q="action=add&reset=1&pageId=<id of contribution page or event>&component=<contribute or event>"}</em>
+{elseif $config->userFramework EQ 'Joomla'}
+  {ts}You can also create front-end links (or menu items) allowing constituents to create their own fundraising pages using the Menu Manager. Select <strong>Contributions &raquo; Personal Campaign Pages</strong> and then select this event.{/ts}
+{/if}
+<p>
 {/htxt} 
 

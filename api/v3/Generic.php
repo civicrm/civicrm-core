@@ -23,6 +23,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
   if ((CRM_Utils_Array::value('cache_clear', $apiRequest['params']))) {
     $results = array();
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
+    CRM_Core_PseudoConstant::flush();
     if(!empty($apiRequest['params']['fieldname'])){
       CRM_Utils_PseudoConstant::flushConstant($apiRequest['params']['fieldname']);
     }
@@ -90,9 +91,14 @@ function civicrm_api3_generic_getfields($apiRequest) {
 
     case 'getoptions':
       $metadata = array(
-        'field' => array('title' => 'Field to retrieve options for',
-        'api.required' => 1,
-      ));
+        'field' => array(
+          'title' => 'Field to retrieve options for',
+          'api.required' => 1,
+        ),
+        'context' => array(
+          'title' => 'Context string',
+        ),
+      );
         break;
     default:
       // oddballs are on their own
@@ -108,10 +114,10 @@ function civicrm_api3_generic_getfields($apiRequest) {
     $helper($metadata);
   }
 
-  $fieldsToResolve = CRM_Utils_Array::value('get_options', $apiOptions, array());
+  $fieldsToResolve = (array) CRM_Utils_Array::value('get_options', $apiOptions, array());
 
   foreach ($metadata as $fieldname => $fieldSpec) {
-    _civicrm_api3_generic_get_metadata_options($metadata, $fieldname, $fieldSpec, $fieldsToResolve);
+    _civicrm_api3_generic_get_metadata_options($metadata, $apiRequest['entity'], $fieldname, $fieldSpec, $fieldsToResolve);
   }
 
   $results[$entity][$action] = civicrm_api3_create_success($metadata, $apiRequest['params'], NULL, 'getfields');
@@ -202,10 +208,19 @@ function civicrm_api3_generic_replace($apiRequest) {
  * @return array of results
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
-  $daoName = _civicrm_api3_get_DAO($apiRequest['entity']);
-  $options = $daoName::buildOptions($apiRequest['params']['field']);
+  // Resolve aliases
+  $fieldName = _civicrm_api3_api_resolve_alias($apiRequest['entity'], $apiRequest['params']['field']);
+  if (!$fieldName) {
+    return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' doesn't exist.");
+  }
+  // Validate 'context' from params
+  $context = CRM_Utils_Array::value('context', $apiRequest['params']);
+  CRM_Core_DAO::buildOptionsContext($context);
+
+  $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
+  $options = $baoName::buildOptions($fieldName, $context);
   if ($options === FALSE) {
-    return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' either doesn't exist or has no associated option list.");
+    return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");
   }
   return civicrm_api3_create_success($options);
 }
@@ -226,27 +241,16 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * @param array $fieldSpec metadata for that field
  * @param array $fieldsToResolve anny field resolutions specifically requested
  */
-function _civicrm_api3_generic_get_metadata_options(&$metadata, $fieldname, $fieldSpec, $fieldsToResolve){
-  if (array_key_exists('enumValues', $fieldSpec)) {
-    // use of a space after the comma is inconsistent in xml
-    $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
-    $metadata[$fieldname]['options'] = explode(',', $enumStr);
+function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldname, $fieldSpec, $fieldsToResolve){
+  if(empty($fieldSpec['pseudoconstant']) && empty($fieldSpec['enumValues'])) {
     return;
   }
 
-  if(empty($fieldSpec['pseudoconstant'])){
-    return ;
-  }
-  elseif(!empty($fieldSpec['FKClassName']) && !in_array($fieldname, $fieldsToResolve)){
+  if (!empty($metadata[$fieldname]['options']) || (!in_array($fieldname, $fieldsToResolve) && !in_array('all', $fieldsToResolve))) {
     return;
   }
-  if(substr($fieldname, -3) == '_id'){
-    $metadata[$fieldname]['api.aliases'][] = substr($fieldname, 0, -3);
-  }
 
-  $pseudoParams = $fieldSpec['pseudoconstant'];
-  $pseudoParams['version'] = 3;
-  $options = civicrm_api('constant', 'get', $pseudoParams);
+  $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldname));
   if (is_array(CRM_Utils_Array::value('values', $options))) {
     $metadata[$fieldname]['options'] = $options['values'];
   }

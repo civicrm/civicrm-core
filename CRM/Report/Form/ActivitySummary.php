@@ -36,7 +36,9 @@
 class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
   protected $_emailField = FALSE;
-  protected $_phoneField = FALSE; function __construct() {
+  protected $_phoneField = FALSE;
+
+  function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -287,18 +289,29 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   }
 
   function from() {
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
     $this->_from = "
         FROM civicrm_activity {$this->_aliases['civicrm_activity']}
 
-             LEFT JOIN civicrm_activity_target target_activity
-                    ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id
-             LEFT JOIN civicrm_activity_assignment assignment_activity
-                    ON {$this->_aliases['civicrm_activity']}.id = assignment_activity.activity_id
-             LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                    ON ({$this->_aliases['civicrm_activity']}.source_contact_id = {$this->_aliases['civicrm_contact']}.id OR
-                         target_activity.target_contact_id = {$this->_aliases['civicrm_contact']}.id                      OR
-                         assignment_activity.assignee_contact_id = {$this->_aliases['civicrm_contact']}.id )
+             LEFT JOIN civicrm_activity_contact target_activity
+                    ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id AND
+                       target_activity.record_type_id = {$targetID}
+             LEFT JOIN civicrm_activity_contact assignment_activity
+                    ON {$this->_aliases['civicrm_activity']}.id = assignment_activity.activity_id AND
+                       assignment_activity.record_type_id = {$assigneeID}
+             LEFT JOIN civicrm_activity_contact source_activity
+                    ON {$this->_aliases['civicrm_activity']}.id = source_activity.activity_id AND
+                       source_activity.record_type_id = {$sourceID}
+             LEFT JOIN civicrm_contact contact_civireport
+                    ON target_activity.contact_id = contact_civireport.id
+             LEFT JOIN civicrm_contact civicrm_contact_assignee
+                    ON assignment_activity.contact_id = civicrm_contact_assignee.id
+             LEFT JOIN civicrm_contact civicrm_contact_source
+                    ON source_activity.contact_id = civicrm_contact_source.id
              {$this->_aclFrom}
              LEFT JOIN civicrm_option_value
                     ON ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )

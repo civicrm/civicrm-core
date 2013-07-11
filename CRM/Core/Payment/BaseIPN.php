@@ -35,10 +35,29 @@
 class CRM_Core_Payment_BaseIPN {
 
   static $_now = NULL;
+
+  /**
+   * Constructor
+   */
   function __construct() {
     self::$_now = date('YmdHis');
   }
 
+  /**
+   * Validate incoming data. This function is intended to ensure that incoming data matches
+   * It provides a form of pseudo-authentication - by checking the calling fn already knows
+   * the correct contact id & contribution id (this can be problematic when that has changed in
+   * the meantime for transactions that are delayed & contacts are merged in-between. e.g
+   * Paypal allows you to resend Instant Payment Notifications if you, for example, moved site
+   * and didn't update your IPN URL.
+   *
+   * @param array $input interpreted values from the values returned through the IPN
+   * @param array $ids more interpreted values (ids) from the values returned through the IPN
+   * @param array $objects an empty array that will be populated with loaded object
+   * @param boolean $required boolean Return FALSE if the relevant objects don't exist
+   * @param integer $paymentProcessorID Id of the payment processor ID in use
+   * @return boolean
+   */
   function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
     // make sure contact exists and is valid
@@ -69,33 +88,16 @@ class CRM_Core_Payment_BaseIPN {
     return TRUE;
   }
 
-  function createContact(&$input, &$ids, &$objects) {
-    $params    = array();
-    $billingID = $ids['billing'];
-    $lookup    = array(
-      'first_name',
-      'last_name',
-      "street_address-{$billingID}",
-      "city-{$billingID}",
-      "state-{$billingID}",
-      "postal_code-{$billingID}",
-      "country-{$billingID}",
-    );
-    foreach ($lookup as $name) {
-      $params[$name] = $input[$name];
-    }
-    if (!empty($params)) {
-      // update contact record
-      $contact = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray, $ids['contact']);
-    }
-
-    return TRUE;
-  }
-
-  /*
+  /**
    * Load objects related to contribution
    *
    * @input array information from Payment processor
+   * @param array $ids
+   * @param array $objects
+   * @param boolean $required
+   * @param integer $paymentProcessorID
+   * @param array $error_handling
+   * @return multitype:number NULL |boolean
    */
   function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
     if (empty($error_handling)) {
@@ -139,6 +141,13 @@ class CRM_Core_Payment_BaseIPN {
     return $success;
   }
 
+  /**
+   * Set contribution to failed
+   * @param array $objects
+   * @param object $transaction
+   * @param array $input
+   * @return boolean
+   */
   function failed(&$objects, &$transaction, $input = array()) {
     $contribution = &$objects['contribution'];
     $memberships = array();
@@ -195,6 +204,12 @@ class CRM_Core_Payment_BaseIPN {
     return TRUE;
   }
 
+  /**
+   * Handled pending contribution status
+   * @param array $objects
+   * @param object $transaction
+   * @return boolean
+   */
   function pending(&$objects, &$transaction) {
     $transaction->commit();
     CRM_Core_Error::debug_log_message("returning since contribution status is pending");
@@ -502,6 +517,7 @@ LIMIT 1;";
         $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)) {
         $input['payment_processor'] = $paymentProcessorId;
       }
+      $input['contribution_status_id'] = array_search('Completed', $contributionStatuses);
       $input['total_amount'] = $input['amount'];
       $input['contribution'] = $contribution;
       $input['financial_type_id'] = $contribution->financial_type_id;
@@ -588,6 +604,13 @@ LIMIT 1;";
     return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
   }
 
+  /**
+   * Update contribution status - this is only called from one place in the code &
+   * it is unclear whether it is a function on the way in or on the way out
+   *
+   * @param unknown_type $params
+   * @return void|Ambigous <value, unknown, array>
+   */
   function updateContributionStatus(&$params) {
     // get minimum required values.
     $statusId       = CRM_Utils_Array::value('contribution_status_id', $params);

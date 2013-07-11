@@ -2535,7 +2535,7 @@ WHERE  contribution_id = %1 ";
         'currency' => $params['contribution']->currency,
         'trxn_id' => $params['contribution']->trxn_id,
         'status_id' => $params['contribution']->contribution_status_id,
-        'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params),
+        'payment_instrument_id' => $params['contribution']->payment_instrument_id,
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
 
@@ -2689,7 +2689,7 @@ WHERE  contribution_id = %1 ";
           $params['trxnParams']['to_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = - $params['total_amount'];
         }
-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' ")); 
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
         $params['trxnParams']['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
           $financialTypeID, $relationTypeId);
       }

@@ -96,7 +96,7 @@
                             <div class="label">{$form.cvv2.label} {$reqMark}</div>
                             <div class="content">
                                 {$form.cvv2.html}
-                                <img src="{$config->resourceBase}i/mini_cvv2.gif" alt="{ts}Usually the last 3-4 digits in the signature area on the back of the card.{/ts}" title="{ts}Usually the last 3-4 digits in the signature area on the back of the card.{/ts}" style="vertical-align: text-bottom;" />
+                                <span class="cvv2-icon" title="{ts}Usually the last 3-4 digits in the signature area on the back of the card.{/ts}"> </span>
                             </div>
                             <div class="clear"></div>
                         </div>
@@ -174,8 +174,8 @@
 cj( function( ) {
   // build list of ids to track changes on
   var address_fields = {/literal}{$profileAddressFields|@json_encode}{literal};
-  var input_ids = [];
-  var select_ids = [];
+  var input_ids = {};
+  var select_ids = {};
   var orig_id = field = field_name = null;
 
   // build input ids

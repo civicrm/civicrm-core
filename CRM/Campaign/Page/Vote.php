@@ -39,7 +39,7 @@
 class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   private $_surveyId;
   private $_interviewerId;
-  
+
   function reserve() {
     //build ajax voter search and selector.
     $controller = new CRM_Core_Controller_Simple('CRM_Campaign_Form_Gotv', ts('Reserve Respondents'));

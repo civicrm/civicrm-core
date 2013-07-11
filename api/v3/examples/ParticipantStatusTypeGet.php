@@ -4,7 +4,7 @@
  
  */
 function participant_status_type_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'name' => 'test status',
   'label' => 'I am a test',
@@ -26,13 +26,13 @@ $params = array(
  */
 function participant_status_type_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 14,
-  'values' => array( 
-      '14' => array( 
+  'values' => array(
+      '14' => array(
           'id' => '14',
           'name' => 'test status',
           'label' => 'I am a test',

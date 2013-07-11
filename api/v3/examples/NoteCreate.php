@@ -4,7 +4,7 @@
  
  */
 function note_create_example(){
-$params = array( 
+$params = array(
   'entity_table' => 'civicrm_contact',
   'entity_id' => 1,
   'note' => 'Hello!!! m testing Note',
@@ -24,13 +24,13 @@ $params = array(
  */
 function note_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
           'entity_table' => 'civicrm_contact',
           'entity_id' => '1',

@@ -59,7 +59,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
    *
    * @return void
    * @acess protected
-   */ 
+   */
   function preProcess() {
     $this->_id = $this->get('id');
 

@@ -119,11 +119,11 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
   function testProfileAddContactstoGroup() {
     $this->webtestLogin();
-    
+
     // take group name and create group
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($groupName);
-     
+
      // Add new profile.
     $this->openCiviPage('admin/uf/group', 'reset=1');
 
@@ -143,7 +143,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     //click on save
     $this->clickLink('_qf_Group_next');
-    
+
     //check for  profile create
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
@@ -159,7 +159,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
       $this->click("//option[@value='$type']");
       $this->click('field_name_1');
       $this->select('field_name_1', "value=$field");
-      $this->clickLink('_qf_Field_next_new-top'); 
+      $this->clickLink('_qf_Field_next_new-top');
     }
 
     // create mode
@@ -171,7 +171,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->type('last_name', $lastName1);
     $this->type('email-Primary', "$firstName1.$lastName1@example.com");
     $this->clickLink('_qf_Edit_next', NULL);
-   
+
     //anonymous contact
     $this->webtestLogout();
     $this->openCiviPage('profile/create', "gid=$gid&reset=1", NULL);
@@ -181,7 +181,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->type('last_name', $lastName2);
     $this->type('email-Primary', "$firstName2.$lastName2@example.com");
     $this->clickLink('_qf_Edit_next', NULL);
-    
+
     $this->webtestLogin();
     //check the existence of the two contacts in the group
     $this->openCiviPage('group', 'reset=1');
@@ -190,8 +190,8 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForVisible('crm-group-selector_processing');
     $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(text(), '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
     $this->clickLink("xpath=//table[@id='crm-group-selector']/tbody/tr/td[1][text()= '$groupName']/following-sibling::td[@class='crm-group-group_links']/span/a");
-    $contactEmails = array( 
-      1 => "$lastName1, $firstName1", 
+    $contactEmails = array(
+      1 => "$lastName1, $firstName1",
       2 => "$lastName2, $firstName2"
     );
     foreach ($contactEmails as $row => $name) {
@@ -223,7 +223,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/uf/group', 'reset=1');
     $this->_testdeleteProfile($profileTitle);
   }
-  
+
   function _testdeleteProfile($profileTitle) {
     //$this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("//div[@id='user-profiles']/div/div/table/tbody//tr/td[1]/span[text() = '$profileTitle']/../following-sibling::td[4]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");

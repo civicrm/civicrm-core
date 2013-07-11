@@ -155,7 +155,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Activity_DAO_Activity' => array(
         array(
           'fieldName' => 'activity_type_id',
-          'sample' => 'Text Message (SMS)',
+          'sample' => 'Email',
           'max' => 50,
         ),
         array(
@@ -185,7 +185,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Campaign_DAO_Survey' => array(
         array(
           'fieldName' => 'activity_type_id',
-          'sample' => 'Text Message (SMS)',
+          'sample' => 'Phone Call',
           'max' => 50,
         ),
       ),
@@ -230,7 +230,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ),
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
@@ -247,7 +247,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ),
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
@@ -274,49 +274,49 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Contribute_DAO_ContributionSoft' => array(
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
       'CRM_Contribute_DAO_Product' => array(
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
       'CRM_Contribute_DAO_ContributionRecur' => array(
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
       'CRM_Financial_DAO_OfficialReceipt' => array(
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
       'CRM_Pledge_DAO_PledgePayment' => array(
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
       'CRM_Pledge_DAO_Pledge' => array(
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
       'CRM_PCP_DAO_PCP' => array(
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
         array(
@@ -468,7 +468,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ),
         array(
           'fieldName' => 'fee_currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
@@ -487,7 +487,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ),
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
@@ -514,7 +514,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ),
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),
@@ -529,7 +529,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ),
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
         array(
@@ -552,7 +552,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ),
         array(
           'fieldName' => 'currency',
-          'sample' => '$',
+          'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
       ),

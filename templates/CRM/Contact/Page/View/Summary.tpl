@@ -51,19 +51,19 @@
 
         {* Include the Actions and Edit buttons if user has 'edit' permission and contact is NOT in trash. *}
           {if $permission EQ 'edit' and !$isDeleted}
-	      {if call_user_func(array('CRM_Core_Permission','check'), 'access CiviCRM')}
+        {if call_user_func(array('CRM_Core_Permission','check'), 'access CiviCRM')}
               <li class="crm-contact-activity crm-summary-block">
                   {include file="CRM/Contact/Page/Inline/Actions.tpl"}
               </li>
-	      {/if}
-	      {if call_user_func(array('CRM_Core_Permission','check'), 'edit my contact')}
+        {/if}
+        {if call_user_func(array('CRM_Core_Permission','check'), 'edit my contact')}
               <li>
                   {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
                   <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
                   <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
                   </a>
               </li>
-	      {/if}
+        {/if}
           {/if}
 
           {* Check for permissions to provide Restore and Delete Permanently buttons for contacts that are in the trash. *}

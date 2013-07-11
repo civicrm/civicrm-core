@@ -1,7 +1,9 @@
 <?php
 class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
   public $line_items = NULL;
-  public $sub_total = 0; function buildLineItems() {
+  public $sub_total = 0;
+
+  function buildLineItems() {
     foreach ($this->cart->events_in_carts as $event_in_cart) {
       $event_in_cart->load_location();
     }

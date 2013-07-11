@@ -333,6 +333,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     }
 
     $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'name');
+    $this->assign('ufGroupName', $name);
+    CRM_Utils_Hook::viewProfile($name);
 
     if (strtolower($name) == 'summary_overlay') {
       $template->assign('overlayProfile', TRUE);

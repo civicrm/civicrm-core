@@ -4,10 +4,10 @@
  /*this demonstrates the usage of chained api functions. A variety of techniques are used
  */
 function contact_get_example(){
-$params = array( 
+$params = array(
   'id' => 1,
   'version' => 3,
-  'api.website.getValue' => array( 
+  'api.website.getValue' => array(
       'return' => 'url',
     ),
   'api.Contribution.getCount' => array(),
@@ -24,13 +24,13 @@ $params = array(
  */
 function contact_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '1',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -59,12 +59,6 @@ function contact_get_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'contact_is_deleted' => 0,
-          'gender_id' => '',
-          'gender' => '',
-          'prefix_id' => '',
-          'prefix' => '',
-          'suffix_id' => '',
-          'suffix' => '',
           'current_employer' => '',
           'address_id' => '',
           'street_address' => '',
@@ -94,63 +88,63 @@ function contact_get_expectedresult(){
           'id' => '1',
           'api.website.getValue' => 'http://civicrm.org',
           'api.Contribution.getCount' => 2,
-          'api.CustomValue.get' => array( 
+          'api.CustomValue.get' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 10,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'entity_id' => '1',
                       'latest' => 'value 4',
-                      'id' => '12',
+                      'id' => '13',
                       '0' => 'value 4',
                     ),
-                  '1' => array( 
+                  '1' => array(
                       'entity_table' => 'Contact',
                     ),
-                  '2' => array( 
+                  '2' => array(
                       'entity_id' => '1',
                       'latest' => 'value 3',
-                      'id' => '13',
+                      'id' => '14',
                       '1' => 'value 2',
                       '2' => 'value 3',
                     ),
-                  '3' => array( 
+                  '3' => array(
                       'entity_table' => 'Contact',
                     ),
-                  '4' => array( 
-                      'entity_id' => '1',
-                      'latest' => '',
-                      'id' => '14',
-                      '1' => 'warm beer',
-                      '2' => '',
-                    ),
-                  '5' => array( 
+                  '4' => array(
                       'entity_id' => '1',
                       'latest' => '',
                       'id' => '15',
-                      '1' => '',
+                      '1' => 'warm beer',
                       '2' => '',
                     ),
-                  '6' => array( 
-                      'entity_table' => 'Contact',
-                    ),
-                  '7' => array( 
+                  '5' => array(
                       'entity_id' => '1',
                       'latest' => '',
                       'id' => '16',
                       '1' => '',
+                      '2' => '',
                     ),
-                  '8' => array( 
-                      'entity_id' => '1',
-                      'latest' => 'vegemite',
-                      'id' => '17',
-                      '1' => 'vegemite',
+                  '6' => array(
+                      'entity_table' => 'Contact',
                     ),
-                  '9' => array( 
+                  '7' => array(
                       'entity_id' => '1',
                       'latest' => '',
+                      'id' => '17',
+                      '1' => '',
+                    ),
+                  '8' => array(
+                      'entity_id' => '1',
+                      'latest' => 'vegemite',
                       'id' => '18',
+                      '1' => 'vegemite',
+                    ),
+                  '9' => array(
+                      'entity_id' => '1',
+                      'latest' => '',
+                      'id' => '19',
                       '1' => '',
                     ),
                 ),

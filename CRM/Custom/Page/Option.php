@@ -278,6 +278,10 @@ ORDER BY weight, label
       $this, FALSE, 0
     );
 
+    if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
+      CRM_Core_Error::fatal("You cannot add or edit muliple choice options in a reserved custom field-set.");
+    }
+
     //as url contain $gid so append breadcrumb dynamically.
     $breadcrumb = array(array('title' => ts('Custom Data Fields'),
         'url' => CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&gid=' . $this->_gid),

@@ -4,7 +4,7 @@
  
  */
 function contribution_page_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'amount' => '34567',
   'currency' => 'NZD',
@@ -21,13 +21,13 @@ $params = array(
  */
 function contribution_page_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'title' => 'Test Contribution Page',
           'financial_type_id' => '1',

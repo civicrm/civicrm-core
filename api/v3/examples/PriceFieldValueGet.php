@@ -4,7 +4,7 @@
  
  */
 function price_field_value_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'name' => 'contribution_amount',
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function price_field_value_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'price_field_id' => '1',
           'name' => 'contribution_amount',

@@ -4,7 +4,7 @@
  
  */
 function email_delete_example(){
-$params = array( 
+$params = array(
   'contact_id' => 8,
   'location_type_id' => 16,
   'email' => 'api@a-team.com',
@@ -22,11 +22,11 @@ $params = array(
  */
 function email_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'values' => 1,
+  'values' => true,
 );
 
   return $expectedResult  ;

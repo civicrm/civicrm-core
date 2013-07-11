@@ -213,6 +213,13 @@ class CRM_Utils_PDF_Label extends TCPDF {
    * function to Print a label
    */
   function AddPdfLabel($texte) {
+    if ($this->countX == $this->xNumber) {
+      // Page full, we start a new one
+      $this->AddPage();
+      $this->countX = 0;
+      $this->countY = 0;
+    }
+
     $posX = $this->marginLeft + ($this->countX * ($this->width + $this->xSpace));
     $posY = $this->marginTop + ($this->countY * ($this->height + $this->ySpace));
     $this->SetXY($posX + $this->paddingLeft, $posY + $this->paddingTop);
@@ -228,17 +235,6 @@ class CRM_Utils_PDF_Label extends TCPDF {
       // End of column reached, we start a new one
       $this->countX++;
       $this->countY = 0;
-    }
-
-    if ($this->countX == $this->xNumber) {
-      // Page full, we start a new one
-      $this->countX = 0;
-      $this->countY = 0;
-    }
-
-    // We are in a new page, then we must add a page
-    if (($this->countX == 0) and ($this->countY == 0)) {
-      $this->AddPage();
     }
   }
 

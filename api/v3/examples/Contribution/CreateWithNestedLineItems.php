@@ -4,7 +4,7 @@
  Create Contribution with Nested Line Items
  */
 function contribution_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 1,
   'receive_date' => '20120511',
   'total_amount' => '100',
@@ -19,20 +19,21 @@ $params = array(
   'contribution_status_id' => 1,
   'version' => 3,
   'skipLineItem' => 1,
-  'api.line_item.create' => array( 
-      '0' => array( 
+  'api.line_item.create' => array(
+      '0' => array(
           'price_field_id' => 1,
           'qty' => 2,
           'line_total' => '20',
           'unit_price' => '10',
         ),
-      '1' => array( 
+      '1' => array(
           'price_field_id' => 1,
           'qty' => 1,
           'line_total' => '80',
           'unit_price' => '80',
         ),
     ),
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'contribution','create',$params );
@@ -45,13 +46,13 @@ $params = array(
  */
 function contribution_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id' => '1',
           'financial_type_id' => '1',
@@ -81,25 +82,14 @@ function contribution_create_expectedresult(){
           'check_number' => 'null',
           'campaign_id' => '',
           'contribution_type_id' => '1',
-          'api.line_item.create' => array( 
-              '0' => array( 
+          'api.line_item.create' => array(
+              '0' => array(
                   'is_error' => 0,
-                  'undefined_fields' => array( 
-                      '0' => 'label',
-                      '1' => 'entity_id',
-                      '2' => 'entity_table',
-                      '3' => 'contribution_id',
-                      '4' => 'api.has_parent',
-                      '5' => 'price_field_id',
-                      '6' => 'qty',
-                      '7' => 'line_total',
-                      '8' => 'unit_price',
-                    ),
                   'version' => 3,
                   'count' => 1,
                   'id' => 1,
-                  'values' => array( 
-                      '0' => array( 
+                  'values' => array(
+                      '0' => array(
                           'id' => '1',
                           'entity_table' => 'civicrm_contribution',
                           'entity_id' => '1',
@@ -115,24 +105,13 @@ function contribution_create_expectedresult(){
                         ),
                     ),
                 ),
-              '1' => array( 
+              '1' => array(
                   'is_error' => 0,
-                  'undefined_fields' => array( 
-                      '0' => 'label',
-                      '1' => 'entity_id',
-                      '2' => 'entity_table',
-                      '3' => 'contribution_id',
-                      '4' => 'api.has_parent',
-                      '5' => 'price_field_id',
-                      '6' => 'qty',
-                      '7' => 'line_total',
-                      '8' => 'unit_price',
-                    ),
                   'version' => 3,
                   'count' => 1,
                   'id' => 2,
-                  'values' => array( 
-                      '0' => array( 
+                  'values' => array(
+                      '0' => array(
                           'id' => '2',
                           'entity_table' => 'civicrm_contribution',
                           'entity_id' => '1',

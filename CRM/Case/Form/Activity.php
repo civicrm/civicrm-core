@@ -595,7 +595,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     // Insert civicrm_log record for the activity (e.g. store the
     // created / edited by contact id and date for the activity)
     // Note - civicrm_log is already created by CRM_Activity_BAO_Activity::create()
-    
+
     // send copy to selected contacts.
     $mailStatus = '';
     $mailToContacts = array();

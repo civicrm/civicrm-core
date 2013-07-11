@@ -241,16 +241,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 
-        $found = FALSE;
-        // we should replace all the tokens that are set in mailing label format
-        foreach ($mailingFormatProperties as $key => $dontCare) {
-          if (CRM_Utils_Array::value($key, $contact)) {
-            $found = TRUE;
-            break;
-          }
-        }
-
-        if (!$found) {
+        if(!$this->tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
           continue;
         }
 
@@ -288,16 +279,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         }
       }
       else {
-        $found = FALSE;
-        // we should replace all the tokens that are set in mailing label format
-        foreach ($mailingFormatProperties as $key => $dontCare) {
-          if (CRM_Utils_Array::value($key, $contact)) {
-            $found = TRUE;
-            break;
-          }
-        }
-
-        if (!$found) {
+        if(!$this->tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
           continue;
         }
 
@@ -358,6 +340,20 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     CRM_Utils_System::civiExit(1);
   }
 
+  /**
+   * Check for presence of tokens to be swapped out
+   * @param array $contact
+   * @param array $mailingFormatProperties
+   * @param array $tokenFields
+   */
+  function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
+    foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
+      if (CRM_Utils_Array::value($key, $contact)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
   /**
    * function to create labels (pdf)
    *

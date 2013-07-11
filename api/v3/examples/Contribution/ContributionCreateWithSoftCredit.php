@@ -4,8 +4,8 @@
  Demonstrates creating contribution with SoftCredit
  */
 function contribution_create_example(){
-$params = array( 
-  'contact_id' => 3,
+$params = array(
+  'contact_id' => 1,
   'receive_date' => '20120511',
   'total_amount' => '100',
   'financial_type_id' => 1,
@@ -28,13 +28,13 @@ $params = array(
  */
 function contribution_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id' => '1',
           'financial_type_id' => '1',

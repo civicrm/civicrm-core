@@ -4,7 +4,7 @@
  
  */
 function mailing_create_example(){
-$params = array( 
+$params = array(
   'subject' => 'maild',
   'body_text' => 'bdkfhdskfhduew',
   'version' => 3,
@@ -22,13 +22,13 @@ $params = array(
  */
 function mailing_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'domain_id' => '1',
           'header_id' => 'null',
@@ -52,11 +52,11 @@ function mailing_create_expectedresult(){
           'msg_template_id' => '',
           'override_verp' => '1',
           'created_id' => '1',
-          'created_date' => '20130204223402',
+          'created_date' => '20120130621222105',
           'scheduled_id' => '',
-          'scheduled_date' => '20130204223402',
+          'scheduled_date' => '20130622085501',
           'approver_id' => '1',
-          'approval_date' => '20130204223402',
+          'approval_date' => '20130622085501',
           'approval_status_id' => '',
           'approval_note' => '',
           'is_archived' => '',
@@ -64,16 +64,16 @@ function mailing_create_expectedresult(){
           'campaign_id' => '',
           'dedupe_email' => '',
           'sms_provider_id' => '',
-          'api.mailing_job.create' => array( 
+          'api.mailing_job.create' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 1,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '1',
                       'mailing_id' => '1',
-                      'scheduled_date' => '20130204223402',
+                      'scheduled_date' => '20130622085501',
                       'start_date' => '',
                       'end_date' => '',
                       'status' => 'Scheduled',

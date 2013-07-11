@@ -72,7 +72,7 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
       elseif ($sortParams['sort'] == 'activity_type') {
         $orderOnPetitionTable = FALSE;
         $lookupTableJoins = "
- LEFT JOIN civicrm_option_value activity_type ON ( activity_type.value = petition.activity_type_id 
+ LEFT JOIN civicrm_option_value activity_type ON ( activity_type.value = petition.activity_type_id
                                                    OR petition.activity_type_id IS NULL )
 INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id AND grp.name = 'activity_type' )";
         $orderByClause = "ORDER BY activity_type.label {$sortParams['sortOrder']}";
@@ -234,8 +234,8 @@ SELECT  petition.id                         as id,
     $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $params = array(
-      1 => array($activity_id, 'Integer'), 
-      2 => array($contact_id, 'Integer'), 
+      1 => array($activity_id, 'Integer'),
+      2 => array($contact_id, 'Integer'),
       3 => array($sourceID, 'Integer')
     );
     CRM_Core_DAO::executeQuery($sql, $params);
@@ -250,9 +250,9 @@ SELECT  petition.id                         as id,
     );
 
     $sql = "
-DELETE FROM civicrm_entity_tag 
-WHERE       entity_table = 'civicrm_contact' 
-AND         entity_id = %1 
+DELETE FROM civicrm_entity_tag
+WHERE       entity_table = 'civicrm_contact'
+AND         entity_id = %1
 AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $params = array(1 => array($contact_id, 'Integer'),
       2 => array($tag_name, 'String'),
@@ -522,7 +522,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       * CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM
       *  send a confirmation request email
       */
-      
+
     // check if the group defined by CIVICRM_PETITION_CONTACTS exists, else create it
     $petitionGroupName = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'petition_contacts',

@@ -55,31 +55,30 @@ function civicrm_api3_relationship_create($params) {
   $values = array();
   _civicrm_api3_relationship_format_params($params, $values);
   $ids = array();
-  $action = CRM_Core_Action::ADD;
 
   if (CRM_Utils_Array::value('id', $params)) {
-    $ids['relationship'] = $params['id'];
     $ids['contactTarget'] = $values['contact_id_b'];
-    $action = CRM_Core_Action::UPDATE;
   }
 
   $values['relationship_type_id'] = $values['relationship_type_id'] . '_a_b';
-  $values['contact_check'] = array($params['contact_id_b'] => $params['contact_id_b']);
-  $ids['contact'] = $values['contact_id_a'];
+  if(!empty($params['contact_id_b'])){
+    $values['contact_check'] = array($params['contact_id_b'] => $params['contact_id_b']);
+  }
+  if(!empty($values['contact_id_a'])){
+    $ids['contact'] = $values['contact_id_a'];
+  }
   $relationshipBAO = CRM_Contact_BAO_Relationship::create($values, $ids);
 
   if ($relationshipBAO[1]) {
-    return civicrm_api3_create_error('Relationship is not valid');
+    throw new API_Exception('Relationship is not valid');
   }
   elseif ($relationshipBAO[2]) {
-    return civicrm_api3_create_error('Relationship already exists');
+    throw new API_Exception('Relationship already exists');
   }
-  CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $values, $ids, $action);
-  $relationID = $relationshipBAO[4][0];
-  return civicrm_api3_create_success(array(
-    $relationID => array('id' => $relationID,
-        'moreIDs' => implode(',', $relationshipBAO[4]),
-      )));
+  $id = $relationshipBAO[4][0];
+  $values = array();
+  _civicrm_api3_object_to_array($relationshipBAO[5][$id], $values[$id]);
+  return civicrm_api3_create_success($values, $params, 'relationship', 'create');
 }
 
 /**

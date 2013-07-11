@@ -456,6 +456,12 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   /**
    * Allow second-degree relations permission to edit contacts
    */
+  public $secondDegRelPermissions = FALSE;
+  
+
+  /**
+   * Allow second-degree relations permission to edit contacts
+   */
   public $wpBasePage = NULL;
 
   /**

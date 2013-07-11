@@ -23,18 +23,22 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+<div class="crm-profile-name-{$ufGroupName}">
+{crmRegion name=profile-form-`$ufGroupName`}
+
 {* Profile forms when embedded in CMS account create (mode=1) or
     cms account edit (mode=8) or civicrm/profile (mode=4) pages *}
 {if ($context eq 'multiProfileDialog')}
 {literal}
 <script type="text/javascript">
-cj(function() {
+cj(function($) {
+  $('#profile-dialog .crm-container-snippet #Edit').validate(CRM.validate.params);
   var formOptions = {
     beforeSubmit:  proccessMultiRecordForm //pre-submit callback
   };
 
   //binding the callback to snippet profile form
-  cj('.crm-container-snippet #Edit').ajaxForm(formOptions);
+  $('.crm-container-snippet #Edit').ajaxForm(formOptions);
 });
 
 // pre-submit callback
@@ -55,10 +59,7 @@ function proccessMultiRecordForm(formData, jqForm, options) {
 
     //if there is any form error show the dialog
     //else redirect to post url
-    if (cj(response).find('.crm-error').html()) {
-      cj('#profile-dialog').show().html(response);
-    }
-    else {
+    if (!cj(response).find('.crm-error').html()) {
       window.location = '{/literal}{$postUrl}{literal}';
     }
 
@@ -69,6 +70,7 @@ function proccessMultiRecordForm(formData, jqForm, options) {
 }
 </script>
 {/literal}
+{include file="CRM/Form/validate.tpl"}
 {/if}
 {if $deleteRecord}
 <div class="messages status no-popup">
@@ -118,6 +120,17 @@ function proccessMultiRecordForm(formData, jqForm, options) {
       {/if}
       {assign var="profileID" value=$field.group_id}
       {assign var=n value=$field.name}
+      {if $field.groupTitle != $fieldset}
+        {if $mode neq 8 && $mode neq 4}
+          <div {if $context neq 'dialog'}id="profilewrap{$field.group_id}"{/if}>
+          <fieldset><legend>{$field.groupTitle}</legend>
+        {/if}
+        {assign var=fieldset  value=`$field.groupTitle`}
+        {assign var=groupHelpPost  value=`$field.groupHelpPost`}
+        {if $field.groupHelpPre}
+          <div class="messages help">{$field.groupHelpPre}</div>
+        {/if}
+      {/if}
       {if $field.field_type eq "Formatting"}
         {$field.help_pre}
       {elseif $n}
@@ -131,16 +144,6 @@ function proccessMultiRecordForm(formData, jqForm, options) {
               </fieldset>
             </div>
             {/if}
-          {/if}
-
-          {if $mode neq 8 && $mode neq 4}
-          <div {if $context neq 'dialog'}id="profilewrap{$field.group_id}"{/if}>
-          <fieldset><legend>{$field.groupTitle}</legend>
-          {/if}
-          {assign var=fieldset  value=`$field.groupTitle`}
-          {assign var=groupHelpPost  value=`$field.groupHelpPost`}
-          {if $field.groupHelpPre}
-            <div class="messages help">{$field.groupHelpPre}</div>
           {/if}
         <div class="form-layout-compressed">
         {/if}
@@ -338,7 +341,7 @@ cj(document).ready(function(){
     var queryString = cj.param(formData);
     queryString = queryString + '&snippet=5&gid=' + {/literal}"{$profileID}"{literal};
     var postUrl = {/literal}"{crmURL p='civicrm/profile/create' h=0 }"{literal};
-    var blockNo = {/literal}{$blockNo}{literal};
+    var blockNo = {/literal}{if $blockNo}{$blockNo}{else}null{/if}{literal};
     var prefix  = {/literal}"{$prefix}"{literal};
     var response = cj.ajax({
       type: "POST",
@@ -355,7 +358,7 @@ cj(document).ready(function(){
             }
           }
           cj('input[name="' + prefix + 'contact_select_id[' + blockNo +']"]').val( response.contactID );
-          CRM.alert(response.sortName + {/literal}'{ts escape="js"} has been created.{/ts}', '{ts escape="js"}Contact Saved{/ts}'{literal}, 'success');
+          CRM.alert(response.displayName + {/literal}'{ts escape="js"} has been created.{/ts}', '{ts escape="js"}Contact Saved{/ts}'{literal}, 'success');
           cj('#contact-dialog-' + prefix + blockNo ).dialog('close');
         }
       }
@@ -374,3 +377,5 @@ cj(document).ready(function(){
 </script>
 {/literal}
 
+{/crmRegion}
+</div> {* end crm-profile-NAME *}

@@ -155,5 +155,6 @@ class CRM_Utils_PseudoConstant {
     foreach (self::findConstants() as $constant) {
       self::flushConstant($constant);
     }
+    CRM_Core_PseudoConstant::flush();
   }
 }

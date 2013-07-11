@@ -77,13 +77,13 @@
       <title>Campaign Type ID</title>
       <type>int unsigned</type>
       <default>NULL</default>
-      <comment>Campaign Type ID.Implicit FK to civicrm_option_value where option_group = campaign_type</comment> 
+      <comment>Campaign Type ID.Implicit FK to civicrm_option_value where option_group = campaign_type</comment>
       <import>true</import>
       <pseudoconstant>
         <optionGroupName>campaign_type</optionGroupName>
       </pseudoconstant>
-      <add>3.3</add> 
-  </field> 
+      <add>3.3</add>
+  </field>
   <index>
       <name>UI_campaign_type_id</name>
       <fieldName>campaign_type_id</fieldName>
@@ -100,7 +100,7 @@
       <pseudoconstant>
         <optionGroupName>campaign_status</optionGroupName>
       </pseudoconstant>
-      <add>3.3</add> 
+      <add>3.3</add>
   </field>
   <index>
       <name>UI_campaign_status_id</name>
