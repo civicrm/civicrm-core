@@ -106,6 +106,34 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('checkbox', 'is_default', ts('Default?'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_reserved', ts('Reserved?'));
+
+    $this->addFormRule(array('CRM_Badge_Form_Layout', 'formRule'));
+  }
+
+  /**
+   * form rule
+   *
+   * @param array $fields  the input form values
+   *
+   * @return true if no errors, else array of errors
+   * @access public
+   * @static
+   */
+  static function formRule($fields) {
+    $errors = array();
+
+    if (CRM_Utils_Array::value(4, $fields['token'])
+      && CRM_Utils_Array::value('add_barcode', $fields)
+      && (CRM_Utils_Array::value('barcode_alignment', $fields) == CRM_Utils_Array::value(4, $fields['text_alignment']))
+    ) {
+      $errors['barcode_alignment'] = ts('You cannot have same alignment for barcode and #4 row.');
+    }
+
+    if (!empty($errors)) {
+      return $errors;
+    }
+
+    return empty($errors) ? TRUE : $errors;
   }
 
   /**
