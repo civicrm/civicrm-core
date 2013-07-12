@@ -92,7 +92,9 @@
       </tr>
       <tr class="crm-badge-layout-form-block-add_barcode">
         <td class="label">{$form.add_barcode.label}</td>
-        <td>{$form.add_barcode.html}&nbsp;&nbsp;&nbsp;{ts}on{/ts}&nbsp;&nbsp;&nbsp;{$form.barcode_alignment.html}</td>
+        <td>{$form.add_barcode.html}&nbsp;&nbsp;&nbsp;{ts}of type{/ts}&nbsp;&nbsp;&nbsp;
+          {$form.barcode_type.html}&nbsp;&nbsp;&nbsp;{ts}on{/ts}&nbsp;&nbsp;&nbsp;{$form.barcode_alignment.html}
+        </td>
       </tr>
       <tr class="crm-badge-layout-form-block-is_active">
         <td class="label">{$form.is_active.label}</td>

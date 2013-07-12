@@ -113,7 +113,10 @@ class CRM_Badge_BAO_Badge {
     }
 
     if (CRM_Utils_Array::value('add_barcode', $layout['data'])) {
-      $formattedRow['barcode'] = $layout['data']['barcode_alignment'];
+      $formattedRow['barcode'] = array(
+        'alignment' => $layout['data']['barcode_alignment'],
+        'type' => $layout['data']['barcode_type'],
+      );
     }
 
     // finally assign all the row values, so that we can use it for barcode etc
@@ -179,43 +182,90 @@ class CRM_Badge_BAO_Badge {
       $this->border, $formattedRow['token'][4]['text_alignment'], 0, 1, $x, $y + $this->pdf->height - 5);
 
     if (CRM_Utils_Array::value('barcode', $formattedRow)) {
-      $style = array(
-        'position' => '',
-        'align' => '',
-        'stretch' => FALSE,
-        'fitwidth' => TRUE,
-        'cellfitalign' => '',
-        'border' => FALSE,
-        'hpadding' => 13.5,
-        'vpadding' => 'auto',
-        'fgcolor' => array(0, 0, 0),
-        'bgcolor' => FALSE,
-        'text' => FALSE,
-        'font' => 'helvetica',
-        'fontsize' => 8,
-        'stretchtext' => 0,
-      );
-
-      // barcode position
-      $xAlign = $x;
-      if ($formattedRow['barcode'] == 'L') {
-        $xAlign += -12;
-      }
-      elseif ($formattedRow['barcode'] == 'R') {
-        $xAlign += 30;
-      }
-      elseif ($formattedRow['barcode'] == 'C') {
-        $xAlign += 15;
-      }
-
       $data = $formattedRow['values'];
-      $data['current_value'] = $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
+
+      if ($formattedRow['barcode']['type'] == 'barcode') {
+        $data['current_value'] =
+          $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
+      }
+      else {
+        // view participant url
+        $data['current_value'] = CRM_Utils_System::url('civicrm/contact/view/participant',
+          'action=view&reset=1&cid=' . $formattedRow['values']['contact_id'] . '&id='
+          . $formattedRow['values']['participant_id'],
+          TRUE,
+          NULL,
+          FALSE
+        );
+      }
 
       // call hook alterBarcode
-      CRM_Utils_Hook::alterBarcode($data);
+      CRM_Utils_Hook::alterBarcode($data, $formattedRow['barcode']['type']);
 
-      $this->pdf->write1DBarcode($data['current_value'], 'C128', $xAlign, $y  + $this->pdf->height - 10, '',
-        12, 0.4, $style, 'B');
+      if ($formattedRow['barcode']['type'] == 'barcode') {
+        // barcode position
+        $xAlign = $x;
+
+        switch ($formattedRow['barcode']['alignment']) {
+          case 'L':
+            $xAlign += -12;
+            break;
+          case 'R':
+            $xAlign += 30;
+            break;
+          case 'C':
+            $xAlign += 15;
+            break;
+        }
+
+        $style = array(
+          'position' => '',
+          'align' => '',
+          'stretch' => FALSE,
+          'fitwidth' => TRUE,
+          'cellfitalign' => '',
+          'border' => FALSE,
+          'hpadding' => 13.5,
+          'vpadding' => 'auto',
+          'fgcolor' => array(0, 0, 0),
+          'bgcolor' => FALSE,
+          'text' => FALSE,
+          'font' => 'helvetica',
+          'fontsize' => 8,
+          'stretchtext' => 0,
+        );
+
+        $this->pdf->write1DBarcode($data['current_value'], 'C128', $xAlign, $y + $this->pdf->height - 10, '',
+          12, 0.4, $style, 'B');
+      }
+      else {
+        // qr code position
+        $xAlign = $x;
+
+        switch ($formattedRow['barcode']['alignment']) {
+          case 'L':
+            $xAlign += -8;
+            break;
+          case 'R':
+            $xAlign += 63;
+            break;
+          case 'C':
+            $xAlign += 29;
+            break;
+        }
+
+        $style = array(
+          'border' => false,
+          'hpadding' => 13.5,
+          'vpadding' => 'auto',
+          'fgcolor' => array(0,0,0),
+          'bgcolor' => false,
+          'position' => '',
+        );
+
+        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,Q', $xAlign, $y  + $this->pdf->height - 23, 30,
+          30, $style, 'B');
+      }
     }
   }
 

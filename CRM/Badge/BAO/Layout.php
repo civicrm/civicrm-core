@@ -189,6 +189,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
 
     $dataValues['add_barcode'] = CRM_Utils_Array::value('add_barcode', $data);
     $dataValues['barcode_alignment'] = CRM_Utils_Array::value('barcode_alignment', $data);
+    $dataValues['barcode_type'] = CRM_Utils_Array::value('barcode_type', $data);
 
     $dataValues['image_1'] = CRM_Utils_Array::value('image_1', $data);
     $dataValues['image_2'] = CRM_Utils_Array::value('image_2', $data);
