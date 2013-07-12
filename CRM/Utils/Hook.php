@@ -1285,4 +1285,15 @@ abstract class CRM_Utils_Hook {
   static function searchProfile($name) {
     return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_searchProfile');
   }
+
+  /**
+   * This hook is called while building the core search query, 
+   * so hook implementers can provide their own query objects which alters/extends core search.
+   *
+   * @param Array $queryObjects
+   * @return void
+   */
+  static function queryObjects(&$queryObjects) {
+    return self::singleton()->invoke(1, $queryObjects, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_queryObjects');
+  }
 }

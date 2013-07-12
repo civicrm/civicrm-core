@@ -387,47 +387,6 @@ class CRM_Extension_Manager {
     $this->mapper->refresh();
   }
 
-  public function &getSearchQueryFields() {
-    $extFields = array();
-    foreach (self::getActiveSearchQueryObjects() as $obj) {
-      $flds = $obj->getFields();
-      $extFields = array_merge($extFields, $flds);
-    }
-    return $extFields;
-  }
-
-  public function alterSearchQuery(&$query, $fnName) {
-    foreach (self::getActiveSearchQueryObjects() as $obj) {
-      $obj->$fnName($query);
-    }
-  }
-
-  public function buildSearchfrom($fieldName, $mode, $side) {
-    foreach (self::getActiveSearchQueryObjects() as $obj) {
-      $obj->from($fieldName, $mode, $side);
-    }
-  }
-
-  public function getActiveSearchQueryObjects() {
-    $queryObjects = array();
-    $extStatus = $this->getStatuses();
-    foreach ($extStatus as $key => $status) {
-      if ($status == CRM_Extension_Manager::STATUS_INSTALLED) {
-        $path = $this->mapper->keyToBasePath($key);
-        $info = $this->mapper->keyToInfo($key);
-        $classFile = $info->civix['namespace'] . DIRECTORY_SEPARATOR . 'BAO' . DIRECTORY_SEPARATOR . 'Query';
-        $queryFile = $path . DIRECTORY_SEPARATOR . "{$classFile}.php";
-        if (file_exists($queryFile)) {
-          require_once $queryFile;
-          $className = str_replace(DIRECTORY_SEPARATOR, '_', $classFile);
-          $obj  = new $className();
-          $queryObjects[] = $obj;
-        }
-      }
-    }
-    return $queryObjects;
-  }
-
   // ----------------------
 
   /**
