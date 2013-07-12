@@ -224,18 +224,6 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook to assessment grant
-   *
-   * @param string $param       the params
-   *
-   * @access public
-   */
-  static function grantAssessment( &$params ) {
-    return self::singleton( )->invoke( 1, $params, self::$_nullObject , self::$_nullObject,
-      self::$_nullObject, self::$_nullObject, 'civicrm_grantAssessment' );
-  }
-
-  /**
    * This hook retrieves links from other modules and injects it into
    * the view contact tabs
    *
