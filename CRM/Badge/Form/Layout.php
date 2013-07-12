@@ -46,9 +46,19 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    * @access public
    */
   public function buildQuickForm() {
-    parent::buildQuickForm();
-
     if ($this->_action & CRM_Core_Action::DELETE) {
+      $this->addButtons(array(
+          array(
+            'type' => 'next',
+            'name' => ts('Delete'),
+            'isDefault' => TRUE,
+          ),
+          array(
+            'type' => 'cancel',
+            'name' => ts('Cancel'),
+          ),
+        )
+      );
       return;
     }
 
@@ -110,6 +120,23 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
     $this->addFormRule(array('CRM_Badge_Form_Layout', 'formRule'));
+
+    $this->addButtons(array(
+        array(
+          'type' => 'next',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'refresh',
+          'name' => ts('Save and Preview'),
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
+    );
   }
 
   /**
@@ -181,7 +208,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       return;
     }
 
-    $params = $data = $this->controller->exportValues($this->_name);
+    $params = $data = $this->exportValues();
 
     unset($data['qfKey']);
     $params['data'] = json_encode($data);
@@ -191,10 +218,27 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     }
 
     // store the submitted values in an array
-    CRM_Badge_BAO_Layout::create($params);
+    $badgeInfo = CRM_Badge_BAO_Layout::create($params);
 
-    CRM_Core_Session::setStatus(ts("The badge layout '%1' has been saved.",
-      array(1 => $params['title'])
-    ), ts('Saved'), 'success');
+    if (isset($params['_qf_Layout_refresh'])) {
+      $params['badge_id'] = $badgeInfo->id;
+      self::buildPreview($params);
+    }
+    else {
+      CRM_Core_Session::setStatus(ts("The badge layout '%1' has been saved.",
+        array(1 => $params['title'])
+      ), ts('Saved'), 'success');
+    }
+  }
+
+  public function buildPreview(&$params) {
+    // get a max participant id
+    $participantID = CRM_Core_DAO::singleValueQuery('select max(id) from civicrm_participant');
+
+    $this->_single = TRUE;
+    $this->_participantIds = array($participantID);
+    $this->_componentClause = " civicrm_participant.id = $participantID ";
+
+    CRM_Badge_BAO_Badge::buildBadges($params, $this);
   }
 }
