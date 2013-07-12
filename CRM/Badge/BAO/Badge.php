@@ -235,7 +235,7 @@ class CRM_Badge_BAO_Badge {
           'stretchtext' => 0,
         );
 
-        $this->pdf->write1DBarcode($data['current_value'], 'C128', $xAlign, $y + $this->pdf->height - 10, '',
+        $this->pdf->write1DBarcode($data['current_value'], 'C128', $xAlign, $y + $this->pdf->height - 10, '65',
           12, 0.4, $style, 'B');
       }
       else {
@@ -244,7 +244,7 @@ class CRM_Badge_BAO_Badge {
 
         switch ($formattedRow['barcode']['alignment']) {
           case 'L':
-            $xAlign += -8;
+            $xAlign += -4;
             break;
           case 'R':
             $xAlign += 63;
@@ -263,8 +263,8 @@ class CRM_Badge_BAO_Badge {
           'position' => '',
         );
 
-        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,Q', $xAlign, $y  + $this->pdf->height - 23, 30,
-          30, $style, 'B');
+        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y  + $this->pdf->height - 20, 23,
+          23, $style, 'B');
       }
     }
   }
@@ -297,6 +297,97 @@ class CRM_Badge_BAO_Badge {
         FALSE, $this->debug, FALSE, FALSE, FALSE);
     }
     $this->pdf->SetXY($x, $y);
+  }
+
+  /**
+   * function to build badges parameters before actually creating badges.
+   *
+   * @param  array  $params associated array of submitted values
+   * @params object $form form/controller object
+   *
+   * @return void
+   * @access public
+   * @static
+   */
+  public static function buildBadges(&$params, &$form) {
+    // get name badge layout info
+    $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
+
+    // spit / get actual field names from token
+    $returnProperties = array();
+    if (!empty($layoutInfo['data']['token'])) {
+      foreach ($layoutInfo['data']['token'] as $index => $value) {
+        $element = '';
+        if ($value) {
+          $token = CRM_Utils_Token::getTokens($value);
+          if (key($token) == 'contact') {
+            $element = $token['contact'][0];
+          }
+          elseif (key($token) == 'event') {
+            $element = $token['event'][0];
+            //FIX ME - we need to standardize event token names
+            if (!strpos($element, 'event_')) {
+              $element = 'event_' . $element;
+            }
+          }
+          elseif (key($token) == 'participant') {
+            $element = $token['participant'][0];
+          }
+
+          // build returnproperties for query
+          $returnProperties[$element] = 1;
+        }
+
+        // add actual field name to row element
+        $layoutInfo['data']['rowElements'][$index] = $element;
+      }
+    }
+
+    // add additional required fields for query execution
+    $additionalFields = array('participant_register_date', 'participant_id', 'event_id', 'contact_id');
+    foreach ($additionalFields as $field) {
+      $returnProperties[$field] = 1;
+    }
+
+    if ($form->_single) {
+      $queryParams = NULL;
+    }
+    else {
+      $queryParams = $form->get('queryParams');
+    }
+
+    $query = new CRM_Contact_BAO_Query($queryParams, $returnProperties, NULL, FALSE, FALSE,
+      CRM_Contact_BAO_Query::MODE_EVENT
+    );
+
+    list($select, $from, $where, $having) = $query->query();
+    if (empty($where)) {
+      $where = "WHERE {$form->_componentClause}";
+    }
+    else {
+      $where .= " AND {$form->_componentClause}";
+    }
+
+    $sortOrder = NULL;
+    if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
+      $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
+      if (!empty($sortOrder)) {
+        $sortOrder = " ORDER BY $sortOrder";
+      }
+    }
+    $queryString = "$select $from $where $having $sortOrder";
+
+    $dao = CRM_Core_DAO::executeQuery($queryString);
+    $rows = array();
+    while ($dao->fetch()) {
+      $rows[$dao->participant_id] = array();
+      foreach ($returnProperties as $key => $dontCare) {
+        $rows[$dao->participant_id][$key] = isset($dao->$key) ? $dao->$key : NULL;
+      }
+    }
+
+    $eventBadgeClass = new CRM_Badge_BAO_Badge();
+    $eventBadgeClass->createLabels($rows, $layoutInfo);
   }
 }
 
