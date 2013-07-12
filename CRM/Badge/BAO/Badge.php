@@ -208,13 +208,13 @@ class CRM_Badge_BAO_Badge {
 
         switch ($formattedRow['barcode']['alignment']) {
           case 'L':
-            $xAlign += -12;
+            $xAlign += -14;
             break;
           case 'R':
-            $xAlign += 30;
+            $xAlign += 32;
             break;
           case 'C':
-            $xAlign += 15;
+            $xAlign += 9;
             break;
         }
 
@@ -235,7 +235,7 @@ class CRM_Badge_BAO_Badge {
           'stretchtext' => 0,
         );
 
-        $this->pdf->write1DBarcode($data['current_value'], 'C128', $xAlign, $y + $this->pdf->height - 10, '65',
+        $this->pdf->write1DBarcode($data['current_value'], 'C128', $xAlign, $y + $this->pdf->height - 10, '70',
           12, 0.4, $style, 'B');
       }
       else {
@@ -244,10 +244,10 @@ class CRM_Badge_BAO_Badge {
 
         switch ($formattedRow['barcode']['alignment']) {
           case 'L':
-            $xAlign += -4;
+            $xAlign += -5;
             break;
           case 'R':
-            $xAlign += 63;
+            $xAlign += 61;
             break;
           case 'C':
             $xAlign += 29;
@@ -263,8 +263,8 @@ class CRM_Badge_BAO_Badge {
           'position' => '',
         );
 
-        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y  + $this->pdf->height - 20, 23,
-          23, $style, 'B');
+        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y  + $this->pdf->height - 26, 30,
+          30, $style, 'B');
       }
     }
   }
