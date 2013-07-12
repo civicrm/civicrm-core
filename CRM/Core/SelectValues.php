@@ -849,5 +849,20 @@ class CRM_Core_SelectValues {
     }
     return $numericOptions;
   }
+
+  /**
+   * barcode types
+   * @static
+   */
+  static function getBarcodeTypes() {
+    static $barcodeTypes = NULL;
+    if (!$barcodeTypes) {
+      $barcodeTypes = array(
+        'barcode' => ts('Linear (1D)'),
+        'qrcode' => ts('QR code'),
+      );
+    }
+    return $barcodeTypes;
+  }
 }
 
