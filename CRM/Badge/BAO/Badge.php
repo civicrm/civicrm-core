@@ -180,8 +180,8 @@ class CRM_Badge_BAO_Badge {
 
     if (CRM_Utils_Array::value('barcode', $formattedRow)) {
       $style = array(
-        'position' => $formattedRow['barcode'],
-        'align' => $formattedRow['barcode'],
+        'position' => '',
+        'align' => '',
         'stretch' => FALSE,
         'fitwidth' => TRUE,
         'cellfitalign' => '',
@@ -196,13 +196,25 @@ class CRM_Badge_BAO_Badge {
         'stretchtext' => 0,
       );
 
+      // barcode position
+      $xAlign = $x;
+      if ($formattedRow['barcode'] == 'L') {
+        $xAlign += -12;
+      }
+      elseif ($formattedRow['barcode'] == 'R') {
+        $xAlign += 30;
+      }
+      elseif ($formattedRow['barcode'] == 'C') {
+        $xAlign += 15;
+      }
+
       $data = $formattedRow['values'];
       $data['current_value'] = $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
 
       // call hook alterBarcode
       CRM_Utils_Hook::alterBarcode($data);
 
-      $this->pdf->write1DBarcode($data['current_value'], 'C128', $x, $y  + $this->pdf->height - 10, '',
+      $this->pdf->write1DBarcode($data['current_value'], 'C128', $xAlign, $y  + $this->pdf->height - 10, '',
         12, 0.4, $style, 'B');
     }
   }
