@@ -131,20 +131,23 @@ class CRM_Badge_BAO_Badge {
   }
 
   public function labelAvery5395(&$formattedRow) {
-    $this->lMarginLogo = 20;
+    $this->lMarginLogo = 18;
     $this->tMarginName = 20;
 
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->GetY();
 
+    $titleWidth = $titleLeftMargin = 0;
     if (CRM_Utils_Array::value('image_1', $formattedRow)) {
       $this->printImage($formattedRow['image_1']);
+      $titleWidth = $titleLeftMargin = $this->lMarginLogo;
     }
 
-    $titleWidth = $this->lMarginLogo;
+    $titleRightMargin = 0;
     if (CRM_Utils_Array::value('image_2', $formattedRow)) {
       $this->printImage($formattedRow['image_2'], $x + 68);
-      $titleWidth = 38;
+      $titleRightMargin = 36;
+      $titleWidth = $this->lMarginLogo;
     }
 
     $this->pdf->SetLineStyle(array(
@@ -155,9 +158,13 @@ class CRM_Badge_BAO_Badge {
       'color' => array(0, 0, 200)
     ));
 
+    if ($titleLeftMargin && $titleRightMargin) {
+      $titleWidth = $titleRightMargin;
+    }
+
     $this->pdf->SetFont($formattedRow['token'][1]['font_name'], '', $formattedRow['token'][1]['font_size']);
     $this->pdf->MultiCell($this->pdf->width - $titleWidth, 0, $formattedRow['token'][1]['value'],
-      $this->border, $formattedRow['token'][1]['text_alignment'], 0, 1, $x + $this->lMarginLogo, $y);
+      $this->border, $formattedRow['token'][1]['text_alignment'], 0, 1, $x + $titleLeftMargin, $y);
 
     $this->pdf->SetFont($formattedRow['token'][2]['font_name'], '', $formattedRow['token'][2]['font_size']);
     $this->pdf->MultiCell($this->pdf->width, 10, $formattedRow['token'][2]['value'],
