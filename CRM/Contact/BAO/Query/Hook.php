@@ -67,7 +67,6 @@ class CRM_Contact_BAO_Query_Hook {
     if ($this->_queryObjects === NULL) {
       $this->_queryObjects = array();
       CRM_Utils_Hook::queryObjects($this->_queryObjects);
-      CRM_Core_Error::debug_var( '$this->_queryObjects', $this->_queryObjects );
     }
     return $this->_queryObjects;
   }
