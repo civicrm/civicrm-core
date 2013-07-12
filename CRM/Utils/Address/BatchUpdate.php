@@ -190,6 +190,8 @@ class CRM_Utils_Address_BatchUpdate {
           $totalGeocoded++;
           $addressParams['geo_code_1'] = $params['geo_code_1'];
           $addressParams['geo_code_2'] = $params['geo_code_2'];
+          $addressParams['postal_code'] = $params['postal_code'];
+          $addressParams['postal_code_suffix'] = $params['postal_code_suffix'];
         }
       }
 
