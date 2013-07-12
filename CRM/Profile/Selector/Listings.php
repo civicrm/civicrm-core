@@ -306,6 +306,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           'name' => ts('Name'),
           'sort' => 'sort_name',
           'direction' => CRM_Utils_Sort::ASCENDING,
+          'field_name' => 'sort_name',
         ),
       );
 
@@ -357,6 +358,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
             'name' => $field['title'],
             'sort' => $name,
             'direction' => $direction,
+            'field_name' => CRM_Core_BAO_UFField::isValidFieldName($name) ? $name : $fieldName,
           );
 
           $direction = CRM_Utils_Sort::DONTCARE;
@@ -583,7 +585,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         $showProfileOverlay
       );
       if ($result->sort_name) {
-        $row['sort_name'] = $result->sort_name;
+        $row[] = $result->sort_name;
         $empty = FALSE;
       }
       else {
