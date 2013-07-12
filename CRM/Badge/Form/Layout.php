@@ -93,9 +93,11 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $rowCount++;
     $this->assign('rowCount', $rowCount);
 
+    $barcodeTypes = CRM_Core_SelectValues::getBarcodeTypes();
     $this->add('checkbox', 'add_barcode', ts('Barcode?'));
-    unset($textAlignment['J']);
+    $this->add('select', "barcode_type", ts('Type'), $barcodeTypes);
     $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
+
 
     $attributes = array('readonly'=> true);
     $this->add('text', 'image_1', ts('Image (top right)'),
