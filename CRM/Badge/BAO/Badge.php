@@ -196,9 +196,14 @@ class CRM_Badge_BAO_Badge {
         'stretchtext' => 0,
       );
 
-      $data = array();
+      $data = $formattedRow['values'];
       $data['current_value'] = $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
-      $this->pdf->write1DBarcode($data['current_value'], 'C128', $x, $y  + $this->pdf->height - 10, '', 12, 0.4, $style, 'B');
+
+      // call hook alterBarcode
+      CRM_Utils_Hook::alterBarcode($data);
+
+      $this->pdf->write1DBarcode($data['current_value'], 'C128', $x, $y  + $this->pdf->height - 10, '',
+        12, 0.4, $style, 'B');
     }
   }
 
