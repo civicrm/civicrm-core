@@ -46,9 +46,9 @@ function ts(text, params) {
   text = CRM.strings[text] || text;
   if (typeof(params) === 'object') {
     for (var i in params) {
-      if (typeof(params[i]) === 'string') {
+      if (typeof(params[i]) === 'string' || typeof(params[i]) === 'number') {
         // sprintf emulation: escape % characters in the replacements to avoid conflicts
-        text = text.replace(new RegExp('%' + i, 'g'), params[i].replace(/%/g, '%-crmescaped-'));
+        text = text.replace(new RegExp('%' + i, 'g'), String(params[i]).replace(/%/g, '%-crmescaped-'));
       }
     }
     return text.replace(/%-crmescaped-/g, '%');

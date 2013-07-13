@@ -3409,7 +3409,7 @@ div.m ul#civicrm-menu,
 }
 
 /* table row highlightng */
-#crm-container table.row-highlight tr:hover {
+.crm-container table.row-highlight tr:hover {
   background-color: #FFFFCC !important;
 }
 #crm-container .civicrm-drupal-wysiwyg .collapsed {
