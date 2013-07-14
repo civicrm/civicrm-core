@@ -313,6 +313,12 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form {
       $this->_formValues["pledge_test"] = 0;
     }
 
+    foreach (array('pledge_amount_low', 'pledge_amount_high') as $f) {
+      if (isset($this->_formValues[$f])) {
+        $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
+      }
+    }
+
     if (isset($this->_ssID) && empty($_POST)) {
       // if we are editing / running a saved search and the form has not been posted
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);

@@ -999,12 +999,7 @@ FROM   civicrm_domain
       }
     }
 
-    // CRM-11582
-    foreach($tr as $key => $value) {
-      $key   = preg_quote($key);
-      $query = preg_replace("/$key\b/", $value, $query);
-    }
-    return $query;
+    return strtr($query, $tr);
   }
 
   static function freeResult($ids = NULL) {

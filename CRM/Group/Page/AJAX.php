@@ -47,7 +47,8 @@ class CRM_Group_Page_AJAX {
 
       echo json_encode($groups);
       CRM_Utils_System::civiExit();
-    } else {
+    }
+    else {
       $sortMapper = array(
         0 => 'groups.title', 1 => 'groups.id', 2 => 'createdBy.sort_name', 3 => '',
         4 => 'groups.group_type', 5 => 'groups.visibility',

@@ -108,16 +108,14 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   function setDefaultValues() {
-    if (!$this->_contactID) {
-      return;
+    if ($this->_contactID) {
+      foreach ($this->_fields as $name => $dontcare) {
+        $fields[$name] = 1;
+      }
+      
+      CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
     }
     $stateCountryMap = array();
-    foreach ($this->_fields as $name => $dontcare) {
-      $fields[$name] = 1;
-    }
-
-    CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
-
     //set custom field defaults
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {

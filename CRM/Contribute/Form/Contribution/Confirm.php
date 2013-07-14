@@ -1313,7 +1313,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contribParams['soft_credit_to'] = $params['soft_credit_to'] = $contribSoftContactId;
     }
 
-    if ($params['amount']) {
+    if (isset($params['amount'])) {
       $contribParams['line_item'] = $form->_lineItem;
       //add contribution record
       $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);

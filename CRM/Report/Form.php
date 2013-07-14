@@ -196,7 +196,6 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_sections = NULL;
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
   protected $_absoluteUrl = FALSE;
-  protected $_grandFlag   = FALSE;
 
   /**
    * Flag to indicate if result-set is to be stored in a class variable which could be retrieved using getResultSet() method.

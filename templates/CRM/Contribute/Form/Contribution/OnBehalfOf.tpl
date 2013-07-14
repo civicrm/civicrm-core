@@ -35,11 +35,11 @@
 <fieldset id="for_organization" class="for_organization-group">
 <legend>{$fieldSetTitle}</legend>
   {if ( $relatedOrganizationFound or $onBehalfRequired ) and !$organizationName}
-  <div id='orgOptions' class="section crm-section">
-    <div class="content">
-      {$form.org_option.html}
+    <div id='orgOptions' class="section crm-section">
+      <div class="content">
+        {$form.org_option.html}
+      </div>
     </div>
-  </div>
   {/if}
 
 <div id="select_org" class="crm-section">
@@ -61,8 +61,8 @@
         <div class="content">
           {$form.onbehalf.$fieldName.html|crmAddClass:big}
           <span>
-                ( <a id='createNewOrg' href="#" onclick="createNew( ); return false;">{ts}Enter a new organization{/ts}</a> )
-            </span>
+              ( <a id='createNewOrg' href="#" onclick="createNew( ); return false;">{ts}Enter a new organization{/ts}</a> )
+          </span>
           <div id="id-onbehalf-orgname-enter-help" class="description">
             {ts}Organization details have been prefilled for you. If this is not the organization you want to use, click "Enter a new organization" above.{/ts}
           </div>
@@ -70,26 +70,26 @@
             <span class='description'>{$onBehalfOfFields.$fieldName.help_post}</span>
           {/if}
         </div>
-        {else}
-        {if $onBehalfOfFields.$fieldName.options_per_line != 0}
+      {else}
+        {if $onBehalfOfFields.$fieldName.options_per_line}
           <div class="label option-label">{$form.onbehalf.$fieldName.label}</div>
-          <div class="content 3">
+          <div class="content">
             {assign var="count" value="1"}
             {strip}
               <table class="form-layout-compressed">
               <tr>
               {* sort by fails for option per line. Added a variable to iterate through the element array*}
                 {assign var="index" value="1"}
-                {foreach name=outer key=key item=item from=$field}
+                {foreach name=outer key=key item=item from=$form.onbehalf.$fieldName}
                   {if $index < 10}
                     {assign var="index" value=`$index+1`}
-                    {else}
+                  {else}
                     <td class="labels font-light">{$form.onbehalf.$fieldName.$key.html}</td>
                     {if $count == $onBehalfOfFields.$fieldName.options_per_line}
-                    </tr>
-                    <tr>
+                      </tr>
+                      <tr>
                       {assign var="count" value="1"}
-                      {else}
+                    {else}
                       {assign var="count" value=`$count+1`}
                     {/if}
                   {/if}
@@ -101,7 +101,7 @@
               <span class='description'>{$onBehalfOfFields.$fieldName.help_post}</span>
             {/if}
           </div>
-          {else}
+        {else}
           <div class="label">{$form.onbehalf.$fieldName.label}</div>
           <div class="content">
             {$form.onbehalf.$fieldName.html}

@@ -369,4 +369,40 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->click("_qf_ContributionView_cancel-top");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
+
+  function testOnlineContributionWithZeroAmount () {
+    $this->webtestLogin();
+
+    // Create a contact to be used as soft creditor
+    $firstName = 'John'.substr(sha1(rand()), 0, 7);
+    $lastName = 'Peterson'.substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact( $firstName, $lastName);
+    $this->waitForElementPresent("css=li#tab_contribute a");
+    $this->click("css=li#tab_contribute a");
+    $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
+    $this->clickLink("link=Record Contribution (Check, Cash, EFT ...)");
+
+     // select financial type
+    $this->select("financial_type_id", "value=1");
+
+    // total amount
+    $this->type("total_amount", "0.00");
+
+    // select payment instrument
+    $this->select("payment_instrument_id", "value=1");
+
+    $this->type("trxn_id", "X20901X1" . rand(100, 10000));
+    $this->clickLink('_qf_Contribution_upload-bottom');
+    $this->waitForText("crm-notification-container", "The contribution record has been saved.");
+
+    $this->waitForElementPresent( "xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']" );
+    $this->clickLink( "xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']" );
+    $expected = array(
+      'Financial Type'   => 'Donation',
+      'Total Amount'        => '0.00',
+      'Contribution Status' => 'Completed',
+      'Paid By'             => 'Credit Card'
+    );
+    $this->webtestVerifyTabularData($expected);
+  }
 }

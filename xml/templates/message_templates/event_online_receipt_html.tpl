@@ -140,7 +140,7 @@ registration process.{/ts}</p>
           {/if}
          </td>
          <td {$valueStyle}>
-          {$phone.phone}
+          {$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
          </td>
         </tr>
        {/if}

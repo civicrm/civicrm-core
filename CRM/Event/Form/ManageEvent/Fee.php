@@ -107,7 +107,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
             $countRow = 0;
             foreach ($options as $optionId => $optionValue) {
               $countRow++;
-              $defaults['value'][$countRow] = $optionValue['amount'];
+              $defaults['value'][$countRow] = CRM_Utils_Money::format($optionValue['amount'], NULL, '%a');
               $defaults['label'][$countRow] = $optionValue['label'];
               $defaults['name'][$countRow] = $optionValue['name'];
               $defaults['weight'][$countRow] = $optionValue['weight'];
@@ -149,7 +149,8 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
         foreach ($discountFields['options'] as $discountFieldsval) {
           $defaults['discounted_label'][$discountFieldsval['weight']] = $discountFieldsval['label'];
-          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = $discountFieldsval['amount'];
+          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] =
+            CRM_Utils_Money::format($discountFieldsval['amount'], NULL, '%a');
           $defaults['discount_option_id'][$rowCount][]= $discountFieldsval['id'];
           if (CRM_Utils_Array::value('is_default', $discountFieldsval)) {
             $defaults['discounted_default'] = $discountFieldsval['weight'];

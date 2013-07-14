@@ -324,16 +324,15 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
         'is_enabled'
       )) {
-        // in order to make sure that every contact must be added to a group (CRM-4613) -
+        // Enabling multisite causes the contact to be added to the domain group
         $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
-        if (CRM_Utils_Array::value('group', $params) && is_array($params['group'])) {
-          $grpFlp = array_flip($params['group']);
-          if (!array_key_exists(1, $grpFlp)) {
+        if(!empty($domainGroupID)){
+          if (CRM_Utils_Array::value('group', $params) && is_array($params['group'])) {
             $params['group'][$domainGroupID] = 1;
           }
-        }
-        else {
-          $params['group'] = array($domainGroupID => 1);
+          else {
+            $params['group'] = array($domainGroupID => 1);
+          }
         }
       }
 
@@ -722,6 +721,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     if (($skipUndelete && !CRM_Core_Permission::check('delete contacts')) ||
       ($restore && !CRM_Core_Permission::check('access deleted contacts'))
     ) {
+      return FALSE;
+    }
+    
+    // CRM-12929
+    // Restrict contact to be delete if contact has financial trxns
+    $error = NULL;
+    if ($skipUndelete && CRM_Financial_BAO_FinancialItem::checkContactPresent(array($id), $error)) {
       return FALSE;
     }
 

@@ -11,7 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+ <table width="500" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -21,11 +21,17 @@
 
   <tr>
    <td>
+	<p>Dear {contact.display_name},</p>
 
     {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
      <p>{$event.confirm_email_text|htmlize}</p>
+
+    {else}
+	<p>Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to <strong>{if $isOnWaitlist}waitlisted{else}registered{/if}</strong> for the following:</p>
+
     {/if}
 
+    <p>
     {if $isOnWaitlist}
      <p>{ts}You have been added to the WAIT LIST for this event.{/ts}</p>
      {if $isPrimary}
@@ -39,7 +45,7 @@ a link to a web page where you can complete your registration.{/ts}</p>
 an email with a link to a web page where you can complete the
 registration process.{/ts}</p>
      {/if}
-    {elseif $is_pay_later}
+    {elseif $is_pay_later && !$isAmountzero}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {else}
      <p>{ts}Please print this confirmation for your records.{/ts}</p>
@@ -49,7 +55,7 @@ registration process.{/ts}</p>
   </tr>
   <tr>
    <td>
-    <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
+    <table width="500" style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
      <tr>
       <th {$headerStyle}>
        {ts}Event Information and Location{/ts}
@@ -58,9 +64,31 @@ registration process.{/ts}</p>
      <tr>
       <td colspan="2" {$valueStyle}>
        {$event.event_title}<br />
-       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+       {$event.event_start_date|date_format:"%A"} {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|date_format:"%A"} {$event.event_end_date|crmDate}{/if}{/if}
       </td>
      </tr>
+
+
+     {if $conference_sessions}
+      <tr>
+       <td colspan="2" {$labelStyle}>
+	{ts}Your schedule:{/ts}
+       </td>
+      </tr>
+      <tr>
+       <td colspan="2" {$valueStyle}>
+	{assign var='group_by_day' value='NA'}
+	{foreach from=$conference_sessions item=session}
+	 {if $session.start_date|date_format:"%Y/%m/%d" != $group_by_day|date_format:"%Y/%m/%d"}
+	  {assign var='group_by_day' value=$session.start_date}
+          <em>{$group_by_day|date_format:"%m/%d/%Y"}</em><br />
+	 {/if}
+	 {$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}<br />
+	 {if $session.location}&nbsp;&nbsp;&nbsp;&nbsp;{$session.location}<br />{/if}
+	{/foreach}
+       </td>
+      </tr>
+     {/if}
 
      {if $event.participant_role neq 'Attendee' and $defaultRole}
       <tr>
@@ -89,7 +117,7 @@ registration process.{/ts}</p>
          {$location.address.1.supplemental_address_2}<br />
         {/if}
         {if $location.address.1.city}
-         {$location.address.1.city} {$location.address.1.postal_code}{if $location.address.1.postal_code_suffix} - {$location.address.1.postal_code_suffix}{/if}<br />
+         {$location.address.1.city}, {$location.address.1.state_province} {$location.address.1.postal_code}{if $location.address.1.postal_code_suffix} - {$location.address.1.postal_code_suffix}{/if}<br />
         {/if}
        </td>
       </tr>
@@ -136,21 +164,27 @@ registration process.{/ts}</p>
        <a href="{$icalFeed}">{ts}Download iCalendar File{/ts}</a>
       </td>
      </tr>
-     {if $email}
-      <tr>
+    {if $event.is_share}
+        <tr>
+            <td colspan="2" {$valueStyle}>
+                {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&reset=1" a=true fe=1 h=1}{/capture}
+                {include file="CRM/common/SocialNetwork.tpl" emailMode=true url=$eventUrl title=$event.title pageURL=$eventUrl}
+            </td>
+        </tr>
+    {/if}
+    {if $payer.name}
+     <tr>
        <th {$headerStyle}>
-        {ts}Registered Email{/ts}
+         {ts}You were registered by:{/ts}
        </th>
-      </tr>
-      <tr>
+     </tr>
+     <tr>
        <td colspan="2" {$valueStyle}>
-        {$email}
+	      {$payer.name}
        </td>
-      </tr>
-     {/if}
-
-
-     {if $event.is_monetary}
+     </tr>
+    {/if}
+    {if $event.is_monetary}
 
       <tr>
        <th {$headerStyle}>
@@ -165,7 +199,7 @@ registration process.{/ts}</p>
           {if $lineItem|@count GT 1} {* Header for multi participant registration cases. *}
            <tr>
             <td colspan="2" {$labelStyle}>
-             {ts 1=$priceset+1}Participant %1{/ts}
+             {ts 1=$priceset+1}Participant %1{/ts} {$part.$priceset.info}
             </td>
            </tr>
           {/if}
@@ -178,27 +212,23 @@ registration process.{/ts}</p>
              <th>{ts}Qty{/ts}</th>
              <th>{ts}Each{/ts}</th>
              <th>{ts}Total{/ts}</th>
-       {if $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
+	     {if  $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
             </tr>
             {foreach from=$value item=line}
              <tr>
               <td>
-        {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}
+              {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}
               </td>
               <td>
                {$line.qty}
               </td>
               <td>
-               {$line.unit_price|crmMoney}
+               {$line.unit_price|crmMoney:$currency}
               </td>
               <td>
-               {$line.line_total|crmMoney}
+               {$line.line_total|crmMoney:$currency}
               </td>
-        {if  $pricesetFieldsCount }
-        <td>
-    {$line.participant_count}
-              </td>
-        {/if}
+	      {if $pricesetFieldsCount }<td>{$line.participant_count}</td> {/if}
              </tr>
             {/foreach}
            </table>
@@ -208,53 +238,46 @@ registration process.{/ts}</p>
        {/foreach}
       {/if}
 
-      {if $amount && !$lineItem}
-       {foreach from=$amount item=amnt key=level}
+      {if $amounts && !$lineItem}
+       {foreach from=$amounts item=amnt key=level}
         <tr>
          <td colspan="2" {$valueStyle}>
-          {$amnt.amount|crmMoney} {$amnt.label}
+          {$amnt.amount|crmMoney:$currency} {$amnt.label}
          </td>
         </tr>
        {/foreach}
       {/if}
+
       {if $isPrimary}
        <tr>
         <td {$labelStyle}>
          {ts}Total Amount{/ts}
-        </td>
+        </td>  
         <td {$valueStyle}>
-         {$totalAmount|crmMoney} {if $hookDiscount.message}({$hookDiscount.message}){/if}
+         {$totalAmount|crmMoney:$currency} {if $hookDiscount.message}({$hookDiscount.message}){/if}
         </td>
        </tr>
        {if $pricesetFieldsCount }
      <tr>
-       <td {$labelStyle}>
-   {ts}Total Participants{/ts}</td>
-       <td {$valueStyle}>
-   {assign var="count" value= 0}
-         {foreach from=$lineItem item=pcount}
-         {assign var="lineItemCount" value=0}
-         {if $pcount neq 'skip'}
-           {foreach from=$pcount item=p_count}
-           {assign var="lineItemCount" value=$lineItemCount+$p_count.participant_count}
-           {/foreach}
-           {if $lineItemCount < 1 }
-           assign var="lineItemCount" value=1}
-           {/if}
-           {assign var="count" value=$count+$lineItemCount}
-         {/if}
-         {/foreach}
-   {$count}
-       </td>
-     </tr>
-     {/if}
-       {if $is_pay_later}
-        <tr>
-         <td colspan="2" {$labelStyle}>
-          {$pay_later_receipt}
-         </td>
-        </tr>
-       {/if}
+       <td {$labelStyle}> 
+      {ts}Total Participants{/ts}</td>   
+      <td {$valueStyle}>
+      {assign var="count" value= 0}	 
+      {foreach from=$lineItem item=pcount}
+      {assign var="lineItemCount" value=0}
+      {if $pcount neq 'skip'}
+        {foreach from=$pcount item=p_count}
+        {assign var="lineItemCount" value=$lineItemCount+$p_count.participant_count}
+        {/foreach}
+      {if $lineItemCount < 1 }
+        {assign var="lineItemCount" value=1}
+      {/if}	
+      {assign var="count" value=$count+$lineItemCount}
+      {/if}
+      {/foreach}
+     {$count}
+     </td> </tr>
+      {/if}
 
        {if $register_date}
         <tr>
@@ -355,80 +378,52 @@ registration process.{/ts}</p>
 
      {/if} {* End of conditional section for Paid events *}
 
-     {if $customPre}
-      <tr>
-       <th {$headerStyle}>
-        {$customPre_grouptitle}
-       </th>
-      </tr>
-      {foreach from=$customPre item=value key=customName}
-       {if ( $trackingFields and ! in_array( $customName, $trackingFields ) ) or ! $trackingFields}
-        <tr>
-         <td {$labelStyle}>
-          {$customName}
-         </td>
-         <td {$valueStyle}>
-          {$value}
-         </td>
-        </tr>
-       {/if}
-      {/foreach}
-     {/if}
 
-     {if $customPost}
-      <tr>
-       <th {$headerStyle}>
-        {$customPost_grouptitle}
-       </th>
-      </tr>
-      {foreach from=$customPost item=value key=customName}
-       {if ( $trackingFields and ! in_array( $customName, $trackingFields ) ) or ! $trackingFields}
-        <tr>
-         <td {$labelStyle}>
-          {$customName}
-         </td>
-         <td {$valueStyle}>
-          {$value}
-         </td>
-        </tr>
-       {/if}
-      {/foreach}
-     {/if}
+{if $customPre}
+{foreach from=$customPre item=customPr key=i}
+   <tr> <th {$headerStyle}>{$customPre_grouptitle.$i}</th></tr>
+   {foreach from=$customPr item=customValue key=customName}
+   {if ( $trackingFields and ! in_array( $customName, $trackingFields ) ) or ! $trackingFields}
+     <tr>
+         <td {$labelStyle}>{$customName}</td>
+         <td {$valueStyle}>{$customValue}</td>
+     </tr>
+   {/if}
+   {/foreach}
+{/foreach}
+{/if}
 
-     {if $customProfile}
-      {foreach from=$customProfile item=value key=customName}
-       <tr>
-        <th {$headerStyle}>
-         {ts 1=$customName+1}Participant Information - Participant %1{/ts}
-        </th>
-       </tr>
-       {foreach from=$value item=val key=field}
-        {if $field eq 'additionalCustomPre' or $field eq 'additionalCustomPost'}
-         <tr>
-          <td colspan="2" {$labelStyle}>
-           {if $field eq 'additionalCustomPre'}
-            {$additionalCustomPre_grouptitle}
-           {else}
-            {$additionalCustomPost_grouptitle}
-           {/if}
-          </td>
-         </tr>
-         {foreach from=$val item=v key=f}
-          <tr>
-           <td {$labelStyle}>
-            {$f}
-           </td>
-           <td {$valueStyle}>
-            {$v}
-           </td>
-          </tr>
+{if $customPost}
+{foreach from=$customPost item=customPos key=j}
+   <tr> <th {$headerStyle}>{$customPost_grouptitle.$j}</th></tr>
+   {foreach from=$customPos item=customValue key=customName}
+   {if ( $trackingFields and ! in_array( $customName, $trackingFields ) ) or ! $trackingFields}
+     <tr>
+         <td {$labelStyle}>{$customName}</td>
+         <td {$valueStyle}>{$customValue}</td>
+     </tr>
+{/if}
+{/foreach}
+{/foreach}
+{/if}
+
+{if $customProfile}
+{foreach from=$customProfile.profile item=eachParticipant key=participantID}
+     <tr><th {$headerStyle}>{ts 1=$participantID+2}Participant %1{/ts} </th></tr>
+     {foreach from=$eachParticipant item=eachProfile key=pid}
+     <tr><th {$headerStyle}>{$customProfile.title.$pid}</th></tr>
+     {foreach from=$eachProfile item=val key=field}
+     <tr>{foreach from=$val item=v key=f}
+         <td {$labelStyle}>{$field}</td> 
+         <td {$valueStyle}>{$v}</td> 
          {/foreach}
-        {/if}
-       {/foreach}
-      {/foreach}
-     {/if}
+     </tr>
+     {/foreach}
+{/foreach}
+{/foreach}
+{/if}
 
-     {if $customGroup}
+    {if $customGroup}
       {foreach from=$customGroup item=value key=customName}
        <tr>
         <th {$headerStyle}>
@@ -447,11 +442,10 @@ registration process.{/ts}</p>
        {/foreach}
       {/foreach}
      {/if}
-
+   
     </table>
    </td>
   </tr>
-
  </table>
 </center>
 

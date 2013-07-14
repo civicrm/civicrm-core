@@ -39,7 +39,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   /**
    * Manually add and remove contacts from a smart group
    */
-  function ztestManualAddRemove() {
+  function testManualAddRemove() {
     // Create smart group $g
     $params = array(
       'name' => 'Deceased Contacts',
@@ -209,7 +209,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   protected function tearDown() {
     parent::tearDown();
-//    $this->deleteTestObjects();
+    $this->deleteTestObjects();
   }
 
   /**

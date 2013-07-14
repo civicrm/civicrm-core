@@ -263,23 +263,6 @@ CREATE TABLE IF NOT EXISTS `civicrm_financial_item` (
   KEY `FK_civicrm_financial_item_financial_account_id` (`financial_account_id`)
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `civicrm_payment` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Id',
-  `payment_batch_number` int(10) unsigned NOT NULL COMMENT 'Payment Batch Nnumber',
-  `payment_number` int(10) unsigned NOT NULL COMMENT 'Payment Number',
-  `financial_type_id` int(10) unsigned NOT NULL COMMENT 'Financial Type ID',
-  `contact_id` int(10) unsigned NOT NULL COMMENT 'Contact ID',
-  `payment_created_date` date DEFAULT NULL COMMENT 'Payment Created Date.',
-  `payment_date` date DEFAULT NULL COMMENT 'Payment Date.',
-  `payable_to_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Payable To Name.',
-  `payable_to_address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Payable To Address.',
-  `amount` decimal(20,2) NOT NULL COMMENT 'Requested grant amount, in default currency.',
-  `currency` varchar(3) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
-  `payment_reason` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Payment Reason.',
-  `replaces_payment_id` varchar(8) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Replaces Payment Id.',
-  PRIMARY KEY (`id`)
-)ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
 ALTER TABLE `civicrm_batch`
 ADD `payment_instrument_id` int(10) unsigned DEFAULT NULL COMMENT 'fk to Payment Instrument options in civicrm_option_values',
 ADD `exported_date` datetime DEFAULT NULL;

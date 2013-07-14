@@ -97,7 +97,7 @@ registration process.{/ts}
 {foreach from=$location.phone item=phone}
 {if $phone.phone}
 
-{if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone}{/if}
+{if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone}{/if} {if $phone.phone_ext} {ts}ext.{/ts} {$phone.phone_ext}{/if}
 {/foreach}
 {foreach from=$location.email item=eventEmail}
 {if $eventEmail.email}

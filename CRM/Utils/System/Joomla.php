@@ -587,7 +587,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param $loadUser boolean load cms user?
    * @param $throwError throw error on failure?
    */
-  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $loadDefines = TRUE) {
+  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL, $loadDefines = TRUE) {
     // Setup the base path related constant.
     $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
 
@@ -601,6 +601,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // Get the framework.
+    if (file_exists($joomlaBase . '/libraries/import.legacy.php')) {
+      require $joomlaBase . '/libraries/import.legacy.php';  
+    }
     require $joomlaBase . '/libraries/import.php';
     require $joomlaBase . '/libraries/joomla/event/dispatcher.php';
     require $joomlaBase . '/configuration.php';
@@ -618,7 +621,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
     else {
       require $joomlaBase . '/libraries/joomla/uri/uri.php';
-      require $joomlaBase . '/libraries/legacy/component/helper.php';
     }
 
     jimport('joomla.application.cli');

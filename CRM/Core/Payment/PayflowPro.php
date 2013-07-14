@@ -489,7 +489,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     // this line makes it work under https
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payflow_query);
     //adding POST data
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL') ? 2 : 0);
     //verifies ssl certificate
     curl_setopt($ch, CURLOPT_FORBID_REUSE, TRUE);
     //forces closure of connection when done

@@ -32,18 +32,18 @@
 </tr>
 <tr>
   <td colspan="2">
-    <label>{ts}Pledge Payment Status{/ts}
+    <label>{ts}Pledge Payment Status{/ts}</label>
       <br />{$form.pledge_payment_status_id.html}
   </td>
 </tr>
 <tr>
   <td>
-    <label>{ts}Pledge Amounts{/ts}
+    <label>{ts}Pledge Amounts{/ts}</label>
       <br />
     {$form.pledge_amount_low.label} {$form.pledge_amount_low.html} &nbsp;&nbsp; {$form.pledge_amount_high.label} {$form.pledge_amount_high.html}
   </td>
   <td>
-    <label>{ts}Pledge Status{/ts}
+    <label>{ts}Pledge Status{/ts}</label>
       <br />{$form.pledge_status_id.html}
   </td>
 </tr>
