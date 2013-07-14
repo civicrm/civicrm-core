@@ -1312,4 +1312,15 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(3, $data, $type, $context, self::$_nullObject,
       self::$_nullObject, 'civicrm_alterBarcode');
   }
+
+  /**
+   * This hook is called while building the core search query, 
+   * so hook implementers can provide their own query objects which alters/extends core search.
+   *
+   * @param Array $queryObjects
+   * @return void
+   */
+  static function queryObjects(&$queryObjects) {
+    return self::singleton()->invoke(1, $queryObjects, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_queryObjects');
+  }
 }
