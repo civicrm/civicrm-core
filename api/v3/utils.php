@@ -273,20 +273,10 @@ function _civicrm_api3_get_DAO($name) {
     $name = 'Contact';
   }
 
-  //hack to deal with incorrectly named BAO/DAO - see CRM-10859 - remove after rename
-  if($name == 'price_set' || $name == 'PriceSet'){
-    return 'CRM_Price_DAO_Set';
-  }
-  if($name == 'price_field' || $name == 'PriceField'){
-    return 'CRM_Price_DAO_Field';
-  }
-  if($name == 'price_field_value' || $name == 'PriceFieldValue'){
-    return 'CRM_Price_DAO_FieldValue';
-  }
-  // these aren't listed on ticket CRM-10859 - but same problem - lack of standardisation
-  if($name == 'mailing_job' || $name == 'MailingJob'){
-    return 'CRM_Mailing_BAO_Job';
-  }
+  //hack to deal with incorrectly named BAO/DAO - see CRM-10859 -
+  // several of these have been removed but am not confident mailing_recipients is
+  // tests so have not tackled.
+  // correct approach for im is unclear
   if($name == 'mailing_recipients' || $name == 'MailingRecipients'){
     return 'CRM_Mailing_BAO_Recipients';
   }

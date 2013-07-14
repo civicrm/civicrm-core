@@ -52,7 +52,7 @@ function civicrm_api3_price_field_value_create($params) {
     $ids['id'] = $params['id'];
   }
 
-  $bao = CRM_Price_BAO_FieldValue::create($params, $ids);
+  $bao = CRM_Price_BAO_PriceFieldValue::create($params, $ids);
 
   $values = array();
   _civicrm_api3_object_to_array($bao, $values[$bao->id]);

@@ -99,7 +99,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
     $bounce    = CRM_Mailing_Event_BAO_Bounce::getTableName();
     $queue     = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing   = CRM_Mailing_BAO_Mailing::getTableName();
-    $job       = CRM_Mailing_BAO_Job::getTableName();
+    $job       = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $query = "
             SELECT      COUNT($delivered.id) as delivered
@@ -158,7 +158,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
     $bounce    = CRM_Mailing_Event_BAO_Bounce::getTableName();
     $queue     = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing   = CRM_Mailing_BAO_Mailing::getTableName();
-    $job       = CRM_Mailing_BAO_Job::getTableName();
+    $job       = CRM_Mailing_BAO_MailingJob::getTableName();
     $contact   = CRM_Contact_BAO_Contact::getTableName();
     $email     = CRM_Core_BAO_Email::getTableName();
 

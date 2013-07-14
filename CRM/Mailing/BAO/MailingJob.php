@@ -34,7 +34,7 @@
  */
 
 require_once 'Mail.php';
-class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
+class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   CONST MAX_CONTACTS_TO_PROCESS = 1000;
 
   /**
@@ -45,7 +45,7 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
   }
 
   function create ($params){
-    $job = new CRM_Mailing_BAO_Job();
+    $job = new CRM_Mailing_BAO_MailingJob();
     $job->mailing_id = $params['mailing_id'];
     $job->status = $params['status'];
     $job->scheduled_date = $params['scheduled_date'];
@@ -63,10 +63,10 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
    * @static
    */
   public static function runJobs($testParams = NULL, $mode = NULL) {
-    $job = new CRM_Mailing_BAO_Job();
+    $job = new CRM_Mailing_BAO_MailingJob();
 
     $config       = CRM_Core_Config::singleton();
-    $jobTable     = CRM_Mailing_DAO_Job::getTableName();
+    $jobTable     = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
 
     if (!empty($testParams)) {
@@ -152,7 +152,7 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
         $job->queue($testParams);
 
         // Mark up the starting time
-        $saveJob             = new CRM_Mailing_DAO_Job();
+        $saveJob             = new CRM_Mailing_DAO_MailingJob();
         $saveJob->id         = $job->id;
         $saveJob->start_date = date('YmdHis');
         $saveJob->status     = 'Running';
@@ -181,7 +181,7 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
 
         $transaction = new CRM_Core_Transaction();
 
-        $saveJob           = new CRM_Mailing_DAO_Job();
+        $saveJob           = new CRM_Mailing_DAO_MailingJob();
         $saveJob->id       = $job->id;
         $saveJob->end_date = date('YmdHis');
         $saveJob->status   = 'Complete';
@@ -205,12 +205,12 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
   // as well as the mailing is complete after the run
   public static function runJobs_post($mode = NULL) {
 
-    $job = new CRM_Mailing_BAO_Job();
+    $job = new CRM_Mailing_BAO_MailingJob();
 
     $mailing = new CRM_Mailing_BAO_Mailing();
 
     $config       = CRM_Core_Config::singleton();
-    $jobTable     = CRM_Mailing_DAO_Job::getTableName();
+    $jobTable     = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
 
     $currentTime = date('YmdHis');
@@ -235,7 +235,7 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
     // For each parent job that is running, let's look at their child jobs
     while ($job->fetch()) {
 
-      $child_job = new CRM_Mailing_BAO_Job();
+      $child_job = new CRM_Mailing_BAO_MailingJob();
 
       $child_job_sql = "
             SELECT count(j.id)
@@ -254,7 +254,7 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
 
         $transaction = new CRM_Core_Transaction();
 
-        $saveJob           = new CRM_Mailing_DAO_Job();
+        $saveJob           = new CRM_Mailing_DAO_MailingJob();
         $saveJob->id       = $job->id;
         $saveJob->end_date = date('YmdHis');
         $saveJob->status   = 'Complete';
@@ -272,17 +272,17 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
 
   // before we run jobs, we need to split the jobs
   public static function runJobs_pre($offset = 200, $mode = NULL) {
-    $job = new CRM_Mailing_BAO_Job();
+    $job = new CRM_Mailing_BAO_MailingJob();
 
     $config       = CRM_Core_Config::singleton();
-    $jobTable     = CRM_Mailing_DAO_Job::getTableName();
+    $jobTable     = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
 
     $currentTime = date('YmdHis');
     $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL('m');
 
 
-    $workflowClause = CRM_Mailing_BAO_Job::workflowClause();
+    $workflowClause = CRM_Mailing_BAO_MailingJob::workflowClause();
 
     $domainID = CRM_Core_Config::domainID();
 
@@ -344,7 +344,7 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
       // update the status of the parent job
       $transaction = new CRM_Core_Transaction();
 
-      $saveJob             = new CRM_Mailing_DAO_Job();
+      $saveJob             = new CRM_Mailing_DAO_MailingJob();
       $saveJob->id         = $job->id;
       $saveJob->start_date = date('YmdHis');
       $saveJob->status     = 'Running';
@@ -362,7 +362,7 @@ class CRM_Mailing_BAO_Job extends CRM_Mailing_DAO_Job {
   public function split_job($offset = 200) {
     $recipient_count = CRM_Mailing_BAO_Recipients::mailingSize($this->mailing_id);
 
-    $jobTable = CRM_Mailing_DAO_Job::getTableName();
+    $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
 
 
     $dao = new CRM_Core_DAO();
@@ -780,7 +780,7 @@ AND    ( ( job_type IS NULL ) OR
       in_array($job->status, array('Scheduled', 'Running', 'Paused'))
     ) {
 
-      $newJob           = new CRM_Mailing_BAO_Job();
+      $newJob           = new CRM_Mailing_BAO_MailingJob();
       $newJob->id       = $job->id;
       $newJob->end_date = date('YmdHis');
       $newJob->status   = 'Canceled';

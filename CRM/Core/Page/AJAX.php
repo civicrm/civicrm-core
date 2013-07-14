@@ -109,9 +109,9 @@ class CRM_Core_Page_AJAX {
     if (!$id || !in_array($context, array('civicrm_event', 'civicrm_contribution_page'))) {
       return false;
     }
-    $priceSetId = CRM_Price_BAO_Set::getFor($context, $id, NULL);
+    $priceSetId = CRM_Price_BAO_PriceSet::getFor($context, $id, NULL);
     if ($priceSetId) {
-      $result = CRM_Price_BAO_Set::setIsQuickConfig($priceSetId, 0);
+      $result = CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetId, 0);
       if ($context == 'civicrm_event') {
         $sql = "UPDATE
           civicrm_price_set cps

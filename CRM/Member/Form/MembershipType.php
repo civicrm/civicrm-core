@@ -447,14 +447,14 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
         'name' => $previousID,
       );
       $editedResults = array();
-      CRM_Price_BAO_Field::retrieve($editedFieldParams, $editedResults);
+      CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
       if (!empty($editedResults)) {
         $editedFieldParams = array(
           'price_field_id' => $editedResults['id'],
           'membership_type_id' => $membershipTypeId,
         );
         $editedResults = array();
-        CRM_Price_BAO_FieldValue::retrieve($editedFieldParams, $editedResults);
+        CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
         $optionsIds['option_id'][1] = CRM_Utils_Array::value('id', $editedResults);
       }
     }

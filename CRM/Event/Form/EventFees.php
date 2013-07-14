@@ -198,7 +198,7 @@ class CRM_Event_Form_EventFees {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
     }
     else {
-      $priceSetId = CRM_Price_BAO_Set::getFor('civicrm_event', $form->_eventId);
+      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $form->_eventId);
     }
 
     if (($form->_action == CRM_Core_Action::ADD) && $form->_eventId && $discountId) {
@@ -291,7 +291,7 @@ class CRM_Event_Form_EventFees {
     }
 
     // get price set ID.
-    $priceSetID = CRM_Price_BAO_Set::getFor('civicrm_event', $eventID);
+    $priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID);
     if (!$priceSetID) {
       return $defaults;
     }

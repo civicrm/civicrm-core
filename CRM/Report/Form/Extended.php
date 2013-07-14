@@ -206,7 +206,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     return array(
       'civicrm_price_field_value' =>
       array(
-        'dao' => 'CRM_Price_BAO_FieldValue',
+        'dao' => 'CRM_Price_BAO_PriceFieldValue',
         'fields' => array(
           'price_field_value_label' =>
           array('title' => ts('Price Field Value Label'),
@@ -247,7 +247,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     return array(
       'civicrm_price_field' =>
       array(
-        'dao' => 'CRM_Price_BAO_Field',
+        'dao' => 'CRM_Price_BAO_PriceField',
         'fields' =>
         array(
           'price_field_label' =>

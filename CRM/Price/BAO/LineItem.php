@@ -194,11 +194,11 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       $options = $fields['options'];
     }
     else {
-      CRM_Price_BAO_FieldValue::getValues($fid, $options, 'weight', TRUE);
+      CRM_Price_BAO_PriceFieldValue::getValues($fid, $options, 'weight', TRUE);
     }
     $fieldTitle = CRM_Utils_Array::value('label', $fields);
     if (!$fieldTitle) {
-      $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $fid, 'label');
+      $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $fid, 'label');
     }
 
     foreach ($params["price_{$fid}"] as $oid => $qty) {
@@ -287,7 +287,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
         if (CRM_Utils_Array::value('price_field_value_id', $line) && !CRM_Utils_Array::value('financial_type_id', $line)) {
-          $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_FieldValue', $line['price_field_value_id'], 'financial_type_id');
+          $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $lineItems = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
@@ -360,7 +360,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution') {
 
     if (!$entityId) {
-      $priceSetDetails = CRM_Price_BAO_Set::getDefaultPriceSet();
+      $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
       foreach ($priceSetDetails as $values) {
         $params['line_item'][$values['setID']][$values['priceFieldID']] = array(
           'price_field_id' => $values['priceFieldID'],
@@ -380,8 +380,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         $lineItems = CRM_Price_BAO_LineItem::getLineItems($id, $entityTable);
         foreach ($lineItems as $key => $values) {
           if (!$setID) {
-            $setID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $values['price_field_id'], 'price_set_id');
-            $params['is_quick_config'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $setID, 'is_quick_config');
+            $setID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $values['price_field_id'], 'price_set_id');
+            $params['is_quick_config'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'is_quick_config');
           }
           if (CRM_Utils_Array::value('is_quick_config', $params) && array_key_exists('total_amount', $params)
             && $totalEntityId == 1) {

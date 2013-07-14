@@ -99,13 +99,13 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%oid%%,\'' . 'CRM_Price_BAO_FieldValue' . '\',\'' . 'enable-disable' . '\' );"',
+          'extra' => 'onclick = "enableDisable( %%oid%%,\'' . 'CRM_Price_BAO_PriceFieldValue' . '\',\'' . 'enable-disable' . '\' );"',
           'ref' => 'disable-action',
           'title' => ts('Disable Price Option'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%oid%%,\'' . 'CRM_Price_BAO_FieldValue' . '\',\'' . 'disable-enable' . '\' );"',
+          'extra' => 'onclick = "enableDisable( %%oid%%,\'' . 'CRM_Price_BAO_PriceFieldValue' . '\',\'' . 'disable-enable' . '\' );"',
           'ref' => 'enable-action',
           'title' => ts('Enable Price Option'),
         ),
@@ -130,7 +130,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    */
   function browse() {
     $customOption = array();
-    CRM_Price_BAO_FieldValue::getValues($this->_fid, $customOption);
+    CRM_Price_BAO_PriceFieldValue::getValues($this->_fid, $customOption);
     $config = CRM_Core_Config::singleton();
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     foreach ($customOption as $id => $values) {
@@ -168,7 +168,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     // Add order changing widget to selector
     $returnURL = CRM_Utils_System::url('civicrm/admin/price/field/option', "action=browse&reset=1&fid={$this->_fid}&sid={$this->_sid}");
     $filter = "price_field_id = {$this->_fid}";
-    CRM_Utils_Weight::addOrder($customOption, 'CRM_Price_DAO_FieldValue',
+    CRM_Utils_Weight::addOrder($customOption, 'CRM_Price_DAO_PriceFieldValue',
       'id', $returnURL, $filter
     );
 
@@ -193,9 +193,9 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $params = array();
     if ($oid) {
       $params['oid'] = $oid;
-      $sid = CRM_Price_BAO_Set::getSetId($params);
+      $sid = CRM_Price_BAO_PriceSet::getSetId($params);
 
-      $usedBy = CRM_Price_BAO_Set::getUsedBy($sid);
+      $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($sid);
     }
     // set the userContext stack
     $session = CRM_Core_Session::singleton();
@@ -218,7 +218,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       CRM_Utils_System::appendBreadCrumb(ts('Price Option'),
         $url
       );
-      $this->assign('usedPriceSetTitle', CRM_Price_BAO_FieldValue::getOptionLabel($oid));
+      $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceFieldValue::getOptionLabel($oid));
       $this->assign('usedBy', $usedBy);
       $comps = array(
         "Event" => "civicrm_event",
@@ -257,8 +257,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     }
 
     if ($this->_sid) {
-      CRM_Price_BAO_Set::checkPermission($this->_sid);
-      $this->_isSetReserved= CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_sid, 'is_reserved');
+      CRM_Price_BAO_PriceSet::checkPermission($this->_sid);
+      $this->_isSetReserved= CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
       $this->assign('isReserved', $this->_isSetReserved);
     }
     //as url contain $sid so append breadcrumb dynamically.
@@ -268,12 +268,12 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 
     if ($this->_fid) {
-      $fieldTitle = CRM_Price_BAO_Field::getTitle($this->_fid);
+      $fieldTitle = CRM_Price_BAO_PriceField::getTitle($this->_fid);
       $this->assign('fid', $this->_fid);
       $this->assign('fieldTitle', $fieldTitle);
       CRM_Utils_System::setTitle(ts('%1 - Price Options', array(1 => $fieldTitle)));
 
-      $htmlType = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_Field', $this->_fid, 'html_type');
+      $htmlType = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceField', $this->_fid, 'html_type');
       $this->assign('addMoreFields', TRUE);
       //for text price field only single option present
       if ($htmlType == 'Text') {

@@ -111,7 +111,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
 
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
     $mg      = CRM_Mailing_DAO_MailingGroup::getTableName();
     $eq      = CRM_Mailing_Event_DAO_Queue::getTableName();
     $ed      = CRM_Mailing_Event_DAO_Delivered::getTableName();
@@ -1603,7 +1603,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
      * CRM_Mailing_Form_Schedule::postProcess() or via API.
      */
     if (isset($params['approval_status_id']) && $params['approval_status_id']) {
-      $job = new CRM_Mailing_BAO_Job();
+      $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
       $job->status = 'Scheduled';
       $job->is_test = 0;
@@ -1636,7 +1636,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'mailing' => self::getTableName(),
       'mailing_group' => CRM_Mailing_DAO_MailingGroup::getTableName(),
       'group' => CRM_Contact_BAO_Group::getTableName(),
-      'job' => CRM_Mailing_BAO_Job::getTableName(),
+      'job' => CRM_Mailing_BAO_MailingJob::getTableName(),
       'queue' => CRM_Mailing_Event_BAO_Queue::getTableName(),
       'delivered' => CRM_Mailing_Event_BAO_Delivered::getTableName(),
       'opened' => CRM_Mailing_Event_BAO_Opened::getTableName(),
@@ -1848,7 +1848,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $row['optout'] = CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, FALSE);
       $report['event_totals']['optout'] += $row['optout'];
 
-      foreach (array_keys(CRM_Mailing_BAO_Job::fields()) as $field) {
+      foreach (array_keys(CRM_Mailing_BAO_MailingJob::fields()) as $field) {
         $row[$field] = $mailing->$field;
       }
 
@@ -2195,7 +2195,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public function &getRows($offset, $rowCount, $sort, $additionalClause = NULL, $additionalParams = NULL) {
     $mailing = self::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
     $group   = CRM_Mailing_DAO_MailingGroup::getTableName();
     $session = CRM_Core_Session::singleton();
 
@@ -2324,7 +2324,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       CRM_Core_Error::fatal();
     }
 
-    $dao = new CRM_Mailing_BAO_Job();
+    $dao = new CRM_Mailing_BAO_MailingJob();
     $dao->id = $id;
     $dao->delete();
   }
@@ -2671,9 +2671,9 @@ WHERE  civicrm_mailing_job.id = %1
     // load bootstrap to call hooks
 
     // Split up the parent jobs into multiple child jobs
-    CRM_Mailing_BAO_Job::runJobs_pre($config->mailerJobSize, $mode);
-    CRM_Mailing_BAO_Job::runJobs(NULL, $mode);
-    CRM_Mailing_BAO_Job::runJobs_post($mode);
+    CRM_Mailing_BAO_MailingJob::runJobs_pre($config->mailerJobSize, $mode);
+    CRM_Mailing_BAO_MailingJob::runJobs(NULL, $mode);
+    CRM_Mailing_BAO_MailingJob::runJobs_post($mode);
 
     // lets release the global cron lock if we do have one
     if ($gotCronLock) {
