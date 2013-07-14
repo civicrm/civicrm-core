@@ -293,7 +293,10 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
 
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
-
+   //regenerate the from field without extra left join on pledge payments
+    $this->_totalPaid = FALSE;
+    $this->from();
+    $this->customDataFrom();
     if (!$this->_having) {
       $totalAmount = $average = array();
       $count = 0;
