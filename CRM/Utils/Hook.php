@@ -472,10 +472,10 @@ abstract class CRM_Utils_Hook {
    * This hook is called when rendering the tabs
    * used for events and potentially contribution pages, etc
    * @param string $tabset   - name of the screen or visual element
-   * @param array $tabs      - the array of tabs that will be displayed   
+   * @param array $tabs      - the array of tabs that will be displayed
    * @param array $context   - extra data about the screen or context in which the tab is used
    *
-   * @return null 
+   * @return null
    * @access public
    */
   static function tabset($tabsetName, &$tabs, $context) {
@@ -1314,7 +1314,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called while building the core search query, 
+   * This hook is called while building the core search query,
    * so hook implementers can provide their own query objects which alters/extends core search.
    *
    * @param Array $queryObjects

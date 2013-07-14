@@ -219,7 +219,7 @@ LIMIT  1
       unset($params['autocompleteContactReference']);
     }
 
-    // save components to be enabled 
+    // save components to be enabled
     if (CRM_Utils_Array::value('enableComponents', $params)) {
       CRM_Core_BAO_Setting::setItem($params['enableComponents'],
         CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,'enable_components');

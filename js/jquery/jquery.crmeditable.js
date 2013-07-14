@@ -27,7 +27,7 @@
 *
 *
 * This offers two features:
-* - crmEditable() edit in place of a single field 
+* - crmEditable() edit in place of a single field
 *  (mostly a wrapper that binds jeditable features with the ajax api and replies on crm-entity crmf-{field} html conventions)
 *  if you want to add an edit in place on a template:
 *  - add a class crm-entity and id {EntityName}-{Entityid} higher in the dom
@@ -90,7 +90,7 @@
           if  (!getEntityID (this,function (e,id) {
             entity=e;
             params.id = id;
-            
+
           })) { return };
 
           params['field']=getFieldName(this);
@@ -156,7 +156,7 @@
             var id= $i.closest('.crm-entity').attr('id');
             if (id) {
               var e=id.match(/(\S*)-(\S*)/);
-               if (!e) 
+               if (!e)
                  console && console.log && console.log("Couldn't get the entity id. You need to set class='crm-entity' id='{entityName}-{id}'");
               formSettings.entity=e[1];
               formSettings.id=e[2];

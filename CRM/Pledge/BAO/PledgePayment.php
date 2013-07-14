@@ -719,7 +719,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
       while ($paymentsAffected->fetch()) {
         $paymentIDs[] = $paymentsAffected->id;
       }
-      // Reset the affected values by the amount paid more than the scheduled amount 
+      // Reset the affected values by the amount paid more than the scheduled amount
       foreach($paymentIDs as $key => $value) {
         $payment = new CRM_Pledge_DAO_PledgePayment();
         $payment->id = $value;
@@ -733,11 +733,11 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
           $payment->save();
         }
       }
-      
+
       //Cancel the initial paid amount
       CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', reset($paymentIDs), 'status_id', $paymentStatusID, 'id');
       CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', reset($paymentIDs), 'actual_amount', $actualAmount, 'id');
-      
+
       //Add new payment after the last payment for the pledge
       $allPayments = self::getPledgePayments($pledgeID);
       $lastPayment = array_pop($allPayments);

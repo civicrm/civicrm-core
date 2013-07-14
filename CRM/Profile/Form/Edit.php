@@ -218,7 +218,7 @@ SELECT module
           $popupRedirect = CRM_Utils_System::url('civicrm/profile/edit', $urlParams, FALSE, NULL, FALSE);
         }
         elseif ($this->_onPopupClose == 'redirectToTab') {
-          $popupRedirect = CRM_Utils_System::url('civicrm/contact/view', 
+          $popupRedirect = CRM_Utils_System::url('civicrm/contact/view',
             "reset=1&cid={$this->_id}&selectedChild=custom_{$this->_customGroupId}", FALSE, NULL, FALSE);
         }
 
