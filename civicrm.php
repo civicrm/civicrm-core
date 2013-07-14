@@ -237,11 +237,9 @@ class CiviCRM_For_WordPress {
       // check if settings file exist, do not show configuration link on
       // install / settings page
       if ( isset( $_GET['page'] ) && $_GET['page'] != 'civicrm-install' ) {
-
         if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
           add_action( 'admin_notices', array( $this, 'show_setup_warning' ) );
         }
-
       }
 
       // merge CiviCRM's HTML header with the WordPress theme's header
@@ -866,7 +864,7 @@ class CiviCRM_For_WordPress {
 
       if (
         $arg1 == 'contribute' &&
-        in_array( $arg2, array('transact', 'campaign', 'pcp') )
+        in_array( $arg2, array('transact', 'campaign', 'pcp', 'updaterecur', 'updatebilling', 'unsubscribe') )
       ) {
         return true;
       }
