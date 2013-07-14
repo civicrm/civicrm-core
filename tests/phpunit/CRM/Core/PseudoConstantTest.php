@@ -201,7 +201,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Public',
         ),
       ),
-      'CRM_Price_DAO_Field' => array(
+      'CRM_Price_DAO_PriceField' => array(
         array(
           'fieldName' => 'visibility_id',
           'sample' => 'Public',

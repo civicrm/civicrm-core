@@ -57,7 +57,7 @@ function civicrm_api3_price_set_create($params) {
     foreach ($entityId as $eid) {
       $eid = (int) trim($eid);
       if ($eid) {
-        CRM_Price_BAO_Set::addTo($params['entity_table'], $eid, $result['id']);
+        CRM_Price_BAO_PriceSet::addTo($params['entity_table'], $eid, $result['id']);
       }
     }
   }
@@ -87,7 +87,7 @@ function civicrm_api3_price_set_get($params) {
   $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   // Fetch associated entities
   foreach ($result as &$item) {
-    $item['entity'] = CRM_Price_BAO_Set::getUsedBy($item['id'], 'entity');
+    $item['entity'] = CRM_Price_BAO_PriceSet::getUsedBy($item['id'], 'entity');
   }
   return civicrm_api3_create_success($result, $params);
 }

@@ -642,7 +642,7 @@ WHERE     cpf.price_set_id = %1
           $priceSetId = $result->price_set_id;
         }
         else{
-          $defaultPriceSets = CRM_Price_BAO_Set::getDefaultPriceSet();
+          $defaultPriceSets = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
           foreach ($defaultPriceSets as $key => $pSet) {
             if ($pSet['name'] == 'contribution_amount'){
               $priceSetId = $pSet['setID'];

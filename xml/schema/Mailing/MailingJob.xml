@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/Mailing</base>
-  <class>Job</class>
+  <class>MailingJob</class>
   <name>civicrm_mailing_job</name>
   <comment>Stores information about the job that executes this mailing</comment>
   <archive>true</archive>

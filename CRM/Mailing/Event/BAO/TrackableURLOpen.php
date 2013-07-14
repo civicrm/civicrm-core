@@ -60,7 +60,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
          * prevents foreign key violations. */
 
 
-    $job  = CRM_Mailing_BAO_Job::getTableName();
+    $job  = CRM_Mailing_BAO_MailingJob::getTableName();
     $eq   = CRM_Mailing_Event_BAO_Queue::getTableName();
     $turl = CRM_Mailing_BAO_TrackableURL::getTableName();
 
@@ -115,7 +115,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     $click   = self::getTableName();
     $queue   = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $query = "
             SELECT      COUNT($click.id) as opened
@@ -167,7 +167,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
 
     $click = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $job = CRM_Mailing_BAO_Job::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailingIDs = implode(',', $mailingIDs);
 
     $query = "
@@ -217,7 +217,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     $url     = CRM_Mailing_BAO_TrackableURL::getTableName();
     $queue   = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
     $email   = CRM_Core_BAO_Email::getTableName();
 

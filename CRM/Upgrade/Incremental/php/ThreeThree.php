@@ -138,7 +138,7 @@ WHERE id = %2
     CRM_Core_DAO::executeQuery($updateLineItem1);
 
 
-    $priceFieldDAO = new CRM_Price_DAO_Field();
+    $priceFieldDAO = new CRM_Price_DAO_PriceField();
     $priceFieldDAO->find();
     $ids = array();
     while ($priceFieldDAO->fetch()) {
@@ -175,7 +175,7 @@ WHERE id = %2
           $fieldValue['count'] = $priceFieldDAO->count;
         }
 
-        $fieldValueDAO = CRM_Price_BAO_FieldValue::add($fieldValue, $ids);
+        $fieldValueDAO = CRM_Price_BAO_PriceFieldValue::add($fieldValue, $ids);
 
         $lineItemDAO = new CRM_Price_DAO_LineItem();
         $lineItemDAO->option_group_id = $opGroupDAO->id;

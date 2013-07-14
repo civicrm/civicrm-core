@@ -73,7 +73,7 @@ for ($i = 1; $i <= $numGroups; $i++) {
   $mailing->is_completed = 1;
   $mailing->save();
 
-  $job                 = new CRM_Mailing_BAO_Job();
+  $job                 = new CRM_Mailing_BAO_MailingJob();
   $job->mailing_id     = $mailing->id;
   $job->scheduled_date = generateRandomDate();
   $job->start_date     = generateRandomDate();

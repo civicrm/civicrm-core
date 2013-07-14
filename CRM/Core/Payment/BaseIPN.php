@@ -796,7 +796,7 @@ LIMIT 1;";
       $lineItems = CRM_Price_BAO_LineItem::getLineItems($contriID, 'contribution');
       if (!empty($lineItems)) {
         foreach ($lineItems as $key => $value) {
-          $pricesetID = new CRM_Price_DAO_Field();
+          $pricesetID = new CRM_Price_DAO_PriceField();
           $pricesetID->id = $value['price_field_id'];
           $pricesetID->find(TRUE);
           $lineSets[$pricesetID->price_set_id][] = $value;

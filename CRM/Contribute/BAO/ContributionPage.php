@@ -608,7 +608,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       ));
 
     //copy price sets
-    CRM_Price_BAO_Set::copyPriceSet('civicrm_contribution_page', $id, $copy->id);
+    CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_contribution_page', $id, $copy->id);
 
     $copyTellFriend = &CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', array(
         'entity_id' => $id,

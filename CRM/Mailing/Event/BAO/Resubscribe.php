@@ -70,7 +70,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
 
     $do = new CRM_Core_DAO();
     $mg = CRM_Mailing_DAO_MailingGroup::getTableName();
-    $job = CRM_Mailing_BAO_Job::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
     $gc = CRM_Contact_BAO_GroupContact::getTableName();
@@ -199,7 +199,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     $config = CRM_Core_Config::singleton();
     $domain = CRM_Core_BAO_Domain::getDomain();
 
-    $jobTable = CRM_Mailing_BAO_Job::getTableName();
+    $jobTable = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
     $contacts = CRM_Contact_DAO_Contact::getTableName();
     $email = CRM_Core_DAO_Email::getTableName();

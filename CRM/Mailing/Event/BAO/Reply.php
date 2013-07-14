@@ -70,7 +70,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailings = CRM_Mailing_BAO_Mailing::getTableName();
-    $jobs = CRM_Mailing_BAO_Job::getTableName();
+    $jobs = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailing->query(
       "SELECT * FROM  $mailings
             INNER JOIN      $jobs
@@ -307,7 +307,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $reply = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job = CRM_Mailing_BAO_Job::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $query = "
             SELECT      COUNT($reply.id) as reply
@@ -362,7 +362,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $reply = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job = CRM_Mailing_BAO_Job::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
     $email = CRM_Core_BAO_Email::getTableName();
 

@@ -132,9 +132,9 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $newArgs = $newArgs[0];
     if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
       $config = CRM_Core_Config::singleton();
-      CRM_Mailing_BAO_Job::runJobs_pre($config->mailerJobSize);
-      CRM_Mailing_BAO_Job::runJobs();
-      CRM_Mailing_BAO_Job::runJobs_post();
+      CRM_Mailing_BAO_MailingJob::runJobs_pre($config->mailerJobSize);
+      CRM_Mailing_BAO_MailingJob::runJobs();
+      CRM_Mailing_BAO_MailingJob::runJobs_post();
     }
 
     $this->_sortByCharacter =
@@ -176,7 +176,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
     if ($this->_action & CRM_Core_Action::DISABLE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
-        CRM_Mailing_BAO_Job::cancel($this->_mailingId);
+        CRM_Mailing_BAO_MailingJob::cancel($this->_mailingId);
         CRM_Utils_System::redirect($context);
       }
       else {

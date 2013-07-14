@@ -90,19 +90,19 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     CRM_Event_BAO_Event::retrieve($params, $defaults);
 
     if (isset($eventId)) {
-      $price_set_id = CRM_Price_BAO_Set::getFor('civicrm_event', $eventId, NULL, 1);
+      $price_set_id = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventId, NULL, 1);
 
       if ($price_set_id) {
         $defaults['price_set_id'] = $price_set_id;
       }
       else {
-        $priceSetId = CRM_Price_BAO_Set::getFor('civicrm_event', $eventId, NULL);
+        $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventId, NULL);
         if ($priceSetId) {
-          if ($isQuick = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $priceSetId, 'is_quick_config')) {
+          if ($isQuick = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config')) {
             $this->assign('isQuick', $isQuick);
-            $priceField = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $priceSetId, 'id', 'price_set_id');
+            $priceField = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $priceSetId, 'id', 'price_set_id');
             $options = array();
-            $priceFieldOptions = CRM_Price_BAO_FieldValue::getValues($priceField, $options, 'weight', true);
+            $priceFieldOptions = CRM_Price_BAO_PriceFieldValue::getValues($priceField, $options, 'weight', true);
             $defaults['price_field_id'] = $priceField;
             $countRow = 0;
             foreach ($options as $optionId => $optionValue) {
@@ -128,7 +128,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $totalLables = $maxSize = $defaultDiscounts = array();
       foreach ($discountedEvent as $optionGroupId) {
         $defaults['discount_price_set'][] = $optionGroupId;
-        $name = $defaults["discount_name[$i]"] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $optionGroupId, 'title');
+        $name = $defaults["discount_name[$i]"] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $optionGroupId, 'title');
 
         list($defaults["discount_start_date[$i]"]) = CRM_Utils_Date::setDateDefaults(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Discount', $optionGroupId,
           'start_date', 'price_set_id'
@@ -136,7 +136,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         list($defaults["discount_end_date[$i]"]) = CRM_Utils_Date::setDateDefaults(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Discount', $optionGroupId,
           'end_date', 'price_set_id'
           ));
-        $defaultDiscounts[] = CRM_Price_BAO_Set::getSetDetail($optionGroupId);
+        $defaultDiscounts[] = CRM_Price_BAO_PriceSet::getSetDetail($optionGroupId);
         $i++;
       }
 
@@ -275,7 +275,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
     $this->add('text', 'fee_label', ts('Fee Label'));
 
-    $price = CRM_Price_BAO_Set::getAssoc(FALSE, 'CiviEvent');
+    $price = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviEvent');
     if (CRM_Utils_System::isNull($price)) {
       $this->assign('price', FALSE);
     }
@@ -358,7 +358,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
       //discount name
       $this->add('text', 'discount_name[' . $i . ']', ts('Discount Name'),
-        CRM_Core_DAO::getAttribute('CRM_Price_DAO_Set', 'title')
+        CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceSet', 'title')
       );
 
       $this->add('hidden', "discount_price_set[$i]", '', array('id' => "discount_price_set[$i]"));
@@ -576,17 +576,17 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
       // delete all the prior label values or discounts in the custom options table
       // and delete a price set if one exists
-      if (CRM_Price_BAO_Set::removeFrom('civicrm_event', $this->_id)) {
+      if (CRM_Price_BAO_PriceSet::removeFrom('civicrm_event', $this->_id)) {
         CRM_Core_BAO_Discount::del($this->_id,'civicrm_event');
       }
     }
 
     if ($params['is_monetary']) {
       if (CRM_Utils_Array::value('price_set_id', $params)) {
-        CRM_Price_BAO_Set::addTo('civicrm_event', $this->_id, $params['price_set_id']);
+        CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_id, $params['price_set_id']);
         if (CRM_Utils_Array::value('price_field_id', $params)) {
-          $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $params['price_field_id'], 'price_set_id');
-          CRM_Price_BAO_Set::setIsQuickConfig($priceSetID,0);
+          $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $params['price_field_id'], 'price_set_id');
+          CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetID,0);
         }
       }
       else {
@@ -612,10 +612,10 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
               if (!CRM_Utils_Array::value('price_field_id', $params)) {
                 $setParams['title'] = $eventTitle = ($this->_isTemplate) ? $this->_defaultValues['template_title'] : $this->_defaultValues['title'];
                 $eventTitle = strtolower(CRM_Utils_String::munge($eventTitle, '_', 245));
-                if (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_Set', $eventTitle, 'id', 'name')) {
+                if (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceSet', $eventTitle, 'id', 'name')) {
                   $setParams['name'] = $eventTitle;
                 }
-                elseif (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_Set', $eventTitle . '_' . $this->_id, 'id', 'name')) {
+                elseif (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceSet', $eventTitle . '_' . $this->_id, 'id', 'name')) {
                   $setParams['name'] = $eventTitle . '_' . $this->_id;
                 }
                 else {
@@ -624,7 +624,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                 }
                 $setParams['is_quick_config'] = 1;
                 $setParams['extends'] = CRM_Core_Component::getComponentID('CiviEvent');
-                $priceSet = CRM_Price_BAO_Set::create($setParams);
+                $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
 
                 $fieldParams['name'] = $fieldParams['label'] = $params['fee_label'];
                 $fieldParams['price_set_id'] = $priceSet->id;
@@ -632,23 +632,23 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
               else {
                 foreach ($params['price_field_value'] as $arrayID => $fieldValueID) {
                   if (empty($params['label'][$arrayID]) && empty($params['value'][$arrayID]) && !empty($fieldValueID)) {
-                    CRM_Price_BAO_FieldValue::setIsActive($fieldValueID, '0');
+                    CRM_Price_BAO_PriceFieldValue::setIsActive($fieldValueID, '0');
                     unset($params['price_field_value'][$arrayID]);
                   }
                 }
                 $fieldParams['id'] = CRM_Utils_Array::value('price_field_id', $params);
                 $fieldParams['option_id'] = $params['price_field_value'];
-                $priceSet = new CRM_Price_BAO_Set();
-                $priceSet->id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', CRM_Utils_Array::value('price_field_id', $params), 'price_set_id');
+                $priceSet = new CRM_Price_BAO_PriceSet();
+                $priceSet->id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $params), 'price_set_id');
               }
               $fieldParams['html_type'] = 'Radio';
-              CRM_Price_BAO_Set::addTo('civicrm_event', $this->_id, $priceSet->id);
+              CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_id, $priceSet->id);
               $fieldParams['option_label'] = $params['label'];
               $fieldParams['option_amount'] = $params['value'];
               $fieldParams['financial_type_id'] = $params['financial_type_id'];
               foreach ($options as $value) $fieldParams['option_weight'][$value['weight']] = $value['weight'];
               $fieldParams['default_option'] = $params['default'];
-              $priceField = CRM_Price_BAO_Field::create($fieldParams);
+              $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
             }
           }
         }
@@ -687,10 +687,10 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                     $eventTitle = strtolower(CRM_Utils_String::munge($this->_defaultValues['title'], '_', 200));
                   }
                   $setParams['title'] = $params['discount_name'][$j];
-                  if (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_Set', $eventTitle . '_' . $params['discount_name'][$j], 'id', 'name')) {
+                  if (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceSet', $eventTitle . '_' . $params['discount_name'][$j], 'id', 'name')) {
                     $setParams['name'] = $eventTitle . '_' . $params['discount_name'][$j];
                   }
-                  elseif (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_Set', $eventTitle . '_' . $params['discount_name'][$j] . '_' . $this->_id, 'id', 'name')) {
+                  elseif (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceSet', $eventTitle . '_' . $params['discount_name'][$j] . '_' . $this->_id, 'id', 'name')) {
                     $setParams['name'] = $eventTitle . '_' . $params['discount_name'][$j] . '_' . $this->_id;
                   }
                   else {
@@ -699,12 +699,12 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   }
                   $setParams['is_quick_config'] = 1;
                   $setParams['extends'] = CRM_Core_Component::getComponentID('CiviEvent');
-                  $priceSet = CRM_Price_BAO_Set::create($setParams);
+                  $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
                   $priceSetID = $priceSet->id;
                 } else {
                   $priceSetID = $discountPriceSets[$j-1];
                   unset($discountPriceSets[$j-1]);
-                  $fieldParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_Field', $priceSetID, 'id', 'price_set_id');
+                  $fieldParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceField', $priceSetID, 'id', 'price_set_id');
                 }
 
                 $fieldParams['name'] = $fieldParams['label'] = $params['fee_label'];
@@ -725,10 +725,10 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   }
                 }
                 //create discount priceset
-                $priceField = CRM_Price_BAO_Field::create($fieldParams);
+                $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
                 if (!empty($discountFieldIDs)) {
                   foreach($discountFieldIDs as $fID){
-                    CRM_Price_BAO_FieldValue::setIsActive($fID, '0');
+                    CRM_Price_BAO_PriceFieldValue::setIsActive($fID, '0');
                   }
                 }
 
@@ -746,15 +746,15 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         }
         if (!empty($discountPriceSets)) {
           foreach ($discountPriceSets as $setId) {
-            CRM_Price_BAO_Set::setIsQuickConfig($setId, 0);
+            CRM_Price_BAO_PriceSet::setIsQuickConfig($setId, 0);
           }
         }
       }
     }
     else {
       if (CRM_Utils_Array::value('price_field_id', $params)) {
-        $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $params['price_field_id'], 'price_set_id');
-        CRM_Price_BAO_Set::setIsQuickConfig($priceSetID,0);
+        $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $params['price_field_id'], 'price_set_id');
+        CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetID,0);
       }
       $params['financial_type_id'] = '';
       $params['is_pay_later'] = 0;

@@ -752,7 +752,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $lineItem = array();
       $priceSetId = null;
       CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetId);
-      CRM_Price_BAO_Set::processAmount($this->_priceSet['fields'],
+      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetId]
       );
       //CRM-11529 for quick config backoffice transactions

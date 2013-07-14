@@ -82,10 +82,10 @@ class CRM_Admin_Page_AJAX {
           }
           break;
 
-        case 'CRM_Price_BAO_Set':
+        case 'CRM_Price_BAO_PriceSet':
           require_once (str_replace('_', DIRECTORY_SEPARATOR, $recordBAO) . '.php');
-          $usedBy = CRM_Price_BAO_Set::getUsedBy($recordID);
-          $priceSet = CRM_Price_BAO_Set::getTitle($recordID);
+          $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($recordID);
+          $priceSet = CRM_Price_BAO_PriceSet::getTitle($recordID);
 
           if (!CRM_Utils_System::isNull($usedBy)) {
             $template = CRM_Core_Smarty::singleton();
@@ -191,7 +191,7 @@ class CRM_Admin_Page_AJAX {
           $status = ts('Are you sure you want to disable this membership status rule?');
           break;
 
-        case 'CRM_Price_BAO_Field':
+        case 'CRM_Price_BAO_PriceField':
           $status = ts('Are you sure you want to disable this price field?');
           break;
 

@@ -28,10 +28,10 @@ function activity_type_create_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 720,
+  'id' => 722,
   'values' => array(
-      '720' => array(
-          'id' => '720',
+      '722' => array(
+          'id' => '722',
           'option_group_id' => '2',
           'label' => 'send out letters',
           'value' => '46',
