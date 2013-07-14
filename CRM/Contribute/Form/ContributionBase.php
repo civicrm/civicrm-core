@@ -330,7 +330,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       // get price info
       // CRM-5095
-      CRM_Price_BAO_Set::initSet($this, $this->_id, 'civicrm_contribution_page');
+      CRM_Price_BAO_PriceSet::initSet($this, $this->_id, 'civicrm_contribution_page');
 
       // this avoids getting E_NOTICE errors in php
       $setNullFields = array(

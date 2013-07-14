@@ -851,7 +851,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
           $form->addRule('selectMembership', ts('Please select one of the memberships.'), 'required');
         }
         else {
-          $autoRenewOption = CRM_Price_BAO_Set::checkAutoRenewForPriceSet($form->_priceSetId);
+          $autoRenewOption = CRM_Price_BAO_PriceSet::checkAutoRenewForPriceSet($form->_priceSetId);
           $form->assign('autoRenewOption', $autoRenewOption);
         }
 
@@ -2749,16 +2749,16 @@ WHERE      civicrm_membership.is_test = 0";
    * @static
    */
   static function createLineItems(&$qf, $membershipType, &$priceSetId) {
-    $qf->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', 'default_membership_type_amount', 'id', 'name');
+    $qf->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
     if ($priceSetId) {
-      $qf->_priceSet = $priceSets = current(CRM_Price_BAO_Set::getSetDetail($priceSetId));
+      $qf->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
     }
     $editedFieldParams = array(
       'price_set_id' => $priceSetId,
       'name' => $membershipType[0],
     );
     $editedResults = array();
-    CRM_Price_BAO_Field::retrieve($editedFieldParams, $editedResults);
+    CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
 
     if (!empty($editedResults)) {
       unset($qf->_priceSet['fields']);
@@ -2770,7 +2770,7 @@ WHERE      civicrm_membership.is_test = 0";
         'membership_type_id' => $membershipType[1],
       );
       $editedResults = array();
-      CRM_Price_BAO_FieldValue::retrieve($editedFieldParams, $editedResults);
+      CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
       $qf->_priceSet['fields'][$fid]['options'][$editedResults['id']] = $priceSets['fields'][$fid]['options'][$editedResults['id']];
       if (CRM_Utils_Array::value('total_amount', $qf->_params)) {
         $qf->_priceSet['fields'][$fid]['options'][$editedResults['id']]['amount'] = $qf->_params['total_amount'];

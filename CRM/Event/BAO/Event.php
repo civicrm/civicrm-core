@@ -200,7 +200,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     }
 
     // price set cleanup, CRM-5527
-    CRM_Price_BAO_Set::removeFrom('civicrm_event', $id);
+    CRM_Price_BAO_PriceSet::removeFrom('civicrm_event', $id);
 
     $event = new CRM_Event_DAO_Event();
     $event->id = $id;
@@ -871,7 +871,7 @@ WHERE civicrm_event.is_active = 1
          $fieldsFix
        );
     }
-    CRM_Price_BAO_Set::copyPriceSet('civicrm_event', $id, $copyEvent->id);
+    CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_event', $id, $copyEvent->id);
     $copyUF = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
       array(
         'entity_id' => $id,
@@ -972,7 +972,7 @@ WHERE civicrm_event.is_active = 1
   static function usesPriceSet($id) {
     static $usesPriceSet = array();
     if (!array_key_exists($id, $usesPriceSet)) {
-      $usesPriceSet[$id] = CRM_Price_BAO_Set::getFor('civicrm_event', $id);
+      $usesPriceSet[$id] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $id);
     }
     return $usesPriceSet[$id];
   }

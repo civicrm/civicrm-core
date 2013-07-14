@@ -485,7 +485,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       $this->set('priceSetId', $this->_priceSetId);
-      CRM_Price_BAO_Set::buildPriceSet($this);
+      CRM_Price_BAO_PriceSet::buildPriceSet($this);
 
       // get only price set form elements.
       if ($getOnlyPriceSetElements) {
@@ -772,7 +772,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $totalAmount = NULL;
     if (empty($this->_lineItems)) {
       $buildPriceSet = FALSE;
-      $priceSets = CRM_Price_BAO_Set::getAssoc(FALSE, 'CiviContribute');
+      $priceSets = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviContribute');
       if (!empty($priceSets) && !$this->_ppID) {
         $buildPriceSet = TRUE;
       }
@@ -936,7 +936,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // do the amount validations.
     if (!CRM_Utils_Array::value('total_amount', $fields) && empty($self->_lineItems)) {
       if ($priceSetId = CRM_Utils_Array::value('price_set_id', $fields)) {
-        CRM_Price_BAO_Field::priceSetValidation($priceSetId, $fields, $errors);
+        CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $fields, $errors);
       }
     }
 
@@ -993,8 +993,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (CRM_Utils_Array::value('price_set_id', $submittedValues) && $this->_action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
       $lineID = key($line);
-      $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
-      $quickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $priceSetId, 'is_quick_config');
+      $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
+      $quickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
       if ($quickConfig) {
         CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_contribution');
       }
@@ -1005,8 +1005,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $priceSetId = $pId = NULL;
     $priceSetId = CRM_Utils_Array::value('price_set_id', $submittedValues);
     if (empty($priceSetId) && !$this->_id) {
-      $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', 'default_contribution_amount', 'id', 'name');
-      $this->_priceSet = current(CRM_Price_BAO_Set::getSetDetail($priceSetId));
+      $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
+      $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
       $fieldID = key($this->_priceSet['fields']);
       $fieldValueId = key($this->_priceSet['fields'][$fieldID]['options']);
       $this->_priceSet['fields'][$fieldID]['options'][$fieldValueId]['amount'] = $submittedValues['total_amount'];
@@ -1014,7 +1014,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($priceSetId) {
-      CRM_Price_BAO_Set::processAmount($this->_priceSet['fields'],
+      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $submittedValues, $lineItem[$priceSetId]);
 
       $submittedValues['total_amount'] = CRM_Utils_Array::value('amount', $submittedValues);
@@ -1046,16 +1046,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $itemId = key($lineItems);
       $fieldType = NULL;
       if ($itemId && CRM_Utils_Array::value('price_field_id', $lineItems[$itemId])) {
-        $fieldType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $lineItems[$itemId]['price_field_id'], 'html_type');
+        $fieldType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'html_type');
       }
       $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
       $lineItems[$itemId]['id'] = $itemId;
       // 10117 update th line items for participants
-      $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $lineItems[$itemId]['price_field_id'], 'price_set_id');
+      $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
       $lineItem[$this->_priceSetId] = $lineItems;
     }
     $isQuickConfig = 0;
-    if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config')) {
+    if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $isQuickConfig = 1;
     }
     //CRM-11529 for quick config backoffice transactions

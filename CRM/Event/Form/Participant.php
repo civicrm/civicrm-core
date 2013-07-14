@@ -1007,7 +1007,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
       ($self->_id && !$self->_paymentId && isset($self->_values['line_items']) && is_array($self->_values['line_items']))
     ) {
       if ($priceSetId = CRM_Utils_Array::value('priceSetId', $values)) {
-        CRM_Price_BAO_Field::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);
+        CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);
       }
     }
     return CRM_Utils_Array::crmIsEmptyArray($errorMsg) ? TRUE : $errorMsg;
@@ -1046,7 +1046,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     if (CRM_Utils_Array::value('contact_select_id', $params)) {
       $this->_contactId = $params['contact_select_id'][1];
     }
-    if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config')) {
+    if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->_quickConfig = $isQuickConfig;
     }
 
@@ -1094,7 +1094,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
         //lets carry currency, CRM-4453
         $params['fee_currency'] = $config->defaultCurrency;
-        CRM_Price_BAO_Set::processAmount($this->_values['fee'],
+        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'],
           $params, $lineItem[0]
         );
         //CRM-11529 for quick config backoffice transactions

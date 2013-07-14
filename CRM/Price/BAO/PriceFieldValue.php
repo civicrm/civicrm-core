@@ -37,20 +37,20 @@
  * Business objects for managing price fields values.
  *
  */
-class CRM_Price_BAO_FieldValue extends CRM_Price_DAO_FieldValue {
+class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
 
   /**
    * insert/update a new entry in the database.
    *
    * @param array $params (reference), array $ids
    *
-   * @return object CRM_Price_DAO_FieldValue object
+   * @return object CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */
   static function &add(&$params, $ids) {
 
-    $fieldValueBAO = new CRM_Price_BAO_FieldValue();
+    $fieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
     $fieldValueBAO->copyValues($params);
 
     if ($id = CRM_Utils_Array::value('id', $ids)) {
@@ -71,7 +71,7 @@ class CRM_Price_BAO_FieldValue extends CRM_Price_DAO_FieldValue {
    *
    * @param array $params (reference), array $ids
    *
-   * @return object CRM_Price_DAO_FieldValue object
+   * @return object CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */
@@ -86,11 +86,11 @@ class CRM_Price_BAO_FieldValue extends CRM_Price_DAO_FieldValue {
 
       $oldWeight = NULL;
       if ($id) {
-        $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_FieldValue', $id, 'weight', 'id');
+        $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'weight', 'id');
       }
 
       $fieldValues = array('price_field_id' => CRM_Utils_Array::value('price_field_id', $params, 0));
-      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_FieldValue', $oldWeight, $params['weight'], $fieldValues);
+      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
       if (!CRM_Utils_Array::value('name', $params)) {
@@ -112,12 +112,12 @@ class CRM_Price_BAO_FieldValue extends CRM_Price_DAO_FieldValue {
    * @param array $params   (reference ) an assoc array
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_DAO_FieldValue object
+   * @return object CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */
   static function retrieve(&$params, &$defaults) {
-    return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_FieldValue', $params, $defaults);
+    return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceFieldValue', $params, $defaults);
   }
 
   /**
@@ -134,7 +134,7 @@ class CRM_Price_BAO_FieldValue extends CRM_Price_DAO_FieldValue {
    * @static
    */
   static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
-    $fieldValueDAO = new CRM_Price_DAO_FieldValue();
+    $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
     $fieldValueDAO->price_field_id = $fieldId;
     $fieldValueDAO->orderBy($orderBy, 'label');
     if ($isActive) {
@@ -161,7 +161,7 @@ class CRM_Price_BAO_FieldValue extends CRM_Price_DAO_FieldValue {
    *
    */
   public static function getOptionLabel($id) {
-    return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_FieldValue', $id, 'label');
+    return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'label');
   }
 
   /**
@@ -176,7 +176,7 @@ class CRM_Price_BAO_FieldValue extends CRM_Price_DAO_FieldValue {
    * @static
    */
   static function setIsActive($id, $is_active) {
-    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_FieldValue', $id, 'is_active', $is_active);
+    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'is_active', $is_active);
   }
 
   /**
@@ -194,7 +194,7 @@ class CRM_Price_BAO_FieldValue extends CRM_Price_DAO_FieldValue {
       return FALSE;
     }
 
-    $fieldValueDAO = new CRM_Price_DAO_FieldValue();
+    $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
     $fieldValueDAO->price_field_id = $fieldId;
     $fieldValueDAO->delete();
   }
@@ -214,7 +214,7 @@ class CRM_Price_BAO_FieldValue extends CRM_Price_DAO_FieldValue {
       return FALSE;
     }
 
-    $fieldValueDAO = new CRM_Price_DAO_FieldValue();
+    $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
     $fieldValueDAO->id = $id;
     return $fieldValueDAO->delete();
   }

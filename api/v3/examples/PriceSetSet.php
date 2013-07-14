@@ -27,10 +27,10 @@ function price_set_set_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 16,
+  'id' => 4,
   'values' => array(
-      '16' => array(
-          'id' => '16',
+      '4' => array(
+          'id' => '4',
           'domain_id' => '',
           'name' => 'event price',
           'title' => 'event price',

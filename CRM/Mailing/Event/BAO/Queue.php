@@ -144,7 +144,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
 
     $queue   = self::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $dao->query("
             SELECT      COUNT(*) as queued
@@ -183,7 +183,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
 
     $queue   = self::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
     $email   = CRM_Core_BAO_Email::getTableName();
 
@@ -252,7 +252,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    */
   public function &getMailing() {
     $mailing  = new CRM_Mailing_BAO_Mailing();
-    $jobs     = CRM_Mailing_BAO_Job::getTableName();
+    $jobs     = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailings = CRM_Mailing_BAO_Mailing::getTableName();
     $queue    = self::getTableName();
 

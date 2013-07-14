@@ -37,7 +37,7 @@
  * Business objects for managing price fields.
  *
  */
-class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
+class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
   protected $_options;
 
@@ -51,12 +51,12 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
    * @param array  $params    (reference ) an assoc array of name/value pairs
    * @param array  $ids       the array that holds all the db ids
    *
-   * @return object CRM_Price_BAO_Field object
+   * @return object CRM_Price_BAO_PriceField object
    * @access public
    * @static
    */
   static function &add(&$params) {
-    $priceFieldBAO = new CRM_Price_BAO_Field();
+    $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     $priceFieldBAO->copyValues($params);
 
@@ -75,7 +75,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Price_DAO_Field object
+   * @return object CRM_Price_DAO_PriceField object
    * @access public
    * @static
    */
@@ -95,7 +95,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
     if ($priceField->html_type == 'Text') {
       $maxIndex = 1;
 
-      $fieldValue = new CRM_Price_DAO_FieldValue();
+      $fieldValue = new CRM_Price_DAO_PriceFieldValue();
       $fieldValue->price_field_id = $priceField->id;
 
       // update previous field values( if any )
@@ -157,7 +157,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
             $optionsIds['id'] = NULL;
           }
         }
-        CRM_Price_BAO_FieldValue::create($options, $optionsIds);
+        CRM_Price_BAO_PriceFieldValue::create($options, $optionsIds);
       }
     }
 
@@ -175,12 +175,12 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_DAO_Field object
+   * @return object CRM_Price_DAO_PriceField object
    * @access public
    * @static
    */
   static function retrieve(&$params, &$defaults) {
-    return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_Field', $params, $defaults);
+    return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceField', $params, $defaults);
   }
 
   /**
@@ -195,7 +195,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
    * @static
    */
   static function setIsActive($id, $is_active) {
-    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_Field', $id, 'is_active', $is_active);
+    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceField', $id, 'is_active', $is_active);
   }
 
   /**
@@ -210,7 +210,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
    *
    */
   public static function getTitle($id) {
-    return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $id, 'label');
+    return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $id, 'label');
   }
 
   /**
@@ -236,7 +236,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
     $feezeOptions = array()
   ) {
 
-    $field = new CRM_Price_DAO_Field();
+    $field = new CRM_Price_DAO_PriceField();
     $field->id = $fieldId;
     if (!$field->find(TRUE)) {
       /* FIXME: failure! */
@@ -272,7 +272,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
 
     $customOption = $fieldOptions;
     if (!is_array($customOption)) {
-      $customOption = CRM_Price_BAO_Field::getOptions($field->id, $inactiveNeeded);
+      $customOption = CRM_Price_BAO_PriceField::getOptions($field->id, $inactiveNeeded);
     }
 
     //use value field.
@@ -501,7 +501,7 @@ class CRM_Price_BAO_Field extends CRM_Price_DAO_Field {
 
     if ($reset || empty($options[$fieldId])) {
       $values = array();
-      CRM_Price_BAO_FieldValue::getValues($fieldId, $values, 'weight', !$inactiveNeeded);
+      CRM_Price_BAO_PriceFieldValue::getValues($fieldId, $values, 'weight', !$inactiveNeeded);
       $options[$fieldId] = $values;
     }
 
@@ -545,17 +545,17 @@ WHERE
    *
    */
   public static function deleteField($id) {
-    $field = new CRM_Price_DAO_Field();
+    $field = new CRM_Price_DAO_PriceField();
     $field->id = $id;
 
     if ($field->find(TRUE)) {
       // delete the options for this field
-      CRM_Price_BAO_FieldValue::deleteValues($id);
+      CRM_Price_BAO_PriceFieldValue::deleteValues($id);
 
       // reorder the weight before delete
       $fieldValues = array('price_set_id' => $field->price_set_id);
 
-      CRM_Utils_Weight::delWeight('CRM_Price_DAO_Field', $field->id, $fieldValues);
+      CRM_Utils_Weight::delWeight('CRM_Price_DAO_PriceField', $field->id, $fieldValues);
 
       // now delete the field
       return $field->delete();
@@ -592,7 +592,7 @@ WHERE
   public static function priceSetValidation($priceSetId, $fields, &$error, $allowNoneSelection = FALSE) {
     // check for at least one positive
     // amount price field should be selected.
-    $priceField = new CRM_Price_DAO_Field();
+    $priceField = new CRM_Price_DAO_PriceField();
     $priceField->price_set_id = $priceSetId;
     $priceField->find();
 
@@ -634,7 +634,7 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
 
       foreach ($htmlTypes as $fieldId => $type) {
         $options = array();
-        CRM_Price_BAO_FieldValue::getValues($fieldId, $options);
+        CRM_Price_BAO_PriceFieldValue::getValues($fieldId, $options);
 
         if (empty($options)) {
           continue;

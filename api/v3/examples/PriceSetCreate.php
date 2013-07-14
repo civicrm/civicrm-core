@@ -31,10 +31,10 @@ function price_set_create_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 15,
+  'id' => 3,
   'values' => array(
-      '15' => array(
-          'id' => '15',
+      '3' => array(
+          'id' => '3',
           'domain_id' => '',
           'name' => 'default_goat_priceset',
           'title' => 'Goat accessories',

@@ -107,7 +107,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    */
   function &getColumnHeaders($action = NULL, $output = NULL) {
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job = CRM_Mailing_BAO_Job::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
     if (!isset(self::$_columnHeaders)) {
       $completedOrder = NULL;
 
@@ -191,7 +191,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * @access public
    */
   function getTotalCount($action) {
-    $job        = CRM_Mailing_BAO_Job::getTableName();
+    $job        = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailing    = CRM_Mailing_BAO_Mailing::getTableName();
     $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL();
 
@@ -389,7 +389,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           $actionMask = CRM_Core_Action::ADD;
         }
         //get status strings as per locale settings CRM-4411.
-        $rows[$key]['status'] = CRM_Mailing_BAO_Job::status($row['status']);
+        $rows[$key]['status'] = CRM_Mailing_BAO_MailingJob::status($row['status']);
 
         $rows[$key]['action'] = CRM_Core_Action::formLink($actionLinks,
           $actionMask,

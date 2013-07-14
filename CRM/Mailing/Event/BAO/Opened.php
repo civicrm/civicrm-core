@@ -88,7 +88,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     $open    = self::getTableName();
     $queue   = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $query = "
             SELECT      COUNT($open.id) as opened
@@ -136,7 +136,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
     $open    = self::getTableName();
     $queue   = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailingIDs = implode(',', $mailingIDs);
 
     $query = "
@@ -182,7 +182,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     $open    = self::getTableName();
     $queue   = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
     $email   = CRM_Core_BAO_Email::getTableName();
 

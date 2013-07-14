@@ -313,7 +313,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if ($this->_priceSetId) {
-      return CRM_Price_BAO_Set::setDefaultPriceSet($this, $defaults);
+      return CRM_Price_BAO_PriceSet::setDefaultPriceSet($this, $defaults);
     }
 
     $defaults = parent::setDefaultValues();
@@ -491,7 +491,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
 
       $this->set('priceSetId', $this->_priceSetId);
-      CRM_Price_BAO_Set::buildPriceSet($this);
+      CRM_Price_BAO_PriceSet::buildPriceSet($this);
 
       $optionsMembershipTypes = array();
       foreach ($this->_priceSet['fields'] as $pField) {
@@ -503,7 +503,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
 
-      $this->assign('autoRenewOption', CRM_Price_BAO_Set::checkAutoRenewForPriceSet($this->_priceSetId));
+      $this->assign('autoRenewOption', CRM_Price_BAO_PriceSet::checkAutoRenewForPriceSet($this->_priceSetId));
 
       $this->assign('optionsMembershipTypes', $optionsMembershipTypes);
       $this->assign('contributionType', CRM_Utils_Array::value('financial_type_id', $this->_priceSet));
@@ -519,7 +519,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     if ($this->_action & CRM_Core_Action::ADD) {
       $buildPriceSet = FALSE;
-      $priceSets = CRM_Price_BAO_Set::getAssoc(FALSE, 'CiviMember');
+      $priceSets = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviMember');
       if (!empty($priceSets)) {
         $buildPriceSet = TRUE;
       }
@@ -853,7 +853,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $priceSetId = CRM_Utils_Array::value('price_set_id', $params);
 
     if ($priceSetId) {
-      CRM_Price_BAO_Field::priceSetValidation($priceSetId, $params, $errors);
+      CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $params, $errors);
 
       $priceFieldIDS = array();
       foreach ($self->_priceSet['fields'] as $priceIds => $dontCare) {
@@ -875,7 +875,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       if (!empty($priceFieldIDS)) {
         $ids = implode(',', $priceFieldIDS);
 
-        $count = CRM_Price_BAO_Set::getMembershipCount($ids);
+        $count = CRM_Price_BAO_PriceSet::getMembershipCount($ids);
         foreach ($count as $id => $occurance) {
           if ($occurance > 1) {
             $errors['_qf_default'] = ts('Select at most one option associated with the same membership type.');
@@ -883,7 +883,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         }
 
         foreach ($priceFieldIDS as $priceFieldId) {
-          if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_FieldValue', $priceFieldId, 'membership_type_id')) {
+          if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
             $self->_memTypeSelected[$id] = $id;
           }
         }
@@ -1119,13 +1119,13 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetId);
     }
     $isQuickConfig = 0;
-    if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config')) {
+    if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $isQuickConfig = 1;
     }
 
     $termsByType = array();
     if ($priceSetId) {
-      CRM_Price_BAO_Set::processAmount($this->_priceSet['fields'],
+      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetId]);
       $params['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
       $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
@@ -1309,7 +1309,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
 
       if ($priceSetId && !$isQuickConfig) {
-        $params['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_Set',
+        $params['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_PriceSet',
           $priceSetId,
           'financial_type_id'
         );
@@ -1529,10 +1529,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $lineItem = array();
           $lineItems         = CRM_Price_BAO_LineItem::getLineItems($params['contribution_id'], 'contribution');
           $itemId            = key($lineItems);
-          $priceSetId  = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $lineItems[$itemId]['price_field_id'], 'price_set_id');
+          $priceSetId  = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
           $fieldType         = NULL;
           if ($itemId && CRM_Utils_Array::value('price_field_id', $lineItems[$itemId])) {
-            $fieldType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $lineItems[$itemId]['price_field_id'], 'html_type');
+            $fieldType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'html_type');
           }
           $lineItems[$itemId]['unit_price'] = $params['total_amount'];
           $lineItems[$itemId]['line_total'] = $params['total_amount'];

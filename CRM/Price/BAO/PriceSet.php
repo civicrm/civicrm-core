@@ -37,7 +37,7 @@
  * Business object for managing price sets
  *
  */
-class CRM_Price_BAO_Set extends CRM_Price_DAO_Set {
+class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
 
   /**
    * class constructor
@@ -51,12 +51,12 @@ class CRM_Price_BAO_Set extends CRM_Price_DAO_Set {
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Price_DAO_Set object
+   * @return object CRM_Price_DAO_PriceSet object
    * @access public
    * @static
    */
   static function create(&$params) {
-    $priceSetBAO = new CRM_Price_BAO_Set();
+    $priceSetBAO = new CRM_Price_BAO_PriceSet();
     $priceSetBAO->copyValues($params);
     if (self::eventPriceSetDomainID()) {
       $priceSetBAO->domain_id = CRM_Core_Config::domainID();
@@ -74,12 +74,12 @@ class CRM_Price_BAO_Set extends CRM_Price_DAO_Set {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Price_DAO_Set object
+   * @return object CRM_Price_DAO_PriceSet object
    * @access public
    * @static
    */
   static function retrieve(&$params, &$defaults) {
-    return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_Set', $params, $defaults);
+    return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceSet', $params, $defaults);
   }
 
   /**
@@ -93,7 +93,7 @@ class CRM_Price_BAO_Set extends CRM_Price_DAO_Set {
    * @access public
    */
   static function setIsActive($id, $isActive) {
-    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_Set', $id, 'is_active', $isActive);
+    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
   }
 
   /**
@@ -149,7 +149,7 @@ WHERE       ps.name = '{$entityName}'
    *
    */
   public static function getTitle($id) {
-    return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $id, 'title');
+    return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $id, 'title');
   }
 
   /**
@@ -285,15 +285,15 @@ WHERE     ct.id = cp.financial_type_id AND
     }
 
     // delete price fields
-    $priceField = new CRM_Price_DAO_Field();
+    $priceField = new CRM_Price_DAO_PriceField();
     $priceField->price_set_id = $id;
     $priceField->find();
     while ($priceField->fetch()) {
       // delete options first
-      CRM_Price_BAO_Field::deleteField($priceField->id);
+      CRM_Price_BAO_PriceField::deleteField($priceField->id);
     }
 
-    $set = new CRM_Price_DAO_Set();
+    $set = new CRM_Price_DAO_PriceSet();
     $set->id = $id;
     return $set->delete();
   }
@@ -309,14 +309,14 @@ WHERE     ct.id = cp.financial_type_id AND
    */
   public static function addTo($entityTable, $entityId, $priceSetId) {
     // verify that the price set exists
-    $dao = new CRM_Price_DAO_Set();
+    $dao = new CRM_Price_DAO_PriceSet();
     $dao->id = $priceSetId;
     if (!$dao->find()) {
       return FALSE;
     }
     unset($dao);
 
-    $dao = new CRM_Price_DAO_SetEntity();
+    $dao = new CRM_Price_DAO_PriceSetEntity();
     // find if this already exists
     $dao->entity_id = $entityId;
     $dao->entity_table = $entityTable;
@@ -334,7 +334,7 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param integer $entityId
    */
   public static function removeFrom($entityTable, $entityId) {
-    $dao               = new CRM_Price_DAO_SetEntity();
+    $dao               = new CRM_Price_DAO_PriceSetEntity();
     $dao->entity_table = $entityTable;
     $dao->entity_id    = $entityId;
     return $dao->delete();
@@ -391,7 +391,7 @@ WHERE     ct.id = cp.financial_type_id AND
     $fid = NULL;
 
     if ($oid = CRM_Utils_Array::value('oid', $params)) {
-      $fieldValue = new CRM_Price_DAO_FieldValue();
+      $fieldValue = new CRM_Price_DAO_PriceFieldValue();
       $fieldValue->id = $oid;
       if ($fieldValue->find(TRUE)) {
         $fid = $fieldValue->price_field_id;
@@ -402,7 +402,7 @@ WHERE     ct.id = cp.financial_type_id AND
     }
 
     if (isset($fid)) {
-      return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', $fid, 'price_set_id');
+      return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $fid, 'price_set_id');
     }
 
     return NULL;
@@ -529,7 +529,7 @@ AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
         }
         $setTree[$setID]['fields'][$fieldID][$field] = $dao->$field;
       }
-      $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_Field::getOptions($fieldID, FALSE);
+      $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_PriceField::getOptions($fieldID, FALSE);
     }
 
     // also get the pre and post help from this price set
@@ -555,7 +555,7 @@ WHERE  id = %1";
 
     //check if priceset is is_config
     if (is_numeric($priceSetId)) {
-      if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
+      if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
         $form->assign('quickConfig', 1);
       }
     }
@@ -803,7 +803,7 @@ WHERE  id = %1";
     $priceSet           = self::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
     $form->_priceSet    = CRM_Utils_Array::value($priceSetId, $priceSet);
     $form->_quickConfig = $quickConfig = 0;
-    if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $priceSetId, 'is_quick_config')) {
+    if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config')) {
       $quickConfig = 1;
     }
 
@@ -845,7 +845,7 @@ WHERE  id = %1";
         if (!is_array($options)) {
           continue;
         }
-        CRM_Price_BAO_Field::addQuickFormElement($form,
+        CRM_Price_BAO_PriceField::addQuickFormElement($form,
           'price_' . $field['id'],
           $field['id'],
           FALSE,
@@ -924,7 +924,7 @@ WHERE  id = %1";
    * @static
    */
   public static function getFieldIds($id) {
-    $priceField = new CRM_Price_DAO_Field();
+    $priceField = new CRM_Price_DAO_PriceField();
     $priceField->price_set_id = $id;
     $priceField->find();
     while ($priceField->fetch()) {
@@ -953,14 +953,14 @@ WHERE  id = %1";
       ),
     );
 
-    $copy = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_Set',
+    $copy = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceSet',
             array('id' => $id),
             NULL,
             $fieldsFix
     );
 
     //copying all the blocks pertaining to the price set
-    $copyPriceField = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_Field',
+    $copyPriceField = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceField',
                       array('price_set_id' => $id),
                       array('price_set_id' => $copy->id)
     );
@@ -969,7 +969,7 @@ WHERE  id = %1";
 
       //copy option group and values
       foreach ($price as $originalId => $copyId) {
-        CRM_Core_DAO::copyGeneric('CRM_Price_DAO_FieldValue',
+        CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceFieldValue',
           array('price_field_id' => $originalId),
           array('price_field_id' => $copyId)
         );
@@ -988,7 +988,7 @@ WHERE  id = %1";
    */
   static function checkPermission($sid) {
     if ($sid && self::eventPriceSetDomainID()) {
-      $domain_id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $sid, 'domain_id', 'id');
+      $domain_id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $sid, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domain_id) {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
       }
@@ -1138,7 +1138,7 @@ GROUP BY     mt.member_of_contact_id";
    * @access public
    */
   static function setIsQuickConfig($id, $isQuickConfig) {
-    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_Set', $id, 'is_quick_config', $isQuickConfig);
+    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_quick_config', $isQuickConfig);
   }
 
   /**
@@ -1191,15 +1191,15 @@ WHERE       ps.id = %1
    *
    */
   static function copyPriceSet($baoName, $id, $newId) {
-    $priceSetId = CRM_Price_BAO_Set::getFor($baoName, $id);
+    $priceSetId = CRM_Price_BAO_PriceSet::getFor($baoName, $id);
     if ($priceSetId) {
-      $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $priceSetId, 'is_quick_config');
+      $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
       if($isQuickConfig) {
-        $copyPriceSet = &CRM_Price_BAO_Set::copy($priceSetId);
-        CRM_Price_BAO_Set::addTo($baoName, $newId, $copyPriceSet->id);
+        $copyPriceSet = &CRM_Price_BAO_PriceSet::copy($priceSetId);
+        CRM_Price_BAO_PriceSet::addTo($baoName, $newId, $copyPriceSet->id);
       }
       else {
-        $copyPriceSet = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_SetEntity',
+        $copyPriceSet = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceSetEntity',
           array(
             'entity_id' => $id,
             'entity_table' => $baoName,
@@ -1212,7 +1212,7 @@ WHERE       ps.id = %1
         $discount = CRM_Core_BAO_Discount::getOptionGroup($id, 'civicrm_event');
         foreach ($discount as $discountId => $setId) {
 
-          $copyPriceSet = &CRM_Price_BAO_Set::copy($setId);
+          $copyPriceSet = &CRM_Price_BAO_PriceSet::copy($setId);
 
           $copyDiscount = &CRM_Core_DAO::copyGeneric(
             'CRM_Core_DAO_Discount',

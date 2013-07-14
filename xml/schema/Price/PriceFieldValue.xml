@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/Price</base>
-  <class>FieldValue</class>
+  <class>PriceFieldValue</class>
   <name>civicrm_price_field_value</name>
   <add>3.3</add>
   <field>
