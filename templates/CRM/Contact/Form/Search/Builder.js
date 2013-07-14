@@ -59,7 +59,7 @@
    */
   function buildSelect(row, field) {
     // Remove operators that can't be used with a select
-    removeOperators(row, ['>', '<', '>=', '<=', 'LIKE', 'RLIKE']);
+    removeOperators(row, ['LIKE', 'RLIKE']);
     var op = $('select[id^=operator]', row);
     if (op.val() == 'IN' || op.val() == 'NOT IN') {
       var multiSelect = 'multiple="multiple">';
