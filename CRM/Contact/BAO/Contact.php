@@ -2551,7 +2551,7 @@ AND       civicrm_openid.is_primary = 1";
     }
 
     if ($emailGreetingString) {
-      CRM_Utils_Token::replaceGreetingTokens($emailGreetingString,
+      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($emailGreetingString,
         $contactDetails,
         $contact->id,
         'CRM_Contact_BAO_Contact'
@@ -2587,7 +2587,7 @@ AND       civicrm_openid.is_primary = 1";
     }
 
     if ($postalGreetingString) {
-      CRM_Utils_Token::replaceGreetingTokens($postalGreetingString,
+      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($postalGreetingString,
         $contactDetails,
         $contact->id,
         'CRM_Contact_BAO_Contact'
@@ -2624,7 +2624,7 @@ AND       civicrm_openid.is_primary = 1";
     }
 
     if ($addresseeString) {
-      CRM_Utils_Token::replaceGreetingTokens($addresseeString,
+      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($addresseeString,
         $contactDetails,
         $contact->id,
         'CRM_Contact_BAO_Contact'
