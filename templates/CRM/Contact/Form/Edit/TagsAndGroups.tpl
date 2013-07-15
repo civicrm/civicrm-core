@@ -35,14 +35,14 @@
             {$form.group.html}
             {literal}	
             <script type="text/javascript">
-	     cj(function(){
+             cj(function(){
                cj("select#group").crmasmSelect({
                  respectParents: true
                });
-	     });
+             });
              </script>
              {/literal}
-         </td>
+          </td>
       {/if}
       {foreach key=key item=item from=$tagGroup}
         {* $type assigned from dynamic.tpl *}
