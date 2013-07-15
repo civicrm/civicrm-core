@@ -126,10 +126,13 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       $paneNames[$pane['title']] = $pane['name'];
     }
 
-    $this->_paneTemplatePath = array();
+    $hookPanes = array();
+    CRM_Contact_BAO_Query_Hook::singleton()->registerAdvancedSearchPane($hookPanes);
+    $paneNames = array_merge($paneNames, $hookPanes);
 
+    $this->_paneTemplatePath = array();
     foreach ($paneNames as $name => $type) {
-      if (!$this->_searchOptions[$type]) {
+      if (!array_key_exists($type, $this->_searchOptions) && !in_array($type, $hookPanes)) {
         continue;
       }
 
@@ -148,12 +151,15 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       ) {
         $allPanes[$name]['open'] = 'true';
 
-
         if (CRM_Utils_Array::value($type, $components)) {
           $c = $components[$type];
           $this->add('hidden', "hidden_$type", 1);
           $c->buildAdvancedSearchPaneForm($this);
           $this->_paneTemplatePath[$type] = $c->getAdvancedSearchPaneTemplatePath();
+        }
+        else if (in_array($type, $hookPanes)) {
+          CRM_Contact_BAO_Query_Hook::singleton()->buildAdvancedSearchPaneForm($this, $type);
+          CRM_Contact_BAO_Query_Hook::singleton()->setAdvancedSearchPaneTemplatePath($this->_paneTemplatePath, $type);
         }
         else {
           CRM_Contact_Form_Search_Criteria::$type($this);

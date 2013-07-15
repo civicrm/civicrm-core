@@ -34,15 +34,34 @@
  */
 
 /**
- * Interface for search BAO query objects
+ * Abstract class for search BAO query objects
  */
-interface CRM_Contact_BAO_Query_Interface {
+abstract class CRM_Contact_BAO_Query_Interface {
 
-  public function &getFields();
+  abstract public function &getFields();
+  abstract public function from($fieldName, $mode, $side);
 
-  public function select(&$query);
+  public function select(&$query) {
+    return NULL;
+  }
 
-  public function where(&$query);
+  public function where(&$query) {
+    return NULL;
+  }
 
-  public function from($fieldName, $mode, $side);
+  public function setTableDependency(&$tables) {
+    return NULL;
+  }
+
+  public function registerAdvancedSearchPane(&$panes) {
+    return NULL;
+  }
+
+  public function buildAdvancedSearchPaneForm(&$form, $type) {
+    return NULL;
+  }
+
+  public function setAdvancedSearchPaneTemplatePath(&$paneTemplatePathArray, $type) {
+    return NULL;
+  }
 }

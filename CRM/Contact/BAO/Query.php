@@ -1389,6 +1389,12 @@ class CRM_Contact_BAO_Query {
       return;
     }
 
+    // skip for hook injected fields / params
+    $extFields = CRM_Contact_BAO_Query_Hook::singleton()->getFields();
+    if (array_key_exists($values[0], $extFields)) {
+      return;
+    }
+
     switch ($values[0]) {
       case 'deleted_contacts':
         $this->deletedContacts($values);
@@ -2165,6 +2171,8 @@ class CRM_Contact_BAO_Query {
 
     // to handle table dependencies of components
     CRM_Core_Component::tableNames($tables);
+    // to handle table dependencies of hook injected tables
+    CRM_Contact_BAO_Query_Hook::singleton()->setTableDependency($tables);
 
     //format the table list according to the weight
     $info = CRM_Core_TableHierarchy::info();
