@@ -409,12 +409,18 @@ class CRM_Core_PseudoConstant {
    * @param String|Int $key
    * @param Array $params will be passed into self::get
    *
-   * @return string
+   * @return bool|null|string
+   *   FALSE if the given field has no associated option list
+   *   NULL if the given key has no corresponding option
+   *   String if label is found
    */
   static function getValue($daoName, $fieldName, $key, $params = array()) {
-     $values = self::get($daoName, $fieldName, $params);
-     return CRM_Utils_Array::value($key, $values);
-   }
+    $values = self::get($daoName, $fieldName, $params);
+    if ($values === FALSE) {
+      return FALSE;
+    }
+    return CRM_Utils_Array::value($key, $values);
+  }
 
   /**
    * Fetch the key for a field option given its label/name
@@ -424,12 +430,18 @@ class CRM_Core_PseudoConstant {
    * @param String|Int $value
    * @param Array $params will be passed into self::get
    *
-   * @return string
+   * @return bool|null|string|number
+   *   FALSE if the given field has no associated option list
+   *   NULL if the given key has no corresponding option
+   *   String|Number if key is found
    */
   static function getKey($daoName, $fieldName, $value, $params = array()) {
-     $values = self::get($daoName, $fieldName, $params);
-     return CRM_Utils_Array::key($value, $values);
-   }
+    $values = self::get($daoName, $fieldName, $params);
+    if ($values === FALSE) {
+      return FALSE;
+    }
+    return CRM_Utils_Array::key($value, $values);
+  }
 
   /**
    * DEPRECATED generic populate method
