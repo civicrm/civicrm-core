@@ -1632,6 +1632,9 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
     'version' => 3,
     'action' => 'create',
   ));
+ if (!isset($result['values'][$fieldName]) && isset($result['values'][$fieldName . '_id'])) {
+    $fieldName = $fieldName . '_id';
+  }
   $meta = $result['values'];
   if (isset($meta[$fieldName])) {
     return $meta[$fieldName]['name'];

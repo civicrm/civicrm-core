@@ -409,8 +409,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     $options = array(
       'group' => 'contact',
       'tag' => 'contact',
-      'country' => 'contact',
-      'state_province' => 'contact',
+      'country' => 'address',
+      'state_province' => 'address',
       'gender' => 'contact',
       'world_region' => 'contact',
       'individual_prefix' => 'contact',
