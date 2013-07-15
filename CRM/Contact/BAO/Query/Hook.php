@@ -93,4 +93,28 @@ class CRM_Contact_BAO_Query_Hook {
     }
     return $from;
   }
+
+  public function setTableDependency(&$tables) {
+    foreach (self::getSearchQueryObjects() as $obj) {
+      $obj->setTableDependency($tables);
+    }
+  }
+
+  public function registerAdvancedSearchPane(&$panes) {
+    foreach (self::getSearchQueryObjects() as $obj) {
+      $obj->registerAdvancedSearchPane($panes);
+    }
+  }
+
+  public function buildAdvancedSearchPaneForm(&$form, $type) {
+    foreach (self::getSearchQueryObjects() as $obj) {
+      $obj->buildAdvancedSearchPaneForm($form, $type);
+    }
+  }
+
+  public function setAdvancedSearchPaneTemplatePath(&$paneTemplatePathArray, $type) {
+    foreach (self::getSearchQueryObjects() as $obj) {
+      $obj->setAdvancedSearchPaneTemplatePath($paneTemplatePathArray, $type);
+    }
+  }
 }
