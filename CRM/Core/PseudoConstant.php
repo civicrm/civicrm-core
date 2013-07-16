@@ -260,8 +260,14 @@ class CRM_Core_PseudoConstant {
     $dao = new $daoName;
     $fields = $dao->fields();
     $fieldKeys = $dao->fieldKeys();
-    $fieldKey = $fieldKeys[$fieldName];
     $dao->free();
+
+    // Support "unique names" as well as sql names
+    $fieldKey = $fieldName;
+    if (empty($fields[$fieldKey])) {
+      $fieldKey = $fieldKeys[$fieldName];
+    }
+    // If neither worked then this field doesn't exist. Return false.
     if (empty($fields[$fieldKey])) {
       return FALSE;
     }
@@ -320,9 +326,7 @@ class CRM_Core_PseudoConstant {
             return FALSE;
           }
           // Get list of fields for the option table
-          $dao = new $daoName;
-          $availableFields = array_keys($dao->fieldKeys());
-          $dao->free();
+          $availableFields = array_keys($fieldKeys);
 
           $select = "SELECT %1 AS id, %2 AS label";
           $from = "FROM %3";
