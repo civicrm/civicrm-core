@@ -221,6 +221,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $badgeInfo = CRM_Badge_BAO_Layout::create($params);
 
     if (isset($params['_qf_Layout_refresh'])) {
+      $this->set('id', $badgeInfo->id);
       $params['badge_id'] = $badgeInfo->id;
       self::buildPreview($params);
     }
@@ -234,6 +235,12 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   public function buildPreview(&$params) {
     // get a max participant id
     $participantID = CRM_Core_DAO::singleValueQuery('select max(id) from civicrm_participant');
+
+    if (!$participantID) {
+      CRM_Core_Session::setStatus(ts('Preview requires at least one event and one participant record.
+       If you are just getting started, you can add a test participant record.'), ts('Preview Requirements'), 'alert');
+      return;
+    }
 
     $this->_single = TRUE;
     $this->_participantIds = array($participantID);

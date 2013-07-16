@@ -91,7 +91,7 @@ class CRM_Badge_BAO_Badge {
           $value = $row[$element];
           // hack to fix date field display format
           if (strpos($element, '_date')) {
-            $value = CRM_Utils_Date::customFormat($value, "%e %b");
+            $value = CRM_Utils_Date::customFormat($value, "%B %E%f");
           }
         }
 
