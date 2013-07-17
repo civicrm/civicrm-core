@@ -257,304 +257,304 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    */
   function import($onDuplicate, &$values) {
     try{
-    // first make sure this is a valid line
-    $response = $this->summary($values);
-    if ($response != CRM_Import_Parser::VALID) {
-      return $response;
-    }
+      // first make sure this is a valid line
+      $response = $this->summary($values);
+      if ($response != CRM_Import_Parser::VALID) {
+        return $response;
+      }
 
-    $params = &$this->getActiveFieldParams();
+      $params = &$this->getActiveFieldParams();
 
-    //assign join date equal to start date if join date is not provided
-    if (!CRM_Utils_Array::value('join_date', $params) &&
-      CRM_Utils_Array::value('membership_start_date', $params)
-    ) {
-      $params['join_date'] = $params['membership_start_date'];
-    }
+      //assign join date equal to start date if join date is not provided
+      if (!CRM_Utils_Array::value('join_date', $params) &&
+        CRM_Utils_Array::value('membership_start_date', $params)
+      ) {
+        $params['join_date'] = $params['membership_start_date'];
+      }
 
-    $session      = CRM_Core_Session::singleton();
-    $dateType     = $session->get('dateTypes');
-    $formatted    = array();
-    $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
+      $session      = CRM_Core_Session::singleton();
+      $dateType     = $session->get('dateTypes');
+      $formatted    = array();
+      $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
 
-    // don't add to recent items, CRM-4399
-    $formatted['skipRecentView'] = TRUE;
-    $dateLabels = array(
-      'join_date' => ts('Member Since'),
-      'membership_start_date' => ts('Start Date'),
-      'membership_end_date' => ts('End Date'),
-    );
-    foreach ($params as $key => $val) {
-      if ($val) {
-        switch ($key) {
-          case 'join_date':
-          case 'membership_start_date':
-          case 'membership_end_date':
-            if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
-              if (!CRM_Utils_Rule::date($params[$key])) {
+      // don't add to recent items, CRM-4399
+      $formatted['skipRecentView'] = TRUE;
+      $dateLabels = array(
+        'join_date' => ts('Member Since'),
+        'membership_start_date' => ts('Start Date'),
+        'membership_end_date' => ts('End Date'),
+      );
+      foreach ($params as $key => $val) {
+        if ($val) {
+          switch ($key) {
+            case 'join_date':
+            case 'membership_start_date':
+            case 'membership_end_date':
+              if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
+                if (!CRM_Utils_Rule::date($params[$key])) {
+                  CRM_Contact_Import_Parser_Contact::addToErrorMsg($dateLabels[$key], $errorMessage);
+                }
+              }
+              else {
                 CRM_Contact_Import_Parser_Contact::addToErrorMsg($dateLabels[$key], $errorMessage);
               }
-            }
-            else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg($dateLabels[$key], $errorMessage);
-            }
-            break;
+              break;
 
-          case 'membership_type_id':
-            if (!is_numeric($val)) {
-              unset($params['membership_type_id']);
-              $params['membership_type'] = $val;
-            }
-            break;
+            case 'membership_type_id':
+              if (!is_numeric($val)) {
+                unset($params['membership_type_id']);
+                $params['membership_type'] = $val;
+              }
+              break;
 
-          case 'status_id':
-            if (!is_numeric($val)) {
-              unset($params['status_id']);
-              $params['membership_status'] = $val;
-            }
-            break;
+            case 'status_id':
+              if (!is_numeric($val)) {
+                unset($params['status_id']);
+                $params['membership_status'] = $val;
+              }
+              break;
 
-          case 'is_override':
-            $params[$key] = CRM_Utils_String::strtobool($val);
-            break;
-        }
-        if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-                    if ( $customFields[$customFieldID]['data_type'] == 'Date' ) {
-            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
-            unset($params[$key]);
-                    } else if ( $customFields[$customFieldID]['data_type'] == 'Boolean' ) {
-            $params[$key] = CRM_Utils_String::strtoboolstr($val);
+            case 'is_override':
+              $params[$key] = CRM_Utils_String::strtobool($val);
+              break;
+          }
+          if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
+                      if ( $customFields[$customFieldID]['data_type'] == 'Date' ) {
+              CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
+              unset($params[$key]);
+                      } else if ( $customFields[$customFieldID]['data_type'] == 'Boolean' ) {
+              $params[$key] = CRM_Utils_String::strtoboolstr($val);
+            }
           }
         }
       }
-    }
-    //date-Format part ends
+      //date-Format part ends
 
-    static $indieFields = NULL;
-    if ($indieFields == NULL) {
-      $tempIndieFields = CRM_Member_DAO_Membership::import();
-      $indieFields = $tempIndieFields;
-    }
-
-    $formatValues = array();
-    foreach ($params as $key => $field) {
-      if ($field == NULL || $field === '') {
-        continue;
+      static $indieFields = NULL;
+      if ($indieFields == NULL) {
+        $tempIndieFields = CRM_Member_DAO_Membership::import();
+        $indieFields = $tempIndieFields;
       }
 
-      $formatValues[$key] = $field;
-    }
-
-    //format params to meet api v2 requirements.
-    //@todo find a way to test removing this formatting
-    $formatError = $this->membership_format_params($formatValues, $formatted, TRUE);
-
-    if ($onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
-        CRM_Core_DAO::$_nullObject,
-        NULL,
-        'Membership'
-      );
-    }
-    else {
-      //fix for CRM-2219 Update Membership
-      // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-      if (CRM_Utils_Array::value('is_override', $formatted) &&
-        !CRM_Utils_Array::value('status_id', $formatted)
-      ) {
-        array_unshift($values, 'Required parameter missing: Status');
-        return CRM_Import_Parser::ERROR;
-      }
-
-      if ($formatValues['membership_id']) {
-        $dao     = new CRM_Member_BAO_Membership();
-        $dao->id = $formatValues['membership_id'];
-        $dates   = array('join_date', 'start_date', 'end_date');
-        foreach ($dates as $v) {
-                    if (!CRM_Utils_Array::value( $v, $formatted )) {
-            $formatted[$v] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $formatValues['membership_id'], $v);
-          }
+      $formatValues = array();
+      foreach ($params as $key => $field) {
+        if ($field == NULL || $field === '') {
+          continue;
         }
 
+        $formatValues[$key] = $field;
+      }
+
+      //format params to meet api v2 requirements.
+      //@todo find a way to test removing this formatting
+      $formatError = $this->membership_format_params($formatValues, $formatted, TRUE);
+
+      if ($onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
         $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
           CRM_Core_DAO::$_nullObject,
-          $formatValues['membership_id'],
+          NULL,
           'Membership'
         );
-        if ($dao->find(TRUE)) {
-          $ids = array(
-            'membership' => $formatValues['membership_id'],
-            'userId' => $session->get('userID'),
-          );
+      }
+      else {
+        //fix for CRM-2219 Update Membership
+        // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
+        if (CRM_Utils_Array::value('is_override', $formatted) &&
+          !CRM_Utils_Array::value('status_id', $formatted)
+        ) {
+          array_unshift($values, 'Required parameter missing: Status');
+          return CRM_Import_Parser::ERROR;
+        }
 
-          $newMembership = CRM_Member_BAO_Membership::create($formatted, $ids, TRUE);
-          if (civicrm_error($newMembership)) {
-            array_unshift($values, $newMembership['is_error'] . ' for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
+        if ($formatValues['membership_id']) {
+          $dao     = new CRM_Member_BAO_Membership();
+          $dao->id = $formatValues['membership_id'];
+          $dates   = array('join_date', 'start_date', 'end_date');
+          foreach ($dates as $v) {
+                      if (!CRM_Utils_Array::value( $v, $formatted )) {
+              $formatted[$v] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $formatValues['membership_id'], $v);
+            }
+          }
+
+          $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
+            CRM_Core_DAO::$_nullObject,
+            $formatValues['membership_id'],
+            'Membership'
+          );
+          if ($dao->find(TRUE)) {
+            $ids = array(
+              'membership' => $formatValues['membership_id'],
+              'userId' => $session->get('userID'),
+            );
+
+            $newMembership = CRM_Member_BAO_Membership::create($formatted, $ids, TRUE);
+            if (civicrm_error($newMembership)) {
+              array_unshift($values, $newMembership['is_error'] . ' for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
+              return CRM_Import_Parser::ERROR;
+            }
+            else {
+              $this->_newMemberships[] = $newMembership->id;
+              return CRM_Import_Parser::VALID;
+            }
+          }
+          else {
+            array_unshift($values, 'Matching Membership record not found for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
+            return CRM_Import_Parser::ERROR;
+          }
+        }
+      }
+
+      //Format dates
+      $startDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('start_date', $formatted), '%Y-%m-%d');
+      $endDate   = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $formatted), '%Y-%m-%d');
+      $joinDate  = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
+
+      if ($this->_contactIdIndex < 0) {
+
+        //retrieve contact id using contact dedupe rule
+        $formatValues['contact_type'] = $this->_contactType;
+        $formatValues['version'] = 3;
+        require_once 'CRM/Utils/DeprecatedUtils.php';
+        $error = _civicrm_api3_deprecated_check_contact_dedupe($formatValues);
+
+        if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
+          $matchedIDs = explode(',', $error['error_message']['params'][0]);
+          if (count($matchedIDs) > 1) {
+            array_unshift($values, 'Multiple matching contact records detected for this row. The membership was not imported');
             return CRM_Import_Parser::ERROR;
           }
           else {
-            $this->_newMemberships[] = $newMembership->id;
+            $cid = $matchedIDs[0];
+            $formatted['contact_id'] = $cid;
+
+            //fix for CRM-1924
+            $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($formatted['membership_type_id'],
+              $joinDate,
+              $startDate,
+              $endDate
+            );
+            self::formattedDates($calcDates, $formatted);
+
+            //fix for CRM-3570, exclude the statuses those having is_admin = 1
+            //now user can import is_admin if is override is true.
+            $excludeIsAdmin = FALSE;
+            if (!CRM_Utils_Array::value('is_override', $formatted)) {
+              $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
+            }
+            $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
+              $endDate,
+              $joinDate,
+              'today',
+              $excludeIsAdmin
+            );
+
+            if (!CRM_Utils_Array::value('status_id', $formatted)) {
+              $formatted['status_id'] = $calcStatus['id'];
+            }
+            elseif (!CRM_Utils_Array::value('is_override', $formatted)) {
+              if (empty($calcStatus)) {
+                array_unshift($values, 'Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
+                return CRM_Import_Parser::ERROR;
+              }
+              elseif ($formatted['status_id'] != $calcStatus['id']) {
+                //Status Hold" is either NOT mapped or is FALSE
+                array_unshift($values, 'Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.');
+                return CRM_Import_Parser::ERROR;
+              }
+            }
+
+            $newMembership = civicrm_api3('membership', 'create', $formatted);
+
+            $this->_newMemberships[] = $newMembership['id'];
             return CRM_Import_Parser::VALID;
           }
         }
         else {
-          array_unshift($values, 'Matching Membership record not found for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
-          return CRM_Import_Parser::ERROR;
-        }
-      }
-    }
-
-    //Format dates
-    $startDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('start_date', $formatted), '%Y-%m-%d');
-    $endDate   = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $formatted), '%Y-%m-%d');
-    $joinDate  = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
-
-    if ($this->_contactIdIndex < 0) {
-
-      //retrieve contact id using contact dedupe rule
-      $formatValues['contact_type'] = $this->_contactType;
-      $formatValues['version'] = 3;
-      require_once 'CRM/Utils/DeprecatedUtils.php';
-      $error = _civicrm_api3_deprecated_check_contact_dedupe($formatValues);
-
-      if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-        $matchedIDs = explode(',', $error['error_message']['params'][0]);
-        if (count($matchedIDs) > 1) {
-          array_unshift($values, 'Multiple matching contact records detected for this row. The membership was not imported');
-          return CRM_Import_Parser::ERROR;
-        }
-        else {
-          $cid = $matchedIDs[0];
-          $formatted['contact_id'] = $cid;
-
-          //fix for CRM-1924
-          $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($formatted['membership_type_id'],
-            $joinDate,
-            $startDate,
-            $endDate
+          // Using new Dedupe rule.
+          $ruleParams = array(
+            'contact_type' => $this->_contactType,
+            'used'         => 'Unsupervised',
           );
-          self::formattedDates($calcDates, $formatted);
+          $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
+          $disp = '';
 
-          //fix for CRM-3570, exclude the statuses those having is_admin = 1
-          //now user can import is_admin if is override is true.
-          $excludeIsAdmin = FALSE;
-          if (!CRM_Utils_Array::value('is_override', $formatted)) {
-            $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
-          }
-          $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
-            $endDate,
-            $joinDate,
-            'today',
-            $excludeIsAdmin
-          );
-
-          if (!CRM_Utils_Array::value('status_id', $formatted)) {
-            $formatted['status_id'] = $calcStatus['id'];
-          }
-          elseif (!CRM_Utils_Array::value('is_override', $formatted)) {
-            if (empty($calcStatus)) {
-              array_unshift($values, 'Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
-              return CRM_Import_Parser::ERROR;
-            }
-            elseif ($formatted['status_id'] != $calcStatus['id']) {
-              //Status Hold" is either NOT mapped or is FALSE
-              array_unshift($values, 'Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.');
-              return CRM_Import_Parser::ERROR;
+          foreach ($fieldsArray as $value) {
+            if (array_key_exists(trim($value), $params)) {
+              $paramValue = $params[trim($value)];
+              if (is_array($paramValue)) {
+                $disp .= $params[trim($value)][0][trim($value)] . " ";
+              }
+              else {
+                $disp .= $params[trim($value)] . " ";
+              }
             }
           }
 
-          $newMembership = civicrm_api3('membership', 'create', $formatted);
+          if (CRM_Utils_Array::value('external_identifier', $params)) {
+            if ($disp) {
+              $disp .= "AND {$params['external_identifier']}";
+            }
+            else {
+              $disp = $params['external_identifier'];
+            }
+          }
 
-          $this->_newMemberships[] = $newMembership['id'];
-          return CRM_Import_Parser::VALID;
+          array_unshift($values, 'No matching Contact found for (' . $disp . ')');
+          return CRM_Import_Parser::ERROR;
         }
       }
       else {
-        // Using new Dedupe rule.
-        $ruleParams = array(
-          'contact_type' => $this->_contactType,
-          'used'         => 'Unsupervised',
+        if (CRM_Utils_Array::value('external_identifier', $formatValues)) {
+          $checkCid = new CRM_Contact_DAO_Contact();
+          $checkCid->external_identifier = $formatValues['external_identifier'];
+          $checkCid->find(TRUE);
+          if ($checkCid->id != $formatted['contact_id']) {
+            array_unshift($values, 'Mismatch of External identifier :' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
+            return CRM_Import_Parser::ERROR;
+          }
+        }
+
+        //to calculate dates
+        $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($formatted['membership_type_id'],
+          $joinDate,
+          $startDate,
+          $endDate
         );
-        $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
-        $disp = '';
+        self::formattedDates($calcDates, $formatted);
+        //end of date calculation part
 
-        foreach ($fieldsArray as $value) {
-          if (array_key_exists(trim($value), $params)) {
-            $paramValue = $params[trim($value)];
-            if (is_array($paramValue)) {
-              $disp .= $params[trim($value)][0][trim($value)] . " ";
-            }
-            else {
-              $disp .= $params[trim($value)] . " ";
-            }
+        //fix for CRM-3570, exclude the statuses those having is_admin = 1
+        //now user can import is_admin if is override is true.
+        $excludeIsAdmin = FALSE;
+        if (!CRM_Utils_Array::value('is_override', $formatted)) {
+          $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
+        }
+        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
+          $endDate,
+          $joinDate,
+          'today',
+          $excludeIsAdmin
+        );
+        if (!CRM_Utils_Array::value('status_id', $formatted)) {
+          $formatted['status_id'] = CRM_Utils_Array::value('id', $calcStatus);
+        }
+        elseif (!CRM_Utils_Array::value('is_override', $formatted)) {
+          if (empty($calcStatus)) {
+            array_unshift($values, 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
+            return CRM_Import_Parser::ERROR;
+          }
+          elseif ($formatted['status_id'] != $calcStatus['id']) {
+            //Status Hold" is either NOT mapped or is FALSE
+            array_unshift($values, 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.');
+            return CRM_Import_Parser::ERROR;
           }
         }
 
-        if (CRM_Utils_Array::value('external_identifier', $params)) {
-          if ($disp) {
-            $disp .= "AND {$params['external_identifier']}";
-          }
-          else {
-            $disp = $params['external_identifier'];
-          }
-        }
+        $newMembership = civicrm_api3('membership', 'create', $formatted);
 
-        array_unshift($values, 'No matching Contact found for (' . $disp . ')');
-        return CRM_Import_Parser::ERROR;
+        $this->_newMemberships[] = $newMembership['id'];
+        return CRM_Import_Parser::VALID;
       }
-    }
-    else {
-      if (CRM_Utils_Array::value('external_identifier', $formatValues)) {
-        $checkCid = new CRM_Contact_DAO_Contact();
-        $checkCid->external_identifier = $formatValues['external_identifier'];
-        $checkCid->find(TRUE);
-        if ($checkCid->id != $formatted['contact_id']) {
-          array_unshift($values, 'Mismatch of External identifier :' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
-          return CRM_Import_Parser::ERROR;
-        }
-      }
-
-      //to calculate dates
-      $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($formatted['membership_type_id'],
-        $joinDate,
-        $startDate,
-        $endDate
-      );
-      self::formattedDates($calcDates, $formatted);
-      //end of date calculation part
-
-      //fix for CRM-3570, exclude the statuses those having is_admin = 1
-      //now user can import is_admin if is override is true.
-      $excludeIsAdmin = FALSE;
-      if (!CRM_Utils_Array::value('is_override', $formatted)) {
-        $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
-      }
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
-        $endDate,
-        $joinDate,
-        'today',
-        $excludeIsAdmin
-      );
-      if (!CRM_Utils_Array::value('status_id', $formatted)) {
-        $formatted['status_id'] = CRM_Utils_Array::value('id', $calcStatus);
-      }
-      elseif (!CRM_Utils_Array::value('is_override', $formatted)) {
-        if (empty($calcStatus)) {
-          array_unshift($values, 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
-          return CRM_Import_Parser::ERROR;
-        }
-        elseif ($formatted['status_id'] != $calcStatus['id']) {
-          //Status Hold" is either NOT mapped or is FALSE
-          array_unshift($values, 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.');
-          return CRM_Import_Parser::ERROR;
-        }
-      }
-
-      $newMembership = civicrm_api3('membership', 'create', $formatted);
-
-      $this->_newMemberships[] = $newMembership['id'];
-      return CRM_Import_Parser::VALID;
-    }
     }
     catch (Exception $e) {
       array_unshift($values, $e->getMessage());
