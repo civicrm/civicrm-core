@@ -256,7 +256,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @access public
    */
   function import($onDuplicate, &$values) {
-
+    try{
     // first make sure this is a valid line
     $response = $this->summary($values);
     if ($response != CRM_Import_Parser::VALID) {
@@ -348,11 +348,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     //format params to meet api v2 requirements.
     //@todo find a way to test removing this formatting
     $formatError = $this->membership_format_params($formatValues, $formatted, TRUE);
-
-    if ($formatError) {
-      array_unshift($values, $formatError['error_message']);
-      return CRM_Import_Parser::ERROR;
-    }
 
     if ($onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
       $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
@@ -468,12 +463,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             }
           }
 
-          $formatted['version'] = 3;
-          $newMembership = civicrm_api('membership', 'create', $formatted);
-          if (civicrm_error($newMembership)) {
-            array_unshift($values, $newMembership['error_message']);
-            return CRM_Import_Parser::ERROR;
-          }
+          $newMembership = civicrm_api3('membership', 'create', $formatted);
 
           $this->_newMemberships[] = $newMembership['id'];
           return CRM_Import_Parser::VALID;
@@ -560,15 +550,15 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         }
       }
 
-      $formatted['version'] = 3;
-      $newMembership = civicrm_api('membership', 'create', $formatted);
-      if (civicrm_error($newMembership)) {
-        array_unshift($values, $newMembership['error_message']);
-        return CRM_Import_Parser::ERROR;
-      }
+      $newMembership = civicrm_api3('membership', 'create', $formatted);
 
       $this->_newMemberships[] = $newMembership['id'];
       return CRM_Import_Parser::VALID;
+    }
+    }
+    catch (Exception $e) {
+      array_unshift($values, $e->getMessage());
+      return CRM_Import_Parser::ERROR;
     }
   }
 
@@ -673,7 +663,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       switch ($key) {
         case 'membership_contact_id':
           if (!CRM_Utils_Rule::integer($value)) {
-            return civicrm_api3_create_error("contact_id not valid: $value");
+            throw new Exception("contact_id not valid: $value");
           }
           $dao     = new CRM_Core_DAO();
           $qParams = array();
@@ -681,7 +671,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             $qParams
           );
           if (!$svq) {
-            return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
+            throw new Exception("Invalid Contact ID: There is no contact record with contact_id = $value.");
           }
           $values['contact_id'] = $values['membership_contact_id'];
           unset($values['membership_contact_id']);
@@ -689,7 +679,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
         case 'membership_type_id':
           if (!CRM_Utils_Array::value($value, CRM_Member_PseudoConstant::membershipType())) {
-            return civicrm_api3_create_error('Invalid Membership Type Id');
+            throw new Exception('Invalid Membership Type Id');
           }
           $values[$key] = $value;
           break;
@@ -702,18 +692,18 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             if (CRM_Utils_Array::value('membership_type_id', $values) &&
               $membershipTypeId != $values['membership_type_id']
             ) {
-              return civicrm_api3_create_error('Mismatched membership Type and Membership Type Id');
+              throw new Exception('Mismatched membership Type and Membership Type Id');
             }
           }
           else {
-            return civicrm_api3_create_error('Invalid Membership Type');
+            throw new Exception('Invalid Membership Type');
           }
           $values['membership_type_id'] = $membershipTypeId;
           break;
 
         case 'status_id':
           if (!CRM_Utils_Array::value($value, CRM_Member_PseudoConstant::membershipStatus())) {
-            return civicrm_api3_create_error('Invalid Membership Status Id');
+            throw new Exception('Invalid Membership Status Id');
           }
           $values[$key] = $value;
           break;
@@ -726,11 +716,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             if (CRM_Utils_Array::value('status_id', $values) &&
               $membershipStatusId != $values['status_id']
             ) {
-              return civicrm_api3_create_error('Mismatched membership Status and Membership Status Id');
+              throw new Exception('Mismatched membership Status and Membership Status Id');
             }
           }
           else {
-            return civicrm_api3_create_error('Invalid Membership Status');
+            throw new Exception('Invalid Membership Status');
           }
           $values['status_id'] = $membershipStatusId;
           break;
