@@ -781,7 +781,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'contact_type' => 'Individual',
       );
     }
-    $params['version'] = API_LATEST_VERSION;
     return $this->_contactCreate($params);
   }
 
@@ -811,9 +810,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int    id of Household created
    */
   private function _contactCreate($params) {
-    $params['version'] = API_LATEST_VERSION;
-    $params['debug'] = 1;
-    $result = civicrm_api('contact', 'create', $params);
+    $result = $this->callAPISuccess('contact', 'create', $params);
     if (CRM_Utils_Array::value('is_error', $result) ||
       !CRM_Utils_Array::value('id', $result)
     ) {
@@ -962,10 +959,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     if (!$membershipStatusID) {
       return;
     }
-    $result = civicrm_api('MembershipStatus', 'Delete', array('id' => $membershipStatusID, 'version' => 3));
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not delete membership status' . $result['error_message']);
-    }
+    $result = $this->callAPISuccess('MembershipStatus', 'Delete', array('id' => $membershipStatusID));
     return;
   }
 
