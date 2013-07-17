@@ -46,7 +46,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
    * @access public
    */
   public function preProcess() {
-    $skipColumnHeader = $this->controller->exportValue('UploadFile', 'skipColumnHeader');
+    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
     //get the data from the session
     $dataValues       = $this->get('dataValues');
@@ -112,8 +112,8 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
    * @access public
    */
   public function postProcess() {
-    $fileName         = $this->controller->exportValue('UploadFile', 'uploadFile');
-    $skipColumnHeader = $this->controller->exportValue('UploadFile', 'skipColumnHeader');
+    $fileName         = $this->controller->exportValue('DataSource', 'uploadFile');
+    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $invalidRowCount  = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
     $onDuplicate      = $this->get('onDuplicate');

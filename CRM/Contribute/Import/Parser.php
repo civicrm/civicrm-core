@@ -572,7 +572,7 @@ pppp   * @return void
     fclose($fd);
   }
 
-  function errorFileName($type) {
+  static function errorFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;
@@ -598,7 +598,7 @@ pppp   * @return void
     return $fileName;
   }
 
-  function saveFileName($type) {
+  static function saveFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;
