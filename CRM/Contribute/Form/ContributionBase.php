@@ -716,7 +716,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             );
             $this->_fields[$key] = $field;
           }
-          if ($field['add_captcha']) {
+          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+          if ($field['add_captcha'] && !$this->_userID) {
             $addCaptcha = TRUE;
           }
         }
