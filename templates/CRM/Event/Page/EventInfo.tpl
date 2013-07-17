@@ -86,7 +86,7 @@
   <div class="event-info">
   {* Display top buttons only if the page is long enough to merit duplicate buttons *}
   {if $event.summary or $event.description}
-    <div class="actionlinks-top">
+    <div class="crm-actionlinks-top">
       {crmRegion name="event-page-eventinfo-actionlinks-top"}
         {if $allowRegistration}
           <div class="action-link section register_link-section register_link-top">
@@ -211,7 +211,7 @@
 
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
-    <div class="actionlinks-bottom">
+    <div class="crm-actionlinks-bottom">
       {crmRegion name="event-page-eventinfo-actionlinks-bottom"}
         {if $allowRegistration}
           <div class="action-link section register_link-section register_link-bottom">
