@@ -324,6 +324,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     $contactType = array('Individual', 'Household', 'Organization');
     foreach ($contactType as $value) {
       $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required);
+      $contactFields = array_merge($contactFields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
+
       // exclude the address options disabled in the Address Settings
       $fields[$value] = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
 
