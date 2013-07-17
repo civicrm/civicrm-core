@@ -279,40 +279,24 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
     // don't add to recent items, CRM-4399
     $formatted['skipRecentView'] = TRUE;
-
+    $dateLabels = array(
+      'join_date' => ts('Member Since'),
+      'membership_start_date' => ts('Start Date'),
+      'membership_end_date' => ts('End Date'),
+    );
     foreach ($params as $key => $val) {
       if ($val) {
         switch ($key) {
           case 'join_date':
-            if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
-              if (!CRM_Utils_Rule::date($params[$key])) {
-                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
-              }
-            }
-            else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
-            }
-            break;
-
           case 'membership_start_date':
-            if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
-              if (!CRM_Utils_Rule::date($params[$key])) {
-                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
-              }
-            }
-            else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
-            }
-            break;
-
           case 'membership_end_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
-                CRM_Contact_Import_Parser_Contact::addToErrorMsg('End Date', $errorMessage);
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg($dateLabels[$key], $errorMessage);
               }
             }
             else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('End Date', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg($dateLabels[$key], $errorMessage);
             }
             break;
 
