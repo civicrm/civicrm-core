@@ -45,7 +45,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     return array(
       array(
         'CRM_Report_Form_Contribute_Detail',
-        array( 
+        array(
           'fields' => array(
             'first_name',
             'email',
@@ -58,7 +58,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
           // FIXME: add filters
         ),
         'fixtures/dataset.sql',
-        'fixtures/report.csv',      
+        'fixtures/report.csv',
       ),
     );
   }
@@ -74,7 +74,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
    */
   public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
     $this->foreignKeyChecksOff();
-    
+
     $this->quickCleanup(self::$_tablesToTruncate);
 
     $config = CRM_Core_Config::singleton();

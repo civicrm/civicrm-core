@@ -37,7 +37,7 @@
  * Delegate query functions based on hook system
  */
 class CRM_Contact_BAO_Query_Hook {
- 
+
   /**
    * @var array of CRM_Contact_BAO_Query_Interface objects
    */
@@ -70,7 +70,7 @@ class CRM_Contact_BAO_Query_Hook {
     }
     return $this->_queryObjects;
   }
-  
+
   public function &getFields() {
     $extFields = array();
     foreach (self::getSearchQueryObjects() as $obj) {
@@ -79,13 +79,13 @@ class CRM_Contact_BAO_Query_Hook {
     }
     return $extFields;
   }
-  
+
   public function alterSearchQuery(&$query, $fnName) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->$fnName($query);
     }
   }
-  
+
   public function buildSearchfrom($fieldName, $mode, $side) {
     $from = '';
     foreach (self::getSearchQueryObjects() as $obj) {

@@ -353,11 +353,11 @@ class CRM_Core_BAO_ConfigSetting {
       // retrieve directory and url preferences also
       CRM_Core_BAO_Setting::retrieveDirectoryAndURLPreferences($defaults);
 
-      // Pickup enabled-components from settings table if found. 
+      // Pickup enabled-components from settings table if found.
       $enableComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
       if (!empty($enableComponents)) {
         $defaults['enableComponents'] = $enableComponents;
-        
+
         $components = CRM_Core_Component::getComponents();
         $enabledComponentIDs = array();
         foreach ($defaults['enableComponents'] as $name) {
@@ -627,7 +627,7 @@ WHERE  option_group_id = (
     }
 
     // get enabled-components from DB and add to the list
-    $enabledComponents = 
+    $enabledComponents =
       CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
     $enabledComponents[] = $componentName;
 

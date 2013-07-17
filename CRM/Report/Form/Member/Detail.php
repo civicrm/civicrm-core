@@ -436,7 +436,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
     if ($this->_contribField) {
       $this->_orderBy .= ", {$this->_aliases['civicrm_contribution']}.receive_date DESC";
-    } 
+    }
   }
 
   function postProcess() {

@@ -217,7 +217,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     $replaceWith = array();
     while($dao->fetch()){
       $type = $this->getLogType($dao->log_type);
-      if (!array_key_exists($type,$replaceWith)) 
+      if (!array_key_exists($type,$replaceWith))
         $replaceWith[$type] = array();
       $replaceWith[$type][] = $dao->log_type;
     }
@@ -226,7 +226,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         $replaceWith[$type] = implode("','", $tables);
       }
     }
-    
+
     $sql = "ALTER TABLE civicrm_temp_civireport_logsummary ADD COLUMN log_civicrm_entity_log_type_label varchar(64)";
     CRM_Core_DAO::executeQuery($sql);
     foreach ($replaceWith as $type => $in) {

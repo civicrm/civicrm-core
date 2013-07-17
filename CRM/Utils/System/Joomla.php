@@ -602,7 +602,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     // Get the framework.
     if (file_exists($joomlaBase . '/libraries/import.legacy.php')) {
-      require $joomlaBase . '/libraries/import.legacy.php';  
+      require $joomlaBase . '/libraries/import.legacy.php';
     }
     require $joomlaBase . '/libraries/import.php';
     require $joomlaBase . '/libraries/joomla/event/dispatcher.php';

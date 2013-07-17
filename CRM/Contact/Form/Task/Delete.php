@@ -169,7 +169,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     else {
       $this->addDefaultButtons($label, 'done');
     }
-    
+
     $this->addFormRule(array('CRM_Contact_Form_Task_Delete', 'formRule'), $this);
   }
 

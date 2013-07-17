@@ -157,7 +157,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
       'name' => 'paymentProcessor',
     );
     $processor = CRM_Financial_BAO_PaymentProcessor::create($params);
-    
+
     $account = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount(
       $processor->id,
       'civicrm_payment_processor'
