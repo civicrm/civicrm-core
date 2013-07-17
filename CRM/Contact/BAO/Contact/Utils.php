@@ -259,7 +259,7 @@ UNION
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organization) {
+  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL) {
     $organizationId = NULL;
 
     // if organization id is passed.
@@ -296,8 +296,7 @@ UNION
       }
     }
 
-    $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
-    if ($organizationId && $organizationId != $previousEmployerID) {
+    if ($organizationId) {
       $cid = array('contact' => $contactID);
 
       // get the relationship type id of "Employee of"
@@ -318,6 +317,9 @@ UNION
 
 
       // In case we change employer, clean prveovious employer related records.
+      if (!$previousEmployerID) {
+        $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
+      }
       if ($previousEmployerID &&
         $previousEmployerID != $organizationId
       ) {
@@ -329,7 +331,7 @@ UNION
 
       $relationshipParams['relationship_ids'] = $relationshipIds;
       // handle related meberships. CRM-3792
-      self::currentEmployerRelatedMembership($contactID, $organizationId, $relationshipParams, $duplicate);
+      self::currentEmployerRelatedMembership($contactID, $organizationId, $relationshipParams, $duplicate, $previousEmployerID);
     }
   }
 
@@ -344,7 +346,7 @@ UNION
    * @access public
    * @static
    */
-  static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE) {
+  static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
     $ids = array();
     $action = CRM_Core_Action::ADD;
 
@@ -365,7 +367,9 @@ UNION
     }
 
     //need to handle related meberships. CRM-3792
-    CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
+    if ($previousEmpID != $employerID) {
+      CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
+    }
   }
 
   /**
