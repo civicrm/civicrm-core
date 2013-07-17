@@ -86,15 +86,15 @@
   <div class="event-info">
   {* Display top buttons only if the page is long enough to merit duplicate buttons *}
   {if $event.summary or $event.description}
-    {crmRegion name="event-page-eventinfo-actionlinks-top"}
-      <div class="actionlinks-top">
+    <div class="actionlinks-top">
+      {crmRegion name="event-page-eventinfo-actionlinks-top"}
         {if $allowRegistration}
           <div class="action-link section register_link-section register_link-top">
             <a href="{$registerURL}" title="{$registerText}" class="button crm-register-button"><span>{$registerText}</span></a>
           </div>
         {/if}
-      </div>
-    {/crmRegion}
+      {/crmRegion}
+    </div>
   {/if}
 
   {if $event.summary}
@@ -211,15 +211,15 @@
 
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
-    {crmRegion name="event-page-eventinfo-actionlinks-bottom"}
-      <div class="actionlinks-bottom">
+    <div class="actionlinks-bottom">
+      {crmRegion name="event-page-eventinfo-actionlinks-bottom"}
         {if $allowRegistration}
           <div class="action-link section register_link-section register_link-bottom">
             <a href="{$registerURL}" title="{$registerText}" class="button crm-register-button"><span>{$registerText}</span></a>
           </div>
         {/if}
-      </div>
-    {/crmRegion}
+      {/crmRegion}
+    </div>
     { if $event.is_public }
         <br />{include file="CRM/Event/Page/iCalLinks.tpl"}
     {/if}
