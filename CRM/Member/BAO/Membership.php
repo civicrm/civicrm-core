@@ -246,18 +246,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     if (!CRM_Utils_Array::value('is_override', $params) &&
       !CRM_Utils_Array::value('skipStatusCal', $params)
     ) {
-      $startDate = $endDate = $joinDate = NULL;
-      if (isset($params['start_date'])) {
-        $startDate = $params['start_date'];
-      }
-
-      if (array_key_exists('end_date', $params)) {
-        $endDate = $params['end_date'];
-        $params['end_date'] = CRM_Utils_Date::processDate($endDate, NULL, TRUE, 'Ymd');
-      }
-
-      if (isset($params['join_date'])) {
-        $joinDate = $params['join_date'];
+      $dates = array('start_date', 'end_date', 'join_date');
+      foreach ($dates as $date) {
+        $$date = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, TRUE, 'Ymd');
       }
 
       //fix for CRM-3570, during import exclude the statuses those having is_admin = 1
@@ -270,7 +261,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $excludeIsAdmin = TRUE;
       }
 
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate, $endDate, $joinDate,
+      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
         'today', $excludeIsAdmin
       );
       if (empty($calcStatus)) {
