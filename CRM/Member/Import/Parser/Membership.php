@@ -366,7 +366,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           return CRM_Import_Parser::ERROR;
         }
 
-        if ($formatValues['membership_id']) {
+        if (!empty($formatValues['membership_id'])) {
           $dao     = new CRM_Member_BAO_Membership();
           $dao->id = $formatValues['membership_id'];
           $dates   = array('join_date', 'start_date', 'end_date');
