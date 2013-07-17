@@ -112,7 +112,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       foreach ($this->_fields as $name => $dontcare) {
         $fields[$name] = 1;
       }
-      
+
       CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
     }
     $stateCountryMap = array();

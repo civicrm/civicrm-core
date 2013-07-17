@@ -107,7 +107,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl();
     }
     $instance->save();
-    
+
     if ($instanceID) {
       CRM_Utils_Hook::pre('edit', 'ReportInstance', $instance->id, $instance);
     }
@@ -179,8 +179,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
     // add / update navigation as required
     if (!empty($navigationParams)) {
-      if (!CRM_Utils_Array::value('id',$params) && 
-        !CRM_Utils_Array::value('instance_id',$params) && 
+      if (!CRM_Utils_Array::value('id',$params) &&
+        !CRM_Utils_Array::value('instance_id',$params) &&
         CRM_Utils_Array::value('id', $navigationParams)) {
         unset($navigationParams['id']);
       }

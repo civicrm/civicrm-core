@@ -134,7 +134,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
       );
       $stateID = CRM_Utils_Array::value('state_province_id',
         $this->_defaults['address'][1]
-      );      
+      );
     }
     CRM_Contact_BAO_Contact_Utils::buildOnBehalfForm($this,
       $this->_contactType,

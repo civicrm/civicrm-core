@@ -280,27 +280,27 @@ LEFT JOIN civicrm_relationship seconddegbb
   and seconddegbb.is_permission_a_b = 1
   and firstdeg.is_permission_a_b = 1
   and seconddegbb.is_active = 1
-WHERE  
+WHERE
   (
-    ( firstdeg.contact_id_a = %1 AND firstdeg.contact_id_b = %2 AND firstdeg.is_permission_a_b = 1 ) 
+    ( firstdeg.contact_id_a = %1 AND firstdeg.contact_id_b = %2 AND firstdeg.is_permission_a_b = 1 )
     OR ( firstdeg.contact_id_a = %2 AND firstdeg.contact_id_b = %1 AND firstdeg.is_permission_b_a = 1 )
-    OR ( 
+    OR (
       firstdeg.contact_id_a = %1 AND seconddegba.contact_id_a = %2
-      AND (seconddegba.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)) 
+      AND (seconddegba.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
     )
-    OR ( 
+    OR (
       firstdeg.contact_id_a = %1 AND seconddegbb.contact_id_b = %2
-      AND (seconddegbb.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)) 
+      AND (seconddegbb.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
     )
-    OR ( 
+    OR (
       firstdeg.contact_id_b = %1 AND seconddegab.contact_id_b = %2
-      AND (seconddegab.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)) 
+      AND (seconddegab.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
     )
-    OR ( 
-      firstdeg.contact_id_b = %1 AND seconddegaa.contact_id_a = %2      AND (seconddegaa.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)) 
+    OR (
+      firstdeg.contact_id_b = %1 AND seconddegaa.contact_id_a = %2      AND (seconddegaa.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
     )
-  ) 
-  AND (firstdeg.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)) 
+  )
+  AND (firstdeg.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
   AND (firstdeg.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
   AND ( firstdeg.is_active = 1)
       ";

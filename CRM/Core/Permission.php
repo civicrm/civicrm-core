@@ -280,7 +280,7 @@ class CRM_Core_Permission {
       return $permissionedEvents;
     }
     if (!empty($permissionedEvents)){
-      return array_search($eventID, $permissionedEvents) === FALSE ? NULL : $eventID;      
+      return array_search($eventID, $permissionedEvents) === FALSE ? NULL : $eventID;
     } else {
       return $eventID;
     }

@@ -723,7 +723,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     ) {
       return FALSE;
     }
-    
+
     // CRM-12929
     // Restrict contact to be delete if contact has financial trxns
     $error = NULL;

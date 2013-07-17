@@ -97,7 +97,7 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '18', '19', '20', '22', '23', '24',
       ),
     ),
-    
+
     // gender_id 1
     array(
       'fv' => array('gender' => 'Female'),
