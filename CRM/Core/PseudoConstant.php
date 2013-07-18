@@ -326,7 +326,9 @@ class CRM_Core_PseudoConstant {
             return FALSE;
           }
           // Get list of fields for the option table
-          $availableFields = array_keys($fieldKeys);
+          $dao = new $daoName;
+          $availableFields = array_keys($dao->fieldKeys());
+          $dao->free();
 
           $select = "SELECT %1 AS id, %2 AS label";
           $from = "FROM %3";
