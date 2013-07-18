@@ -203,7 +203,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       'isDeleted' => $isDeleted,
     );
 
-    if (($session->get('userID') == $this->_contactId) ||
+    if (
       CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)
     ) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/add', "reset=1&action=update&cid={$this->_contactId}");
@@ -286,7 +286,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // things easier in dashboard
     $session = CRM_Core_Session::singleton();
 
-    if ($session->get('userID') == $contactID) {
+    if ($session->get('userID') == $contactID && CRM_Core_Permission::check('edit my contact')) {
       $page->assign('permission', 'edit');
       $page->_permission = CRM_Core_Permission::EDIT;
       // deleted contacts’ stuff should be (at best) only viewable
