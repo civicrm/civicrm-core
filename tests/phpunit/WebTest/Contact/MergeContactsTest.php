@@ -590,49 +590,286 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   /**
    * Helper FN
    */
-  function _createContacts($firstName,$lastName){
-    // add contact
-    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
-    //fill in first name
-    $this->type('first_name', $firstName);
+  function _createContacts($firstName = NULL, $lastName = NULL, $organizationName = NULL, $contactType = 'Individual') {
+    if ($contactType == 'Individual') {
+      // add contact
+      $this->openCiviPage("contact/add", "reset=1&ct=Individual");
+      //fill in first name
+      $this->type('first_name', $firstName);
 
-    //fill in last name
-    $this->type('last_name', $lastName);
+      //fill in last name
+      $this->type('last_name', $lastName);
 
-    //fill in email id
-    $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
+      //fill in email id
+      $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
 
-    //fill in billing email id
-    $this->click('addEmail');
-    $this->waitForElementPresent('email_2_email');
-    $this->type('email_2_email', "$firstName.$lastName@billing.com");
-    $this->select('email_2_location_type_id', 'value=5');
-
-    // Clicking save.
-    $this->click("_qf_Contact_upload_view");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', "Contact Saved");
-
-    //duplicate of above contact.
-    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
-
-    //fill in first name
-    $this->type("first_name", $firstName);
-
-    //fill in last name
-    $this->type("last_name", $lastName);
-
-    //fill in email
-    $this->type("email_1_email", "{$firstName}.{$lastName}@example.com");
+      //fill in billing email id
+      $this->click('addEmail');
+      $this->waitForElementPresent('email_2_email');
+      $this->type('email_2_email', "$firstName.$lastName@billing.com");
+      $this->select('email_2_location_type_id', 'value=5');
 
       // Clicking save.
-    $this->click("_qf_Contact_refresh_dedupe");
+      $this->click("_qf_Contact_upload_view");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->waitForText('crm-notification-container', "Contact Saved");
+
+      //duplicate of above contact.
+      $this->openCiviPage("contact/add", "reset=1&ct=Individual");
+
+      //fill in first name
+      $this->type("first_name", $firstName);
+
+      //fill in last name
+      $this->type("last_name", $lastName);
+
+      //fill in email
+      $this->type("email_1_email", "{$firstName}.{$lastName}@example.com");
+
+      // Clicking save.
+      $this->click("_qf_Contact_refresh_dedupe");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+
+      $this->waitForText('crm-notification-container', "One matching contact was found. You can View or Edit the existing contact.");
+      $this->click("_qf_Contact_upload_duplicate");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->waitForText('crm-notification-container', "Contact Saved");
+    }
+    elseif ($contactType == 'Organization') {
+      // add contact
+      $this->openCiviPage("contact/add", "reset=1&ct=Organization");
+      //fill in Organization name
+      $this->type('organization_name', $organizationName);
+
+      //fill in email id
+      $this->type('email_1_email', "{$organizationName}@org.com");
+      // Clicking save.
+      $this->click("_qf_Contact_upload_view-bottom");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->waitForText('crm-notification-container', "Contact Saved");
+      $mainId = explode("CiviCRM ID:", trim($this->getText("xpath=//div[@id='crm-record-log']/span[@class='col1']")));
+      $mainId = trim($mainId[1]);
+
+      //Duplicate of above contact.
+      $this->openCiviPage("contact/add", "reset=1&ct=Organization");
+
+      //fill in Organization name
+      $this->type('organization_name', $organizationName);
+
+      //fill in email id
+      $this->type('email_1_email', "{$organizationName}@org.com");
+
+      // Clicking save.
+      $this->click("_qf_Contact_upload_view-bottom");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+
+      $this->waitForText('crm-notification-container', "One matching contact was found. You can View or Edit the existing contact.");
+      $this->click("_qf_Contact_upload_duplicate");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->waitForText('crm-notification-container', "Contact Saved");
+      $duplicateId = explode("CiviCRM ID:", trim($this->getText("xpath=//div[@id='crm-record-log']/span[@class='col1']")));
+      $duplicateId = trim($duplicateId[1]);
+
+      return array(
+        'mainId' => $mainId,
+        'duplicateId' => $duplicateId
+      );
+    }
+  }
+
+  /**
+   * Helper FN
+   * to create new membershiptype
+   */
+  function addMembershipType($membershipOrganization) {
+    $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
+    $this->click("link=Add Membership Type");
+    $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
+
+    $this->type('name', "Membership Type $membershipOrganization");
+    $this->type('member_of_contact', $membershipOrganization);
+    $this->click('member_of_contact');
+    $this->waitForElementPresent("css=div.ac_results-inner li");
+    $this->click("css=div.ac_results-inner li.ac_even");
+
+    $this->type('minimum_fee', '1');
+    $this->select( 'financial_type_id', 'value=2' );
+    $this->type('duration_interval', 1);
+    $this->select('duration_unit', "label=year");
+
+    $this->select('period_type', "label=fixed");
+    $this->waitForElementPresent('fixed_period_rollover_day[d]');
+
+    // fixed period start set to April 1
+    $this->select('fixed_period_start_day[M]', 'value=4');
+    // rollover date set to Jan 31
+    $this->select('fixed_period_rollover_day[M]', 'value=1');
+
+    // Employer of relationship
+    $this->select('relationship_type_id', 'value=5_b_a');
+    $this->click('_qf_MembershipType_upload-bottom');
+    $this->waitForElementPresent('link=Add Membership Type');
+    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $membershipOrganization' has been saved."));
+  }
+
+  /**
+   * Test for CRM-12695 fix
+   */
+  function testMergeOrganizations() {
+    $this->webtestLogin();
+
+    // build organisation name
+    $orgnaizationName = 'org_'.substr(sha1(rand()), 0, 7);
+
+    $contactIds = array();
+    // create organization and its duplicate
+    $contactIds = $this->_createContacts(NULL, NULL, $orgnaizationName, 'Organization');
+
+    /*** Add Membership Type - start ***/
+    $this->addMembershipType($orgnaizationName);
+    /*** Add Membership Type - end ***/
+
+    //create a New Individual to be related to main organization
+    $firstName = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, "Anderson", "$firstName@anderson.name");
+    $sortName = "Anderson, $firstName";
+
+    // go to main organization contact to add membership
+    $this->openCiviPage("contact/view", "reset=1&cid={$contactIds['mainId']}");
+    // click through to the membership view screen
+    $this->click("css=li#tab_member a");
+
+    $this->waitForElementPresent("link=Add Membership");
+    $this->click("link=Add Membership");
+
+    $this->waitForElementPresent("_qf_Membership_cancel-bottom");
+
+    // fill in Membership Organization and Type
+    $this->select("membership_type_id[0]", "label={$orgnaizationName}");
+    $this->waitForElementPresent("membership_type_id[1]");
+    // Wait for membership type select to reload
+    $this->waitForTextPresent("Membership Type $orgnaizationName");
+    $this->select("membership_type_id[1]", "label=Membership Type $orgnaizationName");
+
+    $sourceText = "Membership-Organization Duplicate Merge Webtest";
+    // fill in Source
+    $this->type("source", $sourceText);
+
+    // Let Join Date stay default
+
+    // fill in Start Date
+    $this->webtestFillDate('start_date');
+
+    // Clicking save.
+    $this->click("_qf_Membership_upload");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // page was loaded
+    $this->waitForTextPresent($sourceText);
+    // Is status message correct?
+    $this->waitForText('crm-notification-container', "membership for $orgnaizationName has been added.");
+
+    // add relationship "Employer of"
+    // click through to the relationship view screen
+    $this->click("css=li#tab_rel a");
+
+    // wait for add Relationship link
+    $this->waitForElementPresent('link=Add Relationship');
+    $this->click('link=Add Relationship');
+
+    //choose the created relationship type
+    $this->waitForElementPresent("relationship_type_id");
+    $this->select('relationship_type_id', "value=5_b_a");
+
+    //fill in the individual
+    $this->webtestFillAutocomplete($sortName);
+
+    $this->waitForElementPresent("quick-save");
+
+    //fill in the relationship start date
+    //$this->webtestFillDate('start_date', '-2 year');
+    //$this->webtestFillDate('end_date', '+1 year');
+
+    $description = "Well here is some description !!!!";
+    $this->type("description", $description);
+
+    //save the relationship
+    $this->click("quick-save");
+    $this->waitForElementPresent("current-relationships");
+
+    //check the status message
+    $this->assertTrue($this->isTextPresent("New relationship created."));
+
+    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//a[text()='$sortName']");
+    $this->click("xpath=//a[text()='$sortName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->waitForText('crm-notification-container', "One matching contact was found. You can View or Edit the existing contact.");
-    $this->click("_qf_Contact_upload_duplicate");
+    // Check if Membership for the individual is created
+    $this->waitForElementPresent("xpath=//li[@id='tab_member']/a/em");
+    $this->verifyText("xpath=//li[@id='tab_member']/a/em", 1);
+
+    //create a New Individual to be related to duplicate organization
+    $firstNameOther = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstNameOther, "Harmison", "$firstNameOther@harmison.name");
+    $sortNameOther = "Harmison, $firstNameOther";
+
+    // go to main organization contact to add membership
+    $this->openCiviPage("contact/view", "reset=1&cid={$contactIds['duplicateId']}");
+
+    // add relationship "Employer of"
+    // click through to the relationship view screen
+    $this->click("css=li#tab_rel a");
+
+    // wait for add Relationship link
+    $this->waitForElementPresent('link=Add Relationship');
+    $this->click('link=Add Relationship');
+
+    //choose the created relationship type
+    $this->waitForElementPresent("relationship_type_id");
+    $this->select('relationship_type_id', "value=5_b_a");
+
+    //fill in the individual
+    $this->webtestFillAutocomplete($sortNameOther);
+
+    $this->waitForElementPresent("quick-save");
+
+    //fill in the relationship start date
+    $this->webtestFillDate('start_date', '-2 year');
+    $this->webtestFillDate('end_date', '+1 year');
+
+    $description = "Well here is some description !!!!";
+    $this->type("description", $description);
+
+    //save the relationship
+    //$this->click("_qf_Relationship_upload");
+    $this->click("quick-save");
+    $this->waitForElementPresent("current-relationships");
+
+    //check the status message
+    $this->assertTrue($this->isTextPresent("New relationship created."));
+
+    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
+
+    // go directly to contact merge page.
+    $this->openCiviPage("contact/merge", "reset=1&cid={$contactIds['mainId']}&oid={$contactIds['duplicateId']}&action=update&rgid=2");
+
+    $this->waitForElementPresent('_qf_Merge_cancel-bottom');
+    $this->click('_qf_Merge_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', "Contact Saved");
+
+    // click through to the relationship view screen
+    $this->click("css=li#tab_rel a");
+
+    // wait for add Relationship link
+    $this->waitForElementPresent("xpath=//a[text()='$sortNameOther']");
+    // go to duplicate organization's related contact
+    // to check if membership is added to that contact
+    $this->click("xpath=//a[text()='$sortNameOther']");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // Check if Membership for the individual is created
+    $this->waitForElementPresent("xpath=//li[@id='tab_member']/a/em");
+    $this->verifyText("xpath=//li[@id='tab_member']/a/em", 1);
   }
 }
 
