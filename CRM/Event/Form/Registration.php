@@ -646,12 +646,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           //have been skip the additional participant.
           if ($button == 'skip') {
             $field['is_required'] = FALSE;
-          }
-          elseif ($field['add_captcha']) {
+          }          
+          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+          elseif ($field['add_captcha']  && !$contactID) {
             // only add captcha for first page
             $addCaptcha = TRUE;
           }
-
           list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
           if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
             if (!array_key_exists($index, $stateCountryMap)) {

@@ -130,11 +130,15 @@ ORDER BY title";
 
     $addCaptcha = TRUE;
 
-    // if recaptcha is not set, then dont add it
+    // if recaptcha is not configured, then dont add it
+    // CRM-11316 Only enable ReCAPTCHA for anonymous visitors
     $config = CRM_Core_Config::singleton();
+    $session   = CRM_Core_Session::singleton();
+    $contactID = $session->get('userID');
+    
     if (empty($config->recaptchaPublicKey) ||
-      empty($config->recaptchaPrivateKey)
-    ) {
+      empty($config->recaptchaPrivateKey) ||
+      $contactID) {
       $addCaptcha = FALSE;
     }
     else {
@@ -152,6 +156,7 @@ ORDER BY title";
       // add captcha
       $captcha = CRM_Utils_ReCAPTCHA::singleton();
       $captcha->add($this);
+      $this->assign('isCaptcha', TRUE);
     }
 
     $this->addButtons(array(

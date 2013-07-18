@@ -56,6 +56,10 @@ Please check your email inbox for the confirmation email. If you don't find it, 
     {include file="CRM/Campaign/Form/Petition/Block.tpl" fields=$petitionActivityProfile}
   </div>
 
+  {if $isCaptcha}
+      {include file='CRM/common/ReCAPTCHA.tpl'}
+  {/if}
+
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>

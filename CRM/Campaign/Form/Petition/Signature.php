@@ -642,7 +642,8 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
           $this->_fields[$key] = $field;
-          if ($field['add_captcha']) {
+          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+          if ($field['add_captcha'] && !$this->_contactId) {
             $addCaptcha = TRUE;
           }
         }
@@ -650,9 +651,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
         // initialize the state country map
         CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
-        if ($addCaptcha &&
-          !$viewOnly
-        ) {
+        if ($addCaptcha && !$viewOnly) {
           $captcha = CRM_Utils_ReCAPTCHA::singleton();
           $captcha->add($this);
           $this->assign("isCaptcha", TRUE);
