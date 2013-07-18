@@ -824,6 +824,9 @@ SELECT  id
       'Organization' => CRM_Contact_BAO_Contact::importableFields('Organization', FALSE, FALSE, TRUE, TRUE, TRUE),
     );
 
+    // include hook injected fields
+    $fields['Contact'] = array_merge($fields['Contact'], CRM_Contact_BAO_Query_Hook::singleton()->getFields());
+
     // add current employer for individuals
     $fields['Individual']['current_employer'] = array(
       'name' => 'organization_name',
