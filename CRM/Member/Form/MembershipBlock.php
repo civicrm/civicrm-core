@@ -270,6 +270,10 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         if (array_sum($membershipType) == 0) {
           $errors['membership_type'] = ts('Please select at least one Membership Type to include in the Membership section of this page.');
         }
+        elseif (array_sum($membershipType) > CRM_Price_Form_Field::NUM_OPTION) {
+          // for CRM-13079
+          $errors['membership_type'] = ts('You cannot select more than %1 choices. For more complex functionality, please use a Price Set.', array(1 => CRM_Price_Form_Field::NUM_OPTION));
+        }
       }
 
       //for CRM-1302
@@ -280,7 +284,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       }
 
       //give error if default is selected for an unchecked membership type
-      if (isset($params['membership_type_default']) && !$params['membership_type'][$params['membership_type_default']]) {
+      if (!empty($params['membership_type_default']) && !$params['membership_type'][$params['membership_type_default']]) {
         $errors['membership_type_default'] = ts('Can\'t set default option for an unchecked membership type.');
       }
 

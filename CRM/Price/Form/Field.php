@@ -41,7 +41,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   /**
    * Constants for number of options for data types of multiple option.
    */
-  CONST NUM_OPTION = 11;
+  CONST NUM_OPTION = 15;
 
   /**
    * the custom set id saved to the session for an update
