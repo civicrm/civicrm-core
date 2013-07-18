@@ -2289,11 +2289,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
               case 'Select Date':
                 // CRM-6681, set defult values according to date and time format (if any).
                 $dateFormat = NULL;
-                if (CRM_Utils_Array::value('date_format', $field)) {
-                  $dateFormat = $field['date_format'];
+                if (CRM_Utils_Array::value('date_format', $customFields[$customFieldId])) {
+                  $dateFormat = $customFields[$customFieldId]['date_format'];
                 }
 
-                if (!CRM_Utils_Array::value('time_format', $field)) {
+                if (!CRM_Utils_Array::value('time_format', $customFields[$customFieldId])) {
                   list($defaults[$fldName]) = CRM_Utils_Date::setDateDefaults($details[$name], NULL,
                     $dateFormat
                   );
@@ -2303,7 +2303,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                   if (substr($fldName, -1) == ']') {
                     $timeElement = substr($fldName, 0, -1) . '_time]';
                   }
-                  list($defaults[$fldName], $defaults[$timeElement]) = CRM_Utils_Date::setDateDefaults($details[$name], NULL, $dateFormat, $field['time_format']);
+                  list($defaults[$fldName], $defaults[$timeElement]) = CRM_Utils_Date::setDateDefaults($details[$name],
+                    NULL, $dateFormat, $customFields[$customFieldId]['time_format']);
                 }
                 break;
 
