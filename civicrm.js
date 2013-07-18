@@ -9,7 +9,6 @@ jQuery(function ($) {
 
     var component = $("#add_civicomponent_id").val();
     var shortcode = '[civicrm component="' + component + '"';
-
     switch (component) {
       case 'contribution':
         shortcode += ' id="' + $("#add_contributepage_id").val() + '"';
@@ -26,6 +25,9 @@ jQuery(function ($) {
         break;
       case 'user-dashboard':
         break;
+      case 'petition':
+        shortcode += ' id="' + $("#add_petition_id").val() + '"';
+        break;
     }
     shortcode += ']';
     window.send_to_editor(shortcode);
@@ -37,20 +39,30 @@ jQuery(function ($) {
         $('#contribution-section, #component-section').show();
         $('#profile-section, #profile-mode-section').hide();
         $('#event-section, #action-section-event').hide();
+        $('#petition-section').hide();
         break;
       case 'event':
         $('#contribution-section').hide();
         $('#profile-section, #profile-mode-section').hide();
         $('#event-section, #component-section, #action-section-event').show();
+        $('#petition-section').hide();
         break;
       case 'profile':
         $('#contribution-section, #component-section').hide();
         $('#profile-section, #profile-mode-section').show();
         $('#event-section, #action-section-event').hide();
+        $('#petition-section').hide();
+        break;
+      case 'petition':
+        $('#contribution-section, #component-section').hide();
+        $('#profile-section, #profile-mode-section').hide();
+        $('#event-section, #action-section-event').hide();
+        $('#petition-section').show();
         break;
       default:
         $('#contribution-section, #event-section, #component-section, #action-section-event').hide();
         $('#profile-section, #profile-mode-section').hide();
+        $('#petition-section').hide();
         break;
     }
   });

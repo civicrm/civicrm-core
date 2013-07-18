@@ -74,7 +74,7 @@ define( 'CIVICRM_PLUGIN_DIR', plugin_dir_path(__FILE__) );
 define( 'CIVICRM_SETTINGS_PATH', CIVICRM_PLUGIN_DIR . 'civicrm.settings.php' );
 
 // prevent CiviCRM from rendering its own header
-define( 'CIVICRM_UF_HEAD', true );
+define( 'CIVICRM_UF_HEAD', TRUE );
 
 
 /*
@@ -161,7 +161,7 @@ class CiviCRM_For_WordPress {
     }
 
     // store context
-    self::$in_wordpress = ( isset( $_GET['page'] ) && $_GET['page'] == 'CiviCRM' ) ? true : false;
+    self::$in_wordpress = ( isset( $_GET['page'] ) && $_GET['page'] == 'CiviCRM' ) ? TRUE : FALSE;
 
     // there is no session handling in WP hence we start it for CiviCRM pages
     if (!session_id()) {
@@ -170,7 +170,7 @@ class CiviCRM_For_WordPress {
 
     // this is required for ajax calls in civicrm
     if ( $this->civicrm_in_wordpress() ) {
-      $_GET['noheader'] = true;
+      $_GET['noheader'] = TRUE;
     } else {
       $_GET['civicrm_install_type'] = 'wordpress';
     }
@@ -278,11 +278,11 @@ class CiviCRM_For_WordPress {
    */
   public function initialize() {
 
-    static $initialized = false;
-    static $failure = false;
+    static $initialized = FALSE;
+    static $failure = FALSE;
 
     if ( $failure ) {
-      return false;
+      return FALSE;
     }
 
     if ( ! $initialized ) {
@@ -302,7 +302,7 @@ class CiviCRM_For_WordPress {
 
       // check for settings
       if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
-        $error = false;
+        $error = FALSE;
       } else {
         $error = include_once ( CIVICRM_SETTINGS_PATH );
       }
@@ -332,23 +332,23 @@ class CiviCRM_For_WordPress {
         $installLink
       );
 
-      if ($error == false) {
+      if ($error == FALSE) {
         header( 'Location: ' . admin_url() . 'options-general.php?page=civicrm-install' );
-        return false;
+        return FALSE;
       }
 
       // this does pretty much all of the civicrm initialization
       if ( ! file_exists( $civicrm_root . 'CRM/Core/Config.php' ) ) {
-        $error = false;
+        $error = FALSE;
       } else {
         $error = include_once ( 'CRM/Core/Config.php' );
       }
 
       // have we got it?
-      if ( $error == false ) {
+      if ( $error == FALSE ) {
 
         // set static flag
-        $failure = true;
+        $failure = TRUE;
 
         // FIX ME - why?
         wp_die(
@@ -366,12 +366,12 @@ class CiviCRM_For_WordPress {
         );
 
         // won't reach here!
-        return false;
+        return FALSE;
 
       }
 
       // set static flag
-      $initialized = true;
+      $initialized = TRUE;
 
       // initialize the system by creating a config object
       $config = CRM_Core_Config::singleton();
@@ -384,7 +384,7 @@ class CiviCRM_For_WordPress {
         require_once 'CRM/Core/BAO/UFMatch.php';
         CRM_Core_BAO_UFMatch::synchronize(
           $current_user, // user object
-          false, // do not update
+          FALSE, // do not update
           'WordPress', // CMS
           $this->get_civicrm_contact_type('Individual')
         );
@@ -397,7 +397,7 @@ class CiviCRM_For_WordPress {
     do_action( 'civicrm_initialized' );
 
     // success!
-    return true;
+    return TRUE;
 
   }
 
@@ -410,12 +410,12 @@ class CiviCRM_For_WordPress {
    */
   public function invoke() {
 
-    static $alreadyInvoked = false;
+    static $alreadyInvoked = FALSE;
     if ( $alreadyInvoked ) {
       return;
     }
 
-    $alreadyInvoked = true;
+    $alreadyInvoked = TRUE;
     if ( ! $this->initialize() ) {
       return '';
     }
@@ -457,7 +457,7 @@ class CiviCRM_For_WordPress {
      */
     if ( CRM_Utils_Array::value('q', $_GET) != 'civicrm/upgrade' ) {
       require_once 'CRM/Core/BAO/UFMatch.php';
-      CRM_Core_BAO_UFMatch::synchronize( $current_user, false, 'WordPress', 'Individual', true );
+      CRM_Core_BAO_UFMatch::synchronize( $current_user, FALSE, 'WordPress', 'Individual', TRUE );
     }
 
     // do the business
@@ -488,7 +488,7 @@ class CiviCRM_For_WordPress {
       'civicrm-wordpress',
 
       // deprecated argument
-      false,
+      FALSE,
 
       // relative path to directory containing translation files
       dirname( plugin_basename( __FILE__ ) ) . '/languages/'
@@ -591,7 +591,7 @@ class CiviCRM_For_WordPress {
       return;
     }
 
-    $region = CRM_Core_Region::instance('html-header', false);
+    $region = CRM_Core_Region::instance('html-header', FALSE);
     if ( $region ) {
       echo $region->render( '' );
     }
@@ -656,7 +656,7 @@ class CiviCRM_For_WordPress {
   * @description: CiviCRM's theme integration method
   * Called by register_hooks() and shortcode_handler()
   */
-  public function wp_frontend( $shortcode = false ) {
+  public function wp_frontend( $shortcode = FALSE ) {
 
     // kick out if not CiviCRM
     if ( ! $this->initialize() ) { return; }
@@ -667,7 +667,7 @@ class CiviCRM_For_WordPress {
 
     // set the frontend part for civicrm code
     $config = CRM_Core_Config::singleton();
-    $config->userFrameworkFrontend = true;
+    $config->userFrameworkFrontend = TRUE;
 
     $argString = NULL;
     $args = array();
@@ -832,20 +832,20 @@ class CiviCRM_For_WordPress {
   public function check_permission( $args ) {
 
     if ( $args[0] != 'civicrm' ) {
-      return false;
+      return FALSE;
     }
 
     $config = CRM_Core_Config::singleton();
 
     // set frontend true
-    $config->userFrameworkFrontend = true;
+    $config->userFrameworkFrontend = TRUE;
 
     require_once 'CRM/Utils/Array.php';
     // all profile and file urls, as well as user dashboard and tell-a-friend are valid
     $arg1 = CRM_Utils_Array::value(1, $args);
     $validPaths = array('profile', 'user', 'dashboard', 'friend', 'file', 'ajax');
     if ( in_array( $arg1, $validPaths ) ) {
-      return true;
+      return TRUE;
     }
 
     $arg2 = CRM_Utils_Array::value(2, $args);
@@ -856,7 +856,7 @@ class CiviCRM_For_WordPress {
       $arg1 == 'contact' &&
       $arg2 == 'relatedcontact'
     ) {
-      return true;
+      return TRUE;
     }
 
     // a contribution page
@@ -866,14 +866,14 @@ class CiviCRM_For_WordPress {
         $arg1 == 'contribute' &&
         in_array( $arg2, array('transact', 'campaign', 'pcp', 'updaterecur', 'updatebilling', 'unsubscribe') )
       ) {
-        return true;
+        return TRUE;
       }
 
       if (
         $arg1 == 'pcp' &&
         ( !$arg2 || in_array( $arg2, array('info') ) )
       ) {
-        return true;
+        return TRUE;
       }
 
     }
@@ -885,7 +885,7 @@ class CiviCRM_For_WordPress {
         $arg1 == 'event' &&
         in_array( $arg2, array('register', 'info', 'participant', 'ical', 'confirm') )
       ) {
-        return true;
+        return TRUE;
       }
 
       // also allow events to be mapped
@@ -894,14 +894,14 @@ class CiviCRM_For_WordPress {
         $arg2 == 'map' &&
         $arg3 == 'event'
       ) {
-        return true;
+        return TRUE;
       }
 
       if (
         $arg1 == 'pcp' &&
         ( !$arg2 || in_array( $arg2, array('info') ) )
       ) {
-        return true;
+        return TRUE;
       }
 
     }
@@ -917,7 +917,7 @@ class CiviCRM_For_WordPress {
           array('forward', 'unsubscribe', 'resubscribe', 'optout', 'subscribe', 'confirm', 'view')
         )
       ) {
-        return true;
+        return TRUE;
       }
     }
 
@@ -928,11 +928,11 @@ class CiviCRM_For_WordPress {
         $arg1 == 'petition' &&
         in_array($arg2, $validPaths)
       ) {
-        return true;
+        return TRUE;
       }
     }
 
-    return false;
+    return FALSE;
 
   }
 
@@ -984,7 +984,7 @@ class CiviCRM_For_WordPress {
       // to the CiviCRM Contact, we have to search for it all over again...
       CRM_Core_BAO_UFMatch::synchronize(
         $user, // user object
-        true, // update = true
+        TRUE, // update = true
         'WordPress', // CMS
         'Individual' // contact type
       );
@@ -1186,14 +1186,24 @@ class CiviCRM_For_WordPress {
 
       case 'profile':
 
-        if ( $mode == 'edit' ) {
+        if ($mode == 'edit') {
           $args['q'] = 'civicrm/profile/edit';
-        } elseif ( $mode == 'view' ) {
+        }
+        elseif ($mode == 'view') {
           $args['q'] = 'civicrm/profile/view';
-        } else {
+        }
+        else {
           $args['q'] = 'civicrm/profile/create';
         }
         $args['gid'] = $gid;
+        break;
+
+
+      case 'petition':
+
+        $args['q'] = 'civicrm/petition/sign';
+        $args['sid'] = $args['id'];
+        unset($args['id']);
         break;
 
       default:
@@ -1210,7 +1220,7 @@ class CiviCRM_For_WordPress {
     }
 
     // call wp_frontend with $shortcode param
-    return $this->wp_frontend( true );
+    return $this->wp_frontend( TRUE );
 
   }
 
@@ -1258,7 +1268,7 @@ class CiviCRM_For_WordPress {
     }
 
     // enqueue script in footer
-    $in_footer = true;
+    $in_footer = TRUE;
 
     // construct path to file
     $src = plugins_url(
@@ -1275,6 +1285,90 @@ class CiviCRM_For_WordPress {
       $in_footer
     );
 
+  }
+
+  private function get_contribution_pages() {
+    $now = date('Ymdhis');
+    $sql = "
+        SELECT id, title
+        FROM   civicrm_contribution_page
+        WHERE  is_active = 1
+        AND    (
+             ( start_date IS NULL AND end_date IS NULL )
+        OR       ( start_date <= $now AND end_date IS NULL )
+        OR       ( start_date IS NULL AND end_date >= $now )
+        OR       ( start_date <= $now AND end_date >= $now )
+             )
+        ";
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $contributionPages = array();
+    while ($dao->fetch()) {
+      $contributionPages[$dao->id] = $dao->title;
+    }
+    return $contributionPages;
+  }
+
+
+  private function get_event() {
+    $now = date('Ymdhis');
+    $sql = "
+        SELECT id, title
+        FROM   civicrm_event
+        WHERE  is_active = 1
+        AND ( is_template = 0 OR is_template IS NULL )
+        AND    (
+             ( start_date IS NULL AND end_date IS NULL )
+        OR       ( start_date <= $now AND end_date IS NULL )
+        OR       ( start_date IS NULL AND end_date >= $now )
+        OR       ( start_date <= $now AND end_date >= $now )
+        OR       ( start_date >= $now )
+             )
+        ";
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $eventPages = array();
+    while ($dao->fetch()) {
+      $eventPages[$dao->id] = $dao->title;
+    }
+    return $eventPages;
+  }
+
+  private function get_profile_page() {
+    $sql = "
+        SELECT g.id as id, g.title as title
+        FROM   civicrm_uf_group g, civicrm_uf_join j
+        WHERE  g.is_active = 1
+        AND    j.is_active = 1
+        AND    ( group_type LIKE '%Individual%'
+           OR    group_type LIKE '%Contact%' )
+        AND    g.id = j.uf_group_id
+        AND    j.module = 'Profile'
+        ";
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $profilePages = array();
+    while ($dao->fetch()) {
+      $profilePages[$dao->id] = $dao->title;
+    }
+    return $profilePages;
+  }
+
+  private function get_petition() {
+    $params = array(
+      'version' => 3,
+      'is_active' => 1,
+      'activity_type_id' => 'Petition',
+      'return' => array('id', 'title'),
+
+    );
+    $result = civicrm_api('Survey', 'get', $params);
+
+    $petitionPages = array();
+    foreach ($result['values'] as $value) {
+      $petitionPages[$value['id']] = $value['title'];
+    }
+    return $petitionPages;
   }
 
 
@@ -1294,65 +1388,6 @@ class CiviCRM_For_WordPress {
     ) {
 
       $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm-wordpress' );
-
-      $now = date('Ymdhis');
-
-      $sql = "
-        SELECT id, title
-        FROM   civicrm_contribution_page
-        WHERE  is_active = 1
-        AND    (
-             ( start_date IS NULL AND end_date IS NULL )
-        OR       ( start_date <= $now AND end_date IS NULL )
-        OR       ( start_date IS NULL AND end_date >= $now )
-        OR       ( start_date <= $now AND end_date >= $now )
-             )
-        ";
-
-      $dao = CRM_Core_DAO::executeQuery( $sql );
-      $contributionPages = array();
-      while ( $dao->fetch() ) {
-        $contributionPages[$dao->id] = $dao->title;
-      }
-
-      $sql = "
-        SELECT id, title
-        FROM   civicrm_event
-        WHERE  is_active = 1
-        AND ( is_template = 0 OR is_template IS NULL )
-        AND    (
-             ( start_date IS NULL AND end_date IS NULL )
-        OR       ( start_date <= $now AND end_date IS NULL )
-        OR       ( start_date IS NULL AND end_date >= $now )
-        OR       ( start_date <= $now AND end_date >= $now )
-        OR       ( start_date >= $now )
-             )
-        ";
-
-      $dao = CRM_Core_DAO::executeQuery( $sql );
-      $eventPages = array();
-      while ( $dao->fetch() ) {
-        $eventPages[$dao->id] = $dao->title;
-      }
-
-
-      $sql = "
-        SELECT g.id as id, g.title as title
-        FROM   civicrm_uf_group g, civicrm_uf_join j
-        WHERE  g.is_active = 1
-        AND    j.is_active = 1
-        AND    ( group_type LIKE '%Individual%'
-           OR    group_type LIKE '%Contact%' )
-        AND    g.id = j.uf_group_id
-        AND    j.module = 'Profile'
-        ";
-
-      $dao = CRM_Core_DAO::executeQuery( $sql );
-      $profilePages = array();
-      while ( $dao->fetch() ) {
-        $profilePages[$dao->id] = $dao->title;
-      }
-
       ?>
       <div id="civicrm_frontend_pages" style="display:none;">
         <div class="wrap">
@@ -1372,11 +1407,13 @@ class CiviCRM_For_WordPress {
                 <option value="event"><?php _e( 'Event Page', 'civicrm-wordpress' ); ?></option>
                 <option value="profile"><?php _e( 'Profile', 'civicrm-wordpress' ); ?></option>
                 <option value="user-dashboard"><?php _e( 'User Dashboard', 'civicrm-wordpress' ); ?></option>
+                <option value="petition"><?php _e( 'Petition', 'civicrm-wordpress' ); ?></option>
               </select>
 
                <span id="contribution-section" style="display:none;">
                 <select id="add_contributepage_id">
                 <?php
+                  $contributionPages = $this->get_contribution_pages();
                   foreach ($contributionPages as $key => $value) { ?>
                   <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
                   <?php
@@ -1388,6 +1425,7 @@ class CiviCRM_For_WordPress {
               <span id="event-section" style="display:none;">
                 <select id="add_eventpage_id">
                 <?php
+                  $eventPages = $this->get_event();
                   foreach ($eventPages as $key => $value) { ?>
                   <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
                   <?php
@@ -1414,6 +1452,7 @@ class CiviCRM_For_WordPress {
               <span id="profile-section" style="display:none;">
                  <select id="add_profilepage_id">
                  <?php
+                 $profilePages = $this->get_profile_page();
                  foreach ($profilePages as $key => $value) { ?>
                    <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
                    <?php
@@ -1429,6 +1468,18 @@ class CiviCRM_For_WordPress {
                 <input type="radio" name="profile_mode" value="edit" /> <?php _e( 'Edit', 'civicrm-wordpress' ); ?>
                 <input type="radio" name="profile_mode" value="edit" /> <?php _e( 'View', 'civicrm-wordpress' ); ?>
                  </div>
+              </span>
+
+              <span id="petition-section" style="display:none;">
+		            <select id="add_petition_id">
+                <?php
+                $petitionPages = $this->get_petition();
+                foreach ($petitionPages as $key => $value) { ?>
+                  <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
+                <?php
+                }
+                ?>
+                </select>
               </span>
 
               <div style="padding:8px 0 0 0; font-size:11px; font-style:italic; color:#5A5A5A"><?php _e( "Can't find your form? Make sure it is active.", 'civicrm-wordpress' ); ?></div>
@@ -1620,7 +1671,7 @@ function civicrm_buffer_callback($buffer) {
  * CiviCRM's theme integration method
  * Called by civicrm_wp_main() and civicrm_shortcode_handler()
  */
-function civicrm_wp_frontend( $shortcode = false ) {
+function civicrm_wp_frontend( $shortcode = FALSE ) {
   civi_wp()->wp_frontend( $shortcode );
 }
 
