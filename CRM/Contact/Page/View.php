@@ -203,9 +203,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       'isDeleted' => $isDeleted,
     );
 
-    if (
-      CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)
-    ) {
+    if (CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/add', "reset=1&action=update&cid={$this->_contactId}");
     }
 
