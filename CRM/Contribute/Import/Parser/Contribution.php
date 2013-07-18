@@ -73,18 +73,24 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     $fields = CRM_Contribute_BAO_Contribution::importableFields($this->_contactType, FALSE);
 
     $fields = array_merge($fields,
-      array('soft_credit' => array('title' => ts('Soft Credit'),
-        'softCredit' => TRUE,
-        'headerPattern' => '/Soft Credit/i',
-      ))
+      array(
+        'soft_credit' => array(
+          'title' => ts('Soft Credit'),
+          'softCredit' => TRUE,
+          'headerPattern' => '/Soft Credit/i',
+        )
+      )
     );
 
     // add pledge fields only if its is enabled
     if (CRM_Core_Permission::access('CiviPledge')) {
-      $pledgeFields = array('pledge_payment' => array('title' => ts('Pledge Payment'),
+      $pledgeFields = array(
+        'pledge_payment' => array(
+          'title' => ts('Pledge Payment'),
           'headerPattern' => '/Pledge Payment/i',
         ),
-        'pledge_id' => array('title' => ts('Pledge ID'),
+        'pledge_id' => array(
+          'title' => ts('Pledge ID'),
           'headerPattern' => '/Pledge ID/i',
         ),
       );
@@ -388,15 +394,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               'contribution_id' => $ids['contribution'],
             );
 
-            //FIXE ME: Need to fix this logic
-            $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit);
+            //FIX ME: Need to fix this logic
+            $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit['contribution_id']);
             if (CRM_Utils_Array::value('soft_credit_id', $existingSoftCredit)) {
               $formatted['softID'] = $existingSoftCredit['soft_credit_id'];
             }
           }
 
           $newContribution = CRM_Contribute_BAO_Contribution::create($formatted, $ids);
-
           $this->_newContributions[] = $newContribution->id;
 
           //return soft valid since we need to show how soft credits were added
