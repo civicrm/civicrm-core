@@ -149,6 +149,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $this->_fields = array_merge(CRM_Event_BAO_Query::getParticipantFields(), $this->_fields);
     }
 
+    $this->_fields = array_merge($this->_fields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
+
     $this->_selectFields = array();
     foreach ($this->_fields as $name => $field) {
       // lets skip note for now since we dont support it
