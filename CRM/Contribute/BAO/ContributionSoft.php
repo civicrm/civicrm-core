@@ -42,7 +42,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * funtion to add contribution soft credit record
+   * function to add contribution soft credit record
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
@@ -120,14 +120,15 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     while ($cs->fetch()) {
       if ($cs->amount > 0) {
         $count++;
-        $amount[]   = $cs->amount;
-        $average[]  = $cs->average;
+        $amount[] = $cs->amount;
+        $average[] = $cs->average;
         $currency[] = $cs->currency;
       }
     }
 
     if ($count > 0) {
-      return array(implode(',&nbsp;', $amount),
+      return array(
+        implode(',&nbsp;', $amount),
         implode(',&nbsp;', $average),
         implode(',&nbsp;', $currency),
       );
@@ -209,7 +210,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   static function getSoftCreditType($contributionID) {
-  $query = "
+    $query = "
   SELECT id, pcp_id
   FROM  civicrm_contribution_soft
   WHERE contribution_id = %1
@@ -230,8 +231,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     }
     return array($type, $id);
   }
+
   /**
-   *  Function to retrieve the list of soft contributons for given contact.
+   *  Function to retrieve the list of soft contributions for given contact.
    *  @param int $contact_id contact id
    *
    *  @return array
