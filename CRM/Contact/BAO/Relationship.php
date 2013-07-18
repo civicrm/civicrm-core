@@ -167,7 +167,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           ),
         );
       }
-      CRM_Contact_BAO_Relationship::relatedMemberships($relationship->contact_id_a, $params, $ids, $action);
 
       $title = CRM_Contact_BAO_Contact::displayName($relationship->contact_id_a) . ' (' . CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
         $relationship->relationship_type_id, 'label_a_b'
