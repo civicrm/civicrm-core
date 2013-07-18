@@ -1287,7 +1287,7 @@ class CiviCRM_For_WordPress {
 
   }
 
-  public function get_contribution_pages() {
+  private function get_contribution_pages() {
     $now = date('Ymdhis');
     $sql = "
         SELECT id, title
@@ -1310,7 +1310,7 @@ class CiviCRM_For_WordPress {
   }
 
 
-  public function get_event() {
+  private function get_event() {
     $now = date('Ymdhis');
     $sql = "
         SELECT id, title
@@ -1334,7 +1334,7 @@ class CiviCRM_For_WordPress {
     return $eventPages;
   }
 
-  public function get_profile_page() {
+  private function get_profile_page() {
     $sql = "
         SELECT g.id as id, g.title as title
         FROM   civicrm_uf_group g, civicrm_uf_join j
@@ -1354,7 +1354,7 @@ class CiviCRM_For_WordPress {
     return $profilePages;
   }
 
-  public function get_petition() {
+  private function get_petition() {
     $params = array(
       'version' => 3,
       'is_active' => 1,
@@ -1413,7 +1413,7 @@ class CiviCRM_For_WordPress {
                <span id="contribution-section" style="display:none;">
                 <select id="add_contributepage_id">
                 <?php
-                  $contributionPages = civi_wp()->get_contribution_pages();
+                  $contributionPages = $this->get_contribution_pages();
                   foreach ($contributionPages as $key => $value) { ?>
                   <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
                   <?php
@@ -1425,7 +1425,7 @@ class CiviCRM_For_WordPress {
               <span id="event-section" style="display:none;">
                 <select id="add_eventpage_id">
                 <?php
-                  $eventPages = civi_wp()->get_event();
+                  $eventPages = $this->get_event();
                   foreach ($eventPages as $key => $value) { ?>
                   <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
                   <?php
@@ -1452,7 +1452,7 @@ class CiviCRM_For_WordPress {
               <span id="profile-section" style="display:none;">
                  <select id="add_profilepage_id">
                  <?php
-                 $profilePages = civi_wp()->get_profile_page();
+                 $profilePages = $this->get_profile_page();
                  foreach ($profilePages as $key => $value) { ?>
                    <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
                    <?php
@@ -1473,7 +1473,7 @@ class CiviCRM_For_WordPress {
               <span id="petition-section" style="display:none;">
 		            <select id="add_petition_id">
                 <?php
-                $petitionPages = civi_wp()->get_petition();
+                $petitionPages = $this->get_petition();
                 foreach ($petitionPages as $key => $value) { ?>
                   <option value="<?php echo absint($key) ?>"><?php echo esc_html($value) ?></option>
                 <?php
