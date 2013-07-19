@@ -3696,7 +3696,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (9993, 1226, "BRK", "Berkshire"),
 (9994, 1226, "WMD", "West Midlands"),
 (9998, 1226, "WGM", "West Glamorgan"),
-(9999, 1226, "LON", "Greater London"),
+(9999, 1226, "LON", "London"),
 
 (10000, 1107, "CI", "Carbonia-Iglesias"),
 (10001, 1107, "OT", "Olbia-Tempio"),

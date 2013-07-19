@@ -115,3 +115,6 @@ UPDATE civicrm_navigation
        name = 'Event Name Badge Layouts',
        label= '{ts escape="sql" skip="true"}Event Name Badge Layouts{/ts}'
  WHERE name = 'Event Badge Formats';
+
+--CRM-12539 change 'Greater London' to 'London'
+UPDATE `civicrm_state_province` SET `name` = 'London' WHERE `name` = 'Greater London';
