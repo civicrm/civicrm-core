@@ -307,10 +307,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $params['buttonBottom'] = 'PagerBottomButton';
   }
   //end of function
+
   function &getColHeads($action = NULL, $output = NULL) {
-
     $colHeads = self::_getColumnHeaders();
-
     $colHeads[] = array('desc' => ts('Actions'), 'name' => ts('Action'));
     return $colHeads;
   }
@@ -980,7 +979,8 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
         'address_options', TRUE, NULL, TRUE
       );
 
-      self::$_columnHeaders = array('contact_type' => array('desc' => ts('Contact Type')),
+      self::$_columnHeaders = array(
+        'contact_type' => array('desc' => ts('Contact Type')),
         'sort_name' => array(
           'name' => ts('Name'),
           'sort' => 'sort_name',
@@ -988,20 +988,25 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
         ),
       );
 
-      $defaultAddress = array('street_address' => array('name' => ts('Address')),
-        'city' => array('name' => ts('City'),
+      $defaultAddress = array(
+        'street_address' => array('name' => ts('Address')),
+        'city' => array(
+          'name' => ts('City'),
           'sort' => 'city',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
-        'state_province' => array('name' => ts('State'),
+        'state_province' => array(
+          'name' => ts('State'),
           'sort' => 'state_province',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
-        'postal_code' => array('name' => ts('Postal'),
+        'postal_code' => array(
+          'name' => ts('Postal'),
           'sort' => 'postal_code',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
-        'country' => array('name' => ts('Country'),
+        'country' => array(
+          'name' => ts('Country'),
           'sort' => 'country',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
@@ -1013,7 +1018,8 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
         }
       }
 
-      self::$_columnHeaders['email'] = array('name' => ts('Email'),
+      self::$_columnHeaders['email'] = array(
+        'name' => ts('Email'),
         'sort' => 'email',
         'direction' => CRM_Utils_Sort::DONTCARE,
       );
@@ -1067,6 +1073,9 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
     $properties = array();
     foreach ($returnProperties as $name => $value) {
       if ($name != 'location') {
+        if (in_array($name, array('group', 'tag'))) {
+          $name = "{$name}s";
+        }
         $properties[] = $name;
       }
       else {
