@@ -607,10 +607,19 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
+      //special handling for groups/tags
+      $makeException = FALSE;
+      if (in_array($name, array('groups', 'tags'))
+        && isset($this->_returnProperties[substr($name, 0, -1)])
+      ) {
+        $makeException = TRUE;
+      }
+
       $cfID = CRM_Core_BAO_CustomField::getKeyID($name);
       if (
         CRM_Utils_Array::value($name, $this->_paramLookup) ||
-        CRM_Utils_Array::value($name, $this->_returnProperties)
+        CRM_Utils_Array::value($name, $this->_returnProperties) ||
+        $makeException
       ) {
         if ($cfID) {
           // add to cfIDs array if not present
@@ -4032,10 +4041,6 @@ civicrm_relationship.start_date > {$today}
       $this->_whereClause = $this->whereClause();
     }
 
-    // hack for now, add permission only if we are in search
-    // FIXME: we should actually filter out deleted contacts (unless requested to do the opposite)
-    $permission = ' ( 1 ) ';
-    $onlyDeleted = FALSE;
     $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
 
     // if we’re explicitely looking for a certain contact’s contribs, events, etc.

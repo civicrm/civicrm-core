@@ -105,7 +105,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     }
     else {
       // we need to determine component export
-      $stateMachine  = &$this->controller->getStateMachine();
+      $stateMachine  = $this->controller->getStateMachine();
+
       $formName      = CRM_Utils_System::getClassName($stateMachine);
       $componentName = explode('_', $formName);
       $components    = array('Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity');
@@ -316,7 +317,7 @@ FROM   {$this->_componentTable}
    * @access public
    * @static
    */
-  public function formRule($params, $files, $self) {
+  static public function formRule($params, $files, $self) {
     $errors = array();
 
     if (CRM_Utils_Array::value('mergeOption', $params) == self::EXPORT_MERGE_SAME_ADDRESS &&
