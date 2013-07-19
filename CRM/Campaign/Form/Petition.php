@@ -131,14 +131,23 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
   function setDefaultValues() {
     $defaults = $this->_values;
 
-    $ufJoinParams = array(
+    $ufContactJoinParams = array(
       'entity_table' => 'civicrm_survey',
       'entity_id' => $this->_surveyId,
       'weight' => 2,
     );
 
-    if ($ufGroupId = CRM_Core_BAO_UFJoin::findUFGroupId($ufJoinParams)) {
-      $defaults['contact_profile_id'] = $ufGroupId;
+    if ($ufContactGroupId = CRM_Core_BAO_UFJoin::findUFGroupId($ufContactJoinParams)) {
+      $defaults['contact_profile_id'] = $ufContactGroupId;
+    }
+    $ufActivityJoinParams = array(
+      'entity_table' => 'civicrm_survey',
+      'entity_id' => $this->_surveyId,
+      'weight' => 1,
+    );
+
+    if ($ufActivityGroupId = CRM_Core_BAO_UFJoin::findUFGroupId($ufActivityJoinParams)) {
+      $defaults['profile_id'] = $ufActivityGroupId;
     }
     
     if (!isset($defaults['is_active'])) {
