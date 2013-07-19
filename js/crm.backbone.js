@@ -161,6 +161,45 @@
     });
   };
 
+  /**
+   * Find a single record, or create a new record.
+   *
+   * @param Object options:
+   *   - CollectionClass: class
+   *   - crmCriteria: Object values to search/default on
+   *   - defaults: Object values to put on newly created model (if needed)
+   *   - success: function(model)
+   *   - error: function(collection, error)
+   */
+   CRM.Backbone.findCreate = function(options) {
+     options || (options = {});
+     var collection = new options.CollectionClass([], {
+       crmCriteria: options.crmCriteria
+     });
+     collection.fetch({
+      success: function(collection) {
+        if (collection.length == 0) {
+          var attrs = _.extend({}, collection.crmCriteria, options.defaults || {});
+          var model = collection._prepareModel(attrs, options);
+          options.success(model);
+        } else if (collection.length == 1) {
+          options.success(collection.first());
+        } else {
+          options.error(collection, {
+            is_error: 1,
+            error_message: 'Too many matches'
+          });
+        }
+      },
+      error: function(collection, errorData) {
+        if (options.error) {
+          options.error(collection, errorData);
+        }
+      }
+    });
+  };
+
+
   CRM.Backbone.Model = Backbone.Model.extend({
     /**
      * Return JSON version of model -- but only include fields that are
