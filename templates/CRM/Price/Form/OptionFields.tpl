@@ -28,7 +28,7 @@
         {if $useForMember}
             {ts}Fill in a row for each membership type you want to offer as an option (click 'another choice' for each additional choice). Click the help icon for more info on membership price sets.{/ts} {help id="id-member-price-options"}
         {else}
-            {ts}Enter up to ten (10) multiple choice options in this table (click 'another choice' for each additional choice). If you need more than ten options, you can create an unlimited number of additional choices using the Edit Price Options link after saving this new field. Enter a description of the option in the 'Label' column, and the associated price in the 'Amount' column. Click the 'Default' radio button to the left of an option if you want that to be selected by default.{/ts}
+            {ts}Enter up to fifteen (15) multiple choice options in this table (click 'another choice' for each additional choice). If you need more than ten options, you can create an unlimited number of additional choices using the Edit Price Options link after saving this new field. Enter a description of the option in the 'Label' column, and the associated price in the 'Amount' column. Click the 'Default' radio button to the left of an option if you want that to be selected by default.{/ts}
         {/if}
     </div>
   {strip}
@@ -51,7 +51,7 @@
       <th>{ts}Active?{/ts}</th>
     </tr>
 
-  {section name=rowLoop start=1 loop=12}
+  {section name=rowLoop start=1 loop=16}
   {assign var=index value=$smarty.section.rowLoop.index}
   <tr id="optionField_{$index}" class="form-item {cycle values="odd-row,even-row"}">
         <td>
