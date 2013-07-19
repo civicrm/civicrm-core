@@ -121,7 +121,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
         'fields' =>
         array(
           'street_address' => array('title' => ts('Street Address')),
-          'supplemental_address_1' => array('title' => ts('Additional Address')),
+          'supplemental_address_1' => array('title' => ts('Supplemental Address 1')),
           'city' => array('title' => ts('City')),
           'country_id' => array('title' => ts('Country')),
           'state_province_id' => array('title' => ts('State/Province')),
