@@ -1325,6 +1325,7 @@ WHERE civicrm_event.is_active = 1
    */
   static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = array()) {
     if ($gid) {
+      $config = CRM_Core_Config::singleton();
       $session = CRM_Core_Session::singleton();
       $contactID = $session->get('userID');
       if ($contactID) {
@@ -1366,7 +1367,8 @@ WHERE civicrm_event.is_active = 1
           }
         }
         elseif ('date' == substr($name, -4)) {
-          $values[$index] = $params[$name];
+          $values[$index] = CRM_Utils_Date::customFormat(CRM_Utils_Date::processDate($params[$name]),
+            $config->dateformatFull);
         }
         elseif ('country' == substr($name, 0, 7)) {
           if ($params[$name]) {
@@ -1498,18 +1500,15 @@ WHERE civicrm_event.is_active = 1
           else {
             if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name)) {
               $query = "
-SELECT html_type, data_type
+SELECT html_type, data_type, date_format, time_format
 FROM   civicrm_custom_field
 WHERE  id = $cfID
 ";
               $dao = CRM_Core_DAO::executeQuery($query);
               $dao->fetch();
               $htmlType = $dao->html_type;
-              $dataType = $dao->data_type;
 
               if ($htmlType == 'File') {
-                //$fileURL = CRM_Core_BAO_CustomField::getFileURL( $contactID, $cfID );
-                //$params[$index] = $values[$index] = $fileURL['file_url'];
                 $values[$index] = $params[$index];
               }
               else {
@@ -1522,9 +1521,13 @@ WHERE  id = $cfID
                   $customVal = (float )($params[$name]);
                 }
                 elseif ($dao->data_type == 'Date') {
-                  $customVal = $displayValue = $params[$name];
+                  $customVal = $displayValue = CRM_Utils_Date::customFormat(
+                    CRM_Utils_Date::processDate($params[$name]), $config->dateformatFull);
+
                   if (!empty($params[$name . '_time'])) {
-                    $customVal = $displayValue = $params[$name] . ' ' . $params[$name . '_time'];
+                    $customVal = $displayValue = CRM_Utils_Date::customFormat(
+                      CRM_Utils_Date::processDate($params[$name], $params[$name . '_time']),
+                      $config->dateformatDateTime);
                   }
                   $skip = TRUE;
                 }
