@@ -1,4 +1,4 @@
-/* ------ Fixtures/constants ----- */
+/* ------------ Fixtures/constants ------------ */
 
 var VALID_CONTACT_ID = 3;
 var INVALID_CONTACT_ID = 'z';
@@ -11,12 +11,21 @@ var ContactCollection = Backbone.Collection.extend({
 });
 CRM.Backbone.extendCollection(ContactCollection);
 
-/* ------ Assertions ------ */
+/* ------------ Assertions ------------ */
 
+/**
+ * Assert "result" contains an API error
+ * @param result
+ */
 function assertApiError(result) {
   equal(1, result.is_error, 'Expected error boolean');
   ok(result.error_message.length > 0, 'Expected error message')
 }
+
+/**
+ * When calling an AJAX operation which should return successfully,
+ * make sure that there's no error by setting a callback (error: onUnexpectedError)
+ */
 function onUnexpectedError(ignore, result) {
   if (result && result.error_message) {
     ok(false, "API returned an unexpected error: " + result.error_message);
@@ -25,12 +34,17 @@ function onUnexpectedError(ignore, result) {
   }
   start();
 }
+
+/**
+ * When calling an AJAX operation which should return an error,
+ * make sure that there's no success by setting a callback (success: onUnexpectedSuccess)
+ */
 function onUnexpectedSuccess(ignore) {
   ok(false, "API succeeded - but failure was expected");
   start();
 }
 
-/* ------ Test cases ------ */
+/* ------------ Test cases ------------ */
 
 module('model - read');
 
@@ -56,7 +70,6 @@ asyncTest("fetch (error)", function() {
     }
   });
 });
-
 
 module('model - create');
 
