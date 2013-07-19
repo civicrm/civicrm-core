@@ -533,7 +533,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
 
     $name = NULL;
-    if (isset($params['field_name'][1])) {
+    if (isset($params['field_name'][1]) && isset($this->_selectFields[$params['field_name'][1]])) {
       // we dont get a name for a html formatting element
       $name = $this->_selectFields[$params['field_name'][1]];
     }
