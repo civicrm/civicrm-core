@@ -1177,16 +1177,37 @@ WHERE id={$id}; ";
         //unset the fields, which are not related to their
         //contact type.
         $commonValues = array(
-          'Individual' => array('household_name', 'legal_name', 'sic_code', 'organization_name'),
+          'Individual' => array(
+            'household_name',
+            'legal_name',
+            'sic_code',
+            'organization_name'
+          ),
           'Household' => array(
-            'first_name', 'middle_name', 'last_name', 'job_title',
-            'gender_id', 'birth_date', 'organization_name', 'legal_name',
-            'legal_identifier', 'sic_code', 'home_URL', 'is_deceased',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'job_title',
+            'gender_id',
+            'birth_date',
+            'organization_name',
+            'legal_name',
+            'legal_identifier',
+            'sic_code',
+            'home_URL',
+            'is_deceased',
             'deceased_date',
           ),
           'Organization' => array(
-            'first_name', 'middle_name', 'last_name', 'job_title',
-            'gender_id', 'birth_date', 'household_name', 'is_deceased', 'deceased_date',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'job_title',
+            'gender_id',
+            'birth_date',
+            'household_name',
+            'is_deceased',
+            'deceased_date',
           ),
         );
         foreach ($commonValues[$contactType] as $value) {
@@ -1209,16 +1230,20 @@ WHERE id={$id}; ";
       }
 
       if ($isProfile) {
-        $fields = array_merge($fields, array('group' => array('title' => ts('Group(s)'),
-              'name' => 'group',
-            ),
-            'tag' => array('title' => ts('Tag(s)'),
-              'name' => 'tag',
-            ),
-            'note' => array('title' => ts('Note(s)'),
-              'name' => 'note',
-            ),
-          ));
+        $fields = array_merge($fields, array(
+          'group' => array(
+            'title' => ts('Group(s)'),
+            'name' => 'group',
+          ),
+          'tag' => array(
+            'title' => ts('Tag(s)'),
+            'name' => 'tag',
+          ),
+          'note' => array(
+            'title' => ts('Note(s)'),
+            'name' => 'note',
+          ),
+        ));
       }
 
       //Sorting fields in alphabetical order(CRM-1507)
@@ -1277,7 +1302,6 @@ WHERE id={$id}; ";
       $fields = CRM_Core_BAO_Cache::getItem('contact fields', $cacheKeyString);
 
       if (!$fields) {
-        $fields = array();
         $fields = CRM_Contact_DAO_Contact::export();
 
         // the fields are meant for contact types
@@ -1299,13 +1323,15 @@ WHERE id={$id}; ";
           ));
 
         $locationType = array(
-          'location_type' => array('name' => 'location_type',
+          'location_type' => array(
+            'name' => 'location_type',
             'where' => 'civicrm_location_type.name',
             'title' => ts('Location Type'),
           ));
 
         $IMProvider = array(
-          'im_provider' => array('name' => 'im_provider',
+          'im_provider' => array(
+            'name' => 'im_provider',
             'where' => 'civicrm_im.provider_id',
             'title' => ts('IM Provider'),
           ));
@@ -1358,28 +1384,36 @@ WHERE id={$id}; ";
 
         //fix for CRM-791
         if ($export) {
-          $fields = array_merge($fields, array('groups' => array('title' => ts('Group(s)'),
-                'name' => 'groups',
-              ),
-              'tags' => array('title' => ts('Tag(s)'),
-                'name' => 'tags',
-              ),
-              'notes' => array('title' => ts('Note(s)'),
-                'name' => 'notes',
-              ),
-            ));
+          $fields = array_merge($fields, array(
+            'groups' => array(
+              'title' => ts('Group(s)'),
+              'name' => 'groups',
+            ),
+            'tags' => array(
+              'title' => ts('Tag(s)'),
+              'name' => 'tags',
+            ),
+            'notes' => array(
+              'title' => ts('Note(s)'),
+              'name' => 'notes',
+            ),
+          ));
         }
         else {
-          $fields = array_merge($fields, array('group' => array('title' => ts('Group(s)'),
-                'name' => 'group',
-              ),
-              'tag' => array('title' => ts('Tag(s)'),
-                'name' => 'tag',
-              ),
-              'note' => array('title' => ts('Note(s)'),
-                'name' => 'note',
-              ),
-            ));
+          $fields = array_merge($fields, array(
+            'group' => array(
+              'title' => ts('Group(s)'),
+              'name' => 'group',
+            ),
+            'tag' => array(
+              'title' => ts('Tag(s)'),
+              'name' => 'tag',
+            ),
+            'note' => array(
+              'title' => ts('Note(s)'),
+              'name' => 'note',
+            ),
+          ));
         }
 
         //Sorting fields in alphabetical order(CRM-1507)
@@ -1391,25 +1425,53 @@ WHERE id={$id}; ";
         //unset the field which are not related to their contact type.
         if ($contactType != 'All') {
           $commonValues = array(
-            'Individual' => array('household_name', 'legal_name', 'sic_code', 'organization_name',
-              'email_greeting_custom', 'postal_greeting_custom',
+            'Individual' => array(
+              'household_name',
+              'legal_name',
+              'sic_code',
+              'organization_name',
+              'email_greeting_custom',
+              'postal_greeting_custom',
               'addressee_custom',
             ),
             'Household' => array(
-              'first_name', 'middle_name', 'last_name', 'job_title',
-              'gender_id', 'birth_date', 'organization_name', 'legal_name',
-              'legal_identifier', 'sic_code', 'home_URL', 'is_deceased',
-              'deceased_date', 'current_employer', 'email_greeting_custom',
-              'postal_greeting_custom', 'addressee_custom',
-              'prefix_id', 'suffix_id'
+              'first_name',
+              'middle_name',
+              'last_name',
+              'job_title',
+              'gender_id',
+              'birth_date',
+              'organization_name',
+              'legal_name',
+              'legal_identifier',
+              'sic_code',
+              'home_URL',
+              'is_deceased',
+              'deceased_date',
+              'current_employer',
+              'email_greeting_custom',
+              'postal_greeting_custom',
+              'addressee_custom',
+              'prefix_id',
+              'suffix_id'
             ),
             'Organization' => array(
-              'first_name', 'middle_name', 'last_name', 'job_title',
-              'gender_id', 'birth_date', 'household_name',
+              'first_name',
+              'middle_name',
+              'last_name',
+              'job_title',
+              'gender_id',
+              'birth_date',
+              'household_name',
               'email_greeting_custom',
-              'postal_greeting_custom', 'prefix_id',
-              'suffix_id', 'gender_id', 'addressee_custom',
-              'is_deceased', 'deceased_date', 'current_employer',
+              'postal_greeting_custom',
+              'prefix_id',
+              'suffix_id',
+              'gender_id',
+              'addressee_custom',
+              'is_deceased',
+              'deceased_date',
+              'current_employer',
             ),
           );
           foreach ($commonValues[$contactType] as $value) {
