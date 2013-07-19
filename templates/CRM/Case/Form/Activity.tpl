@@ -300,11 +300,12 @@
   {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
-      cj(document).ready(function() {
+    cj(function() {
     {/literal}
-    CRM.buildCustomData( '{$customDataType}' );
     {if $customDataSubType}
       CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
+      {else}
+      CRM.buildCustomData( '{$customDataType}' );
     {/if}
     {literal}
     });
