@@ -607,10 +607,19 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
+      //special handling for groups/tags
+      $makeException = FALSE;
+      if (in_array($name, array('groups', 'tags'))
+        && isset($this->_returnProperties[substr($name, 0, -1)])
+      ) {
+        $makeException = TRUE;
+      }
+
       $cfID = CRM_Core_BAO_CustomField::getKeyID($name);
       if (
         CRM_Utils_Array::value($name, $this->_paramLookup) ||
-        CRM_Utils_Array::value($name, $this->_returnProperties)
+        CRM_Utils_Array::value($name, $this->_returnProperties) ||
+        $makeException
       ) {
         if ($cfID) {
           // add to cfIDs array if not present
