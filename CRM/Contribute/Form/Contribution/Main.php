@@ -897,9 +897,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     if (isset($fields['selectProduct']) &&
-      $fields['selectProduct'] != 'no_thanks' &&
-      $self->_values['amount_block_is_active']
-    ) {
+      $fields['selectProduct'] != 'no_thanks') {
       $productDAO = new CRM_Contribute_DAO_Product();
       $productDAO->id = $fields['selectProduct'];
       $productDAO->find(TRUE);
