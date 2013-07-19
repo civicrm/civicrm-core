@@ -953,10 +953,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->addRule("{$locationName}[$locationId][address][street_address]", ts("Please enter the Street Address for %1.", array(1 => $title)), 'required');
     }
 
-    $location[$locationId]['address']['supplemental_address_1'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_1]", ts('Additional Address 1'),
+    $location[$locationId]['address']['supplemental_address_1'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_1]", ts('Supplemental Address 1'),
       $attributes['supplemental_address_1']
     );
-    $location[$locationId]['address']['supplemental_address_2'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_2]", ts('Additional Address 2'),
+    $location[$locationId]['address']['supplemental_address_2'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_2]", ts('Supplemental Address 2'),
       $attributes['supplemental_address_2']
     );
 

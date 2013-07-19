@@ -117,8 +117,8 @@ class CRM_Contact_Form_Edit_Address {
     $elements = array(
       'address_name' => array(ts('Address Name'), $attributes['address_name'], NULL),
       'street_address' => array(ts('Street Address'), $attributes['street_address'], NULL),
-      'supplemental_address_1' => array(ts('Addt\'l Address 1'), $attributes['supplemental_address_1'], NULL),
-      'supplemental_address_2' => array(ts('Addt\'l Address 2'), $attributes['supplemental_address_2'], NULL),
+      'supplemental_address_1' => array(ts('Supplmental Address 1'), $attributes['supplemental_address_1'], NULL),
+      'supplemental_address_2' => array(ts('Supplmental Address 2'), $attributes['supplemental_address_2'], NULL),
       'city' => array(ts('City'), $attributes['city'], NULL),
       'postal_code' => array(ts('Zip / Postal Code'), array_merge($attributes['postal_code'], array('class' => 'crm_postal_code')), NULL),
       'postal_code_suffix' => array(ts('Postal Code Suffix'), array('size' => 4, 'maxlength' => 12, 'class' => 'crm_postal_code_suffix'), NULL),
