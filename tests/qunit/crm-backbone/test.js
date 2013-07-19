@@ -224,15 +224,14 @@ asyncTest("fetch by malformed ID (error)", function() {
   });
 });
 
-module('fetchCreate');
+module('findCreate');
 
-asyncTest("fetchCreate by ID (1 result)", function() {
-  var c = new ContactCollection([], {
+asyncTest("findCreate by ID (1 result)", function() {
+  CRM.Backbone.findCreate({
+    CollectionClass: ContactCollection,
     crmCriteria: {
       id: VALID_CONTACT_ID
-    }
-  });
-  c.fetchCreate({
+    },
     error: onUnexpectedError,
     success: function(model) {
       equal(model.get('id'), VALID_CONTACT_ID);
@@ -243,13 +242,12 @@ asyncTest("fetchCreate by ID (1 result)", function() {
   });
 });
 
-asyncTest("fetchCreate by crazy name (0 results) - autocreate", function() {
-  var c = new ContactCollection([], {
+asyncTest("findCreate by crazy name (0 results) - autocreate", function() {
+  CRM.Backbone.findCreate({
+    CollectionClass: ContactCollection,
     crmCriteria: {
       organization_name: 'asdf23vmlk2309lk2lkasdk-23ASDF32f'
-    }
-  });
-  c.fetchCreate({
+    },
     defaults: {
       contact_type: 'Organization'
     },
@@ -263,13 +261,12 @@ asyncTest("fetchCreate by crazy name (0 results) - autocreate", function() {
   });
 });
 
-asyncTest("fetchCreate by malformed ID (error)", function() {
-  var c = new ContactCollection([], {
+asyncTest("findCreate by malformed ID (error)", function() {
+  CRM.Backbone.findCreate({
+    CollectionClass: ContactCollection,
     crmCriteria: {
       id: MALFORMED_CONTACT_ID
-    }
-  });
-  c.fetch({
+    },
     success: onUnexpectedSuccess,
     error: function(collection, error) {
       assertApiError(error);
