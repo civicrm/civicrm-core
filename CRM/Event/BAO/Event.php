@@ -1530,7 +1530,7 @@ WHERE  id = $cfID
                   if (!empty($params[$name . '_time'])) {
                     $customVal = $displayValue = CRM_Utils_Date::customFormat(
                       CRM_Utils_Date::processDate($params[$name], $params[$name . '_time']),
-                      $config->dateformatDateTime);
+                      $config->dateformatDatetime);
                   }
                   $skip = TRUE;
                 }
