@@ -44,13 +44,9 @@ VALUES
    (@option_group_id_activity_type, {localize}'Inbound SMS'{/localize},{localize}'Inbound SMS'{/localize}, (SELECT @max_val := @max_val+1), 'Inbound SMS', (SELECT @max_wt := @max_wt+1), 1, NULL),
    (@option_group_id_activity_type, {localize}'SMS delivery'{/localize},{localize}'SMS delivery'{/localize}, (SELECT @max_val := @max_val+1), 'SMS delivery', (SELECT @max_wt := @max_wt+1), 1, NULL);
 
-{if $multilingual}
-  {foreach from=$locales item=locale}
-    UPDATE civicrm_option_value SET label_{$locale} ='Outbound SMS' WHERE name = 'SMS' and option_group_id = @option_group_id_activity_type;
-  {/foreach}
-{else}
-  UPDATE civicrm_option_value SET label ='Outbound SMS' WHERE name = 'SMS' and option_group_id = @option_group_id_activity_type;
-{/if}
+-- CRM-13015 replaced if $multilingual w/ localize method
+UPDATE `civicrm_option_value` SET {localize field="label"}label = '{ts escape="sql"}Outbound SMS{/ts}'{/localize}
+  WHERE name = 'SMS' and option_group_id = @option_group_id_activity_type;
 
 -- CRM-12689
 ALTER TABLE civicrm_action_schedule
@@ -115,3 +111,17 @@ UPDATE civicrm_navigation
        name = 'Event Name Badge Layouts',
        label= '{ts escape="sql" skip="true"}Event Name Badge Layouts{/ts}'
  WHERE name = 'Event Badge Formats';
+ 
+ UPDATE `civicrm_premiums` SET {localize field="premiums_nothankyou_label"}premiums_nothankyou_label = '{ts escape="sql"}No thank-you{/ts}'{/localize};
+
+
+ -- CRM-13015 Change address option labels from Additional Address to Supplemental Address
+SELECT @option_group_id_addroptions := max(id) from civicrm_option_group where name = 'address_options';
+
+UPDATE civicrm_option_value
+  SET {localize field="label"}label = '{ts escape="sql"}Supplemental Address 1{/ts}'{/localize}
+  WHERE name = 'supplemental_address_1' AND option_group_id = @option_group_id_addroptions;
+  
+UPDATE civicrm_option_value
+  SET {localize field="label"}label = '{ts escape="sql"}Supplemental Address 2{/ts}'{/localize}
+  WHERE name = 'supplemental_address_2' AND option_group_id = @option_group_id_addroptions;

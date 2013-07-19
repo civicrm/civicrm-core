@@ -143,7 +143,7 @@
   </field>
   <field>
        <name>supplemental_address_1</name>
-       <title>Additional Address 1</title>
+       <title>Supplemental Address 1</title>
        <type>varchar</type>
        <length>96</length>
        <import>true</import>
@@ -154,7 +154,7 @@
   </field>
   <field>
        <name>supplemental_address_2</name>
-       <title>Additional Address 2</title>
+       <title>Supplemental Address 2</title>
        <type>varchar</type>
        <length>96</length>
        <import>true</import>
