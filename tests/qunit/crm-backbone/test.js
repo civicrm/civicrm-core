@@ -1,7 +1,7 @@
 /* ------------ Fixtures/constants ------------ */
 
 var VALID_CONTACT_ID = 3;
-var INVALID_CONTACT_ID = 'z';
+var MALFORMED_CONTACT_ID = 'z';
 
 var ContactModel = Backbone.Model.extend({});
 CRM.Backbone.extendModel(ContactModel, 'Contact');
@@ -61,7 +61,7 @@ asyncTest("fetch (ok)", function() {
 });
 
 asyncTest("fetch (error)", function() {
-  var c = new ContactModel({id: INVALID_CONTACT_ID});
+  var c = new ContactModel({id: MALFORMED_CONTACT_ID});
   c.fetch({
     success: onUnexpectedSuccess,
     error: function(model, error) {
@@ -212,7 +212,7 @@ asyncTest("fetch by crazy name (0 results)", function() {
 asyncTest("fetch by malformed ID (error)", function() {
   var c = new ContactCollection([], {
     crmCriteria: {
-      id: INVALID_CONTACT_ID
+      id: MALFORMED_CONTACT_ID
     }
   });
   c.fetch({
@@ -224,3 +224,53 @@ asyncTest("fetch by malformed ID (error)", function() {
   });
 });
 
+module('findCreate');
+
+asyncTest("findCreate by ID (1 result)", function() {
+  CRM.Backbone.findCreate({
+    CollectionClass: ContactCollection,
+    crmCriteria: {
+      id: VALID_CONTACT_ID
+    },
+    error: onUnexpectedError,
+    success: function(model) {
+      equal(model.get('id'), VALID_CONTACT_ID);
+      ok(model.get('contact_type') != '', 'Expected contact with valid type')
+      ok(model.get('id'), 'Expected contact with valid ID')
+      start();
+    }
+  });
+});
+
+asyncTest("findCreate by crazy name (0 results) - autocreate", function() {
+  CRM.Backbone.findCreate({
+    CollectionClass: ContactCollection,
+    crmCriteria: {
+      organization_name: 'asdf23vmlk2309lk2lkasdk-23ASDF32f'
+    },
+    defaults: {
+      contact_type: 'Organization'
+    },
+    error: onUnexpectedError,
+    success: function(model) {
+      equal(model.get('organization_name'), 'asdf23vmlk2309lk2lkasdk-23ASDF32f', 'Expected default values from crmCriteria');
+      equal(model.get('contact_type'), 'Organization', 'Expected default values from parameters');
+      ok(!model.get('id'), 'Expected contact without valid ID')
+      start();
+    }
+  });
+});
+
+asyncTest("findCreate by malformed ID (error)", function() {
+  CRM.Backbone.findCreate({
+    CollectionClass: ContactCollection,
+    crmCriteria: {
+      id: MALFORMED_CONTACT_ID
+    },
+    success: onUnexpectedSuccess,
+    error: function(collection, error) {
+      assertApiError(error);
+      start();
+    }
+  });
+});
