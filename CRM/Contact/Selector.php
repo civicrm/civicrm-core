@@ -1073,9 +1073,16 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
     $properties = array();
     foreach ($returnProperties as $name => $value) {
       if ($name != 'location') {
+        // special handling for group and tag
         if (in_array($name, array('group', 'tag'))) {
           $name = "{$name}s";
         }
+
+        // special handling for notes
+        if (in_array($name, array('note', 'note_subject', 'note_body'))) {
+          $name = "notes";
+        }
+
         $properties[] = $name;
       }
       else {

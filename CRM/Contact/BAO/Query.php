@@ -578,12 +578,10 @@ class CRM_Contact_BAO_Query {
    * @access public
    */
   function selectClause() {
-    $properties = array();
 
     $this->addSpecialFields();
 
     foreach ($this->_fields as $name => $field) {
-
       // skip component fields
       // there are done by the alter query below
       // and need not be done on every field
@@ -607,12 +605,25 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
-      //special handling for groups/tags
+      // make an exception for special cases, to add the field in select clause
       $makeException = FALSE;
-      if (in_array($name, array('groups', 'tags'))
+
+      //special handling for groups/tags
+      if (in_array($name, array('groups', 'tags', 'notes'))
         && isset($this->_returnProperties[substr($name, 0, -1)])
       ) {
         $makeException = TRUE;
+      }
+
+      // since note has 3 different options we need special handling
+      // note / note_subject / note_body
+      if ($name == 'notes') {
+        foreach (array('note', 'note_subject', 'note_body') as $noteField) {
+          if (isset($this->_returnProperties[$noteField])) {
+            $makeException = TRUE;
+            break;
+          }
+        }
       }
 
       $cfID = CRM_Core_BAO_CustomField::getKeyID($name);
