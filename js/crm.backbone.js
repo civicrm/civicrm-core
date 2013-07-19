@@ -43,7 +43,7 @@
         success: function(data) {
           // unwrap data
           var values = _.toArray(data['values']);
-          if (values.length == 1) {
+          if (data.count == 1) {
             options.success(values[0]);
           } else {
             data.is_error = 1;
@@ -65,14 +65,15 @@
           CRM.api(model.crmEntityName, 'create', model.toJSON(), apiOptions);
           break;
         case 'read':
+        case 'delete':
+          var apiAction = (method == 'delete') ? 'delete' : 'get';
           var params = model.toCrmCriteria();
           if (!params.id) {
             apiOptions.error({is_error: 1, error_message: 'Missing ID for ' + model.crmEntityName});
             return;
           }
-          CRM.api(model.crmEntityName, 'get', params, apiOptions);
+          CRM.api(model.crmEntityName, apiAction, params, apiOptions);
           break;
-        case 'delete':
         default:
           apiOptions.error({is_error: 1, error_message: "CRM.Backbone.sync(" + method + ") not implemented for models"});
       }

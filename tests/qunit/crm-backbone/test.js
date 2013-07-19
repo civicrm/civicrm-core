@@ -57,6 +57,70 @@ asyncTest("fetch (error)", function() {
   });
 });
 
+
+module('model - create');
+
+asyncTest("create/read/delete/read (ok)", function() {
+  var TOKEN = new Date().getTime();
+  var c1 = new ContactModel({
+    contact_type: "Individual",
+    first_name: "George" + TOKEN,
+    last_name: "Anon" + TOKEN
+  });
+
+  // Create the new contact
+  c1.save({}, {
+    error: onUnexpectedError,
+    success: function() {
+      equal(c1.get("first_name"), "George"+TOKEN, "save() should return new first name");
+
+      // Fetch the newly created contact
+      var c2 = new ContactModel({id: c1.get('id')});
+      c2.fetch({
+        error: onUnexpectedError,
+        success: function() {
+          equal(c2.get("first_name"), c1.get("first_name"), "fetch() should return first name");
+
+          // Destroy the newly created contact
+          c2.destroy({
+            error: onUnexpectedError,
+            success: function() {
+
+              // Attempt (but fail) to fetch the deleted contact
+              var c3 = new ContactModel({id: c1.get('id')});
+              c3.fetch({
+                success: onUnexpectedSuccess,
+                error: function(model, error) {
+                  assertApiError(error);
+                  start();
+                }
+              }); // fetch
+            }
+          }); // destroy
+        }
+      }); // fetch
+    }
+  }); // save
+});
+
+asyncTest("create (error)", function() {
+  var TOKEN = new Date().getTime();
+  var c1 = new ContactModel({
+    // MISSING: contact_type: "Individual",
+    first_name: "George" + TOKEN,
+    last_name: "Anon" + TOKEN
+  });
+
+  // Create the new contact
+  c1.save({}, {
+    success: onUnexpectedSuccess,
+    error: function(model, error) {
+      assertApiError(error);
+      start();
+    }
+  });
+});
+
 module('model - update');
 
 asyncTest("update (ok)", function() {
