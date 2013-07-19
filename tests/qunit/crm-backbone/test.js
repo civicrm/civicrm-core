@@ -72,7 +72,7 @@ asyncTest("create/read/delete/read (ok)", function() {
   c1.save({}, {
     error: onUnexpectedError,
     success: function() {
-      equal(c1.get("first_name"), "George"+TOKEN, "save() should return new first name");
+      equal(c1.get("first_name"), "George" + TOKEN, "save() should return new first name");
 
       // Fetch the newly created contact
       var c2 = new ContactModel({id: c1.get('id')});

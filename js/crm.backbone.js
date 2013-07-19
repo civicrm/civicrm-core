@@ -11,6 +11,7 @@
    * @param method
    * @param model
    * @param options
+   * @see tests/qunit/crm-backbone
    */
   CRM.Backbone.sync = function(method, model, options) {
     var isCollection = _.isArray(model.models);
@@ -95,6 +96,7 @@
    *
    * @param Class ModelClass
    * @param string crmEntityName APIv3 entity name, such as "Contact" or "CustomField"
+   * @see tests/qunit/crm-backbone
    */
   CRM.Backbone.extendModel = function(ModelClass, crmEntityName) {
     // Defaults - if specified in ModelClass, preserve
@@ -133,6 +135,7 @@
    * @endcode
    *
    * @param Class CollectionClass
+   * @see tests/qunit/crm-backbone
    */
   CRM.Backbone.extendCollection = function(CollectionClass) {
     var origInit = CollectionClass.prototype.initialize;
@@ -168,8 +171,8 @@
     toStrictJSON: function() {
       var schema = this.schema;
       var result = this.toJSON();
-      _.each(result, function(value, key){
-        if (! schema[key]) {
+      _.each(result, function(value, key) {
+        if (!schema[key]) {
           delete result[key];
         }
       });
@@ -179,7 +182,7 @@
       this.rels = this.rels || {};
       if (this.rels[key] != value) {
         this.rels[key] = value;
-        this.trigger("rel:"+key, value);
+        this.trigger("rel:" + key, value);
       }
     },
     getRel: function(key) {
@@ -203,12 +206,12 @@
     },
     _copyToChildren: function() {
       var collection = this;
-      collection.each(function(model){
+      collection.each(function(model) {
         collection._copyToChild(model);
       });
     },
     _copyToChild: function(model) {
-      _.each(this.rels, function(relValue, relKey){
+      _.each(this.rels, function(relValue, relKey) {
         model.setRel(relKey, relValue, {silent: true});
       });
     },
@@ -216,7 +219,7 @@
       this.rels = this.rels || {};
       if (this.rels[key] != value) {
         this.rels[key] = value;
-        this.trigger("rel:"+key, value);
+        this.trigger("rel:" + key, value);
       }
     },
     getRel: function(key) {
