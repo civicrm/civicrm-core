@@ -252,7 +252,7 @@ AND    $operationClause LIMIT 1";
         return FALSE;
       }
     }
-    if ($contactID == $selectedContactID) {
+    if ($contactID == $selectedContactID && CRM_Core_Permission::check('edit my contact')) {
       return TRUE;
     }
     else {
