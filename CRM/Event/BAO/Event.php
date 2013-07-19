@@ -1500,7 +1500,7 @@ WHERE civicrm_event.is_active = 1
           else {
             if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name)) {
               $query = "
-SELECT html_type, data_type, date_format, time_format
+SELECT html_type, data_type
 FROM   civicrm_custom_field
 WHERE  id = $cfID
 ";
@@ -1521,6 +1521,9 @@ WHERE  id = $cfID
                   $customVal = (float )($params[$name]);
                 }
                 elseif ($dao->data_type == 'Date') {
+                  //@todo note the currently we are using default date time formatting. Since you can select/set
+                  // different date and time format specific to custom field we should consider fixing this
+                  // sometime in the future
                   $customVal = $displayValue = CRM_Utils_Date::customFormat(
                     CRM_Utils_Date::processDate($params[$name]), $config->dateformatFull);
 
