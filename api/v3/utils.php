@@ -1474,10 +1474,11 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
     // if value = 'user_contact_id' (or similar), replace value with contact id
     if (!is_numeric($params[$fieldName])) {
       $realContactId = _civicrm_api3_resolve_contactID($params[$fieldName]);
-      if (!is_numeric($realContactId)) {
+      if ('unknown-user' === $realContactId) {
         throw new API_Exception("\"$fieldName\" \"{$params[$fieldName]}\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldName,"type"=>"integer"));
+      } elseif (is_numeric($realContactId)) {
+        $params[$fieldName] = $realContactId;
       }
-      $params[$fieldName] = $realContactId;
     }
     if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
       _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, $fieldInfo);
@@ -1506,7 +1507,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
  * Determine a contact ID using a string expression
  *
  * @param string $contactIdExpr e.g. "user_contact_id" or "@user:username"
- * @return int|NULL
+ * @return int|NULL|'unknown-user'
  */
 function  _civicrm_api3_resolve_contactID($contactIdExpr) {
   //if value = 'user_contact_id' replace value with logged in user id
@@ -1521,12 +1522,12 @@ function  _civicrm_api3_resolve_contactID($contactIdExpr) {
 
     $ufID = $config->userSystem->getUfId($matches[1]);
     if (!$ufID) {
-      return NULL;
+      return 'unknown-user';
     }
 
     $contactID = CRM_Core_BAO_UFMatch::getContactId($ufID);
-    if (!$ufID) {
-      return NULL;
+    if (!$contactID) {
+      return 'unknown-user';
     }
 
     return $contactID;
