@@ -107,6 +107,17 @@ abstract class CRM_Utils_System_Base {
   public abstract function getLoginURL($destination = '');
 
   /**
+   * Determine the native ID of the CMS user
+   *
+   * @param $username
+   * @return int|NULL
+   */
+  function getUfId($username) {
+    $className = get_class($this);
+    throw new CRM_Core_Exception("Not implemented: {$className}->getUfId");
+  }
+
+  /**
    * Set a init session with user object
    *
    * @param array $data  array with user specific data
