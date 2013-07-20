@@ -1470,14 +1470,14 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest) {
  */
 function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $entity) {
   //if fieldname exists in params
-  if (CRM_Utils_Array::value($fieldname, $params)) {
+  if (CRM_Utils_Array::value($fieldName, $params)) {
     // if value = 'user_contact_id' (or similar), replace value with contact id
-    if (!is_numeric($params[$fieldname])) {
-      $realContactId = _civicrm_api3_resolve_contactID($params[$fieldname]);
+    if (!is_numeric($params[$fieldName])) {
+      $realContactId = _civicrm_api3_resolve_contactID($params[$fieldName]);
       if (!is_numeric($realContactId)) {
-        throw new API_Exception("\"$fieldname\" \"{$params[$fieldname]}\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldname,"type"=>"integer"));
+        throw new API_Exception("\"$fieldName\" \"{$params[$fieldName]}\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldName,"type"=>"integer"));
       }
-      $params[$fieldname] = $realContactId;
+      $params[$fieldName] = $realContactId;
     }
     if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
       _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, $fieldInfo);
