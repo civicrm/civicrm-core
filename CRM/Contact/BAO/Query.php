@@ -883,7 +883,6 @@ class CRM_Contact_BAO_Query {
       return;
     }
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
- 
     $processed = array();
     $index = 0;
 
@@ -1035,7 +1034,7 @@ class CRM_Contact_BAO_Query {
           $tName = $name . '-' . $pf . $elementType;
           if (isset($tableName)) {
             if ($tableName == 'civicrm_state_province' || $tableName == 'civicrm_country' || $tableName == 'civicrm_county') {
-              $this->_select["{$tName}_id"] = "`$aName`.{$tableName}_id as `{$tName}_id`";
+              $this->_select["{$tName}_id"] = "{$aName}.{$pf}_id as `{$tName}_id`";
             }
             else {
               $this->_select["{$tName}_id"] = "`$tName`.id as `{$tName}_id`";
@@ -1814,10 +1813,9 @@ class CRM_Contact_BAO_Query {
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     if (substr($name, 0, 14) === 'state_province') {
+      $setTables = FALSE;
       if (isset($locType[1]) && is_numeric($locType[1])) {
-        $setTables = FALSE;
         $aName = "{$locationType[$locType[1]]}-address";
-        $this->_whereTables[$tName] = $this->_tables[$aName];
         $where = "`$aName`.state_province_id";
       }
       else {
@@ -1853,11 +1851,9 @@ class CRM_Contact_BAO_Query {
       }
     }
     elseif (substr($name, 0, 7) === 'country') {
+      $setTables = FALSE;
       if (isset($locType[1]) && is_numeric($locType[1])) {
-        $setTables = FALSE;
-        list($tName, $fldName) = self::getLocationTableName($field['where'], $locType);
         $aName = "{$locationType[$locType[1]]}-address";
-        $this->_whereTables[$tName] = $this->_tables[$aName];
         $where = "`$aName`.country_id";
       }
       else {
@@ -1881,14 +1877,13 @@ class CRM_Contact_BAO_Query {
       }
     }
     elseif (substr($name, 0, 6) === 'county') {
+      $setTables = FALSE;
       if (isset($locType[1]) && is_numeric($locType[1])) {
-        $setTables = FALSE;
         $aName = "{$locationType[$locType[1]]}-address";
-        $this->_whereTables[$tName] = $this->_tables[$aName];
         $where = "`$aName`.county_id";
       }
       else {
-        $where = $field['where'];
+        $where = "civicrm_address.county_id";
       }
 
       $counties = CRM_Core_PseudoConstant::county();
@@ -4956,6 +4951,8 @@ AND   displayRelType.is_active = 1
     $useIDsOnly = FALSE
   ) {
     $qill = $value;
+    $pseudoFields = array('email_greeting', 'postal_greeting', 'addressee', 'gender_id', 'prefix_id', 'suffix_id');
+
     if (is_numeric($value)) {
       $qill = $selectValues[(int ) $value];
     }
@@ -4963,11 +4960,13 @@ AND   displayRelType.is_active = 1
       $values = self::parseSearchBuilderString($value);
       if (is_array($values)) {
         $newValues = array();
+        $intVals = array();
         foreach ($values as $v) {
+          $intVals[] = (int) $v;
           $newValues[] = $selectValues[(int ) $v];
         }
-        $value = $newValues;
-        $qill = implode(', ', $value);
+        $value = (in_array($name, $pseudoFields)) ? $intVals : $newValues;
+        $qill = implode(', ', $newValues);
       }
     }
     else {
@@ -4983,8 +4982,18 @@ AND   displayRelType.is_active = 1
     else {
       $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
     }
-    $this->_where[$grouping][] = self::buildClause($wc, $op, $value, $dataType);
+
+    if (in_array($name, $pseudoFields)) {
+      if (!in_array($name, array('gender_id', 'prefix_id', 'suffix_id'))) {
+        $wc = "contact_a.{$name}_id";
+      }
+      $dataType = 'Positive';
+      $value = (!$value) ? 0 : $value;
+    }
+
     $this->_qill[$grouping][] = $label . " $op '$qill'";
+    $op = (in_array($name, $pseudoFields) && ($op == 'LIKE' || $op == 'RLIKE')) ? '=' : $op;
+    $this->_where[$grouping][] = self::buildClause($wc, $op, $value, $dataType);
   }
 
   /**
