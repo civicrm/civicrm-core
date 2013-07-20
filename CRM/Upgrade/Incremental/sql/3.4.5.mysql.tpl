@@ -25,14 +25,14 @@ ALTER TABLE `civicrm_action_log` CHANGE `repetition_number` `repetition_number` 
 UPDATE civicrm_mailing SET domain_id = {$domainID} WHERE domain_id IS NULL;
 
 -- CRM-8402, CRM-8679
-DELETE et2.* from civicrm_entity_tag et1 
+DELETE et2.* from civicrm_entity_tag et1
 INNER JOIN civicrm_entity_tag et2 ON et1.entity_table = et2.entity_table AND et1.entity_id = et2.entity_id AND et1.tag_id = et2.tag_id
 WHERE et1.id < et2.id;
 
-ALTER TABLE civicrm_entity_tag 
+ALTER TABLE civicrm_entity_tag
 DROP INDEX index_entity;
 
-ALTER TABLE civicrm_entity_tag 
+ALTER TABLE civicrm_entity_tag
 ADD UNIQUE INDEX UI_entity_id_entity_table_tag_id( entity_table, entity_id, tag_id );
 
 -- CRM-8513
@@ -58,19 +58,19 @@ INSERT INTO civicrm_option_value
   (@report_template_gid, {localize}'Pledge Summary Report'{/localize}, 'pledge/summary', 'CRM_Report_Form_Pledge_Summary', @weight := @weight + 1, {localize}'Pledge Summary Report.'{/localize}, 1, @pledgeCompId);
 
 -- CRM-8519
-UPDATE civicrm_payment_processor 
-SET `url_site` = 'https://sec.paymentexpress.com/pxpay/pxpay.aspx' 
-WHERE `url_site` = 'https://www.paymentexpress.com/pxpay/pxpay.aspx' 
+UPDATE civicrm_payment_processor
+SET `url_site` = 'https://sec.paymentexpress.com/pxpay/pxpay.aspx'
+WHERE `url_site` = 'https://www.paymentexpress.com/pxpay/pxpay.aspx'
 OR url_site = 'https://sec2.paymentexpress.com/pxpay/pxpay.aspx';
 
-UPDATE civicrm_payment_processor 
-SET `url_site` = 'https://sec.paymentexpress.com/pxpay/pxaccess.aspx' 
-WHERE `url_site` = 'https://www.paymentexpress.com/pxpay/pxaccess.aspx' 
+UPDATE civicrm_payment_processor
+SET `url_site` = 'https://sec.paymentexpress.com/pxpay/pxaccess.aspx'
+WHERE `url_site` = 'https://www.paymentexpress.com/pxpay/pxaccess.aspx'
 OR url_site = 'https://sec2.paymentexpress.com/pxpay/pxpay/pxaccess.aspx';
 
 UPDATE civicrm_payment_processor_type
 SET url_site_default = 'https://sec.paymentexpress.com/pxpay/pxaccess.aspx',
-    url_site_test_default = 'https://sec.paymentexpress.com/pxpay/pxaccess.aspx' 
+    url_site_test_default = 'https://sec.paymentexpress.com/pxpay/pxaccess.aspx'
 WHERE name = 'Payment_Express';
 
 

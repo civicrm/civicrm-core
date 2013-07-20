@@ -9,15 +9,15 @@ SELECT @max_weight              := MAX(ROUND(weight)) from civicrm_option_value 
 INSERT INTO civicrm_option_value
         (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, {localize field='description'}description{/localize}, is_optgroup, is_reserved, is_active, component_id, visibility_id)
 VALUES
-	(@option_group_id_website, {localize}'Main'{/localize}, @max_value+1, 'Main', NULL, 0, NULL, @max_weight+1, {localize}NULL{/localize}, 0, 0, 1, NULL, NULL);
-	
+  (@option_group_id_website, {localize}'Main'{/localize}, @max_value+1, 'Main', NULL, 0, NULL, @max_weight+1, {localize}NULL{/localize}, 0, 0, 1, NULL, NULL);
+
 -- CRM-6763
-UPDATE civicrm_option_group 
+UPDATE civicrm_option_group
    SET is_reserved = 0
  WHERE civicrm_option_group.name = 'encounter_medium';
 
 -- CRM-6814
-ALTER TABLE `civicrm_note` 
+ALTER TABLE `civicrm_note`
   ADD `privacy` INT( 10 ) NOT NULL COMMENT 'Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)';
 
 UPDATE `civicrm_note` SET `privacy` = '0' WHERE 1;
@@ -40,7 +40,7 @@ UPDATE civicrm_navigation SET url = 'civicrm/admin/contribute/add&reset=1&action
         WHERE civicrm_navigation.name = 'New Contribution Page';
 
 -- CRM-6507
-ALTER TABLE civicrm_participant 
+ALTER TABLE civicrm_participant
    CHANGE role_id role_id varchar(128) collate utf8_unicode_ci NULL default NULL COMMENT 'Participant role ID. Implicit FK to civicrm_option_value where option_group = participant_role.';
 
 --
@@ -73,7 +73,7 @@ CREATE TABLE `civicrm_campaign` (
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-CREATE TABLE `civicrm_campaign_group` ( 
+CREATE TABLE `civicrm_campaign_group` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Campaign Group id.',
   `campaign_id` int unsigned NOT NULL COMMENT 'Foreign key to the activity Campaign.',
   `group_type` enum('Include','Exclude') NULL DEFAULT NULL COMMENT 'Type of Group.',
@@ -84,7 +84,7 @@ CREATE TABLE `civicrm_campaign_group` (
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
-CREATE TABLE `civicrm_survey` ( 
+CREATE TABLE `civicrm_survey` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Campaign Group id.',
   `title` varchar(255) NOT NULL COMMENT 'Title of the Survey.',
   `campaign_id` int unsigned DEFAULT NULL COMMENT 'Foreign key to the activity Campaign.',
@@ -116,13 +116,13 @@ ALTER TABLE `civicrm_activity` ADD `result` VARCHAR( 255 ) CHARACTER SET utf8 CO
 INSERT INTO civicrm_component (name, namespace) VALUES ('CiviCampaign'  , 'CRM_Campaign' );
 
 INSERT INTO civicrm_option_group
-       	(`name`, {localize field='description'}description{/localize}, `is_active`)
+         (`name`, {localize field='description'}description{/localize}, `is_active`)
 VALUES
-	('campaign_type'    , {localize}'Campaign Type'{/localize}     , 1 ),
-   	('campaign_status'  , {localize}'Campaign Status'{/localize}   , 1 );
+  ('campaign_type'    , {localize}'Campaign Type'{/localize}     , 1 ),
+     ('campaign_status'  , {localize}'Campaign Status'{/localize}   , 1 );
 
 --insert values for Compaign Types, Campaign Status and Activity types.
-   
+
 SELECT @option_group_id_campaignType   := max(id) from civicrm_option_group where name = 'campaign_type';
 SELECT @option_group_id_campaignStatus := max(id) from civicrm_option_group where name = 'campaign_status';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -130,14 +130,14 @@ SELECT @campaignCompId                 := max(id) FROM civicrm_component where n
 SELECT @max_campaign_act_val           := MAX(ROUND(value)) from civicrm_option_value where option_group_id = @option_group_id_act;
 SELECT @max_campaign_act_wt            := MAX(ROUND(weight)) from civicrm_option_value where option_group_id = @option_group_id_act;
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `weight`, `is_active`, `component_id` ) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `weight`, `is_active`, `component_id` )
 VALUES
   (@option_group_id_campaignType, {localize}'Direct Mail'{/localize},      1, 'Direct Mail',       1,   1, NULL ),
   (@option_group_id_campaignType, {localize}'Referral Program'{/localize}, 2, 'Referral Program',  2,   1, NULL ),
   (@option_group_id_campaignType, {localize}'Voter Engagement'{/localize}, 3, 'Voter Engagement',  3,   1, NULL ),
 
-  (@option_group_id_campaignStatus, {localize}'Planned'{/localize},        1, 'Planned',           1,   1, NULL ), 
+  (@option_group_id_campaignStatus, {localize}'Planned'{/localize},        1, 'Planned',           1,   1, NULL ),
   (@option_group_id_campaignStatus, {localize}'In Progress'{/localize},    2, 'In Progress',       2,   1, NULL ),
   (@option_group_id_campaignStatus, {localize}'Completed'{/localize},      3, 'Completed',         3,   1, NULL ),
   (@option_group_id_campaignStatus, {localize}'Cancelled'{/localize},      4, 'Cancelled',         4,   1, NULL ),
@@ -154,8 +154,8 @@ SELECT @nav_other_id    := id FROM civicrm_navigation WHERE name = 'Other';
 SELECT @nav_other_wt    := MAX(ROUND(weight)) from civicrm_navigation WHERE parent_id = @nav_other_id;
 
 --insert campaigns permissions in 'Other' navigation menu permissions.
-UPDATE  civicrm_navigation 
-   SET  permission = CONCAT( permission, ',administer CiviCampaign,manage campaign,reserve campaign contacts,release campaign contacts,interview campaign contacts' ) 
+UPDATE  civicrm_navigation
+   SET  permission = CONCAT( permission, ',administer CiviCampaign,manage campaign,reserve campaign contacts,release campaign contacts,interview campaign contacts' )
  WHERE  id = @nav_other_id;
 
 INSERT INTO civicrm_navigation
@@ -167,18 +167,18 @@ SELECT @nav_campaign_id    := id FROM civicrm_navigation WHERE name = 'Campaigns
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES    
+VALUES
     ( @domainID, 'civicrm/campaign&reset=1',        '{ts escape="sql"}Dashboard{/ts}', 'Dashboard', 'administer CiviCampaign', '', @nav_campaign_id, '1', NULL, 1 );
 
 SET @campaigndashboardlastID:=LAST_INSERT_ID();
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES    
-    ( @domainID, 'civicrm/campaign&reset=1&subPage=survey',        '{ts escape="sql"}Surveys{/ts}', 'Survey Dashboard', 'administer CiviCampaign', '', @campaigndashboardlastID, '1', NULL, 1 ), 
+VALUES
+    ( @domainID, 'civicrm/campaign&reset=1&subPage=survey',        '{ts escape="sql"}Surveys{/ts}', 'Survey Dashboard', 'administer CiviCampaign', '', @campaigndashboardlastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/campaign&reset=1&subPage=petition',        '{ts escape="sql"}Petition{/ts}', 'Petition Dashboard', 'administer CiviCampaign', '', @campaigndashboardlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/campaign&reset=1&subPage=campaign',        '{ts escape="sql"}Campaigns{/ts}', 'Campaign Dashboard', 'administer CiviCampaign', '', @campaigndashboardlastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/campaign/add&reset=1',        '{ts escape="sql"}New Campaign{/ts}', 'New Campaign', 'administer CiviCampaign', '', @nav_campaign_id, '1', NULL, 2 ), 
+    ( @domainID, 'civicrm/campaign/add&reset=1',        '{ts escape="sql"}New Campaign{/ts}', 'New Campaign', 'administer CiviCampaign', '', @nav_campaign_id, '1', NULL, 2 ),
     ( @domainID, 'civicrm/survey/add&reset=1',        '{ts escape="sql"}New Survey{/ts}', 'New Survey', 'administer CiviCampaign', '', @nav_campaign_id, '1', NULL, 3 ),
     ( @domainID, 'civicrm/petition/add&reset=1',        '{ts escape="sql"}New Petition{/ts}', 'New Petition', 'administer CiviCampaign', '', @nav_campaign_id, '1', NULL, 4 ),
     ( @domainID, 'civicrm/survey/search&reset=1&op=reserve', '{ts escape="sql"}Reserve Voters{/ts}', 'Reserve Voters', 'administer CiviCampaign,manage campaign,reserve campaign contacts', 'OR', @nav_campaign_id, '1', NULL, 5 ),
@@ -195,16 +195,16 @@ VALUES
 insert into civicrm_option_group (name, is_active) values ('system_extensions', 1 );
 
 -- CRM-6907
-  ALTER TABLE  `civicrm_event` 
-          ADD  `currency` VARCHAR( 3 ) 
-CHARACTER SET  utf8 COLLATE utf8_unicode_ci NULL 
+  ALTER TABLE  `civicrm_event`
+          ADD  `currency` VARCHAR( 3 )
+CHARACTER SET  utf8 COLLATE utf8_unicode_ci NULL
       COMMENT  '3 character string, value from config setting or input via user.';
 
       UPDATE   `civicrm_event` SET `currency` = '{$config->defaultCurrency}';
 
-  ALTER TABLE  `civicrm_contribution_page` 
-          ADD  `currency` VARCHAR( 3 ) 
-CHARACTER SET  utf8 COLLATE utf8_unicode_ci NOT NULL 
+  ALTER TABLE  `civicrm_contribution_page`
+          ADD  `currency` VARCHAR( 3 )
+CHARACTER SET  utf8 COLLATE utf8_unicode_ci NOT NULL
    COMMENT '3  character string, value from config setting or input via user.';
 
       UPDATE   `civicrm_contribution_page` SET `currency` = '{$config->defaultCurrency}';
@@ -213,18 +213,18 @@ CHARACTER SET  utf8 COLLATE utf8_unicode_ci NOT NULL
 ALTER TABLE civicrm_option_value MODIFY COLUMN value varchar(512);
 
 INSERT INTO civicrm_option_group
-       	(`name`, {localize field='description'}description{/localize}, `is_active`)
+         (`name`, {localize field='description'}description{/localize}, `is_active`)
 VALUES
-	('directory_preferences', {localize}'Directory Preferences'{/localize}     , 1 ),
-   	('url_preferences'      , {localize}'URL Preferences'{/localize}   , 1 );
+  ('directory_preferences', {localize}'Directory Preferences'{/localize}     , 1 ),
+     ('url_preferences'      , {localize}'URL Preferences'{/localize}   , 1 );
 
 --insert values for Directory and URL preferences
-   
+
 SELECT @option_group_id_dirPref := max(id) from civicrm_option_group where name = 'directory_preferences';
 SELECT @option_group_id_urlPref := max(id) from civicrm_option_group where name = 'url_preferences';
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `name`, `value`, `weight`, `is_active`, `domain_id` ) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `name`, `value`, `weight`, `is_active`, `domain_id` )
 VALUES
   (@option_group_id_dirPref, {localize}'Temporary Files'{/localize}  , 'uploadDir'          , '', 1, 1, @domainID ),
   (@option_group_id_dirPref, {localize}'Images'{/localize}           , 'imageUploadDir'     , '', 2, 1, @domainID ),
@@ -251,12 +251,12 @@ SELECT @max_weight  := max(ROUND(weight)) from civicrm_option_value WHERE option
 SELECT @caseCompId  := max(id) FROM civicrm_component where name = 'CiviCase';
 
 INSERT INTO civicrm_option_value
-  (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight,{localize field='description'} description{/localize}, is_optgroup,is_reserved, is_active, component_id, visibility_id ) 
+  (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight,{localize field='description'} description{/localize}, is_optgroup,is_reserved, is_active, component_id, visibility_id )
 VALUES
   (@ogrID, {localize}'{ts escape="sql"}Case Detail Report{/ts}'{/localize}, 'case/detail', 'CRM_Report_Form_Case_Detail', NULL, 0, 0, @max_weight+1, {localize}'{ts escape="sql"}Case Details{/ts}'{/localize}, 0, 0, 1, @caseCompId, NULL);
 
 -- CRM-5718
-UPDATE civicrm_contribution_widget 
+UPDATE civicrm_contribution_widget
    SET color_title         = CONCAT( '#', SUBSTRING( color_title, 3 ) ),
        color_button        = CONCAT( '#', SUBSTRING( color_button, 3 ) ),
        color_bar           = CONCAT( '#', SUBSTRING( color_bar, 3 ) ),
@@ -266,7 +266,7 @@ UPDATE civicrm_contribution_widget
        color_bg            = CONCAT( '#', SUBSTRING( color_bg, 3 ) ),
        color_about_link    = CONCAT( '#', SUBSTRING( color_about_link, 3 ) ),
        color_homepage_link = CONCAT( '#', SUBSTRING( color_homepage_link, 3 ) );
- 
+
 
 --CRM-4572
 
@@ -287,13 +287,13 @@ ALTER TABLE civicrm_contact DROP mail_to_household_id;
 INSERT INTO civicrm_uf_group
     (name, group_type, {localize field='title'}title{/localize}, is_reserved ) VALUES
     ('shared_address', 'Contact',  {localize}'Shared Address'{/localize}, 1 );
-    
+
 SELECT @uf_group_id_sharedAddress   := max(id) from civicrm_uf_group where name = 'shared_address';
 
 INSERT INTO civicrm_uf_join
    (is_active,module,entity_table,entity_id,weight,uf_group_id) VALUES
    (1, 'Profile', NULL, NULL, 7, @uf_group_id_sharedAddress );
-   
+
 INSERT INTO civicrm_uf_field
    (uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, {localize field='label'}label{/localize}, field_type, {localize field='help_post'}help_post{/localize}, phone_type_id ) VALUES
    (@uf_group_id_sharedAddress, 'street_address',  0, 0, 1, 'User and User Admin Only',  0, 0, 1, {localize}'Street Address (Home)'{/localize},     'Contact',     {localize}NULL{/localize},  NULL),
@@ -303,11 +303,11 @@ INSERT INTO civicrm_uf_field
    (@uf_group_id_sharedAddress, 'state_province',  0, 0, 5, 'Public Pages and Listings', 1, 1, 1, {localize}'State (Home)'{/localize},       'Contact',     {localize}NULL{/localize},  NULL);
 
 -- CRM-6894
-CREATE TABLE `civicrm_batch` ( 
+CREATE TABLE `civicrm_batch` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Address ID.',
-  `name` varchar(64) DEFAULT NULL COMMENT 'Variable name/programmatic handle for this batch.',  
-  `label` varchar(64) DEFAULT NULL COMMENT 'Friendly Name.',     
-  `description` text COMMENT 'Description of this batch set.',                  
+  `name` varchar(64) DEFAULT NULL COMMENT 'Variable name/programmatic handle for this batch.',
+  `label` varchar(64) DEFAULT NULL COMMENT 'Friendly Name.',
+  `description` text COMMENT 'Description of this batch set.',
   `created_id` int(10) unsigned default NULL COMMENT 'FK to Contact ID',
   `created_date` datetime default NULL COMMENT 'When was this item created',
   `modified_id` int(10) unsigned default NULL COMMENT 'FK to Contact ID',

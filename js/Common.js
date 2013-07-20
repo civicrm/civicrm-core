@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @file: global functions for CiviCRM
@@ -44,10 +44,12 @@ var cj = jQuery;
 function ts(text, params) {
   "use strict";
   text = CRM.strings[text] || text;
-  if (params && typeof(params) === 'object') {
+  if (typeof(params) === 'object') {
     for (var i in params) {
-      // sprintf emulation: escape % characters in the replacements to avoid conflicts
-      text = text.replace(new RegExp('%'+i, 'g'), params[i].replace(/%/g, '%-crmescaped-'));
+      if (typeof(params[i]) === 'string' || typeof(params[i]) === 'number') {
+        // sprintf emulation: escape % characters in the replacements to avoid conflicts
+        text = text.replace(new RegExp('%' + i, 'g'), String(params[i]).replace(/%/g, '%-crmescaped-'));
+      }
     }
     return text.replace(/%-crmescaped-/g, '%');
   }
@@ -66,33 +68,34 @@ function ts(text, params) {
  * @param elementType Value to set display style to for showBlocks (e.g. 'block' or 'table-row' or ...)
  * @return none
  */
-function on_load_init_blocks(showBlocks, hideBlocks, elementType)
-{
-    if ( elementType == null ) {
-        var elementType = 'block';
-    }
+function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
+  if (elementType == null) {
+    var elementType = 'block';
+  }
 
-    /* This loop is used to display the blocks whose IDs are present within the showBlocks array */
-    for ( var i = 0; i < showBlocks.length; i++ ) {
-        var myElement = document.getElementById(showBlocks[i]);
-        /* getElementById returns null if element id doesn't exist in the document */
-        if (myElement != null) {
-            myElement.style.display = elementType;
-        } else {
-            alert('showBlocks array item not in .tpl = ' + showBlocks[i]);
-        }
+  /* This loop is used to display the blocks whose IDs are present within the showBlocks array */
+  for (var i = 0; i < showBlocks.length; i++) {
+    var myElement = document.getElementById(showBlocks[i]);
+    /* getElementById returns null if element id doesn't exist in the document */
+    if (myElement != null) {
+      myElement.style.display = elementType;
     }
+    else {
+      alert('showBlocks array item not in .tpl = ' + showBlocks[i]);
+    }
+  }
 
-    /* This loop is used to hide the blocks whose IDs are present within the hideBlocks array */
-    for ( var i = 0; i < hideBlocks.length; i++ ) {
-        var myElement = document.getElementById(hideBlocks[i]);
-        /* getElementById returns null if element id doesn't exist in the document */
-        if (myElement != null) {
-            myElement.style.display = 'none';
-        } else {
-            alert('showBlocks array item not in .tpl = ' + hideBlocks[i]);
-        }
+  /* This loop is used to hide the blocks whose IDs are present within the hideBlocks array */
+  for (var i = 0; i < hideBlocks.length; i++) {
+    var myElement = document.getElementById(hideBlocks[i]);
+    /* getElementById returns null if element id doesn't exist in the document */
+    if (myElement != null) {
+      myElement.style.display = 'none';
     }
+    else {
+      alert('showBlocks array item not in .tpl = ' + hideBlocks[i]);
+    }
+  }
 }
 
 /**
@@ -107,54 +110,65 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType)
  * @param  field_type           Type of element radio/select
  * @param  invert               Boolean - if true, we HIDE target on value match; if false, we SHOW target on value match
  * @return none
-*/
-function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert ) {
-    if ( target_element_type == null ) {
-        var target_element_type = 'block';
-    } else if ( target_element_type == 'table-row' ) {
-        var target_element_type = '';
+ */
+function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert) {
+  if (target_element_type == null) {
+    var target_element_type = 'block';
+  }
+  else {
+    if (target_element_type == 'table-row') {
+      var target_element_type = '';
+    }
+  }
+
+  if (field_type == 'select') {
+    var trigger = trigger_value.split("|");
+    var selectedOptionValue = document.getElementById(trigger_field_id).options[document.getElementById(trigger_field_id).selectedIndex].value;
+
+    var target = target_element_id.split("|");
+    for (var j = 0; j < target.length; j++) {
+      if (invert) {
+        cj('#' + target[j]).show();
+      }
+      else {
+        cj('#' + target[j]).hide();
+      }
+      for (var i = 0; i < trigger.length; i++) {
+        if (selectedOptionValue == trigger[i]) {
+          if (invert) {
+            cj('#' + target[j]).hide();
+          }
+          else {
+            cj('#' + target[j]).show();
+          }
+        }
+      }
     }
 
-    if (field_type == 'select') {
-        var trigger = trigger_value.split("|");
-        var selectedOptionValue = document.getElementById(trigger_field_id).options[document.getElementById(trigger_field_id).selectedIndex].value;
-
-        var target = target_element_id.split("|");
-        for(var j = 0; j < target.length; j++) {
-            if ( invert ) {
-                cj('#' + target[j]).show();
-            } else {
-                cj('#' + target[j]).hide();
-            }
-            for(var i = 0; i < trigger.length; i++) {
-                if (selectedOptionValue == trigger[i]) {
-                    if ( invert ) {
-                        cj('#' + target[j]).hide();
-                    } else {
-                        cj('#' + target[j]).show();
-                    }
-                }
-            }
+  }
+  else {
+    if (field_type == 'radio') {
+      var target = target_element_id.split("|");
+      for (var j = 0; j < target.length; j++) {
+        if (document.getElementsByName(trigger_field_id)[0].checked) {
+          if (invert) {
+            cj('#' + target[j]).hide();
+          }
+          else {
+            cj('#' + target[j]).show();
+          }
         }
-
-    } else if (field_type == 'radio') {
-        var target = target_element_id.split("|");
-        for(var j = 0; j < target.length; j++) {
-            if (document.getElementsByName(trigger_field_id)[0].checked) {
-                if ( invert ) {
-                    cj('#' + target[j]).hide();
-                } else {
-                    cj('#' + target[j]).show();
-                }
-            } else {
-                if ( invert ) {
-                    cj('#' + target[j]).show();
-                } else {
-                    cj('#' + target[j]).hide();
-                }
-            }
+        else {
+          if (invert) {
+            cj('#' + target[j]).show();
+          }
+          else {
+            cj('#' + target[j]).hide();
+          }
         }
+      }
     }
+  }
 }
 
 /**
@@ -170,49 +184,51 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
  * @return
  */
 function toggleCheckboxVals(fldPrefix, object) {
-    if ( object.id == 'toggleSelect' && cj(object).is(':checked') ) {
-       cj( 'Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').attr('checked', true);
-    } else {
-       cj( 'Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').attr('checked', false);
-    }
-   // change the class of selected rows
-   on_load_init_checkboxes(object.form.name);
+  if (object.id == 'toggleSelect' && cj(object).is(':checked')) {
+    cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').attr('checked', true);
+  }
+  else {
+    cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').attr('checked', false);
+  }
+  // change the class of selected rows
+  on_load_init_checkboxes(object.form.name);
 }
 
 function countSelectedCheckboxes(fldPrefix, form) {
-    fieldCount = 0;
-    for( i=0; i < form.elements.length; i++) {
-        fpLen = fldPrefix.length;
-        if (form.elements[i].type == 'checkbox' && form.elements[i].name.slice(0,fpLen) == fldPrefix && form.elements[i].checked == true) {
-            fieldCount++;
-        }
+  fieldCount = 0;
+  for (i = 0; i < form.elements.length; i++) {
+    fpLen = fldPrefix.length;
+    if (form.elements[i].type == 'checkbox' && form.elements[i].name.slice(0, fpLen) == fldPrefix && form.elements[i].checked == true) {
+      fieldCount++;
     }
-    return fieldCount;
+  }
+  return fieldCount;
 }
 
 /**
  * Function to enable task action select
  */
-function toggleTaskAction( status ) {
-    var radio_ts = document.getElementsByName('radio_ts');
-    if (!radio_ts[1]) {
-        radio_ts[0].checked = true;
-    }
-    if ( radio_ts[0].checked || radio_ts[1].checked ) {
-        status = true;
-    }
+function toggleTaskAction(status) {
+  var radio_ts = document.getElementsByName('radio_ts');
+  if (!radio_ts[1]) {
+    radio_ts[0].checked = true;
+  }
+  if (radio_ts[0].checked || radio_ts[1].checked) {
+    status = true;
+  }
 
-    var formElements = ['task', 'Go', 'Print'];
-    for(var i=0; i<formElements.length; i++ ) {
-        var element = document.getElementById( formElements[i] );
-        if ( element ) {
-            if ( status ) {
-                element.disabled = false;
-            } else {
-                element.disabled = true;
-            }
-        }
+  var formElements = ['task', 'Go', 'Print'];
+  for (var i = 0; i < formElements.length; i++) {
+    var element = document.getElementById(formElements[i]);
+    if (element) {
+      if (status) {
+        element.disabled = false;
+      }
+      else {
+        element.disabled = true;
+      }
     }
+  }
 }
 
 /**
@@ -225,42 +241,47 @@ function toggleTaskAction( status ) {
  * Sample usage: onClick="javascript:checkPerformAction('chk_', myForm );"
  *
  */
-function checkPerformAction (fldPrefix, form, taskButton, selection) {
-    var cnt;
-    var gotTask = 0;
+function checkPerformAction(fldPrefix, form, taskButton, selection) {
+  var cnt;
+  var gotTask = 0;
 
-    // taskButton TRUE means we don't need to check the 'task' field - it's a button-driven task
-    if (taskButton == 1) {
-        gotTask = 1;
-    } else if (document.forms[form].task.selectedIndex) {
-        //force user to select all search contacts, CRM-3711
-        if ( document.forms[form].task.value == 13 || document.forms[form].task.value == 14 ) {
-            var toggleSelect = document.getElementsByName('toggleSelect');
-            if ( toggleSelect[0].checked || document.forms[form].radio_ts[0].checked ) {
-                return true;
-            } else {
-                alert( "Please select all contacts for this action.\n\nTo use the entire set of search results, click the 'all records' radio button." );
-                return false;
-            }
+  // taskButton TRUE means we don't need to check the 'task' field - it's a button-driven task
+  if (taskButton == 1) {
+    gotTask = 1;
+  }
+  else {
+    if (document.forms[form].task.selectedIndex) {
+      //force user to select all search contacts, CRM-3711
+      if (document.forms[form].task.value == 13 || document.forms[form].task.value == 14) {
+        var toggleSelect = document.getElementsByName('toggleSelect');
+        if (toggleSelect[0].checked || document.forms[form].radio_ts[0].checked) {
+          return true;
         }
-        gotTask = 1;
+        else {
+          alert("Please select all contacts for this action.\n\nTo use the entire set of search results, click the 'all records' radio button.");
+          return false;
+        }
+      }
+      gotTask = 1;
+    }
+  }
+
+  if (gotTask == 1) {
+    // If user wants to perform action on ALL records and we have a task, return (no need to check further)
+    if (document.forms[form].radio_ts[0].checked) {
+      return true;
     }
 
-    if (gotTask == 1) {
-        // If user wants to perform action on ALL records and we have a task, return (no need to check further)
-        if (document.forms[form].radio_ts[0].checked) {
-            return true;
-        }
-
-        cnt = (selection == 1) ? countSelections() : countSelectedCheckboxes(fldPrefix, document.forms[form]);
-        if (!cnt) {
-            alert ("Please select one or more contacts for this action.\n\nTo use the entire set of search results, click the 'all records' radio button.");
-            return false;
-        }
-    } else {
-        alert ("Please select an action from the drop-down menu.");
-        return false;
+    cnt = (selection == 1) ? countSelections() : countSelectedCheckboxes(fldPrefix, document.forms[form]);
+    if (!cnt) {
+      alert("Please select one or more contacts for this action.\n\nTo use the entire set of search results, click the 'all records' radio button.");
+      return false;
     }
+  }
+  else {
+    alert("Please select an action from the drop-down menu.");
+    return false;
+  }
 }
 
 /**
@@ -270,14 +291,15 @@ function checkPerformAction (fldPrefix, form, taskButton, selection) {
  * @param chkName - it is name of the checkbox
  * @return null
  */
-function checkSelectedBox( chkName ) {
-    var checkElement = cj('#' + chkName );
-    if ( checkElement.attr('checked') ) {
-        cj('input[value=ts_sel]:radio').attr('checked',true );
-        checkElement.parents('tr').addClass('crm-row-selected');
-    } else {
-        checkElement.parents('tr').removeClass('crm-row-selected');
-    }
+function checkSelectedBox(chkName) {
+  var checkElement = cj('#' + chkName);
+  if (checkElement.attr('checked')) {
+    cj('input[value=ts_sel]:radio').attr('checked', true);
+    checkElement.parents('tr').addClass('crm-row-selected');
+  }
+  else {
+    checkElement.parents('tr').removeClass('crm-row-selected');
+  }
 }
 
 /**
@@ -287,16 +309,15 @@ function checkSelectedBox( chkName ) {
  * @access public
  * @return null
  */
-function on_load_init_checkboxes(form)
-{
-    var formName = form;
-    var fldPrefix = 'mark_x';
-    for( i=0; i < document.forms[formName].elements.length; i++) {
-        fpLen = fldPrefix.length;
-        if (document.forms[formName].elements[i].type == 'checkbox' && document.forms[formName].elements[i].name.slice(0,fpLen) == fldPrefix ) {
-            checkSelectedBox (document.forms[formName].elements[i].name, formName);
-        }
+function on_load_init_checkboxes(form) {
+  var formName = form;
+  var fldPrefix = 'mark_x';
+  for (i = 0; i < document.forms[formName].elements.length; i++) {
+    fpLen = fldPrefix.length;
+    if (document.forms[formName].elements[i].type == 'checkbox' && document.forms[formName].elements[i].name.slice(0, fpLen) == fldPrefix) {
+      checkSelectedBox(document.forms[formName].elements[i].name, formName);
     }
+  }
 }
 
 /**
@@ -308,20 +329,26 @@ function on_load_init_checkboxes(form)
  * @access public
  * @return null
  */
-function changeRowColor (rowid, form) {
-    switch (document.getElementById(rowid).className)   {
-        case 'even-row'          :  document.getElementById(rowid).className = 'selected even-row';
-                                    break;
-        case 'odd-row'           :  document.getElementById(rowid).className = 'selected odd-row';
-                                    break;
-        case 'selected even-row' :  document.getElementById(rowid).className = 'even-row';
-                                    break;
-        case 'selected odd-row'  :  document.getElementById(rowid).className = 'odd-row';
-                                    break;
-        case 'form-item'         :  document.getElementById(rowid).className = 'selected';
-                                    break;
-        case 'selected'          :  document.getElementById(rowid).className = 'form-item';
-    }
+function changeRowColor(rowid, form) {
+  switch (document.getElementById(rowid).className) {
+    case 'even-row'          :
+      document.getElementById(rowid).className = 'selected even-row';
+      break;
+    case 'odd-row'           :
+      document.getElementById(rowid).className = 'selected odd-row';
+      break;
+    case 'selected even-row' :
+      document.getElementById(rowid).className = 'even-row';
+      break;
+    case 'selected odd-row'  :
+      document.getElementById(rowid).className = 'odd-row';
+      break;
+    case 'form-item'         :
+      document.getElementById(rowid).className = 'selected';
+      break;
+    case 'selected'          :
+      document.getElementById(rowid).className = 'form-item';
+  }
 }
 
 /**
@@ -331,18 +358,17 @@ function changeRowColor (rowid, form) {
  * @access public
  * @return null
  */
-function on_load_init_check(form)
-{
-    for( i=0; i < document.forms[form].elements.length; i++) {
-      if ( ( document.forms[form].elements[i].type == 'checkbox'
-                  && document.forms[form].elements[i].checked == true )
-           || ( document.forms[form].elements[i].type == 'hidden'
-               && document.forms[form].elements[i].value == 1 ) ) {
-        var ss = document.forms[form].elements[i].id;
-        var row = 'rowid' + ss;
-        changeRowColor(row, form);
-      }
+function on_load_init_check(form) {
+  for (i = 0; i < document.forms[form].elements.length; i++) {
+    if (( document.forms[form].elements[i].type == 'checkbox'
+      && document.forms[form].elements[i].checked == true )
+      || ( document.forms[form].elements[i].type == 'hidden'
+      && document.forms[form].elements[i].value == 1 )) {
+      var ss = document.forms[form].elements[i].id;
+      var row = 'rowid' + ss;
+      changeRowColor(row, form);
     }
+  }
 }
 
 /**
@@ -353,12 +379,12 @@ function on_load_init_check(form)
  * @return null
  */
 function unselectRadio(fieldName, form) {
-    for( i=0; i < document.forms[form].elements.length; i++) {
-        if (document.forms[form].elements[i].name == fieldName) {
-            document.forms[form].elements[i].checked = false;
-        }
+  for (i = 0; i < document.forms[form].elements.length; i++) {
+    if (document.forms[form].elements[i].name == fieldName) {
+      document.forms[form].elements[i].checked = false;
     }
-    return;
+  }
+  return;
 }
 
 /**
@@ -369,37 +395,39 @@ function unselectRadio(fieldName, form) {
  * @param string procText - button text after user clicks it
  * @return null
  */
-var submitcount=0;
+var submitcount = 0;
 /* Changes button label on submit, and disables button after submit for newer browsers.
-Puts up alert for older browsers. */
-function submitOnce(obj,formId,procText) {
-    // if named button clicked, change text
-    if (obj.value != null) {
-        obj.value = procText + " ...";
+ Puts up alert for older browsers. */
+function submitOnce(obj, formId, procText) {
+  // if named button clicked, change text
+  if (obj.value != null) {
+    obj.value = procText + " ...";
+  }
+  if (document.getElementById) { // disable submit button for newer browsers
+    obj.disabled = true;
+    document.getElementById(formId).submit();
+    return true;
+  }
+  else { // for older browsers
+    if (submitcount == 0) {
+      submitcount++;
+      return true;
     }
-    if (document.getElementById) { // disable submit button for newer browsers
-        obj.disabled = true;
-        document.getElementById(formId).submit();
-        return true;
-    } else { // for older browsers
-        if (submitcount == 0) {
-            submitcount++;
-            return true;
-        } else {
-            alert("Your request is currently being processed ... Please wait.");
-            return false;
-        }
+    else {
+      alert("Your request is currently being processed ... Please wait.");
+      return false;
     }
+  }
 }
 
 function popUp(URL) {
   day = new Date();
-  id  = day.getTime();
+  id = day.getTime();
   eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=0,width=640,height=420,left = 202,top = 184');");
 }
 
-function imagePopUp ( path ) {
-    window.open(path,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no,screenX=150,screenY=150,top=150,left=150');
+function imagePopUp(path) {
+  window.open(path, 'popupWindow', 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no,screenX=150,screenY=150,top=150,left=150');
 }
 
 /**
@@ -407,15 +435,20 @@ function imagePopUp ( path ) {
  *
  * @param element name index, that whose innerHTML is to hide else will show the hidden row.
  */
-function showHideRow( index ) {
-    if ( index ) {
-        cj( 'tr#optionField_' + index ).hide( );
-        if( cj( 'table#optionField tr:hidden:first' ).length )  cj( 'div#optionFieldLink' ).show( );
-    } else {
-        cj( 'table#optionField tr:hidden:first' ).show( );
-        if( ! cj( 'table#optionField tr:hidden:last' ).length ) cj( 'div#optionFieldLink' ).hide( );
+function showHideRow(index) {
+  if (index) {
+    cj('tr#optionField_' + index).hide();
+    if (cj('table#optionField tr:hidden:first').length) {
+      cj('div#optionFieldLink').show();
     }
-    return false;
+  }
+  else {
+    cj('table#optionField tr:hidden:first').show();
+    if (!cj('table#optionField tr:hidden:last').length) {
+      cj('div#optionFieldLink').hide();
+    }
+  }
+  return false;
 }
 
 /**
@@ -423,45 +456,51 @@ function showHideRow( index ) {
  *
  * @param element message JSON object.
  */
-function activityStatus( message ) {
-    var d = new Date(), time = [], i;
-    var currentDateTime = d.getTime()
-    var activityTime    = cj("input#activity_date_time_time").val().replace(":", "");
+function activityStatus(message) {
+  var d = new Date(), time = [], i;
+  var currentDateTime = d.getTime()
+  var activityTime = cj("input#activity_date_time_time").val().replace(":", "");
 
-    //chunk the time in bunch of 2 (hours,minutes,ampm)
-  for(i=0; i<activityTime.length; i+=2 ) {
-        time.push( activityTime.slice( i, i+2 ) );
+  //chunk the time in bunch of 2 (hours,minutes,ampm)
+  for (i = 0; i < activityTime.length; i += 2) {
+    time.push(activityTime.slice(i, i + 2));
+  }
+  var activityDate = new Date(cj("input#activity_date_time_hidden").val());
+
+  d.setFullYear(activityDate.getFullYear());
+  d.setMonth(activityDate.getMonth());
+  d.setDate(activityDate.getDate());
+  var hours = time['0'];
+  var ampm = time['2'];
+
+  if (ampm == "PM" && hours != 0 && hours != 12) {
+    // force arithmetic instead of string concatenation
+    hours = hours * 1 + 12;
+  }
+  else {
+    if (ampm == "AM" && hours == 12) {
+      hours = 0;
     }
-    var activityDate = new Date( cj("input#activity_date_time_hidden").val() );
+  }
+  d.setHours(hours);
+  d.setMinutes(time['1']);
 
-    d.setFullYear(activityDate.getFullYear());
-    d.setMonth(activityDate.getMonth());
-    d.setDate(activityDate.getDate());
-    var hours = time['0'];
-    var ampm  = time['2'];
+  var activity_date_time = d.getTime();
 
-    if (ampm == "PM" && hours != 0 && hours != 12) {
-        // force arithmetic instead of string concatenation
-        hours = hours*1 + 12;
-    } else if (ampm == "AM" && hours == 12) {
-        hours = 0;
+  var activityStatusId = cj('#status_id').val();
+
+  if (activityStatusId == 2 && currentDateTime < activity_date_time) {
+    if (!confirm(message.completed)) {
+      return false;
     }
-    d.setHours(hours);
-    d.setMinutes(time['1']);
-
-    var activity_date_time = d.getTime();
-
-    var activityStatusId = cj('#status_id').val();
-
-    if ( activityStatusId == 2 && currentDateTime < activity_date_time ) {
-        if (! confirm( message.completed )) {
-            return false;
-        }
-    } else if ( activity_date_time && activityStatusId == 1 && currentDateTime >= activity_date_time ) {
-        if (! confirm( message.scheduled )) {
-            return false;
-        }
+  }
+  else {
+    if (activity_date_time && activityStatusId == 1 && currentDateTime >= activity_date_time) {
+      if (!confirm(message.scheduled)) {
+        return false;
+      }
     }
+  }
 }
 
 CRM.strings = CRM.strings || {};
@@ -470,11 +509,11 @@ CRM.validate = CRM.validate || {
   functions: []
 };
 
-(function($, undefined) {
+(function ($, undefined) {
   "use strict";
-  $(document).ready(function() {
+  $(document).ready(function () {
     $().crmtooltip();
-    $('.crm-container table.row-highlight').on('change', 'input.select-row, input.select-rows', function() {
+    $('.crm-container table.row-highlight').on('change', 'input.select-row, input.select-rows', function () {
       var target, table = $(this).closest('table');
       if ($(this).hasClass('select-rows')) {
         target = $('tbody tr', table);
@@ -486,16 +525,17 @@ CRM.validate = CRM.validate || {
       }
       target.toggleClass('crm-row-selected', $(this).is(':checked'));
     });
-    $('#crm-container').live('click', function(event) {
+    $('#crm-container').live('click', function (event) {
       if ($(event.target).is('.btn-slide')) {
-          var currentActive = $('#crm-container .btn-slide-active');
-          currentActive.children().hide();
-          currentActive.removeClass('btn-slide-active');
-          $(event.target).children().show();
-          $(event.target).addClass('btn-slide-active');
-      } else {
-          $('.btn-slide .panel').hide();
-          $('.btn-slide-active').removeClass('btn-slide-active');
+        var currentActive = $('#crm-container .btn-slide-active');
+        currentActive.children().hide();
+        currentActive.removeClass('btn-slide-active');
+        $(event.target).children().show();
+        $(event.target).addClass('btn-slide-active');
+      }
+      else {
+        $('.btn-slide .panel').hide();
+        $('.btn-slide-active').removeClass('btn-slide-active');
       }
     });
   });
@@ -507,57 +547,62 @@ CRM.validate = CRM.validate || {
     var amswidth = $("#crm-container form:has(table.advmultiselect)").width();
     if (amswidth < 700) {
       $("form table.advmultiselect td").css('display', 'block');
-    } else {
+    }
+    else {
       $("form table.advmultiselect td").css('display', 'table-cell');
     }
     var contactwidth = $('#crm-container #mainTabContainer').width();
     if (contactwidth < 600) {
       $('#crm-container #mainTabContainer').addClass('narrowpage');
-      $('#crm-container #mainTabContainer.narrowpage #contactTopBar td').each( function(index) {
+      $('#crm-container #mainTabContainer.narrowpage #contactTopBar td').each(function (index) {
         if (index > 1) {
-          if (index%2 == 0) {
+          if (index % 2 == 0) {
             $(this).parent().after('<tr class="narrowadded"></tr>');
           }
           var item = $(this);
           $(this).parent().next().append(item);
         }
       });
-    } else {
+    }
+    else {
       $('#crm-container #mainTabContainer.narrowpage').removeClass('narrowpage');
-      $('#crm-container #mainTabContainer #contactTopBar tr.narrowadded td').each( function() {
+      $('#crm-container #mainTabContainer #contactTopBar tr.narrowadded td').each(function () {
         var nitem = $(this);
         var parent = $(this).parent();
         $(this).parent().prev().append(nitem);
-        if ( parent.children().size() == 0 ) {
+        if (parent.children().size() == 0) {
           parent.remove();
         }
       });
       $('#crm-container #mainTabContainer.narrowpage #contactTopBar tr.added').detach();
     }
     var cformwidth = $('#crm-container #Contact .contact_basic_information-section').width();
-  
+
     if (cformwidth < 720) {
       $('#crm-container .contact_basic_information-section').addClass('narrowform');
       $('#crm-container .contact_basic_information-section table.form-layout-compressed td .helpicon').parent().addClass('hashelpicon');
       if (cformwidth < 480) {
         $('#crm-container .contact_basic_information-section').addClass('xnarrowform');
-      } else {
+      }
+      else {
         $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
       }
-    } else {
+    }
+    else {
       $('#crm-container .contact_basic_information-section.narrowform').removeClass('narrowform');
       $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
     }
   }
+
   advmultiselectResize();
-  $(window).resize(function() {
+  $(window).resize(function () {
     advmultiselectResize();
   });
 
-  $.fn.crmtooltip = function() {
+  $.fn.crmtooltip = function () {
     $('a.crm-summary-link:not(.crm-processed)')
       .addClass('crm-processed')
-      .on('mouseover', function(e) {
+      .on('mouseover', function (e) {
         $(this).addClass('crm-tooltip-active');
         var topDistance = e.pageY - $(window).scrollTop();
         if (topDistance < 300 | topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
@@ -570,14 +615,14 @@ CRM.validate = CRM.validate || {
             .load(this.href);
         }
       })
-      .on('mouseout', function() {
+      .on('mouseout', function () {
         $(this).removeClass('crm-tooltip-active crm-tooltip-down');
       })
       .on('click', false);
   };
 
   var h;
-  CRM.help = function(title, params) {
+  CRM.help = function (title, params) {
     h && h.close && h.close();
     var options = {
       expires: 0
@@ -609,7 +654,7 @@ CRM.validate = CRM.validate || {
    * @return {*}
    * @see http://wiki.civicrm.org/confluence/display/CRM/Notifications+in+CiviCRM
    */
-  CRM.alert = function(text, title, type, options) {
+  CRM.alert = function (text, title, type, options) {
     type = type || 'alert';
     title = title || '';
     options = options || {};
@@ -627,7 +672,7 @@ CRM.validate = CRM.validate || {
       options = $.extend(extra, options);
       options.expires = options.expires === false ? 0 : parseInt(options.expires, 10);
       if (options.unique && options.unique !== '0') {
-        $('#crm-notification-container .ui-notify-message').each(function() {
+        $('#crm-notification-container .ui-notify-message').each(function () {
           if (title === $('h1', this).html() && text === $('.notify-content', this).html()) {
             $('.icon.ui-notify-close', this).click();
           }
@@ -649,7 +694,7 @@ CRM.validate = CRM.validate || {
    *
    * @param node
    */
-  CRM.closeAlertByChild = function(node) {
+  CRM.closeAlertByChild = function (node) {
     $(node).closest('.ui-notify-message').find('.icon.ui-notify-close').click();
   };
 
@@ -661,26 +706,33 @@ CRM.validate = CRM.validate || {
    * @param options {object|void} Override defaults, keys include 'title', 'message',
    *  see jQuery.dialog for full list of available params
    */
-  CRM.confirm = function(buttons, options) {
+  CRM.confirm = function (buttons, options, cancelLabel) {
     var dialog, callbacks = {};
+    cancelLabel = cancelLabel || ts('Cancel');
     var settings = {
       title: ts('Confirm Action'),
       message: ts('Are you sure you want to continue?'),
       resizable: false,
       modal: true,
-      close: function() {$(dialog).remove();},
+      close: function () {
+        $(dialog).remove();
+      },
       buttons: {}
     };
-    settings.buttons[ts('Cancel')] = function() {dialog.dialog('close');};
+
+    settings.buttons[cancelLabel] = function () {
+      dialog.dialog('close');
+    };
     options = options || {};
     $.extend(settings, options);
     if (typeof(buttons) === 'function') {
       callbacks[ts('Continue')] = buttons;
-    } else {
+    }
+    else {
       callbacks = buttons;
     }
-    $.each(callbacks, function(label, callback) {
-      settings.buttons[label] = function() {
+    $.each(callbacks, function (label, callback) {
+      settings.buttons[label] = function () {
         callback.call(dialog);
         dialog.dialog('close');
       };
@@ -696,7 +748,7 @@ CRM.validate = CRM.validate || {
    * Sets an error message
    * If called for a form item, title and removal condition will be handled automatically
    */
-  $.fn.crmError = function(text, title, options) {
+  $.fn.crmError = function (text, title, options) {
     title = title || '';
     text = text || '';
     options = options || {};
@@ -722,18 +774,20 @@ CRM.validate = CRM.validate || {
     var msg = CRM.alert(text, title, 'error', $.extend(extra, options));
     if ($(this).length) {
       var ele = $(this);
-      setTimeout(function() {ele.one('change', function() {
-        msg && msg.close && msg.close();
-        ele.removeClass('error');
-        label.removeClass('crm-error');
-      });}, 1000);
+      setTimeout(function () {
+        ele.one('change', function () {
+          msg && msg.close && msg.close();
+          ele.removeClass('error');
+          label.removeClass('crm-error');
+        });
+      }, 1000);
     }
     return msg;
   };
 
   // Display system alerts through js notifications
   function messagesFromMarkup() {
-    $('div.messages:visible', this).not('.help').not('.no-popup').each(function() {
+    $('div.messages:visible', this).not('.help').not('.no-popup').each(function () {
       var text, title = '';
       $(this).removeClass('status messages');
       var type = $(this).attr('class').split(' ')[0] || 'alert';
@@ -753,7 +807,7 @@ CRM.validate = CRM.validate || {
       CRM.alert(text, title, type, options);
     });
     // Handle qf form errors
-    $('form :input.error', this).one('blur', function() {
+    $('form :input.error', this).one('blur', function () {
       $('.ui-notify-message.error a.ui-notify-close').click();
       $(this).removeClass('error');
       $(this).next('span.crm-error').remove();
@@ -763,7 +817,7 @@ CRM.validate = CRM.validate || {
     });
   }
 
-  $(function() {
+  $(function () {
     if ($('#crm-notification-container').length) {
       // Initialize notifications
       $('#crm-notification-container').notify();
@@ -772,7 +826,7 @@ CRM.validate = CRM.validate || {
     }
   });
 
-  $.fn.crmAccordions = function(speed) {
+  $.fn.crmAccordions = function (speed) {
     var container = $('#crm-container');
     if (speed === undefined) {
       speed = 200;
@@ -798,8 +852,8 @@ CRM.validate = CRM.validate || {
       container.addClass('crm-accordion-processed');
     }
   };
-  $.fn.crmAccordionToggle = function(speed) {
-    $(this).each(function() {
+  $.fn.crmAccordionToggle = function (speed) {
+    $(this).each(function () {
       if ($(this).hasClass('collapsed')) {
         $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
       }

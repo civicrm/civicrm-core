@@ -69,15 +69,15 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     $transaction = new CRM_Core_Transaction();
 
     $do = new CRM_Core_DAO();
-    $mg = CRM_Mailing_DAO_Group::getTableName();
-    $job = CRM_Mailing_BAO_Job::getTableName();
+    $mg = CRM_Mailing_DAO_MailingGroup::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
     $gc = CRM_Contact_BAO_GroupContact::getTableName();
 
     //We Need the mailing Id for the hook...
-    $do->query("SELECT $job.mailing_id as mailing_id 
-                     FROM   $job 
+    $do->query("SELECT $job.mailing_id as mailing_id
+                     FROM   $job
                      WHERE $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
     $do->fetch();
     $mailing_id = $do->mailing_id;
@@ -95,7 +95,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
                 AND     $group.is_hidden = 0"
     );
 
-    /* Make a list of groups and a list of prior mailings that received 
+    /* Make a list of groups and a list of prior mailings that received
          * this mailing */
 
 
@@ -199,7 +199,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     $config = CRM_Core_Config::singleton();
     $domain = CRM_Core_BAO_Domain::getDomain();
 
-    $jobTable = CRM_Mailing_BAO_Job::getTableName();
+    $jobTable = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
     $contacts = CRM_Contact_DAO_Contact::getTableName();
     $email = CRM_Core_DAO_Email::getTableName();
@@ -209,9 +209,9 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $dao = new CRM_Mailing_BAO_Mailing();
-    $dao->query("   SELECT * FROM $mailingTable 
+    $dao->query("   SELECT * FROM $mailingTable
                         INNER JOIN $jobTable ON
-                            $jobTable.mailing_id = $mailingTable.id 
+                            $jobTable.mailing_id = $mailingTable.id
                         WHERE $jobTable.id = $job");
     $dao->fetch();
 

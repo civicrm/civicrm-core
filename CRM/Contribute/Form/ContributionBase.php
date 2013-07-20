@@ -269,7 +269,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       // also check for billing informatin
       // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::locationType();
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       // CRM-8108 remove ts around Billing location type
       //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
       $this->_bltID = array_search('Billing', $locationTypes);
@@ -330,7 +330,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       // get price info
       // CRM-5095
-      CRM_Price_BAO_Set::initSet($this, $this->_id, 'civicrm_contribution_page');
+      CRM_Price_BAO_PriceSet::initSet($this, $this->_id, 'civicrm_contribution_page');
 
       // this avoids getting E_NOTICE errors in php
       $setNullFields = array(
@@ -716,7 +716,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             );
             $this->_fields[$key] = $field;
           }
-          if ($field['add_captcha']) {
+          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+          if ($field['add_captcha'] && !$this->_userID) {
             $addCaptcha = TRUE;
           }
         }

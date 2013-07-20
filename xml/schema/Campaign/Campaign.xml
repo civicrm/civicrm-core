@@ -8,7 +8,7 @@
 
   <field>
       <name>id</name>
-      <title>Campaign ID</title> 
+      <title>Campaign ID</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>Unique Campaign ID.</comment>
@@ -22,7 +22,7 @@
 
   <field>
       <name>name</name>
-      <title>Campaign Name</title> 
+      <title>Campaign Name</title>
       <type>varchar</type>
       <length>255</length>
       <required>true</required>
@@ -41,16 +41,16 @@
        <add>3.3</add>
   </field>
 
-  <field>        
-      <name>description</name>     
-      <title>Campaign Description</title>  
-      <type>text</type>  
+  <field>
+      <name>description</name>
+      <title>Campaign Description</title>
+      <type>text</type>
       <htmlType>textarea</htmlType>
       <rows>8</rows>
       <cols>60</cols>
       <comment>Full description of Campaign.</comment>
-      <add>3.3</add>     
-  </field> 
+      <add>3.3</add>
+  </field>
 
   <field>
       <name>start_date</name>
@@ -72,29 +72,35 @@
       <add>3.3</add>
   </field>
 
-  <field> 
-      <name>campaign_type_id</name> 
-      <title>Campaign Type ID</title>  
-      <type>int unsigned</type> 
-      <default>NULL</default>                
-      <comment>Campaign Type ID.Implicit FK to civicrm_option_value where option_group = campaign_type</comment> 
+  <field>
+      <name>campaign_type_id</name>
+      <title>Campaign Type ID</title>
+      <type>int unsigned</type>
+      <default>NULL</default>
+      <comment>Campaign Type ID.Implicit FK to civicrm_option_value where option_group = campaign_type</comment>
       <import>true</import>
-      <add>3.3</add> 
-  </field> 
+      <pseudoconstant>
+        <optionGroupName>campaign_type</optionGroupName>
+      </pseudoconstant>
+      <add>3.3</add>
+  </field>
   <index>
       <name>UI_campaign_type_id</name>
       <fieldName>campaign_type_id</fieldName>
       <add>3.3</add>
   </index>
 
-   <field> 
-      <name>status_id</name> 
+   <field>
+      <name>status_id</name>
       <title>Campaign Status ID</title>
       <type>int unsigned</type>
       <default>NULL</default>
       <comment>Campaign status ID.Implicit FK to civicrm_option_value where option_group = campaign_status</comment>
       <import>true</import>
-      <add>3.3</add> 
+      <pseudoconstant>
+        <optionGroupName>campaign_status</optionGroupName>
+      </pseudoconstant>
+      <add>3.3</add>
   </field>
   <index>
       <name>UI_campaign_status_id</name>
@@ -135,13 +141,13 @@
        <onDelete>SET NULL</onDelete>
   </foreignKey>
 
-  <field> 
-      <name>is_active</name> 
+  <field>
+      <name>is_active</name>
       <type>boolean</type>
-      <default>1</default>                
-      <comment>Is this Campaign enabled or disabled/cancelled?</comment> 
-      <add>3.3</add> 
-  </field> 
+      <default>1</default>
+      <comment>Is this Campaign enabled or disabled/cancelled?</comment>
+      <add>3.3</add>
+  </field>
 
   <field>
       <name>created_id</name>
@@ -185,17 +191,17 @@
       <comment>Date and time that Campaign was edited last time.</comment>
       <add>3.3</add>
   </field>
-  <field>        
-      <name>goal_general</name>     
-      <type>text</type>     
-      <title>Campaign Goals</title>  
-      <comment>General goals for Campaign.</comment>
-      <add>3.4</add>     
-  </field>  
   <field>
-      <name>goal_revenue</name> 
-      <type>decimal</type> 
-      <comment>The target revenue for this campaign.</comment> 
-      <add>3.4</add> 
+      <name>goal_general</name>
+      <type>text</type>
+      <title>Campaign Goals</title>
+      <comment>General goals for Campaign.</comment>
+      <add>3.4</add>
+  </field>
+  <field>
+      <name>goal_revenue</name>
+      <type>decimal</type>
+      <comment>The target revenue for this campaign.</comment>
+      <add>3.4</add>
   </field>
 </table>

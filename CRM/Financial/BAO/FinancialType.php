@@ -122,90 +122,44 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @static
    */
   static function del($financialTypeId) {
-    //checking if financial type is present
-    $check = false;
+    $financialType = new CRM_Financial_DAO_FinancialType( );
+    $financialType->id = $financialTypeId;
+    $financialType->find(true);
+    // tables to ingore checks for financial_type_id
+    $ignoreTables = array('CRM_Financial_DAO_EntityFinancialAccount');
 
-    // ensure that we have no objects that have an FK to this financial type id that cannot be null
-    $tables =
-      array(
-        array(
-          'table'  => 'civicrm_contribution',
-          'column' => 'financial_type_id'
-        ),
-        array(
-          'table'  => 'civicrm_contribution_page',
-          'column' => 'financial_type_id'
-        ),
-        array(
-          'table'  => 'civicrm_contribution_recur',
-          'column' => 'financial_type_id'
-        ),
-        array(
-          'table'  => 'civicrm_membership_type',
-          'column' => 'financial_type_id'
-        ),
-        array(
-          'table'  => 'civicrm_pledge',
-          'column' => 'financial_type_id',
-        ),
-        array(
-          'table'  => 'civicrm_grant',
-          'column' => 'financial_type_id',
-        ),
-        array(
-          'table'  => 'civicrm_product',
-          'column' => 'financial_type_id',
-        ),
-        array(
-          'table'  => 'civicrm_event',
-          'column' => 'financial_type_id',
-        ),
-        array(
-          'table'  => 'civicrm_premiums_product',
-          'column' => 'financial_type_id',
-        ),
-        array(
-          'table'  => 'civicrm_price_set',
-          'column' => 'financial_type_id',
-        ),
-        array(
-          'table'  => 'civicrm_price_field_value',
-          'column' => 'financial_type_id',
-        ),
-        array(
-          'table'  => 'civicrm_line_item',
-          'column' => 'financial_type_id',
-        ),
-        array(
-          'table'  => 'civicrm_contribution_product ',
-          'column' => 'financial_type_id',
-        ),
-      );
+    //TODO: if (!$financialType->find(true)) {
 
-    $errors = array();
-    $params = array( 1 => array($financialTypeId, 'Integer'));
-    if (CRM_Core_DAO::doesValueExistInTable( $tables, $params, $errors)) {
-      $message  = ts('The following tables have an entry for this financial type') . ': ';
-      $message .= implode( ', ', array_keys($errors));
+    // ensure that we have no objects that have an FK to this financial type id TODO: that cannot be null
+    $occurrences = $financialType->findReferences();
+    if ($occurrences) {
+      $tables = array();
+      foreach ($occurrences as $occurence) {
+        $className = get_class($occurence);
+        if (!in_array($className, $ignoreTables)) {
+        $tables[] = $className;
+        }
+      }
+      if (!empty($tables)) {
+        $message = ts('The following tables have an entry for this financial type: %1', array('%1' => implode(', ', $tables)));
 
-      $errors = array();
-      $errors['is_error'] = 1;
-      $errors['error_message'] = $message;
-      return $errors;
+        $errors = array();
+        $errors['is_error'] = 1;
+        $errors['error_message'] = $message;
+        return $errors;
+      }
     }
 
     //delete from financial Type table
-    $financialType = new CRM_Financial_DAO_FinancialType( );
-    $financialType->id = $financialTypeId;
     $financialType->delete();
 
     $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount( );
     $entityFinancialType->entity_id = $financialTypeId;
     $entityFinancialType->entity_table = 'civicrm_financial_type';
-    $entityFinancialType ->delete();
+    $entityFinancialType->delete();
     return FALSE;
   }
-  
+
   /**
    * to fetch financial type having relationship as Income Account is
    *
@@ -213,24 +167,24 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return array  all financial type with income account is relationship
    * @static
    */
-  static function getIncomeFinancialType() { 
+  static function getIncomeFinancialType() {
     // Financial Type
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     $revenueFinancialType = array();
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
-    CRM_Core_PseudoConstant::populate( 
+    CRM_Core_PseudoConstant::populate(
       $revenueFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True, 
-      $retrieve = 'entity_id', 
-      $filter = null, 
-      "account_relationship = $relationTypeId AND entity_table = 'civicrm_financial_type' " 
+      $all = True,
+      $retrieve = 'entity_id',
+      $filter = null,
+      "account_relationship = $relationTypeId AND entity_table = 'civicrm_financial_type' "
     );
-            
+
     foreach ($financialType as $key => $financialTypeName) {
       if (!in_array($key, $revenueFinancialType)) {
         unset($financialType[$key]);
-      } 
+      }
     }
     return $financialType;
   }

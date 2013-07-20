@@ -324,6 +324,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     $contactType = array('Individual', 'Household', 'Organization');
     foreach ($contactType as $value) {
       $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required);
+      $contactFields = array_merge($contactFields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
+
       // exclude the address options disabled in the Address Settings
       $fields[$value] = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
 
@@ -467,14 +469,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       $csRelationships = array();
 
       if ($mappingType == 'Export') {
-        $subTypeRelationshipTypes = 
+        $subTypeRelationshipTypes =
           CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $val['parent'],
                                                                    FALSE, 'label', TRUE, $subType);
-        
+
         foreach ($subTypeRelationshipTypes as $key => $var) {
           if (!array_key_exists($key, $fields[$val['parent']])) {
             list($type) = explode('_', $key);
-            
+
             $csRelationships[$key]['title'] = $var;
             $csRelationships[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
             $csRelationships[$key]['export'] = TRUE;
@@ -527,7 +529,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     $mapperKeys = array_keys($mapperFields);
 
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
@@ -565,8 +567,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     $sel3['']    = NULL;
     $sel5['']    = NULL;
-    $phoneTypes  = CRM_Core_PseudoConstant::phoneType();
-    $imProviders = CRM_Core_PseudoConstant::IMProvider();
+    $phoneTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     asort($phoneTypes);
 
     foreach ($sel1 as $k => $sel) {
@@ -1024,7 +1026,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             }
           }
 
-          if ($v[0] == 'Contribution' && substr($fldName, 0, 7) != 'custom_' 
+          if ($v[0] == 'Contribution' && substr($fldName, 0, 7) != 'custom_'
             && substr($fldName, 0, 10) != 'financial_') {
             if (substr($fldName, 0, 13) != 'contribution_') {
               $fldName = 'contribution_' . $fldName;
@@ -1088,7 +1090,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       return $fields;
     }
 
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     foreach ($params['mapper'] as $key => $value) {
       foreach ($value as $k => $v) {
         if (isset($v[1])) {
@@ -1173,7 +1175,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
 
           if (CRM_Utils_Array::value('operator', $params)) {
-            $saveMappingFields->operator = CRM_Utils_Array::value($k, $params['operator'][$key]);            
+            $saveMappingFields->operator = CRM_Utils_Array::value($k, $params['operator'][$key]);
           }
           if (CRM_Utils_Array::value('value', $params)) {
             $saveMappingFields->value = CRM_Utils_Array::value($k, $params['value'][$key]);

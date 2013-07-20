@@ -42,7 +42,7 @@
           {ts}Complete OR partial creator name.{/ts}
       </span>
     </td>
-    <td>
+    <td id="group_type-block">
       {$form.group_type.label}<br />
       {$form.group_type.html}<br />
       <span class="description font-italic">
@@ -157,17 +157,16 @@ function buildGroupSelector( filterSearch ) {
                        );
             if ( filterSearch ) {
                 var groupTypes = '';
-                if ( cj('.crm-group-search-form-block #group_type_1').prop('checked') ) {
-                    groupTypes = '1';
+                cj('#group_type-block input').each(function(index) {
+                if (cj(this).prop('checked')) {
+                  if (groupTypes) {
+                    groupTypes = groupTypes + ',' + cj(this).attr('id').substr(11);
+                  }
+                  else {
+                    groupTypes = cj(this).attr('id').substr(11);
+                  }
                 }
-
-                if ( cj('.crm-group-search-form-block #group_type_2').prop('checked') ) {
-                    if ( groupTypes ) {
-                        groupTypes = groupTypes + ',2';
-                    } else {
-                        groupTypes = groupTypes + '2';
-                    }
-                }
+                });
 
                 var groupStatus = '';
                 if ( cj('.crm-group-search-form-block #group_status_1').prop('checked') ) {

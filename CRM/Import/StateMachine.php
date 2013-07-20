@@ -35,26 +35,25 @@
 
 /**
  * State machine for managing different states of the Import process.
- *
  */
 class CRM_Import_StateMachine extends CRM_Core_StateMachine {
 
   /**
-   * class constructor
+   * Class constructor
    *
-   * @param object  CRM_Import_Controller
+   * @param object  CRM_*_Import_Controller
    * @param int     $action
    *
-   * @return object CRM_Import_StateMachine
    */
-  function __construct(&$controller, $action = CRM_Core_Action::NONE) {
+  function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
+    $classType = str_replace('_Controller', '', get_class($controller));
     $this->_pages = array(
-      'CRM_Import_Form_DataSource' => NULL,
-      'CRM_Import_Form_MapField' => NULL,
-      'CRM_Import_Form_Preview' => NULL,
-      'CRM_Import_Form_Summary' => NULL,
+      $classType . '_Form_DataSource' => NULL,
+      $classType . '_Form_MapField' => NULL,
+      $classType . '_Form_Preview' => NULL,
+      $classType . '_Form_Summary' => NULL,
     );
 
     $this->addSequentialPages($this->_pages, $action);

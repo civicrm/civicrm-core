@@ -120,10 +120,10 @@
        <comment>FK to civicrm_case</comment>
        <add>2.2</add>
   </field>
-  <foreignKey> 
-       <name>case_id</name> 
-       <table>civicrm_case</table> 
-       <key>id</key> 
+  <foreignKey>
+       <name>case_id</name>
+       <table>civicrm_case</table>
+       <key>id</key>
        <add>2.2</add>
        <onDelete>CASCADE</onDelete>
   </foreignKey>

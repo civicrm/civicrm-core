@@ -30,6 +30,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $params;
+  public $_eNoticeCompliant = TRUE;
+
   function setUp() {
     $this->_apiversion = 3;
     $phoneBankActivity = civicrm_api('Option_value', 'Get', array('label' => 'PhoneBank', 'version' => $this->_apiversion, 'sequential' => 1));
@@ -44,7 +46,7 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
     $surveyID = $survey['id'];
     $this->params = array (
                            'version' => $this->_apiversion,
-                           'sequential' =>'1', 
+                           'sequential' =>'1',
                            'survey_id' => $surveyID
                            );
     parent::setUp();
@@ -53,7 +55,7 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   function tearDown() {
     $this->quickCleanup(array('civicrm_survey'));
   }
-  
+
   /**
    * Test surveyRespondent get with wrong params type.
    */
@@ -62,21 +64,13 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
     $GetWrongParamsType = civicrm_api("SurveyRespondant","get", $params );
     $this->assertEquals($GetWrongParamsType['error_message'], 'Input variable `params` is not an array');
   }
- 	
-  /**
-   * Test surveyRespondent get with empty params.
-   */
-  public function testGetEmptyParams() {
-    $params = array();
-    $GetEmptyParams = civicrm_api("SurveyRespondant","get", $params );
-    $this->assertEquals($GetEmptyParams['error_message'], 'Mandatory key(s) missing from params array: version');
-  }
+
   /**
    * Test survey respondent get.
    */
   public function testGetSurveyRespondants() {
     $result = civicrm_api("SurveyRespondant","get", $this->params );
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
     $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
   }

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -189,7 +188,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         }
       }
     }
-    
+
     $rows['Role'] = $roleRows;
 
     //Count the Participant by status ID for Event

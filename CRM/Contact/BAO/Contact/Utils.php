@@ -259,7 +259,7 @@ UNION
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organization) {
+  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL) {
     $organizationId = NULL;
 
     // if organization id is passed.
@@ -317,7 +317,9 @@ UNION
 
 
       // In case we change employer, clean prveovious employer related records.
-      $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
+      if (!$previousEmployerID) {
+        $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
+      }
       if ($previousEmployerID &&
         $previousEmployerID != $organizationId
       ) {
@@ -329,7 +331,7 @@ UNION
 
       $relationshipParams['relationship_ids'] = $relationshipIds;
       // handle related meberships. CRM-3792
-      self::currentEmployerRelatedMembership($contactID, $organizationId, $relationshipParams, $duplicate);
+      self::currentEmployerRelatedMembership($contactID, $organizationId, $relationshipParams, $duplicate, $previousEmployerID);
     }
   }
 
@@ -344,7 +346,7 @@ UNION
    * @access public
    * @static
    */
-  static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE) {
+  static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
     $ids = array();
     $action = CRM_Core_Action::ADD;
 
@@ -365,7 +367,9 @@ UNION
     }
 
     //need to handle related meberships. CRM-3792
-    CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
+    if ($previousEmpID != $employerID) {
+      CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
+    }
   }
 
   /**
@@ -510,11 +514,7 @@ WHERE id={$contactId}; ";
           $form->assign('relatedOrganizationFound', TRUE);
         }
 
-        $isRequired = FALSE;
-        if (CRM_Utils_Array::value('is_for_organization', $form->_values) == 2) {
-          $isRequired = TRUE;
-        }
-        $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name'], $isRequired);
+        $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name'], TRUE);
         break;
 
       case 'Household':
@@ -526,7 +526,7 @@ WHERE id={$contactId}; ";
       default:
         // individual
         $form->addElement('select', 'prefix_id', ts('Prefix'),
-          array('' => ts('- prefix -')) + CRM_Core_PseudoConstant::individualPrefix()
+          array('' => ts('- prefix -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
         );
         $form->addElement('text', 'first_name', ts('First Name'),
           $attributes['first_name']
@@ -538,7 +538,7 @@ WHERE id={$contactId}; ";
           $attributes['last_name']
         );
         $form->addElement('select', 'suffix_id', ts('Suffix'),
-          array('' => ts('- suffix -')) + CRM_Core_PseudoConstant::individualSuffix()
+          array('' => ts('- suffix -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
         );
     }
 
@@ -754,9 +754,11 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
 
         case 'target_sort_name':
           $select[] = "contact_target.sort_name as $property";
-          $from[$value] = "INNER JOIN civicrm_contact contact_source ON ( contact_source.id = $compTable.source_contact_id )
-                                 LEFT JOIN civicrm_activity_target ON (civicrm_activity_target.activity_id = $compTable.id)
-                                 LEFT JOIN civicrm_contact as contact_target ON ( contact_target.id = civicrm_activity_target.target_contact_id )";
+          $from[$value] = "
+INNER JOIN civicrm_contact contact_source ON ( contact_source.id = $compTable.source_contact_id )
+LEFT JOIN civicrm_activity_contact ON (civicrm_activity_contact.activity_id = $compTable.id)
+LEFT JOIN civicrm_contact as contact_target ON ( contact_target.id = civicrm_activity_contact.contact_id )
+";
           break;
 
         case 'email':

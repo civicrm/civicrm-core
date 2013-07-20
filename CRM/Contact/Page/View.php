@@ -203,9 +203,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       'isDeleted' => $isDeleted,
     );
 
-    if (($session->get('userID') == $this->_contactId) ||
-      CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)
-    ) {
+    if (CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/add', "reset=1&action=update&cid={$this->_contactId}");
     }
 
@@ -228,7 +226,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // set page title
     $title = self::setTitle($this->_contactId, $isDeleted);
     $this->assign('title', $title);
-    
+
     // Check if this is default domain contact CRM-10482
     if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactId)) {
       $this->assign('domainContact', TRUE);
@@ -286,7 +284,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // things easier in dashboard
     $session = CRM_Core_Session::singleton();
 
-    if ($session->get('userID') == $contactID) {
+    if ($session->get('userID') == $contactID && CRM_Core_Permission::check('edit my contact')) {
       $page->assign('permission', 'edit');
       $page->_permission = CRM_Core_Permission::EDIT;
       // deleted contacts’ stuff should be (at best) only viewable
@@ -340,14 +338,15 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * Add urls for display in the actions menu
    */
   static function addUrls(&$obj, $cid) {
+    // TODO rewrite without so many hard-coded CMS bits; use abstractions like CRM_Core_Permission::check('cms:...') and CRM_Utils_System
+
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
+    $userRecordUrl = NULL;
     if ($uid) {
-      // To do: we should also allow drupal users with CRM_Core_Permission::check( 'view user profiles' ) true to access $userRecordUrl
-      // but this is currently returning false regardless of permission set for the role. dgg
       if ($config->userSystem->is_drupal == '1' &&
-        ($session->get('userID') == $cid || CRM_Core_Permission::check('administer users'))
+        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account')))
       ) {
         $userRecordUrl = CRM_Utils_System::url('user/' . $uid);
       }
@@ -361,8 +360,11 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
           $userRecordUrl = $config->userFrameworkBaseURL . "index.php?option=com_admin&view=profile&layout=edit&id=" . $uid;
         }
       }
-      else {
-        $userRecordUrl = NULL;
+      // For WordPress, provide link to user profile is contact belongs to logged in user OR user has administrator role
+      elseif ($config->userFramework == 'WordPress' &&
+        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users')))
+        ) {
+          $userRecordUrl = $config->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
       }
       $obj->assign('userRecordUrl', $userRecordUrl);
       $obj->assign('userRecordId', $uid);

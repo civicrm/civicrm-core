@@ -55,7 +55,10 @@ class CRM_Core_DAO extends DB_DataObject {
   // special value for mail bulk inserts to avoid
   // potential duplication, assuming a smaller number reduces number of queries
   // by some factor, so some tradeoff. CRM-8678
-  BULK_MAIL_INSERT_COUNT = 10;
+  BULK_MAIL_INSERT_COUNT = 10,
+  QUERY_FORMAT_WILDCARD = 1,
+  QUERY_FORMAT_NO_QUOTES = 2;
+
   /*
    * Define entities that shouldn't be created or deleted when creating/ deleting
    *  test objects - this prevents world regions, countries etc from being added / deleted
@@ -190,20 +193,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @access protected
    */
   function initialize() {
-    $links = $this->links();
-    if (empty($links)) {
-      return;
-    }
-
     $this->_connect();
-
-    if (!isset($GLOBALS['_DB_DATAOBJECT']['LINKS'][$this->_database])) {
-      $GLOBALS['_DB_DATAOBJECT']['LINKS'][$this->_database] = array();
-    }
-
-    if (!array_key_exists($this->__table, $GLOBALS['_DB_DATAOBJECT']['LINKS'][$this->_database])) {
-      $GLOBALS['_DB_DATAOBJECT']['LINKS'][$this->_database][$this->__table] = $links;
-    }
   }
 
   /**
@@ -240,12 +230,13 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * returns list of FK relationships
    *
+   * @static
    * @access public
    *
-   * @return array
+   * @return array of CRM_Core_EntityReference
    */
-  function links() {
-    return NULL;
+  static function getReferenceColumns() {
+    return array();
   }
 
   /**
@@ -272,9 +263,6 @@ class CRM_Core_DAO extends DB_DataObject {
         }
       }
     }
-
-    // set the links
-    $this->links();
 
     return $table;
   }
@@ -980,10 +968,17 @@ FROM   civicrm_domain
             $item[1] == 'Memo' ||
             $item[1] == 'Link'
           ) {
-            if (isset($item[2]) &&
-              $item[2]
-            ) {
-              $item[0] = "'%{$item[0]}%'";
+            // Support class constants stipulating wildcard characters and/or
+            // non-quoting of strings. Also support legacy code which may be
+            // passing in TRUE or 1 for $item[2], which used to indicate the
+            // use of wildcard characters.
+            if (!empty($item[2])) {
+              if ($item[2] & CRM_Core_DAO::QUERY_FORMAT_WILDCARD || $item[2] === TRUE) {
+                $item[0] = "'%{$item[0]}%'";
+              }
+              elseif (!($item[2] & CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)) {
+                $item[0] = "'{$item[0]}'";
+              }
             }
             else {
               $item[0] = "'{$item[0]}'";
@@ -1275,12 +1270,10 @@ SELECT contact_id
       'CRM_Core_DAO_Domain',
     );
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-
     for ($i = 0; $i < $numObjects; ++$i) {
 
       ++$counter;
-      $object   = new $daoName ( );
+      $object = new $daoName();
 
       $fields = &$object->fields();
       foreach ($fields as $name => $value) {
@@ -1323,21 +1316,13 @@ SELECT contact_id
 
             continue;
           }
-          $constant = CRM_Utils_Array::value('pseudoconstant', $value);
-          if (!empty($constant)) {
-            $constantValues = CRM_Utils_PseudoConstant::getConstant($constant['name']);
-            if (!empty($constantValues)) {
-              $constantOptions = array_keys($constantValues);
-              $object->$dbName = $constantOptions[0];
-            }
+          // Pick an option value if needed
+          $options = $daoName::buildOptions($dbName);
+          if ($options) {
+            $object->$dbName = key($options);
             continue;
           }
-          $enum = CRM_Utils_Array::value('enumValues', $value);
-          if (!empty($enum)) {
-            $options = explode(',', $enum);
-            $object->$dbName = $options[0];
-            continue;
-          }
+
           switch ($value['type']) {
             case CRM_Utils_Type::T_INT:
             case CRM_Utils_Type::T_FLOAT:
@@ -1682,30 +1667,70 @@ SELECT contact_id
   }
 
   /**
-   * Check the tables sent in, to see if there are any tables where there is a value for
-   * a column
+   * Find all records which refer to this entity.
    *
-   * This is typically used when we want to delete a row, but want to avoid the FK errors
-   * that it might cause due to this being a required FK
-   *
-   * @param array an array of values (tableName, columnName)
-   * @param array the parameter array with the value and type
-   * @param array (reference) the tables which had an entry for this value
-   *
-   * @return boolean true if no value exists in all the tables
-   * @static
+   * @return array of objects referencing this
    */
-  public static function doesValueExistInTable(&$tables, $params, &$errors) {
-    $errors = array();
-    foreach ($tables as $table) {
-      $sql = "SELECT count(*) FROM {$table['table']} WHERE {$table['column']} = %1";
-      $count = self::singleValueQuery($sql, $params);
-      if ($count > 0) {
-        $errors[$table['table']] = $count;
+  function findReferences() {
+    $links = self::getReferencesToTable(static::getTableName());
+
+    $occurrences = array();
+    foreach ($links as $refSpec) {
+      $refColumn = $refSpec->getReferenceKey();
+      $targetColumn = $refSpec->getTargetKey();
+      $params = array(1 => array($this->$targetColumn, 'String'));
+      $sql = <<<EOS
+SELECT id
+FROM {$refSpec->getReferenceTable()}
+WHERE {$refColumn} = %1
+EOS;
+      if ($refSpec->isGeneric()) {
+        $params[2] = array(static::getTableName(), 'String');
+        $sql .= <<<EOS
+    AND {$refSpec->getTypeColumn()} = %2
+EOS;
+      }
+      $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
+      $result = self::executeQuery($sql, $params, TRUE, $daoName);
+      while ($result->fetch()) {
+        $obj = new $daoName();
+        $obj->id = $result->id;
+        $occurrences[] = $obj;
       }
     }
 
-    return (empty($errors)) ? FALSE : TRUE;
+    return $occurrences;
+  }
+
+  /**
+   * List all tables which have hard foreign keys to this table.
+   *
+   * For now, this returns a description of every entity_id/entity_table
+   * reference.
+   * TODO: filter dynamic entity references on the $tableName, based on
+   * schema metadata in dynamicForeignKey which enumerates a restricted
+   * set of possible entity_table's.
+   *
+   * @param string $tableName table referred to
+   *
+   * @return array structure of table and column, listing every table with a
+   * foreign key reference to $tableName, and the column where the key appears.
+   */
+  static function getReferencesToTable($tableName) {
+    $refsFound = array();
+    foreach (CRM_Core_DAO_AllCoreTables::getClasses() as $daoClassName) {
+      $links = $daoClassName::getReferenceColumns();
+      $daoTableName = $daoClassName::getTableName();
+
+      foreach ($links as $refSpec) {
+        if ($refSpec->getTargetTable() === $tableName
+              or $refSpec->isGeneric()
+        ) {
+          $refsFound[] = $refSpec;
+        }
+      }
+    }
+    return $refsFound;
   }
 
   /**
@@ -1727,5 +1752,63 @@ SELECT contact_id
       return $default;
     }
   }
+
+  /**
+   * Get options for the called BAO object's field.
+   * This function can be overridden by each BAO to add more logic related to context.
+   * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
+   *
+   * @param string $fieldName
+   * @param string $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param array  $props: whatever is known about this bao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    // If a given bao does not override this function
+    $baoName = get_called_class();
+    return CRM_Core_PseudoConstant::get($baoName, $fieldName, array(), $context);
+  }
+
+  /**
+   * Populate option labels for this object's fields.
+   *
+   * @throws exception if called directly on the base class
+   */
+  public function getOptionLabels() {
+    $fields = $this->fields();
+    if ($fields === NULL) {
+      throw new exception ('Cannot call getOptionLabels on CRM_Core_DAO');
+    }
+    foreach ($fields as $field) {
+      $name = CRM_Utils_Array::value('name', $field);
+      if ($name && isset($this->$name)) {
+        $label = CRM_Core_PseudoConstant::getValue(get_class($this), $name, $this->$name);
+        if ($label !== FALSE) {
+          // Append 'label' onto the field name
+          $labelName = $name . '_label';
+          $this->$labelName = $label;
+        }
+      }
+    }
+  }
+
+  /**
+   * Provides documentation and validation for the buildOptions $context param
+   *
+   * @param String $context
+   */
+  public static function buildOptionsContext($context = NULL) {
+    $contexts = array(
+      'get' => "All options are returned, even if they are disabled. Labels are translated.",
+      'create' => "Options are filtered appropriately for the object being created/updated. Labels are translated.",
+      'search' => "Searchable options are returned. Labels are translated.",
+      'validate' => "All options are returned, even if they are disabled. Machine names are used in place of labels.",
+    );
+    // Validation: enforce uniformity of this param
+    if ($context !== NULL && !isset($contexts[$context])) {
+      throw new exception("'$context' is not a valid context for buildOptions.");
+    }
+    return $contexts;
+  }
+
 }
 

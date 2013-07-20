@@ -119,7 +119,7 @@ class CRM_Event_Form_EventFees {
       list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults();
     }
 
-    //CRM-11601 we should keep the record contribution 
+    //CRM-11601 we should keep the record contribution
     //true by default while adding participant
      if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent) {
       $defaults[$form->_pId]['record_contribution'] = 1;
@@ -193,12 +193,12 @@ class CRM_Event_Form_EventFees {
     else {
       $discountId = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
     }
-    
+
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
     }
     else {
-      $priceSetId = CRM_Price_BAO_Set::getFor('civicrm_event', $form->_eventId);
+      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $form->_eventId);
     }
 
     if (($form->_action == CRM_Core_Action::ADD) && $form->_eventId && $discountId) {
@@ -221,7 +221,7 @@ class CRM_Event_Form_EventFees {
           $defaults[$form->_pId] = array_merge($defaults[$form->_pId], $priceSetValues);
         }
       }
-              
+
       if ($form->_action == CRM_Core_Action::ADD && CRM_Utils_Array::value('fields', $form->_priceSet)) {
         foreach ($form->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
@@ -291,7 +291,7 @@ class CRM_Event_Form_EventFees {
     }
 
     // get price set ID.
-    $priceSetID = CRM_Price_BAO_Set::getFor('civicrm_event', $eventID);
+    $priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID);
     if (!$priceSetID) {
       return $defaults;
     }

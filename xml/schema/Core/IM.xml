@@ -60,10 +60,13 @@
       <type>int unsigned</type>
       <comment>Which IM Provider does this screen name belong to.</comment>
       <add>1.1</add>
+      <pseudoconstant>
+        <optionGroupName>instant_messenger_service</optionGroupName>
+      </pseudoconstant>
   </field>
   <index>
     <name>UI_provider_id</name>
-    <fieldName>provider_id</fieldName>    
+    <fieldName>provider_id</fieldName>
     <add>1.6</add>
   </index>
   <field>

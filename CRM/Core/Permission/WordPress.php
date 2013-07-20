@@ -46,6 +46,17 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
    * @access public
    */
   function check($str) {
+    // Generic cms 'administer users' role tranlates to 'administrator' WordPress role
+    $str = $this->translatePermission($str, 'WordPress', array(
+      'administer users' => 'administrator',
+    ));
+    if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
+      return FALSE;
+    }
+    if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
+      return TRUE;
+    }
+
     // for administrators give them all permissions
     if (!function_exists('current_user_can')) {
       return TRUE;

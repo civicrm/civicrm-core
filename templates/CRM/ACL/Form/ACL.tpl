@@ -104,7 +104,7 @@
          </td>
      </tr>
    </table>
-    <div class="status message">{ts}NOTE: For Event ACLs, the 'View' operation allows access to the event information screen. "Edit" allows users to register for the event if online registration is enabled.{/ts}<br /> 
+    <div class="status message">{ts}NOTE: For Event ACLs, the 'View' operation allows access to the event information screen. "Edit" allows users to register for the event if online registration is enabled.{/ts}<br />
     {if $config->userSystem->is_drupal EQ '1'}
     {ts}Please remember that Drupal's "register for events" permission overrides CiviCRM's control over event information access.{/ts}
     {/if}

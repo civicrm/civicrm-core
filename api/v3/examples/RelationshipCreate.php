@@ -4,15 +4,16 @@
  
  */
 function relationship_create_example(){
-$params = array( 
+$params = array(
   'contact_id_a' => 27,
   'contact_id_b' => 28,
-  'relationship_type_id' => 18,
+  'relationship_type_id' => 19,
   'start_date' => '2010-10-30',
   'end_date' => '2010-12-30',
   'is_active' => 1,
   'note' => 'note',
   'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'relationship','create',$params );
@@ -25,15 +26,24 @@ $params = array(
  */
 function relationship_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
-          'moreIDs' => '1',
+          'contact_id_a' => '27',
+          'contact_id_b' => '28',
+          'relationship_type_id' => '19',
+          'start_date' => '20101030000000',
+          'end_date' => '20101230000000',
+          'is_active' => '1',
+          'description' => '',
+          'is_permission_a_b' => 0,
+          'is_permission_b_a' => 0,
+          'case_id' => '',
         ),
     ),
 );

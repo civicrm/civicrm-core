@@ -34,7 +34,7 @@
  */
 
 /**
- * Dummy page for details of demographics 
+ * Dummy page for details of demographics
  *
  */
 class CRM_Contact_Page_Inline_Demographics extends CRM_Core_Page {
@@ -58,20 +58,20 @@ class CRM_Contact_Page_Inline_Demographics extends CRM_Core_Page {
     CRM_Contact_BAO_Contact::getValues( $params, $defaults );
 
     if (CRM_Utils_Array::value('gender_id', $defaults)) {
-      $gender = CRM_Core_PseudoConstant::gender();
+      $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
       $defaults['gender_display'] = $gender[CRM_Utils_Array::value('gender_id', $defaults)];
     }
 
     $this->assign('contactId', $contactId);
     $this->assign($defaults);
-    
+
     //for birthdate format with respect to birth format set
     $this->assign('birthDateViewFormat', CRM_Utils_Array::value('qfMapping', CRM_Utils_Date::checkBirthDateFormat()));
 
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);
-    
-    // finally call parent 
+
+    // finally call parent
     parent::run();
   }
 }

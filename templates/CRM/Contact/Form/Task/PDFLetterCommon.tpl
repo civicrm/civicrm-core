@@ -27,8 +27,16 @@
 {if $form.template.html}
 <table class="form-layout-compressed">
     <tr>
-        <td class="label-left">{$form.template.label}</td>
+      <td class="label-left">{$form.template.label}</td>
       <td>{$form.template.html}</td>
+    </tr>
+    <tr>
+      <td class="label-left">{$form.subject.label}</td>
+      <td>{$form.subject.html}</td>
+    </tr>
+    <tr>
+      <td class="label-left">{$form.campaign_id.label}</td>
+      <td>{$form.campaign_id.html}</td>
     </tr>
 </table>
 {/if}
@@ -90,7 +98,7 @@
     <div class="clear"></div>
     <div class='html'>
   {if $editor EQ 'textarea'}
-      <div class="help description">{ts}NOTE: If you are composing HTML-formatted messages, you may want to enable a Rich Text (WYSIWYG) editor (Administer &raquo; Configure &raquo; Global Settings &raquo; Site Preferences).{/ts}</div>
+      <div class="help description">{ts}NOTE: If you are composing HTML-formatted messages, you may want to enable a Rich Text (WYSIWYG) editor (Administer &raquo; Customize Data & Screens &raquo; Display Preferences).{/ts}</div>
   {/if}
   {$form.html_message.html}<br />
     </div>

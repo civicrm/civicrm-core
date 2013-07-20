@@ -106,7 +106,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($productID) {
       CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, FALSE, $productID, $option);
     }
-    if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config')) {
+    if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->assign('lineItem', $this->_lineItem);
     } else {
       if (is_array($membershipTypeID)) {
@@ -128,8 +128,8 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->assign('honor_block_is_active', $honor_block_is_active);
       $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
 
-      $prefix = CRM_Core_PseudoConstant::individualPrefix();
-      $honor = CRM_Core_PseudoConstant::honor();
+      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
       $this->assign('honor_type', $honor[$params["honor_type_id"]]);
       $this->assign('honor_prefix', ($params["honor_prefix_id"]) ? $prefix[$params["honor_prefix_id"]] : ' ');
       $this->assign('honor_first_name', $params["honor_first_name"]);
@@ -254,7 +254,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $this->_submitValues = array_merge($this->_submitValues, $defaults);
     $this->setDefaults($defaults);
-    
+
     $values['entity_id'] = $this->_id;
     $values['entity_table'] = 'civicrm_contribution_page';
 

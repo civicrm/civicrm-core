@@ -54,8 +54,7 @@ class CRM_Dedupe_Finder {
     $rgBao->id         = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
-        //FIXME:
-      CRM_Core_Error::fatal("$level rule for $ctype does not exist");
+      CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
     }
 
     $rgBao->fillTable();
@@ -82,7 +81,7 @@ class CRM_Dedupe_Finder {
    *
    * @param array  $params  array of params of the form $params[$table][$field] == $value
    * @param string $ctype   contact type to match against
-   * @param string $used    dedupe rule group usage ('Unsupervised' or 'Supervised' or 'General')  
+   * @param string $used    dedupe rule group usage ('Unsupervised' or 'Supervised' or 'General')
    * @param array  $except  array of contacts that shouldn't be considered dupes
    * @param int    $ruleGroupID the id of the dedupe rule we should be using
    *

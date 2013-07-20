@@ -657,7 +657,7 @@ class CRM_Core_SelectValues {
         'is_bulkmail', 'group', 'tag', 'contact_sub_type', 'note',
         'is_deceased', 'deceased_date', 'legal_identifier', 'contact_sub_type', 'user_unique_id',
       );
-      $customFields        = array();
+
       $customFields        = CRM_Core_BAO_CustomField::getFields('Individual');
       $customFieldsAddress = CRM_Core_BAO_CustomField::getFields('Address');
       $customFields        = $customFields + $customFieldsAddress;
@@ -694,6 +694,44 @@ class CRM_Core_SelectValues {
       }
     }
 
+    return $tokens;
+  }
+
+  /**
+   * different type of Participant Tokens
+   *
+   * @static
+   * return array
+   */
+  static function &participantTokens() {
+    static $tokens = NULL;
+    if (!$tokens) {
+      $exportFields = CRM_Event_BAO_Participant::exportableFields();
+
+      $values = array_merge(array_keys($exportFields));
+      unset($values[0]);
+
+      // skipping some tokens for time being.
+      $skipTokens = array(
+        'event_id', 'participant_is_pay_later', 'participant_is_test', 'participant_contact_id',
+        'participant_fee_currency', 'participant_campaign_id', 'participant_status', 'participant_discount_name',
+      );
+
+      $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
+
+      foreach ($values as $key => $val) {
+        if (in_array($val, $skipTokens)) {
+          continue;
+        }
+        //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
+        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($val)) {
+          $tokens["{participant.$val}"] = CRM_Utils_Array::value($customFieldId, $customFields) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
+        }
+        else {
+          $tokens["{participant.$val}"] = $exportFields[$val]['title'];
+        }
+      }
+    }
     return $tokens;
   }
 
@@ -810,6 +848,21 @@ class CRM_Core_SelectValues {
         $numericOptions[$i] = $i;
     }
     return $numericOptions;
+  }
+
+  /**
+   * barcode types
+   * @static
+   */
+  static function getBarcodeTypes() {
+    static $barcodeTypes = NULL;
+    if (!$barcodeTypes) {
+      $barcodeTypes = array(
+        'barcode' => ts('Linear (1D)'),
+        'qrcode' => ts('QR code'),
+      );
+    }
+    return $barcodeTypes;
   }
 }
 

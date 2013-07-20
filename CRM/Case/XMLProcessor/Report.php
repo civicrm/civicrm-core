@@ -225,13 +225,17 @@ AND    ac.case_id = %1
         $joinCaseActivity = " INNER JOIN civicrm_case_activity ca ON a.id = ca.activity_id ";
       }
 
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+      $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+      $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+
       $query = "
-SELECT     a.*, aa.assignee_contact_id as assigneeID, at.target_contact_id as targetID
+SELECT     a.*, aa.contact_id as assigneeID, at.contact_id as targetID
 {$selectCaseActivity}
 FROM       civicrm_activity a
 {$joinCaseActivity}
-LEFT JOIN civicrm_activity_target at ON a.id = at.activity_id
-LEFT JOIN civicrm_activity_assignment aa ON a.id = aa.activity_id
+LEFT JOIN civicrm_activity_contact at ON a.id = at.activity_id AND at.record_type_id = $targetID
+LEFT JOIN civicrm_activity_contact aa ON a.id = aa.activity_id AND aa.record_type_id = $assigneeID
 WHERE      a.id = %1
     ";
       $params = array(1 => array($activityID, 'Integer'));
@@ -297,10 +301,13 @@ WHERE      a.id = %1
       );
     }
 
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     if (!empty($activityDAO->targetID)) {
       // Re-lookup the target ID since the DAO only has the first recipient if there are multiple.
       // Maybe not the best solution.
-      $targetNames   = CRM_Activity_BAO_ActivityTarget::getTargetNames($activityDAO->id);
+      $targetNames   = CRM_Activity_BAO_ActivityContact::getNames($activityDAO->id, $targetID);
       $processTarget = FALSE;
       $label         = ts('With Contact(s)');
       if (in_array($activityTypeInfo['name'], array('Email', 'Inbound Email'))) {
@@ -366,9 +373,11 @@ WHERE      a.id = %1
       'value' => $this->redact($creator),
       'type' => 'String',
     );
-
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $source_contact_id = CRM_Activity_BAO_Activity::getActivityContact($activityDAO->id, $sourceID);
     $reporter = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $activityDAO->source_contact_id,
+      $source_contact_id,
       'display_name'
     );
 
@@ -396,7 +405,7 @@ WHERE      a.id = %1
 
     if (!empty($activityDAO->assigneeID)) {
       //allow multiple assignee contacts.CRM-4503.
-      $assignee_contact_names = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityDAO->id, TRUE);
+        $assignee_contact_names = CRM_Activity_BAO_ActivityContact::getNames($activityDAO->id, $assigneeID, TRUE);
 
       foreach ($assignee_contact_names as & $assignee) {
         // add Assignee to the strings to be redacted across the case session

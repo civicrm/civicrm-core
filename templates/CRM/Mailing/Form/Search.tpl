@@ -32,7 +32,7 @@
     </tr>
     <tr>
         <td>
-	    <label>{if $sms eq 1}{ts}SMS Date{/ts}{else}{ts}Mailing Date{/ts}{/if}</label>
+      <label>{if $sms eq 1}{ts}SMS Date{/ts}{else}{ts}Mailing Date{/ts}{/if}</label>
   </td>
     </tr>
     <tr>

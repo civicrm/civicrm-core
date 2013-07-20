@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -42,10 +40,20 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
   protected $_phoneField = FALSE;
   protected $_charts = array('' => 'Tabular');
   protected $_customGroupExtends = array(
-    'Membership'); 
+    'Membership');
   public $_drilldownReport = array('member/detail' => 'Link to Detail Report');
-  
+
   function __construct() {
+
+    // Check if CiviCampaign is a) enabled and b) has active campaigns
+    $config = CRM_Core_Config::singleton();
+    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    if ($campaignEnabled) {
+      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
+      $this->activeCampaigns = $getCampaigns['campaigns'];
+      asort($this->activeCampaigns);
+    }
+
     // UI for selecting columns to appear in the report list
     // array conatining the columns, group_bys and filters build and provided to Form
     $this->_columns = array(
@@ -190,6 +198,18 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
       ),
     );
 
+    // If we have a campaign, build out the relevant elements
+    if ($campaignEnabled && !empty($this->activeCampaigns)) {
+      $this->_columns['civicrm_membership']['fields']['campaign_id'] = array(
+        'title' => 'Campaign',
+        'default' => 'false',
+      );
+      $this->_columns['civicrm_membership']['filters']['campaign_id'] = array('title' => ts('Campaign'),
+        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'options' => $this->activeCampaigns,
+      );
+    }
+
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -240,35 +260,35 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
 
     $this->_from = "
         FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-              INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']} 
-                         ON {$this->_aliases['civicrm_contact']}.id = 
+              INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
+                         ON {$this->_aliases['civicrm_contact']}.id =
                             {$this->_aliases['civicrm_membership']}.contact_id AND {$this->_aliases['civicrm_membership']}.is_test = 0
               LEFT  JOIN civicrm_membership_status {$this->_aliases['civicrm_membership_status']}
-                         ON {$this->_aliases['civicrm_membership_status']}.id = 
+                         ON {$this->_aliases['civicrm_membership_status']}.id =
                             {$this->_aliases['civicrm_membership']}.status_id
-              LEFT  JOIN civicrm_membership_type {$this->_aliases['civicrm_membership_type']} 
+              LEFT  JOIN civicrm_membership_type {$this->_aliases['civicrm_membership_type']}
                          ON {$this->_aliases['civicrm_membership']}.membership_type_id =
                             {$this->_aliases['civicrm_membership_type']}.id";
 
     //  include address field if address column is to be included
     if ($this->_addressField) {
       $this->_from .= "
-            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
+            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
 
     // include email field if email column is to be included
     if ($this->_emailField) {
       $this->_from .= "
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} 
+            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
 
     // include phone field if phone column is to be included
     if ($this->_phoneField) {
       $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']} 
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id 
+            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id
                      AND {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
     }
   }
@@ -414,6 +434,14 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Membership Detail for this Contact.");
+      }
+
+      // If using campaigns, convert campaign_id to campaign title
+      if (array_key_exists('civicrm_membership_campaign_id', $row)) {
+        if ($value = $row['civicrm_membership_campaign_id']) {
+          $rows[$rowNum]['civicrm_membership_campaign_id'] = $this->activeCampaigns[$value];
+        }
+        $entryFound = TRUE;
       }
 
       // skip looking further in rows, if first row itself doesn't

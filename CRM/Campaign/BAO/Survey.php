@@ -140,7 +140,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
       elseif ($sortParams['sort'] == 'activity_type') {
         $orderOnSurveyTable = FALSE;
         $lookupTableJoins = "
- LEFT JOIN civicrm_option_value activity_type ON ( activity_type.value = survey.activity_type_id 
+ LEFT JOIN civicrm_option_value activity_type ON ( activity_type.value = survey.activity_type_id
                                                    OR survey.activity_type_id IS NULL )
 INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id AND grp.name = 'activity_type' )";
         $orderByClause = "ORDER BY activity_type.label {$sortParams['sortOrder']}";
@@ -389,7 +389,7 @@ SELECT  survey.id    as id,
     }
     $reportId = CRM_Campaign_BAO_Survey::getReportID($id);
     if($reportId){
-      CRM_Report_BAO_Instance::delete($reportId);
+      CRM_Report_BAO_ReportInstance::del($reportId);
     }
     $dao = new CRM_Campaign_DAO_Survey();
     $dao->id = $id;
@@ -463,7 +463,7 @@ SELECT  survey.id    as id,
       $whereClause  = "contact.id IN (" . implode(',', $voterIds) . ')';
 
       $query = "
-  SELECT  contact.id as contactId, $selectClause 
+  SELECT  contact.id as contactId, $selectClause
     FROM  $fromClause
    WHERE  $whereClause
 Group By  contact.id";
@@ -516,18 +516,23 @@ Group By  contact.id";
     }
 
     $targetContactIds = ' ( ' . implode(',', $voterIds) . ' ) ';
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
-    $query = " 
-    SELECT  activity.id, activity.status_id, 
-            activityTarget.target_contact_id as voter_id,
-            activityAssignment.assignee_contact_id as interviewer_id
+    $query = "
+    SELECT  activity.id, activity.status_id,
+            activityTarget.contact_id as voter_id,
+            activityAssignment.contact_id as interviewer_id
       FROM  civicrm_activity activity
-INNER JOIN  civicrm_activity_target activityTarget ON ( activityTarget.activity_id = activity.id )
-INNER JOIN  civicrm_activity_assignment activityAssignment ON ( activityAssignment.activity_id = activity.id )
+INNER JOIN  civicrm_activity_contact activityTarget
+  ON ( activityTarget.activity_id = activity.id AND activityTarget.record_type_id = $targetID )
+INNER JOIN  civicrm_activity_contact activityAssignment
+  ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
      WHERE  activity.source_record_id = %1
        AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
-       AND  activityAssignment.assignee_contact_id = %2
-       AND  activityTarget.target_contact_id IN {$targetContactIds} 
+       AND  activityAssignment.contact_id = %2
+       AND  activityTarget.contact_id IN {$targetContactIds}
             $whereClause";
 
     $activity = CRM_Core_DAO::executeQuery($query, array(1 => array($surveyId, 'Integer'),
@@ -571,11 +576,11 @@ INNER JOIN  civicrm_activity_assignment activityAssignment ON ( activityAssignme
     }
 
     if ($interviewerId) {
-      $where[] = "( activityAssignment.assignee_contact_id =  $interviewerId )";
+      $where[] = "( activityAssignment.contact_id =  $interviewerId )";
     }
 
     if (!empty($voterIds)) {
-      $where[] = "( activityTarget.target_contact_id IN ( " . implode(',', $voterIds) . " ) )";
+      $where[] = "( activityTarget.contact_id IN ( " . implode(',', $voterIds) . " ) )";
     }
 
     $whereClause = NULL;
@@ -593,20 +598,26 @@ INNER JOIN  civicrm_activity_assignment activityAssignment ON ( activityAssignme
     }
     else {
       $select = "
-    SELECT  activity.id, activity.status_id, 
-            activityTarget.target_contact_id as voter_id,
-            activityAssignment.assignee_contact_id as interviewer_id,
+    SELECT  activity.id, activity.status_id,
+            activityTarget.contact_id as voter_id,
+            activityAssignment.contact_id as interviewer_id,
             activity.result as result,
             activity.activity_date_time as activity_date_time,
             contact_a.display_name as voter_name";
     }
 
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
     $query = "
             $select
       FROM  civicrm_activity activity
-INNER JOIN  civicrm_activity_target activityTarget ON ( activityTarget.activity_id = activity.id )
-INNER JOIN  civicrm_activity_assignment activityAssignment ON ( activityAssignment.activity_id = activity.id )
-INNER JOIN  civicrm_contact contact_a ON ( activityTarget.target_contact_id = contact_a.id )
+INNER JOIN  civicrm_activity_contact activityTarget
+  ON ( activityTarget.activity_id = activity.id AND activityTarget.record_type_id = $targetID )
+INNER JOIN  civicrm_activity_contact activityAssignment
+  ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
+INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a.id )
      WHERE  activity.source_record_id = %1
        AND  activity.activity_type_id = %2
        AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
@@ -675,7 +686,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.target_contact_id = co
   }
 
   /**
-   * This function retrieve all option groups which are created as a result set 
+   * This function retrieve all option groups which are created as a result set
    *
    * @return $resultSets an array of option groups.
    * @static
@@ -694,7 +705,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.target_contact_id = co
   }
 
   /**
-   * This function is to check survey activity.  
+   * This function is to check survey activity.
    *
    * @param int $activityId activity id.
    * @param int $activityTypeId activity type id.
@@ -793,7 +804,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.target_contact_id = co
     if (CRM_Core_Permission::check('access CiviReport')) {
       $reportID = self::getReportID($surveyId);
       if ($reportID) {
-        $voterLinks['report'] = 
+        $voterLinks['report'] =
           array(
                 'name' => 'report',
                 'url'  => "civicrm/report/instance/{$reportID}",
@@ -846,14 +857,14 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.target_contact_id = co
         'entity_table' => 'civicrm_survey',
         'module' => 'CiviCampaign',
       );
-      
+
       list($first, $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       if ($first) {
-        $ufIds[$surveyId] = array($first);        
+        $ufIds[$surveyId] = array($first);
       }
       if ($second) {
-        $ufIds[$surveyId][] = array_shift($second);        
+        $ufIds[$surveyId][] = array_shift($second);
       }
     }
 
@@ -995,12 +1006,14 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.target_contact_id = co
     }
 
     $interviewers = array();
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $query = "
-    SELECT  contact.id as id, 
+    SELECT  contact.id as id,
             contact.sort_name as sort_name
-      FROM  civicrm_contact contact 
-INNER JOIN  civicrm_activity_assignment assignment ON ( assignment.assignee_contact_id = contact.id )
+      FROM  civicrm_contact contact
+INNER JOIN civicrm_activity_contact assignment ON ( assignment.contact_id = contact.id AND record_type_id = $assigneeID )
 INNER JOIN  civicrm_activity activity ON ( activity.id = assignment.activity_id )
 INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
             {$whereClause}";
@@ -1028,14 +1041,14 @@ INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
     $releasedCount = 0;
     if ($reserveStatusId && !empty($surveyActivityTypesIds)) {
       $query = '
-    SELECT  activity.id as id, 
+    SELECT  activity.id as id,
             activity.activity_date_time as activity_date_time,
             survey.id as surveyId,
             survey.release_frequency as release_frequency
       FROM  civicrm_activity activity
-INNER JOIN  civicrm_survey survey ON ( survey.id = activity.source_record_id ) 
-     WHERE  activity.is_deleted = 0 
-       AND  activity.status_id = %1 
+INNER JOIN  civicrm_survey survey ON ( survey.id = activity.source_record_id )
+     WHERE  activity.is_deleted = 0
+       AND  activity.status_id = %1
        AND  activity.activity_type_id IN ( ' . implode(', ', $surveyActivityTypesIds) . ' )';
       $activity = CRM_Core_DAO::executeQuery($query, array(1 => array($reserveStatusId, 'Positive')));
       $releasedIds = array();

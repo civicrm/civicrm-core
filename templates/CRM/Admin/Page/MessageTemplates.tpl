@@ -26,7 +26,7 @@
 {capture assign=crmURL}{crmURL p='civicrm/admin/messageTemplates/add' q="action=add&reset=1"}{/capture}
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Admin/Form/MessageTemplates.tpl"}
-   
+
 {elseif $action eq 4}
   {* View a system default workflow template *}
 
@@ -49,7 +49,7 @@
       </div>
     </div>
   </div>
-  
+
   <div class="crm-section msg_txt-section">
   <h3 class="header-dark">{$form.msg_text.label}</h3>
     <div class="text">
@@ -80,7 +80,7 @@
       {$form.pdf_format_id.html}
     </div>
   </div>
-    
+
   <div id="crm-submit-buttons">{$form.buttons.html}</div>
   </fieldset>
 {/if}
@@ -92,7 +92,7 @@
       <li id='tab_user'>    <a href='#user'     title='{ts}User-driven Messages{/ts}'>    {ts}User-driven Messages{/ts}    </a></li>
       <li id='tab_workflow'><a href='#workflow' title='{ts}System Workflow Messages{/ts}'>{ts}System Workflow Messages{/ts}</a></li>
     </ul>
-  
+
     {* create two selector tabs, first being the ‘user’ one, the second being the ‘workflow’ one *}
     {include file="CRM/common/enableDisable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
@@ -141,7 +141,7 @@
               </div>
               <div class="spacer"></div>
             {/if}
-            
+
             {if empty( $template_row) }
                 <div class="messages status no-popup">
                     <div class="icon inform-icon"></div>&nbsp;

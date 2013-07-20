@@ -364,7 +364,7 @@ class CRM_Core_Block {
 
         foreach ($components as $componentName => $obj) {
           if (in_array($componentName, $config->enableComponents)) {
-            eval('$obj->creatNewShortcut( $shortCuts, $newCredit );');
+            $obj->creatNewShortcut($shortCuts, $newCredit);
           }
         }
       }

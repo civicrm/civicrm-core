@@ -51,7 +51,7 @@ class CRM_Utils_Request {
 
   /**
    * class constructor
-   */ 
+   */
   function __construct() {}
 
   /**

@@ -86,7 +86,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_contribution',
       'civicrm_line_item',
       'civicrm_website',
-      'civicrm_relationship'
+      'civicrm_relationship',
+      'civicrm_uf_match',
     );
 
     $this->quickCleanup($tablesToTruncate);
@@ -171,9 +172,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'contact_type' => 'Does not Exist',
       'version' => $this->_apiversion,
     );
-    $contact = civicrm_api('contact', 'create', $params);
-    $this->assertEquals($contact['is_error'], 1, "In line " . __LINE__);
-    $this->assertEquals('contact_type `Does not Exist` is not valid.', $contact['error_message']);
+    $result = $this->callAPIFailure('contact', 'create', $params);
+    $this->assertEquals("'Does not Exist' is not a valid option for field contact_type", $result['error_message']);
   }
 
   /**
@@ -353,20 +353,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contact['id'], "In line " . __LINE__);
 
     // delete the contact
-    civicrm_api('contact', 'delete', $contact);
+    $this->callAPISuccess('contact', 'delete', $contact);
   }
   /**
-   *  Verify that attempt to create organization contact with only
-   *  organization name succeeds
+   *  Verify that attempt to create organization contact without organization name fails
    */
   function testCreateNoNameOrganization() {
     $params = array(
       'first_name' => 'The abc Organization',
       'contact_type' => 'Organization',
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('contact', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], "In line " . __LINE__);
+    $result = $this->callAPIFailure('contact', 'create', $params);
   }
   /**
    * check with complete array + custom field
@@ -391,6 +388,21 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
   }
+
+  /**
+   * CRM-12773 - expectation is that civicrm quietly ignores
+   * fields without values
+   */
+  function testCreateWithNULLCustomCRM12773() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params = $this->_params;
+    $params['custom_' . $ids['custom_field_id']] = NULL;
+    $result = civicrm_api('contact', 'create', $params);
+    $this->assertAPISuccess($result, ' in line ' . __LINE__);
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+  }
+
 
   /*
    * Test creating a current employer through API
@@ -773,8 +785,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('contact', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], "In line " . __LINE__);
+    $result = $this->callAPIFailure('contact', 'create', $params);
   }
   /**
    *  Verify that attempt to create individual contact with first
@@ -886,8 +897,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('contact', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], 'should fail due to missing household name on line ' . __LINE__);
+    $result = $this->callAPIFailure('contact', 'create', $params);
   }
 
   /**
@@ -1311,7 +1321,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
                         'email'            => 'man2@yahoo.com',
                         'contact_type'     => 'Individual',
                         'location_type_id' => 1,
-                        'version' 				=> $this->_apiversion,
+                        'version'         => $this->_apiversion,
                         'api.contribution.create'    => array(
 
                              'receive_date'           => '2010-01-01',
@@ -1365,6 +1375,62 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // delete the contact
     civicrm_api('contact', 'delete', $contact);
+  }
+
+  /**
+   * Test for Contact.get id=@user:username
+   */
+  function testContactGetByUsername() {
+    // setup - create contact with a uf-match
+    $cid = $this->individualCreate(array(
+      'contact_type' => 'Individual',
+      'first_name' => 'testGetByUsername',
+      'last_name' => 'testGetByUsername',
+    ));
+
+    $ufMatchParams = array(
+      'domain_id' => CRM_Core_Config::domainID(),
+      'uf_id' => 99,
+      'uf_name' => 'the-email-matching-key-is-not-really-the-username',
+      'contact_id' => $cid,
+    );
+    $ufMatch = CRM_Core_BAO_UFMatch::create($ufMatchParams);
+    $this->assertTrue(is_numeric($ufMatch->id));
+
+    // setup - mock the calls to CRM_Utils_System_*::getUfId
+    $userSystem = $this->getMock('CRM_Utils_System_UnitTests', array('getUfId'));
+    $userSystem->expects($this->once())
+      ->method('getUfId')
+      ->with($this->equalTo('exampleUser'))
+      ->will($this->returnValue(99));
+    CRM_Core_Config::singleton()->userSystem = $userSystem;
+
+    // perform a lookup
+    $result = $this->callAPISuccess('Contact', 'get', array(
+      'version' => 3,
+      'id' => '@user:exampleUser',
+    ));
+    $this->assertEquals('testGetByUsername', $result['values'][$cid]['first_name']);
+  }
+
+  /**
+   * Test for Contact.get id=@user:username (with an invalid username)
+   */
+  function testContactGetByUnknownUsername() {
+    // setup - mock the calls to CRM_Utils_System_*::getUfId
+    $userSystem = $this->getMock('CRM_Utils_System_UnitTests', array('getUfId'));
+    $userSystem->expects($this->once())
+      ->method('getUfId')
+      ->with($this->equalTo('exampleUser'))
+      ->will($this->returnValue(NULL));
+    CRM_Core_Config::singleton()->userSystem = $userSystem;
+
+    // perform a lookup
+    $result = $this->callAPIFailure('Contact', 'get', array(
+      'version' => 3,
+      'id' => '@user:exampleUser',
+    ));
+    $this->assertRegExp('/cannot be resolved to a contact ID/', $result['error_message']);
   }
 
   /**
@@ -1720,8 +1786,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
-    $result = civicrm_api('contact', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], 'lacking permissions should not be enough to create a contact');
+    $result = $this->callAPIFailure('contact', 'create', $params);
     $this->assertEquals('API permission check failed for contact/create call; missing permission: add contacts.', $result['error_message'], 'lacking permissions should not be enough to create a contact');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'import contacts');
@@ -1736,8 +1801,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = array('id' => $result['id'], 'contact_type' => 'Individual', 'last_name' => 'Bar', 'check_permissions' => TRUE, 'version' => $this->_apiversion);
 
     $config->userPermissionClass->permissions = array('access CiviCRM');
-    $result = civicrm_api('contact', 'update', $params);
-    $this->assertEquals(1, $result['is_error'], 'lacking permissions should not be enough to update a contact');
+    $result = $this->callAPIFailure('contact', 'update', $params);
     $this->assertEquals('API permission check failed for contact/update call; missing permission: edit all contacts.', $result['error_message'], 'lacking permissions should not be enough to update a contact');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'view all contacts', 'edit all contacts', 'import contacts');

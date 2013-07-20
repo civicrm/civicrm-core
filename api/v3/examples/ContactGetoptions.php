@@ -4,7 +4,7 @@
  Demonstrates retrieving options for a custom field
  */
 function contact_getoptions_example(){
-$params = array( 
+$params = array(
   'field' => 'custom_1',
   'version' => 3,
 );
@@ -19,11 +19,11 @@ $params = array(
  */
 function contact_getoptions_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 2,
-  'values' => array( 
+  'values' => array(
       '1' => 'Label1',
       '2' => 'Label2',
     ),

@@ -4,24 +4,25 @@
  Create entities and location block in 1 api call
  */
 function loc_block_createentities_example(){
-$params = array( 
-  'version' => 3,
-  'email' => array( 
+$params = array(
+  'email' => array(
       'location_type_id' => 1,
       'email' => 'test2@loc.block',
     ),
-  'phone' => array( 
+  'phone' => array(
       'location_type_id' => 1,
       'phone' => '987654321',
     ),
-  'phone_2' => array( 
+  'phone_2' => array(
       'location_type_id' => 1,
       'phone' => '456-7890',
     ),
-  'address' => array( 
+  'address' => array(
       'location_type_id' => 1,
       'street_address' => '987654321',
     ),
+  'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'loc_block','createEntities',$params );
@@ -34,14 +35,14 @@ $params = array(
  */
 function loc_block_createentities_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
-          'address' => array( 
+  'values' => array(
+      '3' => array(
+          'address' => array(
               'id' => '3',
               'location_type_id' => '1',
               'is_primary' => 0,
@@ -49,7 +50,7 @@ function loc_block_createentities_expectedresult(){
               'street_address' => '987654321',
               'manual_geo_code' => 0,
             ),
-          'email' => array( 
+          'email' => array(
               'id' => '4',
               'contact_id' => 'null',
               'location_type_id' => '1',
@@ -63,7 +64,7 @@ function loc_block_createentities_expectedresult(){
               'signature_text' => '',
               'signature_html' => '',
             ),
-          'phone' => array( 
+          'phone' => array(
               'id' => '3',
               'contact_id' => 'null',
               'location_type_id' => '1',
@@ -75,7 +76,7 @@ function loc_block_createentities_expectedresult(){
               'phone_numeric' => '',
               'phone_type_id' => '',
             ),
-          'phone_2' => array( 
+          'phone_2' => array(
               'id' => '4',
               'contact_id' => 'null',
               'location_type_id' => '1',

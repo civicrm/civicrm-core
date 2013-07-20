@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -122,7 +121,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
         'fields' =>
         array(
           'street_address' => array('title' => ts('Street Address')),
-          'supplemental_address_1' => array('title' => ts('Additional Address')),
+          'supplemental_address_1' => array('title' => ts('Supplemental Address 1')),
           'city' => array('title' => ts('City')),
           'country_id' => array('title' => ts('Country')),
           'state_province_id' => array('title' => ts('State/Province')),
@@ -163,7 +162,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
             'default' => TRUE,
             'required' => TRUE,
             'clause' => '
-contribution_civireport1.total_amount_count as contribution1_total_amount_count, 
+contribution_civireport1.total_amount_count as contribution1_total_amount_count,
 contribution_civireport1.total_amount_sum as contribution1_total_amount_sum',
           ),
           'total_amount2' =>
@@ -175,7 +174,7 @@ contribution_civireport1.total_amount_sum as contribution1_total_amount_sum',
             'default' => TRUE,
             'required' => TRUE,
             'clause' => '
-contribution_civireport2.total_amount_count as contribution2_total_amount_count, 
+contribution_civireport2.total_amount_count as contribution2_total_amount_count,
 contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
           ),
         ),
@@ -605,14 +604,14 @@ SELECT contact_id FROM civicrm_temp_civireport_repeat1 UNION SELECT contact_id F
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     $sql = "
-SELECT civicrm_temp_civireport_repeat3.contact_id, 
-			 civicrm_temp_civireport_repeat1.total_amount_sum as contribution1_total_amount_sum,
-			 civicrm_temp_civireport_repeat2.total_amount_sum as contribution2_total_amount_sum
+SELECT civicrm_temp_civireport_repeat3.contact_id,
+       civicrm_temp_civireport_repeat1.total_amount_sum as contribution1_total_amount_sum,
+       civicrm_temp_civireport_repeat2.total_amount_sum as contribution2_total_amount_sum
 FROM civicrm_temp_civireport_repeat3
 LEFT JOIN civicrm_temp_civireport_repeat1
-			 ON civicrm_temp_civireport_repeat3.contact_id = civicrm_temp_civireport_repeat1.contact_id
+       ON civicrm_temp_civireport_repeat3.contact_id = civicrm_temp_civireport_repeat1.contact_id
 LEFT JOIN civicrm_temp_civireport_repeat2
-			 ON civicrm_temp_civireport_repeat3.contact_id = civicrm_temp_civireport_repeat2.contact_id";
+       ON civicrm_temp_civireport_repeat3.contact_id = civicrm_temp_civireport_repeat2.contact_id";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     //store contributions in array 'contact_sums' for comparison
@@ -683,12 +682,12 @@ LEFT JOIN civicrm_temp_civireport_repeat2
 SELECT COUNT({$this->_aliases['civicrm_contribution']}1.total_amount_count )       as count,
        SUM({$this->_aliases['civicrm_contribution']}1.total_amount_sum )           as amount,
        ROUND(AVG({$this->_aliases['civicrm_contribution']}1.total_amount_sum), 2)  as avg,
-  	   COUNT({$this->_aliases['civicrm_contribution']}2.total_amount_count )       as count2,
+       COUNT({$this->_aliases['civicrm_contribution']}2.total_amount_count )       as count2,
        SUM({$this->_aliases['civicrm_contribution']}2.total_amount_sum )           as amount2,
        ROUND(AVG({$this->_aliases['civicrm_contribution']}2.total_amount_sum), 2)  as avg2,
        currency";
     $sql = "{$select} {$this->_from} {$this->_where}
-GROUP BY    currency 
+GROUP BY    currency
 ";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
@@ -788,17 +787,17 @@ GROUP BY contribution2.{$contriCol}";
 
     $sql = "
 CREATE TEMPORARY TABLE civicrm_temp_civireport_repeat1 (
-{$create} 
+{$create}
 {$contriCol} int unsigned,
 total_amount_sum int,
-total_amount_count int         
+total_amount_count int
 ) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
     CRM_Core_DAO::executeQuery($sql);
     $sql = "INSERT INTO civicrm_temp_civireport_repeat1 {$subContributionQuery1}";
     CRM_Core_DAO::executeQuery($sql);
 
     $sql = "
-CREATE TEMPORARY TABLE civicrm_temp_civireport_repeat2 ( 
+CREATE TEMPORARY TABLE civicrm_temp_civireport_repeat2 (
 {$create}
 {$contriCol} int unsigned,
 total_amount_sum int,
@@ -950,7 +949,7 @@ currency varchar(3)
           'reset=1&force=1&id_op=eq&id_value=' . $row['contact_civireport_id'],
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
-        
+
         $rows[$rowNum]['contact_civireport_sort_name_link'] = $url;
         $rows[$rowNum]['contact_civireport_sort_name_hover'] = ts("View Contribution details for this contact");
       }

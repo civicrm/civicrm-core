@@ -4,7 +4,7 @@
  shows setting a variable for a current domain
  */
 function setting_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'uniq_email_per_site' => 1,
 );
@@ -19,13 +19,13 @@ $params = array(
  */
 function setting_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'uniq_email_per_site' => '1',
         ),
     ),

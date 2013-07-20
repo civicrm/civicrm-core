@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -37,8 +36,6 @@
  * @version $Id: Email.php 2011-02-16 ErikHommel $
  */
 
-require_once 'CRM/Core/BAO/Email.php';
-
 /**
  * Add an Email for a contact
  *
@@ -56,7 +53,7 @@ function civicrm_api3_email_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */

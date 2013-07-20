@@ -4,9 +4,9 @@
  Get with Contact Ref Custom Field
  */
 function activity_create_example(){
-$params = array( 
+$params = array(
   'source_contact_id' => 17,
-  'activity_type_id' => '44',
+  'activity_type_id' => '46',
   'subject' => 'test activity type id',
   'activity_date_time' => '2011-06-02 14:36:13',
   'status_id' => 2,
@@ -28,16 +28,15 @@ $params = array(
  */
 function activity_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
-          'source_contact_id' => '17',
-          'activity_type_id' => '44',
+          'activity_type_id' => '46',
           'subject' => 'test activity type id',
           'activity_date_time' => '2011-06-02 14:36:13',
           'duration' => '120',
@@ -49,6 +48,7 @@ function activity_create_expectedresult(){
           'is_auto' => 0,
           'is_current_revision' => '1',
           'is_deleted' => 0,
+          'source_contact_id' => '17',
           'custom_2_id' => '17',
           'custom_2_1_id' => '17',
           'custom_2' => 'Contact, Test',

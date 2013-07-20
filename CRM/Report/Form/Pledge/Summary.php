@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -219,16 +218,16 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
   function from() {
     $this->_from = "
             FROM civicrm_pledge {$this->_aliases['civicrm_pledge']}
-                 LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']} 
-                      ON ({$this->_aliases['civicrm_contact']}.id = 
+                 LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+                      ON ({$this->_aliases['civicrm_contact']}.id =
                           {$this->_aliases['civicrm_pledge']}.contact_id )
                  {$this->_aclFrom} ";
 
     // include address field if address column is to be included
     if ($this->_addressField) {
       $this->_from .= "
-                 LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-                           ON ({$this->_aliases['civicrm_contact']}.id = 
+                 LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                           ON ({$this->_aliases['civicrm_contact']}.id =
                                {$this->_aliases['civicrm_address']}.contact_id) AND
                                {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
@@ -236,9 +235,9 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     // include email field if email column is to be included
     if ($this->_emailField) {
       $this->_from .= "
-                 LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} 
-                           ON ({$this->_aliases['civicrm_contact']}.id = 
-                               {$this->_aliases['civicrm_email']}.contact_id) AND 
+                 LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
+                           ON ({$this->_aliases['civicrm_contact']}.id =
+                               {$this->_aliases['civicrm_email']}.contact_id) AND
                                {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
 
@@ -376,7 +375,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       $this->_where = "WHERE ({$this->_aliases['civicrm_pledge']}.is_test=0 ) ";
     }
     else {
-      $this->_where = "WHERE  ({$this->_aliases['civicrm_pledge']}.is_test=0 )  AND 
+      $this->_where = "WHERE  ({$this->_aliases['civicrm_pledge']}.is_test=0 )  AND
                                       " . implode(' AND ', $clauses);
     }
 

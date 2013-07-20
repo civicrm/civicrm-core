@@ -149,6 +149,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $this->_fields = array_merge(CRM_Event_BAO_Query::getParticipantFields(), $this->_fields);
     }
 
+    $this->_fields = array_merge($this->_fields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
+
     $this->_selectFields = array();
     foreach ($this->_fields as $name => $field) {
       // lets skip note for now since we dont support it
@@ -280,7 +282,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     $this->assign('noSearchable', $noSearchable);
 
-    $this->_location_types = CRM_Core_PseudoConstant::locationType();
+    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
     /**
@@ -331,7 +333,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
     $sel3[''] = NULL;
-    $phoneTypes = CRM_Core_PseudoConstant::phoneType();
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     ksort($phoneTypes);
 
     foreach ($sel1 as $k => $sel) {
@@ -407,6 +409,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
 
+    // CRM_Core_Error::debug(array($sel1, $sel2, $sel3, $sel4));
     $sel->setOptions(array($sel1, $sel2, $sel3, $sel4));
 
     // proper interpretation of spec in CRM-8732
@@ -530,7 +533,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
 
     $name = NULL;
-    if (isset($params['field_name'][1])) {
+    if (isset($params['field_name'][1]) && isset($this->_selectFields[$params['field_name'][1]])) {
       // we dont get a name for a html formatting element
       $name = $this->_selectFields[$params['field_name'][1]];
     }

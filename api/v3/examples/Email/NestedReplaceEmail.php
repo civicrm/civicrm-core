@@ -4,32 +4,32 @@
  example demonstrates use of Replace in a nested API call
  */
 function email_replace_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'id' => 10,
-  'api.email.replace' => array( 
-      'values' => array( 
-          '0' => array( 
+  'api.email.replace' => array(
+      'values' => array(
+          '0' => array(
               'location_type_id' => 20,
               'email' => '1-1@example.com',
               'is_primary' => 1,
             ),
-          '1' => array( 
+          '1' => array(
               'location_type_id' => 20,
               'email' => '1-2@example.com',
               'is_primary' => 0,
             ),
-          '2' => array( 
+          '2' => array(
               'location_type_id' => 20,
               'email' => '1-3@example.com',
               'is_primary' => 0,
             ),
-          '3' => array( 
+          '3' => array(
               'location_type_id' => 21,
               'email' => '2-1@example.com',
               'is_primary' => 0,
             ),
-          '4' => array( 
+          '4' => array(
               'location_type_id' => 21,
               'email' => '2-2@example.com',
               'is_primary' => 0,
@@ -48,13 +48,13 @@ $params = array(
  */
 function email_replace_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 10,
-  'values' => array( 
-      '10' => array( 
+  'values' => array(
+      '10' => array(
           'contact_id' => '10',
           'contact_type' => 'Organization',
           'contact_sub_type' => '',
@@ -83,12 +83,6 @@ function email_replace_expectedresult(){
           'organization_name' => 'Unit Test Organization',
           'sic_code' => '',
           'contact_is_deleted' => 0,
-          'gender_id' => '',
-          'gender' => '',
-          'prefix_id' => '',
-          'prefix' => '',
-          'suffix_id' => '',
-          'suffix' => '',
           'current_employer' => '',
           'address_id' => '',
           'street_address' => '',
@@ -116,12 +110,12 @@ function email_replace_expectedresult(){
           'worldregion_id' => '',
           'world_region' => '',
           'id' => '10',
-          'api.email.replace' => array( 
+          'api.email.replace' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 5,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '18',
                       'contact_id' => '10',
                       'location_type_id' => '20',
@@ -135,7 +129,7 @@ function email_replace_expectedresult(){
                       'signature_text' => '',
                       'signature_html' => '',
                     ),
-                  '1' => array( 
+                  '1' => array(
                       'id' => '19',
                       'contact_id' => '10',
                       'location_type_id' => '20',
@@ -149,7 +143,7 @@ function email_replace_expectedresult(){
                       'signature_text' => '',
                       'signature_html' => '',
                     ),
-                  '2' => array( 
+                  '2' => array(
                       'id' => '20',
                       'contact_id' => '10',
                       'location_type_id' => '20',
@@ -163,7 +157,7 @@ function email_replace_expectedresult(){
                       'signature_text' => '',
                       'signature_html' => '',
                     ),
-                  '3' => array( 
+                  '3' => array(
                       'id' => '21',
                       'contact_id' => '10',
                       'location_type_id' => '21',
@@ -177,7 +171,7 @@ function email_replace_expectedresult(){
                       'signature_text' => '',
                       'signature_html' => '',
                     ),
-                  '4' => array( 
+                  '4' => array(
                       'id' => '22',
                       'contact_id' => '10',
                       'location_type_id' => '21',

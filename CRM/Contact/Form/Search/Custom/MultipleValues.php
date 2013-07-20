@@ -106,7 +106,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
     $form->addElement('select', 'group', ts('in'), $group);
 
     // add select for tags
-    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::tag();
+    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     $form->addElement('select', 'tag', ts('Tagged'), $tag);
 
     if (empty($this->_groupTree)) {

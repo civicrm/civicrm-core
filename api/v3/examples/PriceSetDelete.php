@@ -4,9 +4,9 @@
  
  */
 function price_set_delete_example(){
-$params = array( 
+$params = array(
   'version' => 3,
-  'id' => 17,
+  'id' => 5,
 );
 
   $result = civicrm_api( 'price_set','delete',$params );
@@ -19,7 +19,7 @@ $params = array(
  */
 function price_set_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

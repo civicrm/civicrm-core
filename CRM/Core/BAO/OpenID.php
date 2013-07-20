@@ -106,8 +106,8 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
     }
 
     $query = "
-SELECT civicrm_openid.openid, civicrm_location_type.name as locationType, civicrm_openid.is_primary as is_primary, 
-civicrm_openid.allowed_to_login as allowed_to_login, civicrm_openid.id as openid_id, 
+SELECT civicrm_openid.openid, civicrm_location_type.name as locationType, civicrm_openid.is_primary as is_primary,
+civicrm_openid.allowed_to_login as allowed_to_login, civicrm_openid.id as openid_id,
 civicrm_openid.location_type_id as locationTypeId
 FROM      civicrm_contact
 LEFT JOIN civicrm_openid ON ( civicrm_openid.contact_id = civicrm_contact.id )

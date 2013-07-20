@@ -75,47 +75,47 @@ class CRM_Activity_Page_AJAX {
     $sortMapper = array(
       0 => 'sort_name', 1 => 'phone', 2 => 'email',
     );
- 
+
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
     $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
     $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
-    
+
     $params = $_POST;
     if ($sort && $sortOrder) {
       $sortSQL = $sort .' '.$sortOrder;
     }
-    
+
     // get the activities related to given case
     $globalGroupInfo = array();
-    
+
     // get the total row count
     $relGlobalTotalCount = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, NULL, FALSE, TRUE, NULL, NULL);
     // limit the rows
-    $relGlobal = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, $sortSQL, $showLinks = TRUE, FALSE, $offset, $rowCount);    
-    
+    $relGlobal = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, $sortSQL, $showLinks = TRUE, FALSE, $offset, $rowCount);
+
     $iFilteredTotal = $iTotal = $relGlobalTotalCount;
     $selectorElements = array('sort_name', 'phone', 'email');
-    
+
     echo CRM_Utils_JSON::encodeDataTableSelector($relGlobal, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
-  }  
-  
+  }
+
   static function getCaseClientRelationships() {
     $caseID    = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    
+
     $sortMapper = array(
       0 => 'relation', 1 => 'name', 2 => 'phone', 3 => 'email'
     );
- 
+
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
     $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
     $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : 'relation';
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
-    
+
     $params = $_POST;
     if ($sort && $sortOrder) {
       $sortSQL = $sort .' '.$sortOrder;
@@ -126,9 +126,9 @@ class CRM_Activity_Page_AJAX {
       CRM_Contact_BAO_Relationship::CURRENT,
       0, 0, 0, NULL, NULL, FALSE
     );
- 
+
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID);
-      
+
     // Now build 'Other Relationships' array by removing relationships that are already listed under Case Roles
     // so they don't show up twice.
     $clientRelationships = array();
@@ -137,47 +137,46 @@ class CRM_Activity_Page_AJAX {
         $clientRelationships[] = $r;
       }
     }
-    
+
     // sort clientRelationships array using jquery call params
     foreach ($clientRelationships as $key => $row) {
-      $sortArray[$key]  = $row[$sort]; 
+      $sortArray[$key]  = $row[$sort];
     }
-    $sort_type = "SORT_".strtoupper($sortOrder);
-    $sort_function = "array_multisort(\$sortArray, ".$sort_type.", \$clientRelationships);";
-    eval($sort_function);
-    
+    $sort_type = "SORT_" . strtoupper($sortOrder);
+    array_multisort($sortArray, constant($sort_type), $clientRelationships);
+
     //limit the rows
     $allClientRelationships = $clientRelationships;
     $clientRelationships = array_slice($allClientRelationships, $offset, $rowCount, TRUE);
-    
+
     // after sort we can update username fields to be a url
     foreach($clientRelationships as $key => $value) {
       $clientRelationships[$key]['name'] = '<a href='.CRM_Utils_System::url('civicrm/contact/view',
        'action=view&reset=1&cid='.$clientRelationships[$key]['cid']).'>'.$clientRelationships[$key]['name'].'</a>';
     }
-    
+
     $iFilteredTotal = $iTotal = $params['total'] = count($allClientRelationships);
     $selectorElements = array('relation', 'name', 'phone', 'email');
-    
+
     echo CRM_Utils_JSON::encodeDataTableSelector($clientRelationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
-  }  
-  
-  
+  }
+
+
   static function getCaseRoles() {
     $caseID    = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    
+
     $sortMapper = array(
       0 => 'relation', 1 => 'name', 2 => 'phone', 3 => 'email', 4 => 'actions'
     );
- 
+
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
     $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
     $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : 'relation';
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
-    
+
     $params = $_POST;
     if ($sort && $sortOrder) {
       $sortSQL = $sort .' '.$sortOrder;
@@ -187,14 +186,14 @@ class CRM_Activity_Page_AJAX {
     $caseTypeName = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles    = $xmlProcessor->get($caseTypeName, 'CaseRoles');
-    
+
     $hasAccessToAllCases = CRM_Core_Permission::check('access all cases and activities');
-    
+
     $managerRoleId = $xmlProcessor->getCaseManagerRoleId($caseTypeName);
     if (!empty($managerRoleId)) {
       $caseRoles[$managerRoleId] = $caseRoles[$managerRoleId] . '<br />' . '(' . ts('Case Manager') . ')';
     }
-    
+
     foreach ($caseRelationships as $key => $value) {
       //calculate roles that don't have relationships
       if (CRM_Utils_Array::value($value['relation_type'], $caseRoles)) {
@@ -205,7 +204,7 @@ class CRM_Activity_Page_AJAX {
       // mark orginal case relationships record to use on setting edit links below
       $caseRelationships[$key]['source'] = 'caseRel';
     }
-    
+
     $caseRoles['client'] = CRM_Case_BAO_Case::getContactNames($caseID);
 
     // move/transform caseRoles array data to caseRelationships
@@ -239,10 +238,8 @@ class CRM_Activity_Page_AJAX {
       $sortArray[$key]  = $row[$sort];
     }
 
-    $sort_type = "SORT_".strtoupper($sortOrder);
-
-    $sort_function = "array_multisort(\$sortArray, ".$sort_type.", \$caseRelationships);";
-    eval($sort_function);
+    $sort_type = "SORT_" . strtoupper($sortOrder);
+    array_multisort($sortArray, constant($sort_type), $caseRelationships);
 
     //limit rows display
     $allCaseRelationships = $caseRelationships;
@@ -266,12 +263,12 @@ class CRM_Activity_Page_AJAX {
       if ($hasAccessToAllCases) {
         switch($caseRelationships[$key]['source']){
         case 'caseRel':
-          $caseRelationships[$key]['actions'] = 
+          $caseRelationships[$key]['actions'] =
             '<a href="#" title="edit case role" onclick="createRelationship( '.$caseRelationships[$key]['relation_type'].', '.$caseRelationships[$key]['cid'].', '.$caseRelationships[$key]['rel_id'].', '.$idx.', \''.$caseRelationships[$key]['relation'].'\' );return false;"><div class="icon edit-icon" ></div></a>&nbsp;&nbsp;<a href="#" class="case-role-delete" case_id="'.$caseID.'" rel_type="'.$caseRelationships[$key]['relation_type'].'"><div class="icon delete-icon" title="remove contact from case role"></div></a>';
           break;
-          
+
         case 'caseRoles':
-          $caseRelationships[$key]['actions'] = 
+          $caseRelationships[$key]['actions'] =
             '<a href="#" title="edit case role" onclick="createRelationship('.$caseRelationships[$key]['relation_type'].', null, null, '.$idx.',  \''.$caseRelationships[$key]['relation'].'\');return false;"><div class="icon edit-icon"></div></a>';
           break;
         }
@@ -282,11 +279,11 @@ class CRM_Activity_Page_AJAX {
     }
     $iFilteredTotal = $iTotal = $params['total'] = count($allCaseRelationships);
     $selectorElements = array('relation', 'name', 'phone', 'email', 'actions');
-    
+
     echo CRM_Utils_JSON::encodeDataTableSelector($caseRelationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
-  }    
-  
+  }
+
   static function convertToCaseActivity() {
     $params = array('caseID', 'activityID', 'contactID', 'newSubject', 'targetContactIds', 'mode');
     foreach ($params as $param) {
@@ -361,12 +358,19 @@ class CRM_Activity_Page_AJAX {
     if (!empty($params['targetContactIds'])) {
       $targetContacts = array_unique(explode(',', $params['targetContactIds']));
     }
+
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
     foreach ($targetContacts as $key => $value) {
       $targ_params = array(
         'activity_id' => $mainActivityId,
-        'target_contact_id' => $value,
+        'contact_id' => $value,
+        'record_type_id' => $targetID
       );
-      CRM_Activity_BAO_Activity::createActivityTarget($targ_params);
+      CRM_Activity_BAO_ActivityContact::create($targ_params);
     }
 
     // typically this will be empty, since assignees on another case may be completely different
@@ -377,9 +381,10 @@ class CRM_Activity_Page_AJAX {
     foreach ($assigneeContacts as $key => $value) {
       $assigneeParams = array(
         'activity_id' => $mainActivityId,
-        'assignee_contact_id' => $value,
+        'contact_id' => $value,
+        'record_type_id' => $assigneeID
       );
-      CRM_Activity_BAO_Activity::createActivityAssignment($assigneeParams);
+      CRM_Activity_BAO_ActivityContact::create($assigneeParams);
     }
 
     //attach newly created activity to case.
@@ -402,7 +407,7 @@ class CRM_Activity_Page_AJAX {
 
     $sortMapper = array(
       0 => 'activity_type', 1 => 'subject', 2 => 'source_contact_name',
-      3 => '', 4 => '', 5 => 'activity_date_time', 6 => 'status_id',
+      3 => '', 4 => 'activity_date_time', 5 => 'status_id',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -429,7 +434,7 @@ class CRM_Activity_Page_AJAX {
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
     if ($userID) {
-      $activityFilter = 
+      $activityFilter =
         array('activity_type_filter_id' => CRM_Utils_Array::value('activity_type_id', $params),
               'activity_type_exclude_filter_id' => CRM_Utils_Array::value('activity_type_exclude_id', $params));
               CRM_Core_BAO_Setting::setItem($activityFilter,
@@ -440,12 +445,12 @@ class CRM_Activity_Page_AJAX {
                                             $userID
                                     );
     }
-    
+
     $iFilteredTotal = $iTotal = $params['total'];
     $selectorElements = array(
       'activity_type', 'subject', 'source_contact',
       'target_contact', 'assignee_contact',
-      'activity_date', 'status', 'openstats','links', 'class',
+      'activity_date', 'status','links', 'class',
     );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);

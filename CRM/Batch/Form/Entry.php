@@ -60,7 +60,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $_profileId;
 
   public $_action;
-  
+
   public $_mode;
 
   public $_params;
@@ -81,12 +81,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return void
    * @access public
-   */ 
+   */
   function preProcess() {
     $this->_batchId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    
+
     if (empty($this->_batchInfo)) {
       $params = array('id' => $this->_batchId);
       CRM_Batch_BAO_Batch::retrieve($params, $this->_batchInfo);
@@ -234,6 +234,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     foreach ($params['field'] as $key => $value) {
       $batchTotal += $value['total_amount'];
 
+      //validate for soft credit fields
+      if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && !CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+        $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount');
+      }
+      if (CRM_Utils_Array::value($key, $params['soft_credit_amount'])
+        && CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value($key, $params['soft_credit_amount'])) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
+        $errors["soft_credit_amount[$key]"] = ts('Soft credit amount should not be greater than the total amount');
+      }
+
       //membership type is required for membership batch entry
       if ( $self->_batchInfo['type_id'] == 2 ) {
         if ( !CRM_Utils_Array::value( 1, $value['membership_type'] ) ) {
@@ -282,19 +291,19 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
       //get all status
       $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      $completeStatus = array_search( 'Completed', $allStatus );  
-      $specialFields = array( 
+      $completeStatus = array_search( 'Completed', $allStatus );
+      $specialFields = array(
         'join_date' => $currentDate,
         'receive_date' => $currentDate,
         'receive_date_time' => $currentTime,
-        'contribution_status_id' => $completeStatus 
+        'contribution_status_id' => $completeStatus
       );
 
       for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
         foreach ($specialFields as $key => $value ) {
-          $defaults['field'][$rowNumber][$key] = $value;  
+          $defaults['field'][$rowNumber][$key] = $value;
         }
-      } 
+      }
     }
     else {
       // get the existing batch values from cache table
@@ -362,11 +371,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     );
 
     // get the price set associated with offline contribution record.
-    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', 'default_contribution_amount', 'id', 'name');
-    $this->_priceSet = current(CRM_Price_BAO_Set::getSetDetail($priceSetId));
+    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
+    $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
     $fieldID = key($this->_priceSet['fields']);
-
-    $assetRelation = key(CRM_CORE_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
 
     if (isset($params['field'])) {
       foreach ($params['field'] as $key => $value) {
@@ -380,9 +387,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // update contact information
         $this->updateContactInfo($value);
 
-        // handle soft credit
-        if (CRM_Utils_Array::value('soft_credit_contact_select_id', $params) && CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id'])) {
-          $value['soft_credit_to'] = $params['soft_credit_contact_select_id'][$key];
+        //build soft credit params
+        if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+          $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
+          $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
         }
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
@@ -431,13 +439,13 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $value['price_'.$fieldID] = 1;
 
         $lineItem = array();
-        CRM_Price_BAO_Set::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);
+        CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);
 
         //unset amount level since we always use quick config price set
         unset($value['amount_level']);
 
-        //CRM-11529 for backoffice transactions 
-        //when financial_type_id is passed in form, update the 
+        //CRM-11529 for backoffice transactions
+        //when financial_type_id is passed in form, update the
         //lineitems with the financial type selected in form
         if (CRM_Utils_Array::value('financial_type_id', $value) && CRM_Utils_Array::value($priceSetId, $lineItem)) {
           foreach ($lineItem[$priceSetId] as &$values) {
@@ -502,7 +510,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       'membership_start_date' => 'startDate',
       'membership_end_date' => 'endDate'
     );
-    
+
     $dates = array(
       'join_date',
       'start_date',
@@ -511,8 +519,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     );
 
     // get the price set associated with offline memebership
-    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', 'default_membership_type_amount', 'id', 'name');
-    $this->_priceSet = $priceSets = current(CRM_Price_BAO_Set::getSetDetail($priceSetId));
+    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
+    $this->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
 
     if (isset($params['field'])) {
       $customFields = array();
@@ -594,8 +602,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         // handle soft credit
-        if (CRM_Utils_Array::value('soft_credit_contact_select_id', $params) && CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id'])) {
-          $value['soft_credit_to'] = $params['soft_credit_contact_select_id'][$key];
+        if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+          $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
+          $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
         }
 
         if ( CRM_Utils_Array::value('receive_date', $value) ) {
@@ -611,14 +620,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $value['skipRecentView'] = TRUE;
 
         // make entry in line item for contribution
-        
+
         $editedFieldParams = array(
           'price_set_id' => $priceSetId,
-          'name' => $value['membership_type'][0] 
+          'name' => $value['membership_type'][0]
         );
 
         $editedResults = array();
-        CRM_Price_BAO_Field::retrieve($editedFieldParams, $editedResults);
+        CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
 
         if (!empty($editedResults)) {
           unset($this->_priceSet['fields']);
@@ -631,7 +640,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           );
 
           $editedResults = array();
-          CRM_Price_BAO_FieldValue::retrieve($editedFieldParams, $editedResults);
+          CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
           $this->_priceSet['fields'][$fid]['options'][$editedResults['id']] = $priceSets['fields'][$fid]['options'][$editedResults['id']];
           if (CRM_Utils_Array::value('total_amount', $value)) {
             $this->_priceSet['fields'][$fid]['options'][$editedResults['id']]['amount'] = $value['total_amount'];
@@ -640,20 +649,20 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $fieldID = key($this->_priceSet['fields']);
           $value['price_' . $fieldID] = $editedResults['id'];
 
-          $lineItem = array(); 
-          CRM_Price_BAO_Set::processAmount($this->_priceSet['fields'],
+          $lineItem = array();
+          CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
             $value, $lineItem[$priceSetId]
           );
 
-          //CRM-11529 for backoffice transactions 
-          //when financial_type_id is passed in form, update the 
+          //CRM-11529 for backoffice transactions
+          //when financial_type_id is passed in form, update the
           //lineitems with the financial type selected in form
           if (CRM_Utils_Array::value('financial_type_id', $value) && CRM_Utils_Array::value($priceSetId, $lineItem)) {
             foreach ($lineItem[$priceSetId] as &$values) {
               $values['financial_type_id'] = $value['financial_type_id'];
             }
           }
-          
+
           $value['lineItems'] = $lineItem;
           $value['processPriceSet'] = TRUE;
         }
@@ -662,12 +671,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         unset($value['membership_type']);
         unset($value['membership_start_date']);
         unset($value['membership_end_date']);
-        
-        $value['is_renew'] = false; 
+
+        $value['is_renew'] = false;
         if ( CRM_Utils_Array::value('member_option', $params) && CRM_Utils_Array::value( $key, $params['member_option'] ) == 2 ) {
           $this->_params = $params;
-          $value['is_renew'] = true; 
-          $membership = CRM_Member_BAO_Membership::renewMembership( 
+          $value['is_renew'] = true;
+          $membership = CRM_Member_BAO_Membership::renewMembership(
             $value['contact_id'],
             $value['membership_type_id'],
             FALSE, $this, NULL, NULL,
@@ -676,7 +685,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
           // make contribution entry
           CRM_Member_BAO_Membership::recordMembershipContribution( $value, CRM_Core_DAO::$_nullArray, $membership->id );
-        } 
+        }
         else {
           $membership = CRM_Member_BAO_Membership::create($value, CRM_Core_DAO::$_nullArray);
         }

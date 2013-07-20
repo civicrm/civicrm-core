@@ -509,7 +509,7 @@ class CRM_Contribute_BAO_Query {
       // Supporting search for currency type -- CRM-4711
 
       case 'contribution_currency_type':
-        $currencySymbol = CRM_Core_PseudoConstant::currencySymbols('name');
+        $currencySymbol = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'));
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.currency",
           $op, $currencySymbol[$value], "String"
         );
@@ -754,7 +754,7 @@ class CRM_Contribute_BAO_Query {
     // Added contribution source
     $form->addElement('text', 'contribution_source', ts('Contribution Source'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'source'));
 
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE);
 
     $form->add('text', 'contribution_amount_low', ts('From'), array('size' => 8, 'maxlength' => 8));
     $form->addRule('contribution_amount_low', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('9.99', ' '))), 'money');
@@ -767,7 +767,7 @@ class CRM_Contribute_BAO_Query {
       ts('Currency Type'),
       array(
         '' => ts('- any -')) +
-      CRM_Core_PseudoConstant::currencySymbols('name')
+      CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'))
     );
 
     $form->add('select', 'financial_type_id',

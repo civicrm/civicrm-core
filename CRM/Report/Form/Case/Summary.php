@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -87,9 +86,11 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
           ),
           'start_date' => array(
             'title' => ts('Start Date'), 'default' => TRUE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'end_date' => array(
             'title' => ts('End Date'), 'default' => TRUE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'duration' => array(
             'title' => ts('Duration (Days)'), 'default' => FALSE,
@@ -224,7 +225,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
 
     if ($this->_relField) {
       $this->_from = "
-            FROM civicrm_contact $c 
+            FROM civicrm_contact $c
 inner join civicrm_relationship $cr on {$c}.id = ${cr}.contact_id_b
 inner join civicrm_case $cc on ${cc}.id = ${cr}.case_id
 inner join civicrm_relationship_type $crt on ${crt}.id=${cr}.relationship_type_id

@@ -44,10 +44,16 @@
     <default>NULL</default>
     <comment>3 character string, value from config setting or input via user.</comment>
     <add>3.2</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>numeric_code</nameColumn>
+    </pseudoconstant>
   </field>
   <field>
     <name>frequency_unit</name>
-    <type>enum</type> 
+    <type>enum</type>
     <values>day,week,month,year</values>
     <default>'month'</default>
     <comment>Time units for recurrence of payment.</comment>
@@ -98,29 +104,29 @@
     <comment>Date this recurring contribution finished successfully</comment>
     <add>1.6</add>
   </field>
-  <field>   
+  <field>
     <name>processor_id</name>
-    <type>varchar</type>   
+    <type>varchar</type>
     <length>255</length>
-    <comment>Possibly needed to store a unique identifier for this recurring payment order - if this is available from the processor??</comment>   
-    <add>1.6</add>   
-  </field>  
-  <field>        
-    <name>trxn_id</name>     
+    <comment>Possibly needed to store a unique identifier for this recurring payment order - if this is available from the processor??</comment>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>trxn_id</name>
     <title>Transaction ID</title>
-    <type>varchar</type>     
-    <length>255</length>  
+    <type>varchar</type>
+    <length>255</length>
     <comment>unique transaction id. may be processor id, bank id + trans id, or account number + check number... depending on payment_method</comment>
-    <add>1.6</add>     
-  </field>   
-  <field>        
-    <name>invoice_id</name>     
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>invoice_id</name>
     <title>Invoice ID</title>
-    <type>varchar</type>     
-    <length>255</length>  
+    <type>varchar</type>
+    <length>255</length>
     <comment>unique invoice id, system generated or passed in</comment>
-    <add>1.6</add>     
-  </field>   
+    <add>1.6</add>
+  </field>
   <index>
     <name>UI_contrib_trxn_id</name>
     <fieldName>trxn_id</fieldName>
@@ -146,8 +152,8 @@
     <fieldName>contribution_status_id</fieldName>
     <add>1.6</add>
   </index>
-  <field>     
-    <name>is_test</name>  
+  <field>
+    <name>is_test</name>
     <title>Test</title>
     <type>boolean</type>
     <default>0</default>
@@ -180,13 +186,13 @@
     <comment>At Groundspring we set a business rule to retry failed payments every 7 days - and stored the next scheduled attempt date there.</comment>
     <add>1.6</add>
   </field>
-  <field>     
+  <field>
     <name>auto_renew</name>
-    <type>boolean</type> 
-    <required>true</required> 
+    <type>boolean</type>
+    <required>true</required>
     <default>0</default>
-    <comment>Some systems allow contributor to set a number of installments - but then auto-renew the subscription or commitment if they do not cancel.</comment>  
-    <add>1.6</add>  
+    <comment>Some systems allow contributor to set a number of installments - but then auto-renew the subscription or commitment if they do not cancel.</comment>
+    <add>1.6</add>
   </field>
   <field>
     <name>payment_processor_id</name>
@@ -194,11 +200,11 @@
     <comment>Foreign key to civicrm_payment_processor.id</comment>
     <add>3.3</add>
   </field>
-  <foreignKey> 
-    <name>payment_processor_id</name> 
-    <table>civicrm_payment_processor</table> 
-    <key>id</key> 
-    <add>3.3</add> 
+  <foreignKey>
+    <name>payment_processor_id</name>
+    <table>civicrm_payment_processor</table>
+    <key>id</key>
+    <add>3.3</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
@@ -238,6 +244,9 @@
     <title>Payment Instrument</title>
     <type>int unsigned</type>
     <comment>FK to Payment Instrument</comment>
+    <pseudoconstant>
+      <optionGroupName>payment_instrument</optionGroupName>
+    </pseudoconstant>
     <add>4.1</add>
   </field>
   <index>
@@ -260,11 +269,11 @@
     <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  <field> 
-    <name>is_email_receipt</name> 
-    <type>boolean</type> 
-    <comment>if true, receipt is automatically emailed to contact on each successful payment</comment> 
+  <field>
+    <name>is_email_receipt</name>
+    <type>boolean</type>
+    <comment>if true, receipt is automatically emailed to contact on each successful payment</comment>
     <default>1</default>
-    <add>4.1</add> 
-  </field> 
+    <add>4.1</add>
+  </field>
 </table>

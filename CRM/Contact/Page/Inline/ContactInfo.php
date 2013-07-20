@@ -34,7 +34,7 @@
  */
 
 /**
- * Page to disply contact information on topi of summary 
+ * Page to disply contact information on topi of summary
  *
  */
 class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
@@ -71,8 +71,8 @@ class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
 
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);
- 
-    // finally call parent 
+
+    // finally call parent
     parent::run();
   }
 }

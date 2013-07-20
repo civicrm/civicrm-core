@@ -236,8 +236,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
 
     // get all event pages. pcp campaign start and end dates for event related pcp's use the online registration start and end dates,
     // altho if target is contribution page this might not be correct. fixme? dgg
-    $query = "SELECT id, title, start_date, end_date, registration_start_date, registration_end_date 
-                  FROM civicrm_event 
+    $query = "SELECT id, title, start_date, end_date, registration_start_date, registration_end_date
+                  FROM civicrm_event
                   WHERE is_template IS NULL OR is_template != 1";
     $epages = CRM_Core_DAO::executeQuery($query);
     while ($epages->fetch()) {

@@ -4,7 +4,7 @@
  
  */
 function im_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'contact_id' => 1,
   'name' => 'My Yahoo IM Handle',
@@ -22,13 +22,13 @@ $params = array(
  */
 function im_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id' => '1',
           'location_type_id' => '1',

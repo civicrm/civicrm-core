@@ -147,7 +147,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
    * @access public
    */
   public function buildQuickForm() {
-    $wysiwyg_options = array('' => ts('Textarea')) + CRM_Core_PseudoConstant::wysiwygEditor();
+    $wysiwyg_options = array('' => ts('Textarea')) + CRM_Core_OptionGroup::values('wysiwyg_editor');
 
     $config = CRM_Core_Config::singleton();
     $extra = array();

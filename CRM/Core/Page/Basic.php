@@ -213,8 +213,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     if ($action & CRM_Core_Action::ENABLE) {
       $action -= CRM_Core_Action::ENABLE;
     }
-
-    eval('$object = new ' . $this->getBAOName() . '( );');
+    $baoString = $this->getBAOName();
+    $object = new $baoString();
 
     $values = array();
 
@@ -263,7 +263,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
           $this->action($object, $action, $values[$object->id], $links, $permission);
 
           if (isset($object->mapping_type_id)) {
-            $mappintTypes = CRM_Core_PseudoConstant::mappingTypes();
+            $mappintTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id');
             $values[$object->id]['mapping_type'] = $mappintTypes[$object->mapping_type_id];
           }
         }
@@ -307,7 +307,14 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
         $values['class'] = 'reserved';
         // check if object is relationship type
         $object_type = get_class($object);
-        if ($object_type == 'CRM_Contact_BAO_RelationshipType' || $object_type == 'CRM_Core_BAO_LocationType') {
+
+        $exceptions = array(
+          'CRM_Contact_BAO_RelationshipType',
+          'CRM_Core_BAO_LocationType',
+          'CRM_Badge_BAO_Layout',
+        );
+
+        if (in_array($object_type, $exceptions)) {
           $newAction = CRM_Core_Action::VIEW + CRM_Core_Action::UPDATE;
         }
         else {

@@ -73,7 +73,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     /*
      * initialize the task and row fields
      */
-      
+
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
@@ -149,17 +149,21 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     $this->controller->resetPage('Email');
     $params = $this->exportValues();
     $this->_contacts = array();
+
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     //get assignee contacts
     if (!empty($params['assigned_to'])) {
       foreach ($this->_activityHolderIds as $key => $id) {
-        $ids = array_keys(CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($id));
+        $ids = array_keys(CRM_Activity_BAO_ActivityContact::getNames($id, $assigneeID));
         $this->_contacts = array_merge($this->_contacts, $ids);
       }
     }
     //get target contacts
     if (!empty($params['with_contact'])) {
       foreach ($this->_activityHolderIds as $key => $id) {
-        $ids = array_keys(CRM_Activity_BAO_ActivityTarget::getTargetNames($id));
+        $ids = array_keys(CRM_Activity_BAO_ActivityContact::getNames($id, $targetID));
         $this->_contacts = array_merge($this->_contacts, $ids);
       }
     }

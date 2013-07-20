@@ -164,7 +164,7 @@ cj(function(){
   var orgDataUrl = "{/literal}{$dataUrl}{literal}";
   var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing contact.{/ts}{literal}";
   cj('#member_of_contact').autocomplete( orgDataUrl,
-    { width : 180, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1
+    { width : 200, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
   }).result(
     function(event, data, formatted) {
       ( parseInt( data[1] ) ) ? cj( "#member_of_contact_id" ).val( data[1] ) : cj( "#member_of_contact_id" ).val('');

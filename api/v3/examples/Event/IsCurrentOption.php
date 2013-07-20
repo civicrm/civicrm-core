@@ -4,9 +4,10 @@
  demonstrates use of is.Current option
  */
 function event_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'isCurrent' => 1,
+  'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'event','get',$params );
@@ -19,13 +20,13 @@ $params = array(
  */
 function event_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'title' => 'Annual CiviCRM meet 2',
           'event_title' => 'Annual CiviCRM meet 2',
@@ -35,10 +36,10 @@ function event_get_expectedresult(){
           'event_type_id' => '1',
           'participant_listing_id' => 0,
           'is_public' => '1',
-          'start_date' => '2013-02-05 00:00:00',
-          'event_start_date' => '2013-02-05 00:00:00',
-          'end_date' => '2013-02-11 00:00:00',
-          'event_end_date' => '2013-02-11 00:00:00',
+          'start_date' => '2013-06-23 00:00:00',
+          'event_start_date' => '2013-06-23 00:00:00',
+          'end_date' => '2013-06-29 00:00:00',
+          'event_end_date' => '2013-06-29 00:00:00',
           'is_online_registration' => '1',
           'registration_start_date' => '2010-06-01 00:00:00',
           'registration_end_date' => '2010-10-15 00:00:00',
@@ -55,7 +56,7 @@ function event_get_expectedresult(){
           'is_multiple_registrations' => 0,
           'allow_same_participant_emails' => 0,
           'is_template' => 0,
-          'created_date' => '2013-02-04 22:31:23',
+          'created_date' => '20120130621222105',
           'is_share' => '1',
         ),
     ),

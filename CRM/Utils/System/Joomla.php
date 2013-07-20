@@ -602,7 +602,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     // Get the framework.
     if (file_exists($joomlaBase . '/libraries/import.legacy.php')) {
-      require $joomlaBase . '/libraries/import.legacy.php';  
+      require $joomlaBase . '/libraries/import.legacy.php';
     }
     require $joomlaBase . '/libraries/import.php';
     require $joomlaBase . '/libraries/joomla/event/dispatcher.php';
@@ -686,9 +686,31 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $loginURL .= 'index.php?option=com_users&view=login';
     return $loginURL;
   }
-  
+
   public function getLoginDestination(&$form) {
     return;
+  }
+
+  /**
+   * Return default Site Settings
+   * @return array array
+   * - $url, (Joomla - non admin url)
+   * - $siteName,
+   * - $siteRoot
+   */
+  function getDefaultSiteSettings($dir){
+    $config = CRM_Core_Config::singleton();
+    $url = preg_replace(
+      '|/administrator|',
+      '',
+      $config->userFrameworkBaseURL
+    );
+    $siteRoot = preg_replace(
+      '|/media/civicrm/.*$|',
+      '',
+      $config->imageUploadDir
+    );
+    return array($url, NULL, $siteRoot);
   }
 }
 

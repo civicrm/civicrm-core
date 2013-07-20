@@ -77,6 +77,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_renderer;
 
   /**
+   * An array to hold a list of datefields on the form
+   * so that they can be converted to ISO in a consistent manner
+   *
+   * @var array
+   *
+   * e.g on a form declare $_dateFields = array(
+   *  'receive_date' => array('default' => 'now'),
+   *  );
+   *  then in postProcess call $this->convertDateFieldsToMySQL($formValues)
+   *  to have the time field re-incorporated into the field & 'now' set if
+   *  no value has been passed in
+   */
+  protected $_dateFields = array();
+
+  /**
    * cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
@@ -870,7 +885,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'editor_id'
     );
     $editor = strtolower(CRM_Utils_Array::value($editorID,
-        CRM_Core_PseudoConstant::wysiwygEditor()
+        CRM_Core_OptionGroup::values('wysiwyg_editor')
       ));
     if (!$editor || $forceTextarea) {
       $editor = 'textarea';
@@ -938,10 +953,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->addRule("{$locationName}[$locationId][address][street_address]", ts("Please enter the Street Address for %1.", array(1 => $title)), 'required');
     }
 
-    $location[$locationId]['address']['supplemental_address_1'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_1]", ts('Additional Address 1'),
+    $location[$locationId]['address']['supplemental_address_1'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_1]", ts('Supplemental Address 1'),
       $attributes['supplemental_address_1']
     );
-    $location[$locationId]['address']['supplemental_address_2'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_2]", ts('Additional Address 2'),
+    $location[$locationId]['address']['supplemental_address_2'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_2]", ts('Supplemental Address 2'),
       $attributes['supplemental_address_2']
     );
 
@@ -1216,6 +1231,34 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $defaultCurrency = $config->defaultCurrency;
     }
     $this->setDefaults(array($name => $defaultCurrency));
+  }
+
+  /**
+   * Convert all date fields within the params to mysql date ready for the
+   * BAO layer. In this case fields are checked against the $_datefields defined for the form
+   * and if time is defined it is incorporated
+   *
+   * @param array $params input params from the form
+   *
+   * @todo it would probably be better to work on $this->_params than a passed array
+   * @todo standardise the format which dates are passed to the BAO layer in & remove date
+   * handling from BAO
+   */
+  function convertDateFieldsToMySQL(&$params){
+    foreach ($this->_dateFields as $fieldName => $specs){
+      if(!empty($params[$fieldName])){
+        $params[$fieldName] = CRM_Utils_Date::isoToMysql(
+          CRM_Utils_Date::processDate(
+          $params[$fieldName],
+          CRM_Utils_Array::value("{$fieldName}_time", $params), TRUE)
+        );
+      }
+      else{
+        if(isset($specs['default'])){
+          $params[$fieldName] = date('YmdHis', strtotime($specs['default']));
+        }
+      }
+    }
   }
 
   function removeFileRequiredRules($elementName) {

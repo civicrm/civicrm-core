@@ -85,7 +85,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       c.source AS source,
       ft.currency AS currency,
       cov_status.label AS status,
-      CASE 
+      CASE
         WHEN efti.entity_id IS NOT NULL
         THEN efti.amount
         ELSE eftc.amount
@@ -163,7 +163,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       $financialItems = array();
       $this->_batchIds = $batchId;
       while ($dao->fetch()) {
-        $creditAccountName = $creditAccountType = 
+        $creditAccountName = $creditAccountType =
           $creditAccount = NULL;
         if ($dao->credit_account) {
           $creditAccountName = $dao->credit_account_name;
@@ -173,9 +173,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
         else {
           $creditAccountName = $dao->from_credit_account_name;
           $creditAccountType = $dao->from_credit_account_type_code;
-          $creditAccount = $dao->from_credit_account;   
+          $creditAccount = $dao->from_credit_account;
         }
-        
+
         $financialItems[] = array(
           'Transaction Date' => $dao->trxn_date,
           'Debit Account' => $dao->to_account_code,

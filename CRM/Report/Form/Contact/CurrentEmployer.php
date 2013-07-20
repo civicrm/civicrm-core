@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -42,7 +41,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
     'Contact', 'Individual');
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
-  
+
   function __construct() {
 
     $this->_columns = array(
@@ -79,9 +78,9 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           array('title' => ts('Employee Name'),
             'required' => TRUE,
           ),
-		  'first_name' => array('title' => ts('First Name'),
+      'first_name' => array('title' => ts('First Name'),
           ),
-		  'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Last Name'),
           ),
           'job_title' =>
           array('title' => ts('Job Title'),
@@ -216,22 +215,22 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
   function from() {
     $this->_from = "
-FROM civicrm_contact {$this->_aliases['civicrm_contact']} 
+FROM civicrm_contact {$this->_aliases['civicrm_contact']}
 
      LEFT JOIN civicrm_contact {$this->_aliases['civicrm_employer']}
           ON {$this->_aliases['civicrm_employer']}.id={$this->_aliases['civicrm_contact']}.employer_id
 
      {$this->_aclFrom}
      LEFT JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
-          ON ( {$this->_aliases['civicrm_relationship']}.contact_id_a={$this->_aliases['civicrm_contact']}.id 
-              AND {$this->_aliases['civicrm_relationship']}.contact_id_b={$this->_aliases['civicrm_contact']}.employer_id 
-              AND {$this->_aliases['civicrm_relationship']}.relationship_type_id=4) 
-     LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-          ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id 
+          ON ( {$this->_aliases['civicrm_relationship']}.contact_id_a={$this->_aliases['civicrm_contact']}.id
+              AND {$this->_aliases['civicrm_relationship']}.contact_id_b={$this->_aliases['civicrm_contact']}.employer_id
+              AND {$this->_aliases['civicrm_relationship']}.relationship_type_id=4)
+     LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+          ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id
              AND {$this->_aliases['civicrm_address']}.is_primary = 1 )
- 
-     LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']} 
-          ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id 
+
+     LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
+          ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
              AND {$this->_aliases['civicrm_email']}.is_primary = 1) ";
   }
 
@@ -332,7 +331,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       //handle gender
       if (array_key_exists('civicrm_contact_gender_id', $row)) {
         if ($value = $row['civicrm_contact_gender_id']) {
-          $gender = CRM_Core_PseudoConstant::gender();
+          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
           $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
         }
         $entryFound = TRUE;

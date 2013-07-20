@@ -3,14 +3,6 @@
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <title>CiviCRM Installer</title>
-<script>
-function show(id) {
-  document.getElementById(id).style.display = '';
-}
-function hide(id) {
-  document.getElementById(id).style.display = 'none';
-}
-</script>
 <link rel="stylesheet" type="text/css" href=<?php echo $installURLPath . "template.css"?> />
 </head>
 
@@ -30,14 +22,14 @@ function hide(id) {
 <p class="warning">There are some issues that we recommend you look at before installing, however, you are still able to install the software.  Please see below for details.</p>
 
 <?php } else if(!$dbReq->hasErrors()) { ?>
-<p class="good">You're ready to install! &nbsp;&nbsp; 
+<p class="good">You're ready to install! &nbsp;&nbsp;
 </p>
 
 <?php } ?>
 
 <p>
   <input id="install_button" type="submit" name="go" value="Check Requirements and Install CiviCRM" onclick="document.getElementById('saving_top').style.display = ''; this.value = 'Installing CiviCRM...'" />
-  
+
   <span id="saving_top" style="display: none">
   &nbsp;
     <img src=<?php echo $installURLPath . "network-save.gif"?> />
@@ -82,7 +74,7 @@ create the database for you; otherwise, you must give the name of a database tha
 
 
 <h4>Other Settings</h4>
-<p style="margin-left: 2em" id="misc_credentials" > 
+<p style="margin-left: 2em" id="misc_credentials" >
 <!--style="display: none"-->
 <label for="seedLanguage"><span>Language of basic data:</span></label><select id="seedLanguage" name="seedLanguage">
   <?php

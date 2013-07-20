@@ -46,6 +46,12 @@ class CRM_Logging_Schema {
     'logging/contribute/summary',
   );
 
+  //CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement 
+  private $exceptions = array(
+    'civicrm_job'   => array('last_run'),
+    'civicrm_group' => array('cache_date'),
+  ); 
+
   /**
    * Populate $this->tables and $this->logs with current db state.
    */
@@ -255,7 +261,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     // add report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao             = new CRM_Report_DAO_Instance;
+      $dao             = new CRM_Report_DAO_ReportInstance;
       $dao->domain_id  = $domain_id;
       $dao->report_id  = $report;
       $dao->title      = $titles[$report];
@@ -342,7 +348,7 @@ COLS;
     // delete report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao            = new CRM_Report_DAO_Instance;
+      $dao            = new CRM_Report_DAO_ReportInstance;
       $dao->domain_id = $domain_id;
       $dao->report_id = $report;
       $dao->delete();
@@ -403,7 +409,7 @@ COLS;
       $cond = array( );
       foreach ($columns as $column) {
         // ignore modified_date changes
-        if ($column != 'modified_date') {
+        if ($column != 'modified_date' && !in_array($column, CRM_Utils_Array::value($table, $this->exceptions, array()))) {
           $cond[] = "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'')";
         }
       }

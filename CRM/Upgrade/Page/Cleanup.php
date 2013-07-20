@@ -29,7 +29,7 @@ class CRM_Upgrade_Page_Cleanup  extends CRM_Core_Page {
     $rows     = CRM_Upgrade_Incremental_php_FourTwo::deleteInvalidPairs();
     $template = CRM_Core_Smarty::singleton();
 
-    $columnHeaders = array("Contact ID", "ContributionID", "Contribution Status", "MembershipID", 
+    $columnHeaders = array("Contact ID", "ContributionID", "Contribution Status", "MembershipID",
                            "Membership Type", "Start Date", "End Date", "Membership Status", "Action");
     $template->assign('columnHeaders', $columnHeaders);
     $template->assign('rows', $rows);

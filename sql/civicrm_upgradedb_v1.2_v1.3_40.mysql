@@ -43,11 +43,11 @@ CREATE TABLE civicrm_accept_credit_card (
      is_active tinyint    COMMENT 'Is this property active?' 
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -238,7 +238,7 @@ CREATE TABLE civicrm_dupe_match (
 -- * 
 -- *
 -- *******************************************************/
-	
+  
    CREATE TABLE civicrm_financial_trxn (
 
 
@@ -306,7 +306,7 @@ CREATE TABLE civicrm_dupe_match (
      FOREIGN KEY (uf_group_id) REFERENCES civicrm_uf_group(id)
   
 )  TYPE=InnoDB  ;
-	
+  
 
 -- /*******************************************************
 -- *
@@ -364,7 +364,7 @@ CREATE TABLE civicrm_dupe_match (
 -- * Modify the civicrm_uf_group  Table Structure
 -- *
 -- *******************************************************/
-	
+  
     ALTER TABLE `civicrm_uf_group` DROP `weight` ;
 
 
@@ -378,7 +378,7 @@ CREATE TABLE civicrm_dupe_match (
                                   DROP `is_match` ;
    
    ALTER TABLE `civicrm_uf_field` ADD `location_type_id` INT UNSIGNED COMMENT 'Location type of this mapping, if required';
-   ALTER TABLE `civicrm_uf_field` ADD INDEX (`location_type_id`);	
+   ALTER TABLE `civicrm_uf_field` ADD INDEX (`location_type_id`);  
    ALTER TABLE `civicrm_uf_field` ADD FOREIGN KEY (`location_type_id`) REFERENCES `civicrm_location_type` (`id`);
 
    ALTER TABLE `civicrm_uf_field` ADD `phone_type` VARCHAR( 64 )   COMMENT 'Phone type, if required';
@@ -412,9 +412,9 @@ CREATE TABLE civicrm_dupe_match (
 -- *******************************************************/
 
   INSERT INTO `civicrm_accept_credit_card` VALUES (1,1,'Visa','Visa',0,1),
-					          (2,1,'MasterCard','Master Card',0,1),
-						  (3,1,'Amex','American Express',0,1),
-						  (4,1,'Discover','Discover',0,1);
+                    (2,1,'MasterCard','Master Card',0,1),
+              (3,1,'Amex','American Express',0,1),
+              (4,1,'Discover','Discover',0,1);
 
 
 -- /*******************************************************

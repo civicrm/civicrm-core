@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -175,8 +174,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
 
   /*
-	 * Test GET DAO function returns DAO
-	 */
+   * Test GET DAO function returns DAO
+   */
   function testGetDAO() {
     $DAO = _civicrm_api3_get_DAO('civicrm_api3_custom_group_get');
     $this->assertEquals('CRM_Core_DAO_CustomGroup', $DAO);
@@ -196,8 +195,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Member_DAO_Membership', $DAO);
   }
   /*
-	 * Test GET DAO function returns DAO
-	 */
+   * Test GET DAO function returns DAO
+   */
   function testGetBAO() {
     $BAO = _civicrm_api3_get_BAO('civicrm_api3_website_get');
     $this->assertEquals('CRM_Core_BAO_Website', $BAO);
@@ -254,6 +253,18 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('values', $result);
     $result = civicrm_api('event', 'getfields', array('version' => 3));
     $this->assertArrayHasKey('values', $result);
+  }
+
+  function testGetFields_AllOptions() {
+    $result = civicrm_api('contact', 'getfields', array(
+      'options' => array(
+        'get_options' => 'all',
+      ),
+      'version' => 3
+    ));
+    $this->assertAPISuccess($result);
+    $this->assertEquals('Household', $result['values']['contact_type']['options']['Household']);
+    $this->assertEquals('HTML', $result['values']['preferred_mail_format']['options']['HTML']);
   }
 }
 

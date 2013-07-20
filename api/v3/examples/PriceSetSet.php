@@ -4,7 +4,7 @@
  
  */
 function price_set_set_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'entity_table' => 'civicrm_event',
   'entity_id' => 1,
@@ -23,14 +23,14 @@ $params = array(
  */
 function price_set_set_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 16,
-  'values' => array( 
-      '16' => array( 
-          'id' => '16',
+  'id' => 4,
+  'values' => array(
+      '4' => array(
+          'id' => '4',
           'domain_id' => '',
           'name' => 'event price',
           'title' => 'event price',

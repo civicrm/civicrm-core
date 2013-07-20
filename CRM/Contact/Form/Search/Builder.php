@@ -393,6 +393,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     return array_merge(
       CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE),
       CRM_Core_Component::getQueryFields(),
+      CRM_Contact_BAO_Query_Hook::singleton()->getFields(),
       CRM_Activity_BAO_Activity::exportableFields()
     );
   }
@@ -407,10 +408,10 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     // Hack to add options not retrieved by getfields
     // This list could go on and on, but it would be better to fix getfields
     $options = array(
-      'group' => 'contact',
-      'tag' => 'contact',
-      'country' => 'contact',
-      'state_province' => 'contact',
+      'group' => 'group_contact',
+      'tag' => 'entity_tag',
+      'country' => 'address',
+      'state_province' => 'address',
       'gender' => 'contact',
       'world_region' => 'contact',
       'individual_prefix' => 'contact',

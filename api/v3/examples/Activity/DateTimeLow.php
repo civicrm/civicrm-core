@@ -4,7 +4,7 @@
  demonstrates _low filter (at time of writing doesn't work if contact_id is set
  */
 function activity_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'filter.activity_date_time_low' => '20120101000000',
   'sequential' => 1,
@@ -20,16 +20,15 @@ $params = array(
  */
 function activity_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '2',
-          'source_contact_id' => '17',
-          'activity_type_id' => '44',
+          'activity_type_id' => '46',
           'subject' => 'Make-it-Happen Meeting',
           'activity_date_time' => '2012-02-16 00:00:00',
           'duration' => '120',
@@ -41,6 +40,7 @@ function activity_get_expectedresult(){
           'is_auto' => 0,
           'is_current_revision' => '1',
           'is_deleted' => 0,
+          'source_contact_id' => '17',
         ),
     ),
 );

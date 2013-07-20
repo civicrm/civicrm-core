@@ -375,20 +375,23 @@ AND    entity_table = 'civicrm_contact'
 
   function activity(&$contactIDs, &$additionalContacts) {
     static $_activitiesHandled = array();
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     $ids = implode(',', $contactIDs);
 
     $sql = "(
   SELECT     a.*
   FROM       civicrm_activity a
-  INNER JOIN civicrm_activity_assignment aa ON aa.activity_id = a.id
-  WHERE      aa.assignee_contact_id IN ( $ids )
+  INNER JOIN civicrm_activity_contact aa ON aa.activity_id = a.id AND aa.record_type_id = $assigneeID
+  WHERE      aa.contact_id IN ( $ids )
     AND      ( a.activity_type_id != 3 AND a.activity_type_id != 20 )
 ) UNION (
   SELECT     a.*
   FROM       civicrm_activity a
-  INNER JOIN civicrm_activity_target at ON at.activity_id = a.id
-  WHERE      at.target_contact_id IN ( $ids )
+  INNER JOIN civicrm_activity_contact at ON at.activity_id = a.id AND at.record_type_id = $targetID
+  WHERE      at.contact_id IN ( $ids )
     AND      ( a.activity_type_id != 3 AND a.activity_type_id != 20 )
 )
 ";
@@ -428,8 +431,9 @@ AND    entity_table = 'civicrm_contact'
     $activityIDString = implode(",", $activityIDs);
 
     // now get all assignee contact ids and target contact ids for this activity
-    $sql = "SELECT * FROM civicrm_activity_assignment WHERE activity_id IN ($activityIDString)";
-    $aaDAO = & CRM_Core_DAO::executeQuery($sql);
+    $sql   = "SELECT * FROM civicrm_activity_contact WHERE activity_id IN ($activityIDString) AND record_type = 'Assignee'";
+    $aaDAO = &CRM_Core_DAO::executeQuery($sql);
+
     $activityContacts = array();
     while ($aaDAO->fetch()) {
       $activityAssignee = array(
@@ -442,8 +446,9 @@ AND    entity_table = 'civicrm_contact'
     }
     $aaDAO->free();
 
-    $sql = "SELECT * FROM civicrm_activity_target WHERE activity_id IN ($activityIDString)";
-    $atDAO = & CRM_Core_DAO::executeQuery($sql);
+    $sql = "SELECT * FROM civicrm_activity_contact WHERE activity_id IN ($activityIDString) AND record_type = 'Target'";
+    $atDAO = &CRM_Core_DAO::executeQuery($sql);
+
     while ($atDAO->fetch()) {
       $activityTarget = array(
         'id' => $atDAO->id,

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -104,8 +103,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
 
   function testGetUFMatchIDWrongParam() {
     $params = 'a string';
-    $result = civicrm_api('uf_match', 'get', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $result = $this->callAPIFailure('uf_match', 'get', $params);
   }
 
   /**
@@ -124,8 +122,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
 
   function testGetUFIDWrongParam() {
     $params = 'a string';
-    $result = civicrm_api('uf_match', 'get', $params);
-    $this->assertEquals($result['is_error'], 1);
+    $result = $this->callAPIFailure('uf_match', 'get', $params);
   }
 
   /**

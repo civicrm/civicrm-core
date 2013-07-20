@@ -5,7 +5,7 @@ UPDATE `civicrm_dedupe_rule_group` SET  `is_default` = 0 WHERE @cnt_strict > 1 A
 SELECT @max_fuzzy := max(id), @cnt_fuzzy := count(*) FROM `civicrm_dedupe_rule_group` WHERE `contact_type` = 'Individual' AND `level` = 'Fuzzy' AND `is_default` = 1;
 UPDATE `civicrm_dedupe_rule_group` SET  `is_default` = 0 WHERE @cnt_fuzzy > 1 AND id = @max_fuzzy;
 
--- Insert line items for contribution for api/import  
+-- Insert line items for contribution for api/import
 SELECT @fieldID := cpf.id, @fieldValueID := cpfv.id FROM civicrm_price_set cps
 LEFT JOIN civicrm_price_field cpf ON  cps.id = cpf.price_set_id
 LEFT JOIN civicrm_price_field_value cpfv ON cpf.id = cpfv.price_field_id

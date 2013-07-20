@@ -36,11 +36,7 @@
 /**
  * Drupal specific stuff goes here
  */
-class CRM_Utils_System_Drupal6 extends CRM_Utils_System_Base {
-  function __construct() {
-    $this->is_drupal = TRUE;
-    $this->supports_form_extensions = TRUE;
-  }
+class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
   /**
    * if we are using a theming system, invoke theme, else just print the
@@ -592,6 +588,20 @@ SELECT name, mail
     user_authenticate_finalize(&$edit);
   }
   */
+
+  /**
+   * Determine the native ID of the CMS user
+   *
+   * @param $username
+   * @return int|NULL
+   */
+  function getUfId($username) {
+    $user = user_load(array('name' => $username));
+    if (empty($user->uid)) {
+      return NULL;
+    }
+    return $user->uid;
+  }
 
   /**
    * Set a message in the UF to display to a user

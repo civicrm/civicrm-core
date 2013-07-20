@@ -8,7 +8,7 @@
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
+s | under the terms of the GNU Affero General Public License           |
  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
@@ -126,10 +126,13 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       $paneNames[$pane['title']] = $pane['name'];
     }
 
-    $this->_paneTemplatePath = array();
+    $hookPanes = array();
+    CRM_Contact_BAO_Query_Hook::singleton()->registerAdvancedSearchPane($hookPanes);
+    $paneNames = array_merge($paneNames, $hookPanes);
 
+    $this->_paneTemplatePath = array();
     foreach ($paneNames as $name => $type) {
-      if (!$this->_searchOptions[$type]) {
+      if (!array_key_exists($type, $this->_searchOptions) && !in_array($type, $hookPanes)) {
         continue;
       }
 
@@ -148,15 +151,18 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       ) {
         $allPanes[$name]['open'] = 'true';
 
-
         if (CRM_Utils_Array::value($type, $components)) {
           $c = $components[$type];
           $this->add('hidden', "hidden_$type", 1);
           $c->buildAdvancedSearchPaneForm($this);
           $this->_paneTemplatePath[$type] = $c->getAdvancedSearchPaneTemplatePath();
         }
+        else if (in_array($type, $hookPanes)) {
+          CRM_Contact_BAO_Query_Hook::singleton()->buildAdvancedSearchPaneForm($this, $type);
+          CRM_Contact_BAO_Query_Hook::singleton()->setAdvancedSearchPaneTemplatePath($this->_paneTemplatePath, $type);
+        }
         else {
-          eval('CRM_Contact_Form_Search_Criteria::' . $type . '( $this );');
+          CRM_Contact_Form_Search_Criteria::$type($this);
           $template = ucfirst($type);
           $this->_paneTemplatePath[$type] = "CRM/Contact/Form/Search/Criteria/{$template}.tpl";
         }

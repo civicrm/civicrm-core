@@ -63,14 +63,14 @@ class CRM_Upgrade_Incremental_php_FourThree {
       }
     }
     if ($rev == '4.3.beta4' && CRM_Utils_Constant::value('CIVICRM_UF', FALSE) == 'Drupal6') {
-      // CRM-11823 - Make sure the D6 HTML HEAD technique will work on upgrade pages
-      theme('item_list', array()); // force-load theme registry
-      $theme_registry = theme_get_registry();
-      if (
-        !isset($theme_registry['page']['preprocess functions']) ||
-        FALSE === array_search('civicrm_preprocess_page_inject', $theme_registry['page']['preprocess functions'])
-      ) {
-        CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
+      // CRM-11823 - Make sure the D6 HTML HEAD technique will work on
+      // upgrade pages ... except when we're in Drush.
+      if (!function_exists('drush_main')) {
+        theme('item_list', array()); // force-load theme registry
+        $theme_registry = theme_get_registry();
+        if (!isset($theme_registry['page']['preprocess functions']) || FALSE === array_search('civicrm_preprocess_page_inject', $theme_registry['page']['preprocess functions'])) {
+          CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
+        }
       }
     }
   }
@@ -299,7 +299,7 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
   function upgrade_4_3_4($rev) {
     $this->addTask(ts('Upgrade DB to 4.3.4: SQL'), 'task_4_3_x_runSql', $rev);
   }
-  
+
   function upgrade_4_3_5($rev) {
     // CRM-12156
     $config = CRM_Core_Config::singleton();
@@ -310,7 +310,7 @@ WHERE CONSTRAINT_NAME = 'FK_civicrm_financial_item_contact_id'
 AND CONSTRAINT_SCHEMA = %1";
     $params = array(1 => array($dbname['database'], 'String'));
     $onDelete = CRM_Core_DAO::singleValueQuery($sql, $params, TRUE, FALSE);
-    
+
     if ($onDelete != 'CASCADE') {
       $query = "ALTER TABLE `civicrm_financial_item`
 DROP FOREIGN KEY FK_civicrm_financial_item_contact_id,
@@ -428,14 +428,14 @@ AND    financial_account_type_id = {$accountType}
 ";
     $financialAccountId = CRM_Core_DAO::singleValueQuery($query);
 
-    $accountRelationsips = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL);
+    $accountRelationsips = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
 
     $accountsReceivableAccount = array_search('Accounts Receivable Account is', $accountRelationsips);
     $incomeAccountIs = array_search('Income Account is', $accountRelationsips);
     $assetAccountIs = array_search('Asset Account is', $accountRelationsips);
     $expenseAccountIs = array_search('Expense Account is', $accountRelationsips);
 
-    $financialItemStatus = CRM_Core_PseudoConstant::accountOptionValues('financial_item_status');
+    $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $unpaidStatus = array_search('Unpaid', $financialItemStatus);
     $paidStatus = array_search('Paid', $financialItemStatus);
 
@@ -903,7 +903,7 @@ ALTER TABLE civicrm_financial_account
         $saveDao = new CRM_Contact_DAO_SavedSearch();
       }
       else {
-        $saveDao = new CRM_Report_DAO_Instance();
+        $saveDao = new CRM_Report_DAO_ReportInstance();
       }
       $saveDao->id = $dao->id;
 

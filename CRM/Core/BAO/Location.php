@@ -63,7 +63,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
     // create location blocks.
     foreach (self::$blocks as $block) {
       if ($block != 'address') {
-        eval('$location[$block] = CRM_Core_BAO_Block::create( $block, $params, $entity );');
+        $location[$block] = CRM_Core_BAO_Block::create( $block, $params, $entity );
       }
       else {
         $location[$block] = CRM_Core_BAO_Address::create($params, $fixAddress, $entity);
@@ -198,8 +198,8 @@ WHERE e.id = %1";
     $locBlock->delete();
     foreach ($store as $daoName => $id) {
       if ($id) {
-        $daoName = substr($daoName, 0, -2);
-        eval('$dao = new CRM_Core_DAO_' . $daoName . '( );');
+        $daoName = 'CRM_Core_DAO_' . substr($daoName, 0, -2);
+        $dao = new $daoName();
         $dao->id = $id;
         $dao->find(TRUE);
         $dao->delete();
@@ -245,12 +245,12 @@ WHERE e.id = %1";
     if (empty($entityBlock)) {
       return NULL;
     }
-
+    $blocks = array();
     $name_map = array(
       'im' => 'IM',
       'openid' => 'OpenID',
     );
-
+    $blocks = array();
     //get all the blocks for this contact
     foreach (self::$blocks as $block) {
       if (array_key_exists($block, $name_map)) {
@@ -259,7 +259,8 @@ WHERE e.id = %1";
       else {
         $name = ucfirst($block);
       }
-      eval('$blocks[$block] = CRM_Core_BAO_' . $name . '::getValues( $entityBlock, $microformat );');
+      $baoString = 'CRM_Core_BAO_' . $name;
+      $blocks[$block] = $baoString::getValues( $entityBlock, $microformat );
     }
     return $blocks;
   }

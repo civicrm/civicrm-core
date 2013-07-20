@@ -91,7 +91,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
         return PEAR::raiseError( 'Unable to create spooled mailing.' );
       }
 
-      $job = new CRM_Mailing_BAO_Job();
+      $job = new CRM_Mailing_BAO_MailingJob();
       $job->is_test = 0; // if set to 1 it doesn't show in the UI
       $job->status = 'Complete';
       $job->scheduled_date = CRM_Utils_Date::processDate(date('Y-m-d'), date('H:i:s'));
@@ -101,7 +101,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $job->save();
       $job_id = $job->id; // need this for parent_id below
 
-      $job = new CRM_Mailing_BAO_Job();
+      $job = new CRM_Mailing_BAO_MailingJob();
       $job->is_test = 0;
       $job->status = 'Complete';
       $job->scheduled_date = CRM_Utils_Date::processDate(date('Y-m-d'), date('H:i:s'));

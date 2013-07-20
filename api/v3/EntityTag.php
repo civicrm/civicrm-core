@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -98,7 +97,7 @@ function civicrm_api3_entity_tag_display($params) {
 
   $values = CRM_Core_BAO_EntityTag::getTag($entityID, $entityTable);
   $result = array();
-  $tags   = CRM_Core_PseudoConstant::tag();
+  $tags   = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
   foreach ($values as $v) {
     $result[] = $tags[$v];
   }

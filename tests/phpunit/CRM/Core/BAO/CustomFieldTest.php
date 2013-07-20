@@ -40,6 +40,31 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertDBNotNull('CRM_Core_DAO_CustomField', 1, 'id', 'is_active', 'Database check for edited CustomField.');
     $this->assertDBNotNull('CRM_Core_DAO_CustomField', $fields['label'], 'id', 'label', 'Database check for edited CustomField.');
 
+    $dbFieldName = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldID, 'name', 'id', 'Database check for edited CustomField.');
+    $dbColumnName = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldID, 'column_name', 'id', 'Database check for edited CustomField.');
+    $this->assertEquals(strtolower("{$dbFieldName}_{$customFieldID}"), $dbColumnName,
+        "Column name ends in ID");
+
+    Custom::deleteGroup($customGroup);
+  }
+  
+  function testCreateCustomfieldColumnName() {
+    $customGroup = Custom::createGroup(array(), 'Individual');
+    $fields = array(
+      'label' => 'testFld 2',
+      'column_name' => 'special_colname',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+      'custom_group_id' => $customGroup->id,
+    );
+    $customField = CRM_Core_BAO_CustomField::create($fields);
+    $customFieldID = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customGroup->id, 'id', 'custom_group_id',
+      'Database check for created CustomField.'
+    );
+    $dbColumnName = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldID, 'column_name', 'id', 'Database check for edited CustomField.');
+    $this->assertEquals($fields['column_name'], $dbColumnName,
+        "Column name set as specified");
+
     Custom::deleteGroup($customGroup);
   }
 
@@ -108,8 +133,9 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'groupId' => $customGroup->id,
-      'dataType' => 'Memo',
-      'htmlType' => 'TextArea',
+      'label' => 'Throwaway Field',
+      'data_type' => 'Memo',
+      'html_type' => 'TextArea',
     );
 
     $customField = Custom::createField(array(), $fields);

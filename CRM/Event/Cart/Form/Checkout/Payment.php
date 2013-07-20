@@ -125,7 +125,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       if ($payment_processor_id == NULL && $event_in_cart->event->payment_processor != NULL) {
         $payment_processor_id = $event_in_cart->event->payment_processor;
-		$this->financial_type_id = $event_in_cart->event->financial_type_id;
+    $this->financial_type_id = $event_in_cart->event->financial_type_id;
       }
       else {
         if ($event_in_cart->event->payment_processor != NULL && $event_in_cart->event->payment_processor != $payment_processor_id) {
@@ -226,7 +226,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
   function process_event_line_item(&$event_in_cart, $class = NULL) {
     $cost         = 0;
-    $price_set_id = CRM_Price_BAO_Set::getFor("civicrm_event", $event_in_cart->event_id);
+    $price_set_id = CRM_Price_BAO_PriceSet::getFor("civicrm_event", $event_in_cart->event_id);
     $amount_level = NULL;
     if ($price_set_id) {
       $event_price_values = array();
@@ -235,10 +235,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
           $event_price_values[$matches[1]] = $value;
         }
       }
-      $price_sets       = CRM_Price_BAO_Set::getSetDetail($price_set_id, TRUE);
+      $price_sets       = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE);
       $price_set        = $price_sets[$price_set_id];
       $price_set_amount = array();
-      CRM_Price_BAO_Set::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
+      CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
       $cost            = $event_price_values['amount'];
       $amount_level    = $event_price_values['amount_level'];
     }
@@ -559,7 +559,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'payment_processor' => $this->_paymentProcessor['payment_processor_type'],
       'trxn_id' => $result['trxn_id'],
     );
-	  $trxn = new CRM_Financial_DAO_FinancialTrxn();
+    $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($trxnParams);
     if (!CRM_Utils_Rule::currencyCode($trxn->currency)) {
       $config = CRM_Core_Config::singleton();
@@ -618,7 +618,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         'amount' => $params['amount'],
         'currency' => CRM_Utils_Array::value('currencyID', $params),
       );
-		    $entity_trxn =& new CRM_Financial_DAO_EntityFinancialTrxn();
+        $entity_trxn =& new CRM_Financial_DAO_EntityFinancialTrxn();
       $entity_trxn->copyValues($entity_financial_trxn_params);
       $entity_trxn->save();
     }

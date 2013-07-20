@@ -59,15 +59,15 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
   function build_price_options($event) {
     $price_fields_for_event = array();
     $base_field_name = "event_{$event->id}_amount";
-    $price_set_id = CRM_Price_BAO_Set::getFor('civicrm_event', $event->id);
+    $price_set_id = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event->id);
     if ($price_set_id) {
-      $price_sets = CRM_Price_BAO_Set::getSetDetail($price_set_id, TRUE, TRUE);
+      $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
       $price_set  = $price_sets[$price_set_id];
       $index      = -1;
       foreach ($price_set['fields'] as $field) {
         $index++;
         $field_name = "event_{$event->id}_price_{$field['id']}";
-        CRM_Price_BAO_Field::addQuickFormElement($this, $field_name, $field['id'], FALSE);
+        CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE);
         $price_fields_for_event[] = $field_name;
       }
     }
@@ -85,7 +85,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       $price_set_id = CRM_Event_BAO_Event::usesPriceSet($event_in_cart->event_id);
       if ($price_set_id) {
-        $priceField = new CRM_Price_DAO_Field();
+        $priceField = new CRM_Price_DAO_PriceField();
         $priceField->price_set_id = $price_set_id;
         $priceField->find();
 
@@ -104,7 +104,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
 
         $lineItem = array();
         if (is_array($this->_values['fee']['fields'])) {
-          CRM_Price_BAO_Set::processAmount($this->_values['fee']['fields'], $fields, $lineItem);
+          CRM_Price_BAO_PriceSet::processAmount($this->_values['fee']['fields'], $fields, $lineItem);
           //XXX total...
           if ($fields['amount'] < 0) {
             $this->_errors['_qf_default'] = ts("Price Levels can not be less than zero. Please select the options accordingly");

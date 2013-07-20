@@ -36,11 +36,7 @@
 /**
  * Drupal specific stuff goes here
  */
-class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
-  function __construct() {
-    $this->is_drupal = TRUE;
-    $this->supports_form_extensions = TRUE;
-  }
+class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
   /**
    * Function to create a user in Drupal.
@@ -661,6 +657,20 @@ AND    u.status = 1
     user_login_finalize(&$edit);
   }
   */
+
+  /**
+   * Determine the native ID of the CMS user
+   *
+   * @param $username
+   * @return int|NULL
+   */
+  function getUfId($username) {
+    $user = user_load_by_name($username);
+    if (empty($user->uid)) {
+      return NULL;
+    }
+    return $user->uid;
+  }
 
   /**
    * Set a message in the UF to display to a user

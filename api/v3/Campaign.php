@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -35,8 +34,6 @@
  * @copyright CiviCRM LLC (c) 2004-2013
  */
 
-require_once 'CRM/Campaign/BAO/Campaign.php';
-
 /**
  * create/update campaign
  *
@@ -57,7 +54,7 @@ function civicrm_api3_campaign_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */

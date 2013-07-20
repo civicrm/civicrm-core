@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+
 {* Callback snippet: Load payment processor *}
 {if $snippet}
 {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
@@ -318,7 +319,7 @@
   {/if}
 
   {if $isCaptcha}
-  {include file='CRM/common/ReCAPTCHA.tpl'}
+    {include file='CRM/common/ReCAPTCHA.tpl'}
   {/if}
   <div id="crm-submit-buttons" class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}

@@ -272,7 +272,7 @@ class CRM_Event_BAO_Query {
         return;
 
       case 'participant_fee_id':
-        $feeLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_FieldValue', $value, 'label');
+        $feeLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $value, 'label');
         $feeLabel = CRM_Core_DAO::escapeString(trim($feeLabel));
         if ($value) {
           $query->_where[$grouping][] = "civicrm_participant.fee_level $op '$feeLabel'";
@@ -570,7 +570,7 @@ class CRM_Event_BAO_Query {
     $eventTypeId      = &$form->add('hidden', 'event_type_id', '', array('id' => 'event_type_id'));
     $participantFeeId = &$form->add('hidden', 'participant_fee_id', '', array('id' => 'participant_fee_id'));
 
-    CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
 
     $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     asort($status);

@@ -33,7 +33,7 @@
       {if $premiumBlock.premiums_intro_text}
         <div id="premiums-intro" class="crm-section premiums_intro-section">
           {$premiumBlock.premiums_intro_text}
-        </div> 
+        </div>
       {/if}
     {/if}
 
@@ -63,7 +63,7 @@
             <input type="checkbox" checked="checked" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label}
           </div>
         </div>
-      {/if}          
+      {/if}
       {foreach from=$products item=row}
         <div class="premium {if $showPremium}premium-selectable{/if}" id="premium_id-{$row.id}" min_contribution="{$row.min_contribution}">
           <div class="premium-short">
@@ -92,7 +92,7 @@
                 {/if}
               {else}
                 <div class="premium-full-options">
-                  <p><strong>{$row.options}</strong></p> 
+                  <p><strong>{$row.options}</strong></p>
                 </div>
               {/if}
               {if ( ($premiumBlock.premiums_display_min_contribution AND $context EQ "makeContribution") OR $preview EQ 1) AND $row.min_contribution GT 0 }
@@ -113,7 +113,7 @@
             <input type="checkbox" checked="checked" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label}
           </div>
         </div>
-      {/if}          
+      {/if}
       </div>
     {/strip}
 
@@ -123,15 +123,15 @@
       </div>
     {/if}
   </div>
-  
+
   {if $context EQ "makeContribution"}
     {literal}
-    <script> 
+    <script>
       cj(function($){
         var is_separate_payment = {/literal}{if $membershipBlock.is_separate_payment}{$membershipBlock.is_separate_payment}{else}0{/if}{literal};
 
         // select a new premium
-        function select_premium(premium_id) { 
+        function select_premium(premium_id) {
           if(cj(premium_id).length) {
             // hide other active premium
             cj('.premium-full').hide();
@@ -192,7 +192,7 @@
           check_price_set('.contribution_amount-content input[type="radio"]');
 
           // next, check for membership level price set
-          check_price_set('.membership_amount-content input[type="radio"]'); 
+          check_price_set('.membership_amount-content input[type="radio"]');
 
           // make sure amount is a number at this point
           if(!amount) amount = 0;
@@ -288,12 +288,12 @@
           }
           return true;
         }, error_message);
-        
+
         // add validation rules
         CRM.validate.functions.push(function(){
           cj('#selectProduct').rules('add', 'premiums');
         });
-        
+
         // need to use jquery validate's ignore option, so that it will not ignore hidden fields
         CRM.validate.params['ignore'] = '.ignore';
       });

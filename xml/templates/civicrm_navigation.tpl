@@ -22,6 +22,9 @@
 -- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 -- +--------------------------------------------------------------------+
 -- Navigation Menu, Preferences and Mail Settings
+--
+-- Generated from {$smarty.template}
+-- {$generated}
 
 SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 
@@ -69,6 +72,7 @@ VALUES
   ( @domainID, NULL, 1, 'Mailing Preferences', 'civimail_workflow', '{serialize}0{/serialize}' ),
   ( @domainID, NULL, 1, 'Mailing Preferences', 'civimail_server_wide_lock', '{serialize}0{/serialize}' ),
   ( @domainID, NULL, 1, 'Mailing Preferences', 'mailing_backend', {literal}'a:1:{s:15:"outBound_option";s:1:"3";}'{/literal} ),
+  ( @domainID, NULL, 1, 'Mailing Preferences', 'write_activity_record', '{serialize}1{/serialize}' ),
   ( @domainID, NULL, 1, 'Member Preferences' , 'default_renewal_contribution_page', NULL ),
   ( @domainID, NULL, 1, 'Multi Site Preferences', 'is_enabled', '{serialize}0{/serialize}' ),
   ( @domainID, NULL, 1, 'Multi Site Preferences', 'uniq_email_per_site', '{serialize}0{/serialize}' ),
@@ -249,7 +253,7 @@ VALUES
     ( @domainID, 'civicrm/admin/component&reset=1',                         '{ts escape="sql" skip="true"}Headers, Footers, and Automated Messages{/ts}', 'Headers, Footers, and Automated Messages', 'access CiviMail,administer CiviCRM', 'AND', @mailinglastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/admin/messageTemplates&reset=1',                  '{ts escape="sql" skip="true"}Message Templates{/ts}', 'Message Templates',                 'administer CiviCRM', '', @mailinglastID, '1', NULL, 7 ),
     ( @domainID, 'civicrm/admin/options/from_email&group=from_email_address&reset=1', '{ts escape="sql" skip="true"}From Email Addresses{/ts}', 'From Email Addresses', 'administer CiviCRM', '', @mailinglastID, '1', 1, 8 ),
-    ( @domainID, 'civicrm/sms/send?reset=1',  '{ts escape="sql" skip="true"}New SMS{/ts}', 'New SMS',	 'administer CiviCRM', NULL, @mailinglastID, '1', NULL, 9 ),
+    ( @domainID, 'civicrm/sms/send?reset=1',  '{ts escape="sql" skip="true"}New SMS{/ts}', 'New SMS', 'administer CiviCRM', NULL, @mailinglastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/mailing/browse?reset=1&sms=1', '{ts escape="sql" skip="true"}Find Mass SMS{/ts}', 'Find Mass SMS', 'administer CiviCRM', NULL, @mailinglastID, '1', 1, 10 );
 
 INSERT INTO civicrm_navigation
@@ -525,7 +529,7 @@ VALUES
     ( @domainID, 'civicrm/admin/participant_status&reset=1',                   '{ts escape="sql" skip="true"}Participant Statuses{/ts}', 'Participant Statuses',       'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 8 ),
     ( @domainID, 'civicrm/admin/options/participant_role&group=participant_role&reset=1', '{ts escape="sql" skip="true"}Participant Roles{/ts}', 'Participant Roles',  'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/admin/options/participant_listing&group=participant_listing&reset=1', '{ts escape="sql" skip="true"}Participant Listing Options{/ts}', 'Participant Listing Options', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 10 ),
-    ( @domainID, 'civicrm/admin/options/event_badge&group=event_badge&reset=1', '{ts escape="sql" skip="true"}Event Badge Formats{/ts}', 'Event Badge Formats', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 11 ),
+    ( @domainID, 'civicrm/admin/badgelayout&reset=1',                       '{ts escape="sql" skip="true"}Event Name Badge Layouts{/ts}', 'Event Name Badge Layouts', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 11 ),
     ( @domainID, 'civicrm/admin/paymentProcessor&reset=1',                  '{ts escape="sql" skip="true"}Payment Processors{/ts}', 'Payment Processors',              'administer CiviCRM', '',                     @adminEventlastID, '1', NULL, 12),
     ( @domainID, 'civicrm/admin/setting/preferences/event&reset=1',         '{ts escape="sql" skip="true"}CiviEvent Component Settings{/ts}', 'CiviEvent Component Settings','access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 13 );
 

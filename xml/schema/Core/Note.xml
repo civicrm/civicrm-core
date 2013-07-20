@@ -33,6 +33,11 @@
        <comment>Foreign key to the referenced item.</comment>
        <add>1.1</add>
   </field>
+  <dynamicForeignKey>
+       <idColumn>entity_id</idColumn>
+       <typeColumn>entity_table</typeColumn>
+       <add>1.1</add>
+  </dynamicForeignKey>
   <index>
        <name>index_entity</name>
        <fieldName>entity_table</fieldName>

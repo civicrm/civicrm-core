@@ -95,7 +95,7 @@ class CRM_Campaign_BAO_Query {
     //all below tables are require to fetch  result.
 
     //1. get survey activity target table in.
-    $query->_select['survey_activity_target_contact_id'] = 'civicrm_activity_target.target_contact_id as survey_activity_target_contact_id';
+    $query->_select['survey_activity_target_contact_id'] = 'civicrm_activity_target.contact_id as survey_activity_target_contact_id';
     $query->_select['survey_activity_target_id'] = 'civicrm_activity_target.id as survey_activity_target_id';
     $query->_element['survey_activity_target_id'] = 1;
     $query->_element['survey_activity_target_contact_id'] = 1;
@@ -158,10 +158,10 @@ class CRM_Campaign_BAO_Query {
         $query->_qill[$grouping][] = ts('Survey - %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $value, 'title')));
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_activity.source_record_id',
-          $op, $value, "Integer"
+          $op, $value, 'Integer'
         );
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_survey.id',
-          $op, $value, "Integer"
+          $op, $value, 'Integer'
         );
         return;
 
@@ -170,13 +170,12 @@ class CRM_Campaign_BAO_Query {
 
         $query->_qill[$grouping][] = ts('Survey Status - %1', array(1 => $activityStatus[$value]));
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_activity.status_id',
-          $op, $value, "Integer"
+          $op, $value, 'Integer'
         );
         return;
 
       case 'campaign_search_voter_for':
-        if (in_array($value, array(
-          'release', 'interview'))) {
+        if (in_array($value, array('release', 'interview'))) {
           $query->_where[$grouping][] = '(civicrm_activity.is_deleted = 0 OR civicrm_activity.is_deleted IS NULL)';
         }
         return;
@@ -190,8 +189,8 @@ class CRM_Campaign_BAO_Query {
           }
         }
         $query->_qill[$grouping][] = ts('Survey Interviewer - %1', array(1 => $surveyInterviewerName));
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_activity_assignment.assignee_contact_id',
-          $op, $value, "Integer"
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_activity_assignment.contact_id',
+          $op, $value, 'Integer'
         );
         return;
     }
@@ -205,9 +204,15 @@ class CRM_Campaign_BAO_Query {
       return $from;
     }
 
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
     switch ($name) {
       case self::CIVICRM_ACTIVITY_TARGET:
-        $from = " INNER JOIN civicrm_activity_target ON ( civicrm_activity_target.target_contact_id = contact_a.id ) ";
+        $from = " INNER JOIN civicrm_activity_contact civicrm_activity_target
+   ON ( civicrm_activity_target.contact_id = contact_a.id AND civicrm_activity_target.record_type_id = $targetID) ";
         break;
 
       case self::CIVICRM_ACTIVITY:
@@ -219,7 +224,8 @@ class CRM_Campaign_BAO_Query {
 
       case self::CIVICRM_ACTIVITY_ASSIGNMENT:
         $from = "
-INNER JOIN civicrm_activity_assignment ON ( civicrm_activity.id = civicrm_activity_assignment.activity_id ) ";
+INNER JOIN  civicrm_activity_contact civicrm_activity_assignment ON ( civicrm_activity.id = civicrm_activity_assignment.activity_id AND
+civicrm_activity_assignment.record_type_id = $assigneeID ) ";
         break;
 
       case 'civicrm_survey':

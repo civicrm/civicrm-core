@@ -352,6 +352,19 @@ class CRM_Core_BAO_ConfigSetting {
     if (!empty($defaults)) {
       // retrieve directory and url preferences also
       CRM_Core_BAO_Setting::retrieveDirectoryAndURLPreferences($defaults);
+
+      // Pickup enabled-components from settings table if found.
+      $enableComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+      if (!empty($enableComponents)) {
+        $defaults['enableComponents'] = $enableComponents;
+
+        $components = CRM_Core_Component::getComponents();
+        $enabledComponentIDs = array();
+        foreach ($defaults['enableComponents'] as $name) {
+          $enabledComponentIDs[] = $components[$name]->componentID;
+        }
+        $defaults['enableComponentIDs'] = $enabledComponentIDs;
+      }
     }
   }
 
@@ -438,48 +451,23 @@ class CRM_Core_BAO_ConfigSetting {
     return array($url, $dir, $siteName, $siteRoot);
   }
 
+/**
+ * Return likely default settings
+ * @return array site settings
+ *  -$url,
+ * - $dir Base Directory
+ * - $siteName
+ * - $siteRoot
+ */
   static function getBestGuessSettings() {
     $config = CRM_Core_Config::singleton();
-
-    $url = $config->userFrameworkBaseURL;
-    $siteName = $siteRoot = NULL;
-    if ($config->userFramework == 'Joomla') {
-      $url = preg_replace(
-        '|/administrator|',
-        '',
-        $config->userFrameworkBaseURL
-      );
-      $siteRoot = preg_replace(
-        '|/media/civicrm/.*$|',
-        '',
-        $config->imageUploadDir
-      );
-    }
-
     $dir = preg_replace(
       '|civicrm/templates_c/.*$|',
       '',
       $config->templateCompileDir
     );
 
-    if ($config->userSystem->is_drupal) {
-      $matches = array();
-      if (preg_match(
-          '|/sites/([\w\.\-\_]+)/|',
-          $config->templateCompileDir,
-          $matches
-        )) {
-        $siteName = $matches[1];
-        if ($siteName) {
-          $siteName = "/sites/$siteName/";
-          $siteNamePos = strpos($dir, $siteName);
-          if ($siteNamePos !== FALSE) {
-            $siteRoot = substr($dir, 0, $siteNamePos);
-          }
-        }
-      }
-    }
-
+    list($url, $siteName, $siteRoot) = $config->userSystem->getDefaultSiteSettings($dir);
     return array($url, $dir, $siteName, $siteRoot);
   }
 
@@ -638,48 +626,26 @@ WHERE  option_group_id = (
       return FALSE;
     }
 
-    // get config_backend value
-    $sql = "
-SELECT config_backend
-FROM   civicrm_domain
-WHERE  id = %1
-";
-    $params = array(1 => array(CRM_Core_Config::domainID(), 'Integer'));
-    $configBackend = CRM_Core_DAO::singleValueQuery($sql, $params);
+    // get enabled-components from DB and add to the list
+    $enabledComponents =
+      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents[] = $componentName;
 
-    if (!$configBackend) {
-      static $alreadyVisited = FALSE;
-      if ($alreadyVisited) {
-        CRM_Core_Error::fatal(ts('Returning early due to unexpected error - civicrm_domain.config_backend column value is NULL. Try visiting CiviCRM Home page.'));
-      }
-
-      $alreadyVisited = TRUE;
-
-      // try to recreate the config backend
-      $config = CRM_Core_Config::singleton(TRUE, TRUE);
-      return self::enableComponent($componentName);
+    $enabledComponentIDs = array();
+    foreach ($enabledComponents as $name) {
+      $enabledComponentIDs[] = $components[$name]->componentID;
     }
-    $configBackend = unserialize($configBackend);
-
-    $configBackend['enableComponents'][] = $componentName;
-    $configBackend['enableComponentIDs'][] = $components[$componentName]->componentID;
 
     // fix the config object
-    $config->enableComponents = $configBackend['enableComponents'];
-    $config->enableComponentIDs = $configBackend['enableComponentIDs'];
+    $config->enableComponents = $enabledComponents;
+    $config->enableComponentIDs = $enabledComponentIDs;
 
     // also force reset of component array
     CRM_Core_Component::getEnabledComponents(TRUE);
 
-    // check if component is already there, is so return
-    $configBackend = serialize($configBackend);
-    $sql = "
-UPDATE civicrm_domain
-SET    config_backend = %2
-WHERE  id = %1
-";
-    $params[2] = array($configBackend, 'String');
-    CRM_Core_DAO::executeQuery($sql, $params);
+    // update DB
+    CRM_Core_BAO_Setting::setItem($enabledComponents,
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,'enable_components');
 
     return TRUE;
   }

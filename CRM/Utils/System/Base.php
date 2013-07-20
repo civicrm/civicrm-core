@@ -87,10 +87,13 @@ abstract class CRM_Utils_System_Base {
     return $url;
   }
 
-  /*
-   * Currently this is just helping out the test class as defaults is calling it - maybe move fix to defaults
+  /**
+   * Determine the location of the CMS root.
+   *
+   * @return string|NULL local file system path to CMS root, or NULL if it cannot be determined
    */
   function cmsRootPath() {
+    return NULL;
   }
 
   /**
@@ -102,6 +105,17 @@ abstract class CRM_Utils_System_Base {
    * @static
    */
   public abstract function getLoginURL($destination = '');
+
+  /**
+   * Determine the native ID of the CMS user
+   *
+   * @param $username
+   * @return int|NULL
+   */
+  function getUfId($username) {
+    $className = get_class($this);
+    throw new CRM_Core_Exception("Not implemented: {$className}->getUfId");
+  }
 
   /**
    * Set a init session with user object
@@ -126,12 +140,25 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Return default Site Settings
+   * @return array array
+   * - $url, (Joomla - non admin url)
+   * - $siteName,
+   * - $siteRoot
+   */
+  function getDefaultSiteSettings($dir) {
+    $config = CRM_Core_Config::singleton();
+    $url = $config->userFrameworkBaseURL;
+    return array($url, NULL, NULL);
+  }
+
+  /**
    * Perform an post login activities required by the UF -
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp, calls hook_user op 'login' and generates a new session.
    * @param array $edit: The array of form values submitted by the user.
    *
   function userLoginFinalize($edit = array()){
   }
-  */
+   */
 }
 

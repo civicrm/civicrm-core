@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Generated from {$smarty.template}
+    {$generated}
+-->
 <extension method="upgrade" type="component" version="2.5">
   <name>CiviCRM</name>
   <creationDate>{$creationDate}</creationDate>
@@ -9,10 +13,10 @@
   <version>{$CiviCRMVersion}</version>
   <description>CiviCRM</description>
   <files folder="site">
-	  <filename>civicrm.php</filename>
-	  <filename>civicrm.html.php</filename>
-	  <folder>views</folder>
-	  <folder>elements</folder>
+    <filename>civicrm.php</filename>
+    <filename>civicrm.html.php</filename>
+    <folder>views</folder>
+    <folder>elements</folder>
   </files>
   <install>
     <queries>

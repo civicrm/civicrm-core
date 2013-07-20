@@ -52,7 +52,7 @@ class CRM_Contact_Page_Inline_Email extends CRM_Core_Page {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
-    $locationTypes = CRM_Core_PseudoConstant::locationDisplayName();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name'));
 
     $entityBlock = array('contact_id' => $contactId);
     $emails = CRM_Core_BAO_Email::getValues($entityBlock);
@@ -78,8 +78,8 @@ class CRM_Contact_Page_Inline_Email extends CRM_Core_Page {
 
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);
- 
-    // finally call parent 
+
+    // finally call parent
     parent::run();
   }
 }

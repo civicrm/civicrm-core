@@ -49,7 +49,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->_contactID    = $this->organizationCreate();
     $loc                 = $this->locationTypeCreate();
     $this->_locationType = $loc->id;
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
     $this->quickCleanup(array('civicrm_phone'));
     $this->_params = array(
       'contact_id' => $this->_contactID,
@@ -121,27 +121,18 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
    * Test civicrm_phone_get with wrong params.
    */
   public function testGetWrongParams() {
-    $params = array('contact_id' => 'abc', 'version' => $this->_apiversion, 'debug'=>1 );
-    $result = civicrm_api('Phone', 'Get', $params);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertEquals(0, $result['count'], 'In line ' . __LINE__);
+    $this->callAPIFailure('Phone', 'Get', array('contact_id' => 'abc'));
 
-    $params = array('location_type_id' => 'abc', 'version' => $this->_apiversion);
-    $result = civicrm_api('Phone', 'Get', ($params));
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $this->callAPIFailure('Phone', 'Get', array('location_type_id' => 'abc'));
 
-    $params = array('phone_type_id' => 'abc', 'version' => $this->_apiversion);
-    $result = civicrm_api('Phone', 'Get', ($params));
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertTrue(empty($result['count']), 'In line ' . __LINE__);
+    $this->callAPIFailure('Phone', 'Get', array('phone_type_id' => 'abc'));
   }
 
   /**
    * Test civicrm_phone_get - success expected.
    */
   public function testGet() {
-    $phone = civicrm_api('phone', 'create', $this->_params);
-    $this->assertAPISuccess($phone, 'In line ' . __LINE__);
+    $phone = $this->callAPISuccess('phone', 'create', $this->_params);
     $params = array(
       'contact_id' =>  $this->_params['contact_id'],
       'phone' => $phone['values'][$phone['id']]['phone'],
@@ -163,8 +154,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
    */
   public function testCreateWrongParamsType() {
     $params = 'a string';
-    $result = civicrm_api('Phone', 'Create', $params);
-    $this->assertEquals(1, $result['is_error'], "In line " . __LINE__);
+    $result = $this->callAPIFailure('Phone', 'Create', $params);
   }
 
   /**

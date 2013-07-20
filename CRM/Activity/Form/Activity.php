@@ -168,7 +168,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'type' => 'select',
         'label' => ts('Priority'),
         'attributes' =>
-        CRM_Core_PseudoConstant::priority(),
+        CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
         'required' => TRUE
       ),
       'source_contact_id' => array(
@@ -461,7 +461,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->setFields();
 
     if ($this->_activityTypeFile) {
-      eval("CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}::preProcess( \$this );");
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
+      $className::preProcess($this);
     }
 
     $this->_values = $this->get('values');
@@ -592,12 +593,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if ($this->_activityTypeFile) {
-      eval('$defaults += CRM_' . $this->_crmDir . '_Form_Activity_' .
-        $this->_activityTypeFile . '::setDefaultValues($this);'
-      );
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
+      $defaults += $className::setDefaultValues($this);
     }
     if (!CRM_Utils_Array::value('priority_id', $defaults)) {
-      $priority = CRM_Core_PseudoConstant::priority();
+      $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
       $defaults['priority_id'] = array_search('Normal', $priority);
     }
     if (!CRM_Utils_Array::value('status_id', $defaults)) {
@@ -762,7 +762,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->addDateTime('activity_date_time', ts('Date'), TRUE, array('formatType' => 'activityDateTime'));
 
     //add followup date
-    $this->addDateTime('followup_date', ts('in'));
+    $this->addDateTime('followup_date', ts('in'), FALSE, array('formatType' => 'activityDateTime'));
 
     //autocomplete url
     $dataUrl = CRM_Utils_System::url("civicrm/ajax/rest",
@@ -874,14 +874,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if ($this->_activityTypeFile) {
-      eval("CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}::buildQuickForm( \$this );");
-    }
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
 
-    if ($this->_activityTypeFile) {
-      eval('$this->addFormRule' .
-        "(array(
-          'CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}', 'formrule'), \$this);"
-      );
+      $className::buildQuickForm($this);
+      $this->addFormRule(array($className, 'formRule'), $this);
     }
 
     $this->addFormRule(array('CRM_Activity_Form_Activity', 'formRule'), $this);
@@ -1078,13 +1074,15 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   protected function processActivity(&$params) {
     $activityAssigned = array();
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     // format assignee params
     if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
       //skip those assignee contacts which are already assigned
       //while sending a copy.CRM-4509.
       $activityAssigned = array_flip($params['assignee_contact_id']);
       if ($this->_activityId) {
-        $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($this->_activityId);
+        $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($this->_activityId, $assigneeID);
         $activityAssigned = array_diff_key($activityAssigned, $assigneeContacts);
       }
     }
@@ -1139,7 +1137,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       )
     ) {
       $mailToContacts = array();
-      $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activity->id, TRUE, FALSE);
+      //FIX ME : add more parameters to 'getNames' function
+      $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($activity->id, $assigneeID, TRUE, FALSE);
 
       //build an associative array with unique email addresses.
       foreach ($activityAssigned as $id => $dnc) {
@@ -1214,9 +1213,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   function beginPostProcess(&$params) {
     if ($this->_activityTypeFile) {
-      eval("CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}" .
-        "::beginPostProcess( \$this, \$params );"
-      );
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
+      $className::beginPostProcess($this, $params);
     }
   }
 
@@ -1227,9 +1225,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   function endPostProcess(&$params, &$activity) {
     if ($this->_activityTypeFile) {
-      eval("CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}" .
-        "::endPostProcess( \$this, \$params, \$activity );"
-      );
+      $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
+      $className::endPostProcess($this, $params, $activity );
     }
   }
 }

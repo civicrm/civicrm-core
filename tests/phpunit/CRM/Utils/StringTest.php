@@ -104,5 +104,22 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
       $this->assertRegExp('/^[12345678]+$/', $actual);
     }
   }
+
+  public function parsePrefixData() {
+    $cases = array();
+    $cases[] = array('administer CiviCRM', NULL, array(NULL, 'administer CiviCRM'));
+    $cases[] = array('administer CiviCRM', 'com_civicrm', array('com_civicrm', 'administer CiviCRM'));
+    $cases[] = array('Drupal:access user profiles', NULL, array('Drupal', 'access user profiles'));
+    $cases[] = array('Joomla:component:perm', NULL, array('Joomla', 'component:perm'));
+    return $cases;
+  }
+
+  /**
+   * @dataProvider parsePrefixData
+   */
+  public function testParsePrefix($input, $defaultPrefix, $expected) {
+    $actual = CRM_Utils_String::parsePrefix(':', $input, $defaultPrefix);
+    $this->assertEquals($expected, $actual);
+  }
 }
 

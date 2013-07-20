@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -84,7 +83,7 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
       }
 
       // save updated instance criteria
-      $dao              = new CRM_Report_DAO_Instance();
+      $dao              = new CRM_Report_DAO_ReportInstance();
       $dao->id          = $instances->id;
       $dao->form_values = serialize($formValues);
       $dao->save();
@@ -121,7 +120,7 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
       $config = CRM_Core_Config::singleton();
       $tables = array('civicrm_address', 'civicrm_contact', 'civicrm_mailing', 'civicrm_mailing_component');
       $triggers = array(array('when' => 'before', 'event' => 'update'), array('when' => 'before', 'event' => 'insert'));
-      
+
       // FIXME: Doing require_once is a must here because a call like CRM_Core_I18n_SchemaStructure_3_4_beta2 makes
       // class loader look for file like - CRM/Core/I18n/SchemaStructure/3/4/beta2.php which is not what we want to be loaded
       require_once "CRM/Core/I18n/SchemaStructure_3_4_beta2.php";
@@ -194,7 +193,7 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
       }
 
       // save updated instance criteria
-      $dao              = new CRM_Report_DAO_Instance();
+      $dao              = new CRM_Report_DAO_ReportInstance();
       $dao->id          = $instances->id;
       $dao->form_values = serialize($formValues);
       $dao->save();
@@ -274,7 +273,7 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
       }
 
       // save updated instance criteria
-      $dao              = new CRM_Report_DAO_Instance();
+      $dao              = new CRM_Report_DAO_ReportInstance();
       $dao->id          = $instances->id;
       $dao->form_values = serialize($formValues);
       $dao->save();
@@ -283,11 +282,11 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
 
     $bulkEmailActivityType = CRM_Core_DAO::singleValueQuery("
 SELECT v.id
-FROM   civicrm_option_value v, 
-       civicrm_option_group g 
-WHERE  v.option_group_id = g.id 
-  AND  g.name      = %1 
-  AND  g.is_active = 1  
+FROM   civicrm_option_value v,
+       civicrm_option_group g
+WHERE  v.option_group_id = g.id
+  AND  g.name      = %1
+  AND  g.is_active = 1
   AND  v.name      = %2", array(1 => array('activity_type', 'String'),
         2 => array('Bulk Email', 'String'),
       ));
@@ -308,10 +307,10 @@ WHERE  v.option_group_id = g.id
     }
 
     $pages = CRM_Core_DAO::executeQuery("
-SELECT    civicrm_contribution_page.id 
+SELECT    civicrm_contribution_page.id
 FROM      civicrm_contribution_page
-LEFT JOIN civicrm_uf_join ON entity_table = 'civicrm_contribution_page' AND entity_id = civicrm_contribution_page.id AND module = 'OnBehalf' 
-WHERE     is_for_organization = 1 
+LEFT JOIN civicrm_uf_join ON entity_table = 'civicrm_contribution_page' AND entity_id = civicrm_contribution_page.id AND module = 'OnBehalf'
+WHERE     is_for_organization = 1
 AND       civicrm_uf_join.id IS NULL
 ");
 

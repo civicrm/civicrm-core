@@ -4,7 +4,7 @@
  
  */
 function contribution_recur_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'contact_id' => 3,
   'installments' => '12',
@@ -26,13 +26,13 @@ $params = array(
  */
 function contribution_recur_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id' => '3',
           'amount' => '500',
@@ -41,7 +41,7 @@ function contribution_recur_create_expectedresult(){
           'frequency_interval' => '1',
           'installments' => '12',
           'start_date' => '20120101000000',
-          'create_date' => '20130204222627',
+          'create_date' => '20130713234826',
           'modified_date' => '2012-11-14 16:02:35',
           'cancel_date' => '',
           'end_date' => '',

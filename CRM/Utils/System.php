@@ -208,7 +208,7 @@ class CRM_Utils_System {
     return $config->userSystem->url($path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend);
   }
 
-  function href($text, $path = NULL, $query = NULL, $absolute = TRUE,
+  static function href($text, $path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE, $frontend = FALSE, $forceBackend = FALSE
   ) {
     $url = self::url($path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend);
@@ -1255,6 +1255,7 @@ class CRM_Utils_System {
       CRM_Pledge_BAO_Pledge::$_exportableFields =
       CRM_Contribute_BAO_Query::$_contributionFields =
       CRM_Core_BAO_CustomField::$_importFields =
+      CRM_Core_BAO_Cache::$_cache =
       CRM_Core_DAO::$_dbColumnValueCache = NULL;
 
     CRM_Core_OptionGroup::flushAll();

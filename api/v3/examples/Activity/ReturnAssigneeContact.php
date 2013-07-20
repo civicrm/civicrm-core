@@ -4,12 +4,12 @@
  Function demonstrates getting asignee_contact_id & using it to get the contact
  */
 function activity_get_example(){
-$params = array( 
+$params = array(
   'activity_id' => 1,
   'version' => 3,
   'sequential' => 1,
   'return.assignee_contact_id' => 1,
-  'api.contact.get' => array( 
+  'api.contact.get' => array(
       'id' => '$value.source_contact_id',
     ),
 );
@@ -24,16 +24,15 @@ $params = array(
  */
 function activity_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '1',
-          'source_contact_id' => '17',
-          'activity_type_id' => '44',
+          'activity_type_id' => '46',
           'subject' => 'test activity type id',
           'activity_date_time' => '2011-06-02 14:36:13',
           'duration' => '120',
@@ -45,16 +44,17 @@ function activity_get_expectedresult(){
           'is_auto' => 0,
           'is_current_revision' => '1',
           'is_deleted' => 0,
-          'assignee_contact_id' => array( 
+          'assignee_contact_id' => array(
               '0' => '19',
             ),
-          'api.contact.get' => array( 
+          'source_contact_id' => '17',
+          'api.contact.get' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 17,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'contact_id' => '17',
                       'contact_type' => 'Individual',
                       'contact_sub_type' => '',
@@ -83,12 +83,6 @@ function activity_get_expectedresult(){
                       'organization_name' => '',
                       'sic_code' => '',
                       'contact_is_deleted' => 0,
-                      'gender_id' => '',
-                      'gender' => '',
-                      'prefix_id' => '',
-                      'prefix' => '',
-                      'suffix_id' => '',
-                      'suffix' => '',
                       'current_employer' => '',
                       'address_id' => '',
                       'street_address' => '',

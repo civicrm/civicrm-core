@@ -257,10 +257,14 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
         }
 
         $query = "
-SELECT activity_type_id , source_contact_id
-FROM   civicrm_activity
-WHERE  id = %1";
-        $params = array(1 => array($key, 'Integer'));
+SELECT a.activity_type_id, ac.contact_id
+FROM   civicrm_activity a
+JOIN   civicrm_activity_contact ac ON ( ac.activity_id = a.id
+AND    ac.record_type_id = %2 )
+WHERE  a.id = %1 ";
+        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $params = array(1 => array($key, 'Integer'), 2 => array($sourceID, 'Integer'));
         $dao = CRM_Core_DAO::executeQuery($query, $params);
         $dao->fetch();
 
@@ -268,7 +272,7 @@ WHERE  id = %1";
         $value['activity_type_id'] = $dao->activity_type_id;
 
         // Get Conatct ID
-        $value['source_contact_id'] = $dao->source_contact_id;
+        $value['source_contact_id'] = $dao->contact_id;
 
         // make call use API 3
         $value['version'] = 3;

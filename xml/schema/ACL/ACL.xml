@@ -8,6 +8,7 @@
     <add>1.6</add>
     <field>
         <name>id</name>
+        <title>ACL ID</title>
         <type>int unsigned</type>
         <required>true</required>
         <comment>Unique table ID</comment>
@@ -47,6 +48,11 @@
         <comment>ID of the object possessing this ACL</comment>
         <add>1.6</add>
     </field>
+    <dynamicForeignKey>
+        <idColumn>entity_id</idColumn>
+        <typeColumn>entity_table</typeColumn>
+        <add>1.6</add>
+    </dynamicForeignKey>
     <field>
         <name>operation</name>
         <type>enum</type>
@@ -83,7 +89,7 @@
     </field>
     <index>
        <name>index_acl_id</name>
-       <fieldName>acl_id</fieldName>       
+       <fieldName>acl_id</fieldName>
        <add>1.6</add>
     </index>
     <field>

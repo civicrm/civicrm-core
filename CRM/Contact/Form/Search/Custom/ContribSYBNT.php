@@ -35,9 +35,11 @@
 class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
+  public $_permissionedComponent;
 
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
+    $this->_permissionedComponent = 'CiviContribute';
 
     $this->_columns = array(
       ts('Contact Id') => 'contact_id',

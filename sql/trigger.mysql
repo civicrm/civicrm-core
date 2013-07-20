@@ -31,12 +31,12 @@ BEGIN
   -- we delete the corresponding entity_id/entity_table entries
   -- from all the linked tables (note, log etc)
   DELETE FROM civicrm_note
-        WHERE entity_id    = OLD.id 
+        WHERE entity_id    = OLD.id
           AND entity_table = 'civicrm_contact';
   DELETE FROM civicrm_log
         WHERE entity_id    = OLD.id
           AND entity_table = 'civicrm_contact';
-  DELETE FROM civicrm_task_status 
+  DELETE FROM civicrm_task_status
         WHERE responsible_entity_id    = OLD.id
           AND responsible_entity_table = 'civicrm_contact';
 

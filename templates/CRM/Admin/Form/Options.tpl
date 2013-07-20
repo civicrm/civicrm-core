@@ -62,12 +62,12 @@
                <span class="description">{ts}The option label is displayed to users.{/ts}</span>
              </td>
            </tr>
-	   {if $form.financial_account_id.html}
+     {if $form.financial_account_id.html}
              <tr class="crm-admin-options-form-block-grouping">
                <td class="label">{$form.financial_account_id.label}</td>
                <td>{$form.financial_account_id.html}</td>
              </tr>
-	   {/if}
+     {/if}
         {/if}
       {if $gName eq 'case_status'}
             <tr class="crm-admin-options-form-block-grouping">

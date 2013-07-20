@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -138,8 +137,8 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
       CRM_Utils_System::setTitle($this->_title .' - '.ts( 'Assigned Financial Accounts'));
-      $financialAccountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
-      $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
+      $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
+      $accountRelationship = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
       $dao->copyValues($params);
       $dao->find();
       while ($dao->fetch()) {
@@ -160,7 +159,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
           if (!empty($financialAccount->financial_account_type_id)) {
             $optionGroupName = 'financial_account_type';
             $financialType[$dao->id]['financial_account_type'] = CRM_Utils_Array::value($financialAccount->financial_account_type_id, $financialAccountType);
-            
+
           }
           if (!empty($dao->account_relationship)) {
             $optionGroupName = 'account_relationship';
@@ -170,7 +169,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
         // form all action links
         $action = array_sum(array_keys($this->links()));
         $links = self::links();
-        
+
         //CRM-12492
         if ($dao->account_relationship == $relationTypeId) {
           unset($links[CRM_Core_Action::DELETE]);

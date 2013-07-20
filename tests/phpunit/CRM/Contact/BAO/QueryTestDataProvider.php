@@ -50,14 +50,16 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
    */
   private $dataset = array(
     //  Include static group 3
-    array('fv' => array('group' => array('3' => 1)),
+    array(
+      'fv' => array('group' => array('3' => 1)),
       'id' => array(
         '17', '18', '19', '20', '21',
         '22', '23', '24',
       ),
     ),
     //  Include static group 5
-    array('fv' => array('group' => array('5' => 1)),
+    array(
+      'fv' => array('group' => array('5' => 1)),
       'id' => array(
         '13', '14', '15', '16', '21',
         '22', '23', '24',
@@ -65,23 +67,23 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
     ),
     //  Include static groups 3 and 5
     array(
-      'fv' => array('group' => array('3' => 1,
-          '5' => 1,
-        )),
+      'fv' => array('group' => array('3' => 1, '5' => 1)),
       'id' => array(
         '13', '14', '15', '16', '17', '18',
         '19', '20', '21', '22', '23', '24',
       ),
     ),
     //  Include tag 7
-    array('fv' => array('tag' => array('7' => 1)),
+    array(
+      'fv' => array('tag' => array('7' => 1)),
       'id' => array(
         '11', '12', '15', '16',
         '19', '20', '23', '24',
       ),
     ),
     //  Include tag 9
-    array('fv' => array('tag' => array('9' => 1)),
+    array(
+      'fv' => array('tag' => array('9' => 1)),
       'id' => array(
         '10', '12', '14', '16',
         '18', '20', '22', '24',
@@ -89,13 +91,27 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
     ),
     //  Include tags 7 and 9
     array(
-      'fv' => array('tag' => array('7' => 1,
-          '9' => 1,
-        )),
+      'fv' => array('tag' => array('7' => 1, '9' => 1)),
       'id' => array(
         '10', '11', '12', '14', '15', '16',
         '18', '19', '20', '22', '23', '24',
       ),
+    ),
+
+    // gender_id 1
+    array(
+      'fv' => array('gender' => 'Female'),
+      'id' => array('9', '20', '22'),
+    ),
+    // prefix_id 2
+    array(
+      'fv' => array('individual_prefix' => 'Ms.'),
+      'id' => array('10', '13'),
+    ),
+    // suffix_id 2
+    array(
+      'fv' => array('individual_suffix' => 'V'),
+      'id' => array('16', '19', '20', '21'),
     ),
   );
 
@@ -134,13 +150,3 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
   }
 }
 // class CRM_Contact_BAO_QueryTestDataProvider
-
-// -- set Emacs parameters --
-// Local variables:
-// mode: php;
-// tab-width: 4
-// c-basic-offset: 4
-// c-hanging-comment-ender-p: nil
-// indent-tabs-mode: nil
-// End:
-

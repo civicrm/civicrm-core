@@ -117,14 +117,14 @@
     <title>New Petition</title>
     <page_callback>CRM_Campaign_Form_Petition</page_callback>
     <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
-  </item>  
+  </item>
   <item>
     <path>civicrm/petition/sign</path>
     <title>Sign Petition</title>
     <page_callback>CRM_Campaign_Form_Petition_Signature</page_callback>
     <access_arguments>sign CiviCRM Petition</access_arguments>
      <is_public>true</is_public>
-  </item>   
+  </item>
   <item>
     <path>civicrm/petition/browse</path>
     <title>View Petition Signatures</title>

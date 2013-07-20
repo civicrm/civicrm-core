@@ -4,7 +4,7 @@
  
  */
 function mail_settings_get_example(){
-$params = array( 
+$params = array(
   'domain_id' => 1,
   'name' => 'my mail setting',
   'domain' => 'setting.com',
@@ -25,13 +25,13 @@ $params = array(
  */
 function mail_settings_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
           'domain_id' => '1',
           'name' => 'my mail setting',

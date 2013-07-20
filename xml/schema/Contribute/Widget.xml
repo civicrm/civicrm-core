@@ -18,16 +18,16 @@
        <name>id</name>
        <autoincrement>true</autoincrement>
   </primaryKey>
-  <field> 
-      <name>contribution_page_id</name> 
-      <type>int unsigned</type>                 
-      <comment>The Contribution Page which triggered this contribution</comment> 
-      <add>1.5</add> 
-  </field> 
-  <foreignKey> 
-       <name>contribution_page_id</name> 
-       <table>civicrm_contribution_page</table> 
-       <key>id</key> 
+  <field>
+      <name>contribution_page_id</name>
+      <type>int unsigned</type>
+      <comment>The Contribution Page which triggered this contribution</comment>
+      <add>1.5</add>
+  </field>
+  <foreignKey>
+       <name>contribution_page_id</name>
+       <table>civicrm_contribution_page</table>
+       <key>id</key>
        <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>

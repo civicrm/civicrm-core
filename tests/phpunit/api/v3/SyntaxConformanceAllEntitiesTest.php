@@ -45,7 +45,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
 
   /** This test case doesn't require DB reset */
   public $DBResetRequired = FALSE;
-
+  public $_eNoticeCompliant = FALSE;
   /* they are two types of missing APIs:
        - Those that are to be implemented
          (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
@@ -115,7 +115,16 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     }
     return $entities;
   }
-
+  /**
+   * Mailing Contact Just doesn't support id. We have always insisted on finding a way to
+   * support id in API but in this case the underlying tables are crying out for a restructue
+   * & it just doesn't make sense
+   * @param unknown_type $sequential
+   * @return multitype:string |multitype:multitype:string
+   */
+  public static function toBeSkipped_getByID($sequential = FALSE) {
+    return array('MailingContact');
+  }
 
   public static function toBeSkipped_create($sequential = FALSE) {
     $entitiesWithoutCreate = array('MailingGroup', 'Constant', 'Entity', 'Location', 'Profile', 'MailingRecipients');
@@ -146,7 +155,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
  * @return multitype:string |multitype:multitype:string
  */
   public static function toBeSkipped_automock($sequential = FALSE) {
-    $entitiesWithoutGet = array('EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
+    $entitiesWithoutGet = array('MailingContact', 'EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
     }
@@ -224,6 +233,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       'PaymentProcessor',
       'MailSettings',
       'Setting',
+      'MailingContact',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -356,8 +366,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_get to be implemented");
       return;
     }
-    $result = civicrm_api($Entity, 'Get', 'string');
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure($Entity, 'Get', 'string');
     $this->assertEquals(2000, $result['error_code']);
     $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
@@ -390,7 +399,9 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
   public function testAcceptsOnlyID_get($Entity) {
     // big random number. fun fact: if you multiply it by pi^e, the result is another random number, but bigger ;)
     $nonExistantID = 30867307034;
-    if (in_array($Entity, $this->toBeImplemented['get'])) {
+    if (in_array($Entity, $this->toBeImplemented['get'])
+        || in_array($Entity, $this->toBeSkipped_getByID())
+    ) {
       return;
     }
 
@@ -399,7 +410,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
     // we'll fix this once beta1 is released
     //        return;
 
-    $result = civicrm_api($Entity, 'Get', array( 'debug' => 1, 'version' => 3, 'id' => $nonExistantID));
+    $result = civicrm_api($Entity, 'Get', array('version' => 3, 'id' => $nonExistantID));
 
     if ($result['is_error']) {
       // just to get a clearer message in the log
@@ -693,22 +704,17 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_URL:
           $entity[$field] = 'warm.beer.com';
       }
-      $constant = CRM_Utils_Array::value('pseudoconstant', $specs);
-      if (!empty($constant)) {
-        $constantOptions = array_reverse(array_keys(CRM_Utils_PseudoConstant::getConstant($constant['name'])));
-        $entity[$field] = (string) $constantOptions[0];
-      }
-      $enum = CRM_Utils_Array::value('enumValues', $specs);
-      if (!empty($enum)) {
-        // reverse so we 'change' value
-        $options = array_reverse(explode(',', $enum));
-        $entity[$fieldName] = $options[0];
+      if (!empty($specs['pseudoconstant']) || !empty($specs['enumValues'])) {
+        $options = civicrm_api($entityName, 'getoptions', array('context' => 'create', 'field' => $field, 'version' => 3));
+        if (empty($options['values'])) {
+          print_r($options);
+        }
+        $entity[$field] = array_rand($options['values']);
       }
       $updateParams = array(
         'version' => 3,
         'id' => $entity['id'],
         $field => $entity[$field],
-        'debug' => 1,
       );
 
       $update = civicrm_api($entityName, 'create', $updateParams);
@@ -728,7 +734,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       );
 
       $checkEntity = civicrm_api($entityName, 'getsingle', $checkParams);
-      $this->assertEquals($entity, $checkEntity, "changing field $fieldName" . print_r($entity,TRUE) );//. print_r($checkEntity,true) .print_r($checkParams,true) . print_r($update,true) . print_r($updateParams, TRUE));
+      $this->assertEquals($entity, $checkEntity, "changing field $fieldName\n" . print_r($entity,TRUE) );//. print_r($checkEntity,true) .print_r($checkParams,true) . print_r($update,true) . print_r($updateParams, TRUE));
     }
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();

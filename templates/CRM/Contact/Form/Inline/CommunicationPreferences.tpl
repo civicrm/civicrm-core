@@ -60,6 +60,8 @@
           {$form.preferred_language.html}
         </div>
       </div>
+
+      {if !empty($form.preferred_mail_format)}
       <div class="crm-summary-row">
         <div class="crm-label">
           {$form.preferred_mail_format.label}
@@ -68,6 +70,7 @@
           {$form.preferred_mail_format.html} {help id="id-emailFormat" file="CRM/Contact/Form/Contact.hlp"}
         </div>
       </div>
+      {/if}
 
       {if !empty($form.email_greeting_id)}
       <div class="crm-summary-row">

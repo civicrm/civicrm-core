@@ -194,7 +194,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
                      civicrm_option_group g
               WHERE  v.option_group_id = g.id
                      AND  g.name         = 'activity_type'
-                     AND  v.is_active    = 1 
+                     AND  v.is_active    = 1
                      AND  g.is_active    = 1";
 
       if (!$all) {
@@ -265,7 +265,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * Flush given pseudoconstant so it can be reread from db
-   * nex time it's requested.
+   * next time it's requested.
    *
    * @access public
    * @static
@@ -273,7 +273,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param boolean $name pseudoconstant to be flushed
    *
    */
-  public static function flush($name) {
+  public static function flush($name = 'cache') {
    if (isset(self::$$name)) {
       self::$$name = NULL;
     }

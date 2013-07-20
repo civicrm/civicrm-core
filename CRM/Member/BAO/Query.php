@@ -132,7 +132,7 @@ class CRM_Member_BAO_Query {
       if (!CRM_Utils_Array::value(0, $query->_params[$id])) {
         continue;
       }
-      if (substr($query->_params[$id][0], 0, 7) == 'member_') {
+      if (substr($query->_params[$id][0], 0, 7) == 'member_' || substr($query->_params[$id][0], 0, 11) == 'membership_') {
         if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
@@ -190,12 +190,23 @@ class CRM_Member_BAO_Query {
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
+      case 'membership_status':
       case 'member_status_id':
-        $status = implode(',', array_keys($value));
-
-        if (count($value) > 1) {
-          $op = 'IN';
-          $status = "({$status})";
+        if (!is_array($value)) {
+          $status = $value;
+          if (!empty($value)) {
+            $value = array_flip(explode(",", str_replace(array( '(', ')' ), '', $value)));
+          }
+          else {
+            $value = array();
+          }
+        }
+        else {
+          $status = implode(',', array_keys($value));
+          if (count($value) > 1) {
+            $op = 'IN';
+            $status = "({$status})";
+          }
         }
 
         $names = array();
@@ -261,11 +272,23 @@ class CRM_Member_BAO_Query {
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
+      case 'membership_type':
       case 'member_membership_type_id':
-        $mType = implode(',', array_keys($value));
-        if (count($value) > 1) {
-          $op = 'IN';
-          $mType = "({$mType})";
+        if (!is_array($value)) {
+          $mType = $value;
+          if (!empty($value)) {
+            $value = array_flip(explode(",", str_replace(array( '(', ')' ), '', $value)));
+          }
+          else {
+            $value = array();
+          }
+        }
+        else {
+          $mType = implode(',', array_keys($value));
+          if (count($value) > 1) {
+            $op = 'IN';
+            $mType = "({$mType})";
+          }
         }
 
         $names = array();
@@ -395,11 +418,11 @@ class CRM_Member_BAO_Query {
 
     $form->addElement('text', 'member_source', ts('Source'));
 
-    CRM_Core_Form_Date::buildDateRange($form, 'member_join_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'member_join_date', 1, '_low', '_high', ts('From'), FALSE);
 
-    CRM_Core_Form_Date::buildDateRange($form, 'member_start_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'member_start_date', 1, '_low', '_high', ts('From'), FALSE);
 
-    CRM_Core_Form_Date::buildDateRange($form, 'member_end_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'member_end_date', 1, '_low', '_high', ts('From'), FALSE);
 
     $form->addYesNo('member_is_primary', ts('Primary Member?'));
     $form->addYesNo('member_pay_later', ts('Pay Later?'));

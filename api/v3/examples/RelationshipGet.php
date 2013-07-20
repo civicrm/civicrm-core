@@ -4,9 +4,10 @@
  
  */
 function relationship_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'id' => 1,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'relationship','get',$params );
@@ -19,30 +20,24 @@ $params = array(
  */
 function relationship_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id_a' => '36',
           'contact_id_b' => '37',
-          'relationship_type_id' => '21',
+          'relationship_type_id' => '22',
           'start_date' => '2008-12-20',
           'is_active' => '1',
           'description' => '',
           'is_permission_a_b' => 0,
           'is_permission_b_a' => 0,
-          'custom_5' => 'custom string',
-          'custom_5_1' => 'custom string',
-          'custom_1' => 'xyz',
-          'custom_1_-1' => 'xyz',
-          'custom_3' => '07/11/2009',
-          'custom_3_-1' => '07/11/2009',
-          'custom_4' => 'http://civicrm.org',
-          'custom_4_-1' => 'http://civicrm.org',
+          'custom_1' => 'custom string',
+          'custom_1_1' => 'custom string',
         ),
     ),
 );

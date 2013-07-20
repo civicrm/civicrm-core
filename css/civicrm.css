@@ -1254,7 +1254,7 @@ div.crm-container label {
   height: auto;
   margin: 0 1px;
   padding: 2px 5px;
-  font-family: Arial, Helvetica, sans-serif; 
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .crm-container #alpha-filter a {
@@ -2585,6 +2585,10 @@ div.grippie {
   background-position: -3px -161px;
 }
 
+.crm-container .swap-icon {
+  background-position: -82px -81px;
+}
+
 #crm-container .geotag {
   padding: 2px 0 2px 20px !important;
   background: url('../i/geotag_16.png') left center no-repeat;
@@ -3405,7 +3409,7 @@ div.m ul#civicrm-menu,
 }
 
 /* table row highlightng */
-#crm-container table.row-highlight tr:hover {
+.crm-container table.row-highlight tr:hover {
   background-color: #FFFFCC !important;
 }
 #crm-container .civicrm-drupal-wysiwyg .collapsed {
@@ -3955,3 +3959,58 @@ span.crm-status-icon {
   border: 1px solid #000;
   text-align: center;
 }
+
+/* Styles for credit card payment logos */
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a {
+  display: block;
+  float: left;
+  width: 50px;
+  height: 30px;
+  background: url(../i/creditcard-icons.png) no-repeat 0 0 transparent;
+  text-indent: -20000px;
+  margin-right: 10px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  border: 1px solid #FFFFFF;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-visa {
+  background-position: -50px 0;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-mastercard {
+  background-position: -100px 0;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-amex {
+  background-position: -150px 0;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-discover {
+  background-position: -200px 0;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-jcb {
+  background-position: -250px 0;
+}
+
+#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-unionpay {
+  background-position: -300px 0;
+}
+
+#crm-container .cvv2-icon {
+  display: inline-block;
+  width: 50px;
+  height: 30px;
+  background: url(../i/creditcard-icons.png) no-repeat 0 0 transparent;
+}
+
+/* Avoid weird border around the images (some themes will add a border around images) */
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a,
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a:link,
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a:hover,
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a:focus,
+#crm-container .credit_card_type-section .crm-credit_card_type-icons a:active {
+  color: #fff;
+}
+

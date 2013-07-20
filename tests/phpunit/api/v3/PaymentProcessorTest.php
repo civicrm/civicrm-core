@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -89,9 +88,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'is_active' => 1,
       'version' => $this->_apiversion,
     );
-    $result = civicrm_api('payment_processor', 'create', $payProcParams);
-
-    $this->assertEquals($result['is_error'], 1);
+    $result = $this->callAPIFailure('payment_processor', 'create', $payProcParams);
   }
 
   /**
@@ -100,6 +97,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   function testPaymentProcessorCreate() {
     $params = $this->_params;
     $result = civicrm_api('payment_processor', 'create', $params);
+    $this->assertAPISuccess($result);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'in line ' . __LINE__);
 
@@ -117,7 +115,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     require_once 'api/v3/examples/PaymentProcessorCreate.php';
     $result = payment_processor_create_example();
     $expectedResult = payment_processor_create_expectedresult();
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
   }
 
   ///////////////// civicrm_payment_processor_delete methods
@@ -135,7 +133,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
 
     $result = civicrm_api('payment_processor', 'delete', $params);
     $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
   }
 
   ///////////////// civicrm_payment_processors_get methods

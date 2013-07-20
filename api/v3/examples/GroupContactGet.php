@@ -4,7 +4,7 @@
  
  */
 function group_contact_get_example(){
-$params = array( 
+$params = array(
   'contact_id' => 3,
   'version' => 3,
 );
@@ -19,19 +19,19 @@ $params = array(
  */
 function group_contact_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'group_id' => '1',
           'title' => 'New Test Group Created',
           'visibility' => 'Public Pages',
           'is_hidden' => 0,
-          'in_date' => '2013-02-04 22:32:04',
+          'in_date' => '2013-06-22 08:50:14',
           'in_method' => 'API',
         ),
     ),

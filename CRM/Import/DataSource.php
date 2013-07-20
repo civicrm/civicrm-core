@@ -33,8 +33,6 @@
  *
  */
 
-#require_once 'CRM/Import/Parser/Contact.php';
-
 /**
  * This class defines the DataSource interface but must be subclassed to be
  * useful.

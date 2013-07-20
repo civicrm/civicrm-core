@@ -37,7 +37,7 @@
         {/if}
       {else}
         {$form.$fldName.$blockNo.html}
-        {if $form.$profSelect}
+        {if $form.$profSelect and $showNewSelect}
           &nbsp;&nbsp;{ts}OR{/ts}&nbsp;&nbsp;{$form.$profSelect.$blockNo.html}<div id="contact-dialog-{$prefix}{$blockNo}" class="hiddenElement"></div>
         {/if}
       {/if}
@@ -129,7 +129,7 @@
     var contactElement = '#' + prefix + 'contact_' + blockNo;
     var contactHiddenElement = 'input[name="{/literal}{$prefix}{literal}contact_select_id[' + blockNo +']"]';
     cj( contactElement ).autocomplete( contactUrl, {
-      selectFirst : false, matchContains: true, minChars: 1
+      selectFirst : false, matchContains: true, minChars: 1, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
     }).result( function(event, data, formatted) {
       cj( contactHiddenElement ).val(data[1]);
       {/literal}

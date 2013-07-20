@@ -4,9 +4,10 @@
  
  */
 function batch_delete_example(){
-$params = array( 
-  'id' => 5,
+$params = array(
+  'id' => 1,
   'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'batch','delete',$params );
@@ -19,7 +20,7 @@ $params = array(
  */
 function batch_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

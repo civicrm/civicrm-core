@@ -191,6 +191,9 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $contribution->currency = $objects['contribution']->currency;
       $contribution->payment_instrument_id = $objects['contribution']->payment_instrument_id;
       $contribution->amount_level = $objects['contribution']->amount_level;
+      $contribution->honor_contact_id = $objects['contribution']->honor_contact_id;
+      $contribution->honor_type_id = $objects['contribution']->honor_type_id;
+      $contribution->campaign_id = $objects['contribution']->campaign_id;
 
       $objects['contribution'] = &$contribution;
     }
@@ -230,11 +233,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $transaction = new CRM_Core_Transaction();
-
-    // fix for CRM-2842
-    //  if ( ! $this->createContact( $input, $ids, $objects ) ) {
-    //       return false;
-    //  }
 
     $participant = &$objects['participant'];
     $membership = &$objects['membership'];
@@ -350,4 +348,3 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $input['trxn_id']    = self::retrieve('txn_id', 'String', 'POST', FALSE);
   }
 }
-

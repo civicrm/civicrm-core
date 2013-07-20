@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -42,6 +41,8 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   protected $_mailingidField = FALSE;
 
   protected $_customGroupExtends = array();
+
+  protected $_add2groupSupported = FALSE;
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 

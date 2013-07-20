@@ -108,11 +108,6 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
-    $params['enableComponentIDs'] = array();
-    foreach ($params['enableComponents'] as $name) {
-      $params['enableComponentIDs'][] = $this->_components[$name]->componentID;
-    }
-
     // if CiviCase is being enabled,
     // load the case related sample data
     if (in_array('CiviCase', $params['enableComponents']) &&

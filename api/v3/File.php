@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -42,12 +41,6 @@
  */
 
 /**
- * Files required for this package
- */
-require_once 'CRM/Core/DAO/File.php';
-require_once 'CRM/Core/BAO/File.php';
-
-/**
  * Create a file
  *
  * This API is used for creating a file
@@ -64,8 +57,6 @@ function civicrm_api3_file_create($params) {
   if (!isset($params['upload_date'])) {
     $params['upload_date'] = date("Ymd");
   }
-
-  require_once 'CRM/Core/DAO/File.php';
 
   $fileDAO = new CRM_Core_DAO_File();
   $properties = array('id', 'file_type_id', 'mime_type', 'uri', 'document', 'description', 'upload_date');
@@ -117,7 +108,6 @@ function &civicrm_api3_file_update($params) {
     return civicrm_api3_create_error('Required parameter missing');
   }
 
-  require_once 'CRM/Core/DAO/File.php';
   $fileDAO = new CRM_Core_DAO_File();
   $fileDAO->id = $params['id'];
   if ($fileDAO->find(TRUE)) {
@@ -150,14 +140,12 @@ function civicrm_api3_file_delete($params) {
 
   $check = FALSE;
 
-  require_once 'CRM/Core/DAO/EntityFile.php';
   $entityFileDAO = new CRM_Core_DAO_EntityFile();
   $entityFileDAO->file_id = $params['id'];
   if ($entityFileDAO->find()) {
     $check = $entityFileDAO->delete();
   }
 
-  require_once 'CRM/Core/DAO/File.php';
   $fileDAO = new CRM_Core_DAO_File();
   $fileDAO->id = $params['id'];
   if ($fileDAO->find(TRUE)) {

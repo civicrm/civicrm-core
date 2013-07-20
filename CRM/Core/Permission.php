@@ -54,6 +54,16 @@ class CRM_Core_Permission {
   CONST EDIT = 1, VIEW = 2, DELETE = 3, CREATE = 4, SEARCH = 5, ALL = 6, ADMIN = 7;
 
   /**
+   * A placeholder permission which always fails
+   */
+  const ALWAYS_DENY_PERMISSION = "*always deny*";
+
+  /**
+   * A placeholder permission which always fails
+   */
+  const ALWAYS_ALLOW_PERMISSION = "*always allow*";
+
+  /**
    * get the current permission of this user
    *
    * @return string the permission of the user (edit or view or null)
@@ -148,7 +158,8 @@ class CRM_Core_Permission {
       return TRUE;
     }
 
-    if (self::check('administer Multiple Organizations') &&
+    if (
+      self::check('administer Multiple Organizations') &&
       self::isMultisiteEnabled()
     ) {
       return TRUE;
@@ -162,7 +173,7 @@ class CRM_Core_Permission {
   }
 
   public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE) {
-    $customGroups = CRM_Core_PseudoConstant::customGroup($reset);
+    $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id', array('fresh' => $reset));
     $defaultGroups = array();
 
     // check if user has all powerful permission
@@ -198,7 +209,7 @@ class CRM_Core_Permission {
   }
 
   public static function ufGroup($type = CRM_Core_Permission::VIEW) {
-    $ufGroups = CRM_Core_PseudoConstant::ufGroup();
+    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
     $allGroups = array_keys($ufGroups);
 
@@ -268,7 +279,11 @@ class CRM_Core_Permission {
     if (!$eventID) {
       return $permissionedEvents;
     }
-    return array_search($eventID, $permissionedEvents) === FALSE ? NULL : $eventID;
+    if (!empty($permissionedEvents)){
+      return array_search($eventID, $permissionedEvents) === FALSE ? NULL : $eventID;
+    } else {
+      return $eventID;
+    }
   }
 
   static function eventClause($type = CRM_Core_Permission::VIEW, $prefix = NULL) {
@@ -444,11 +459,14 @@ class CRM_Core_Permission {
       'add contacts' => $prefix . ts('add contacts'),
       'view all contacts' => $prefix . ts('view all contacts'),
       'edit all contacts' => $prefix . ts('edit all contacts'),
+      'view my contact' => $prefix . ts('view my contact'),
+      'edit my contact' => $prefix . ts('edit my contact'),
       'delete contacts' => $prefix . ts('delete contacts'),
       'access deleted contacts' => $prefix . ts('access deleted contacts'),
       'import contacts' => $prefix . ts('import contacts'),
       'edit groups' => $prefix . ts('edit groups'),
       'administer CiviCRM' => $prefix . ts('administer CiviCRM'),
+      'skip IDS check' => $prefix . ts('skip IDS check'),
       'access uploaded files' => $prefix . ts('access uploaded files'),
       'profile listings and forms' => $prefix . ts('profile listings and forms'),
       'profile listings' => $prefix . ts('profile listings'),

@@ -81,14 +81,15 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
     $eventType = CRM_Event_PseudoConstant::eventType();
     $eventTemplate = CRM_Event_PseudoConstant::eventTemplates();
-    $autoRenew = CRM_Core_PseudoConstant::autoRenew();
+    $autoRenew = CRM_Core_OptionGroup::values('auto_renew_options');
     $membershipType = CRM_Member_PseudoConstant::membershipType();
 
     asort($activityType);
 
     $sel1 = $sel2 = $sel3 = $sel4 = $sel5 = array();
-    $options = array('manual' => ts('Choose Recipient(s)'),
-               'group' => ts('Select a Group'),
+    $options = array(
+      'manual' => ts('Choose Recipient(s)'),
+      'group' => ts('Select a Group'),
     );
 
     $entityMapping = array();
@@ -99,14 +100,14 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     }
 
     foreach ($mapping as $value) {
-      $entityValue         = CRM_Utils_Array::value('entity_value', $value);
-      $entityStatus        = CRM_Utils_Array::value('entity_status', $value);
-      $entityRecipient     = CRM_Utils_Array::value('entity_recipient', $value);
-      $valueLabel          = array('- ' . strtolower(CRM_Utils_Array::value('entity_value_label', $value)) . ' -');
-      $key                 = CRM_Utils_Array::value('id', $value);
+      $entityValue = CRM_Utils_Array::value('entity_value', $value);
+      $entityStatus = CRM_Utils_Array::value('entity_status', $value);
+      $entityRecipient = CRM_Utils_Array::value('entity_recipient', $value);
+      $valueLabel = array('- ' . strtolower(CRM_Utils_Array::value('entity_value_label', $value)) . ' -');
+      $key = CRM_Utils_Array::value('id', $value);
       $entityMapping[$key] = CRM_Utils_Array::value('entity', $value);
 
-      $sel1Val = null;
+      $sel1Val = NULL;
       switch ($entityValue) {
         case 'activity_type':
           if ($value['entity'] == 'civicrm_activity') {
@@ -155,15 +156,15 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
         switch ($entityRecipient) {
           case 'activity_contacts':
-            $activityContacts = CRM_Core_PseudoConstant::activityContacts();
+            $activityContacts = CRM_Core_OptionGroup::values('activity_contacts');
             $sel5[$entityRecipient] = $activityContacts + $options;
-            $recipientMapping += CRM_Core_PseudoConstant::activityContacts('name');
+            $recipientMapping += CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
             break;
 
           case 'event_contacts':
-            $eventContacts = CRM_Core_PseudoConstant::eventContacts();
+            $eventContacts = CRM_Core_OptionGroup::values('event_contacts');
             $sel5[$entityRecipient] = $eventContacts + $options;
-            $recipientMapping += CRM_Core_PseudoConstant::eventContacts('name');
+            $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
             break;
 
           case NULL:
@@ -176,8 +177,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
     foreach ($mapping as $value) {
       $entityStatus = CRM_Utils_Array::value('entity_status', $value);
-      $statusLabel  = array('- ' . strtolower(CRM_Utils_Array::value('entity_status_label', $value)) . ' -');
-      $id           = CRM_Utils_Array::value('id', $value);
+      $statusLabel = array('- ' . strtolower(CRM_Utils_Array::value('entity_status_label', $value)) . ' -');
+      $id = CRM_Utils_Array::value('id', $value);
 
       switch ($entityStatus) {
         case 'activity_status':
@@ -227,9 +228,10 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
   static function getSelection1($id = NULL) {
     $mapping = self::getMapping($id);
-    $sel4    = $sel5 = array();
-    $options = array('manual' => ts('Choose Recipient(s)'),
-               'group' => ts('Select a Group'),
+    $sel4 = $sel5 = array();
+    $options = array(
+      'manual' => ts('Choose Recipient(s)'),
+      'group' => ts('Select a Group'),
     );
 
     $recipientMapping = array_combine(array_keys($options), array_keys($options));
@@ -247,15 +249,15 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
       switch ($entityRecipient) {
         case 'activity_contacts':
-          $activityContacts = CRM_Core_PseudoConstant::activityContacts();
+          $activityContacts = CRM_Core_OptionGroup::values('activity_contacts');
           $sel5[$id] = $activityContacts + $options;
-          $recipientMapping += CRM_Core_PseudoConstant::activityContacts('name');
+          $recipientMapping += CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
           break;
 
         case 'event_contacts':
-          $eventContacts = CRM_Core_PseudoConstant::eventContacts();
+          $eventContacts = CRM_Core_OptionGroup::values('event_contacts');
           $sel5[$id] = $eventContacts + $options;
-          $recipientMapping += CRM_Core_PseudoConstant::eventContacts('name');
+          $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
           break;
 
         case NULL:
@@ -289,7 +291,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $civicrm_participant_status_type = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event_template = CRM_Event_PseudoConstant::eventTemplates();
 
-    $auto_renew_options = CRM_Core_PseudoConstant::autoRenew();
+    $auto_renew_options = CRM_Core_OptionGroup::values('auto_renew_options');
     $civicrm_membership_type = CRM_Member_PseudoConstant::membershipType();
 
     asort($activity_type);
@@ -328,8 +330,9 @@ WHERE   cas.entity_value = $id AND
 
       $query .= $where;
 
-      $params = array(1 => array($id, 'Integer'),
-                2 => array($entityValue, 'String'),
+      $params = array(
+        1 => array($id, 'Integer'),
+        2 => array($entityValue, 'String'),
       );
     }
 
@@ -600,9 +603,16 @@ WHERE   cas.entity_value = $id AND
         $tokenEntity = 'activity';
         $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
         $extraSelect = ', ov.label as activity_type, e.id as activity_id';
-        $extraJoin   = "INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
+        $extraJoin   = "
+INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
 INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
         $extraWhere = 'AND e.is_current_revision = 1 AND e.is_deleted = 0';
+        if ($actionSchedule->limit_to == 0) {
+          $extraJoin   = "
+LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
+LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
+          $extraWhere = '';
+        }
       }
 
       if ($mapping->entity == 'civicrm_participant') {
@@ -619,6 +629,17 @@ LEFT  JOIN civicrm_address address ON address.id = lb.address_id
 LEFT  JOIN civicrm_email email ON email.id = lb.email_id
 LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id
 ";
+        if ($actionSchedule->limit_to == 0) {
+          $extraJoin   = "
+LEFT JOIN civicrm_event ev ON e.event_id = ev.id
+LEFT JOIN civicrm_option_group og ON og.name = 'event_type'
+LEFT JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
+LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
+LEFT JOIN civicrm_address address ON address.id = lb.address_id
+LEFT JOIN civicrm_email email ON email.id = lb.email_id
+LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
+";
+        }
       }
 
       if ($mapping->entity == 'civicrm_membership') {
@@ -628,18 +649,30 @@ LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id
         $extraJoin   = '
  INNER JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
  INNER JOIN civicrm_membership_status ms ON e.status_id = ms.id';
+
+        if ($actionSchedule->limit_to == 0) {
+          $extraJoin   = '
+ LEFT JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
+ LEFT JOIN civicrm_membership_status ms ON e.status_id = ms.id';
+        }
+      }
+
+      $entityJoinClause = "INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
+      if ($actionSchedule->limit_to == 0) {
+        $entityJoinClause = "LEFT JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
+        $extraWhere .= " AND (e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact')";
       }
 
       $query = "
-SELECT reminder.id as reminderID, reminder.*, e.id as entityID, e.* {$extraSelect}
+SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.*, e.id as entityID, e.* {$extraSelect}
 FROM  civicrm_action_log reminder
-INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id
+{$entityJoinClause}
 {$extraJoin}
 WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 {$extraWhere}";
 
       $dao = CRM_Core_DAO::executeQuery($query,
-             array(1 => array($actionSchedule->id, 'Integer'))
+        array(1 => array($actionSchedule->id, 'Integer'))
       );
 
       while ($dao->fetch()) {
@@ -670,11 +703,11 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 
         $isError  = 0;
         $errorMsg = '';
-        $toEmail  = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contact_id);
+        $toEmail  = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contactID);
         if ($toEmail) {
           $result =
             CRM_Core_BAO_ActionSchedule::sendReminder(
-              $dao->contact_id,
+              $dao->contactID,
               $toEmail,
               $actionSchedule->id,
               $fromEmailAddress,
@@ -705,9 +738,9 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $activityParams = array(
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
-            'source_contact_id' => $session->get('userID') ?
-            $session->get('userID') : $dao->contact_id,
-            'target_contact_id' => $dao->contact_id,
+            'source_contact_id' =>
+            $session->get('userID') ? $session->get('userID') : $dao->contactID,
+            'target_contact_id' => $dao->contactID,
             'activity_date_time' => date('YmdHis'),
             'status_id' => $activityStatusID,
             'activity_type_id' => $activityTypeID,
@@ -733,14 +766,14 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $mapping->find(TRUE);
 
       $select = $join = $where = array();
-
+      $limitTo = $actionSchedule->limit_to;
       $value = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-               trim($actionSchedule->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)
+        trim($actionSchedule->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)
       );
       $value = implode(',', $value);
 
       $status = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-                trim($actionSchedule->entity_status, CRM_Core_DAO::VALUE_SEPARATOR)
+        trim($actionSchedule->entity_status, CRM_Core_DAO::VALUE_SEPARATOR)
       );
       $status = implode(',', $status);
 
@@ -750,20 +783,25 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $from = "{$mapping->entity} e";
 
       if ($mapping->entity == 'civicrm_activity') {
+        $contactField = 'r.contact_id';
+        $table = 'civicrm_activity e';
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+        $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
         switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
           case 'Activity Assignees':
-            $contactField = 'r.assignee_contact_id';
-            $join[] = 'INNER JOIN civicrm_activity_assignment r ON  r.activity_id = e.id';
+            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$assigneeID}";
             break;
 
           case 'Activity Source':
-            $contactField = 'e.source_contact_id';
+            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$sourceID}";
             break;
 
           default:
           case 'Activity Targets':
-            $contactField = 'r.target_contact_id';
-            $join[] = 'INNER JOIN civicrm_activity_target r ON  r.activity_id = e.id';
+            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
             break;
 
         }
@@ -784,11 +822,12 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       }
 
       if ($mapping->entity == 'civicrm_participant') {
+        $table = 'civicrm_event r';
         $contactField = 'e.contact_id';
         $join[] = 'INNER JOIN civicrm_event r ON e.event_id = r.id';
         if ($actionSchedule->recipient_listing) {
           $rList = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-                   trim($actionSchedule->recipient_listing, CRM_Core_DAO::VALUE_SEPARATOR)
+            trim($actionSchedule->recipient_listing, CRM_Core_DAO::VALUE_SEPARATOR)
           );
           $rList = implode(',', $rList);
 
@@ -822,7 +861,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $notINClause = '';
       if ($mapping->entity == 'civicrm_membership') {
         $contactField = 'e.contact_id';
-
+        $table = 'civicrm_membership e';
         // build where clause
         if ( $status == 2 ) {
           //auto-renew memberships
@@ -843,26 +882,37 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $where[] = "( e.is_override IS NULL OR e.is_override = 0 )";
         $dateField = str_replace('membership_', 'e.', $actionSchedule->start_action_date);
         $notINClause = self::permissionedRelationships($contactField);
-        
+
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
         $mStatus = implode (',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
 
       }
-
-      if ($actionSchedule->group_id) {
-        $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
-        $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
+      if ($limitTo) {
+        if ($actionSchedule->group_id) {
+          $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
+          $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
+        }
+        elseif (!empty($actionSchedule->recipient_manual)) {
+          $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
+          $where[] = "{$contactField} IN ({$rList})";
+        }
       }
-      elseif (!empty($actionSchedule->recipient_manual)) {
-        $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
-        $where[] = "{$contactField} IN ({$rList})";
+      else {
+        $addGroup = $addWhere = '';
+        if ($actionSchedule->group_id) {
+          $addGroup = " INNER JOIN civicrm_group_contact grp ON c.id = grp.contact_id AND grp.status = 'Added'";
+          $addWhere = " grp.group_id IN ({$actionSchedule->group_id})";
+        }
+        if (!empty($actionSchedule->recipient_manual)) {
+          $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
+          $addWhere = "c.id IN ({$rList})";
+        }
       }
-
-      $select[]           = "{$contactField} as contact_id";
-      $select[]           = 'e.id as entity_id';
-      $select[]           = "'{$mapping->entity}' as entity_table";
-      $select[]           = "{$actionSchedule->id} as action_schedule_id";
+      $select[] = "{$contactField} as contact_id";
+      $select[] = 'e.id as entity_id';
+      $select[] = "'{$mapping->entity}' as entity_table";
+      $select[] = "{$actionSchedule->id} as action_schedule_id";
       $reminderJoinClause = "civicrm_action_log reminder ON reminder.contact_id = {$contactField} AND
 reminder.entity_id          = e.id AND
 reminder.entity_table       = '{$mapping->entity}' AND
@@ -871,10 +921,10 @@ reminder.action_schedule_id = %1";
       $join[] = "INNER JOIN civicrm_contact c ON c.id = {$contactField} AND c.is_deleted = 0 AND c.is_deceased = 0 ";
 
       if ($actionSchedule->start_action_date) {
-        $startDateClause   = array();
-        $op                = ($actionSchedule->start_action_condition == 'before' ? '<=' : '>=');
-        $operator          = ($actionSchedule->start_action_condition == 'before' ? 'DATE_SUB' : 'DATE_ADD');
-        $date              = $operator . "({$dateField}, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
+        $startDateClause = array();
+        $op = ($actionSchedule->start_action_condition == 'before' ? '<=' : '>=');
+        $operator = ($actionSchedule->start_action_condition == 'before' ? 'DATE_SUB' : 'DATE_ADD');
+        $date = $operator . "({$dateField}, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
         $startDateClause[] = "'{$now}' >= {$date}";
         if ($mapping->entity == 'civicrm_participant') {
           $startDateClause[] = $operator. "({$now}, INTERVAL 1 DAY ) {$op} " . $dateField;
@@ -894,17 +944,32 @@ reminder.action_schedule_id = %1";
 
       // start composing query
       $selectClause = 'SELECT ' . implode(', ', $select);
-      $fromClause   = "FROM $from";
-      $joinClause   = !empty($join) ? implode(' ', $join) : '';
-      $whereClause  = 'WHERE ' . implode(' AND ', $where);
+      $fromClause = "FROM $from";
+      $joinClause = !empty($join) ? implode(' ', $join) : '';
+      $whereClause = 'WHERE ' . implode(' AND ', $where);
+      $union = '';
 
+    if ($limitTo == 0) {
+      $union ="
+UNION
+     SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id
+FROM (civicrm_contact c, {$table})
+LEFT JOIN civicrm_action_log reminder ON reminder.contact_id = c.id AND
+        reminder.entity_id          = c.id AND
+        reminder.entity_table       = 'civicrm_contact' AND
+        reminder.action_schedule_id = {$actionSchedule->id}
+{$addGroup}
+WHERE (reminder.id IS NULL AND c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere}) AND
+ {$dateClause}";
+    }
       $query = "
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
 {$selectClause}
 {$fromClause}
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
-{$whereClause} AND {$dateClause} {$notINClause}";
+{$whereClause} AND {$dateClause} {$notINClause}
+{$union}";
 
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
@@ -1006,8 +1071,9 @@ WHERE     m.owner_membership_id IS NOT NULL AND
                         WHERE  mapping_id = %1 AND
                                entity_value = %2";
 
-    $params = array(1 => array($mappingID, 'Integer'),
-              2 => array($id, 'Integer'),
+    $params = array(
+      1 => array($mappingID, 'Integer'),
+      2 => array($id, 'Integer'),
     );
     return CRM_Core_DAO::singleValueQuery($queryString, $params);
   }
@@ -1022,7 +1088,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
 
     switch ($mapping['entity']) {
       case 'civicrm_participant':
-        $eventContacts = CRM_Core_PseudoConstant::eventContacts('name');
+        $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         if (!CRM_Utils_Array::value($recipientType, $eventContacts)) {
           return $options;
         }

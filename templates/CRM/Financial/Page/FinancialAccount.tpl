@@ -34,7 +34,7 @@
   </div>
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-	    <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-top" class="button"><span><div class="icon add-icon"></div>{ts}Add Financial Account{/ts}</span></a>
+      <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-top" class="button"><span><div class="icon add-icon"></div>{ts}Add Financial Account{/ts}</span></a>
     </div>
   {/if}
 
@@ -44,8 +44,8 @@
     <p></p>
       <div class="form-item">
       {strip}
-    	{* handle enable/disable actions*}
-     	{include file="CRM/common/enableDisable.tpl"}
+      {* handle enable/disable actions*}
+       {include file="CRM/common/enableDisable.tpl"}
       <table id="crm-financial_accounts" class="display">
          <thead class="sticky">
           <th>{ts}Name{/ts}</th>
@@ -60,7 +60,7 @@
         </thead>
         {foreach from=$rows item=row}
         <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-        <td>{$row.name}</td>	
+        <td>{$row.name}</td>
         <td>{$row.description}</td>
         <td>{$row.accounting_code}</td>
         <td>{$row.financial_account_type_id}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>
@@ -76,7 +76,7 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-    	    <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add Financial Account{/ts}</span></a>
+          <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add Financial Account{/ts}</span></a>
         </div>
       {/if}
       </div>
@@ -86,6 +86,6 @@
       <div class="icon inform-icon"></div>
       {capture assign=crmURL}{crmURL q="action=add&reset=1"}{/capture}
       {ts 1=$crmURL}There are no Financial Account entered. You can <a href='%1'>add one</a>.{/ts}
-    </div>    
+    </div>
   {/if}
 {/if}

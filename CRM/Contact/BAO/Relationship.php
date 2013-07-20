@@ -47,22 +47,30 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
+   * per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
+   *  "we are moving away from the $ids param "
    *
    * @return object CRM_Contact_BAO_Relationship object
    * @access public
    * @static
    */
-  static function create(&$params, &$ids) {
+  static function create(&$params, $ids = array()) {
     $valid = $invalid = $duplicate = $saved = 0;
-    $relationshipId = CRM_Utils_Array::value('relationship', $ids);
+    $relationships = array();
+    $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
     //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket
-    if (CRM_Utils_Array::value('relationship', $ids)) {
-      CRM_Utils_Hook::pre('edit', 'Relationship', $ids['relationship'], $params);
+    if(empty($relationshipId)){
+      $hook = 'create';
+      $action = CRM_Core_Action::ADD;
     }
-    else {
-      CRM_Utils_Hook::pre('create', 'Relationship', NULL, $params);
+    else{
+      $hook = 'edit';
+      $action = CRM_Core_Action::UPDATE;
     }
+
+    CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
+
     if (!$relationshipId) {
       // creating a new relationship
       $dataExists = self::dataExists($params);
@@ -98,6 +106,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
         $relationship = self::add($params, $ids, $key);
         $relationshipIds[] = $relationship->id;
+        $relationships[$relationship->id] = $relationship;
         $valid++;
       }
       // editing the relationship
@@ -131,6 +140,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         // editing an existing relationship
         $relationship = self::add($params, $ids, $ids['contactTarget']);
         $relationshipIds[] = $relationship->id;
+        $relationships[$relationship->id] = $relationship;
         $saved++;
       }
     }
@@ -161,7 +171,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       $title = CRM_Contact_BAO_Contact::displayName($relationship->contact_id_a) . ' (' . CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
         $relationship->relationship_type_id, 'label_a_b'
       ) . ' ' . CRM_Contact_BAO_Contact::displayName($relationship->contact_id_b) . ')';
-
       // add the recently created Relationship
       CRM_Utils_Recent::add($title,
         $url,
@@ -173,7 +182,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       );
     }
 
-    return array($valid, $invalid, $duplicate, $saved, $relationshipIds);
+    return array($valid, $invalid, $duplicate, $saved, $relationshipIds, $relationships);
   }
 
   /**

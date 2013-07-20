@@ -4,12 +4,13 @@
  
  */
 function phone_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 3,
   'location_type_id' => 6,
   'phone' => '(123) 456-7890',
   'is_primary' => 1,
   'version' => 3,
+  'phone_type_id' => 1,
 );
 
   $result = civicrm_api( 'phone','create',$params );
@@ -22,13 +23,13 @@ $params = array(
  */
 function phone_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id' => '3',
           'location_type_id' => '6',
@@ -38,7 +39,7 @@ function phone_create_expectedresult(){
           'phone' => '(123) 456-7890',
           'phone_ext' => '',
           'phone_numeric' => '',
-          'phone_type_id' => '',
+          'phone_type_id' => '1',
         ),
     ),
 );

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -38,7 +37,7 @@ class CRM_Report_Utils_Report {
 
   static function getValueFromUrl($instanceID = NULL) {
     if ($instanceID) {
-      $optionVal = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_Instance',
+      $optionVal = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance',
         $instanceID,
         'report_id'
       );
@@ -104,7 +103,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
     if ($instanceID) {
       $drilldownInstanceID = false;
       if (array_key_exists($urlValue, $drilldownReport))
-        $drilldownInstanceID = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_Instance', $instanceID, 'drilldown_id', 'id');
+        $drilldownInstanceID = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'drilldown_id', 'id');
 
       if (!$drilldownInstanceID)
         $drilldownInstanceID = self::getInstanceIDForValue($urlValue);
@@ -127,6 +126,8 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
 
   // get instance count for a template
   static function getInstanceCount($optionVal) {
+    if (empty($optionVal)) return 0;
+
     $sql = "
 SELECT count(inst.id)
 FROM   civicrm_report_instance inst
@@ -149,7 +150,7 @@ WHERE  inst.report_id = %1";
 
     $params = array('id' => $instanceID);
     $instanceInfo = array();
-    CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_Instance',
+    CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_ReportInstance',
       $params,
       $instanceInfo
     );
@@ -279,7 +280,7 @@ WHERE  inst.report_id = %1";
 
     $instanceValues = array();
     $params = array('id' => $instanceId);
-    CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_Instance',
+    CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_ReportInstance',
       $params,
       $instanceValues
     );
@@ -311,7 +312,7 @@ WHERE  inst.report_id = %1";
 
     $instanceValues = array();
     $params = array('id' => $instanceId);
-    CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_Instance',
+    CRM_Core_DAO::commonRetrieve('CRM_Report_DAO_ReportInstance',
       $params,
       $instanceValues
     );
@@ -348,7 +349,7 @@ WHERE  inst.report_id = %1";
     $is_error     = 0;
     if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form')) {
       $instanceInfo = array();
-      CRM_Report_BAO_Instance::retrieve(array('id' => $instanceId), $instanceInfo);
+      CRM_Report_BAO_ReportInstance::retrieve(array('id' => $instanceId), $instanceInfo);
 
       if (!empty($instanceInfo['title'])) {
         $obj->assign('reportTitle', $instanceInfo['title']);

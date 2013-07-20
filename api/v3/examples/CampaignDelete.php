@@ -4,7 +4,7 @@
  
  */
 function campaign_delete_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'id' => 2,
 );
@@ -19,7 +19,7 @@ $params = array(
  */
 function campaign_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,

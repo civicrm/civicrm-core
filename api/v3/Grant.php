@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -34,8 +33,6 @@
  * @subpackage API_Grant
  * @copyright CiviCRM LLC (c) 2004-2013
  */
-
-require_once 'CRM/Grant/BAO/Grant.php';
 
 /**
  * create/update grant

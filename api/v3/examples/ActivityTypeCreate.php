@@ -4,7 +4,7 @@
  
  */
 function activity_type_create_example(){
-$params = array( 
+$params = array(
   'weight' => '2',
   'label' => 'send out letters',
   'version' => 3,
@@ -24,17 +24,17 @@ $params = array(
  */
 function activity_type_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 723,
-  'values' => array( 
-      '723' => array( 
-          'id' => '723',
+  'id' => 722,
+  'values' => array(
+      '722' => array(
+          'id' => '722',
           'option_group_id' => '2',
           'label' => 'send out letters',
-          'value' => '44',
+          'value' => '46',
           'name' => 'send out letters',
           'grouping' => '',
           'filter' => 0,

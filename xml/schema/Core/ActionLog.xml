@@ -43,6 +43,11 @@
        <comment>name of the entity table for the above id, e.g. civicrm_activity, civicrm_participant</comment>
        <add>3.4</add>
   </field>
+  <dynamicForeignKey>
+       <idColumn>entity_id</idColumn>
+       <typeColumn>entity_table</typeColumn>
+       <add>3.4</add>
+  </dynamicForeignKey>
   <field>
       <name>action_schedule_id</name>
       <type>int unsigned</type>

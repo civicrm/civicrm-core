@@ -257,7 +257,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $honorDefault = array();
       $idParams = array('contact_id' => $this->_honorID);
       CRM_Contact_BAO_Contact::retrieve($idParams, $honorDefault);
-      $honorType = CRM_Core_PseudoConstant::honor();
+      $honorType = CRM_Core_PseudoConstant::get('CRM_Pledge_DAO_Pledge', 'honor_type_id');
       $defaults['honor_prefix_id'] = $honorDefault['prefix_id'];
       $defaults['honor_first_name'] = CRM_Utils_Array::value('first_name', $honorDefault);
       $defaults['honor_last_name'] = CRM_Utils_Array::value('last_name', $honorDefault);
@@ -330,7 +330,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         $showAdditionalInfo = TRUE;
         $allPanes[$name]['open'] = 'true';
       }
-      eval('CRM_Contribute_Form_AdditionalInfo::build' . $type . '( $this );');
+      $fnName = "build{$type}";
+      CRM_Contribute_Form_AdditionalInfo::$fnName($this);
     }
 
     $this->assign('allPanes', $allPanes);
@@ -447,8 +448,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $this->addDate('acknowledge_date', ts('Acknowledgment Date'));
 
-        $this->add('select', 'financial_type_id', 
-                   ts( 'Financial Type' ), 
+        $this->add('select', 'financial_type_id',
+                   ts( 'Financial Type' ),
                    array(''=>ts( '- select -' )) + CRM_Contribute_PseudoConstant::financialType( ),
       TRUE
     );

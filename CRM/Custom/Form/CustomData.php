@@ -48,7 +48,7 @@ class CRM_Custom_Form_CustomData {
    * @return void
    */
   static function preProcess(&$form, $subName = NULL, $subType = NULL,
-    $groupCount = NULL, $type = NULL, $entityID = NULL
+    $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {
     if ($type) {
       $form->_type = $type;
@@ -102,7 +102,7 @@ class CRM_Custom_Form_CustomData {
 
     $typeCheck = CRM_Utils_Request::retrieve( 'type', 'String', CRM_Core_DAO::$_nullObject );
     $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive', CRM_Core_DAO::$_nullObject);
-    if ( isset($typeCheck) && $urlGroupId) { 
+    if ( isset($typeCheck) && $urlGroupId) {
       $form->_groupID = $urlGroupId;
     } else {
       $form->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $form);
@@ -115,14 +115,15 @@ class CRM_Custom_Form_CustomData {
     if (!is_array($subType) && strstr($subType, CRM_Core_DAO::VALUE_SEPARATOR)) {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
-    
+
     $groupTree = &CRM_Core_BAO_CustomGroup::getTree($form->_type,
       $form,
       $form->_entityId,
       $gid,
       $subType,
       $form->_subName,
-      $getCachedTree
+      $getCachedTree,
+      $onlySubType
     );
 
     if (property_exists($form, '_customValueCount') && !empty($groupTree)) {

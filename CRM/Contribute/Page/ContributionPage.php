@@ -339,7 +339,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       );
       $query = "
 SELECT      ccp.title
-FROM        civicrm_contribution_page ccp 
+FROM        civicrm_contribution_page ccp
 JOIN        civicrm_pcp cp ON ccp.id = cp.page_id
 WHERE       cp.page_id = {$id}
 AND         cp.page_type = 'contribute'

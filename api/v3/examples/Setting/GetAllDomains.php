@@ -4,7 +4,7 @@
  shows getting a variable for all domains
  */
 function setting_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'domain_id' => 'all',
   'return' => 'uniq_email_per_site',
@@ -20,18 +20,18 @@ $params = array(
  */
 function setting_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 3,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'uniq_email_per_site' => '1',
         ),
-      '2' => array( 
+      '2' => array(
           'uniq_email_per_site' => '1',
         ),
-      '3' => array( 
+      '3' => array(
           'uniq_email_per_site' => '1',
         ),
     ),

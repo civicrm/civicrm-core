@@ -102,19 +102,23 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
 
       $ids = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_saved_search', $groups);
-      foreach (array_values($ids) as $id) {
-        $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
-        $this->_viewPermissionedGroups[$groupKey][$id] = $title;
-        $this->_viewPermission = TRUE;
+      if (!empty($ids)) {
+        foreach (array_values($ids) as $id) {
+          $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
+          $this->_viewPermissionedGroups[$groupKey][$id] = $title;
+          $this->_viewPermission = TRUE;
+        }
       }
 
       $ids = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_saved_search', $groups);
-      foreach (array_values($ids) as $id) {
-        $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
-        $this->_editPermissionedGroups[$groupKey][$id] = $title;
-        $this->_viewPermissionedGroups[$groupKey][$id] = $title;
-        $this->_editPermission = TRUE;
-        $this->_viewPermission = TRUE;
+      if (!empty($ids)) {
+        foreach (array_values($ids) as $id) {
+          $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
+          $this->_editPermissionedGroups[$groupKey][$id] = $title;
+          $this->_viewPermissionedGroups[$groupKey][$id] = $title;
+          $this->_editPermission = TRUE;
+          $this->_viewPermission = TRUE;
+        }
       }
     }
 
@@ -213,21 +217,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
       return CRM_Core_Permission::VIEW;
     }
     return NULL;
-  }
-
-  /**
-   * given a permission string, check for access requirements
-   *
-   * @param string $str the permission to check
-   *
-   * @return boolean true if yes, else false
-   * @access public
-   */
-  function check($str, $contactID = NULL) {
-    if (function_exists('user_access')) {
-      return user_access($str) ? TRUE : FALSE;
-    }
-    return TRUE;
   }
 
   function getContactEmails($uids) {

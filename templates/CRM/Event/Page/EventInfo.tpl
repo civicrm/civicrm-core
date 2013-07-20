@@ -84,24 +84,26 @@
 {/if}
 <div class="vevent crm-event-id-{$event.id} crm-block crm-event-info-form-block">
   <div class="event-info">
-  {if $event.summary}
-      <div class="crm-section event_summary-section">
+  {* Display top buttons only if the page is long enough to merit duplicate buttons *}
+  {if $event.summary or $event.description}
+    <div class="crm-actionlinks-top">
+      {crmRegion name="event-page-eventinfo-actionlinks-top"}
         {if $allowRegistration}
           <div class="action-link section register_link-section register_link-top">
             <a href="{$registerURL}" title="{$registerText}" class="button crm-register-button"><span>{$registerText}</span></a>
           </div>
         {/if}
+      {/crmRegion}
+    </div>
+  {/if}
+
+  {if $event.summary}
+      <div class="crm-section event_summary-section">
         {$event.summary}
       </div>
   {/if}
   {if $event.description}
       <div class="crm-section event_description-section summary">
-          {* Put the top register link to the right of description if no summary *}
-          {if $allowRegistration && !$event.summary}
-              <div class="action-link section register_link-section register_link-top">
-                <a href="{$registerURL}" title="{$registerText}" class="button crm-register-button"><span>{$registerText}</span></a>
-              </div>
-          {/if}
           {$event.description}
       </div>
   {/if}
@@ -183,22 +185,22 @@
               <table class="form-layout-compressed fee_block-table">
                   {foreach from=$feeBlock.value name=fees item=value}
                       {assign var=idx value=$smarty.foreach.fees.iteration}
-	                    {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
+                      {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
                       {if $feeBlock.lClass.$idx}
                           {assign var="lClass" value=$feeBlock.lClass.$idx}
                       {else}
                           {assign var="lClass" value="fee_level-label"}
                       {/if}
-	                    {if $isQuickConfig && $lClass EQ "price_set_option_group-label"}
-	                      {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
-	                    {else}
+                      {if $isQuickConfig && $lClass EQ "price_set_option_group-label"}
+                        {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
+                      {else}
                       <tr>
                           <td class="{$lClass} crm-event-label">{$feeBlock.label.$idx}</td>
                           {if $isPriceSet & $feeBlock.isDisplayAmount.$idx}
                           <td class="fee_amount-value right">{$feeBlock.value.$idx|crmMoney}</td>
                           {/if}
                       </tr>
-	                    {/if}
+                      {/if}
                   {/foreach}
               </table>
           </div>
@@ -209,11 +211,15 @@
 
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
-  {if $allowRegistration}
-        <div class="action-link section register_link-section register_link-bottom">
+    <div class="crm-actionlinks-bottom">
+      {crmRegion name="event-page-eventinfo-actionlinks-bottom"}
+        {if $allowRegistration}
+          <div class="action-link section register_link-section register_link-bottom">
             <a href="{$registerURL}" title="{$registerText}" class="button crm-register-button"><span>{$registerText}</span></a>
-        </div>
-    {/if}
+          </div>
+        {/if}
+      {/crmRegion}
+    </div>
     { if $event.is_public }
         <br />{include file="CRM/Event/Page/iCalLinks.tpl"}
     {/if}

@@ -245,17 +245,68 @@ AND    $operationClause LIMIT 1";
    */
   static function relationship($selectedContactID, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
+    $config = CRM_Core_Config::singleton();
     if (!$contactID) {
       $contactID = $session->get('userID');
       if (!$contactID) {
         return FALSE;
       }
     }
-    if ($contactID == $selectedContactID) {
+    if ($contactID == $selectedContactID && CRM_Core_Permission::check('edit my contact')) {
       return TRUE;
     }
     else {
-      $query = "
+      if ($config->secondDegRelPermissions) {
+        $query = "
+SELECT firstdeg.id
+FROM   civicrm_relationship firstdeg
+LEFT JOIN civicrm_relationship seconddegaa
+  on firstdeg.contact_id_a = seconddegaa.contact_id_b
+  and seconddegaa.is_permission_b_a = 1
+  and firstdeg.is_permission_b_a = 1
+  and seconddegaa.is_active = 1
+LEFT JOIN civicrm_relationship seconddegab
+  on firstdeg.contact_id_a = seconddegab.contact_id_a
+  and seconddegab.is_permission_a_b = 1
+  and firstdeg.is_permission_b_a = 1
+  and seconddegab.is_active = 1
+LEFT JOIN civicrm_relationship seconddegba
+  on firstdeg.contact_id_b = seconddegba.contact_id_b
+  and seconddegba.is_permission_b_a = 1
+  and firstdeg.is_permission_a_b = 1
+  and seconddegba.is_active = 1
+LEFT JOIN civicrm_relationship seconddegbb
+  on firstdeg.contact_id_b = seconddegbb.contact_id_a
+  and seconddegbb.is_permission_a_b = 1
+  and firstdeg.is_permission_a_b = 1
+  and seconddegbb.is_active = 1
+WHERE
+  (
+    ( firstdeg.contact_id_a = %1 AND firstdeg.contact_id_b = %2 AND firstdeg.is_permission_a_b = 1 )
+    OR ( firstdeg.contact_id_a = %2 AND firstdeg.contact_id_b = %1 AND firstdeg.is_permission_b_a = 1 )
+    OR (
+      firstdeg.contact_id_a = %1 AND seconddegba.contact_id_a = %2
+      AND (seconddegba.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+    )
+    OR (
+      firstdeg.contact_id_a = %1 AND seconddegbb.contact_id_b = %2
+      AND (seconddegbb.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+    )
+    OR (
+      firstdeg.contact_id_b = %1 AND seconddegab.contact_id_b = %2
+      AND (seconddegab.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+    )
+    OR (
+      firstdeg.contact_id_b = %1 AND seconddegaa.contact_id_a = %2      AND (seconddegaa.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+    )
+  )
+  AND (firstdeg.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+  AND (firstdeg.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+  AND ( firstdeg.is_active = 1)
+      ";
+      }
+      else {
+        $query = "
 SELECT id
 FROM   civicrm_relationship
 WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
@@ -264,6 +315,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
        (contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
   AND  ( civicrm_relationship.is_active = 1 )
 ";
+      }
       $params = array(1 => array($contactID, 'Integer'),
         2 => array($selectedContactID, 'Integer'),
       );

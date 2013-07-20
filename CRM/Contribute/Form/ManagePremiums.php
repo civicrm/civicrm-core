@@ -172,27 +172,27 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->add('Select', 'frequency_unit', ts('Frequency Unit'), array('' => '- select period -', 'day' => 'Day', 'week' => 'Week', 'month' => 'Month', 'year' => 'Year'));
 
     $this->add('text', 'frequency_interval', ts('Frequency'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'frequency_interval'));
-    
+
     //Financial Type CRM-11106
     $financialType = CRM_Contribute_PseudoConstant::financialType( );
     $premiumFinancialType = array();
     CRM_Core_PseudoConstant::populate(
       $premiumFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True, 
-      $retrieve = 'entity_id', 
-      $filter = null, 
-      'account_relationship = 8' 
+      $all = True,
+      $retrieve = 'entity_id',
+      $filter = null,
+      'account_relationship = 8'
     );
-            
+
     $costFinancialType = array();
     CRM_Core_PseudoConstant::populate(
       $costFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True, 
-      $retrieve = 'entity_id', 
-      $filter = null, 
-      'account_relationship = 7' 
+      $all = True,
+      $retrieve = 'entity_id',
+      $filter = null,
+      'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
     foreach( $financialType as $key => $financialTypeName ){
@@ -201,14 +201,14 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     }
     if( count( $financialType ) ){
       $this->assign( 'financialType', $financialType );
-    } 
+    }
     $this->add(
-      'select', 
-      'financial_type_id', 
-      ts( 'Financial Type' ), 
+      'select',
+      'financial_type_id',
+      ts( 'Financial Type' ),
       array(''=>ts('- select -')) + $financialType
     );
-    
+
     $this->add('checkbox', 'is_active', ts('Enabled?'));
 
     $this->addFormRule(array('CRM_Contribute_Form_ManagePremiums', 'formRule'));

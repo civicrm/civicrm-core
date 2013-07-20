@@ -121,7 +121,8 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     $versionName = self::$_numberMap[$versionParts[0]] . self::$_numberMap[$versionParts[1]];
 
     if (!array_key_exists($versionName, $incrementalPhpObject)) {
-      eval("\$incrementalPhpObject['$versionName'] = new CRM_Upgrade_Incremental_php_{$versionName};");
+      $className = "CRM_Upgrade_Incremental_php_{$versionName}";
+      $incrementalPhpObject[$versionName] = new $className();
     }
     return $incrementalPhpObject[$versionName];
   }
@@ -489,7 +490,7 @@ SET    version = '$version'
           // callback
           array('CRM_Upgrade_Form', 'doIncrementalUpgradeFinish'),
           // arguments
-          array($rev),
+          array($rev, $currentVer, $latestVer, $postUpgradeMessageFile),
           "Finish Upgrade DB to $rev"
         );
         $queue->createItem($task);
@@ -597,7 +598,7 @@ SET    version = '$version'
    * @param $latestVer string, the target (final) revision
    * @param $postUpgradeMessageFile string, path of a modifiable file which lists the post-upgrade messages
    */
-  static function doIncrementalUpgradeFinish(CRM_Queue_TaskContext $ctx, $rev) {
+  static function doIncrementalUpgradeFinish(CRM_Queue_TaskContext $ctx, $rev, $currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->setVersion($rev);
     CRM_Utils_System::flushCache();

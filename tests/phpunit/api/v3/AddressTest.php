@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
@@ -50,7 +49,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
     $this->_contactID = $this->organizationCreate();
     $this->_locationType = $this->locationTypeCreate();
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
 
     $this->_params = array(
       'contact_id' => $this->_contactID,
@@ -120,8 +119,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   public function testCreateAddressTooLongSuffix() {
     $params = $this->_params;
     $params['street_number_suffix'] = 'really long string';
-    $result = civicrm_api('address', 'create', $params);
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('address', 'create', $params);
     $this->assertEquals(2100, $result['error_code']);
   }
   /*

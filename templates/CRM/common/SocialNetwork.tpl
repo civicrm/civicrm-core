@@ -28,7 +28,7 @@
 <div class="crm-section crm-socialnetwork help">
     <h3 class="nobackground">{ts}Help spread the word{/ts}</h3>
     <div class="description">
-        {ts}Please help us and let your friends, colleagues and followers know about our page{/ts}{if $title}: 
+        {ts}Please help us and let your friends, colleagues and followers know about our page{/ts}{if $title}:
         <span class="bold"><a href="{$pageURL}">{$title}</a></span>
         {else}.{/if}
     </div>
@@ -45,7 +45,7 @@
             {*use advanced buttons for pages*}
             <div class="label">
                 <iframe allowtransparency="true" frameborder="0" scrolling="no"
-                src="//platform.twitter.com/widgets/tweet_button.html?text={$title}&amp;url={$url}" 
+                src="//platform.twitter.com/widgets/tweet_button.html?text={$title}&amp;url={$url}"
                 style="width:100px; height:20px;">
                 </iframe>
             </div>
@@ -53,7 +53,7 @@
                 <g:plusone href={$url}></g:plusone>
             </div>
             <div class="label" style="width:300px;">
-                <iframe src="//www.facebook.com/plugins/like.php?app_id=240719639306341&amp;href={$url|escape:'url'}&amp;send=false&amp;layout=standard&amp;show_faces=false&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:300px; height:30px;" allowTransparency="true"> 
+                <iframe src="//www.facebook.com/plugins/like.php?app_id=240719639306341&amp;href={$url|escape:'url'}&amp;send=false&amp;layout=standard&amp;show_faces=false&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:300px; height:30px;" allowTransparency="true">
                 </iframe>
             </div>
             <div class="label">

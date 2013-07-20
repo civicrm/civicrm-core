@@ -4,7 +4,7 @@
  
  */
 function uf_join_get_example(){
-$params = array( 
+$params = array(
   'entity_table' => 'civicrm_contribution_page',
   'entity_id' => 1,
   'version' => 3,
@@ -21,13 +21,13 @@ $params = array(
  */
 function uf_join_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '1',
           'is_active' => '1',
           'module' => 'CiviContribute',

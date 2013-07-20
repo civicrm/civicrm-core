@@ -141,8 +141,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     );
 
     foreach ($dependancy as $name => $field) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, "CRM_Member_DAO_" . $name) . ".php");
-      eval('$dao = new CRM_Member_DAO_' . $name . '();');
+      $baoString = 'CRM_Member_BAO_' . $name;
+      $dao = new $baoString();
       $dao->$field = $membershipTypeId;
       if ($dao->find(TRUE)) {
         $check = TRUE;
@@ -391,7 +391,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day']){
           $fixed_period_rollover = True;
         }
-        
+
         // Start date is always first day of actualStartDate month
         if (!$startDate) {
           $actualStartDate = $startDate = $year . '-' . $month . '-01';
@@ -659,7 +659,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
   public static function createMembershipPriceField($params, $ids, $previousID, $membershipTypeId) {
 
-    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', 'default_membership_type_amount', 'id', 'name');
+    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
 
     if (CRM_Utils_Array::value('member_of_contact_id', $params)) {
       $fieldName = $params['member_of_contact_id'];
@@ -674,7 +674,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       'name' => $fieldName,
     );
     $results = array();
-    CRM_Price_BAO_Field::retrieve($fieldParams, $results);
+    CRM_Price_BAO_PriceField::retrieve($fieldParams, $results);
     if (empty($results)) {
       $fieldParams = array();
       $fieldParams['label'] = $fieldLabel;
@@ -685,7 +685,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $fieldParams['weight'] = $fieldParams['option_weight'][1] = 1;
       $fieldParams['option_label'][1] = $params['name'];
       $fieldParams['option_description'][1] = CRM_Utils_Array::value('description', $params);
-      
+
       $fieldParams['membership_type_id'][1] = $membershipTypeId;
       $fieldParams['option_amount'][1] = empty($params['minimum_fee']) ? 0 : $params['minimum_fee'];
       $fieldParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
@@ -694,8 +694,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         CRM_Member_Form_MembershipType::checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, $optionsIds);
         $fieldParams['option_id'] = CRM_Utils_Array::value('option_id', $optionsIds);
       }
-      $priceField = CRM_Price_BAO_Field::create($fieldParams);
-    } 
+      $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
+    }
     else {
       $fieldID = $results['id'];
       $fieldValueParams = array(
@@ -703,12 +703,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         'membership_type_id' => $membershipTypeId,
       );
       $results = array();
-      CRM_Price_BAO_FieldValue::retrieve($fieldValueParams, $results);
+      CRM_Price_BAO_PriceFieldValue::retrieve($fieldValueParams, $results);
       if (!empty($results)) {
         $results['label']  = $results['name'] = $params['name'];
         $results['amount'] = empty($params['minimum_fee']) ? 0 : $params['minimum_fee'];
         $optionsIds['id']  = $results['id'];
-      } 
+      }
       else {
         $results = array(
           'price_field_id' => $fieldID,
@@ -728,16 +728,16 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
       $results['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
       $results['description'] = CRM_Utils_Array::value('description', $params);
-      CRM_Price_BAO_FieldValue::add($results, $optionsIds);
+      CRM_Price_BAO_PriceFieldValue::add($results, $optionsIds);
     }
   }
 
   /** This function updates all price field value for quick config
    * price set which has membership type
    *
-   *  @param  integer      membership type id 
+   *  @param  integer      membership type id
    *
-   *  @param  integer      financial type id 
+   *  @param  integer      financial type id
    */
   static function updateAllPriceFieldValue($membershipTypeId, $params) {
     if (CRM_Utils_Array::value('minimum_fee', $params)){
@@ -755,7 +755,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     );
 
     $queryParams = array(1 => array($membershipTypeId, 'Integer'));
-    foreach ($updateValues as $key => $value) { 
+    foreach ($updateValues as $key => $value) {
       if (array_key_exists($value[1], $params)) {
         $updateFields[] = "cpfv." . $value[0] . " = %$key";
         if ($value[1] == 'minimum_fee') {
@@ -769,11 +769,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     }
 
     $query = "UPDATE `civicrm_price_field_value` cpfv
-INNER JOIN civicrm_price_field cpf on cpf.id = cpfv.price_field_id 
+INNER JOIN civicrm_price_field cpf on cpf.id = cpfv.price_field_id
 INNER JOIN civicrm_price_set cps on cps.id = cpf.price_set_id
-SET " . implode(' , ', $updateFields) . " WHERE cpfv.membership_type_id = %1 
+SET " . implode(' , ', $updateFields) . " WHERE cpfv.membership_type_id = %1
 AND cps.is_quick_config = 1 AND cps.name != 'default_membership_type_amount'";
     CRM_Core_DAO::executeQuery($query, $queryParams);
-  } 
+  }
 }
 

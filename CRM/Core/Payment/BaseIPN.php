@@ -35,10 +35,29 @@
 class CRM_Core_Payment_BaseIPN {
 
   static $_now = NULL;
+
+  /**
+   * Constructor
+   */
   function __construct() {
     self::$_now = date('YmdHis');
   }
 
+  /**
+   * Validate incoming data. This function is intended to ensure that incoming data matches
+   * It provides a form of pseudo-authentication - by checking the calling fn already knows
+   * the correct contact id & contribution id (this can be problematic when that has changed in
+   * the meantime for transactions that are delayed & contacts are merged in-between. e.g
+   * Paypal allows you to resend Instant Payment Notifications if you, for example, moved site
+   * and didn't update your IPN URL.
+   *
+   * @param array $input interpreted values from the values returned through the IPN
+   * @param array $ids more interpreted values (ids) from the values returned through the IPN
+   * @param array $objects an empty array that will be populated with loaded object
+   * @param boolean $required boolean Return FALSE if the relevant objects don't exist
+   * @param integer $paymentProcessorID Id of the payment processor ID in use
+   * @return boolean
+   */
   function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
     // make sure contact exists and is valid
@@ -69,33 +88,16 @@ class CRM_Core_Payment_BaseIPN {
     return TRUE;
   }
 
-  function createContact(&$input, &$ids, &$objects) {
-    $params    = array();
-    $billingID = $ids['billing'];
-    $lookup    = array(
-      'first_name',
-      'last_name',
-      "street_address-{$billingID}",
-      "city-{$billingID}",
-      "state-{$billingID}",
-      "postal_code-{$billingID}",
-      "country-{$billingID}",
-    );
-    foreach ($lookup as $name) {
-      $params[$name] = $input[$name];
-    }
-    if (!empty($params)) {
-      // update contact record
-      $contact = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray, $ids['contact']);
-    }
-
-    return TRUE;
-  }
-
-  /*
+  /**
    * Load objects related to contribution
    *
    * @input array information from Payment processor
+   * @param array $ids
+   * @param array $objects
+   * @param boolean $required
+   * @param integer $paymentProcessorID
+   * @param array $error_handling
+   * @return multitype:number NULL |boolean
    */
   function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
     if (empty($error_handling)) {
@@ -139,6 +141,13 @@ class CRM_Core_Payment_BaseIPN {
     return $success;
   }
 
+  /**
+   * Set contribution to failed
+   * @param array $objects
+   * @param object $transaction
+   * @param array $input
+   * @return boolean
+   */
   function failed(&$objects, &$transaction, $input = array()) {
     $contribution = &$objects['contribution'];
     $memberships = array();
@@ -162,6 +171,11 @@ class CRM_Core_Payment_BaseIPN {
     //add lineitems for recurring payments
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id && $addLineItems) {
       $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id);
+    }
+
+    //copy initial contribution custom fields for recurring contributions
+    if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
+      $this->copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
     if (!CRM_Utils_Array::value('skipComponentSync', $input)) {
@@ -190,6 +204,12 @@ class CRM_Core_Payment_BaseIPN {
     return TRUE;
   }
 
+  /**
+   * Handled pending contribution status
+   * @param array $objects
+   * @param object $transaction
+   * @return boolean
+   */
   function pending(&$objects, &$transaction) {
     $transaction->commit();
     CRM_Core_Error::debug_log_message("returning since contribution status is pending");
@@ -220,6 +240,11 @@ class CRM_Core_Payment_BaseIPN {
     //add lineitems for recurring payments
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id && $addLineItems) {
       $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id);
+    }
+
+    //copy initial contribution custom fields for recurring contributions
+    if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
+      $this->copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
     if (!CRM_Utils_Array::value('skipComponentSync', $input)) {
@@ -468,6 +493,11 @@ LIMIT 1;";
       $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id);
     }
 
+    //copy initial contribution custom fields for recurring contributions
+    if ($recurContrib && $recurContrib->id) {
+      $this->copyCustomValues($recurContrib->id, $contribution->id);
+    }
+
     // next create the transaction record
     $paymentProcessor = $paymentProcessorId = '';
     if (isset($objects['paymentProcessor'])) {
@@ -497,7 +527,7 @@ LIMIT 1;";
         $input['participant_id'] = $contribution->_relatedObjects['participant']->id;
         $input['skipLineItem'] = 1;
       }
-      
+
       CRM_Contribute_BAO_Contribution::recordFinancialAccounts($input, NULL);
     }
 
@@ -535,7 +565,7 @@ LIMIT 1;";
 
   function getBillingID(&$ids) {
     // get the billing location type
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     // CRM-8108 remove the ts around the Billing locationtype
     //$ids['billing'] =  array_search( ts('Billing'),  $locationTypes );
     $ids['billing'] = array_search('Billing', $locationTypes);
@@ -574,6 +604,13 @@ LIMIT 1;";
     return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
   }
 
+  /**
+   * Update contribution status - this is only called from one place in the code &
+   * it is unclear whether it is a function on the way in or on the way out
+   *
+   * @param unknown_type $params
+   * @return void|Ambigous <value, unknown, array>
+   */
   function updateContributionStatus(&$params) {
     // get minimum required values.
     $statusId       = CRM_Utils_Array::value('contribution_status_id', $params);
@@ -759,7 +796,7 @@ LIMIT 1;";
       $lineItems = CRM_Price_BAO_LineItem::getLineItems($contriID, 'contribution');
       if (!empty($lineItems)) {
         foreach ($lineItems as $key => $value) {
-          $pricesetID = new CRM_Price_DAO_Field();
+          $pricesetID = new CRM_Price_DAO_PriceField();
           $pricesetID->id = $value['price_field_id'];
           $pricesetID->find(TRUE);
           $lineSets[$pricesetID->price_set_id][] = $value;
@@ -769,5 +806,45 @@ LIMIT 1;";
       CRM_Price_BAO_LineItem::processPriceSet($contributionId, $lineSets);
     }
   }
-}
 
+  // function to copy custom data of the
+  // initial contribution into its recurring contributions
+  function copyCustomValues($recurId, $targetContributionId) {
+    if ($recurId && $targetContributionId) {
+      // get the initial contribution id of recur id
+      $sourceContributionId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
+
+      // if the same contribution is being proccessed then return
+      if ($sourceContributionId == $targetContributionId) {
+        return;
+      }
+      // check if proper recurring contribution record is being processed
+      $targetConRecurId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $targetContributionId, 'contribution_recur_id');
+      if ($targetConRecurId != $recurId) {
+        return;
+      }
+
+      // copy custom data
+      $extends = array('Contribution');
+      $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+      if ($groupTree) {
+        foreach ($groupTree as $groupID => $group) {
+          $table[$groupTree[$groupID]['table_name']] = array('entity_id');
+          foreach ($group['fields'] as $fieldID => $field) {
+            $table[$groupTree[$groupID]['table_name']][] = $groupTree[$groupID]['fields'][$fieldID]['column_name'];
+          }
+        }
+
+        foreach ($table as $tableName => $tableColumns) {
+          $insert          = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
+          $tableColumns[0] = $targetContributionId;
+          $select          = 'SELECT ' . implode(', ', $tableColumns);
+          $from            = ' FROM ' . $tableName;
+          $where           = " WHERE {$tableName}.entity_id = {$sourceContributionId}";
+          $query           = $insert . $select . $from . $where;
+          $dao             = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+        }
+      }
+    }
+  }
+}

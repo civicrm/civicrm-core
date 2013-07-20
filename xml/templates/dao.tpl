@@ -30,8 +30,9 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
  *
+ * Generated from {$table.sourceFile}
+ * {$generated}
  */
 
 require_once 'CRM/Core/DAO.php';
@@ -62,6 +63,14 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       * @static
       */
       static $_fields = null;
+
+     /**
+      * static instance to hold the keys used in $_fields for each field.
+      *
+      * @var array
+      * @static
+      */
+      static $_fieldKeys = null;
 
      /**
       * static instance to hold the FK relationships
@@ -122,22 +131,27 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
         parent::__construct( );
     {rdelim}
 
-{if $table.foreignKey}
+{if $table.foreignKey || $table.dynamicForeignKey}
     /**
-     * return foreign links
+     * return foreign keys and entity references
      *
+     * @static
      * @access public
-     * @return array
+     * @return array of CRM_Core_EntityReference
      */
-    function links( ) {ldelim}
-  if ( ! ( self::$_links ) ) {ldelim}
-       self::$_links = array(
+    static function getReferenceColumns() {ldelim}
+      if (!self::$_links) {ldelim}
+        self::$_links = array(
 {foreach from=$table.foreignKey item=foreign}
-                                   '{$foreign.name}' => '{$foreign.table}:{$foreign.key}',
+          new CRM_Core_EntityReference(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}'),
 {/foreach}
-                             );
-        {rdelim}
-        return self::$_links;
+
+{foreach from=$table.dynamicForeignKey item=foreign}
+          new CRM_Core_EntityReference(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}'),
+{/foreach}
+        );
+      {rdelim}
+      return self::$_links;
     {rdelim}
 {/if} {* table.foreignKey *}
 
@@ -219,6 +233,30 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                                       );
           {rdelim}
           return self::$_fields;
+      {rdelim}
+
+      /**
+       * Returns an array containing, for each field, the arary key used for that
+       * field in self::$_fields.
+       *
+       * @access public
+       * @return array
+       */
+      static function &fieldKeys( ) {ldelim}
+        if ( ! ( self::$_fieldKeys ) ) {ldelim}
+               self::$_fieldKeys = array (
+{foreach from=$table.fields item=field}
+                    '{$field.name}' =>
+{if $field.uniqueName}
+                                            '{$field.uniqueName}'
+{else}
+                                            '{$field.name}'
+{/if},
+
+{/foreach} {* table.fields *}
+                                      );
+          {rdelim}
+          return self::$_fieldKeys;
       {rdelim}
 
       /**

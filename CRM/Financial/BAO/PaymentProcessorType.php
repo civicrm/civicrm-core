@@ -151,12 +151,12 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
     if (isset($paymentProcessorType->billing_mode)) {
       // ugh unidirectional manipulation
       if (!is_numeric($paymentProcessorType->billing_mode)) {
-        $billingModes = array_flip(CRM_Core_PseudoConstant::billingMode());
+        $billingModes = array_flip(self::buildOptions('billing_mode'));
         if (array_key_exists($paymentProcessorType->billing_mode, $billingModes)) {
           $paymentProcessorType->billing_mode = $billingModes[$paymentProcessorType->billing_mode];
         }
       }
-      if (!array_key_exists($paymentProcessorType->billing_mode, CRM_Core_PseudoConstant::billingMode())) {
+      if (!array_key_exists($paymentProcessorType->billing_mode, self::buildOptions('billing_mode'))) {
         throw new Exception("Unrecognized billing_mode");
       }
     }
@@ -212,6 +212,29 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
       $ppt[$dao->$attr] = $dao->id;
     }
     return $ppt;
+  }
+
+  /**
+   * Get options for a given field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+    // Special logic for fields whose options depend on context or properties
+    switch ($fieldName) {
+      // These options are not in the db
+      case 'billing_mode':
+        return array(
+          CRM_Core_Payment::BILLING_MODE_FORM => 'form',
+          CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
+          CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+        );
+    }
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 }
 

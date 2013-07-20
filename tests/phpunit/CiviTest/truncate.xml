@@ -69,12 +69,6 @@
 
   <civicrm_sms_provider />
 
-  <civicrm_project />
-
-  <civicrm_task />
-
-  <civicrm_task_status />
-
   <civicrm_membership_status />
 
   <civicrm_campaign />
@@ -155,6 +149,8 @@
 
   <civicrm_setting />
 
+  <civicrm_print_label />
+
   <civicrm_acl_cache />
 
   <civicrm_group />
@@ -189,9 +185,7 @@
 
   <civicrm_activity />
 
-  <civicrm_activity_assignment />
-
-  <civicrm_activity_target />
+  <civicrm_activity_contact />
 
   <civicrm_case_activity />
 

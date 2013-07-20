@@ -974,6 +974,36 @@ class CRM_Utils_Date {
             $from    = self::intervalAdd('year', -1, $to);
             $from    = self::intervalAdd('second', 1, $from);
             break;
+
+          case 'current':
+            $from['M'] = $from['d'] = 1;
+            $from['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            break;
+
+          case 'ending_2':
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            $from    = self::intervalAdd('year', -2, $to);
+            $from    = self::intervalAdd('second', 1, $from);
+            break;
+
+          case 'ending_3':
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            $from    = self::intervalAdd('year', -3, $to);
+            $from    = self::intervalAdd('second', 1, $from);
+            break;
         }
         break;
 
@@ -1114,6 +1144,18 @@ class CRM_Utils_Date {
             $from    = self::intervalAdd('month', -3, $to);
             $from    = self::intervalAdd('second', 1, $from);
             break;
+
+          case 'current':
+            $quarter   = ceil($now['mon'] / 3);
+            $from['d'] = 1;
+            $from['M'] = (3 * $quarter) - 2;
+            $from['Y'] = $now['year'];
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            break;
         }
         break;
 
@@ -1206,6 +1248,17 @@ class CRM_Utils_Date {
             $from    = self::intervalAdd('month', -1, $to);
             $from    = self::intervalAdd('second', 1, $from);
             break;
+
+          case 'current':
+            $from['d'] = 1;
+            $from['M'] = $now['mon'];;
+            $from['Y'] = $now['year'];
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            break;
         }
         break;
 
@@ -1267,6 +1320,18 @@ class CRM_Utils_Date {
             $to['i'] = $to['s'] = 59;
             $from    = self::intervalAdd('day', -7, $to);
             $from    = self::intervalAdd('second', 1, $from);
+            break;
+
+          case 'current':
+            $from['d'] = $now['mday'];
+            $from['M'] = $now['mon'];
+            $from['Y'] = $now['year'];
+            $from      = self::intervalAdd('day', -1 * ($now['wday']), $from);
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
             break;
         }
         break;
@@ -1527,7 +1592,7 @@ class CRM_Utils_Date {
       }
 
       // validate date.
-      eval('$valid = CRM_Utils_Rule::' . $ruleName . '( $dateVal );');
+      $valid = CRM_Utils_Rule::$ruleName($dateVal);
 
       if ($valid) {
         //format date and time to default.

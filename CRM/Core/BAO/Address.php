@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -668,28 +666,29 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
 
   static function fixAllStateSelects(&$form, $defaults, $batchFieldNames = false) {
     $config = CRM_Core_Config::singleton();
-
     $map = null;
     if (is_array($batchFieldNames)) {
       $map = $batchFieldNames;
     }
-    else if (!empty($config->stateCountryMap)) {
+    elseif (!empty($config->stateCountryMap)) {
       $map = $config->stateCountryMap;
     }
-
     if (!empty($map)) {
       foreach ($map as $index => $match) {
-        if (
-          array_key_exists('state_province', $match) &&
-          array_key_exists('country', $match)
+        if (array_key_exists('state_province', $match)
+          || array_key_exists('country', $match)
+          || array_key_exists('county', $match)
         ) {
+          $countryElementName = CRM_Utils_Array::value('country', $match);
+          $stateProvinceElementName = CRM_Utils_Array::value('state_province', $match);
+          $countyElementName = CRM_Utils_Array::value('county', $match);
           CRM_Contact_Form_Edit_Address::fixStateSelect(
             $form,
-            $match['country'],
-            $match['state_province'],
-            CRM_Utils_Array::value('county', $match),
-            CRM_Utils_Array::value($match['country'], $defaults),
-            CRM_Utils_Array::value($match['state_province'], $defaults)
+            $countryElementName,
+            $stateProvinceElementName,
+            $countyElementName,
+            CRM_Utils_Array::value($countryElementName, $defaults),
+            CRM_Utils_Array::value($stateProvinceElementName, $defaults)
           );
         }
         else {
@@ -1149,5 +1148,54 @@ SELECT is_primary,
    */
   static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Address', $id);
+  }
+
+  /**
+   * Get options for a given address field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
+   * TODO: In context of chainselect, what to return if e.g. a country has no states?
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+    // Special logic for fields whose options depend on context or properties
+    switch ($fieldName) {
+      // Filter state_province list based on chosen country or site defaults
+      case 'state_province_id':
+        if (empty($props['country_id'])) {
+          $config = CRM_Core_Config::singleton();
+          if (!empty($config->provinceLimit)) {
+            $props['country_id'] = $config->provinceLimit;
+          }
+          else {
+            $props['country_id'] = $config->defaultContactCountry;
+          }
+        }
+        if (!empty($props['country_id'])) {
+          $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
+        }
+        break;
+      // Filter country list based on site defaults
+      case 'country_id':
+        if ($context != 'get' && $context != 'validate') {
+          $config = CRM_Core_Config::singleton();
+          if (!empty($config->countryLimit) && is_array($config->countryLimit)) {
+            $params['condition'] = 'id IN (' . implode(',', $config->countryLimit) . ')';
+          }
+        }
+        break;
+      // Filter county list based on chosen state
+      case 'county_id':
+        if (!empty($props['state_province_id'])) {
+          $params['condition'] = 'state_province_id IN (' . implode(',', (array) $props['state_province_id']) . ')';
+        }
+        break;
+    }
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 }

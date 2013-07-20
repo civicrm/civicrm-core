@@ -167,12 +167,12 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
     if (CRM_Utils_Array::value('financialTrxnId', $fids)) {
       $this->_online = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $fids['financialTrxnId'], 'payment_processor_id');
     }
-    
+
     // Also don't allow user to update some fields for recurring contributions.
     if (!$this->_online) {
       $this->_online = CRM_Utils_Array::value('contribution_recur_id', $values);
     }
-    
+
     $this->assign('isOnline', $this->_online ? TRUE : FALSE);
 
     //unset the honor type id:when delete the honor_contact_id
@@ -190,29 +190,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
       $values['note'] = $daoNote->note;
     }
     $this->_contributionType = $values['financial_type_id'];
-
-    $csParams = array('contribution_id' => $id);
-    $softCredit = CRM_Contribute_BAO_Contribution::getSoftContribution($csParams, TRUE);
-
-    if (CRM_Utils_Array::value('soft_credit_to', $softCredit)) {
-      $softCredit['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $softCredit['soft_credit_to'], 'sort_name'
-      );
-    }
-    $values['soft_credit_to'] = CRM_Utils_Array::value('sort_name', $softCredit);
-    $values['softID'] = CRM_Utils_Array::value('soft_credit_id', $softCredit);
-    $values['soft_contact_id'] = CRM_Utils_Array::value('soft_credit_to', $softCredit);
-
-    if (CRM_Utils_Array::value('pcp_id', $softCredit)) {
-      $pcpId = CRM_Utils_Array::value('pcp_id', $softCredit);
-      $pcpTitle = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcpId, 'title');
-      $contributionPageTitle = CRM_PCP_BAO_PCP::getPcpPageTitle($pcpId, 'contribute');
-      $values['pcp_made_through'] = CRM_Utils_Array::value('sort_name', $softCredit) . " :: " . $pcpTitle . " :: " . $contributionPageTitle;
-      $values['pcp_made_through_id'] = CRM_Utils_Array::value('pcp_id', $softCredit);
-      $values['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $softCredit);
-      $values['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $softCredit);
-      $values['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $softCredit);
-    }
   }
 
   /**
@@ -377,7 +354,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @return void
    */
   public function assignBillingType() {
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $this->_bltID = array_search('Billing', $locationTypes);
     if (!$this->_bltID) {
       CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));

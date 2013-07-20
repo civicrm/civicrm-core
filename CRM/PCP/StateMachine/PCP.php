@@ -42,10 +42,10 @@ class CRM_PCP_StateMachine_PCP extends CRM_Core_StateMachine {
   /**
    * class constructor
    *
-   * @param object  CRM_Import_Controller
+   * @param object  CRM_Contact_Import_Controller
    * @param int     $action
    *
-   * @return object CRM_Import_StateMachine
+   * @return object CRM_Contact_Import_StateMachine
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);

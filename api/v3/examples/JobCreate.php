@@ -4,7 +4,7 @@
  
  */
 function job_create_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'sequential' => 1,
   'name' => 'API_Test_Job',
@@ -26,13 +26,13 @@ $params = array(
  */
 function job_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '1',
           'domain_id' => '1',
           'run_frequency' => 'Daily',

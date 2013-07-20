@@ -32,6 +32,11 @@
     <comment>entry in table</comment>
     <add>1.7</add>
   </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.7</add>
+  </dynamicForeignKey>
   <field>
     <name>price_field_id</name>
     <type>int unsigned</type>
@@ -118,31 +123,31 @@
     <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  <field>  
-    <name>financial_type_id</name> 
+  <field>
+    <name>financial_type_id</name>
     <title>Financial Type</title>
-    <type>int unsigned</type>  
+    <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Financial Type.</comment>
-    <add>4.3</add> 
-  </field>    
-  <foreignKey>  
-    <name>financial_type_id</name>  
-    <table>civicrm_financial_type</table>  
-    <key>id</key>  
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
     <onDelete>SET NULL</onDelete>
     <add>4.3</add>
-  </foreignKey> 
-  <field>  
-    <name>deductible_amount</name> 
+  </foreignKey>
+  <field>
+    <name>deductible_amount</name>
     <title>Deductible Amount</title>
-    <type>decimal</type> 
+    <type>decimal</type>
     <default>0.0</default>
     <headerPattern>/unit?.?amoun/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
-    <required>true</required> 
+    <required>true</required>
     <comment>Tax-deductible portion of the amount</comment>
-    <add>4.3</add> 
-  </field>   
+    <add>4.3</add>
+  </field>
 </table>
 

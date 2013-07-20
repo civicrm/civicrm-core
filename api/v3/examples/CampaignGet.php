@@ -4,7 +4,7 @@
  
  */
 function campaign_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'title' => 'campaign title',
   'description' => 'Call people, ask for money',
@@ -21,19 +21,19 @@ $params = array(
  */
 function campaign_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
           'name' => 'campaign_title',
           'title' => 'campaign title',
           'description' => 'Call people, ask for money',
           'is_active' => '1',
-          'created_date' => '2008-07-05 00:00:00',
+          'created_date' => '20120130621222105',
         ),
     ),
 );

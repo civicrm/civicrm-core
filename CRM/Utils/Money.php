@@ -49,15 +49,16 @@ class CRM_Utils_Money {
    * %C - the currency ISO code (e.g., 'USD') if provided
    * %c - the currency symbol (e.g., '$') if available
    *
-   * @param float  $amount    the monetary amount to display (1234.56)
-   * @param string $currency  the three-letter ISO currency code ('USD')
-   * @param string $format    the desired currency format
+   * @param float  $amount      the monetary amount to display (1234.56)
+   * @param string $currency    the three-letter ISO currency code ('USD')
+   * @param string $format      the desired currency format
+   * @param string $valueFormat the desired monetary value display format (e.g. '%!i')
    *
    * @return string  formatted monetary string
    *
    * @static
    */
-  static function format($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE) {
+  static function format($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE, $valueFormat = NULL) {
 
     if (CRM_Utils_System::isNull($amount)) {
       return '';
@@ -68,28 +69,25 @@ class CRM_Utils_Money {
     if (!$format) {
       $format = $config->moneyformat;
     }
-
+    
+    if (!$valueFormat) {
+      $valueFormat = $config->moneyvalueformat;
+    }
+     
     if ($onlyNumber) {
       // money_format() exists only in certain PHP install (CRM-650)
       if (is_numeric($amount) and function_exists('money_format')) {
-        $amount = money_format($config->moneyvalueformat, $amount);
+        $amount = money_format($valueFormat, $amount);
       }
       return $amount;
     }
 
     if (!self::$_currencySymbols) {
-      $currencySymbolName = CRM_Core_PseudoConstant::currencySymbols('name');
-      $currencySymbol = CRM_Core_PseudoConstant::currencySymbols();
-
-      self::$_currencySymbols = array_combine($currencySymbolName, $currencySymbol);
+      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('keyColumn' => 'name', 'labelColumn' => 'symbol'));
     }
 
     if (!$currency) {
       $currency = $config->defaultCurrency;
-    }
-
-    if (!$format) {
-      $format = $config->moneyformat;
     }
 
     // money_format() exists only in certain PHP install (CRM-650)
@@ -97,7 +95,7 @@ class CRM_Utils_Money {
     if (is_numeric($amount) && function_exists('money_format')) {
       $lc = setlocale(LC_MONETARY, 0);
       setlocale(LC_MONETARY, 'en_US.utf8', 'en_US', 'en_US.utf8', 'en_US', 'C');
-      $amount = money_format($config->moneyvalueformat, $amount);
+      $amount = money_format($valueFormat, $amount);
       setlocale(LC_MONETARY, $lc);
     }
 

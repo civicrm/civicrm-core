@@ -348,10 +348,10 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $paramsSet['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $paramsSet['extends'] = 1;
 
-    $priceset = CRM_Price_BAO_Set::create($paramsSet);
+    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
 
     //Checking for priceset added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_Set', $priceset->id, 'title',
+    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceset->id, 'title',
       'id', $paramsSet['title'], 'Check DB for created priceset'
     );
     $paramsField = array(
@@ -372,10 +372,10 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     );
 
     $ids = array();
-    $pricefield = CRM_Price_BAO_Field::create($paramsField, $ids);
+    $pricefield = CRM_Price_BAO_PriceField::create($paramsField, $ids);
 
     //Checking for priceset added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_Field', $pricefield->id, 'label',
+    $this->assertDBCompareValue('CRM_Price_BAO_PriceField', $pricefield->id, 'label',
       'id', $paramsField['label'], 'Check DB for created pricefield'
     );
 
@@ -414,13 +414,13 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       CRM_Event_BAO_Participant::fixEventLevel($values[$participant->id]['fee_level']);
     }
 
-    $deletePricefield = CRM_Price_BAO_Field::deleteField($pricefield->id);
-    $this->assertDBNull('CRM_Price_BAO_Field', $pricefield->id, 'name',
+    $deletePricefield = CRM_Price_BAO_PriceField::deleteField($pricefield->id);
+    $this->assertDBNull('CRM_Price_BAO_PriceField', $pricefield->id, 'name',
       'id', 'Check DB for non-existence of Price Field.'
     );
 
-    $deletePriceset = CRM_Price_BAO_Set::deleteSet($priceset->id);
-    $this->assertDBNull('CRM_Price_BAO_Set', $priceset->id, 'title',
+    $deletePriceset = CRM_Price_BAO_PriceSet::deleteSet($priceset->id);
+    $this->assertDBNull('CRM_Price_BAO_PriceSet', $priceset->id, 'title',
       'id', 'Check DB for non-existence of Price Set.'
     );
 

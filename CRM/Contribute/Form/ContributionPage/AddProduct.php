@@ -167,28 +167,28 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
     $session->pushUserContext($url);
 
     $this->add('select', 'product_id', ts('Select the Product') . ' ', $this->_products, TRUE);
-    
+
     $this->addElement('text', 'weight', ts('Weight'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_PremiumsProduct', 'weight'));
-    
+
     $financialType = CRM_Contribute_PseudoConstant::financialType( );
     $premiumFinancialType = array();
     CRM_Core_PseudoConstant::populate(
       $premiumFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True, 
-      $retrieve = 'entity_id', 
-      $filter = null, 
-      'account_relationship = 8' 
+      $all = True,
+      $retrieve = 'entity_id',
+      $filter = null,
+      'account_relationship = 8'
     );
-            
+
     $costFinancialType = array();
     CRM_Core_PseudoConstant::populate(
       $costFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True, 
-      $retrieve = 'entity_id', 
-      $filter = null, 
-      'account_relationship = 7' 
+      $all = True,
+      $retrieve = 'entity_id',
+      $filter = null,
+      'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
     foreach( $financialType as $key => $financialTypeName ){
@@ -197,11 +197,11 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
     }
     if( count( $financialType ) ){
       $this->assign( 'financialType', $financialType );
-    } 
+    }
     $this->add(
-      'select', 
-      'financial_type_id', 
-      ts( 'Financial Type' ), 
+      'select',
+      'financial_type_id',
+      ts( 'Financial Type' ),
       array(''=>ts('- select -')) + $financialType
     );
     $this->addRule('weight', ts('Please enter integer value for weight'), 'integer');
@@ -272,7 +272,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       if ($this->_pid) {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_PremiumsProduct', $this->_pid, 'weight', 'id');
       }
-      
+
       // updateOtherWeights needs to filter on premiums_id
       $filter = array('premiums_id' => $params['premiums_id']);
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Contribute_DAO_PremiumsProduct', $oldWeight, $params['weight'], $filter);

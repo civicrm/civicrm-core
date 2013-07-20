@@ -108,11 +108,11 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $storeRecipients = FALSE,
     $dedupeEmail = FALSE,
     $mode = NULL) {
-    $mailingGroup = new CRM_Mailing_DAO_Group();
+    $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
 
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
-    $mg      = CRM_Mailing_DAO_Group::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $mg      = CRM_Mailing_DAO_MailingGroup::getTableName();
     $eq      = CRM_Mailing_Event_DAO_Queue::getTableName();
     $ed      = CRM_Mailing_Event_DAO_Delivered::getTableName();
     $eb      = CRM_Mailing_Event_DAO_Bounce::getTableName();
@@ -517,7 +517,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   }
 
   private function _getMailingGroupIds($type = 'Include') {
-    $mailingGroup = new CRM_Mailing_DAO_Group();
+    $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
     $group = CRM_Contact_DAO_Group::getTableName();
     if (!isset($thi->sid)) {
       // we're just testing tokens, so return any group
@@ -1306,7 +1306,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * domain and mailing tokens
    *
    */
-  static function tokenReplace(&$mailing) {
+  public static function tokenReplace(&$mailing) {
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     foreach (array('text', 'html') as $type) {
@@ -1404,8 +1404,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (!isset($this->id)) {
       return array();
     }
-    $mg      = new CRM_Mailing_DAO_Group();
-    $mgtable = CRM_Mailing_DAO_Group::getTableName();
+    $mg      = new CRM_Mailing_DAO_MailingGroup();
+    $mgtable = CRM_Mailing_DAO_MailingGroup::getTableName();
     $group   = CRM_Contact_BAO_Group::getTableName();
 
     $mg->query("SELECT      $group.title as name FROM $mgtable
@@ -1564,7 +1564,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $mailingTableName = CRM_Mailing_BAO_Mailing::getTableName();
 
     /* Create the mailing group record */
-    $mg = new CRM_Mailing_DAO_Group();
+    $mg = new CRM_Mailing_DAO_MailingGroup();
     foreach (array('groups', 'mailings') as $entity) {
       foreach (array('include', 'exclude', 'base') as $type) {
         if (isset($params[$entity]) &&
@@ -1603,14 +1603,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
      * CRM_Mailing_Form_Schedule::postProcess() or via API.
      */
     if (isset($params['approval_status_id']) && $params['approval_status_id']) {
-      $job = new CRM_Mailing_BAO_Job();
+      $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
       $job->status = 'Scheduled';
       $job->is_test = 0;
       $job->scheduled_date = $params['scheduled_date'];
       $job->save();
       // Populate the recipients.
-      $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, true, false);
+      $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
     }
 
     return $mailing;
@@ -1634,9 +1634,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $t = array(
       'mailing' => self::getTableName(),
-      'mailing_group' => CRM_Mailing_DAO_Group::getTableName(),
+      'mailing_group' => CRM_Mailing_DAO_MailingGroup::getTableName(),
       'group' => CRM_Contact_BAO_Group::getTableName(),
-      'job' => CRM_Mailing_BAO_Job::getTableName(),
+      'job' => CRM_Mailing_BAO_MailingJob::getTableName(),
       'queue' => CRM_Mailing_Event_BAO_Queue::getTableName(),
       'delivered' => CRM_Mailing_Event_BAO_Delivered::getTableName(),
       'opened' => CRM_Mailing_Event_BAO_Opened::getTableName(),
@@ -1848,7 +1848,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $row['optout'] = CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, FALSE);
       $report['event_totals']['optout'] += $row['optout'];
 
-      foreach (array_keys(CRM_Mailing_BAO_Job::fields()) as $field) {
+      foreach (array_keys(CRM_Mailing_BAO_MailingJob::fields()) as $field) {
         $row[$field] = $mailing->$field;
       }
 
@@ -2159,7 +2159,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // get all the groups that this user can access
     // if they dont have universal access
-    $groups = CRM_Core_PseudoConstant::group(null, false);
+    $groups = CRM_Core_PseudoConstant::group(NULL, FALSE);
     if (!empty($groups)) {
       $groupIDs = implode(',', array_keys($groups));
       $selectClause = ($count) ? 'COUNT( DISTINCT m.id) as count' : 'DISTINCT( m.id ) as id';
@@ -2195,8 +2195,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public function &getRows($offset, $rowCount, $sort, $additionalClause = NULL, $additionalParams = NULL) {
     $mailing = self::getTableName();
-    $job     = CRM_Mailing_BAO_Job::getTableName();
-    $group   = CRM_Mailing_DAO_Group::getTableName();
+    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $group   = CRM_Mailing_DAO_MailingGroup::getTableName();
     $session = CRM_Core_Session::singleton();
 
     $mailingACL = self::mailingACL();
@@ -2324,7 +2324,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       CRM_Core_Error::fatal();
     }
 
-    $dao = new CRM_Mailing_BAO_Job();
+    $dao = new CRM_Mailing_BAO_MailingJob();
     $dao->id = $id;
     $dao->delete();
   }
@@ -2531,7 +2531,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @access public
    */
   public function searchMailingIDs() {
-    $group = CRM_Mailing_DAO_Group::getTableName();
+    $group = CRM_Mailing_DAO_MailingGroup::getTableName();
     $mailing = self::getTableName();
 
     $query = "
@@ -2649,7 +2649,8 @@ WHERE  civicrm_mailing_job.id = %1
       shuffle($lockArray);
 
       // check if we are using global locks
-      $serverWideLock = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+      $serverWideLock = CRM_Core_BAO_Setting::getItem(
+        CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
         'civimail_server_wide_lock'
       );
       foreach ($lockArray as $lockID) {
@@ -2670,9 +2671,9 @@ WHERE  civicrm_mailing_job.id = %1
     // load bootstrap to call hooks
 
     // Split up the parent jobs into multiple child jobs
-    CRM_Mailing_BAO_Job::runJobs_pre($config->mailerJobSize, $mode);
-    CRM_Mailing_BAO_Job::runJobs(NULL, $mode);
-    CRM_Mailing_BAO_Job::runJobs_post($mode);
+    CRM_Mailing_BAO_MailingJob::runJobs_pre($config->mailerJobSize, $mode);
+    CRM_Mailing_BAO_MailingJob::runJobs(NULL, $mode);
+    CRM_Mailing_BAO_MailingJob::runJobs_post($mode);
 
     // lets release the global cron lock if we do have one
     if ($gotCronLock) {
@@ -2737,6 +2738,108 @@ AND        m.id = %1
 ";
     $params = array( 1 => array( $mid, 'Integer' ) );
     return CRM_Core_DAO::singleValueQuery($sql, $params);
+  }
+
+  /**
+   * This function is a wrapper for ajax activity selector
+   *
+   * @param  array   $params associated array for params record id.
+   *
+   * @return array   $contactActivities associated array of contact activities
+   * @access public
+   */
+  public static function getContactMailingSelector(&$params) {
+    // format the params
+    $params['offset']   = ($params['page'] - 1) * $params['rp'];
+    $params['rowCount'] = $params['rp'];
+    $params['sort']     = CRM_Utils_Array::value('sortBy', $params);
+    $params['caseId']   = NULL;
+
+    // get contact mailings
+    $mailings = CRM_Mailing_BAO_Mailing::getContactMailings($params);
+
+    // add total
+    $params['total'] = CRM_Mailing_BAO_Mailing::getContactMailingsCount($params);
+
+    //CRM-12814
+    if ( !empty($mailings) ) {
+      $openCounts = CRM_Mailing_Event_BAO_Opened::getMailingTotalCount(array_keys($mailings));
+      $clickCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getMailingTotalCount(array_keys($mailings));
+    }
+
+    // format params and add links
+    $contactMailings = array();
+    foreach ($mailings as $mailingId => $values) {
+      $contactMailings[$mailingId]['subject'] = $values['subject'];
+      $contactMailings[$mailingId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
+      $contactMailings[$mailingId]['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report/event',
+        "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&event=queue&context=mailing");
+      $contactMailings[$mailingId]['mailing_creator'] = CRM_Utils_System::href(
+          $values['creator_name'],
+          'civicrm/contact/view',
+          "reset=1&cid={$values['creator_id']}");
+
+      //CRM-12814
+      $contactMailings[$mailingId]['openstats'] = "Opens: ".$openCounts[$values['mailing_id']].
+        "<br />Clicks: ".$clickCounts[$values['mailing_id']];
+
+      $actionLinks = array(
+        CRM_Core_Action::VIEW => array(
+          'name'  => ts('View'),
+          'url'   => 'civicrm/mailing/view',
+          'qs'    => "reset=1&id={$values['mailing_id']}",
+          'title' => ts('View Mailing'),
+          'class' => 'crm-mailing-view',
+        ),
+        CRM_Core_Action::BROWSE => array(
+          'name' => ts('Mailing Report'),
+          'url' => 'civicrm/mailing/report',
+          'qs' => "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&context=mailing",
+          'title' => ts('View Mailing Report'),
+        )
+      );
+
+      $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink($actionLinks);
+    }
+
+    return $contactMailings;
+  }
+
+  /**
+   * Function to retrieve contact mailing
+   *
+   * @param array $params associated array
+   *
+   * @return array of mailings for a contact
+   *
+   * @static
+   * @access public
+   */
+  static public function getContactMailings(&$params) {
+    $params['version'] = 3;
+    $params['offset']  = ($params['page'] - 1) * $params['rp'];
+    $params['limit']   = $params['rp'];
+    $params['sort']    = CRM_Utils_Array::value('sortBy', $params);
+
+    $result = civicrm_api('MailingContact', 'get', $params);
+    return $result['values'];
+  }
+
+  /**
+   * Function to retrieve contact mailing count
+   *
+   * @param array $params associated array
+   *
+   * @return int count of mailings for a contact
+   *
+   * @static
+   * @access public
+   */
+  static public function getContactMailingsCount(&$params) {
+    $params['version'] = 3;
+
+    $result = civicrm_api('MailingContact', 'getcount', $params);
+    return $result['values']['count'];
   }
 }
 

@@ -442,16 +442,6 @@
           }
           loadData = true;
         }
-
-        if ( loadData && roleGroupMapper[0] ) {
-          var splitGroup = roleGroupMapper[0].split(",");
-          for ( i = 0; i < splitGroup.length; i++ ) {
-            var roleCustomGroupId = splitGroup[i];
-            if ( cj( '#'+roleCustomGroupId ).length > 0 ) {
-              cj( '#'+roleCustomGroupId ).remove( );
-            }
-          }
-        }
       }
       else {
         var groupUnload = new Array( );

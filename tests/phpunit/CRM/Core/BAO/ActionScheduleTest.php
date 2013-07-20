@@ -32,7 +32,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @var object see CiviTest/CiviMailUtils
    */
   var $mut;
-
+  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Action-Schedule BAO',
@@ -72,7 +72,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => '20100610',
       'is_override' => 'NULL',
     );
-    
+
     $this->fixtures['phonecall'] = array( // createTestObject
       'status_id' => 1,
       'activity_type_id' => 2,
@@ -258,11 +258,15 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
-    // $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
     $contact = civicrm_api('contact', 'create', $this->fixtures['contact']);
-    $activity->source_contact_id = $contact['id'];
     $activity->save();
+
+    $source['contact_id'] = $contact['id'];
+    $source['activity_id'] = $activity->id;
+    $source['record_type_id'] = 2;
+    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
+    $activityContact->save();
 
     $this->assertCronRuns(array(
       array( // Before the 24-hour mark, no email
@@ -287,8 +291,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
     $contact = civicrm_api('contact', 'create', $this->fixtures['contact']);
-    $activity->source_contact_id = $contact['id'];
     $activity->save();
+
+    $source['contact_id'] = $contact['id'];
+    $source['activity_id'] = $activity->id;
+    $source['record_type_id'] =2;
+    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
+    $activityContact->save();
 
     $this->assertCronRuns(array(
       array( // Before the 24-hour mark, no email
@@ -364,7 +373,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'version' => 3,
     ));
     $this->assertAPISuccess($result);
-    
+
     // Add an alternative membership type, and only send messages for that type
     $extraMembershipType = $this->createTestObject('CRM_Member_DAO_MembershipType', array());
     $this->assertTrue(is_numeric($extraMembershipType->id));

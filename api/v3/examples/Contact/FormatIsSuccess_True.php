@@ -5,7 +5,7 @@
     This param causes only the success or otherwise of the function to be returned as BOOLEAN
  */
 function contact_get_example(){
-$params = array( 
+$params = array(
   'version' => 3,
   'id' => 17,
   'format.is_success' => 1,

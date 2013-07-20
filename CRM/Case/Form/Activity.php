@@ -596,7 +596,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     // created / edited by contact id and date for the activity)
     // Note - civicrm_log is already created by CRM_Activity_BAO_Activity::create()
 
-
     // send copy to selected contacts.
     $mailStatus = '';
     $mailToContacts = array();
@@ -604,7 +603,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     //CRM-5695
     //check for notification settings for assignee contacts
     $selectedContacts = array('contact_check');
-
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'activity_assignee_notification'
       )) {
@@ -617,8 +617,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
           $mailStatus = ts("A copy of the activity has also been sent to selected contacts(s).");
         }
         else {
-          $params[$val] = array_flip($params[$val]);
-          $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activity->id, TRUE, FALSE);
+          $this->_relatedContacts = CRM_Activity_BAO_ActivityContact::getNames($activity->id, $assigneeID, TRUE, FALSE);
           $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contacts(s).");
         }
         //build an associative array with unique email addresses.

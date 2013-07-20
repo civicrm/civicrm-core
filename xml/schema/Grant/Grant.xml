@@ -36,7 +36,7 @@
     <key>id</key>
     <add>1.8</add>
     <onDelete>CASCADE</onDelete>
-  </foreignKey>  
+  </foreignKey>
   <field>
     <name>application_received_date</name>
     <title>Application received date</title>
@@ -81,7 +81,6 @@
     <type>int unsigned</type>
     <title>Grant Type Id</title>
     <pseudoconstant>
-      <name>grantType</name>
       <optionGroupName>grant_type</optionGroupName>
     </pseudoconstant>
     <export>false</export>
@@ -92,9 +91,12 @@
   <index>
     <name>index_grant_type_id</name>
     <fieldName>grant_type_id</fieldName>
+    <pseudoconstant>
+      <optionGroupName>grant_type</optionGroupName>
+    </pseudoconstant>
     <add>1.8</add>
   </index>
-  <field>     
+  <field>
     <name>amount_total</name>
     <title>Total Amount</title>
     <type>decimal</type>
@@ -123,11 +125,18 @@
   </field>
   <field>
     <name>currency</name>
+    <title>Grant Currency</title>
     <type>varchar</type>
     <length>3</length>
     <required>true</required>
     <comment>3 character string, value from config setting or input via user.</comment>
     <add>3.2</add>
+      <pseudoconstant>
+        <table>civicrm_currency</table>
+        <keyColumn>name</keyColumn>
+        <labelColumn>full_name</labelColumn>
+        <nameColumn>numeric_code</nameColumn>
+      </pseudoconstant>
   </field>
   <field>
     <name>currency</name>
@@ -135,10 +144,10 @@
     <length>8</length>
     <default>NULL</default>
     <comment>3 character string, value from config setting or input via user.</comment>
-    <add>3.2</add>  
+    <add>3.2</add>
     <drop>4.3</drop>
   </field>
-  <field> 
+  <field>
     <name>rationale</name>
     <type>text</type>
     <title>Grant Rationale</title>
@@ -149,35 +158,38 @@
     <import>true</import>
     <add>1.8</add>
   </field>
-  <field> 
+  <field>
     <name>status_id</name>
     <type>int unsigned</type>
     <title>Grant Status Id</title>
     <uniqueName>grant_status_id</uniqueName>
     <required>true</required>
-    <import>true</import> 
+    <import>true</import>
     <export>false</export>
     <comment>Id of Grant status.</comment>
+    <pseudoconstant>
+      <optionGroupName>grant_status</optionGroupName>
+    </pseudoconstant>
     <add>1.8</add>
   </field>
-  <index> 
+  <index>
     <name>index_status_id</name>
     <fieldName>status_id</fieldName>
     <add>1.8</add>
   </index>
-  <field>  
-    <name>financial_type_id</name> 
+  <field>
+    <name>financial_type_id</name>
     <title>Financial Type</title>
-    <type>int unsigned</type>  
+    <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Financial Type.</comment>
-    <add>4.3</add> 
-  </field>    
-  <foreignKey>  
-    <name>financial_type_id</name>  
-    <table>civicrm_financial_type</table>  
-    <key>id</key>  
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
     <onDelete>SET NULL</onDelete>
     <add>4.3</add>
-  </foreignKey> 
+  </foreignKey>
 </table>

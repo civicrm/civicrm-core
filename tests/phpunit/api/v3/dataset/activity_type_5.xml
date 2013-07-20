@@ -22,7 +22,7 @@
     <column>relationship_id</column>
     <column>is_current_revision</column>
     <column>original_id</column>
-    <column>result</column>    
+    <column>result</column>
     <column>is_deleted</column>
     <row>
       <value>4</value>                      <!--  id  -->
@@ -45,7 +45,7 @@
       <null />  <!--  relationship_id  -->
       <null />   <!--  is_current_revision  -->
       <null />   <!--  original_id  -->
-      <null />   <!--  result  -->      
+      <null />   <!--  result  -->
       <null />   <!--  is_deleted  -->
     </row>
   </table>

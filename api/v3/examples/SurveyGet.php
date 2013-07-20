@@ -4,12 +4,13 @@
  
  */
 function survey_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'title' => 'survey title',
-  'activity_type_id' => '30',
+  'activity_type_id' => '35',
   'max_number_of_contacts' => 12,
   'instructions' => 'Call people, ask for money',
+  'version' => 3,
+  'debug' => 0,
 );
 
   $result = civicrm_api( 'survey','get',$params );
@@ -22,21 +23,21 @@ $params = array(
  */
 function survey_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'title' => 'survey title',
-          'activity_type_id' => '30',
+          'activity_type_id' => '35',
           'instructions' => 'Call people, ask for money',
           'max_number_of_contacts' => '12',
           'is_active' => '1',
           'is_default' => 0,
-          'created_date' => '2013-02-04 22:43:26',
+          'created_date' => '20120130621222105',
           'bypass_confirm' => 0,
         ),
     ),
