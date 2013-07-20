@@ -2286,7 +2286,31 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
         if (!$mainCaseId) {
           continue;
         }
+
+        // CRM-11662 Copy Case custom data
+        $extends = array('case');
+        $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+        if ($groupTree) {
+          foreach ($groupTree as $groupID => $group) {
+            $table[$groupTree[$groupID]['table_name']] = array('entity_id');
+            foreach ($group['fields'] as $fieldID => $field) {
+              $table[$groupTree[$groupID]['table_name']][] = $groupTree[$groupID]['fields'][$fieldID]['column_name'];
+            }
+          }
+
+          foreach ($table as $tableName => $tableColumns) {
+            $insert          = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
+            $tableColumns[0] = $mainCaseId;
+            $select          = 'SELECT ' . implode(', ', $tableColumns);
+            $from            = ' FROM ' . $tableName;
+            $where           = " WHERE {$tableName}.entity_id = {$otherCaseId}";
+            $query           = $insert . $select . $from . $where;
+            $dao             = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          }
+        }
+        
         $mainCase->free();
+        
         $mainCaseIds[] = $mainCaseId;
         //insert record for case contact.
         $otherCaseContact = new CRM_Case_DAO_CaseContact();
