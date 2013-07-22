@@ -236,16 +236,6 @@ class CRM_Core_BAO_ConfigSetting {
         }
       }
 
-      // since language field won't be present before upgrade.
-      if (CRM_Core_Config::isUpgradeMode()) {
-        // dont add if its empty
-        if (!empty($defaults)) {
-          // retrieve directory and url preferences also
-          CRM_Core_BAO_Setting::retrieveDirectoryAndURLPreferences($defaults);
-        }
-        return;
-      }
-
       // check if there are any locale strings
       if ($domain->locale_custom_strings) {
         $defaults['localeCustomStrings'] = unserialize($domain->locale_custom_strings);
