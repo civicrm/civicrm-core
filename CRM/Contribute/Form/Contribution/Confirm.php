@@ -936,7 +936,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // all the payment processors expect the name and address to be in the
       // so we copy stuff over to first_name etc.
       $paymentParams = $this->_params;
-            $contributionTypeId = $this->_values['financial_type_id'];
+      $contributionTypeId = $this->_values['financial_type_id'];
 
       $fieldTypes = array();
       if (!empty($paymentParams['onbehalf']) &&

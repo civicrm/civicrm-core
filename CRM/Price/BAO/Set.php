@@ -540,7 +540,7 @@ WHERE  id = %1";
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     if ($dao->fetch()) {
       $setTree[$setID]['extends'] = $dao->extends;
-            $setTree[$setID]['financial_type_id']    = $dao->financial_type_id;
+      $setTree[$setID]['financial_type_id'] = $dao->financial_type_id;
       $setTree[$setID]['help_pre'] = $dao->help_pre;
       $setTree[$setID]['help_post'] = $dao->help_post;
       $setTree[$setID]['is_quick_config'] = $dao->is_quick_config;
