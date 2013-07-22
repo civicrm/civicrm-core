@@ -578,7 +578,7 @@ class CRM_Contact_BAO_Query {
       return;
     }
 
-    $value = array();
+    $values = array();
     foreach ($this->_pseudoConstantsSelect as $key => $value) {
       if (property_exists($dao, $value['idCol'])) {
         $val = $dao->$value['idCol'];
@@ -601,10 +601,10 @@ class CRM_Contact_BAO_Query {
         else {
           $dao->$key = CRM_Core_PseudoConstant::accountOptionValues($value['pseudoField'], $val);
         }
-        $value[$key] = $dao->$key;
+        $values[$key] = $dao->$key;
       }
     }
-    return $value;
+    return $values;
   }
 
   /**
@@ -1861,6 +1861,7 @@ class CRM_Contact_BAO_Query {
       }
 
       $countries = CRM_Core_PseudoConstant::country();
+
       if (is_numeric($value)) {
         $this->_where[$grouping][] = self::buildClause($where, $op, $value, 'Positive');
         $value = $countries[(int ) $value];

@@ -161,5 +161,9 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   function templateFile() {
     return 'CRM/Contact/Form/Search/Basic.tpl';
   }
+
+  function getQueryObj() {
+    return $this->_query;
+  }
 }
 

@@ -589,20 +589,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
 
     // for CRM-3157 purposes
-    if (in_array('country', $names)) {
-      $pseudoconstants['country'] = array(
-        'dbName' => 'country_id',
-        'values' => CRM_Core_PseudoConstant::country()
-      );
-    }
-
-    if (in_array('state_province', $names)) {
-      $pseudoconstants['state_province'] = array(
-        'dbName' => 'state_province_id',
-        'values' => CRM_Core_PseudoConstant::stateProvince()
-      );
-    }
-
     if (in_array('world_region', $names)) {
       $pseudoconstants['world_region'] = array(
         'dbName' => 'world_region_id',
@@ -612,8 +598,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $seenIDs = array();
     while ($result->fetch()) {
+      $this->_query->convertToPseudoNames($result);
       $row = array();
-
       // the columns we are interested in
       foreach ($names as $property) {
         if ($property == 'status') {
@@ -637,6 +623,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
           CRM_Core_OptionGroup::lookupValues($paramsNew, $name, FALSE);
           $row[$key] = $paramsNew[$key];
+        }
+        elseif ($property == 'gender_id') {
+          $row['gender'] = $result->gender;
+        }
+        elseif ($property == 'prefix_id' || $property == 'suffix_id') {
+          $newProperty = 'individual_' . substr($property, 0, -3);
+          $row[$newProperty] = $result->$newProperty;
         }
         elseif (strpos($property, '-im')) {
           $row[$property] = $result->$property;
