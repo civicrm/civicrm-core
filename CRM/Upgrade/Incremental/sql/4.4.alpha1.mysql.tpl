@@ -127,3 +127,7 @@ UPDATE civicrm_option_value
 UPDATE civicrm_option_value
   SET {localize field="label"}label = '{ts escape="sql"}Supplemental Address 2{/ts}'{/localize}
   WHERE name = 'supplemental_address_2' AND option_group_id = @option_group_id_addroptions;
+
+-- CRM-12717
+UPDATE `civicrm_navigation` SET label = '{ts escape="sql"}Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.){/ts}', name = 'Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)'
+WHERE url = 'civicrm/admin/setting/misc&reset=1';
