@@ -710,6 +710,7 @@ CRM.validate = CRM.validate || {
       message: ts('Are you sure you want to continue?'),
       resizable: false,
       modal: true,
+      width: 'auto',
       close: function () {
         $(dialog).remove();
       },
