@@ -1180,21 +1180,7 @@ AND civicrm_membership.is_test = %2";
   static function statusAvailabilty($contactId) {
     $membership = new CRM_Member_DAO_MembershipStatus();
     $membership->whereAdd('is_active=1');
-    $count = $membership->count();
-
-    if (!$count) {
-      // Redirect the form in case of error
-      // @todo this redirect in the BAO layer is really bad & should be moved to the form layer
-      // however since we have no idea how (if) this is triggered we can't safely move / remove it
-      // note I think this is the error triggered when there are no active memberships
-      // & you attempt to add one
-      $errorParams = array(
-        'message_title' => ts('Invalid Action'),
-        'legacy_redirect_path' => 'civicrm/contact/view',
-        'legacy_redirect_query' => "reset=1&force=1&cid={$contactId}&selectedChild=member",
-      );
-      throw new CiviCRM_Exception(ts('There are no configured membership statuses, You cannot add this membership.'), 0, $errorParams);
-    }
+    return $membership->count();
   }
 
   /**
