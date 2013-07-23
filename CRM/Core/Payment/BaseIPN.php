@@ -180,13 +180,15 @@ class CRM_Core_Payment_BaseIPN {
 
     if (!CRM_Utils_Array::value('skipComponentSync', $input)) {
       if (!empty($memberships)) {
+        // if transaction is failed then set "Cancelled" as membership status
+        $cancelStatusId = array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus());
         foreach ($memberships as $membership) {
           if ($membership) {
-            $membership->status_id = 4;
+            $membership->status_id = $cancelStatusId;
             $membership->save();
 
             //update related Memberships.
-            $params = array('status_id' => 4);
+            $params = array('status_id' => $cancelStatusId);
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
           }
         }
