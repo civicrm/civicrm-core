@@ -113,6 +113,78 @@
   };
 
   /**
+   * Configure a model class to track whether a model has unsaved changes.
+   *
+   * The ModelClass will be extended with:
+   *  - Method: isSaved() - true if there have been no changes to the data since the last fetch or save
+   *  - Event: saved(object model, bool is_saved) - triggered whenever isSaved() value would change
+   *
+   *  Note: You should not directly call isSaved() within the context of the success/error/sync callback;
+   *  I haven't found a way to make isSaved() behave correctly within these callbacks without patching
+   *  Backbone. Instead, attach an event listener to the 'saved' event.
+   *
+   * @param ModelClass
+   */
+  CRM.Backbone.trackSaved = function(ModelClass) {
+    // Retain references to some of the original class's functions
+    var Parent = _.pick(ModelClass.prototype, 'initialize', 'save', 'fetch');
+
+    // Private callback
+    var onSyncSuccess = function() {
+      this._modified = false;
+      if (this._oldModified.length > 0) {
+        this._oldModified.pop();
+      }
+      this.trigger('saved', this, this.isSaved());
+    };
+    var onSaveError = function() {
+      if (this._oldModified.length > 0) {
+        this._modified = this._oldModified.pop();
+        this.trigger('saved', this, this.isSaved());
+      }
+    };
+
+    // Defaults - if specified in ModelClass, preserve
+    _.defaults(ModelClass.prototype, {
+      isSaved: function() {
+        var result = !this.isNew() && !this._modified;
+        return result;
+      },
+      _saved_onchange: function(model, options) {
+        if (options.parse) return;
+        var oldModified = this._modified;
+        this._modified = true;
+        if (!oldModified) {
+          this.trigger('saved', this, this.isSaved());
+        }
+      }
+    });
+
+    // Overrides - if specified in ModelClass, replace
+    _.extend(ModelClass.prototype, {
+      initialize: function(options) {
+        this._modified = false;
+        this._oldModified = [];
+        this.listenTo(this, 'change', this._saved_onchange);
+        this.listenTo(this, 'error', onSaveError);
+        this.listenTo(this, 'sync', onSyncSuccess);
+        if (Parent.initialize) {
+          return Parent.initialize.apply(this, arguments);
+        }
+      },
+      save: function() {
+        // we'll assume success
+        this._oldModified.push(this._modified);
+        return Parent.save.apply(this, arguments);
+      },
+      fetch: function() {
+        this._oldModified.push(this._modified);
+        return Parent.fetch.apply(this, arguments);
+      }
+    });
+  };
+
+  /**
    * Connect a "collection" class to CiviCRM's APIv3
    *
    * Note: the collection supports a special property, crmCriteria, which is an array of
