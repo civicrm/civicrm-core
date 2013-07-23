@@ -2138,9 +2138,12 @@ ORDER BY civicrm_email.is_primary DESC";
     $privacy = CRM_Core_SelectValues::privacy();
     foreach ($privacy as $key => $value) {
       if (array_key_exists($key, $fields)) {
+        // do not reset values for existing contacts, if fields are added to a profile
         if (array_key_exists($key, $params)) {
           $data[$key] = $params[$key];
-          // dont reset it for existing contacts
+          if (empty($params[$key])) {
+            $data[$key] = 0;
+          }
         }
         elseif (!$contactID) {
           $data[$key] = 0;
