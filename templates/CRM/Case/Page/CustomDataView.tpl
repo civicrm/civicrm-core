@@ -48,8 +48,8 @@
               {if $element.field_type == 'File'}
                 {if $element.field_value.displayURL}
                   <td class="html-adjust">
-                    <a href="#" onclick="imagePopUp('{$element.field_value.imageURL}'); return false;">
-                    <img src="{$element.field_value.displayURL}" height = "100" width="100">
+                    <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
+                      <img src="{$element.field_value.displayURL}" height = "100" width="100">
                     </a>
                   </td>
                   {else}
