@@ -160,6 +160,15 @@ var CRM = CRM || {};
     return CRM.api.call(this, entity, action, params, options);
   };
 
+  /**
+   * FIXME: This function is not documented, is not used anywhere in the codebase, and doesn't
+   * clearly differentiate field elements which store the "contact id" versus the "contact label".
+   * My guess is that it's designed more for "quick-search" and less for "CRUD forms".
+   *
+   * @param params
+   * @param options
+   * @return {*}
+   */
   $.fn.crmAutocomplete = function (params, options) {
     if (typeof params == 'undefined') params = {};
     if (typeof options == 'undefined') options = {};
