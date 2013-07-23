@@ -332,9 +332,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       $this->_formValues["activity_test"] = 0;
     }
 
-    if (!CRM_Utils_Array::value('activity_contact_name', $this->_formValues) && !CRM_Utils_Array::value('contact_id', $this->_formValues)) {
-      $this->_formValues['activity_role'] = NULL;
-    }
     CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -397,11 +394,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
       return;
     }
 
-    $this->_formValues['activity_role'] = 1;
-    $this->_formValues['activity_contact_name'] = '';
-    $this->_defaults['activity_role'] = 1;
-    $this->_defaults['activity_contact_name'] = '';
-
     $status = CRM_Utils_Request::retrieve('status', 'String', $this);
     if ($status) {
       $this->_formValues['activity_status'] = $status;
@@ -446,7 +438,10 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
 
     if ($signupType) {
       //$this->_formValues['activity_type_id'] = array();
-
+      $this->_formValues['activity_role'] = 1;
+      $this->_formValues['activity_contact_name'] = '';
+      $this->_defaults['activity_role'] = 1;
+      $this->_defaults['activity_contact_name'] = '';
       $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
 
       $renew = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
