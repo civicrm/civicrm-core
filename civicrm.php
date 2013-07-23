@@ -99,10 +99,10 @@ class CiviCRM_For_WordPress {
 
   /**
    * @description: getter method which returns the CiviCRM instance and optionally
-   * creates one if it does not already exist. Props to bbPress for the architecture.
+   * creates one if it does not already exist. Standard CiviCRM singleton pattern.
    * @return CiviCRM plugin instance
    */
-  public static function instance() {
+  public static function singleton() {
 
     // if it doesn't already exist...
     if ( ! isset( self::$instance ) ) {
@@ -175,7 +175,6 @@ class CiviCRM_For_WordPress {
       $_GET['civicrm_install_type'] = 'wordpress';
     }
 
-    // same procedure as civicrm_wp_main()
     $this->register_hooks();
 
     // notify plugins
@@ -197,7 +196,7 @@ class CiviCRM_For_WordPress {
 
 
   /**
-   * @description: register hooks (same procedure as civicrm_wp_main() )
+   * @description: register hooks
    */
   public function register_hooks() {
 
@@ -1521,7 +1520,7 @@ Procedures start here
  * @return CiviCRM_For_WordPress instance
  */
 function civi_wp() {
-  return CiviCRM_For_WordPress::instance();
+  return CiviCRM_For_WordPress::singleton();
 }
 
 /**
@@ -1555,86 +1554,12 @@ previous versions of the CiviCRM WordPress plugin.
 
 
 /**
- * register the plugin's WordPress hooks
- */
-function civicrm_wp_main() {
-  civi_wp()->register_hooks();
-}
-
-/**
  * add CiviCRM access capabilities to WordPress roles
  * Called by postProcess() in civicrm/CRM/ACL/Form/WordPress/Permissions.php
- * Also a callback for the 'init' hook in civicrm_wp_main()
+ * Also a callback for the 'init' hook in civi_wp()->register_hooks()
  */
 function wp_civicrm_capability() {
   civi_wp()->set_access_capabilities();
-}
-
-/**
- * Callback method for 'admin_menu' hook as set in civicrm_wp_main()
- * Adds menu items to WordPress admin menu
- */
-function civicrm_wp_add_menu_items() {
-  civi_wp()->add_menu_items();
-}
-
-/**
- * callback method for 'media_buttons_context' hook as set in civicrm_wp_main()
- */
-function civicrm_add_form_button( $context ) {
-  return civi_wp()->add_form_button( $context );
-}
-
-/**
- * Callback method for 'admin_footer' hook as set in civicrm_wp_main()
- */
-function civicrm_add_form_button_html() {
-  civi_wp()->add_form_button_html();
-}
-
-/**
- * Callback function for missing settings file in civicrm_wp_main()
- */
-function civicrm_setup_warning() {
-  civi_wp()->show_setup_warning();
-}
-
-/**
- * merge CiviCRM's HTML header with the WordPress theme's header
- * Callback from WordPress 'admin_head' and 'wp_head' hooks
- */
-function civicrm_wp_head() {
-  civi_wp()->wp_head();
-}
-
-/**
- * Callback function for 'user_register' hook
- */
-function civicrm_user_register( $userID ) {
-  _civicrm_update_user( $userID );
-}
-
-/**
- * Callback function for 'profile_update' hook
- */
-function civicrm_profile_update( $userID ) {
-  _civicrm_update_user( $userID );
-}
-
-/**
- * Common function for user create/update hooks above
- * Seems to (wrongly) create new CiviCRM Contact every time a user changes their
- * first_name or last_name attributes
- */
-function _civicrm_update_user( $userID ) {
-  civi_wp()->update_user( $userID );
-}
-
-/**
- * Callback function for 'get_header' hook
- */
-function civicrm_wp_shortcode_includes() {
-  civi_wp()->add_shortcode_includes();
 }
 
 /**
@@ -1647,40 +1572,11 @@ function civicrm_wp_in_civicrm() {
 }
 
 /**
- * Start buffering, called in civicrm_wp_main()
- */
-function civicrm_buffer_start() {
-  civi_wp()->buffer_start();
-}
-
-/**
- * Flush buffer, callback for 'wp_footer'
- */
-function civicrm_buffer_end() {
-  civi_wp()->buffer_end();
-}
-
-/**
- * Callback for ob_start() in civicrm_buffer_start()
- */
-function civicrm_buffer_callback($buffer) {
-  // moved to class, given that it's never called directly
-}
-
-/**
- * CiviCRM's theme integration method
- * Called by civicrm_wp_main() and civicrm_shortcode_handler()
- */
-function civicrm_wp_frontend( $shortcode = FALSE ) {
-  civi_wp()->wp_frontend( $shortcode );
-}
-
-/**
  * This was the original name of the initialization function and is
  * retained for backward compatibility
  */
 function civicrm_wp_initialize() {
-  return civicrm_initialize();
+  return civi_wp()->initialize();
 }
 
 /**
@@ -1689,20 +1585,6 @@ function civicrm_wp_initialize() {
  */
 function civicrm_initialize() {
   return civi_wp()->initialize();
-}
-
-/**
- * Override WordPress post comment status attribute in civicrm_wp_frontend()
- */
-function civicrm_turn_comments_off() {
-  civi_wp()->turn_comments_off();
-}
-
-/**
- * Override WordPress post attributes in civicrm_wp_frontend()
- */
-function civicrm_set_post_blank() {
-  civi_wp()->set_post_blank();
 }
 
 /**
@@ -1737,13 +1619,6 @@ function civicrm_wp_invoke() {
 }
 
 /**
- * Only called by civicrm_wp_invoke() to undo WordPress default behaviour
- */
-function civicrm_remove_wp_magic_quotes() {
-  civi_wp()->remove_wp_magic_quotes();
-}
-
-/**
  * Method that runs only when civicrm plugin is activated.
  */
 function civicrm_activate() {
@@ -1773,13 +1648,6 @@ function civicrm_run_installer() {
  */
 function civicrm_get_ctype( $default = NULL ) {
   return civi_wp()->get_civicrm_contact_type( $default );
-}
-
-/**
- * Handles CiviCRM-defined shortcodes, but probably never called directly
- */
-function civicrm_shortcode_handler( $atts ) {
-  return civi_wp()->shortcode_handler( $atts );
 }
 
 /**
