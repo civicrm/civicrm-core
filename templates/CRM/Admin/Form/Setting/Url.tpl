@@ -74,7 +74,8 @@
             {$form.verifySSL.label}
         </td>
         <td>
-            {$form.verifySSL.html} {help id='id-verify_ssl'}
+            {$form.verifySSL.html} {help id='id-verify_ssl'}<br/>
+            <p class="description font-red">{ts}{$verifySSL_description}{/ts}</p>
         </td>
     </tr>
     <tr class="crm-miscellaneous-form-block-cvv-backoffice-required">

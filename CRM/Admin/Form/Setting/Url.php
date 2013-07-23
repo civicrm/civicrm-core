@@ -49,6 +49,9 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Resource URLs'));
+    $settingFields = civicrm_api('setting', 'getfields', array(
+      'version' => 3
+    ));
 
     $this->addElement('text', 'userFrameworkResourceURL', ts('CiviCRM Resource URL'));
     $this->addElement('text', 'imageUploadURL', ts('Image Upload URL'));
@@ -56,6 +59,8 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     $this->addElement('text', 'extensionsURL', ts('Extension Resource URL'));
     $this->addYesNo('enableSSL', ts('Force Secure URLs (SSL)'));
     $this->addYesNo('verifySSL', ts('Verify SSL Certs'));
+    // FIXME: verifySSL should use $_settings instead of manually adding fields
+    $this->assign('verifySSL_description', $settingFields['values']['verifySSL']['description']);
 
     $this->addFormRule(array('CRM_Admin_Form_Setting_Url', 'formRule'));
 
