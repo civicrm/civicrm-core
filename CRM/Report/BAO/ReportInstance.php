@@ -68,7 +68,9 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       );
     }
 
-    $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
+    if (!isset($params['id'])) {
+      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
+    }
 
     $instanceID = CRM_Utils_Array::value('id', $params);
     if (CRM_Utils_Array::value('instance_id', $params)) {
@@ -90,7 +92,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
 
     // explicitly set to null if params value is empty
-    if (empty($params['grouprole'])) {
+    if (!$instanceID && empty($params['grouprole'])) {
       $instance->grouprole = 'null';
     }
 
@@ -130,8 +132,12 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    * @static
    */
   static function &create(&$params) {
-    $params['header']    = CRM_Utils_Array::value('report_header',$params);
-    $params['footer']    = CRM_Utils_Array::value('report_footer',$params);
+    if (isset($params['report_header'])) {
+      $params['header']    = CRM_Utils_Array::value('report_header',$params);
+    }
+    if (isset($params['report_footer'])) {
+      $params['footer']    = CRM_Utils_Array::value('report_footer',$params);
+    }
 
     // build navigation parameters
     if (CRM_Utils_Array::value('is_navigation', $params)) {
