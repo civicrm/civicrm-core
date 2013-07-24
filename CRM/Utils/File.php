@@ -529,9 +529,11 @@ HTACCESS;
     $result = array();
     while (!empty($todos)) {
       $subdir = array_shift($todos);
-      foreach (glob("$subdir/$pattern") as $match) {
-        if (!is_dir($match)) {
-          $result[] = $match;
+      if (is_array(glob("$subdir/$pattern"))) {
+        foreach (glob("$subdir/$pattern") as $match) {
+          if (!is_dir($match)) {
+            $result[] = $match;
+          }
         }
       }
       $dh = opendir($subdir);
