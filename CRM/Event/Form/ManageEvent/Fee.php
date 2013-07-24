@@ -627,6 +627,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   $setParams['name'] = $eventTitle . '_' . date('is', $timeSec[0]) . $timeSec[1];
                 }
                 $setParams['is_quick_config'] = 1;
+                $setParams['financial_type_id'] = $params['financial_type_id'];
                 $setParams['extends'] = CRM_Core_Component::getComponentID('CiviEvent');
                 $priceSet = CRM_Price_BAO_Set::create($setParams);
 
@@ -644,6 +645,9 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                 $fieldParams['option_id'] = $params['price_field_value'];
                 $priceSet = new CRM_Price_BAO_Set();
                 $priceSet->id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Field', CRM_Utils_Array::value('price_field_id', $params), 'price_set_id');
+                if ($this->_defaultValues['financial_type_id'] != $params['financial_type_id']) {
+                  CRM_Core_DAO::setFieldValue('CRM_Price_DAO_Set', $priceSet->id, 'financial_type_id', $params['financial_type_id']);
+                }
               }
               $fieldParams['html_type'] = 'Radio';
               CRM_Price_BAO_Set::addTo('civicrm_event', $this->_id, $priceSet->id);
@@ -702,11 +706,15 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                     $setParams['name'] = $eventTitle . '_' . $params['discount_name'][$j] . '_' . date('is', $timeSec[0]) . $timeSec[1];
                   }
                   $setParams['is_quick_config'] = 1;
+                  $setParams['financial_type_id'] = $params['financial_type_id'];
                   $setParams['extends'] = CRM_Core_Component::getComponentID('CiviEvent');
                   $priceSet = CRM_Price_BAO_Set::create($setParams);
                   $priceSetID = $priceSet->id;
                 } else {
                   $priceSetID = $discountPriceSets[$j-1];
+                  if ($this->_defaultValues['financial_type_id'] != $params['financial_type_id']) {
+                    CRM_Core_DAO::setFieldValue('CRM_Price_DAO_Set', $priceSetID, 'financial_type_id', $params['financial_type_id']);
+                  }
                   unset($discountPriceSets[$j-1]);
                   $fieldParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_Field', $priceSetID, 'id', 'price_set_id');
                 }
@@ -766,6 +774,9 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
     //update events table
     $params['id'] = $this->_id;
+    // skip update of financial type in price set
+    $params['skipFinancialType'] = TRUE;
+    
     CRM_Event_BAO_Event::add($params);
 
     parent::endPostProcess();

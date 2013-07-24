@@ -90,9 +90,12 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    */
   static function add(&$params) {
     CRM_Utils_System::flushCache();
-
+    $financialTypeId = NULL;
     if (CRM_Utils_Array::value('id', $params)) {
       CRM_Utils_Hook::pre('edit', 'Event', $params['id'], $params);
+      if (!CRM_Utils_Array::value('skipFinancialType', $params)) {
+        $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['id'], 'financial_type_id');
+      }
     }
     else {
       CRM_Utils_Hook::pre('create', 'Event', NULL, $params);
@@ -109,7 +112,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     else {
       CRM_Utils_Hook::post('create', 'Event', $event->id, $event);
     }
-
+    if ($financialTypeId && CRM_Utils_Array::value('financial_type_id', $params) 
+      && $financialTypeId != $params['financial_type_id']) {
+      CRM_Price_BAO_FieldValue::updateFinancialType($params['id'], 'civicrm_event', $params['financial_type_id']);
+    }
     return $result;
   }
 
