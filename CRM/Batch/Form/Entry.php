@@ -77,6 +77,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $_contactFields = array();
 
   /**
+   * Fields array of fields in the batch profile
+   * (based on the uf_field table data)
+   * (this can't be protected as it is passed into the CRM_Contact_Form_Task_Batch::parseStreetAddress function
+   * (although a future refactoring might hopefully change that so it uses the api & the function is not
+   * required
+   * @var array
+   */
+  public $_fields = array();
+  /**
    * build all the data structures needed to build the form
    *
    * @return void
@@ -602,7 +611,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         // handle soft credit
-        if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+        if (is_array(CRM_Utils_Array::value('soft_credit_contact_select_id', $params)) && CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
         }
@@ -726,6 +735,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
       }
     }
+    return TRUE;
   }
 
   /**
@@ -746,6 +756,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     CRM_Contact_BAO_Contact::createProfileContact($value, $this->_fields,
       $value['contact_id']
     );
+  }
+  /**
+   * Function exists purely for unit testing purposes. If you feel tempted to use this in live code
+   * then it probably means there is some functionality that needs to be moved
+   * out of the form layer
+   * @param unknown_type $params
+   */
+  function testProcessMembership($params) {
+    return $this->processMembership($params);
   }
 }
 
