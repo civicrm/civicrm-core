@@ -116,6 +116,11 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
             'title' => ts('Log Type'),
             'type' => CRM_Utils_Type::T_STRING,
           ),
+          'log_type_table' => array(
+            'name'  => 'log_type',
+            'title' => ts('Log Type Table'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'log_action' => array(
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => array('Insert' => ts('Insert'), 'Update' => ts('Update'), 'Delete' => ts('Delete')),

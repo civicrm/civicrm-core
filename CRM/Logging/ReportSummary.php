@@ -197,6 +197,13 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       }
     }
 
+    $logTypeTableClause = '(1)';
+    if ($logTypeTableValue = CRM_Utils_Array::value("log_type_table_value", $this->_params)) {
+      $logTypeTableClause = $this->whereClause($this->_columns['log_civicrm_entity']['filters']['log_type_table'], 
+                            $this->_params['log_type_table_op'], $logTypeTableValue, NULL, NULL);
+      unset($this->_params['log_type_table_value']);
+    }
+    
     foreach ( $this->_logTables as $entity => $detail ) {
       if ((in_array($this->getLogType($entity), $logTypes) &&
         CRM_Utils_Array::value('log_type_op', $this->_params) == 'in') ||
@@ -238,6 +245,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     $this->limit();
     $sql = "{$this->_select}
 FROM civicrm_temp_civireport_logsummary entity_log_civireport
+WHERE {$logTypeTableClause}
 GROUP BY log_civicrm_entity_log_date, log_civicrm_entity_log_type_label, log_civicrm_entity_log_conn_id, log_civicrm_entity_log_user_id, log_civicrm_entity_altered_contact_id
 ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
     $sql = str_replace('modified_contact_civireport.display_name', 'entity_log_civireport.altered_contact',   $sql);
