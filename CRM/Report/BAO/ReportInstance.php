@@ -100,14 +100,17 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       $instance->id = $instanceID;
     }
 
-    if ($reportID = CRM_Utils_Array::value('report_id', $params)) {
-      $instance->report_id = $reportID;
-    } else if ($instanceID) {
-      $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl($instanceID);
-    } else {
-      // just take it from current url
-      $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl();
+    if (! $instanceID) {
+      if ($reportID = CRM_Utils_Array::value('report_id', $params)) {
+        $instance->report_id = $reportID;
+      } else if ($instanceID) {
+        $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl($instanceID);
+      } else {
+        // just take it from current url
+        $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl();
+      }
     }
+
     $instance->save();
 
     if ($instanceID) {
