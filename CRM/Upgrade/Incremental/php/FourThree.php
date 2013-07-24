@@ -330,7 +330,7 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
     $upgrade = new CRM_Upgrade_Form();
     //here we update price set entries
     $sqlFinancialIds = "
-SELECT id, name
+SELECT id, LCASE(name) name
 FROM   civicrm_financial_type
 WHERE name IN ('Donation', 'Event Fee', 'Member Dues');
 ";
@@ -342,9 +342,9 @@ WHERE name IN ('Donation', 'Event Fee', 'Member Dues');
 UPDATE civicrm_price_set ps
 SET    ps.financial_type_id =
   CASE
-    WHEN ps.extends LIKE '%1%' THEN {$financialIds['Event Fee']}
-    WHEN ps.extends LIKE '2' THEN {$financialIds['Donation']}
-    WHEN ps.extends LIKE '3' THEN {$financialIds['Member Dues']}
+    WHEN ps.extends LIKE '%1%' THEN {$financialIds['event fee']}
+    WHEN ps.extends LIKE '2' THEN {$financialIds['donation']}
+    WHEN ps.extends LIKE '3' THEN {$financialIds['member dues']}
   END
 WHERE  financial_type_id IS NULL
 ";

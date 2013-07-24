@@ -218,5 +218,43 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     $fieldValueDAO->id = $id;
     return $fieldValueDAO->delete();
   }
+  
+  /**
+   * Update civicrm_price_field_value.financial_type_id 
+   * when financial_type_id of contribution_page or event is changed
+   *
+   * @param   int   $entityId  Id
+   * @param   String $entityTable  entity table
+   * @param   String $financialTypeID financial type id
+   *
+   * @access public
+   * @static
+   */
+  static function updateFinancialType($entityId, $entityTable, $financialTypeID) {
+    if (!$entityId || !$entityTable || !$financialTypeID) {
+      return FALSE;
+    }
+    $setClause[] = "cpfv.financial_type_id = %3 ";
+    $params = array(
+      1 => array($entityId, 'Integer'),
+      2 => array($entityTable, 'String'),
+      3 => array($financialTypeID, 'Integer'),
+      4 => array(CRM_Core_Component::getComponentID('CiviMember'), 'Integer'),
+    );
+    if ($entityTable == 'civicrm_contribution_page') {
+      $setClause[] = "cps.financial_type_id = CASE
+WHEN cps.extends LIKE '%%4%%'
+THEN %3
+ELSE cps.financial_type_id
+END ";
+    }
+    $sql = "UPDATE `civicrm_price_field_value` cpfv
+INNER JOIN civicrm_price_field cpf ON cpf.id = cpfv.price_field_id
+INNER JOIN civicrm_price_set_entity ces ON cpf.price_set_id = ces.price_set_id
+INNER JOIN civicrm_price_set cps ON cps.id = ces.price_set_id
+SET " . implode(',', $setClause) . " WHERE ces.entity_id = %1 AND ces.entity_table = %2 AND cpfv.membership_type_id IS NULL";
+    // for event discount price sets
+    CRM_Core_DAO::executeQuery($sql, $params);
+  }
 }
 

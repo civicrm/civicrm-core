@@ -1800,7 +1800,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     else {
       $form->assign('receiptType', 'membership signup');
     }
-    $form->assign('receive_date', CRM_Utils_Array::value('receive_date', $formValues ) );
+    $form->assign('receive_date', CRM_Utils_Date::processDate(CRM_Utils_Array::value('receive_date', $formValues)));
     $form->assign('formValues', $formValues);
 
     if (empty($lineItem)) {

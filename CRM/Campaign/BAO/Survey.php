@@ -950,7 +950,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     }
 
     $profileFields = CRM_Core_BAO_UFGroup::getFields($profileId,
-      FALSE, CRM_Core_Action::VIEW
+      FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, 'field_name', TRUE
     );
 
     //don't load these fields in grid.

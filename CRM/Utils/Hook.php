@@ -126,9 +126,13 @@ abstract class CRM_Utils_Hook {
     }
   }
 
-  function runHooks(&$civiModules, $fnSuffix, $numParams,
+  function runHooks($civiModules, $fnSuffix, $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5
   ) {
+    // $civiModules is *not* passed by reference because runHooks
+    // must be reentrant. PHP is finicky about running
+    // multiple loops over the same variable. The circumstances
+    // to reproduce the issue are pretty intricate.
     $result = $fResult = array();
 
     if ($civiModules !== NULL) {
