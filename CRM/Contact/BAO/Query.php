@@ -698,6 +698,28 @@ class CRM_Contact_BAO_Query {
                 $this->_element["{$name}_id"] = 1;
                 $this->_select["{$name}_id"] = "contact_a.{$name}_id as {$name}_id";
                 $this->_pseudoConstantsSelect[$name] = array('pseudoField' => $tableName, 'idCol' => "{$name}_id");
+                $this->_pseudoConstantsSelect[$name]['select'] = "{$name}.{$fieldName} as $name";
+                $this->_pseudoConstantsSelect[$name]['element'] = $name;
+
+                if ($tableName == 'email_greeting') {
+                  $this->_pseudoConstantsSelect[$name]['join'] =
+                    " LEFT JOIN civicrm_option_group option_group_email_greeting ON (option_group_email_greeting.name = 'email_greeting')";
+                  $this->_pseudoConstantsSelect[$name]['join'] .=
+                    " LEFT JOIN civicrm_option_value email_greeting ON (contact_a.email_greeting_id = email_greeting.value AND option_group_email_greeting.id = email_greeting.option_group_id ) ";
+                }
+                elseif ($tableName == 'postal_greeting') {
+                  $this->_pseudoConstantsSelect[$name]['join'] =
+                    " LEFT JOIN civicrm_option_group option_group_postal_greeting ON (option_group_postal_greeting.name = 'postal_greeting')";
+                  $this->_pseudoConstantsSelect[$name]['join'] .=
+                    " LEFT JOIN civicrm_option_value postal_greeting ON (contact_a.postal_greeting_id = postal_greeting.value AND option_group_postal_greeting.id = postal_greeting.option_group_id ) ";
+                }
+                elseif ($tableName == 'addressee') {
+                  $this->_pseudoConstantsSelect[$name]['join'] =
+                    " LEFT JOIN civicrm_option_group option_group_addressee ON (option_group_addressee.name = 'addressee')";
+                  $this->_pseudoConstantsSelect[$name]['join'] .=
+                    " LEFT JOIN civicrm_option_value addressee ON (contact_a.addressee_id = addressee.value AND option_group_addressee.id = addressee.option_group_id ) ";
+                }
+                $this->_pseudoConstantsSelect[$name]['table'] = $tableName;
 
                 //get display
                 $greetField = "{$name}_display";
@@ -1059,10 +1081,12 @@ class CRM_Contact_BAO_Query {
               if (substr_count($a, 'state_province_name') > 0) {
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"] =
                   array('pseudoField' => 'state_province_name', 'idCol' => "{$tName}_id");
+                $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['select'] = "`$tName`.name as `{$name}-{$elementFullName}`";
               }
               else {
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"] =
                   array('pseudoField' => 'state_province_abbreviation', 'idCol' => "{$tName}_id");
+                $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['select'] = "`$tName`.abbreviation as `{$name}-{$elementFullName}`";
               }
             }
             else {
@@ -1073,13 +1097,17 @@ class CRM_Contact_BAO_Query {
               }
               if ($pf == 'country' || $pf == 'county') {
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"] = array('pseudoField' => $pf, 'idCol' => "{$tName}_id");
+                $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['select'] = "`$tName`.$fieldName as `{$name}-{$elementFullName}`";
               }
               else {
                 $this->_select["{$name}-{$elementFullName}"] = "`$tName`.$fieldName as `{$name}-{$elementFullName}`";
               }
             }
 
-            if (!in_array($pf, array('state_province', 'country', 'county'))) {
+            if (in_array($pf, array('state_province', 'country', 'county'))) {
+              $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['element'] = "{$name}-{$elementFullName}";
+            }
+            else {
               $this->_element["{$name}-{$elementFullName}"] = 1;
             }
 
@@ -1112,18 +1140,27 @@ class CRM_Contact_BAO_Query {
                   break;
 
                 case 'civicrm_state_province':
+                  $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['table'] = $tName;
+                  $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['join'] =
+                    "\nLEFT JOIN $tableName `$tName` ON `$tName`.id = $aName.state_province_id";
                   if ($addWhere) {
                     $this->_whereTables["{$name}-address"] = $addressJoin;
                   }
                   break;
 
                 case 'civicrm_country':
-                  if ($addWhere) {
+                  $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['table'] = $newName;
+                  $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['join'] =
+                    "\nLEFT JOIN $tableName `$tName` ON `$tName`.id = $aName.country_id";
+                   if ($addWhere) {
                     $this->_whereTables["{$name}-address"] = $addressJoin;
                   }
                   break;
 
                 case 'civicrm_county':
+                  $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['table'] = $newName;
+                  $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['join'] =
+                    "\nLEFT JOIN $tableName `$tName` ON `$tName`.id = $aName.county_id";
                   if ($addWhere) {
                     $this->_whereTables["{$name}-address"] = $addressJoin;
                   }
@@ -4024,13 +4061,14 @@ civicrm_relationship.start_date > {$today}
       TRUE, $smartGroupCache
     );
 
-   //this should add a check for view deleted if permissions are enabled
-   if ($skipPermissions){
-     $query->_skipDeleteClause = TRUE;
-   }
+    //this should add a check for view deleted if permissions are enabled
+    if ($skipPermissions){
+      $query->_skipDeleteClause = TRUE;
+    }
     $query->generatePermissionClause(FALSE, $count);
 
-    list($pseudoFieldTable, $pseudoSimpleFieldTable) = $this->filterPseudoFieldsJoin($sort);
+    // note : this modifies _fromClause and _simpleFromClause
+    $query->filterPseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $query->query($count);
 
@@ -4123,19 +4161,17 @@ civicrm_relationship.start_date > {$today}
         break;
       }
     }
+
     $this->generatePermissionClause($onlyDeleted, $count);
 
-    list($pseudoFieldTable, $pseudoSimpleFieldTable) = $this->filterPseudoFieldsJoin($sort);
+    // note : this modifies _fromClause and _simpleFromClause
+    list($pseudoTable, $pseudoSimpleTable) = $this->filterPseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
 
     //additional from clause should be w/ proper joins.
     if ($additionalFromClause) {
       $from .= "\n" . $additionalFromClause;
-    }
-
-    if ($pseudoFieldTable) {
-      $from .= $pseudoFieldTable;
     }
 
     if (empty($where)) {
@@ -4269,10 +4305,11 @@ civicrm_relationship.start_date > {$today}
 
           if ($additionalFromClause) {
             $this->_simpleFromClause .= "\n" . $additionalFromClause;
+
           }
 
-          if ($pseudoSimpleFieldTable) {
-            $this->_simpleFromClause .= "\n" . $pseudoSimpleFieldTable;
+          if ($pseudoSimpleTable) {
+            $this->_simpleFromClause .= $pseudoSimpleTable;
           }
 
           // if we are doing a transform, do it here
@@ -5085,6 +5122,7 @@ AND   displayRelType.is_active = 1
         }
       }
     }
+
     $presentSimpleFrom = $present;
 
     if (array_key_exists('civicrm_worldregion', $this->_whereTables) &&
@@ -5096,12 +5134,17 @@ AND   displayRelType.is_active = 1
       unset($present['civicrm_country']);
     }
 
+    $presentClause = $presentSimpleFromClause = NULL;
     if (!empty($present)) {
-      $present = implode(' ', $present);
+      $presentClause = implode(' ', $present);
     }
     if (!empty($presentSimpleFrom)) {
-      $presentSimpleFrom = implode(' ', $presentSimpleFrom);
+      $presentSimpleFromClause = implode(' ', $presentSimpleFrom);
     }
-    return array($present, $presentSimpleFrom);
+
+    $this->_fromClause = $this->_fromClause . $presentClause;
+    $this->_simpleFromClause = $this->_simpleFromClause . $presentSimpleFromClause;
+
+    return array($presentClause, $presentSimpleFromClause);
   }
 }
