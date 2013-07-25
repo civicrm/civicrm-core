@@ -734,7 +734,11 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
       );
 
       $checkEntity = civicrm_api($entityName, 'getsingle', $checkParams);
-      $this->assertEquals($entity, $checkEntity, "changing field $fieldName\n" . print_r($entity,TRUE) );//. print_r($checkEntity,true) .print_r($checkParams,true) . print_r($update,true) . print_r($updateParams, TRUE));
+      $this->assertEquals($entity, $checkEntity, "changing field $fieldName\n" .
+        print_r($entity, TRUE)
+        //print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE)
+      );
+
     }
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();
