@@ -36,7 +36,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 
 class api_v3_CustomGroupTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_entity;
   protected $_params;
   public $_eNoticeCompliant = TRUE;
@@ -51,7 +51,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   function setUp() {
-    $this->_apiversion = 3;
     $this->_entity     = 'CustomGroup';
     $this->_params     = array(
       'title' => 'Test_Group_1',
@@ -63,7 +62,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_pre' => 'This is Pre Help For Test Group 1',
       'help_post' => 'This is Post Help For Test Group 1',
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
     parent::setUp();
   }
@@ -78,14 +76,13 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
   /**
    * check with empty array
+   * note that these tests are of marginal value so should not be included in copy & paste
+   * code. The SyntaxConformance is capable of testing this for all entities on create
+   * & delete (& it would be easy to add if not there)
    */
   function testCustomGroupCreateNoParam() {
-    $params = array(
-      'version' => $this->_apiversion,
-    );
-    $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['error_message'],
-      'Mandatory key(s) missing from params array: title, extends', 'In line ' . __LINE__
+    $customGroup = $this->callAPIFailure('custom_group', 'create', array(),
+      'Mandatory key(s) missing from params array: title, extends'
     );
   }
 
@@ -103,10 +100,9 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_pre' => 'This is Pre Help For Test Group 1',
       'help_post' => 'This is Post Help For Test Group 1',
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
+    $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: extends', 'In line ' . __LINE__);
     $this->assertAPIFailure($customGroup, 'In line ' . __LINE__);
   }
@@ -126,7 +122,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_post' => 'This is Post Help For Test Group 1',
       'is_active' => 1,
       'extends' => array(),
-      'version' => $this->_apiversion,
     );
 
     $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
@@ -148,11 +143,9 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_post' => 'This is Post Help For Test Group 1',
       'is_active' => 1,
       'extends' => 'Individual',
-      'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertApiSuccess($customGroup);
+    $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
   }
 
   /**
@@ -169,12 +162,9 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_pre' => 'This is Pre Help For Test Group 1',
       'help_post' => 'This is Post Help For Test Group 1',
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('custom_group', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPIAndDocument('custom_group', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['extends'], 'Individual', 'In line ' . __LINE__);
   }
@@ -184,8 +174,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    */
   function testCustomGroupGetFields() {
     $params = array(
-      'version' => $this->_apiversion,
-      'options' => array('get_options' => 'style'),
+        'options' => array('get_options' => 'style'),
     );
 
     $result = $this->callAPISuccess('custom_group', 'getfields', $params);
@@ -210,11 +199,10 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_pre' => 'This is Pre Help For Test Group 1',
       'help_post' => 'This is Post Help For Test Group 1',
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $result = $this->callAPIFailure('custom_group', 'create', $params);
-    $this->assertEquals($result['error_message'], 'implode(): Invalid arguments passed', 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('custom_group', 'create', $params,
+    'implode(): Invalid arguments passed');
   }
 
   /**
@@ -230,11 +218,9 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_pre' => 'This is Pre Help For Test Group 1',
       'help_post' => 'This is Post Help For Test Group 1',
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['style'], 'Inline', 'In line ' . __LINE__);
   }
@@ -258,12 +244,10 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'style' => 'Tab',
       'help_pre' => 'This is Pre Help For Test Group 2',
       'help_post' => 'This is Post Help For Test Group 2',
-      'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: title', 'In line ' . __LINE__);
-    $this->assertAPIFailure($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPIFailure('custom_group', 'create', $params,
+      'Mandatory key(s) missing from params array: title');
   }
 
   /**
@@ -279,11 +263,9 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_pre' => 'This is Pre Help For Test Group 3',
       'help_post' => 'This is Post Help For Test Group 3',
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Household', 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['style'], 'Tab', 'In line ' . __LINE__);
@@ -303,11 +285,9 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_pre' => 'This is Pre Help For Test Group 6',
       'help_post' => 'This is Post Help For Test Group 6',
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Contribution', 'In line ' . __LINE__);
   }
@@ -327,11 +307,9 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'style' => 'Inline',
       'help_pre' => 'This is Pre Help For Test Group 8',
       'help_post' => 'This is Post Help For Test Group 8',
-      'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Group', 'In line ' . __LINE__);
   }
@@ -349,11 +327,9 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'style' => 'Inline',
       'help_pre' => 'This is Pre Help For Test Group 10',
       'help_post' => 'This is Post Help For Test Group 10',
-      'version' => $this->_apiversion,
     );
 
-    $customGroup = civicrm_api('custom_group', 'create', $params);
-    $this->assertAPISuccess($customGroup, 'In line ' . __LINE__);
+    $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($customGroup['id'], 'In line ' . __LINE__);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Activity', 'In line ' . __LINE__);
   }
@@ -381,13 +357,11 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    * check with valid custom group id
    */
   function testCustomGroupDelete() {
-    $customGroup = $this->customGroupCreate('Individual', 'test_group');
+    $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
     $params = array(
       'id' => $customGroup['id'],
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('custom_group', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('custom_group', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
   }
   /*
@@ -398,14 +372,12 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
   public function testGetCustomGroupSuccess() {
 
-    civicrm_api($this->_entity, 'create', $this->_params);
-    $params = array('version' => 3);
-    $result = civicrm_api($this->_entity, 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $params = array();
+    $result = $this->callAPIAndDocument($this->_entity, 'get', $params, __FUNCTION__, __FILE__);
     $values = $result['values'][$result['id']];
     foreach ($this->_params as $key => $value) {
-      if ($key == 'version' || $key == 'weight') {
+      if ($key == 'weight') {
         continue;
       }
       $this->assertEquals($value, $values[$key], $key . " doesn't match " . print_r($values, TRUE) . 'in line' . __LINE__);
