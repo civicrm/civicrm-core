@@ -73,39 +73,6 @@ function _civicrm_api3_entity_tag_get_spec(&$params) {
 
 /**
  *
- * @param <type> $params
- *
- * @return <type>
- * @todo EM 7 Jan 2011 - believe this should be deleted
- * @deprecated
- */
-function civicrm_api3_entity_tag_display($params) {
-
-  civicrm_api3_verify_one_mandatory($params, NULL, array('entity_id', 'contact_id'));
-
-  $entityID = NULL;
-  $entityTable = 'civicrm_contact';
-
-  if (!($entityID = CRM_Utils_Array::value('entity_id', $params))) {
-    $entityID = CRM_Utils_Array::value('contact_id', $params);
-  }
-
-
-  if (CRM_Utils_Array::value('entity_table', $params)) {
-    $entityTable = $params['entity_table'];
-  }
-
-  $values = CRM_Core_BAO_EntityTag::getTag($entityID, $entityTable);
-  $result = array();
-  $tags   = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
-  foreach ($values as $v) {
-    $result[] = $tags[$v];
-  }
-  return implode(',', $result);
-}
-
-/**
- *
  * @param array $params
  *
  * @return array
