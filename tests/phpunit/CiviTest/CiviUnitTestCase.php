@@ -649,6 +649,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * check that a deleted item has been deleted
+   */
+  function assertAPIDeleted($entity, $id) {
+    $this->callAPISuccess($entity, 'getcount', array('id' => $id), 0);
+  }
+
+
+  /**
    * check that api returned 'is_error' => 1
    * else provide full message
    * @param array $apiResult api result
