@@ -133,7 +133,11 @@ function civicrm_api3_generic_getfields($apiRequest) {
  * @return integer count of results
  */
 function civicrm_api3_generic_getcount($apiRequest) {
+  $apiRequest['params']['options']['is_count'] = TRUE;
   $result = civicrm_api($apiRequest['entity'], 'get', $apiRequest['params']);
+  if(is_numeric (CRM_Utils_Array::value('values', $result))) {
+    return (int) $result['values'];
+  }
   return $result['count'];
 }
 

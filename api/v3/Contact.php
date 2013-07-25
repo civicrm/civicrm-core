@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
   +--------------------------------------------------------------------+
   | CiviCRM version 4.3                                                |
@@ -191,7 +189,7 @@ function civicrm_api3_contact_getcount($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
   $count = _civicrm_api3_get_using_query_object('contact', $params, $options,1);
-  return $count;
+  return (int) $count;
 }
 
 /**
