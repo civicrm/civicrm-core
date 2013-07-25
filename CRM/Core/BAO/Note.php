@@ -138,7 +138,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @access public
    * @static
    */
-  static function &add(&$params, $ids) {
+  static function &add(&$params, $ids = array()) {
     $dataExists = self::dataExists($params);
     if (!$dataExists) {
       return CRM_Core_DAO::$_nullObject;
@@ -160,9 +160,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
         $note->contact_id = $params['entity_id'];
       }
     }
-
-    if (CRM_Utils_Array::value('id', $ids)) {
-      $note->id = CRM_Utils_Array::value('id', $ids);
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
+    if ($id) {
+      $note->id = $id;
     }
 
     $note->save();
