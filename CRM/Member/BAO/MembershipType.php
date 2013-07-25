@@ -163,22 +163,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
       if (in_array('MembershipBlock', $status)) {
         $deleteURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
-        $message .= '<br/>' . ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', array(1 => $deleteURL, 2 => $cnt));
-      }
-      if (!$skipRedirect) {
-        $session = CRM_Core_Session::singleton();
-        CRM_Core_Session::setStatus($message, ts('Membership Not Deleted'), 'error');
-        return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/member/membershipType', 'reset=1&action=browse'));
-      }
-      else {
-        $error = array();
-        $error['is_error'] = 1;
-        //don't translate as api error message are not translated
-        $error['error_message'] = $message;
-        return $error;
+        $message .= ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', array(1 => $deleteURL, 2 => $cnt));
+        throw new CRM_Core_Exception($message);
       }
     }
-
+    CRM_Utils_Weight::delWeight('CRM_Member_DAO_MembershipType', $membershipTypeId);
     //delete from membership Type table
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->id = $membershipTypeId;
