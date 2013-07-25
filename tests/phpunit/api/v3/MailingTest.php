@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  *  File for the TestMailing class
  *
  *  (PHP 5)
@@ -37,6 +37,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params = array();
   protected $_entity = 'Mailing';
+  public $_eNoticeCompliant = TRUE;
 
   function get_info() {
     return array(
@@ -69,7 +70,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params, __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals(1, $jobs['count']);
-    unset($params['created_id']);// return isn't working on this in getAndCheck so lets not check it for now
+    unset($this->_params['created_id']);// return isn't working on this in getAndCheck so lets not check it for now
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
   }
 
