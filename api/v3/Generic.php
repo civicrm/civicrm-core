@@ -87,6 +87,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
         'id' => array('title' => 'Unique Identifier',
           'api.required' => 1,
           'api.aliases' => array($lcase_entity . '_id'),
+          'type' => CRM_Utils_Type::T_INT,
         ));
       break;
 
