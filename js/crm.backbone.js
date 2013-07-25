@@ -8,7 +8,7 @@
    * To load collections using API queries, set the "crmCriteria" property or override the
    * method "toCrmCriteria".
    *
-   * @param method
+   * @param method Accepts normal Backbone.sync methods; also accepts "crm-replace"
    * @param model
    * @param options
    * @see tests/qunit/crm-backbone
@@ -33,6 +33,13 @@
       switch (method) {
         case 'read':
           CRM.api(model.crmEntityName, 'get', model.toCrmCriteria(), apiOptions);
+          break;
+        // replace all entities matching "x.crmCriteria" with new entities in "x.models"
+        case 'crm-replace':
+          var params = this.toCrmCriteria();
+          params.version = 3;
+          params.values = this.toJSON();
+          CRM.api(model.crmEntityName, 'replace', params, apiOptions);
           break;
         default:
           apiOptions.error({is_error: 1, error_message: "CRM.Backbone.sync(" + method + ") not implemented for collections"});
@@ -115,9 +122,11 @@
   /**
    * Configure a model class to track whether a model has unsaved changes.
    *
-   * The ModelClass will be extended with:
-   *  - Method: isSaved() - true if there have been no changes to the data since the last fetch or save
-   *  - Event: saved(object model, bool is_saved) - triggered whenever isSaved() value would change
+   * Methods:
+   *  - setModified() - flag the model as modified/dirty
+   *  - isSaved() - return true if there have been no changes to the data since the last fetch or save
+   * Events:
+   *  - saved(object model, bool is_saved) - triggered whenever isSaved() value would change
    *
    *  Note: You should not directly call isSaved() within the context of the success/error/sync callback;
    *  I haven't found a way to make isSaved() behave correctly within these callbacks without patching
@@ -193,8 +202,11 @@
    * deletion (or not) -- however, deletion will be deferred until save()
    * is called.
    *
+   * Methods:
+   *   setSoftDeleted(boolean) - flag the model as deleted (or not-deleted)
+   *   isSoftDeleted() - determine whether model has been soft-deleted
    * Events:
-   *   softDelete: function(model, is_deleted) -- change value of is_deleted
+   *   softDelete(model, is_deleted) -- change value of is_deleted
    *
    * @param ModelClass
    */
@@ -233,7 +245,7 @@
    * Connect a "collection" class to CiviCRM's APIv3
    *
    * Note: the collection supports a special property, crmCriteria, which is an array of
-   * query options to send to the API
+   * query options to send to the API.
    *
    * @code
    * // Setup class
@@ -249,6 +261,9 @@
    *   crmCriteria: {contact_type: 'Organization'}
    * });
    * c.fetch();
+   * c.get(123).set('property', 'value');
+   * c.get(456).setDeleted(true);
+   * c.save();
    * @endcode
    *
    * @param Class CollectionClass
@@ -260,7 +275,30 @@
     _.defaults(CollectionClass.prototype, {
       crmEntityName: CollectionClass.prototype.model.prototype.crmEntityName,
       toCrmCriteria: function() {
-        return this.crmCriteria || {};
+        return (this.crmCriteria) ? _.extend({}, this.crmCriteria) : {};
+      },
+
+      /**
+       * Reconcile the server's collection with the client's collection.
+       * New/modified items from the client will be saved/updated on the
+       * server. Deleted items from the client will be deleted on the
+       * server.
+       *
+       * @param Object options - accepts "success" and "error" callbacks
+       */
+      save: function(options) {
+        options || (options = {});
+        var collection = this;
+        var success = options.success;
+        options.success = function(resp) {
+          // Ensure attributes are restored during synchronous saves.
+          collection.reset(resp, options);
+          if (success) success(collection, resp, options);
+          // collection.trigger('sync', collection, resp, options);
+        };
+        wrapError(collection, options);
+
+        return this.sync('crm-replace', this, options)
       }
     });
     // Overrides - if specified in CollectionClass, replace
@@ -274,6 +312,18 @@
         if (origInit) {
           return origInit.apply(this, arguments);
         }
+      },
+      toJSON: function() {
+        var result = [];
+        // filter models list, excluding any soft-deleted items
+        this.each(function(model) {
+          // if model doesn't track soft-deletes
+          // or if model tracks soft-deletes and wasn't soft-deleted
+          if (!model.isSoftDeleted || !model.isSoftDeleted()) {
+            result.push(model.toJSON());
+          }
+        });
+        return result;
       }
     });
   };
@@ -432,4 +482,13 @@
     }
   });
   */
+
+  // Wrap an optional error callback with a fallback error event.
+  var wrapError = function (model, options) {
+    var error = options.error;
+    options.error = function(resp) {
+      if (error) error(model, resp, options);
+      model.trigger('error', model, resp, options);
+    };
+  };
 })(cj);
