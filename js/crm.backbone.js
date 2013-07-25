@@ -152,6 +152,9 @@
       },
       _saved_onchange: function(model, options) {
         if (options.parse) return;
+        this.setModified();
+      },
+      setModified: function() {
         var oldModified = this._modified;
         this._modified = true;
         if (!oldModified) {
@@ -185,6 +188,48 @@
   };
 
   /**
+   * Configure a model class to support client-side soft deletion.
+   * One can call "model.setDeleted(BOOLEAN)" to flag an entity for
+   * deletion (or not) -- however, deletion will be deferred until save()
+   * is called.
+   *
+   * Events:
+   *   softDelete: function(model, is_deleted) -- change value of is_deleted
+   *
+   * @param ModelClass
+   */
+  CRM.Backbone.trackSoftDelete = function(ModelClass) {
+    // Retain references to some of the original class's functions
+    var Parent = _.pick(ModelClass.prototype, 'save');
+
+    // Defaults - if specified in ModelClass, preserve
+    _.defaults(ModelClass.prototype, {
+      is_soft_deleted: false,
+      setSoftDeleted: function(is_deleted) {
+        if (this.is_soft_deleted != is_deleted) {
+          this.is_soft_deleted = is_deleted;
+          this.trigger('softDelete', this, is_deleted);
+          if (this.setModified) this.setModified(); // FIXME: ugly interaction, trackSoftDelete-trackSaved
+        }
+      },
+      isSoftDeleted: function() {
+        return this.is_soft_deleted;
+      }
+    });
+
+    // Overrides - if specified in ModelClass, replace
+    _.extend(ModelClass.prototype, {
+      save: function(attributes, options) {
+        if (this.isSoftDeleted()) {
+          return this.destroy(options);
+        } else {
+          return Parent.save.apply(this, arguments);
+        }
+      }
+    });
+  };
+
+    /**
    * Connect a "collection" class to CiviCRM's APIv3
    *
    * Note: the collection supports a special property, crmCriteria, which is an array of
