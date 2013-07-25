@@ -580,6 +580,10 @@ class CRM_Contact_BAO_Query {
 
     $values = array();
     foreach ($this->_pseudoConstantsSelect as $key => $value) {
+      if (CRM_Utils_Array::value('sorting', $this->_pseudoConstantsSelect[$key])) {
+        continue;
+      }
+
       if (property_exists($dao, $value['idCol'])) {
         $val = $dao->$value['idCol'];
         if (CRM_Utils_System::isNull($val)) {
@@ -3395,6 +3399,7 @@ WHERE  id IN ( $groupIDs )
   function country(&$values, $fromStateProvince = TRUE) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
+
     if (!$fromStateProvince) {
       $stateValues = $this->getWhereValues('state_province', $grouping);
       if (!empty($stateValues)) {
@@ -3420,7 +3425,7 @@ WHERE  id IN ( $groupIDs )
           $value,
           'Positive'
         );
-        $countryName = $countries[(int ) $value];
+        $countryName = $countries[(int) $value];
       }
       else {
         $intValues = self::parseSearchBuilderString($value);
@@ -3479,7 +3484,7 @@ WHERE  id IN ( $groupIDs )
   function county(&$values, $status = null) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    if (! is_array($value)) {
+    if (!is_array($value)) {
       // force the county to be an array
       $value = array($value);
     }
@@ -3493,7 +3498,21 @@ WHERE  id IN ( $groupIDs )
       }
     }
     $names = array();
-    if ($inputFormat == 'id') {
+    if ($op == '=') {
+      $op = 'IN';
+    }
+    else if ($op == '!=') {
+      $op = 'NOT IN';
+    }
+    else {
+      // this converts IS (NOT)? EMPTY to IS (NOT)? NULL
+      $op = str_replace('EMPTY', 'NULL', $op);
+    }
+
+    if (in_array( $op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
+      $clause = "civicrm_address.county_id $op";
+    }
+    elseif ($inputFormat == 'id') {
       $clause = 'civicrm_address.county_id IN (' . implode(',', $value) . ')';
 
       $county = CRM_Core_PseudoConstant::county();
@@ -3513,7 +3532,6 @@ WHERE  id IN ( $groupIDs )
     }
     $this->_tables['civicrm_address'] = 1;
     $this->_whereTables['civicrm_address'] = 1;
-
     $this->_where[$grouping][] = $clause;
     if (!$status) {
       $this->_qill[$grouping][] = ts('County') . ' - ' . implode(' ' . ts('or') . ' ', $names);
@@ -3570,7 +3588,7 @@ WHERE  id IN ( $groupIDs )
       $op = str_replace('EMPTY', 'NULL', $op);
     }
     if ( in_array( $op, array( 'IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY' ) ) ) {
-      $stateClause = "civicrm_address.id $op";
+      $stateClause = "civicrm_address.state_province_id $op";
     }
     else if ($inputFormat == 'id') {
       if ($op != 'NOT IN') {
@@ -4068,7 +4086,7 @@ civicrm_relationship.start_date > {$today}
     $query->generatePermissionClause(FALSE, $count);
 
     // note : this modifies _fromClause and _simpleFromClause
-    $query->filterPseudoFieldsJoin($sort);
+    $query->includePseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $query->query($count);
 
@@ -4165,7 +4183,7 @@ civicrm_relationship.start_date > {$today}
     $this->generatePermissionClause($onlyDeleted, $count);
 
     // note : this modifies _fromClause and _simpleFromClause
-    list($pseudoTable, $pseudoSimpleTable) = $this->filterPseudoFieldsJoin($sort);
+    list($pseudoTable, $pseudoSimpleTable) = $this->includePseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
 
@@ -5101,11 +5119,11 @@ AND   displayRelType.is_active = 1
   }
 
   /*
-   * exclude pseudo replacement for fields used for sorting
+   * include pseudo fields LEFT JOIN
    * @param  $sort  can be a object or string
    *
    */
-  function filterPseudoFieldsJoin($sort) {
+  function includePseudoFieldsJoin($sort) {
     if (!$sort || empty($this->_pseudoConstantsSelect)) {
       return;
     }
@@ -5118,6 +5136,7 @@ AND   displayRelType.is_active = 1
         if (preg_match($regex, $sort)) {
           $this->_elemnt[$value['element']] = 1;
           $this->_select[$value['element']] = $value['select'];
+          $this->_pseudoConstantsSelect[$name]['sorting'] = 1;
           $present[$value['table']] = $value['join'];
         }
       }
