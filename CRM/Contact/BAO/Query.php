@@ -693,12 +693,8 @@ class CRM_Contact_BAO_Query {
                 CRM_Core_OptionValue::select($this);
               }
 
-              if (
-                in_array(
-                  $tableName,
-                  array('email_greeting', 'postal_greeting', 'addressee')
-                )
-              ) {
+              if (in_array($tableName,
+                  array('email_greeting', 'postal_greeting', 'addressee'))) {
                 $this->_element["{$name}_id"] = 1;
                 $this->_select["{$name}_id"] = "contact_a.{$name}_id as {$name}_id";
                 $this->_pseudoConstantsSelect[$name] = array('pseudoField' => $tableName, 'idCol' => "{$name}_id");
@@ -723,9 +719,14 @@ class CRM_Contact_BAO_Query {
 
               if (in_array($tName, array('country', 'state_province', 'county'))) {
                 $pf = ($tName == 'state_province') ? 'state_province_name' : $name;
-                $this->_pseudoConstantsSelect[$pf] = array('pseudoField' => $tName, 'idCol' => "{$tName}_id");
+                $this->_pseudoConstantsSelect[$pf] =
+                  array('pseudoField' => $tName, 'idCol' => "{$tName}_id",
+                    'table' => "civicrm_{$tName}", 'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ");
+
                 if ($tName == 'state_province') {
-                  $this->_pseudoConstantsSelect[$tName] = array('pseudoField' => 'state_province_abbreviation', 'idCol' => "{$tName}_id");
+                  $this->_pseudoConstantsSelect[$tName] =
+                    array('pseudoField' => 'state_province_abbreviation', 'idCol' => "{$tName}_id",
+                      'table' => "civicrm_{$tName}", 'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ");
                 }
 
                 $this->_select["{$tName}_id"] = "civicrm_address.{$tName}_id as {$tName}_id";
@@ -767,7 +768,15 @@ class CRM_Contact_BAO_Query {
                   $this->_select[$name] = "contact_a.{$fieldName}  as `$name`";
                 }
               }
-              elseif (!in_array($tName, array('state_province', 'country', 'county'))) {
+              elseif (in_array($tName, array('state_province', 'country', 'county'))) {
+                $this->_pseudoConstantsSelect[$pf]['select'] = "{$field['where']} as `$name`";
+                $this->_pseudoConstantsSelect[$pf]['element'] = $name;
+                if ($tName == 'state_province') {
+                  $this->_pseudoConstantsSelect[$tName]['select'] = "{$field['where']} as `$name`";
+                  $this->_pseudoConstantsSelect[$tName]['element'] = $name;
+                }
+              }
+              else {
                 $this->_select[$name] = "{$field['where']} as `$name`";
               }
               if (!in_array($tName, array('state_province', 'country', 'county'))) {
@@ -1279,6 +1288,7 @@ class CRM_Contact_BAO_Query {
         $select .= "{$this->_distinctComponentClause}, ";
       }
       $select .= implode(', ', $this->_select);
+
       $from = $this->_fromClause;
     }
 
@@ -4019,6 +4029,9 @@ civicrm_relationship.start_date > {$today}
      $query->_skipDeleteClause = TRUE;
    }
     $query->generatePermissionClause(FALSE, $count);
+
+    list($pseudoFieldTable, $pseudoSimpleFieldTable) = $this->filterPseudoFieldsJoin($sort);
+
     list($select, $from, $where, $having) = $query->query($count);
 
     $options = $query->_options;
@@ -4095,7 +4108,6 @@ civicrm_relationship.start_date > {$today}
       $this->_includeContactIds = TRUE;
       $this->_whereClause = $this->whereClause();
     }
-
     $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
 
     // if we’re explicitely looking for a certain contact’s contribs, events, etc.
@@ -4113,11 +4125,17 @@ civicrm_relationship.start_date > {$today}
     }
     $this->generatePermissionClause($onlyDeleted, $count);
 
+    list($pseudoFieldTable, $pseudoSimpleFieldTable) = $this->filterPseudoFieldsJoin($sort);
+
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
 
     //additional from clause should be w/ proper joins.
     if ($additionalFromClause) {
       $from .= "\n" . $additionalFromClause;
+    }
+
+    if ($pseudoFieldTable) {
+      $from .= $pseudoFieldTable;
     }
 
     if (empty($where)) {
@@ -4252,6 +4270,11 @@ civicrm_relationship.start_date > {$today}
           if ($additionalFromClause) {
             $this->_simpleFromClause .= "\n" . $additionalFromClause;
           }
+
+          if ($pseudoSimpleFieldTable) {
+            $this->_simpleFromClause .= "\n" . $pseudoSimpleFieldTable;
+          }
+
           // if we are doing a transform, do it here
           // CRM-7969
           $having = NULL;
@@ -4260,6 +4283,7 @@ civicrm_relationship.start_date > {$today}
           }
 
           $limitQuery = "$limitSelect {$this->_simpleFromClause} $where $groupBy $order $limit";
+
           $limitDAO = CRM_Core_DAO::executeQuery($limitQuery);
           $limitIDs = array();
           while ($limitDAO->fetch()) {
@@ -5038,5 +5062,46 @@ AND   displayRelType.is_active = 1
 
     return $returnValues;
   }
-}
 
+  /*
+   * exclude pseudo replacement for fields used for sorting
+   * @param  $sort  can be a object or string
+   *
+   */
+  function filterPseudoFieldsJoin($sort) {
+    if (!$sort || empty($this->_pseudoConstantsSelect)) {
+      return;
+    }
+    $sort = is_string($sort) ? $sort : $sort->orderBy();
+    $present = array();
+
+    foreach ($this->_pseudoConstantsSelect as $name => $value) {
+      if (CRM_Utils_Array::value('table', $value)) {
+        $regex = "/({$value['table']}\.|{$name})/";
+        if (preg_match($regex, $sort)) {
+          $this->_elemnt[$value['element']] = 1;
+          $this->_select[$value['element']] = $value['select'];
+          $present[$value['table']] = $value['join'];
+        }
+      }
+    }
+    $presentSimpleFrom = $present;
+
+    if (array_key_exists('civicrm_worldregion', $this->_whereTables) &&
+      array_key_exists('civicrm_country', $presentSimpleFrom)) {
+      unset($presentSimpleFrom['civicrm_country']);
+    }
+    if (array_key_exists('civicrm_worldregion', $this->_tables) &&
+      array_key_exists('civicrm_country', $present)) {
+      unset($present['civicrm_country']);
+    }
+
+    if (!empty($present)) {
+      $present = implode(' ', $present);
+    }
+    if (!empty($presentSimpleFrom)) {
+      $presentSimpleFrom = implode(' ', $presentSimpleFrom);
+    }
+    return array($present, $presentSimpleFrom);
+  }
+}
