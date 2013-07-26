@@ -58,6 +58,10 @@ define('API_LATEST_VERSION', 3);
 class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
+   * api version - easier to override than just a defin
+   */
+  protected $_apiversion = API_LATEST_VERSION;
+  /**
    *  Database has been initialized
    *
    * @var boolean
@@ -612,9 +616,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $prefix .= ': ';
     }
     $errorMessage = empty($apiResult['error_message']) ? '' : " " . $apiResult['error_message'];
+
+    if(!empty($apiResult['debug_information'])) {
+      $errorMessage .= "\n " . print_r($apiResult['debug_information'], TRUE);
+    }
     if(!empty($apiResult['trace'])){
       $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
     }
+
     $this->assertEquals(0, $apiResult['is_error'], $prefix . $errorMessage);
   }
 
@@ -632,10 +641,30 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $this->assertEquals($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix );
     }
     $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
+    $this->assertNotEmpty($apiResult['error_message']);
   }
 
   function assertType($expected, $actual, $message = '') {
     return $this->assertInternalType($expected, $actual, $message);
+  }
+
+  /**
+   * check that api returned 'is_error' => 1
+   * else provide full message
+   * @param array $apiResult api result
+   * @param string $prefix extra test to add to message
+   */
+  function assertAPIArrayComparison($result, $expected, $valuesToExclude = array(), $prefix = '') {
+    $valuesToExclude = array_merge($valuesToExclude, array('debug', 'xdebug', 'sequential'));
+    foreach ($valuesToExclude as $value) {
+      if(isset($result[$value])) {
+        unset($result[$value]);
+      }
+      if(isset($expected[$value])) {
+        unset($expected[$value]);
+      }
+    }
+    $this->assertEquals($result, $expected, "api result array comparison failed " . $prefix . print_r($result, TRUE) . ' was compared to ' . print_r($expected, TRUE));
   }
 
   /**
@@ -644,16 +673,23 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @param string $function - pass this in to create a generated example
-   * @param string $file - pass this in to create a generated example
+   * @param mixed $checkAgainst optional value to check result against, implemented for getvalue, getcount, getsingle
    */
-  function callAPISuccess($entity, $action, $params) {
+  function callAPISuccess($entity, $action, $params, $checkAgainst = NULL) {
     $params = array_merge(array(
-        'version' => API_LATEST_VERSION,
+        'version' => $this->_apiversion,
         'debug' => 1,
       ),
       $params
     );
+    switch (strtolower($action)) {
+      case 'getvalue' :
+        return $this->callAPISuccessGetValue($entity, $params, $checkAgainst);
+      case 'getsingle' :
+        return $this->callAPISuccessGetSingle($entity, $params, $checkAgainst);
+      case 'getcount' :
+          return $this->callAPISuccessGetCount($entity, $params, $checkAgainst);
+    }
     $result = civicrm_api($entity, $action, $params);
     $this->assertAPISuccess($result, "Failure in api call for $entity $action");
     return $result;
@@ -675,7 +711,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   function callAPISuccessGetValue($entity, $params, $type = NULL) {
     $params += array(
-      'version' => API_LATEST_VERSION,
+      'version' => $this->_apiversion,
       'debug' => 1,
     );
     $result = civicrm_api($entity, 'getvalue', $params);
@@ -692,6 +728,62 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * This function exists to wrap api getsingle function & check the result
+   * so we can ensure they succeed & throw exceptions without litterering the test with checks
+   * @param string $entity
+   * @param array $params
+   * @param array $checkAgainst - array to compare result against
+   * - boolean
+   * - integer
+   * - double
+   * - string
+   * - array
+   * - object
+   */
+  function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
+    $params += array(
+      'version' => $this->_apiversion,
+      'debug' => 1,
+    );
+    $result = civicrm_api($entity, 'getsingle', $params);
+    if(!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
+      throw new Exception('Invalid getsingle result' . print_r($result, TRUE));
+    }
+    if($checkAgainst){
+      // @todo - have gone with the fn that unsets id? should we check id?
+      $this->checkArrayEquals($result, $checkAgainst);
+    }
+    return $result;
+  }
+  /**
+   * This function exists to wrap api getValue function & check the result
+   * so we can ensure they succeed & throw exceptions without litterering the test with checks
+   * There is a type check in this
+   * @param string $entity
+   * @param array $params
+   * @param string $type - per http://php.net/manual/en/function.gettype.php possible types
+   * - boolean
+   * - integer
+   * - double
+   * - string
+   * - array
+   * - object
+   */
+  function callAPISuccessGetCount($entity, $params, $count = NULL) {
+    $params += array(
+      'version' => $this->_apiversion,
+      'debug' => 1,
+    );
+    $result = civicrm_api($entity, 'getcount', $params);
+    if(!is_integer($result) || !empty($result['is_error']) || isset($result['values'])) {
+      throw new Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
+    }
+    if(is_int($count)){
+      $this->assertEquals($count, $result, "incorect count returned from $entity getcount");
+    }
+    return $result;
+  }
+  /**
    * This function exists to wrap api functions
    * so we can ensure they succeed, generate and example & throw exceptions without litterering the test with checks
    *
@@ -702,12 +794,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $file - pass this in to create a generated example
    */
   function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
-    $params['version'] = API_LATEST_VERSION;
+    $params['version'] = $this->_apiversion;
     if(!isset($params['debug'])){
       // don't debug by default to keep examples tidy
       $params['debug'] = 0;
     }
-    $result = $this->callAPISuccess($entity, $action, $params);
+    try{
+      $result = $this->callAPISuccess($entity, $action, $params);
+    }
+    catch (EXCEPTION $e) {
+      // but if it fails call again with debug on for better error message
+      $params['debug'] = 1;
+      $result = $this->callAPISuccess($entity, $action, $params);
+
+    }
     $this->documentMe($params, $result, $function, $file, $description, $subfile, $actionName);
     return $result;
   }
@@ -723,7 +823,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
     if (is_array($params)) {
       $params += array(
-        'version' => API_LATEST_VERSION,
+        'version' => $this->_apiversion,
       );
     }
     $result = civicrm_api($entity, $action, $params);
@@ -757,7 +857,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $orgParams = array(
       'organization_name' => 'Unit Test Organization',
       'contact_type' => 'Organization',
-      'version' => API_LATEST_VERSION,
     );
     return $this->_contactCreate(array_merge($orgParams, $params));
   }
@@ -798,7 +897,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'contact_type' => 'Household',
       );
     }
-    $params['version'] = API_LATEST_VERSION;
     return $this->_contactCreate($params);
   }
 
@@ -822,7 +920,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function contactDelete($contactID) {
     $params = array(
       'id' => $contactID,
-      'version' => API_LATEST_VERSION,
       'skip_undelete' => 1,
       'debug' => 1,
     );
@@ -833,11 +930,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       //since this is mainly for cleanup lets put a safeguard here
       return;
     }
-    $result = civicrm_api('contact', 'delete', $params);
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not delete contact, with message: ' . CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . CRM_Utils_Array::value('trace', $result));
-    }
-    return;
+    $result = $this->callAPISuccess('contact', 'delete', $params);
+    return  $result;
   }
 
   function contactTypeDelete($contactTypeId) {
@@ -888,7 +982,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'start_date' => '2007-01-21',
       'end_date' => '2007-12-21',
       'source' => 'Payment',
-      'version' => API_LATEST_VERSION,
     );
 
     foreach ($pre as $key => $val) {
@@ -897,19 +990,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       }
     }
 
-    $result = civicrm_api('Membership', 'create', $params);
-
-    if (CRM_Utils_Array::value('is_error', $result) ||
-      !CRM_Utils_Array::value('id', $result)
-    ) {
-      if (CRM_Utils_Array::value('error_message', $result)) {
-        throw new Exception('Could not create membership, with message: ' . CRM_Utils_Array::value('error_message', $result));
-      }
-      else {
-        throw new Exception('Could not create membership' . ' - in line: ' . __LINE__);
-      }
-    }
-
+    $result = $this->callAPISuccess('Membership', 'create', $params);
     return $result['id'];
   }
 
@@ -919,21 +1000,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param int $membershipTypeID
    */
   function membershipTypeDelete($params) {
-    $params['version'] = API_LATEST_VERSION;
-
-    $result = civicrm_api('MembershipType', 'Delete', $params);
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not delete membership type' . $result['error_message']);
-    }
+    $result = $this->callAPISuccess('MembershipType', 'Delete', $params);
     return;
   }
 
   function membershipDelete($membershipID) {
-    $deleteParams = array('version' => 3, 'id' => $membershipID);
-    $result = civicrm_api('Membership', 'Delete', $deleteParams);
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not delete membership ' . $result['error_message'] . " params were " . print_r($deleteParams, TRUE));
-    }
+    $deleteParams = array('id' => $membershipID);
+    $result = $this->callAPISuccess('Membership', 'Delete', $deleteParams);
     return;
   }
 
@@ -943,15 +1016,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params['end_event'] = 'end_date';
     $params['is_current_member'] = 1;
     $params['is_active'] = 1;
-    $params['version'] = API_LATEST_VERSION;
 
-    $result = civicrm_api('MembershipStatus', 'Create', $params);
-    require_once 'CRM/Member/PseudoConstant.php';
+    $result = $this->callAPISuccess('MembershipStatus', 'Create', $params);
     CRM_Member_PseudoConstant::flush('membershipStatus');
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception("Could not create membership status: $name, Error message: " . $result['error_message']);
-      exit();
-    }
     return $result['id'];
   }
 
@@ -975,15 +1042,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       );
     }
 
-    $params['version'] = API_LATEST_VERSION;
-
-    $result = civicrm_api('relationship_type', 'create', $params);
-
-    if (civicrm_error($params) || CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not create relationship type');
-    }
-
-    require_once 'CRM/Core/PseudoConstant.php';
+    $result = $this->callAPISuccess('relationship_type', 'create', $params);
     CRM_Core_PseudoConstant::flush('relationshipType');
 
     return $result['id'];
@@ -996,14 +1055,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   function relationshipTypeDelete($relationshipTypeID) {
     $params['id'] = $relationshipTypeID;
-    $params['version'] = API_LATEST_VERSION;
-    civicrm_api('relationship_type', 'delete', $params);
-
-    if (civicrm_error($params)) {
-      throw new Exception('Could not delete relationship type');
-    }
-
-    return;
+    $this->callAPISuccess('relationship_type', 'delete', $params);
   }
 
   function paymentProcessorTypeCreate($params = NULL) {
@@ -1018,11 +1070,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'is_active' => 1,
       );
     }
+    $result = $this->callAPISuccess('payment_processor_type', 'create', $params);
 
-    $params['version'] = API_LATEST_VERSION;
-
-    $result = civicrm_api('payment_processor_type', 'create', $params);
-    $this->assertAPISuccess($result);
     CRM_Core_PseudoConstant::flush('paymentProcessorType');
 
     return $result['id'];
@@ -1049,15 +1098,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'register_date' => 20070219,
       'source' => 'Wimbeldon',
       'event_level' => 'Payment',
-      'version' => API_LATEST_VERSION,
       'debug' => 1,
     );
 
     $params = array_merge($defaults, $params);
-    $result = civicrm_api('Participant', 'create', $params);
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not create participant ' . $result['error_message'] . print_r($result,1));
-    }
+    $result = $this->callAPISuccess('Participant', 'create', $params);
     return $result['id'];
   }
 
@@ -1089,7 +1134,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   function contributionPageCreate($params) {
     $this->_pageParams = array(
-      'version' => 3,
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
@@ -1100,7 +1144,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'min_amount' => 10,
       'max_amount' => 1000,
     );
-    $contributionPage = civicrm_api('contribution_page', 'create', $this->_pageParams);
+    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     return $contributionPage;
   }
 
@@ -1118,7 +1162,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       )
     );
 
-    require_once 'CRM/Contribute/PseudoConstant.php';
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     CRM_Contribute_PseudoConstant::flush('financialType');
     return key($financialType);
@@ -1130,16 +1173,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   function contributionTypeDelete($contributionTypeID = NULL) {
     if ($contributionTypeID === NULL) {
-      civicrm_api('Contribution', 'get',
+      $this->callAPISuccess('Contribution', 'get',
         array(
-          'version' => 3,
           'financial_type_id' => 10,
           'api.contribution.delete' => 1,
         )
       );
-      civicrm_api('Contribution', 'get',
+      $this->callAPISuccess('Contribution', 'get',
         array(
-          'version' => 3,
           'financial_type_id' => 11,
           'api.contribution.delete' => 1,
         )
@@ -1150,8 +1191,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $del = CRM_Financial_BAO_FinancialType::del(11, 1);
     }
     else {
-      civicrm_api('Contribution', 'get', array(
-        'version' => 3,
+      $this->callAPISuccess('Contribution', 'get', array(
         'financial_type_id' => $contributionTypeID,
         'api.contribution.delete' => 1
       ));
@@ -1173,11 +1213,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'name' => 'New Tag3' . rand(),
         'description' => 'This is description for New Tag ' . rand(),
         'domain_id' => '1',
-        'version' => API_LATEST_VERSION,
       );
     }
 
-    $result = civicrm_api('Tag', 'create', $params);
+    $result = $this->callAPISuccess('Tag', 'create', $params);
     return $result;
   }
 
@@ -1190,12 +1229,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     require_once 'api/api.php';
     $params = array(
       'tag_id' => $tagId,
-      'version' => API_LATEST_VERSION,
     );
-    $result = civicrm_api('Tag', 'delete', $params);
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Could not delete tag');
-    }
+    $result = $this->callAPISuccess('Tag', 'delete', $params);
     return $result['id'];
   }
 
@@ -1205,12 +1240,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param  array  $params
    */
   function entityTagAdd($params) {
-    $params['version'] = API_LATEST_VERSION;
-    $result = civicrm_api('entity_tag', 'create', $params);
-
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      throw new Exception('Error while creating entity tag');
-    }
+    $result = $this->callAPISuccess('entity_tag', 'create', $params);
     return TRUE;
   }
 
@@ -1236,10 +1266,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'frequency_unit' => 'year',
       'frequency_day' => 15,
       'installments' => 5,
-      'version' => API_LATEST_VERSION,
     );
 
-    $result = civicrm_api('Pledge', 'create', $params);
+    $result = $this->callAPISuccess('Pledge', 'create', $params);
     return $result['id'];
   }
 
@@ -1251,10 +1280,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function pledgeDelete($pledgeId) {
     $params = array(
       'pledge_id' => $pledgeId,
-      'version' => API_LATEST_VERSION,
     );
-
-    civicrm_api('Pledge', 'delete', $params);
+    $this->callAPISuccess('Pledge', 'delete', $params);
   }
 
   /**
@@ -1277,7 +1304,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'trxn_id' => $trxnID,
       'invoice_id' => $invoiceID,
       'source' => 'SSF',
-      'version' => API_LATEST_VERSION,
       'contribution_status_id' => 1,
       // 'note'                   => 'Donating for Nobel Cause', *Fixme
     );
@@ -1287,18 +1313,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $params['net_amount'] = 95.00;
     }
 
-    $result = civicrm_api('contribution', 'create', $params);
-    if (CRM_Utils_Array::value('is_error', $result) ||
-      !CRM_Utils_Array::value('id', $result)
-    ) {
-      if (CRM_Utils_Array::value('error_message', $result)) {
-        throw new Exception('Could not create contribution, with message: ' . CRM_Utils_Array::value('error_message', $result));
-      }
-      else {
-        throw new Exception('Could not create contribution in line: ' . __LINE__);
-      }
-    }
-
+    $result = $this->callAPISuccess('contribution', 'create', $params);
     return $result['id'];
   }
 
@@ -1319,32 +1334,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'trxn_id' => 12345,
       'invoice_id' => 67890,
       'source' => 'SSF',
-      'version' => $this->_apiversion,
     );
-
-    if (isset($params['contribution_status_id'])) {
-      $contribParams['contribution_status_id'] = $params['contribution_status_id'];
-    }
-    else {
-      $contribParams['contribution_status_id'] = 1;
-    }
-    if (isset($params['is_pay_later'])) {
-      $contribParams['is_pay_later'] = 1;
-    }
-    if (isset($params['payment_processor'])) {
-      $contribParams['payment_processor'] = $params['payment_processor'];
-    }
-    $result = civicrm_api('contribution', 'create', $contribParams);
-    if (CRM_Utils_Array::value('is_error', $result) ||
-      !CRM_Utils_Array::value('id', $result)
-    ) {
-      if (CRM_Utils_Array::value('error_message', $result)) {
-        throw new Exception('Could not create contribution, with message: ' . CRM_Utils_Array::value('error_message', $result));
-      }
-      else {
-        throw new Exception('Could not create contribution in line: ' . __LINE__);
-      }
-    }
+    $contribParams = array_merge($contribParams, $params);
+    $result = $this->callAPISuccess('contribution', 'create', $contribParams);
 
     return $result['id'];
   }
@@ -1357,21 +1349,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function contributionDelete($contributionId) {
     $params = array(
       'contribution_id' => $contributionId,
-      'version' => API_LATEST_VERSION,
     );
-    $result = civicrm_api('contribution', 'delete', $params);
-
-    if (CRM_Utils_Array::value('is_error', $result) ||
-      !CRM_Utils_Array::value('id', $result)
-    ) {
-      if (CRM_Utils_Array::value('error_message', $result)) {
-        throw new Exception('Could not delete contribution, with message: ' . CRM_Utils_Array::value('error_message', $result));
-      }
-      else {
-        throw new Exception('Could not delete contribution - in line: ' . __LINE__);
-      }
-    }
-
+    $result = $this->callAPISuccess('contribution', 'delete', $params);
     return $result;
   }
 
@@ -1389,7 +1368,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'contact_type' => 'Individual',
         'first_name' => 'Event',
         'last_name' => 'Creator',
-        'version' => API_LATEST_VERSION
       ));
     }
 
@@ -1449,22 +1427,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array(
       'participant_id' => $participantID,
       'contribution_id' => $contributionID,
-      'version' => API_LATEST_VERSION,
     );
 
-    $result = civicrm_api('participant_payment', 'create', $params);
-
-    if (CRM_Utils_Array::value('is_error', $result) ||
-      !CRM_Utils_Array::value('id', $result)
-    ) {
-      if (CRM_Utils_Array::value('error_message', $result)) {
-        throw new Exception('Could not delete contribution, with message: ' . CRM_Utils_Array::value('error_message', $result));
-      }
-      else {
-        throw new Exception('Could not delete contribution - in line: ' . __LINE__);
-      }
-    }
-
+    $result = $this->callAPISuccess('participant_payment', 'create', $params);
     return $result['id'];
   }
 
@@ -1476,21 +1441,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function participantPaymentDelete($paymentID) {
     $params = array(
       'id' => $paymentID,
-      'version' => API_LATEST_VERSION,
     );
-
-    $result = civicrm_api('participant_payment', 'delete', $params);
-
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      if (CRM_Utils_Array::value('error_message', $result)) {
-        throw new Exception('Could not delete contribution, with message: ' . CRM_Utils_Array::value('error_message', $result));
-      }
-      else {
-        throw new Exception('Could not delete contribution - in line: ' . __LINE__);
-      }
-    }
-
-    return;
+    $result = $this->callAPISuccess('participant_payment', 'delete', $params);
   }
 
   /**
@@ -1515,17 +1467,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array(
       'contact_id' => $contactID,
       'address' => $address,
-      'version' => 2,
       'location_format' => '2.0',
       'location_type' => 'New Location Type',
     );
 
-    $result = civicrm_api('Location', 'create', $params);
-
-    if (civicrm_error($result)) {
-      throw new Exception("Could not create location: {$result['error_message']}");
-    }
-
+    $result = $this->callAPISuccess('Location', 'create', $params);
     return $result;
   }
 
@@ -1535,14 +1481,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @params array $pamars parameters
    */
   function locationDelete($params) {
-    $params['version'] = 2;
-
-    $result = civicrm_api('Location', 'delete', $params);
-    if (civicrm_error($result)) {
-      throw new Exception("Could not delete location: {$result['error_message']}");
-    }
-
-    return;
+    $result = $this->callAPISuccess('Location', 'delete', $params);
   }
 
   /**
@@ -1565,7 +1504,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $locationType->save();
     // clear getfields cache
     CRM_Core_PseudoConstant::flush();
-    civicrm_api('phone', 'getfields', array('version' => 3, 'cache_clear' => 1));
+    $this->callAPISuccess('phone', 'getfields', array('version' => 3, 'cache_clear' => 1));
     return $locationType;
   }
 
@@ -1575,7 +1514,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param int location type id
    */
   function locationTypeDelete($locationTypeId) {
-    require_once 'CRM/Core/DAO/LocationType.php';
     $locationType = new CRM_Core_DAO_LocationType();
     $locationType->id = $locationTypeId;
     $locationType->delete();
@@ -1602,20 +1540,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
           '1' => 1,
           '2' => 1,
         ),
-        'version' => API_LATEST_VERSION,
       );
     }
 
-    $result = civicrm_api('Group', 'create', $params);
-    if (CRM_Utils_Array::value('id', $result)) {
-      return $result['id'];
-    }
-    elseif (CRM_Utils_Array::value('result', $result)) {
-      return $result['result']->id;
-    }
-    else {
-      return NULL;
-    }
+    $result = $this->callAPISuccess('Group', 'create', $params);
+    return $result['id'];
   }
 
   /**
@@ -1627,10 +1556,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     $params = array(
       'id' => $gid,
-      'version' => API_LATEST_VERSION,
     );
 
-    civicrm_api('Group', 'delete', $params);
+    $this->callAPISuccess('Group', 'delete', $params);
   }
 
   /**
@@ -1649,9 +1577,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'uf_group_id' => 1,
       );
     }
-
-    $result = crm_add_uf_join($params);
-
+    $result = $this->callAPISuccess('uf_join', 'create', $params);
     return $result;
   }
 
@@ -1686,7 +1612,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'group_id' => 1,
     );
 
-    civicrm_api('GroupContact', 'Create', $params);
+    $this->callAPISuccess('GroupContact', 'Create', $params);
   }
 
   /**
@@ -1718,7 +1644,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'prefix' => 'Ms.',
         'email' => 'julia_anderson@civicrm.org',
         'contact_type' => 'Individual',
-        'version' => API_LATEST_VERSION,
       );
 
       $individualTargetID = $this->individualCreate($contactParams);
@@ -1735,12 +1660,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'details' => 'Lets schedule a meeting',
         'status_id' => 1,
         'activity_name' => 'Meeting',
-        'version' => API_LATEST_VERSION,
       );
     }
 
-
-    $result = civicrm_api('Activity', 'create', $params);
+    $result = $this->callAPISuccess('Activity', 'create', $params);
 
     $result['target_contact_id'] = $individualTargetID;
     $result['assignee_contact_id'] = $individualTargetID;
@@ -1753,13 +1676,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @params array $params parameters
    */
   function activityTypeCreate($params) {
-    $params['version'] = API_LATEST_VERSION;
-    $result = civicrm_api('ActivityType', 'create', $params);
-    if (CRM_Utils_Array::value('is_error', $result) ||
-      !CRM_Utils_Array::value('id', $result)
-    ) {
-      throw new Exception('Could not create Activity type ' . $result['error_message']);
-    }
+    $result = $this->callAPISuccess('ActivityType', 'create', $params);
     return $result;
   }
 
@@ -1770,11 +1687,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   function activityTypeDelete($activityTypeId) {
     $params['activity_type_id'] = $activityTypeId;
-    $params['version'] = API_LATEST_VERSION;
-    $result = civicrm_api('ActivityType', 'delete', $params);
-    if (!$result) {
-      throw new Exception('Could not delete activity type');
-    }
+    $result = $this->callAPISuccess('ActivityType', 'delete', $params);
     return $result;
   }
 
@@ -1978,14 +1891,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function customFieldDelete($customFieldID) {
 
     $params['id'] = $customFieldID;
-    $params['version'] = API_LATEST_VERSION;
-
-    $result = civicrm_api('custom_field', 'delete', $params);
-
-    if (civicrm_error($result)) {
-      throw new Exception('Could not delete custom field');
-    }
-    return;
+    return $this->callAPISuccess('custom_field', 'delete', $params);
   }
 
   /**
@@ -2003,21 +1909,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'contact_id' => $cId,
       'modified_date' => date('Ymd'),
       'subject' => 'Test Note',
-      'version' => API_LATEST_VERSION,
     );
 
-    $result = civicrm_api('Note', 'create', $params);
-
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      if (CRM_Utils_Array::value('error_message', $result)) {
-        throw new Exception('Could not delete note, with message: ' . CRM_Utils_Array::value('error_message', $result));
-      }
-      else {
-        throw new Exception('Could not delete note - in line: ' . __LINE__);
-      }
-    }
-
-    return $result;
+    return $this->callAPISuccess('Note', 'create', $params);
   }
 
   /**
@@ -2093,6 +1987,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'hash' => '67eac7789eaee00',
       'modified_date' => '2012-11-14 16:02:35',
       'created_date' => '20120130621222105',
+      'create_date' => '20120130621222105',
     );
 
     //swap out keys that change too often
@@ -2151,20 +2046,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    */
   function noteDelete($params) {
-    $params['version'] = API_LATEST_VERSION;
-
-    $result = civicrm_api('Note', 'delete', $params);
-
-    if (CRM_Utils_Array::value('is_error', $result)) {
-      if (CRM_Utils_Array::value('error_message', $result)) {
-        throw new Exception('Could not delete note, with message: ' . CRM_Utils_Array::value('error_message', $result));
-      }
-      else {
-        throw new Exception('Could not delete note - in line: ' . __LINE__);
-      }
-    }
-
-    return $result;
+    return $this->callAPISuccess('Note', 'delete', $params);
   }
 
   /**
@@ -2184,7 +2066,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'is_required' => 1,
       'is_searchable' => 0,
       'is_active' => 1,
-      'version' => API_LATEST_VERSION,
     );
 
     $optionGroup = array(
@@ -2203,25 +2084,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     $params = array_merge($fieldParams, $optionGroup, $optionValue);
 
-    $result = civicrm_api('custom_field', 'create', $params);
-
-    if ($result['is_error'] == 0 && isset($result['id'])) {
-      return $result;
-    }
-    if (civicrm_error($result)
-      || !(CRM_Utils_Array::value('customFieldId', $result['result']))
-    ) {
-      throw new Exception('Could not create Custom Field');
-    }
-    return $result;
+    return $this->callAPISuccess('custom_field', 'create', $params);
   }
 
   function confirmEntitiesDeleted($entities) {
     foreach ($entities as $entity) {
 
-      $result = civicrm_api($entity, 'Get', array(
-        'version' => 3,
-      ));
+      $result = $this->callAPISuccess($entity, 'Get', array());
       if ($result['error'] == 1 || $result['count'] > 0) {
         // > than $entity[0] to allow a value to be passed in? e.g. domain?
         return TRUE;
@@ -2271,19 +2140,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   function getAndCheck($params, $id, $entity, $delete = 1, $errorText = '') {
 
-    $result = civicrm_api($entity, 'GetSingle', array(
+    $result = $this->callAPISuccessGetSingle($entity, array(
       'id' => $id,
-      'version' => API_LATEST_VERSION,
     ));
 
     if ($delete) {
-      civicrm_api($entity, 'Delete', array(
+      $this->callAPISuccess($entity, 'Delete', array(
         'id' => $id,
-        'version' => API_LATEST_VERSION,
       ));
     }
     $dateFields = $keys = array();
-    $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => 'get'));
+    $fields = $this->callAPISuccess($entity, 'getfields', array('version' => 3, 'action' => 'get'));
     foreach ($fields['values'] as $field => $settings) {
       if (array_key_exists($field, $result)) {
         $keys[CRM_Utils_Array::Value('name', $settings, $field)] = $field;

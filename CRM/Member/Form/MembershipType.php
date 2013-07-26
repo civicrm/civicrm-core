@@ -325,8 +325,12 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Utils_Weight::delWeight('CRM_Member_DAO_MembershipType', $this->_id);
+      try{
       CRM_Member_BAO_MembershipType::del($this->_id);
+      }
+      catch(CRM_Core_Exception $e) {
+        CRM_Core_Error::statusBounce($e->getMessage(), NULL, ts('Membership Type Not Deleted'));
+      }
       CRM_Core_Session::setStatus(ts('Selected membership type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
