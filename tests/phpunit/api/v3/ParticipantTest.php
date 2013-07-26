@@ -577,19 +577,20 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals($participants['count'], 3);
     $params = array('contact_id' => $this->_contactID2, 'api.participant.delete' => 1);
     $participants = $this->callAPIAndDocument('Participant', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile, 'Get');
-    $this->assertEquals(1, $participants['count'], "only one participant should be left. line " . __LINE__);
+    $check = $this->callAPISuccess('participant', 'getcount', array());
+    $this->assertEquals(1, $check,"only one participant should be left. line " . __LINE__);
   }
   /*
      * Test creation of a participant with an associated contribution
      */
   function testCreateParticipantWithPayment() {
-    $this->_contributionTypeId = $this->contributionTypeCreate();
     $description = "single function to create contact w partipation & contribution. Note that in the
       case of 'contribution' the 'create' is implied (api.contribution.create)";
     $subfile = "CreateParticipantPayment";
     $params = array(
       'contact_type' => 'Individual',
-      'display_name' => 'dlobo',      'api.participant' => array(
+      'display_name' => 'dlobo',
+      'api.participant' => array(
         'event_id' => $this->_eventID,
         'status_id' => 1,
         'role_id' => 1,
