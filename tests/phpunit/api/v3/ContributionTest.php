@@ -638,8 +638,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function testContributionCreateExample() {
     //make sure at least on page exists since there is a truncate in tear down
     $page = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
+    $this->assertAPISuccess($page);
     require_once 'api/v3/examples/ContributionCreate.php';
-    $result = contribution_create_example();
+    $result         = contribution_create_example();
     $this->assertAPISuccess($result);
     $contributionId = $result['id'];
     $expectedResult = contribution_create_expectedresult();
@@ -697,6 +698,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function testCreateContributionOnline() {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $contributionPage = $this->callAPISuccess( 'contribution_page','create',  $this->_pageParams );
+    $this->assertAPISuccess($contributionPage);
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -750,6 +752,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $this->_pageParams['is_pay_later'] = 1;
     $contributionPage = $this->callAPISuccess( 'contribution_page','create',$this->_pageParams );
+    $this->assertAPISuccess($contributionPage);
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -782,6 +785,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function testCreateContributionPendingOnline() {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $contributionPage = $this->callAPISuccess( 'contribution_page', 'create', $this->_pageParams );
+    $this->assertAPISuccess($contributionPage);
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -890,6 +894,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'payment_instrument_id' => $instrumentId,)
     );
     $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
+    $this->assertAPISuccess($contribution);
     $this->_checkFinancialTrxn($contribution, 'paymentInstrument');
   }
 
@@ -1001,6 +1006,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     );
     $original = $this->callAPISuccess('contribution', 'get', $old_params);
+    //Make sure it came back
+    $this->assertAPISuccess($original, 'In line ' . __LINE__);
     $this->assertEquals($original['id'], $contributionID, 'In line ' . __LINE__);
     //set up list of old params, verify
 
@@ -1059,6 +1066,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     );
     $result = $this->callAPISuccess('contribution', 'delete', $params);
+    $this->assertAPISuccess($result, 'in line' . __LINE__);
   }
 
   ///////////////// civicrm_contribution_delete methods
@@ -1315,6 +1323,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     if ($delete) {
       $this->callAPISuccess('contribution', 'delete', array('id' => $id));
     }
+    $this->assertAPISuccess($contribution, 0, 'In line ' . __LINE__);
     $values = $contribution['values'][$contribution['id']];
     $params['receive_date'] = date('Y-m-d H:i:s', strtotime($params['receive_date']));
     // this is not returned in id format

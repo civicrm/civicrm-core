@@ -33,7 +33,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   protected $_membershipTypeID;
   protected $_membershipStatusID;
   public $_eNoticeCompliant = TRUE;
-  protected $_apiversion = 3;
+  protected $_apiversion =3;
 
   function get_info() {
     return array(
@@ -61,14 +61,6 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   ///////////////// civicrm_membership_status_get methods
 
-  /**
-   *  Test civicrm_membership_status_get with wrong params type
-   */
-  function testGetWrongParamsType() {
-    $params = 'a string';
-    $result = $this->callAPIFailure('membership_status', 'get', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array', 'In line ' . __LINE__);
-  }
 
   /**
    *  Test civicrm_membership_status_get with empty params
@@ -95,15 +87,14 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
    *  Test civicrm_membership_status_get. Success expected.
    */
   function testGetLimit() {
-    $result = $this->callAPISuccess('membership_status', 'getcount', array());
-    $this->assertGreaterThan(1, $result, "Check more than one exists In line " . __LINE__);
+    $result = $this->callAPISuccess('membership_status', 'get', array());
+    $this->assertGreaterThan(1, $result['count'], "Check more than one exists In line " . __LINE__);
     $params['option.limit'] = 1;
     $result = $this->callAPISuccess('membership_status', 'get', $params);
-    $this->assertEquals(1, $result['count'], "Check only 1 retrieved");
+    $this->assertEquals(1, $result['count'], "Check only 1 retrieved " . __LINE__);
   }
 
   function testCreateDuplicateName() {
-
     $params = array('name' => 'name');
     $result = $this->callAPISuccess('membership_status', 'create', $params);
     $result = $this->callAPIFailure('membership_status', 'create', $params,
@@ -145,13 +136,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   ///////////////// civicrm_membership_status_delete methods
   function testDeleteEmptyParams() {
-    $params = array();
-    $result = $this->callAPIFailure('membership_status', 'delete', $params);
-  }
-
-  function testDeleteWrongParamsType() {
-    $params = 'incorrect value';
-    $result = $this->callAPIFailure('membership_status', 'delete', $params);
+    $result = $this->callAPIFailure('membership_status', 'delete', array());
   }
 
   function testDeleteWithMissingRequired() {
@@ -163,10 +148,8 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $membershipID = $this->membershipStatusCreate();
     $params = array(
       'id' => $membershipID,
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPISuccess('membership_status', 'delete', $params);
   }
   /*
      * Test that trying to delete membership status while membership still exists creates error
@@ -184,25 +167,20 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $membershipStatusID,
-      'version' => 3,
     );
 
-    $result = civicrm_api('membership', 'create', $params);
+    $result = $this->callAPISuccess('membership', 'create', $params);
     $membershipID = $result['id'];
 
     $params = array(
       'id' => $membershipStatusID,
-      'version' => $this->_apiversion,
     );
     $result = $this->callAPIFailure('membership_status', 'delete', $params);
 
-    civicrm_api('Membership', 'Delete', array(
+    $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $membershipID,
-        'version' => $this->_apiversion,
-      ));
-
-    $result = civicrm_api('membership_status', 'delete', $params);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    ));
+    $result = $this->callAPISuccess('membership_status', 'delete', $params);
   }
 }
 

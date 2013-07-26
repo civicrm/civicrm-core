@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -105,11 +104,9 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     $params = array(
       'parent_group_id' => 1,
       'child_group_id' => 2,
-      'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('group_nesting', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('group_nesting', 'get', $params, __FUNCTION__, __FILE__);
     // expected data loaded in setUp
     $expected = array(
       1 => array('id' => 1,
@@ -126,11 +123,9 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    */
   public function testGetWithChildGroupId() {
     $params = array(
-      'child_group_id' => 4,
-      'version' => $this->_apiversion,
-    );
+      'child_group_id' => 4,    );
 
-    $result = civicrm_api('group_nesting', 'get', $params);
+    $result = $this->callAPISuccess('group_nesting', 'get', $params);
 
     // expected data loaded in setUp
     $expected = array(
@@ -154,11 +149,9 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    */
   public function testGetWithParentGroupId() {
     $params = array(
-      'parent_group_id' => 1,
-      'version' => $this->_apiversion,
-    );
+      'parent_group_id' => 1,    );
 
-    $result = civicrm_api('group_nesting', 'get', $params);
+    $result = $this->callAPISuccess('group_nesting', 'get', $params);
 
     // expected data loaded in setUp
     $expected = array(
@@ -183,45 +176,15 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_nesting_get for no records results.
-   * Error expected.
+   * Success expected. (these tests are of marginal value as are in syntax conformance,
+   * don't copy & paste
    */
   public function testGetEmptyResults() {
-    // no such record in the db
     $params = array(
       'parent_group_id' => 1,
       'child_group_id' => 700,
     );
-
-    $result = civicrm_api('group_nesting', 'get', $params);
-    $this->assertAPIFailure($result,
-      "In line " . __LINE__
-    );
-  }
-
-  /**
-   * Test civicrm_group_nesting_get with empty params.
-   * Error expected.
-   */
-  public function testGetWithEmptyParams() {
-    $params = array();
-
-    $result = civicrm_api('group_nesting', 'get', $params);
-    $this->assertAPIFailure($result,
-      "In line " . __LINE__
-    );
-  }
-
-  /**
-   * Test civicrm_group_nesting_get with wrong parameters type.
-   * Error expected.
-   */
-  public function testGetWithWrongParamsType() {
-    $params = 'a string';
-
-    $result = civicrm_api('group_nesting', 'get', $params);
-    $this->assertAPIFailure($result,
-      "In line " . __LINE__
-    );
+    $result = $this->callAPISuccess('group_nesting', 'get', $params);
   }
 
   ///////////////// civicrm_group_nesting_create methods
@@ -234,17 +197,13 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     $params = array(
       'parent_group_id' => 1,
       'child_group_id' => 3,
-      'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('group_nesting', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPIAndDocument('group_nesting', 'create', $params, __FUNCTION__, __FILE__);
 
     // we have 4 group nesting records in the example
     // data, expecting next number to be the id for newly created
     $id = 5;
-    unset($params['version']);
     $this->assertDBState('CRM_Contact_DAO_GroupNesting', $id, $params);
   }
 
@@ -253,25 +212,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    * Error expected.
    */
   public function testCreateWithEmptyParams() {
-    $params = array();
-
-    $result = civicrm_api('group_nesting', 'create', $params);
-    $this->assertAPIFailure($result,
-      "In line " . __LINE__
-    );
-  }
-
-  /**
-   * Test civicrm_group_nesting_create with wrong parameter type.
-   * Error expected.
-   */
-  public function testCreateWithWrongParamsType() {
-    $params = 'a string';
-
-    $result = civicrm_api('group_nesting', 'create', $params);
-    $this->assertAPIFailure($result,
-      "In line " . __LINE__
-    );
+    $result = $this->callAPIFailure('group_nesting', 'create', array());
   }
 
   ///////////////// civicrm_group_nesting_remove methods
@@ -283,16 +224,12 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     // groups id=1 and id=2 loaded in setUp
     $getparams = array(
       'parent_group_id' => 1,
-      'child_group_id' => 2,
-      'version' => $this->_apiversion,
-    );
+      'child_group_id' => 2,    );
 
-    $result = civicrm_api('group_nesting', 'get', $getparams);
-    $params = array('version' => 3, 'id' => $result['id']);
-    $result = civicrm_api('group_nesting', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
-    $this->assertEquals(0, civicrm_api('group_nesting', 'getcount', $getparams));
+    $result = $this->callAPISuccess('group_nesting', 'get', $getparams);
+    $params = array('id' => $result['id']);
+    $result = $this->callAPIAndDocument('group_nesting', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(0, $this->callAPISuccess('group_nesting', 'getcount', $getparams));
   }
 
   /**
@@ -300,25 +237,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    * Error expected.
    */
   public function testDeleteWithEmptyParams() {
-    $params = array();
-
-    $result = civicrm_api('group_nesting', 'delete', $params);
-    $this->assertAPIFailure($result,
-      "In line " . __LINE__
-    );
-  }
-
-  /**
-   * Test civicrm_group_nesting_remove with wrong parameter type.
-   * Error expected.
-   */
-  public function testDeleteWithWrongParamsType() {
-    $params = 'a string';
-
-    $result = civicrm_api('group_nesting', 'delete', $params);
-    $this->assertAPIFailure($result,
-      "In line " . __LINE__
-    );
+    $result = $this->callAPIFailure('group_nesting', 'delete', array());
   }
 }
 

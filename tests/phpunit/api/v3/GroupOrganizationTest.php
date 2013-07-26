@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -89,17 +88,12 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
     $params = array(
       'organization_id' => $this->_orgID,
-      'group_id' => $this->_groupID,
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('group_organization', 'create', $params);
+      'group_id' => $this->_groupID,    );
+    $result = $this->callAPISuccess('group_organization', 'create', $params);
     $paramsGet = array(
       'organization_id' => $result['id'],
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('group_organization', 'get', $paramsGet);
-    $this->documentMe($paramsGet, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPIAndDocument('group_organization', 'get', $paramsGet, __FUNCTION__, __FILE__);
   }
 
   /**
@@ -109,15 +103,13 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
     $params = array(
       'organization_id' => $this->_orgID,
-      'group_id' => $this->_groupID,
-      'version' => $this->_apiversion,
-      'sequential' => 1,
+      'group_id' => $this->_groupID,      'sequential' => 1,
     );
-    $result = civicrm_api('group_organization', 'create', $params);
+    $result = $this->callAPISuccess('group_organization', 'create', $params);
 
     $paramsGet = array('organization_id' => $result['values'][0]['organization_id']);
 
-    $result = civicrm_api('group_organization', 'get', $params);
+    $result = $this->callAPISuccess('group_organization', 'get', $params);
     $this->assertAPISuccess($result);
   }
 
@@ -125,10 +117,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    * Test civicrm_group_organization_get with empty params.
    */
   public function testGroupOrganizationGetWithEmptyParams() {
-    $params = array(
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('group_organization', 'get', $params);
+    $params = array(    );
+    $result = $this->callAPISuccess('group_organization', 'get', $params);
 
     $this->assertAPISuccess($result);
   }
@@ -147,10 +137,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    */
   public function testGroupOrganizationGetWithInvalidKeys() {
     $params = array(
-      'invalid_key' => 1,
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('group_organization', 'get', $params);
+      'invalid_key' => 1,    );
+    $result = $this->callAPISuccess('group_organization', 'get', $params);
 
     $this->assertAPISuccess($result);
   }
@@ -163,21 +151,15 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   public function testGroupOrganizationCreate() {
     $params = array(
       'organization_id' => $this->_orgID,
-      'group_id' => $this->_groupID,
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('group_organization', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, "in line " . __LINE__);
+      'group_id' => $this->_groupID,    );
+    $result = $this->callAPIAndDocument('group_organization', 'create', $params, __FUNCTION__, __FILE__);
   }
 
   /**
    * check with empty params array
    */
   public function testGroupOrganizationCreateWithEmptyParams() {
-    $params = array(
-      'version' => $this->_apiversion,
-    );
+    $params = array(    );
     $result = $this->callAPIFailure('group_organization', 'create', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: group_id, organization_id');
   }
@@ -196,9 +178,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    */
   public function testGroupOrganizationCreateWithInvalidKeys() {
     $params = array(
-      'invalid_key' => 1,
-      'version' => $this->_apiversion,
-    );
+      'invalid_key' => 1,    );
     $result = $this->callAPIFailure('group_organization', 'create', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: group_id, organization_id');
   }
@@ -218,9 +198,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    * Test civicrm_group_organization_remove with empty params.
    */
   public function testGroupOrganizationDeleteWithEmptyParams() {
-    $params = array(
-      'version' => $this->_apiversion,
-    );
+    $params = array(    );
     $result = $this->callAPIFailure('group_organization', 'delete', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
   }
@@ -231,18 +209,13 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   public function testGroupOrganizationDelete() {
     $paramsC = array(
       'organization_id' => $this->_orgID,
-      'group_id' => $this->_groupID,
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('group_organization', 'create', $paramsC);
+      'group_id' => $this->_groupID,    );
+    $result = $this->callAPISuccess('group_organization', 'create', $paramsC);
 
     $params = array(
       'id' => $result['id'],
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('group_organization', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, "in line " . __LINE__);
+    $result = $this->callAPIAndDocument('group_organization', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
   /**
@@ -250,9 +223,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    */
   public function testGroupOrganizationDeleteWithInvalidKey() {
     $paramsDelete = array(
-      'invalid_key' => 1,
-      'version' => $this->_apiversion,
-    );
+      'invalid_key' => 1,    );
     $result = $this->callAPIFailure('group_organization', 'delete', $paramsDelete);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
   }
