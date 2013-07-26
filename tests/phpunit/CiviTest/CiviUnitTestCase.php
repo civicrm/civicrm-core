@@ -2100,7 +2100,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       }
       if (in_array($key, $dateTimeFields)) {
         $value = date('Y-m-d H:i:s', strtotime($value));
-        $result[$keys[$key]] = date('Y-m-d H:i:s', strtotime(CRM_Utils_Array::value($keys[$key], $result, CRM_Utils_Array::value($uniquekey, $result))));
+        $result[$keys[$key]] = date('Y-m-d H:i:s', strtotime(CRM_Utils_Array::value($keys[$key], $result, CRM_Utils_Array::value($key, $result))));
       }
       $this->assertEquals($value, $result[$keys[$key]], $key . " GetandCheck function determines that for key {$key} value: $value doesn't match " . print_r($result[$keys[$key]], TRUE) . $errorText);
     }
