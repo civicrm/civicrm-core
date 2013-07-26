@@ -678,7 +678,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
      * Test creation of a participant with an associated contribution
      */
   function testCreateParticipantWithPayment() {
-    $this->_contributionTypeId = $this->contributionTypeCreate();
+    $this->_financialTypeId = 1;
     $description = "single function to create contact w partipation & contribution. Note that in the
       case of 'contribution' the 'create' is implied (api.contribution.create)";
     $subfile = "CreateParticipantPayment";

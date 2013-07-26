@@ -1157,60 +1157,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Function to create Financial Type
-   *
-   * @return int $id of financial account created
-   */
-  function contributionTypeCreate() {
-
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
-        dirname(__FILE__) . '/../api/v' . API_LATEST_VERSION . '/dataset/financial_types.xml'
-      )
-    );
-
-    $financialType = CRM_Contribute_PseudoConstant::financialType();
-    CRM_Contribute_PseudoConstant::flush('financialType');
-    return key($financialType);
-  }
-
-  /**
-   * Function to delete financial Types
-   * @param int $contributionTypeId
-   */
-  function contributionTypeDelete($contributionTypeID = NULL) {
-    if ($contributionTypeID === NULL) {
-      $this->callAPISuccess('Contribution', 'get',
-        array(
-          'financial_type_id' => 10,
-          'api.contribution.delete' => 1,
-        )
-      );
-      $this->callAPISuccess('Contribution', 'get',
-        array(
-          'financial_type_id' => 11,
-          'api.contribution.delete' => 1,
-        )
-      );
-
-      // we know those were loaded from /dataset/financial_types.xml
-      $del = CRM_Financial_BAO_FinancialType::del(10, 1);
-      $del = CRM_Financial_BAO_FinancialType::del(11, 1);
-    }
-    else {
-      $this->callAPISuccess('Contribution', 'get', array(
-        'financial_type_id' => $contributionTypeID,
-        'api.contribution.delete' => 1
-      ));
-      $del = CRM_Financial_BAO_FinancialType::del($contributionTypeID, 1);
-    }
-    if (is_array($del)) {
-      $this->assertEquals(0, CRM_Utils_Array::value('is_error', $del), $del['error_message']);
-    }
-  }
-
-  /**
    * Function to create Tag
    *
    * @return int tag_id of created tag
