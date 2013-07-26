@@ -2056,7 +2056,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'id' => $id,
       ));
     }
-    $dateFields = $keys = array();
+    $dateFields = $keys = $dateTimeFields = array();
     $fields = $this->callAPISuccess($entity, 'getfields', array('version' => 3, 'action' => 'get'));
     foreach ($fields['values'] as $field => $settings) {
       if (array_key_exists($field, $result)) {
