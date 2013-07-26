@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
 | CiviCRM version 4.3                                                |
@@ -59,10 +58,8 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
       'phone_id' => $phone['id'],
       'email_id' => $email['id'],
     );
-    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $id = $result['id'];
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$id]['id'], 'In line ' . __LINE__);
     $this->getAndCheck($params, $id, $this->_entity);
@@ -92,14 +89,11 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
 
     // Now check our results using the return param 'all'
-    $getParams = array(
-      'version' => $this->_apiversion,
-      'id' => $id,
+    $getParams = array(      'id' => $id,
       'return' => 'all'
     );
     // Can't use callAPISuccess with getsingle
-    $result = civicrm_api($this->_entity, 'getsingle', $getParams);
-    $this->documentMe($getParams, $result, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call', NULL, 'get');
+    $result = $this->callAPIAndDocument($this->_entity, 'getsingle', $getParams, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call', NULL, 'get');
     $this->assertNotNull($result['email_id'], 'In line ' . __LINE__);
     $this->assertNotNull($result['phone_id'], 'In line ' . __LINE__);
     $this->assertNotNull($result['phone_2_id'], 'In line ' . __LINE__);

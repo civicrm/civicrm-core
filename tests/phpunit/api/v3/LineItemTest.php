@@ -104,14 +104,12 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $deleteParams = array('id' => $getResult['id']);
     $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($deleteResult, 'In line ' . __LINE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array(      ));
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 
   public function testGetFieldsLineItem() {
     $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create', 'action' => 'create'));
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
   }
 

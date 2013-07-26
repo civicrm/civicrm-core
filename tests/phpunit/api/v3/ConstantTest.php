@@ -68,11 +68,9 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
    *  Test civicrm_constant_get( ) for unknown constant
    */
   public function testUnknownConstant() {
-    $result = civicrm_api('constant', 'get', array(
+    $result = $this->callAPIFailure('constant', 'get', array(
       'name' => 'thisTypeDoesNotExist',
-        'version' => $this->_apiversion,
-      ));
-    $this->assertEquals(1, $result['is_error'], "In line " . __LINE__);
+    ));
   }
 
   /**
@@ -80,19 +78,15 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
    */
   public function testActivityStatus() {
 
-    $result = civicrm_api('constant', 'get', array(
+    $result = $this->callAPISuccess('constant', 'get', array(
       'name' => 'activityStatus',
-        'version' => $this->_apiversion,
-      ));
+    ));
 
     $this->assertTrue($result['count'] > 5, "In line " . __LINE__);
     $this->assertContains('Scheduled', $result['values'], "In line " . __LINE__);
     $this->assertContains('Completed', $result['values'], "In line " . __LINE__);
     $this->assertContains('Cancelled', $result['values'], "In line " . __LINE__);
 
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
 
   /**
@@ -102,15 +96,11 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
 
     $parameters = array(TRUE, FALSE, TRUE);
 
-    $result = civicrm_api('constant', 'get', array(
+    $result = $this->callAPISuccess('constant', 'get', array(
       'name' => 'activityType',
-        'version' => $this->_apiversion,
-      ));
+    ));
     $this->assertTrue($result['count'] > 2, "In line " . __LINE__);
     $this->assertContains('Meeting', $result['values'], "In line " . __LINE__);
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
 
   /**
@@ -122,19 +112,13 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
 
     $params = array(
       'field' => 'location_type_id',
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('address', 'getoptions', $params);
-    $this->assertAPISuccess($result);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('address', 'getoptions', $params, __FUNCTION__, __FILE__);
     $this->assertTrue($result['count'] > 3, "In line " . __LINE__);
     $this->assertContains('Home', $result['values'], "In line " . __LINE__);
     $this->assertContains('Work', $result['values'], "In line " . __LINE__);
     $this->assertContains('Main', $result['values'], "In line " . __LINE__);
     $this->assertContains('Billing', $result['values'], "In line " . __LINE__);
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
 
   /**
@@ -143,10 +127,8 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   public function testPhoneType() {
     $params = array(
       'field' => 'phone_type_id',
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('phone', 'getoptions', $params);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPISuccess('phone', 'getoptions', $params);
 
     $this->assertEquals(5, $result['count'], "In line " . __LINE__);
     $this->assertContains('Phone', $result['values'], "In line " . __LINE__);
@@ -154,10 +136,6 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $this->assertContains('Fax', $result['values'], "In line " . __LINE__);
     $this->assertContains('Pager', $result['values'], "In line " . __LINE__);
     $this->assertContains('Voicemail', $result['values'], "In line " . __LINE__);
-
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
 
   /**
@@ -166,18 +144,13 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   public function testmailProtocol() {
     $params = array(
       'field' => 'protocol',
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('mail_settings', 'getoptions', $params);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPISuccess('mail_settings', 'getoptions', $params);
 
     $this->assertEquals(4, $result['count'], "In line " . __LINE__);
     $this->assertContains('IMAP', $result['values'], "In line " . __LINE__);
     $this->assertContains('Maildir', $result['values'], "In line " . __LINE__);
     $this->assertContains('POP3', $result['values'], "In line " . __LINE__);
     $this->assertContains('Localdir', $result['values'], "In line " . __LINE__);
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
 }

@@ -75,7 +75,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_mailing_create
+   * Test civicrm_mailing_delete
    */
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
@@ -102,7 +102,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'time_stamp' => '20111109212100',
     );
     $result = $this->callAPIFailure('mailing_event', 'bounce', $params,
-      'Queue event could not be found');
+      'Queue event could not be found'
+    );
   }
 
   //----------- civicrm_mailing_event_confirm methods -----------
@@ -146,7 +147,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
          );
     $result = $this->callAPIFailure('mailing_event', 'reply', $params,
       'Queue event could not be found'
-     );
+    );
   }
 
 

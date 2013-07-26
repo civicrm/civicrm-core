@@ -42,10 +42,20 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public $_eNoticeCompliant = TRUE;
   public $DBResetRequired = FALSE;
   public $_entity = 'Job';
+  public $_params = array();
 
   function setUp() {
     parent::setUp();
-    $this->quickCleanup(array('civicrm_job'));
+    $this->_params = array(
+      'sequential' => 1,
+      'name' => 'API_Test_Job',
+      'description' => 'A long description written by hand in cursive',
+      'run_frequency' => 'Daily',
+      'api_entity' => 'ApiTestEntity',
+      'api_action' => 'apitestaction',
+      'parameters' => 'Semi-formal explanation of runtime job parameters',
+      'is_active' => 1,
+    );
   }
 
   function tearDown() {
@@ -57,26 +67,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * check with no name
    */
   function testCreateWithoutName() {
-    $params = array('is_active' => 1);
+    $params = array(
+      'is_active' => 1,    );
     $result = $this->callAPIFailure('job', 'create', $params,
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
-  }
-  /**
-   * create job with an valid "run_frequency" value
-   */
-  function testCreateWithValidFrequency() {
-    $params = array(
-      'sequential' => 1,
-      'name' => 'API_Test_Job',
-      'description' => 'A long description written by hand in cursive',
-      'run_frequency' => 'Hourly',
-      'api_entity' => 'ApiTestEntity',
-      'api_action' => 'apitestaction',
-      'parameters' => 'Semi-formal explanation of runtime job parameters',
-      'is_active' => 1,
-    );
-    $result = $this->callAPISuccess('job', 'create', $params);
   }
 
   /**
@@ -100,23 +95,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * create job
    */
   function testCreate() {
-    $params = array(
-      'sequential' => 1,
-      'name' => 'API_Test_Job',
-      'description' => 'A long description written by hand in cursive',
-      'run_frequency' => 'Daily',
-      'api_entity' => 'ApiTestEntity',
-      'api_action' => 'apitestaction',
-      'parameters' => 'Semi-formal explanation of runtime job parameters',
-      'is_active' => 1,
-    );
-    $result = $this->callAPIAndDocument('job', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('job', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['values'][0]['id'], 'in line ' . __LINE__);
 
     // mutate $params to match expected return value
-    unset($params['sequential']);
+    unset($this->_params['sequential']);
     //assertDBState compares expected values in $result to actual values in the DB
-    $this->assertDBState('CRM_Core_DAO_Job', $result['id'], $params);
+    $this->assertDBState('CRM_Core_DAO_Job', $result['id'], $this->_params);
   }
 
   /**
@@ -150,13 +135,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * check with incorrect required fields
-   * note to copy & pasters - this test is of marginal value
-   * and effort would be better put into making the one in syntax
-   * conformance work for all entities
    */
   function testDeleteWithIncorrectData() {
     $params = array(
-      'id' => 'abcd');
+      'id' => 'abcd',    );
     $result = $this->callAPIFailure('job', 'delete', $params);
   }
 
@@ -164,23 +146,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * check job delete
    */
   function testDelete() {
-    $createParams = array(
-      'sequential' => 1,
-      'name' => 'API_Test_Job',
-      'description' => 'A long description written by hand in cursive',
-      'run_frequency' => 'Daily',
-      'api_entity' => 'ApiTestEntity',
-      'api_action' => 'apitestaction',
-      'parameters' => 'Semi-formal explanation of runtime job parameters',
-      'is_active' => 1,
-    );
-    $createResult = $this->callAPISuccess('job', 'create', $createParams);
-    $this->assertAPISuccess($createResult);
-
-    $params = array(
-      'id' => $createResult['id'],
-    );
+    $createResult = $this->callAPISuccess('job', 'create', $this->_params);
+    $params = array('id' => $createResult['id'],);
     $result = $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->assertAPIDeleted($this->_entity, $createResult['id']);
   }
 
   /**
@@ -199,14 +168,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
  */
   public function testCallUpdateGreetingSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 'postal_greeting', 'ct' => 'Individual'));
-    $this->assertAPISuccess($result);
    }
 
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess() {
     $gt = 'postal_greeting,email_greeting,addressee';
     $ct = 'Individual,Household';
     $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct));
-    $this->assertAPISuccess($result);
   }
 }
 

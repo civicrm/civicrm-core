@@ -38,7 +38,6 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   function setUp() {
     $this->_apiversion = 3;
     $this->params = array(
-      'version' => 3,
       'name' => 'test status',
       'label' => 'I am a test',
       'class' => 'Positive',
@@ -54,17 +53,13 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   function tearDown() {}
 
   public function testCreateParticipantStatusType() {
-    $result = civicrm_api('participant_status_type', 'create', $this->params);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument('participant_status_type', 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
   }
 
   public function testGetParticipantStatusType() {
-    $result = civicrm_api('participant_status_type', 'get', $this->params);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument('participant_status_type', 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
     $this->id = $result['id'];
@@ -72,15 +67,12 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
 
   public function testDeleteParticipantStatusType() {
 
-    $ParticipantStatusType = civicrm_api('ParticipantStatusType', 'Create', $this->params);
-    $entity = civicrm_api('participant_status_type', 'get', array('version' => 3));
-    $result = civicrm_api('participant_status_type', 'delete', array('version' => 3, 'id' => $ParticipantStatusType['id']));
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
-    $getCheck = civicrm_api('ParticipantStatusType', 'GET', array('version' => 3, 'id' => $ParticipantStatusType['id']));
-    $checkDeleted = civicrm_api('ParticipantStatusType', 'Get', array(
-      'version' => 3,
-      ));
+    $ParticipantStatusType = $this->callAPISuccess('ParticipantStatusType', 'Create', $this->params);
+    $entity = $this->callAPISuccess('participant_status_type', 'get', array());
+    $result = $this->callAPIAndDocument('participant_status_type', 'delete', array('id' => $ParticipantStatusType['id']), __FUNCTION__, __FILE__);
+    $getCheck = $this->callAPISuccess('ParticipantStatusType', 'GET', array('id' => $ParticipantStatusType['id']));
+    $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', array(
+           ));
     $this->assertEquals($entity['count'] - 1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 }
