@@ -567,7 +567,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
 
   /**
    * Function to delete membership.
-   * Wrapper for most delete calls. Use this unless you JUST want to delete memberships w/o deleting the parent.
+   * Wrapper for most delete calls. Use this unless you JUST want to delete related memberships w/o deleting the parent.
    *
    * @param int $membershipId membership id that needs to be deleted
    *
@@ -2150,7 +2150,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         CRM_Member_BAO_Membership::create($params, $relMemIds);
               $available --;
             } else { // we have run out of inherited memberships, so delete extras
-              CRM_Member_BAO_Membership::deleteMembership($params['id']);
+              self::deleteMembership($params['id']);
             }
           // we need to first check if there will remain inherited memberships, so queue it up
           } else {
