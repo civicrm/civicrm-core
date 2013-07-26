@@ -2,6 +2,10 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   function setUp() {
     parent::setUp();
   }

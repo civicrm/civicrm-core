@@ -1,6 +1,10 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   function testBreakReference() {
     // Get a reference and make a change
     $fooRef1 = self::returnByReference();
