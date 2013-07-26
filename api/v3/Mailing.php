@@ -67,12 +67,23 @@ function _civicrm_api3_mailing_create_spec(&$params) {
 }
 
 /**
+ * Handle a create event.
+ *
+ * @param array $params
+ * @return array API Success Array
+ */
+function civicrm_api3_mailing_delete($params, $ids = array()) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+
+/**
  * Handle a get event.
  *
  * @param array $params
  * @return array
  */
-function civicrm_api3_mailing_get($params, $ids = array()) {
+function civicrm_api3_mailing_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 

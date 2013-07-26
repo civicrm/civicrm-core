@@ -1,7 +1,7 @@
 {literal}<?php{/literal}
 
 /*
- *{$description}
+ *{if $description} {$description}{/if}
  */
 function {$function}_example(){literal}{{/literal}
 $params = {$params|@print_array};

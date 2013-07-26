@@ -71,15 +71,7 @@ function _civicrm_api3_job_create_spec(&$params) {
  * {@schema Core/Job.xml}
  */
 function civicrm_api3_job_create($params) {
-  if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for job ID');
-  }
-
-  $dao = CRM_Core_BAO_Job::create($params);
-
-  $result = array();
-  _civicrm_api3_object_to_array($dao, $result[$dao->id]);
-  return civicrm_api3_create_success($result, $params, 'job', 'create', $dao);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**

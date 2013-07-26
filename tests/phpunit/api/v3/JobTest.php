@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -38,12 +37,11 @@
  */
 require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_JobTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion = 3;
 
   public $_eNoticeCompliant = TRUE;
   public $DBResetRequired = FALSE;
   public $_entity = 'Job';
-  public $_apiVersion = 3;
 
   function setUp() {
     parent::setUp();
@@ -59,14 +57,26 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * check with no name
    */
   function testCreateWithoutName() {
-    $params = array(
-      'is_active' => 1,
-      'version' => $this->_apiVersion,
-    );
-    $result = $this->callAPIFailure('job', 'create', $params);
-    $this->assertEquals($result['error_message'],
+    $params = array('is_active' => 1);
+    $result = $this->callAPIFailure('job', 'create', $params,
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
+  }
+  /**
+   * create job with an valid "run_frequency" value
+   */
+  function testCreateWithValidFrequency() {
+    $params = array(
+      'sequential' => 1,
+      'name' => 'API_Test_Job',
+      'description' => 'A long description written by hand in cursive',
+      'run_frequency' => 'Hourly',
+      'api_entity' => 'ApiTestEntity',
+      'api_action' => 'apitestaction',
+      'parameters' => 'Semi-formal explanation of runtime job parameters',
+      'is_active' => 1,
+    );
+    $result = $this->callAPISuccess('job', 'create', $params);
   }
 
   /**
@@ -74,7 +84,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   function testCreateWithInvalidFrequency() {
     $params = array(
-      'version' => $this->_apiVersion,
       'sequential' => 1,
       'name' => 'API_Test_Job',
       'description' => 'A long description written by hand in cursive',
@@ -92,7 +101,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   function testCreate() {
     $params = array(
-      'version' => $this->_apiVersion,
       'sequential' => 1,
       'name' => 'API_Test_Job',
       'description' => 'A long description written by hand in cursive',
@@ -102,13 +110,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     );
-    $result = civicrm_api('job', 'create', $params);
-    $this->assertAPISuccess($result);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('job', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['values'][0]['id'], 'in line ' . __LINE__);
 
     // mutate $params to match expected return value
-    unset($params['version']);
     unset($params['sequential']);
     //assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Core_DAO_Job', $result['id'], $params);
@@ -145,15 +150,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * check with incorrect required fields
+   * note to copy & pasters - this test is of marginal value
+   * and effort would be better put into making the one in syntax
+   * conformance work for all entities
    */
   function testDeleteWithIncorrectData() {
     $params = array(
-      'id' => 'abcd',
-      'version' => $this->_apiVersion,
-    );
-
+      'id' => 'abcd');
     $result = $this->callAPIFailure('job', 'delete', $params);
-    $this->assertEquals($result['error_message'], 'Invalid value for job ID');
   }
 
   /**
@@ -161,7 +165,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   function testDelete() {
     $createParams = array(
-      'version' => $this->_apiVersion,
       'sequential' => 1,
       'name' => 'API_Test_Job',
       'description' => 'A long description written by hand in cursive',
@@ -171,41 +174,38 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     );
-    $createResult = civicrm_api('job', 'create', $createParams);
+    $createResult = $this->callAPISuccess('job', 'create', $createParams);
     $this->assertAPISuccess($createResult);
 
     $params = array(
       'id' => $createResult['id'],
-      'version' => $this->_apiVersion,
     );
-    $result = civicrm_api('job', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
   /**
 
   public function testCallUpdateGreetingMissingParams() {
-    $result = civicrm_api($this->_entity, 'update_greeting', array('gt' => 1, 'version' => $this->_apiVersion));
+    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1));
     $this->assertEquals('Mandatory key(s) missing from params array: ct', $result['error_message']);
   }
 
   public function testCallUpdateGreetingIncorrectParams() {
-    $result = civicrm_api($this->_entity, 'update_greeting', array('gt' => 1, 'ct' => 'djkfhdskjfhds', 'version' => $this->_apiVersion));
+    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1, 'ct' => 'djkfhdskjfhds'));
     $this->assertEquals('ct `djkfhdskjfhds` is not valid.', $result['error_message']);
   }
 /*
  * Note that this test is about tesing the metadata / calling of the function & doesn't test the success of the called function
  */
   public function testCallUpdateGreetingSuccess() {
-    $result = civicrm_api($this->_entity, 'update_greeting', array('gt' => 'postal_greeting', 'ct' => 'Individual', 'version' => $this->_apiVersion));
+    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 'postal_greeting', 'ct' => 'Individual'));
     $this->assertAPISuccess($result);
    }
 
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess() {
     $gt = 'postal_greeting,email_greeting,addressee';
     $ct = 'Individual,Household';
-    $result = civicrm_api($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct, 'version' => $this->_apiVersion));
+    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct));
     $this->assertAPISuccess($result);
   }
 }

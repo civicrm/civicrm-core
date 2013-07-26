@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
@@ -38,7 +37,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_contactID;
   protected $_createdParticipants;
   protected $_participantID;
@@ -56,7 +55,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
     $tablesToTruncate = array(
       'civicrm_contribution',
@@ -65,19 +63,17 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate);
     $event = $this->eventCreate(NULL);
     $this->_eventID = $event['id'];
-
     $this->_contactID = $this->individualCreate(NULL);
-
     $this->_createdParticipants = array();
     $this->_individualId = $this->individualCreate(NULL);
 
     $this->_participantID = $this->participantCreate(array('contactID' => $this->_contactID, 'eventID' => $this->_eventID));
     $this->_contactID2 = $this->individualCreate(NULL);
-    $this->_participantID2 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID, 'version' => $this->_apiversion));
-    $this->_participantID3 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID, 'version' => $this->_apiversion));
+    $this->_participantID2 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID));
+    $this->_participantID3 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID));
 
     $this->_contactID3 = $this->individualCreate(NULL);
-    $this->_participantID4 = $this->participantCreate(array('contactID' => $this->_contactID3, 'eventID' => $this->_eventID, 'version' => $this->_apiversion));
+    $this->_participantID4 = $this->participantCreate(array('contactID' => $this->_contactID3, 'eventID' => $this->_eventID));
   }
 
   function tearDown() {
@@ -92,9 +88,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
         'civicrm_financial_item',
         'civicrm_financial_trxn',
         'civicrm_entity_financial_trxn',
-      )
+      ),
+      TRUE
     );
-    $this->contributionTypeDelete();
   }
 
   ///////////////// civicrm_participant_payment_create methods
@@ -121,9 +117,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   function testPaymentCreateMissingContributionId() {
     //Without Payment EntityID
     $params = array(
-      'participant_id' => $this->_participantID,
-      'version' => $this->_apiversion,
-    );
+      'participant_id' => $this->_participantID,    );
 
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -139,12 +133,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'participant_id' => $this->_participantID,
       'contribution_id' => $contributionID,
-      'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('participant_payment', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
+    $result = $this->callAPIAndDocument('participant_payment', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertTrue(array_key_exists('id', $result), 'in line ' . __LINE__);
 
     //delete created contribution
@@ -177,9 +168,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   function testPaymentUpdateMissingParticipantId() {
     //WithoutParticipantId
     $params = array(
-      'contribution_id' => '3',
-      'version' => $this->_apiversion,
-    );
+      'contribution_id' => '3',    );
 
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -189,9 +178,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   function testPaymentUpdateMissingContributionId() {
     $params = array(
-      'participant_id' => $this->_participantID,
-      'version' => $this->_apiversion,
-    );
+      'participant_id' => $this->_participantID,    );
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
@@ -207,22 +194,18 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID,
-      'version' => $this->_apiversion,
-    );
+      'contribution_id' => $contributionID,    );
 
     // Update Payment
-    $participantPayment = civicrm_api('participant_payment', 'create', $params);
+    $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
     $this->assertEquals($participantPayment['id'], $this->_participantPaymentID);
     $this->assertTrue(array_key_exists('id', $participantPayment));
     // check Financial records
     $this->_checkFinancialRecords($params, 'offline');
     $params = array(
       'id' => $this->_participantPaymentID,
-      'version' => $this->_apiversion,
     );
-    $deletePayment = civicrm_api('participant_payment', 'delete', $params);
-    $this->assertEquals($deletePayment['is_error'], 0);
+    $deletePayment = $this->callAPISuccess('participant_payment', 'delete', $params);
   }
 
   /**
@@ -244,22 +227,18 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID,
-      'version' => $this->_apiversion,
-    );
+      'contribution_id' => $contributionID,    );
 
     // Update Payment
-    $participantPayment = civicrm_api('participant_payment', 'create', $params);
+    $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
     $this->assertEquals($participantPayment['id'], $this->_participantPaymentID);
     $this->assertTrue(array_key_exists('id', $participantPayment));
     // check Financial records
     $this->_checkFinancialRecords($params, 'online');
     $params = array(
       'id' => $this->_participantPaymentID,
-      'version' => $this->_apiversion,
     );
-    $deletePayment = civicrm_api('participant_payment', 'delete', $params);
-    $this->assertEquals($deletePayment['is_error'], 0);
+    $deletePayment = $this->callAPISuccess('participant_payment', 'delete', $params);
   }
 
   /**
@@ -283,22 +262,18 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID,
-      'version' => $this->_apiversion,
-    );
+      'contribution_id' => $contributionID,    );
 
     // Update Payment
-    $participantPayment = civicrm_api('participant_payment', 'create', $params);
+    $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
     // check Financial Records
     $this->_checkFinancialRecords($params, 'payLater');
     $this->assertEquals($participantPayment['id'], $this->_participantPaymentID);
     $this->assertTrue(array_key_exists('id', $participantPayment));
     $params = array(
       'id' => $this->_participantPaymentID,
-      'version' => $this->_apiversion,
     );
-    $deletePayment = civicrm_api('participant_payment', 'delete', $params);
-    $this->assertEquals($deletePayment['is_error'], 0);
+    $deletePayment = $this->callAPISuccess('participant_payment', 'delete', $params);
   }
 
   ///////////////// civicrm_participant_payment_delete methods
@@ -315,7 +290,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    * check with empty array
    */
   function testPaymentDeleteWithEmptyParams() {
-    $params = array('version' => $this->_apiversion);
+    $params = array();
     $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
     $this->assertEquals('Mandatory key(s) missing from params array: id', $deletePayment['error_message']);
   }
@@ -325,9 +300,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   function testPaymentDeleteWithWrongID() {
     $params = array(
-      'id' => 0,
-      'version' => $this->_apiversion,
-    );
+      'id' => 0,    );
     $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
     $this->assertEquals($deletePayment['error_message'], 'Mandatory key(s) missing from params array: id');
   }
@@ -344,25 +317,12 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
     $params = array(
       'id' => $this->_participantPaymentID,
-      'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('participant_payment', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPIAndDocument('participant_payment', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
   ///////////////// civicrm_participantPayment_get methods
-
-  /**
-   * Test civicrm_participantPayment_get with wrong params type.
-   */
-  public function testGetWrongParamsType() {
-    $params = 'eeee';
-    $GetWrongParamsType = civicrm_api('participant_payment', 'get', $params);
-    $this->assertEquals($GetWrongParamsType['error_message'], 'Input variable `params` is not an array');
-  }
-
   /**
    * Test civicrm_participantPayment_get - success expected.
    */
@@ -375,11 +335,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'participant_id' => $this->_participantID4,
       'contribution_id' => $contributionID,
-      'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('participant_payment', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('participant_payment', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['participant_id'], $this->_participantID4, 'Check Participant Id');
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $contributionID, 'Check Contribution Id');
   }

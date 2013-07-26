@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -40,7 +39,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   protected $_ufGroupId = 11;
   protected $_ufFieldId;
   protected $_contactId = 69;
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_params;
   protected $_entity = 'uf_field';
   public $_eNoticeCompliant = TRUE;
@@ -58,7 +57,6 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       )
     );
 
-    $this->_apiversion = 3;
     $op = new PHPUnit_Extensions_Database_Operation_Insert;
     $op->execute(
       $this->_dbconn,
@@ -66,7 +64,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     );
     $this->_sethtmlGlobals();
 
-    civicrm_api('uf_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
+    $this->callAPISuccess('uf_field', 'getfields', array('cache_clear' => 1));
 
     $this->_params = array(
       'field_name' => 'phone',
@@ -78,7 +76,6 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       'is_active' => 1,
       'location_type_id' => 1,
       'phone_type_id' => 1,
-      'version' => $this->_apiversion,
       'uf_group_id' => $this->_ufGroupId,
     );
   }
@@ -100,11 +97,8 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
    */
   public function testCreateUFField() {
     $params = $this->_params; // copy
-    $ufField = civicrm_api('uf_field', 'create', $params);
-    $this->documentMe($params, $ufField, __FUNCTION__, __FILE__);
-    unset($params['version']);
+    $ufField = $this->callAPIAndDocument('uf_field', 'create', $params, __FUNCTION__, __FILE__);
     unset($params['uf_group_id']);
-    $this->assertAPISuccess($ufField, " in line " . __LINE__);
     $this->_ufFieldId = $ufField['id'];
     foreach ($params as $key => $value) {
       $this->assertEquals($ufField['values'][$ufField['id']][$key], $params[$key]);
@@ -199,15 +193,12 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     );
 
     $params = array(
-      'version' => $this->_apiversion,
       'uf_group_id' => $this->_ufGroupId,
       'option.autoweight' => FALSE,
       'values' => $baseFields,
     );
 
-    $result = civicrm_api('uf_field', 'replace', $params);
-    $this->assertAPISuccess($result);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('uf_field', 'replace', $params, __FUNCTION__, __FILE__);
     $inputsByName = CRM_Utils_Array::index(array('field_name'), $params['values']);
     $this->assertEquals(count($params['values']), count($result['values']));
     foreach ($result['values'] as $outUfField) {

@@ -53,7 +53,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
     );
     $this->_relationshipTypeId = $this->relationshipTypeCreate($params);
     $this->_orgContactID = $this->organizationCreate();
-    $this->_contributionTypeId = $this->contributionTypeCreate();
+    $this->_financialTypeId = 1;
 
     $params = array(
       'name' => 'test type',
@@ -63,7 +63,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'member_of_contact_id' => $this->_orgContactID,
       'period_type' => 'fixed',
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,
@@ -82,7 +82,6 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
     $this->membershipStatusDelete($this->_mebershipStatusID);
-    $this->contributionTypeDelete(NULL);
     $this->contactDelete($this->_orgContactID);
   }
 

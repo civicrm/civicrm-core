@@ -30,6 +30,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/AuthorizeNet.php';
 require_once 'CiviTest/Contact.php';
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Authorize.net processing',
@@ -50,7 +54,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     );
 
     $this->processor = new CRM_Core_Payment_AuthorizeNet('Contribute', $paymentProcessor);
-    $this->_contributionTypeId = $this->contributionTypeCreate();
+    $this->_financialTypeId = 1;
 
     // for some strange unknown reason, in batch mode this value gets set to null
     // so crude hack here to avoid an exception and hence an error
@@ -59,7 +63,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   function tearDown() {
     $this->paymentProcessor->delete($this->processorParams->id);
-    $tablesToTruncate = array( 'civicrm_financial_type', 'civicrm_contribution', 'civicrm_contribution_recur', 'civicrm_line_item' );
+    $tablesToTruncate = array('civicrm_contribution', 'civicrm_contribution_recur', 'civicrm_line_item' );
     $this->quickCleanup($tablesToTruncate);
   }
 
@@ -74,7 +78,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
     $contactId  = Contact::createIndividual($nameParams);
 
-    $ids = array('contribution' => NULL);
     $invoiceID = sha1(rand());
     $amount    = rand(100, 1000) . '.00';
 
@@ -96,7 +99,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $contributionParams = array(
       'contact_id'   => $contactId,
-      'financial_type_id'   => $this->_contributionTypeId,
+      'financial_type_id'   => $this->_financialTypeId,
       'receive_date' => date('Ymd'),
       'total_amount' => $amount,
       'invoice_id'   => $invoiceID,
@@ -129,7 +132,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => 12,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'is_email_receipt' => 1,
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => date('Ymd'),
@@ -175,7 +178,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'email' => "{$firstName}.{$lastName}@example.com",
       'contactID' => $contactId,
       'contributionID' => $contribution->id,
-      'contributionTypeID' => $this->_contributionTypeId,
+      'contributionTypeID' => $this->_financialTypeId,
       'contributionRecurID' => $recur->id,
     );
 
@@ -231,7 +234,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $contributionParams = array(
       'contact_id'   => $contactId,
-      'financial_type_id'   => $this->_contributionTypeId,
+      'financial_type_id'   => $this->_financialTypeId,
       'receive_date' => $start_date,
       'total_amount' => $amount,
       'invoice_id'   => $invoiceID,
@@ -240,7 +243,8 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'is_test' => 1,
       'contribution_status_id' => 2,
     );
-    $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams, $ids);
+
+    $this->callAPISuccess('contribution', 'create', $contributionParams);
 
     $params = array(
       'qfKey' => '00ed21c7ca00a1f7d555555596ef7_4454',
@@ -264,7 +268,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => 3,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'is_email_receipt' => 1,
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => $start_date,
@@ -311,7 +315,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'email' => "{$firstName}.{$lastName}@example.com",
       'contactID' => $contactId,
       'contributionID' => $contribution->id,
-      'contributionTypeID' => $this->_contributionTypeId,
+      'contributionTypeID' => $this->_financialTypeId,
       'contributionRecurID' => $recur->id,
     );
 

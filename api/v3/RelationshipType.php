@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -98,7 +97,6 @@ function _civicrm_api3_relationship_type_create_spec(&$params) {
  * @example RelationshipTypeGet.php
  */
 function civicrm_api3_relationship_type_get($params) {
-
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -113,16 +111,6 @@ function civicrm_api3_relationship_type_get($params) {
  * @access public
  */
 function civicrm_api3_relationship_type_delete($params) {
-
-  if ($params['id'] != NULL && !CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for relationship type ID');
-  }
-
-  $relationTypeBAO = new CRM_Contact_BAO_RelationshipType();
-  $result = $relationTypeBAO->del($params['id']);
-  if (!$result) {
-    return civicrm_api3_create_error('Could not delete relationship type');
-  }
-  return civicrm_api3_create_success($result, $params, 'relationship_type', 'delete', $relationTypeBAO);
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 

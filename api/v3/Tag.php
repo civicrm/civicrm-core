@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -48,20 +47,8 @@
  * @access public
  */
 function civicrm_api3_tag_create($params) {
-
-  $ids = array('tag' => CRM_Utils_Array::value('tag', $params));
-  if (CRM_Utils_Array::value('tag', $params)) {
-    $ids['tag'] = $params['tag'];
-  }
-  if (CRM_Utils_Array::value('id', $params)) {
-    $ids['tag'] = $params['id'];
-  }
-  $tagBAO = CRM_Core_BAO_Tag::add($params, $ids);
-
-    $values = array();
-    _civicrm_api3_object_to_array($tagBAO, $values[$tagBAO->id]);
-    return civicrm_api3_create_success($values, $params, 'tag', 'create', $tagBAO);
-  }
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
 
 /**
  * Specify Meta data for create. Note that this data is retrievable via the getfields function
@@ -70,6 +57,7 @@ function civicrm_api3_tag_create($params) {
 function _civicrm_api3_tag_create_spec(&$params) {
   $params['used_for']['api.default'] = 'civicrm_contact';
   $params['name']['api.required'] = 1;
+  $params['id']['api.aliases'] = array('tag');
 }
 
 /**

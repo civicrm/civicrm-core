@@ -41,8 +41,6 @@
  * Files required for this package
  */
 
-
-
 /**
  * Handle creation of a Mailing Job for a Mailing.
  */
@@ -72,5 +70,12 @@ function _civicrm_api3_mailing_job_create_spec(&$params) {
  */
 function civicrm_api3_mailing_job_get($params, $ids = array()) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Handle deletion of a Mailing Job for a Mailing.
+ */
+function civicrm_api3_mailing_job_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
