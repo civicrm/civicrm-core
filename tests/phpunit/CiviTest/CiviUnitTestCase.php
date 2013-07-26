@@ -108,7 +108,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Allow classes to state E-notice compliance
    */
-  public $_eNoticeCompliant = FALSE;
+  public $_eNoticeCompliant = TRUE;
 
   /**
    * @var boolean DBResetRequired allows skipping DB reset
