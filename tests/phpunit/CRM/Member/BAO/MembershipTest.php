@@ -295,7 +295,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
     );
-    CRM_Member_BAO_Membership::deleteMembership($membershipId);
+    CRM_Member_BAO_Membership::del($membershipId);
 
     $membershipId = $this->assertDBNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for deleted membership.'

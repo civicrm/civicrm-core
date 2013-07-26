@@ -90,10 +90,12 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   function testMembershipDelete() {
     $membershipID = $this->contactMembershipCreate($this->_params);
+    $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID);
     $params = array(
-      'id' => $membershipID,
+      'id' => $membershipID
     );
     $result = $this->callAPIAndDocument('membership', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->assertDBRowNotExist('CRM_Member_DAO_Membership', $membershipID);
   }
 
   function testMembershipDeleteEmpty() {

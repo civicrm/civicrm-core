@@ -567,6 +567,23 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
 
   /**
    * Function to delete membership.
+   * Wrapper for most delete calls. Use this unless you JUST want to delete memberships w/o deleting the parent.
+   *
+   * @param int $membershipId membership id that needs to be deleted
+   *
+   * @static
+   *
+   * @return $results   no of deleted Membership on success, false otherwise
+   * @access public
+   */
+  static function del($membershipId) {
+    //delete related first and then delete parent.
+    self::deleteRelatedMemberships($membershipId);
+    return self::deleteMembership($membershipId);    
+  }
+  
+  /**
+   * Function to delete membership.
    *
    * @param int $membershipId membership id that needs to be deleted
    *
@@ -580,6 +597,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     $params = array('id' => $membershipId);
     $memValues = array();
     $memberships = self::getValues($params, $memValues);
+
     $membership = $memberships[$membershipId];
 
     CRM_Utils_Hook::pre('delete', 'Membership', $membershipId, $memValues);
@@ -625,6 +643,36 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     CRM_Utils_Recent::del($membershipRecent);
 
     return $results;
+  }
+
+  /**
+   * Function to delete related memberships
+   *
+   * @param int $ownerMembershipId
+   * @param int $contactId
+   *
+   * @return null
+   * @static
+   */
+  static function deleteRelatedMemberships($ownerMembershipId, $contactId = NULL) {
+    if (!$ownerMembershipId && !$contactId) {
+      return;
+    }
+
+    $membership = new CRM_Member_DAO_Membership();
+    $membership->owner_membership_id = $ownerMembershipId;
+
+    if ($contactId) {
+      $membership->contact_id = $contactId;
+    }
+
+    $membership->find();
+    while ($membership->fetch()) {
+      //delete related first and then delete parent.
+      self::deleteRelatedMemberships($membership->id);
+      self::deleteMembership($membership->id);
+    }
+    $membership->free();
   }
 
   /**
@@ -1880,36 +1928,6 @@ SELECT c.contribution_page_id as pageID
   }
 
   /**
-   * Function to delete related memberships
-   *
-   * @param int $ownerMembershipId
-   * @param int $contactId
-   *
-   * @return null
-   * @static
-   */
-  static function deleteRelatedMemberships($ownerMembershipId, $contactId = NULL) {
-    if (!$ownerMembershipId && !$contactId) {
-      return;
-    }
-
-    $membership = new CRM_Member_DAO_Membership();
-    $membership->owner_membership_id = $ownerMembershipId;
-
-    if ($contactId) {
-      $membership->contact_id = $contactId;
-    }
-
-    $membership->find();
-    while ($membership->fetch()) {
-      //delete related first and then delete parent.
-      self::deleteRelatedMemberships($membership->id);
-      self::deleteMembership($membership->id);
-    }
-    $membership->free();
-  }
-
-  /**
    * Function to updated related memberships
    *
    * @param int   $ownerMembershipId owner Membership Id
@@ -2061,7 +2079,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
 
     //lets cleanup related membership if any.
     if (empty($relatedContacts)) {
-      CRM_Member_BAO_Membership::deleteRelatedMemberships($membership->id);
+      self::deleteRelatedMemberships($membership->id);
     }
     else {
       // Edit the params array
