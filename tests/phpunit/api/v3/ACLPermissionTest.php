@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -36,17 +35,16 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 
 class api_v3_ACLPermissionTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_params;
   protected $hookClass = null;
+  public $DBResetRequired = FALSE;
 
   public $_eNoticeCompliant = TRUE;
 
   protected $_entity;
 
   function setUp() {
-    $this->_apiversion = 3;
-
     parent::setUp();
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject('CRM_Pledge_BAO_Pledge', array(), 1, 0);
@@ -73,13 +71,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
  */
   function testContactGetNoResultsHook(){
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
-    $result = civicrm_api('contact', 'get', array(
-      'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('contact', 'get', array(
       'check_permissions' => 1,
       'return' => 'display_name',
     ));
-
-    $this->assertAPISuccess($result,"this should succeed but return no results. line " . __LINE__);
     $this->assertEquals(0, $result['count']);
   }
 
@@ -88,28 +83,23 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   */
   function testContactGetAllResultsHook(){
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
-    $result = civicrm_api('contact', 'get', array(
-        'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('contact', 'get', array(
         'check_permissions' => 1,
         'return' => 'display_name',
     ));
 
-    $this->assertAPISuccess($result,"this should succeed but return no results. line " . __LINE__);
     $this->assertEquals(2, $result['count']);
   }
   /**
    * Function just tests that an empty where hook returns the 2 expected results
   */
   function testContactGetPermissionHookNoDeleted(){
-    civicrm_api('contact', 'create', array('id' => 2, 'version' => $this->_apiversion, 'is_deleted' => 1));
+    $this->callAPISuccess('contact', 'create', array('id' => 2, 'is_deleted' => 1));
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
-    $result = civicrm_api('contact', 'get', array(
-        'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('contact', 'get', array(
         'check_permissions' => 1,
         'return' => 'display_name',
     ));
-
-    $this->assertAPISuccess($result,"this should succeed but return one results. line " . __LINE__);
     $this->assertEquals(1, $result['count']);
   }
 
@@ -119,12 +109,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   function testContactGetHookLimitingHook(){
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
 
-    $result = civicrm_api('contact', 'get', array(
-      'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('contact', 'get', array(
       'check_permissions' => 1,
       'return' => 'display_name',
       ));
-    $this->assertAPISuccess($result, 'api call succeeded');
     $this->assertEquals(1, $result['count']);
   }
 
@@ -133,12 +121,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
  */
   function testContactGetHookLimitingHookDontCheck(){
     //
-    $result = civicrm_api('contact', 'get', array(
-        'version' => $this->_apiversion,
-        'check_permissions' => 0,
-        'return' => 'display_name',
+    $result = $this->callAPISuccess('contact', 'get', array(
+      'check_permissions' => 0,
+      'return' => 'display_name',
     ));
-    $this->assertAPISuccess($result, 'api call succeeded');
     $this->assertEquals(2, $result['count']);
   }
   /**
@@ -146,14 +132,12 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   function testContactGetIDFilter(){
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
-    $result = civicrm_api('contact', 'get', array(
-      'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('contact', 'get', array(
       'sequential' => 1,
       'id' => 2,
       'check_permissions' => 1,
     ));
 
-    $this->assertAPISuccess($result, 'api call succeeded');
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(2, $result['id']);
   }
@@ -163,8 +147,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
  */
     function testContactGetAddressReturned(){
       $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
-      $fullresult = civicrm_api('contact', 'get', array(
-          'version' => $this->_apiversion,
+      $fullresult = $this->callAPISuccess('contact', 'get', array(
           'sequential' => 1,
       ));
       //return doesn't work for all keys - can't fix that here so let's skip ...
@@ -184,13 +167,11 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         'worldregion_id',
         'world_region');
       $expectedReturnElements = array_diff(array_keys($fullresult['values'][0]),$elementsReturnDoesntSupport);
-      $result = civicrm_api('contact', 'get', array(
-          'version' => $this->_apiversion,
+      $result = $this->callAPISuccess('contact', 'get', array(
           'check_permissions' => 1,
           'return' => $expectedReturnElements,
           'sequential' => 1,
       ));
-      $this->assertAPISuccess($result, 'api call succeeded');
       $this->assertEquals(1, $result['count']);
       foreach ($expectedReturnElements as $element){
         $this->assertArrayHasKey($element, $result['values'][0]);
@@ -201,17 +182,14 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     */
     function testContactGetPledgeIDNotReturned(){
       $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
-      $fullresult = civicrm_api('contact', 'get', array(
-          'version' => $this->_apiversion,
+      $fullresult = $this->callAPISuccess('contact', 'get', array(
           'sequential' => 1,
       ));
-      $result = civicrm_api('contact', 'get', array(
-        'version' => $this->_apiversion,
+      $result = $this->callAPISuccess('contact', 'get', array(
         'check_permissions' => 1,
         'return' => 'pledge_id',
         'sequential' => 1,
       ));
-      $this->assertAPISuccess($result);
       $this->assertArrayNotHasKey('pledge_id', $result['values'][0]);
     }
 
@@ -220,17 +198,14 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     */
     function testContactGetPledgeIDNotFiltered(){
       $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
-      $fullresult = civicrm_api('contact', 'get', array(
-          'version' => $this->_apiversion,
+      $fullresult = $this->callAPISuccess('contact', 'get', array(
           'sequential' => 1,
       ));
-      $result = civicrm_api('contact', 'get', array(
-        'version' => $this->_apiversion,
+      $result = $this->callAPISuccess('contact', 'get', array(
         'check_permissions' => 1,
         'pledge_id' => 1,
         'sequential' => 1,
       ));
-      $this->assertAPISuccess($result, 'api call succeeded');
       $this->assertEquals(2, $result['count']);
     }
 
@@ -239,17 +214,16 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     */
     function testContactGetPledgeNotChainable(){
       $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
-      $fullresult = civicrm_api('contact', 'get', array(
-          'version' => $this->_apiversion,
+      $fullresult = $this->callAPISuccess('contact', 'get', array(
           'sequential' => 1,
       ));
-      $result = civicrm_api('contact', 'get', array(
-          'version' => $this->_apiversion,
+      $result = $this->callAPIFailure('contact', 'get', array(
           'check_permissions' => 1,
           'api.pledge.get' => 1,
           'sequential' => 1,
-      ));
-      $this->assertEquals('Error in call to pledge_get : API permission check failed for pledge/get call; missing permission: access CiviCRM.', $result['error_message']);
+      ),
+      'Error in call to pledge_get : API permission check failed for pledge/get call; missing permission: access CiviCRM.'
+      );
     }
 
   /**
