@@ -27,6 +27,10 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   function setUp() {
     parent::setUp();
     if (class_exists('test_extension_manager_paymenttest')) {

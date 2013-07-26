@@ -34,6 +34,10 @@ require_once 'CiviTest/Membership.php';
 require_once 'CRM/Core/Controller.php';
 
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Membership BAOs',

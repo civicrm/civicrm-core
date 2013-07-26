@@ -2065,9 +2065,20 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       else {
         $keys[CRM_Utils_Array::Value('name', $settings, $field)] = CRM_Utils_Array::value('name', $settings, $field);
       }
-
-      if (CRM_Utils_Array::value('type', $settings) == CRM_Utils_Type::T_DATE) {
-        $dateFields[] = $field;
+      $type = CRM_Utils_Array::value('type', $settings);
+      if ($type == CRM_Utils_Type::T_DATE) {
+        $dateFields[] = $settings['name'];
+        // we should identify both real names & unique names as dates
+        if($field != $settings['name']) {
+          $dateFields[] = $field;
+        }
+      }
+      if($type == CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) {
+        $dateTimeFields[] = $settings['name'];
+        // we should identify both real names & unique names as dates
+        if($field != $settings['name']) {
+          $dateTimeFields[] = $field;
+        }
       }
     }
 
@@ -2080,14 +2091,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
 
     foreach ($params as $key => $value) {
-      if ($key == 'version' || substr($key, 0, 3) == 'api') {
+      if ($key == 'version' || substr($key, 0, 3) == 'api' || !array_key_exists($keys[$key], $result)) {
         continue;
       }
       if (in_array($key, $dateFields)) {
         $value = date('Y-m-d', strtotime($value));
         $result[$key] = date('Y-m-d', strtotime($result[$key]));
       }
-      $this->assertEquals($value, $result[$keys[$key]], $key . " GetandCheck function determines that value: $value doesn't match " . print_r($result, TRUE) . $errorText);
+      if (in_array($key, $dateTimeFields)) {
+        $value = date('Y-m-d H:i:s', strtotime($value));
+        $result[$keys[$key]] = date('Y-m-d H:i:s', strtotime(CRM_Utils_Array::value($keys[$key], $result, CRM_Utils_Array::value($uniquekey, $result))));
+      }
+      $this->assertEquals($value, $result[$keys[$key]], $key . " GetandCheck function determines that for key {$key} value: $value doesn't match " . print_r($result[$keys[$key]], TRUE) . $errorText);
     }
   }
 
