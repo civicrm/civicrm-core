@@ -13,8 +13,7 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
   function tearDown() {}
 
   public function testCustomSearch() {
-    $result = civicrm_api('CustomSearch', 'create', array(
-      'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('CustomSearch', 'create', array(
       'label' => 'Invalid, overwritten',
       'description' => 'Longish description of the example search form',
       'class_name' => 'CRM_Contact_Form_Search_Custom_Examplez',
@@ -31,12 +30,11 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"');
 
     // deactivate
-    $result = civicrm_api('CustomSearch', 'create', array(
-      'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('CustomSearch', 'create', array(
       'id' => $entityId,
       'is_active' => 0,
     ));
-    $this->assertAPISuccess($result);
+
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"
@@ -46,12 +44,11 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"');
 
     // activate
-    $result = civicrm_api('CustomSearch', 'create', array(
-      'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('CustomSearch', 'create', array(
       'id' => $entityId,
       'is_active' => 1,
     ));
-    $this->assertAPISuccess($result);
+
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"
@@ -60,11 +57,9 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"');
 
-    $result = civicrm_api('CustomSearch', 'delete', array(
-      'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('CustomSearch', 'delete', array(
       'id' => $entityId,
     ));
-    $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"

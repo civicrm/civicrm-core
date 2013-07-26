@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -70,8 +69,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $domain = 1;
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     $location = array();
-    $domContact = civicrm_api('contact', 'create', array(
-      'version' => $this->_apiversion,
+    $domContact = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Organization',
       'organization_name' => 'new org',
       'api.phone.create' => array(
@@ -90,17 +88,14 @@ class api_v3_DomainTest extends CiviUnitTestCase {
       )
     );
 
-    civicrm_api('domain','create',array(
+    $this->callAPISuccess('domain','create',array(
       'id' => 1,
       'contact_id' => $domContact['id'],
-      'version' => $this->_apiversion
       )
     );
-    $this->_apiversion = 3;
     $this->params = array(
       'name' => 'A-team domain',
       'description' => 'domain of chaos',
-      'version' => $this->_apiversion,
       'domain_version' => '4.2',
       'contact_id' => $domContact['id'],
     );
@@ -124,10 +119,8 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    */
   public function testGet() {
 
-
-    $params = array('version' => 3, 'sequential' => 1,);
-    $result = civicrm_api('domain', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $params = array('sequential' => 1,);
+    $result = $this->callAPIAndDocument('domain', 'get', $params, __FUNCTION__, __FILE__);
 
     $this->assertType('array', $result, 'In line' . __LINE__);
 
@@ -144,8 +137,8 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   }
 
   public function testGetCurrentDomain() {
-    $params = array('version' => 3, 'current_domain' => 1);
-    $result = civicrm_api('domain', 'get', $params);
+    $params = array('current_domain' => 1);
+    $result = $this->callAPISuccess('domain', 'get', $params);
 
     $this->assertType('array', $result, 'In line' . __LINE__);
 
@@ -178,14 +171,12 @@ class api_v3_DomainTest extends CiviUnitTestCase {
 
 
   public function testGetCurrentDomainTwice() {
-    $domain = civicrm_api('domain', 'getvalue', array(
-        'version' => 3,
+    $domain = $this->callAPISuccess('domain', 'getvalue', array(
         'current_domain' => 1,
         'return' => 'name',
       ));
     $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE) . 'in line ' . __LINE__);
-    $domain = civicrm_api('domain', 'getvalue', array(
-        'version' => 3,
+    $domain = $this->callAPISuccess('domain', 'getvalue', array(
         'current_domain' => 1,
         'return' => 'name',
       ));
@@ -196,9 +187,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    * Test civicrm_domain_create.
    */
   public function testCreate() {
-    $result = civicrm_api('domain', 'create', $this->params);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPIAndDocument('domain', 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['count'], 1);
     $this->assertNotNull($result['id']);
     $this->assertEquals($result['values'][$result['id']]['name'], $this->params['name']);
@@ -210,22 +199,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    * Error expected.
    */
   public function testCreateWithEmptyParams() {
-    $params = array('version' => $this->_apiversion);
-    $result = civicrm_api('domain', 'create', $params);
-    $this->assertAPIFailure($result,
-      "In line " . __LINE__
-    );
-  }
-
-  /**
-   * Test civicrm_domain_create with wrong parameter type.
-   */
-  public function testCreateWithWrongParams() {
-    $params = 1;
-    $result = civicrm_api('domain', 'create', $params);
-    $this->assertAPIFailure($result,
-      "In line " . __LINE__
-    );
+    $result = $this->callAPIFailure('domain', 'create', array());
   }
 }
 

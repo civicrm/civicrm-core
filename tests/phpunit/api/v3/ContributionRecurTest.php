@@ -48,7 +48,6 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     parent::setUp();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->params = array(
-      'version' => 3,
       'contact_id' => $this->ids['contact'][0],
       'installments' => '12',
       'frequency_interval' => '1',
@@ -63,7 +62,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   function tearDown() {
     foreach ($this->ids as $entity => $entities) {
       foreach ($entities as $id) {
-        civicrm_api($entity, 'delete', array('version' => $this->_apiversion, 'id' => $id));
+        $this->callAPISuccess($entity, 'delete', array('id' => $id));
       }
     }
     $tablesToTruncate = array(
@@ -76,41 +75,32 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   public function testCreateContributionRecur() {
-    $result = civicrm_api($this->_entity, 'create', $this->params);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
 
   public function testGetContributionRecur() {
-    $result = civicrm_api($this->_entity, 'create', $this->params);
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $getParams = array(
-      'version' => $this->_apiversion,
       'amount' => '500',
     );
-    $result = civicrm_api($this->_entity, 'get', $getParams);
-    $this->documentMe($getParams, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
   }
 
   public function testDeleteContributionRecur() {
-    $result = civicrm_api($this->_entity, 'create', $this->params);
-    $deleteParams = array('version' => 3, 'id' => $result['id']);
-    $result = civicrm_api($this->_entity, 'delete', $deleteParams);
-    $this->documentMe($deleteParams, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $checkDeleted = civicrm_api($this->_entity, 'get', array(
-      'version' => 3,
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $deleteParams = array('id' => $result['id']);
+    $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array(
       ));
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $checkDeleted['count']);
   }
 
   public function testGetFieldsContributionRecur() {
-    $result = civicrm_api($this->_entity, 'getfields', array('version' => 3, 'action' => 'create'));
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
 }
