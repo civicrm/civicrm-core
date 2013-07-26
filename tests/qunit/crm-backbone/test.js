@@ -5,6 +5,7 @@ var MALFORMED_CONTACT_ID = 'z';
 
 var ContactModel = Backbone.Model.extend({});
 CRM.Backbone.extendModel(ContactModel, 'Contact');
+CRM.Backbone.trackSaved(ContactModel);
 
 var ContactCollection = Backbone.Collection.extend({
   model: ContactModel
@@ -80,27 +81,33 @@ asyncTest("create/read/delete/read (ok)", function() {
     first_name: "George" + TOKEN,
     last_name: "Anon" + TOKEN
   });
+  equal(c1.isSaved(), false, "");
 
   // Create the new contact
   c1.save({}, {
     error: onUnexpectedError,
     success: function() {
       equal(c1.get("first_name"), "George" + TOKEN, "save() should return new first name");
+      equal(c1.isSaved(), true, "");
 
       // Fetch the newly created contact
       var c2 = new ContactModel({id: c1.get('id')});
+      equal(c2.isSaved(), true, "");
       c2.fetch({
         error: onUnexpectedError,
         success: function() {
           equal(c2.get("first_name"), c1.get("first_name"), "fetch() should return first name");
+          equal(c2.isSaved(), true, "");
 
           // Destroy the newly created contact
           c2.destroy({
             error: onUnexpectedError,
             success: function() {
+              equal(c2.isSaved(), true, "");
 
               // Attempt (but fail) to fetch the deleted contact
               var c3 = new ContactModel({id: c1.get('id')});
+              equal(c3.isSaved(), true, "");
               c3.fetch({
                 success: onUnexpectedSuccess,
                 error: function(model, error) {
@@ -139,20 +146,27 @@ module('model - update');
 asyncTest("update (ok)", function() {
   var NICKNAME = "George" + new Date().getTime();
   var c = new ContactModel({id: VALID_CONTACT_ID});
-  c.save({
+  equal(c.isSaved(), true, "");
+  c.set({
     nick_name: NICKNAME
-  }, {
+  });
+  equal(c.isSaved(), false, "");
+  c.save({}, {
     error: onUnexpectedError,
     success: function() {
       equal(c.get("nick_name"), NICKNAME, "save() should return new nickname");
+      _.defer(function(){
+        equal(c.isSaved(), true, "");
 
-      var c2 = new ContactModel({id: VALID_CONTACT_ID});
-      c2.fetch({
-        error: onUnexpectedError,
-        success: function() {
-          equal(c2.get("nick_name"), NICKNAME, "fetch() should return new nickname");
-          start();
-        }
+        // read back - make sure the save worked
+        var c2 = new ContactModel({id: VALID_CONTACT_ID});
+        c2.fetch({
+          error: onUnexpectedError,
+          success: function() {
+            equal(c2.get("nick_name"), NICKNAME, "fetch() should return new nickname");
+            start();
+          }
+        });
       });
     }
   });
@@ -161,13 +175,19 @@ asyncTest("update (ok)", function() {
 asyncTest("update (error)", function() {
   var NICKNAME = "George" + new Date().getTime();
   var c = new ContactModel({id: VALID_CONTACT_ID});
-  c.save({
+  equal(c.isSaved(), true, "");
+  c.set({
     contact_type: 'Not-a.va+lidConta(ype'
-  }, {
+  });
+  equal(c.isSaved(), false, "");
+  c.save({}, {
     success: onUnexpectedSuccess,
     error: function(model, error) {
       assertApiError(error);
-      start();
+      _.defer(function(){
+        equal(c.isSaved(), false, "");
+        start();
+      });
     }
   });
 });
