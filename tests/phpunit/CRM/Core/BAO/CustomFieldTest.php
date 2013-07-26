@@ -3,6 +3,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
 class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Custom Field BAOs',
@@ -47,7 +51,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     Custom::deleteGroup($customGroup);
   }
-  
+
   function testCreateCustomfieldColumnName() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
@@ -232,8 +236,8 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     // Alice: Group[B] has fields[countryB], but fields[countryC] did not exist before
     $this->assertDBQuery(1,
-      "SELECT count(*) FROM {$groups['B']->table_name} 
-            WHERE entity_id = %1 
+      "SELECT count(*) FROM {$groups['B']->table_name}
+            WHERE entity_id = %1
             AND {$fields['countryB']->column_name} = %3
             AND {$fields['countryC']->column_name} is null",
       array(
@@ -244,8 +248,8 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     // Bob: Group[B] has merged fields[countryB] and fields[countryC] on the same record
     $this->assertDBQuery(1,
-      "SELECT count(*) FROM {$groups['B']->table_name} 
-            WHERE entity_id = %1 
+      "SELECT count(*) FROM {$groups['B']->table_name}
+            WHERE entity_id = %1
             AND {$fields['countryB']->column_name} = %3
             AND {$fields['countryC']->column_name} = %4",
       array(
@@ -257,8 +261,8 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     // Carol: Group[B] still has fields[countryC] but did not get fields[countryB]
     $this->assertDBQuery(1,
-      "SELECT count(*) FROM {$groups['B']->table_name} 
-            WHERE entity_id = %1 
+      "SELECT count(*) FROM {$groups['B']->table_name}
+            WHERE entity_id = %1
             AND {$fields['countryB']->column_name} is null
             AND {$fields['countryC']->column_name} = %4",
       array(
