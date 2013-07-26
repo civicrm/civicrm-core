@@ -151,6 +151,11 @@ function civicrm_api3_create_error($msg, $data = array(), &$dao = NULL) {
   }
   $data['is_error'] = 1;
   $data['error_message'] = $msg;
+  // we will show sql to privelledged user only (not sure of a specific
+  // security hole here but seems sensible - perhaps should apply to the trace as well?
+  if(isset($data['sql']) && CRM_Core_Permission::check('Administer CiviCRM')) {
+    $data['debug_information'] = $data['sql'];
+  }
   if (is_array($dao) && isset($dao['params']) && is_array($dao['params']) && CRM_Utils_Array::value('api.has_parent', $dao['params'])) {
     $errorCode = empty($data['error_code']) ? 'chained_api_failed' : $data['error_code'];
     throw new API_Exception('Error in call to ' . $dao['entity'] . '_' . $dao['action'] . ' : ' . $msg, $errorCode, $data);
@@ -214,7 +219,7 @@ function civicrm_api3_create_success($values = 1, $params = array(
 
   $result['version'] = 3;
   if (is_array($values)) {
-    $result['count'] = count($values);
+    $result['count'] = (int) count($values);
 
     // Convert value-separated strings to array
     _civicrm_api3_separate_values($values);
@@ -1549,7 +1554,7 @@ function  _civicrm_api3_resolve_contactID($contactIdExpr) {
 function _civicrm_api3_validate_html(&$params, &$fieldName, &$fieldInfo) {
   if ($value = CRM_Utils_Array::value($fieldName, $params)) {
     if (!CRM_Utils_Rule::xssString($value)) {
-      throw new API_Exception('Illegal characters in input (potential scripting attack)',array("field"=>$fieldName,"error_code"=>"xss"));
+      throw new API_Exception('Illegal characters in input (potential scripting attack)', array("field"=>$fieldName,"error_code"=>"xss"));
     }
   }
 }
