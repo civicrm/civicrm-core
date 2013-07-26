@@ -40,11 +40,9 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->contributionTypeCreate();
   }
 
   function teardown() {
-    $this->contributionTypeDelete();
   }
 
   /**
@@ -115,7 +113,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-                         'financial_type_id'   => 1,
+      'financial_type_id'   => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -176,7 +174,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-                         'financial_type_id'   => 1,
+      'financial_type_id'   => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -235,7 +233,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-                        'financial_type_id'   => 4,
+      'financial_type_id'   => 4,
       'contribution_status_id' => 1,
       'receive_date' => date('Ymd'),
       'total_amount' => 66,
@@ -298,7 +296,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-                        'financial_type_id'   => 1,
+      'financial_type_id'   => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -362,7 +360,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-                       'financial_type_id'   => 1,
+      'financial_type_id'   => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -418,7 +416,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-                        'financial_type_id'   => 1,
+      'financial_type_id'   => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',

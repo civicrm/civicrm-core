@@ -51,7 +51,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->_relationshipTypeId = $this->relationshipTypeCreate($params);
     $this->_orgContactID = $this->organizationCreate();
     $this->_indiviContactID = $this->individualCreate();
-    $this->_contributionTypeId = $this->contributionTypeCreate();
+    $this->_financialTypeId = 1;
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
   }
 
@@ -63,7 +63,6 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   function tearDown() {
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     $this->membershipStatusDelete($this->_membershipStatusID);
-    $this->contributionTypeDelete();
     $this->contactDelete($this->_orgContactID);
     $this->contactDelete($this->_indiviContactID);
   }
@@ -82,7 +81,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'member_of_contact_id' => $this->_orgContactID,
       'period_type' => 'fixed',
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
     );
@@ -112,7 +111,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'member_of_contact_id' => $this->_orgContactID,
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
     );
@@ -139,7 +138,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'duration_interval' => 1,
       'member_of_contact_id' => $this->_orgContactID,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,
@@ -171,7 +170,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'member_of_contact_id' => $this->_orgContactID,
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,
@@ -199,7 +198,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'fixed_period_start_day' => 1213,
       'fixed_period_rollover_day' => 1214,
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,
@@ -227,7 +226,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'member_of_contact_id' => $this->_orgContactID,
       'period_type' => 'fixed',
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,
@@ -252,7 +251,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'member_of_contact_id' => $this->_orgContactID,
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,
@@ -279,7 +278,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'member_of_contact_id' => $this->_orgContactID,
       'period_type' => 'rolling',
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,
@@ -305,7 +304,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'member_of_contact_id' => $this->_orgContactID,
       'period_type' => 'rolling',
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,
@@ -348,7 +347,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'member_of_contact_id' => $this->_orgContactID,
       'period_type' => 'rolling',
       'duration_interval' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'relationship_type_id' => $this->_relationshipTypeId,
       'visibility' => 'Public',
       'is_active' => 1,

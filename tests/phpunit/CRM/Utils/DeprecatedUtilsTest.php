@@ -26,7 +26,6 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
     );
 
     $this->quickCleanup($tablesToTruncate);
-    $this->contributionTypeDelete();
   }
   /**
    *  Test civicrm_contact_check_params with no contact type

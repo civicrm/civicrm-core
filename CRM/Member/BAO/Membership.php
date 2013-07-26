@@ -265,20 +265,17 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         'today', $excludeIsAdmin
       );
       if (empty($calcStatus)) {
-        if (!$skipRedirect) {
-          // Redirect the form in case of error
-          CRM_Core_Session::setStatus(ts('The membership cannot be saved.') .
-            '<br/>' .
-            ts('No valid membership status for given dates.'),
-          ts('Save Error'), 'error');
-          return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view',
-              "reset=1&force=1&cid={$params['contact_id']}&selectedChild=member"
-            ));
-        }
-        // Return the error message to the api
-        $error = array();
-        $error['is_error'] = ts('The membership cannot be saved. No valid membership status for given dates. Please provide at least start_date. Optionally end_date and join_date.');
-        return $error;
+        // Redirect the form in case of error
+        // @todo this redirect in the BAO layer is really bad & should be moved to the form layer
+        // however since we have no idea how (if) this is triggered we can't safely move / remove it
+        // NB I tried really hard to trigger this error from backoffice membership form in order to test it
+        // and am convinced form validation is complete on that form WRT this error.
+        $errorParams = array(
+          'message_title' => ts('No valid membership status for given dates.'),
+          'legacy_redirect_path' => 'civicrm/contact/view',
+          'legacy_redirect_query' => "reset=1&force=1&cid={$params['contact_id']}&selectedChild=member",
+        );
+        throw new CRM_Core_Exception(ts('The membership cannot be saved.'), 0, $errorParams);
       }
       $params['status_id'] = $calcStatus['id'];
     }
@@ -1183,13 +1180,7 @@ AND civicrm_membership.is_test = %2";
   static function statusAvailabilty($contactId) {
     $membership = new CRM_Member_DAO_MembershipStatus();
     $membership->whereAdd('is_active=1');
-    $count = $membership->count();
-
-    if (!$count) {
-      $session = CRM_Core_Session::singleton();
-      CRM_Core_Session::setStatus(ts('There are no status present, You cannot add membership.'), ts('Deleted'), 'error');
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$contactId}&selectedChild=member"));
-    }
+    return $membership->count();
   }
 
   /**
@@ -1417,11 +1408,14 @@ AND civicrm_membership.is_test = %2";
         }
       }
       $message = ts('Payment Processor Error message') . ': ' . implode('<br/>', $message);
-      $session = CRM_Core_Session::singleton();
-      $session->setStatus($message);
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
-          "_qf_Main_display=true&qfKey={$form->_params['qfKey']}"
-        ));
+      // Redirect the form in case of error
+      // @todo this redirect in the BAO layer is really bad & should be moved to the form layer
+      // however since we have no idea how (if) this is triggered we can't safely move / remove it
+      $errorParams = array(
+        'legacy_redirect_path' => 'civicrm/contribute/transact',
+        'legacy_redirect_query' => "_qf_Main_display=true&qfKey={$form->_params['qfKey']}",
+      );
+      throw new CiviCRM_Exception($message, 0, $errorParams);
     }
 
     // CRM-7851

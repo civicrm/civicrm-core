@@ -35,7 +35,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *  @subpackage API_Core
  */
 
-class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
+class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   protected $_apiversion;
 
   /**
@@ -89,19 +89,19 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
 
   public static function entities_get() {
     // all the entities, beside the ones flagged
-    return api_v3_SyntaxConformanceAllEntitiesTest::entities(api_v3_SyntaxConformanceAllEntitiesTest::toBeSkipped_get(TRUE));
+    return api_v3_SyntaxConformanceTest::entities(api_v3_SyntaxConformanceTest::toBeSkipped_get(TRUE));
   }
 
   public static function entities_create() {
-    return api_v3_SyntaxConformanceAllEntitiesTest::entities(api_v3_SyntaxConformanceAllEntitiesTest::toBeSkipped_create(TRUE));
+    return api_v3_SyntaxConformanceTest::entities(api_v3_SyntaxConformanceTest::toBeSkipped_create(TRUE));
   }
 
   public static function entities_updatesingle() {
-    return api_v3_SyntaxConformanceAllEntitiesTest::entities(api_v3_SyntaxConformanceAllEntitiesTest::toBeSkipped_updatesingle(TRUE));
+    return api_v3_SyntaxConformanceTest::entities(api_v3_SyntaxConformanceTest::toBeSkipped_updatesingle(TRUE));
   }
 
   public static function entities_delete() {
-    return api_v3_SyntaxConformanceAllEntitiesTest::entities(api_v3_SyntaxConformanceAllEntitiesTest::toBeSkipped_delete(TRUE));
+    return api_v3_SyntaxConformanceTest::entities(api_v3_SyntaxConformanceTest::toBeSkipped_delete(TRUE));
   }
 
   public static function toBeSkipped_get($sequential = FALSE) {
@@ -139,7 +139,7 @@ class api_v3_SyntaxConformanceAllEntitiesTest extends CiviUnitTestCase {
   }
 
   public static function toBeSkipped_delete($sequential = FALSE) {
-    $entitiesWithout = array('Mailing', 'MailingGroup', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue');
+    $entitiesWithout = array('MailingGroup', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue');
     if ($sequential === TRUE) {
       return $entitiesWithout;
     }

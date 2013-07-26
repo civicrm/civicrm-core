@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
   +--------------------------------------------------------------------+
   | CiviCRM version 4.3                                                |
@@ -205,7 +203,7 @@ function civicrm_api3_create_success($values = 1, $params = array(
       $allFields = array_keys($apiFields['values']);
     }
     $paramFields = array_keys($params);
-    $undefined = array_diff($paramFields, $allFields, array_keys($_COOKIE), array('action', 'entity', 'debug', 'version', 'check_permissions', 'IDS_request_uri', 'IDS_user_agent', 'return', 'sequential', 'rowCount', 'option_offset', 'option_limit', 'custom', 'option_sort'));
+    $undefined = array_diff($paramFields, $allFields, array_keys($_COOKIE), array('action', 'entity', 'debug', 'version', 'check_permissions', 'IDS_request_uri', 'IDS_user_agent', 'return', 'sequential', 'rowCount', 'option_offset', 'option_limit', 'custom', 'option_sort', 'options'));
     if ($undefined) {
       $result['undefined_fields'] = array_merge($undefined);
     }
@@ -535,7 +533,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
       }
     }
   }
-  if (!empty($options['return']) && is_array($options['return'])) {
+  if (!empty($options['return']) && is_array($options['return']) && empty($options['is_count'])) {
     $dao->selectAdd();
     $options['return']['id'] = TRUE;// ensure 'id' is included
     $allfields =  _civicrm_api3_get_unique_name_array($dao);
@@ -593,6 +591,7 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  * @return array $options options extracted from params
  */
 function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
+  $is_count = FALSE;
   $sort = CRM_Utils_Array::value('sort', $params, 0);
   $sort = CRM_Utils_Array::value('option.sort', $params, $sort);
   $sort = CRM_Utils_Array::value('option_sort', $params, $sort);
@@ -607,6 +606,8 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
   $limit = CRM_Utils_Array::value('option_limit', $params, $limit);
 
   if (is_array(CRM_Utils_Array::value('options', $params))) {
+    // is count is set by generic getcount not user
+    $is_count = CRM_Utils_Array::value('is_count', $params['options']);
     $offset = CRM_Utils_Array::value('offset', $params['options'], $offset);
     $limit  = CRM_Utils_Array::value('limit', $params['options'], $limit);
     $sort   = CRM_Utils_Array::value('sort', $params['options'], $sort);
@@ -641,8 +642,10 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     'offset' => $offset,
     'sort' => $sort,
     'limit' => $limit,
+    'is_count' => $is_count,
     'return' => !empty($returnProperties) ? $returnProperties : NULL,
   );
+
   if (!$queryObject) {
     return $options;
   }
@@ -678,9 +681,11 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
 function _civicrm_api3_apply_options_to_dao(&$params, &$dao, $entity) {
 
   $options = _civicrm_api3_get_options_from_params($params,FALSE,$entity);
-  $dao->limit((int)$options['offset'], (int)$options['limit']);
-  if (!empty($options['sort'])) {
-    $dao->orderBy($options['sort']);
+  if(!$options['is_count']) {
+    $dao->limit((int)$options['offset'], (int)$options['limit']);
+    if (!empty($options['sort'])) {
+      $dao->orderBy($options['sort']);
+    }
   }
 }
 
@@ -727,10 +732,16 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
  */
 function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, $entity = "") {
   $result = array();
+  if(isset($params['options']) && CRM_Utils_Array::value('is_count', $params['options'])) {
+    return $dao->count();
+  }
   if (empty($dao) || !$dao->find()) {
     return array();
   }
 
+  if(isset($dao->count)) {
+    return $dao->count;
+  }
   //if custom fields are required we will endeavour to set them . NB passing $entity in might be a bit clunky / unrequired
   if (!empty($entity) && CRM_Utils_Array::value('return', $params) && is_array($params['return'])) {
     foreach ($params['return'] as $return) {
@@ -921,7 +932,7 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
   $bao = new $bao_name();
   _civicrm_api3_dao_set_filter($bao, $params, TRUE,$entity);
   if ($returnAsSuccess) {
-    return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity);
+      return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity);
   }
   else {
     return _civicrm_api3_dao_to_array($bao, $params, FALSE, $entity);
@@ -1569,7 +1580,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
         throw new Exception("Currency not a valid code: $value");
       }
     }
-    if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
+    if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options']) || !empty($fieldInfo['enumValues'])) {
       _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, $fieldInfo);
     }
     // Check our field length

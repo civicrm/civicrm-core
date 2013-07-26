@@ -28,6 +28,10 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   protected $_contributionTypeId;
   protected $_contributionParams;
   protected $_contactId;

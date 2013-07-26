@@ -50,7 +50,9 @@ class CRM_Core_Invoke {
   static function invoke($args) {
     try {
       return self::_invoke($args);
-    } catch (Exception $e) {
+    }
+
+    catch (Exception $e) {
       return CRM_Core_Error::handleUnhandledException($e);
     }
   }
@@ -68,7 +70,36 @@ class CRM_Core_Invoke {
         self::hackStandalone($args);
         $item = self::getItem($args);
         return self::runItem($item);
-      } catch (Exception $e) {
+      }
+      catch (CRM_Core_EXCEPTION $e) {
+        $params = $e->getErrorData();
+        $message = $e->getMessage();
+        if (isset($params['legacy_status_bounce'])) {
+          //@todo remove this- see comments on
+          //https://github.com/eileenmcnaughton/civicrm-core/commit/ae686b09e2c987091612bb25ba0a58e520a203e7
+          CRM_Core_Error::statusBounce($params['message']);
+        }
+        else {
+          $session = CRM_Core_Session::singleton();
+          $session->setStatus(
+            $message,
+            CRM_Utils_Array::value('message_title', $params),
+            CRM_Utils_Array::value('message_type', $params, 'error')
+          );
+
+          // @todo remove this code - legacy redirect path is an interim measure for moving redirects out of BAO
+          // to somewhere slightly more acceptable. they should not be part of the exception class & should
+          // be managed @ the form level - if you find a form that is triggering this piece of code
+          // you should log a ticket for it to be removed with details about the form you were on.
+          if(!empty($params['legacy_redirect_path'])) {
+            if(CRM_Utils_System::isDevelopment()) {
+              // here we could set a message telling devs to log it per above
+            }
+            CRM_Utils_System::redirect($params['legacy_redirect_path'], $params['legacy_redirect_query']);
+          }
+        }
+      }
+      catch (Exception $e) {
         // Recall: CRM_Core_Config is initialized before calling CRM_Core_Invoke
         $config = CRM_Core_Config::singleton();
         return CRM_Core_Error::handleUnhandledException($e);

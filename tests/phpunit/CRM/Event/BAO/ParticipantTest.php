@@ -32,6 +32,10 @@ require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Event.php';
 require_once 'CiviTest/Participant.php';
 class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Participant BAOs',
