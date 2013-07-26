@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -39,107 +37,86 @@
  */
 require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_MailingContactTest extends CiviUnitTestCase {
-  protected $_apiversion;
-
+  protected $_apiversion = 3;
+  protected $_entity = 'mailing';
   function setUp() {
     parent::setUp();
-    $this->_apiversion = 3;
-    $this->_entity     = 'mailing';
-    $this->_contact_params     = array(
+    $params = array(
       'first_name' => 'abc1',
       'contact_type' => 'Individual',
       'last_name' => 'xyz1',
-      'version' => $this->_apiversion,
     );
-    $this->_contact = civicrm_api("contact", "create", $this->_contact_params);
-
-    /*$this->quickCleanup(
-      array(
-        'civicrm_mailing',
-        'civicrm_job',
-        'civicrm_mailing_event_queue',
-        'civicrm_mailing_event_delivered',
-        'civicrm_mailing_event_bounced',
-      )
-    );*/
+    $this->_contact = $this->callAPISuccess("contact", "create", $params);
   }
 
   function tearDown() {
+    $this->callAPISuccess("contact", "delete", array('id' => $this->_contact['id']));
     parent::tearDown();
-    civicrm_api("contact", "delete", $this->_contact_id);
-
   }
 
   /*
    * Test that the api responds correctly to null params
+   * Note to copy & pasters - tests like this that test the wrapper belong in the SyntaxConformance class
+   * (which already has a 'not array test)
+   * I have left this here in case 'null' isn't covered in that class
+   * but don't copy it only any other classes
    */
-
     public function testMailingNullParams() {
         $result = $this->callAPIFailure('MailingContact', 'get', null);
     }
+
     public function testMailingContactGetFields() {
-      $result = civicrm_api('MailingContact', 'getfields', array(
-        'version' => 3,
-        'action' => 'get',
+      $result = $this->callAPISuccess('MailingContact', 'getfields', array(
+         'action' => 'get',
         )
       );
-      $this->assertAPISuccess($result);
       $this->assertEquals('Delivered', $result['values']['type']['api.default']);
     }
 
-  /*
+  /**
    * Test that the api will return the proper error when you do not
    * supply the contact_id
+   * Note to copy & pasters - test is of marginal if any value & testing of wrapper level functionaliy
+   * belongs in the SyntaxConformance class
    */
 
   public function testMailingNoContactID() {
     $params = array(
       'something' => 'This is not a real field',
-      'version' => $this->_apiversion,
     );
-
     $result = $this->callAPIFailure('MailingContact', 'get', $params);
   }
 
-  /*
+  /**
    * Test that invalid contact_id return with proper error messages
+   * Note to copy & pasters - test is of marginal if any value & testing of wrapper level functionaliy
+   * belongs in the SyntaxConformance class
    */
     public function testMailingContactInvalidContactID() {
-        $params = array(
-            'contact_id' => 'This is not a number',
-            'version' => $this->_apiversion,
-        );
-
-        $result = $this->callAPIFailure('MailingContact', 'get', $params);
+      $params = array('contact_id' => 'This is not a number',);
+      $result = $this->callAPIFailure('MailingContact', 'get', $params);
    }
 
-   /*
+   /**
     * Test that invalid types are returned with appropriate errors
     */
     public function testMailingContactInvalidType() {
-        $params = array(
-            'contact_id' => 23,
-            'type' => 'invalid',
-            'version' => $this->_apiversion,
-        );
-
-        $result = $this->callAPIFailure('MailingContact', 'get', $params);
+      $params = array(
+        'contact_id' => 23,
+        'type' => 'invalid',
+      );
+      $result = $this->callAPIFailure('MailingContact', 'get', $params);
     }
 
-
-    /*
+    /**
     * Test that the API returns properly when there are no mailings
     * for a the given contact
     */
     public function testMailingContactNoMailings() {
         $params = array(
             'contact_id' => $this->_contact['id'],
-            'version' => $this->_apiversion,
         );
-
-        $result = civicrm_api('MailingContact', 'get', $params);
-        $this->assertAPISuccess($result, "In line " . __LINE__);
-
+        $result = $this->callAPISuccess('MailingContact', 'get', $params);
         $this->assertEquals($result['count'], 0, "In line " . __LINE__);
         $this->assertTrue(empty($result['values']), "In line " . __LINE__);
     }
@@ -165,12 +142,10 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         $params = array(
             'contact_id' => 23,
             'type' => 'Delivered',
-            'version' => $this->_apiversion,
         );
 
-        $result = civicrm_api('MailingContact', 'get', $params);
-        $count = civicrm_api('MailingContact', 'getcount', $params);
-        $this->assertAPISuccess($result, "In line " . __LINE__);
+        $result = $this->callAPISuccess('MailingContact', 'get', $params);
+        $count = $this->callAPISuccess('MailingContact', 'getcount', $params);
         $this->assertEquals($result['count'], 1, "In line " . __LINE__);
         $this->assertEquals($count, 1, "In line " . __LINE__);
         $this->assertFalse(empty($result['values']), "In line " . __LINE__);
@@ -202,11 +177,9 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         $params = array(
             'contact_id' => 23,
             'type' => 'Bounced',
-            'version' => $this->_apiversion,
         );
 
-        $result = civicrm_api('MailingContact', 'get', $params);
-        $this->assertAPISuccess($result, "In line " . __LINE__);
+        $result = $this->callAPISuccess('MailingContact', 'get', $params);
         $this->assertEquals($result['count'], 1, "In line " . __LINE__);
         $this->assertFalse(empty($result['values']), "In line " . __LINE__);
         $this->assertEquals($result['values'][2]['mailing_id'], 2, "In line " . __LINE__);
@@ -214,7 +187,4 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
         $this->assertEquals($result['values'][2]['creator_id'], 1, "In line " . __LINE__);
         $this->assertEquals($result['values'][2]['creator_name'], "xyz1, abc1", "In line " . __LINE__);
     }
-
-
-
 }
