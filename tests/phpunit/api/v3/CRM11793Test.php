@@ -60,16 +60,14 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
   }
 
   function _testCRM11793ContactType($contactType) {
-    $result = civicrm_api(
+    $result = $this->callAPISuccess(
       'contact',
       'get',
       array(
-        'version' => 3,
         'contact_type' => $contactType
       )
     );
 
-    $this->assertAPISuccess($result, "In line " . __LINE__);
     foreach ($result['values'] as $idx => $contact) {
       $this->assertEquals($contact['contact_type'], $contactType, "In line " . __LINE__);
     }

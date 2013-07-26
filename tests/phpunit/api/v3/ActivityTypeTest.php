@@ -55,9 +55,8 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
    *  Test civicrm_activity_type_get()
    */
   function testActivityTypeGet() {
-    $params = array('version' => $this->_apiversion);
-    $result = civicrm_api('activity_type', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $params = array();
+    $result = $this->callAPIAndDocument('activity_type', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values']['1'], 'Meeting', 'In line ' . __LINE__);
     $this->assertEquals($result['values']['13'], 'Open Case', 'In line ' . __LINE__);
   }
@@ -70,15 +69,12 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
     $params = array(
       'weight' => '2',
       'label' => 'send out letters',
-      'version' => $this->_apiversion,
       'filter' => 0,
       'is_active' => 1,
       'is_optgroup' => 1,
       'is_default' => 0,
     );
-    $result = civicrm_api('activity_type', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result);
+    $result = $this->callAPIAndDocument('activity_type', 'create', $params, __FUNCTION__, __FILE__);
   }
 
   /**
@@ -89,11 +85,8 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
     $params = array(
       'label' => 'type_create',
       'weight' => '2',
-      'version' => $this->_apiversion,
     );
-    $activitycreate = civicrm_api('activity_type', 'create', $params);
-    $activityID = $activitycreate['id'];
-    $this->assertAPISuccess($activitycreate, "in line " . __LINE__);
+    $activitycreate = $this->callAPISuccess('activity_type', 'create', $params);
     $this->assertArrayHasKey('id', $activitycreate);
     $this->assertArrayHasKey('option_group_id', $activitycreate['values'][$activitycreate['id']]);
   }
@@ -106,16 +99,12 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
     $params = array(
       'label' => 'type_create_delete',
       'weight' => '2',
-      'version' => $this->_apiversion,
     );
-    $activitycreate = civicrm_api('activity_type', 'create', $params);
+    $activitycreate = $this->callAPISuccess('activity_type', 'create', $params);
     $params = array(
       'activity_type_id' => $activitycreate['id'],
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('activity_type', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPIFailure($result, 'In line ' . __LINE__);
+    $result = $this->callAPISuccess('activity_type', 'delete', $params, __FUNCTION__, __FILE__);
   }
 }
 

@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -47,10 +46,9 @@
  * @access public
  *
  * @example ActivityTypeGet.php
- * @deprecated - use constant_get
+ * @deprecated - use getoptions
  */
 function civicrm_api3_activity_type_get($params) {
-
 
   $activityTypes = CRM_Core_OptionGroup::values('activity_type');
   return civicrm_api3_create_success($activityTypes, $params, 'activity_type', 'get');
@@ -66,13 +64,9 @@ function civicrm_api3_activity_type_get($params) {
  *
  * @access public
  *
- *{@schema Activity/ActivityType.xml}
- *
- * {@example ActivityTypeCreate.php 0}
  * @deprecated - we will introduce OptionValue Create - plse consider helping with this if not done
  */
 function civicrm_api3_activity_type_create($params) {
-
 
   $action = 1;
   $groupParams = array('name' => 'activity_type');
@@ -101,21 +95,15 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
 /**
  * Function to delete activity type
  *
- * @param activityTypeId int   activity type id to delete
- *
- * @return boolen
+ * @param array $params array including id of activity_type to delete
+
+ * @return array API result array
  *
  * @access public
  *
  * @deprecated - we will introduce OptionValue Delete- plse consider helping with this if not done
- * {@example ActivityTypeDelete.php 0}
  */
 function civicrm_api3_activity_type_delete($params) {
-
-  civicrm_api3_verify_mandatory($params, NULL, array('activity_type_id'));
-
-  $activityTypeId = $params['activity_type_id'];
-
-  return CRM_Core_BAO_OptionValue::del($activityTypeId);
+  return civicrm_api3_create_success(CRM_Core_BAO_OptionValue::del($params['id']), $params);
 }
 

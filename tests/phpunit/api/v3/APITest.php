@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -38,7 +37,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
   public $_eNoticeCompliant = TRUE;
 
-  protected $_apiversion;
+  protected $_apiversion =3;
 
   /**
    * Sets up the fixture, for example, opens a network connection.
@@ -48,7 +47,6 @@ class api_v3_APITest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->_apiversion = 3;
   }
 
   /**
@@ -95,40 +93,26 @@ class api_v3_APITest extends CiviUnitTestCase {
   function testAPIWrapperIncludeNoFile() {
 
 
-    $result = civicrm_api('RandomFile', 'get', array('version' => 3));
-    $this->assertAPIFailure($result);
-    $this->assertEquals($result['error_message'], 'API (RandomFile,get) does not exist (join the API team and implement it!)');
+    $result = $this->callAPIFailure('RandomFile', 'get', array(), 'API (RandomFile,get) does not exist (join the API team and implement it!)');
   }
 
   function testAPIWrapperCamelCaseFunction() {
-    $result = civicrm_api('OptionGroup', 'Get', array(
-      'version' => 3,
-      ));
-    $this->assertEquals(0, $result['is_error']);
+    $result = $this->callAPISuccess('OptionGroup', 'Get', array());
   }
 
   function testAPIWrapperLcaseFunction() {
-    $result = civicrm_api('OptionGroup', 'get', array(
-      'version' => 3,
-      ));
-    $this->assertEquals(0, $result['is_error']);
+    $result = $this->callAPISuccess('OptionGroup', 'get', array());
   }
 
   function testAPIResolver() {
     $oldpath = get_include_path();
     set_include_path($oldpath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
-    $result = civicrm_api('contact', 'example_action1', array(
-        'version' => 3,
-      ));
+    $result = $this->callAPISuccess('contact', 'example_action1', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_generic_example_action1 is ok');
-    $result = civicrm_api('contact', 'example_action2', array(
-        'version' => 3,
-      ));
+    $result = $this->callAPISuccess('contact', 'example_action2', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_contact_example_action2 is ok');
-    $result = civicrm_api('test_entity', 'example_action3', array(
-        'version' => 3,
-      ));
+    $result = $this->callAPISuccess('test_entity', 'example_action3', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_test_entity_example_action3 is ok');
 
     set_include_path($oldpath);
