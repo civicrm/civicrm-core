@@ -100,7 +100,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         $id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
         $relatedContactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($relatedContactId);
-        CRM_Member_BAO_Membership::deleteMembership($id);
+        CRM_Member_BAO_Membership::del($id);
         CRM_Core_Session::setStatus(ts('Related membership for %1 has been deleted.', array(1 => $relatedDisplayName)), ts('Membership Deleted'), 'success');
         break;
       case 'create':

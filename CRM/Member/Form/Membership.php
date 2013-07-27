@@ -1067,8 +1067,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Member_BAO_Membership::deleteRelatedMemberships($this->_id);
-      CRM_Member_BAO_Membership::deleteMembership($this->_id);
+      CRM_Member_BAO_Membership::del($this->_id);
       return;
     }
 
