@@ -1942,6 +1942,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     if (isset($result['values']) && is_array($result['values'])) {
       foreach ($result['values'] as $index => &$values) {
+        if(!is_array($values)) {
+          continue;
+        }
         foreach($values as $key => &$value) {
           if(substr($key, 0, 3)  == 'api' && is_array($value)) {
             if(isset($value['is_error'])) {
