@@ -40,7 +40,6 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     parent::setUp();
     // put stuff here that should happen before all tests in this unit
     $priceSetparams = array(
-      'version' => 3,
       #     [domain_id] =>
       'name' => 'default_goat_priceset',
       'title' => 'Goat accomodation',
@@ -53,11 +52,10 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_reserved' => 1,
     );
 
-    $price_set = civicrm_api('price_set', 'create',$priceSetparams);
+    $price_set = $this->callAPISuccess('price_set', 'create',$priceSetparams);
     $this->priceSetID = $price_set['id'];
 
     $priceFieldparams = array(
-      'version' => $this->_apiversion,
       'price_set_id' => $this->priceSetID,
       'name' => 'grassvariety',
       'label' => 'Grass Variety',
@@ -65,10 +63,9 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_enter_qty' => 1,
       'is_active' => 1,
     );
-    $priceField = civicrm_api('price_field','create', $priceFieldparams);
+    $priceField = $this->callAPISuccess('price_field','create', $priceFieldparams);
     $this->priceFieldID = $priceField['id'];
     $this->_params = array(
-      'version' => 3,
       'price_field_id' => $this->priceFieldID,
       'name' => 'ryegrass',
       'label' => 'juicy and healthy',
@@ -78,7 +75,6 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $membershipOrgId = $this->organizationCreate(NULL);
     $this->_membershipTypeID = $this->membershipTypeCreate($membershipOrgId);
     $priceSetparams1 = array(
-      'version' => $this->_apiversion,
       'name' => 'priceset',
       'title' => 'Priceset with Multiple Terms',
       'is_active' => 1,
@@ -87,10 +83,9 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_quick_config' => 1,
       'is_reserved' => 1,
     );
-    $price_set1 = civicrm_api('price_set', 'create',$priceSetparams1);
+    $price_set1 = $this->callAPISuccess('price_set', 'create',$priceSetparams1);
     $this->priceSetID1 = $price_set1['id'];
     $priceFieldparams1 = array(
-      'version' => $this->_apiversion,
       'price_set_id' => $this->priceSetID1,
       'name' => 'memtype',
       'label' => 'memtype',
@@ -98,7 +93,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_enter_qty' => 1,
       'is_active' => 1,
     );
-    $priceField1 = civicrm_api('price_field','create', $priceFieldparams1);
+    $priceField1 = $this->callAPISuccess('price_field','create', $priceFieldparams1);
     $this->priceFieldID1 = $priceField1['id'];
   }
 
@@ -109,20 +104,16 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     );
     $this->quickCleanup($tablesToTruncate);
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
-    civicrm_api('PriceField','delete', array(
-        'version' => 3,
+    $this->callAPISuccess('PriceField','delete', array(
         'id' => $this->priceFieldID1,
     ));
-    civicrm_api('PriceSet','delete', array(
-      'version' => 3,
+    $this->callAPISuccess('PriceSet','delete', array(
       'id' => $this->priceSetID1,
     ));
-    civicrm_api('PriceField','delete', array(
-        'version' => 3,
+    $this->callAPISuccess('PriceField','delete', array(
         'id' => $this->priceFieldID,
     ));
-    $delete = civicrm_api('PriceSet','delete', array(
-      'version' => 3,
+    $delete = $this->callAPISuccess('PriceSet','delete', array(
       'id' => $this->priceSetID,
     ));
 
@@ -130,9 +121,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
   }
 
   public function testCreatePriceFieldValue() {
-    $result = civicrm_api($this->_entity, 'create', $this->_params);
-    $this->id = $result['id'];
-    $this->documentMe($this->_params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
@@ -140,44 +129,34 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
   }
 
   public function testGetBasicPriceFieldValue() {
-    $createResult = civicrm_api($this->_entity, 'create', $this->_params);
+    $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $this->id = $createResult['id'];
     $this->assertAPISuccess($createResult);
     $getParams = array(
-      'version' => $this->_apiversion,
       'name' => 'contribution_amount',
     );
-    $getResult = civicrm_api($this->_entity, 'get', $getParams);
-    $this->documentMe($getParams, $getResult, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($getResult, 'In line ' . __LINE__);
+    $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
-    civicrm_api('price_field_value','delete', array('version' => 3, 'id' => $createResult['id']));
+    $this->callAPISuccess('price_field_value','delete', array('id' => $createResult['id']));
   }
 
   public function testDeletePriceFieldValue() {
-    $startCount = civicrm_api($this->_entity, 'getcount', array(
-      'version' => $this->_apiversion,
-      ));
-    $createResult = civicrm_api($this->_entity, 'create', $this->_params);
-    $deleteParams = array('version' => $this->_apiversion, 'id' => $createResult['id']);
-    $deleteResult = civicrm_api($this->_entity, 'delete', $deleteParams);
-    $this->documentMe($deleteParams, $deleteResult, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($deleteResult, 'In line ' . __LINE__);
-    $endCount = civicrm_api($this->_entity, 'getcount', array(
-      'version' => $this->_apiversion,
-      ));
+    $startCount = $this->callAPISuccess($this->_entity, 'getcount', array());
+    $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $deleteParams = array('id' => $createResult['id']);
+    $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+
+    $endCount = $this->callAPISuccess($this->_entity, 'getcount', array());
     $this->assertEquals($startCount, $endCount, 'In line ' . __LINE__);
   }
 
   public function testGetFieldsPriceFieldValue() {
-    $result = civicrm_api($this->_entity, 'getfields', array('version' => $this->_apiversion, 'action' => 'create'));
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(1, $result['values']['max_value']['type']);
   }
 
   public function testCreatePriceFieldValuewithMultipleTerms() {
     $params = array(
-      'version' => 3,
       'price_field_id' => $this->priceFieldID1,
       'membership_type_id' =>  $this->_membershipTypeID,
       'name' => 'memType1',
@@ -187,16 +166,13 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_active' => 1,
       'financial_type_id' => 2,
      );
-    $result = civicrm_api($this->_entity, 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['membership_num_terms'], 2);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    civicrm_api($this->_entity, 'delete', array('version' => 3, 'id' => $result['id']));
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
   }
   public function testGetPriceFieldValuewithMultipleTerms() {
     $params1 = array(
-      'version' => 3,
       'price_field_id' => $this->priceFieldID1,
       'membership_type_id' =>  $this->_membershipTypeID,
       'name' => 'memType1',
@@ -207,7 +183,6 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'financial_type_id' => 2,
      );
     $params2 = array(
-      'version' => 3,
       'price_field_id' => $this->priceFieldID1,
       'membership_type_id' =>  $this->_membershipTypeID,
       'name' => 'memType2',
@@ -217,13 +192,12 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_active' => 1,
       'financial_type_id' => 2,
      );
-    $result1 = civicrm_api($this->_entity, 'create', $params1);
-    $result2 = civicrm_api($this->_entity, 'create', $params2);
-    $result = civicrm_api($this->_entity, 'get', array( 'version' => 3, 'price_field_id' =>$this->priceFieldID1 ));
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result1 = $this->callAPISuccess($this->_entity, 'create', $params1);
+    $result2 = $this->callAPISuccess($this->_entity, 'create', $params2);
+    $result = $this->callAPISuccess($this->_entity, 'get', array('price_field_id' =>$this->priceFieldID1 ));
     $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
-    civicrm_api($this->_entity,'delete', array('version' => 3, 'id' => $result1['id']));
-    civicrm_api($this->_entity,'delete', array('version' => 3, 'id' => $result2['id']));
+    $this->callAPISuccess($this->_entity,'delete', array('id' => $result1['id']));
+    $this->callAPISuccess($this->_entity,'delete', array('id' => $result2['id']));
   }
 }
 
