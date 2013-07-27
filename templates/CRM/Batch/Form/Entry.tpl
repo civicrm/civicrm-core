@@ -183,8 +183,21 @@
        var validRow   = 0;
        var inValidRow = 0;
        var errorExists = false;
+       var rowID = parentRow.closest('div.crm-grid-row').attr('entity_id');
+
        parentRow.find('div .required').each(function(){
-         if ( !cj(this).val( ) ) {
+         //special case to handle contact autocomplete select
+         var fieldId = cj(this).attr('id');
+         if (fieldId.substring(0, 16) == 'primary_contact_') {
+           // if display value is set then make sure we also check if contact id is set
+           if ( !cj(this).val( ) ) {
+             inValidRow++;
+           }
+           else if (cj(this).val( ) && !cj('input[name="primary_contact_select_id[' + rowID + ']"]').val()) {
+             inValidRow++;
+             errorExists = true;
+           }
+         } else if ( !cj(this).val( ) ) {
             inValidRow++;
          } else if ( cj(this).hasClass('error') && !cj(this).hasClass('valid') ) {
             errorExists = true;
@@ -193,7 +206,7 @@
          }
        });
 
-       // this means use has entered some data
+       // this means user has entered some data
        if ( errorExists ) {
          parentRow.find("div:first span").prop('class', 'batch-invalid');
        } else if ( inValidRow == 0 && validRow > 0 ) {
