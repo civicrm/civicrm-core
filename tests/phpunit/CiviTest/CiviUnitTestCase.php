@@ -804,9 +804,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
     $params['version'] = $this->_apiversion;
     $result = $this->callAPISuccess($entity, $action, $params);
-    if (is_array($result)) {
-      unset($result['xdebug']);
-    }
     $this->documentMe($params, $result, $function, $file, $description, $subfile, $actionName);
     return $result;
   }
@@ -1881,24 +1878,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $entityAction = ucwords($action);
     }
 
-    $fieldsToChange = array(
-      'hash' => '67eac7789eaee00',
-      'modified_date' => '2012-11-14 16:02:35',
-      'created_date' => '20120130621222105',
-      'create_date' => '20120130621222105',
-    );
-
-    //swap out keys that change too often
-    foreach ($fieldsToChange as $changeKey => $changeValue) {
-      if (isset($result['values']) && is_array($result['values'])) {
-        foreach ($result['values'] as $key => $value) {
-          if (is_array($value) && array_key_exists($changeKey, $value)) {
-            $result['values'][$key][$changeKey] = $changeValue;
-          }
-        }
-      }
-    }
-
+    $this->tidyExampleResult($result);
     // a cleverer person than me would do it in a single regex
     if (strstr($entity, 'UF')) {
       $fnPrefix = strtolower(preg_replace('/(?<! )(?<!^)(?<=UF)[A-Z]/', '_$0', $entity));
@@ -1933,6 +1913,55 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         $f = fopen("../api/v3/examples/$entity/$subfile.php", "w+b");
         fwrite($f, $smarty->fetch('../tests/templates/documentFunction.tpl'));
         fclose($f);
+      }
+    }
+  }
+
+  /**
+   * Tidy up examples array so that fields that change often ..don't
+   * and debug related fields are unset
+   * @param array $params
+   */
+  function tidyExampleResult(&$result){
+    if(!is_array($result)) {
+      return;
+    }
+    $fieldsToChange = array(
+      'hash' => '67eac7789eaee00',
+      'modified_date' => '2012-11-14 16:02:35',
+      'created_date' => '20120130621222105',
+      'create_date' => '20120130621222105',
+    );
+
+    $keysToUnset = array('xdebug', 'undefined_fields');
+    foreach ($keysToUnset as $unwantedKey) {
+      if(isset($result[$unwantedKey])) {
+        unset($result[$unwantedKey]);
+      }
+    }
+
+    if (isset($result['values']) && is_array($result['values'])) {
+      foreach ($result['values'] as $index => &$values) {
+        foreach($values as $key => &$value) {
+          if(substr($key, 0, 3)  == 'api' && is_array($value)) {
+            if(isset($value['is_error'])) {
+              // we have a std nested result format
+              $this->tidyExampleResult($value);
+            }
+            else{
+              foreach ($value as &$nestedResult) {
+                // this is an alternative syntax for nested results a keyed array of results
+                $this->tidyExampleResult($nestedResult);
+              }
+            }
+          }
+          if(in_array($key, $keysToUnset)) {
+            unset($values[$key]);
+          }
+          if(array_key_exists($key, $fieldsToChange)) {
+            $value = $fieldsToChange[$key];
+          }
+        }
       }
     }
   }
