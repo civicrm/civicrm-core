@@ -613,8 +613,8 @@ class CRM_Utils_Token {
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
-      function ($matches) use(&$contact, $key, $html, $escapeSmarty) {
-        return CRM_Utils_Token::getContactTokenReplacement($matches[1], $contact, $key, $html, $escapeSmarty);
+      function ($matches) use(&$contact, $html, $returnBlankToken, $escapeSmarty) {
+        return CRM_Utils_Token::getContactTokenReplacement($matches[1], $contact, $html, $returnBlankToken, $escapeSmarty);
       },
       $str
     );
