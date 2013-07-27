@@ -72,8 +72,8 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $mailings = CRM_Mailing_BAO_Mailing::getTableName();
     $jobs = CRM_Mailing_BAO_Job::getTableName();
     $mailing->query(
-      "SELECT * FROM  $mailings 
-            INNER JOIN      $jobs 
+      "SELECT * FROM  $mailings
+            INNER JOIN      $jobs
                 ON          $jobs.mailing_id = $mailings.id
             WHERE           $jobs.id = {$q->job_id}"
     );
@@ -135,7 +135,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
       // CRM-5567: we need to set Reply-To: so that any response
       // to the forward goes to the sender of the reply
-      $parsed->setHeader('Reply-To', $replyto instanceof ezcMailAddress ? $parsed->from->__toString() : $replyto);
+      $parsed->setHeader('Reply-To', $replyto instanceof ezcMailAddress ? $replyto : $parsed->from->__toString());
 
       // $h must be an array, so we can't use generateHeaders()'s result,
       // but we have to regenerate the headers because we changed To
@@ -173,7 +173,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
         'Subject' => "Re: {$mailing->subject}",
         'To' => $mailing->replyto_email,
         'From' => $from,
-        'Reply-To' => empty($replyto) ? $dao->email : $replyto,
+        'Reply-To' => empty($replyto) ? $eq->email : $replyto,
         'Return-Path' => "do-not-reply@{$emailDomain}",
       );
 
