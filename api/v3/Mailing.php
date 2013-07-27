@@ -162,7 +162,7 @@ function _civicrm_api3_mailing_event_reply_spec(&$params) {
   $params['job_id']['api.required'] = 1;
   $params['event_queue_id']['api.required'] = 1;
   $params['hash']['api.required'] = 1;
-  $params['replyTo']['api.required'] = 1;
+  $params['replyTo']['api.required'] = 0;
 }
 
 /**
