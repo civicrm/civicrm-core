@@ -38,7 +38,7 @@
     </tr>
    </table>
 
-   <div class="crm-accordion-wrapper crm-plain_text_email-accordion collapsed">
+   <div id="premiumSettings" class="crm-accordion-wrapper crm-plain_text_email-accordion collapsed">
    <div class="crm-accordion-header">
         {ts}Premiums Settings{/ts}
    </div>
@@ -81,7 +81,7 @@
       </td>
     </tr>
     <tr class="crm-contribution-contributionpage-premium-form-block-premiums_nothankyou_label">
-       <td class="label">{$form.premiums_nothankyou_label.label}
+       <td class="label">{$form.premiums_nothankyou_label.label}<span class="marker"> *</span>
        </td>
        <td class="html-adjust">{$form.premiums_nothankyou_label.html}<br />
             <span class="description">{ts}You can change the text for the 'No thank-you' radio button.{/ts}</span>
@@ -96,9 +96,10 @@
     </tr>
     </table>
     </div><!-- /.crm-accordion-body -->
+    {* Call Premiums tpl inside premiumSettings div to hide it on unchecking premiums_active checkbox*}    
+    {include file="CRM/Contribute/Page/Premium.tpl"}
     </div><!-- /.crm-accordion-wrapper -->
 
-    {include file="CRM/Contribute/Page/Premium.tpl"}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
@@ -106,6 +107,37 @@
 {literal}
 cj(function() {
    cj().crmAccordions();
+
+   // bind click event to premiums_active checkbox
+   cj('#premiums_active').click(function() {
+     // call function to show/hide Premium Settings div
+     premiumBlock(cj(this).prop('checked'));
+   });
+
+   // show/hide Premium Settings div on page load
+   // depending on "Premiums Section Enabled?" checkbox's value
+   if (!cj('#premiums_active').is(':checked')) {
+     cj("#premiumSettings:not(.collapsed)").crmAccordionToggle();
+     cj('#premiumSettings').hide();
+   }
+   else {
+     cj("#premiumSettings").crmAccordionToggle();
+     cj('#premiumSettings').show();
+   }
+     
+   // function to show/hide Premium Settings
+   function premiumBlock(checked) {
+     if (checked) {
+       cj("#premiumSettings").crmAccordionToggle();
+       cj('#premiumSettings').show();
+       return;
+     }
+     else {
+       cj("#premiumSettings:not(.collapsed)").crmAccordionToggle();
+       cj('#premiumSettings').hide();
+       return;
+     }
+   }
 });
 {/literal}
 </script>
