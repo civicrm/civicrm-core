@@ -803,18 +803,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
     $params['version'] = $this->_apiversion;
-    if(!isset($params['debug'])){
-      // don't debug by default to keep examples tidy
-      $params['debug'] = 0;
-    }
-    try{
-      $result = $this->callAPISuccess($entity, $action, $params);
-    }
-    catch (EXCEPTION $e) {
-      // but if it fails call again with debug on for better error message
-      $params['debug'] = 1;
-      $result = $this->callAPISuccess($entity, $action, $params);
-
+    $result = $this->callAPISuccess($entity, $action, $params);
+    if (is_array($result)) {
+      unset($result['xdebug']);
     }
     $this->documentMe($params, $result, $function, $file, $description, $subfile, $actionName);
     return $result;
