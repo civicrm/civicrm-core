@@ -131,3 +131,7 @@ UPDATE civicrm_option_value
 -- CRM-12717
 UPDATE `civicrm_navigation` SET label = '{ts escape="sql"}Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.){/ts}', name = 'Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)'
 WHERE url = 'civicrm/admin/setting/misc&reset=1';
+
+-- CRM-13112
+ALTER TABLE civicrm_survey
+  ADD is_share TINYINT( 4 ) NULL DEFAULT '1' COMMENT 'Can people share the petition through social media?';

@@ -166,8 +166,8 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
   public function buildQuickForm() {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-
-      $this->addButtons(array(
+      $this->addButtons(
+        array(
           array(
             'type' => 'next',
             'name' => ts('Delete'),
@@ -181,7 +181,6 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       );
       return;
     }
-
 
     $this->add('text', 'title', ts('Petition Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'title'), TRUE);
 
@@ -208,7 +207,8 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     // custom group id
     $this->add('select', 'profile_id', ts('Activity Profile'),
       array(
-        '' => ts('- select -')) + $customProfiles
+        '' => ts('- select -')
+      ) + $customProfiles
     );
 
     // thank you title and text (html allowed in text)
@@ -218,6 +218,9 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     // bypass email confirmation?
     $this->add('checkbox', 'bypass_confirm', ts('Bypass email confirmation'));
 
+    //is share through social media
+    $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
+
     // is active ?
     $this->add('checkbox', 'is_active', ts('Is Active?'));
 
@@ -225,7 +228,8 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $this->add('checkbox', 'is_default', ts('Is Default?'));
 
     // add buttons
-    $this->addButtons(array(
+    $this->addButtons(
+      array(
         array(
           'type' => 'next',
           'name' => ts('Save'),
@@ -256,6 +260,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
     $params['last_modified_id'] = $session->get('userID');
     $params['last_modified_date'] = date('YmdHis');
+    $params['is_share'] = CRM_Utils_Array::value('is_share', $params, FALSE);
 
     if ($this->_surveyId) {
 
@@ -278,7 +283,6 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
 
     $surveyId = CRM_Campaign_BAO_Survey::create($params);
-
 
     // also update the ProfileModule tables
     $ufJoinParams = array(

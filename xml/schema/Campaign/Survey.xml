@@ -201,4 +201,12 @@
     <comment>text and html allowed. displayed above result on success page</comment>
     <add>4.2</add>
   </field>
+  <field>
+    <name>is_share</name>
+    <title>Is shared through social media</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Can people share the petition through social media?</comment>
+    <add>4.4</add>
+  </field>
 </table>
