@@ -84,6 +84,11 @@ function _civicrm_api3_price_set_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_price_set_get($params) {
+  // hack to make getcount work. - not sure the best approach here
+  // as creating an alternate getcount function also feels a bit hacky
+  if(isset($params['options'])  && isset($params['options']['is_count'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  }
   $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   // Fetch associated entities
   foreach ($result as &$item) {
