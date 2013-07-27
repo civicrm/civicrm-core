@@ -112,8 +112,30 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
       $components    = array('Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity');
 
       if (in_array($componentName[1], $components)) {
-        $fieldName = strtoupper($componentName[1]) . '_EXPORT';
-        $this->_exportMode = self::$fieldName;
+        switch ($componentName[1]) {
+          case 'Contribute':
+            $this->_exportMode = self::CONTRIBUTE_EXPORT;
+            break;
+          case 'Member':
+            $this->_exportMode = self::MEMBER_EXPORT;
+            break;
+          case 'Event':
+            $this->_exportMode = self::EVENT_EXPORT;
+            break;
+          case 'Pledge':
+            $this->_exportMode = self::PLEDGE_EXPORT;
+            break;
+          case 'Case':
+            $this->_exportMode = self::CASE_EXPORT;
+            break;
+          case 'Grant':
+            $this->_exportMode = self::GRANT_EXPORT;
+            break;
+          case 'Activity':
+            $this->_exportMode = self::ACTIVITY_EXPORT;
+            break;
+        }
+
         $className = "CRM_{$componentName[1]}_Form_Task";
         $className::preProcessCommon( $this, true );
         $values = $this->controller->exportValues('Search');
