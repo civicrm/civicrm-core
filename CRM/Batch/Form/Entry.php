@@ -242,6 +242,16 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       }
     }
 
+    // if contact name is set for a row using autocomplete widget then make sure contact id exists, CRM-13078
+    // I was not able to replicate this on my local but adding this check and hopefully it will fix the issue.
+    if (!empty($params['primary_contact'])) {
+      foreach($params['primary_contact'] as $rowIndex => $contactName) {
+        if (empty($params['primary_contact_select_id'][$rowIndex])) {
+          $errors['primary_contact['.$rowIndex.']'] = ts('Please select a valid contact.');
+        }
+      }
+    }
+
     if ($batchTotal != $self->_batchInfo['total']) {
       $self->assign('batchAmountMismatch', TRUE);
       $errors['_qf_defaults'] = ts('Total for amounts entered below does not match the expected batch total.');
@@ -365,8 +375,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', 'default_contribution_amount', 'id', 'name');
     $this->_priceSet = current(CRM_Price_BAO_Set::getSetDetail($priceSetId));
     $fieldID = key($this->_priceSet['fields']);
-
-    $assetRelation = key(CRM_CORE_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
 
     if (isset($params['field'])) {
       foreach ($params['field'] as $key => $value) {

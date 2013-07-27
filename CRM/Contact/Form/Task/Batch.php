@@ -289,10 +289,8 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
   //end of function
 
-  function parseStreetAddress(&$contactValues, &$form) {
-    if (!is_array($contactValues) ||
-      !is_array($form->_fields)
-    ) {
+  public static function parseStreetAddress(&$contactValues, &$form) {
+    if (!is_array($contactValues) || !is_array($form->_fields)) {
       return;
     }
 
