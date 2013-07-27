@@ -83,7 +83,7 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
   public function postProcess() {
     $deletedMembers = 0;
     foreach ($this->_memberIds as $memberId) {
-      if (CRM_Member_BAO_Membership::deleteMembership($memberId)) {
+      if (CRM_Member_BAO_Membership::del($memberId)) {
         $deletedMembers++;
       }
     }
