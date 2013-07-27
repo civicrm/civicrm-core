@@ -134,7 +134,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     // contribution status is missing, choose Completed as default status
-    if (!CRM_Utils_Array::value('contribution_status_id', $params)) {
+    // do this for create mode only
+    if (!CRM_Utils_Array::value('contribution', $ids) && !CRM_Utils_Array::value('contribution_status_id', $params)) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
 
