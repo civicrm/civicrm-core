@@ -426,10 +426,6 @@ function popUp(URL) {
   eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=0,width=640,height=420,left = 202,top = 184');");
 }
 
-function imagePopUp(path) {
-  window.open(path, 'popupWindow', 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no,screenX=150,screenY=150,top=150,left=150');
-}
-
 /**
  * Function to show / hide the row in optionFields
  *
@@ -714,6 +710,7 @@ CRM.validate = CRM.validate || {
       message: ts('Are you sure you want to continue?'),
       resizable: false,
       modal: true,
+      width: 'auto',
       close: function () {
         $(dialog).remove();
       },
@@ -824,6 +821,20 @@ CRM.validate = CRM.validate || {
       messagesFromMarkup.call($('#crm-container'));
       $('#crm-container').on('crmFormLoad', '*', messagesFromMarkup);
     }
+
+    // bind the event for image popup
+    $('body').on('click', 'a.crm-image-popup', function() {
+      var o = $('<div class="crm-container crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
+
+      CRM.confirm('',
+        {
+          title: ts('Preview'),
+          message: o
+        },
+        ts('Done')
+      );
+      return false;
+    });
   });
 
   $.fn.crmAccordions = function (speed) {
