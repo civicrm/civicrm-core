@@ -1,22 +1,30 @@
 <?php
-
-/*
- This demonstrates use of the 'format.single_entity_array' param.
+/**
+ * Test Generated example of using contact getsingle API
+ * This demonstrates use of the 'format.single_entity_array' param.
     /* This param causes the only contact to be returned as an array without the other levels.
-    /* it will be ignored if there is not exactly 1 result
+    /* it will be ignored if there is not exactly 1 result *
  */
 function contact_getsingle_example(){
 $params = array(
-  'version' => 3,
   'id' => 17,
 );
 
-  $result = civicrm_api( 'contact','getsingle',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'getsingle', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_getsingle_expectedresult(){
@@ -79,7 +87,7 @@ function contact_getsingle_expectedresult(){
   'id' => '17',
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

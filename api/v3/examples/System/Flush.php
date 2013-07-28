@@ -1,19 +1,26 @@
 <?php
-
-/*
- Flush all system caches
+/**
+ * Test Generated example of using system flush API
+ * Flush all system caches *
  */
 function system_flush_example(){
-$params = array(
-  'version' => 3,
-);
+$params = array();
 
-  $result = civicrm_api( 'system','flush',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('system', 'flush', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function system_flush_expectedresult(){
@@ -25,7 +32,7 @@ function system_flush_expectedresult(){
   'values' => 1,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

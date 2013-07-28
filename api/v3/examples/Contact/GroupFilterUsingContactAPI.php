@@ -1,7 +1,7 @@
 <?php
-
-/*
- Get all from group and display contacts
+/**
+ * Test Generated example of using contact get API
+ * Get all from group and display contacts *
  */
 function contact_get_example(){
 $params = array(
@@ -9,16 +9,24 @@ $params = array(
       '0' => 1,
       '1' => 26,
     ),
-  'version' => 3,
   'contact_type' => 'Individual',
 );
 
-  $result = civicrm_api( 'contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_get_expectedresult(){
@@ -89,7 +97,7 @@ function contact_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

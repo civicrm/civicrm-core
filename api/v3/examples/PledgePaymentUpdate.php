@@ -1,23 +1,29 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using pledge_payment update API
+ * *
  */
 function pledge_payment_update_example(){
 $params = array(
-  'pledge_id' => 1,
-  'contribution_id' => 1,
-  'version' => 3,
-  'status_id' => 2,
-  'actual_amount' => 20,
+  'id' => 1,
+  'status_id' => 1,
 );
 
-  $result = civicrm_api( 'pledge_payment','update',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('pledge_payment', 'update', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function pledge_payment_update_expectedresult(){
@@ -35,7 +41,7 @@ function pledge_payment_update_expectedresult(){
           'scheduled_amount' => '20.00',
           'actual_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '20130622000000',
+          'scheduled_date' => '20130728000000',
           'reminder_date' => '',
           'reminder_count' => 0,
           'status_id' => '1',
@@ -43,7 +49,7 @@ function pledge_payment_update_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

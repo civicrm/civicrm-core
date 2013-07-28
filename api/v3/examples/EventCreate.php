@@ -1,7 +1,7 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using event create API
+ * *
  */
 function event_create_example(){
 $params = array(
@@ -20,15 +20,23 @@ $params = array(
   'is_monetary' => 0,
   'is_active' => 1,
   'is_show_location' => 0,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'event','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('event', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function event_create_expectedresult(){
@@ -97,7 +105,7 @@ function event_create_expectedresult(){
           'is_template' => 0,
           'template_title' => '',
           'created_id' => '',
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 05:52:14',
           'currency' => '',
           'campaign_id' => '',
           'is_share' => '',
@@ -107,7 +115,7 @@ function event_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,23 +1,31 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using domain create API
+ * *
  */
 function domain_create_example(){
 $params = array(
   'name' => 'A-team domain',
   'description' => 'domain of chaos',
-  'version' => 3,
   'domain_version' => '4.2',
   'contact_id' => 6,
 );
 
-  $result = civicrm_api( 'domain','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('domain', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function domain_create_expectedresult(){
@@ -41,7 +49,7 @@ function domain_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

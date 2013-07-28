@@ -1,11 +1,10 @@
 <?php
-
-/*
- shows getting a variable for specified domains
+/**
+ * Test Generated example of using setting Get API
+ * shows getting a variable for specified domains *
  */
 function setting_get_example(){
 $params = array(
-  'version' => 3,
   'domain_id' => array(
       '0' => 1,
       '1' => 2,
@@ -15,12 +14,21 @@ $params = array(
     ),
 );
 
-  $result = civicrm_api( 'setting','Get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('setting', 'Get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function setting_get_expectedresult(){
@@ -39,7 +47,7 @@ function setting_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

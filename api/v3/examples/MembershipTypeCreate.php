@@ -1,7 +1,7 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using membership_type create API
+ * *
  */
 function membership_type_create_example(){
 $params = array(
@@ -15,15 +15,23 @@ $params = array(
   'duration_interval' => '10',
   'period_type' => 'rolling',
   'visibility' => 'public',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'membership_type','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('membership_type', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function membership_type_create_expectedresult(){
@@ -61,7 +69,7 @@ function membership_type_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

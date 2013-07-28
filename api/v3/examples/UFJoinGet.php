@@ -1,22 +1,30 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using uf_join get API
+ * *
  */
 function uf_join_get_example(){
 $params = array(
   'entity_table' => 'civicrm_contribution_page',
   'entity_id' => 1,
-  'version' => 3,
   'sequential' => 1,
 );
 
-  $result = civicrm_api( 'uf_join','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('uf_join', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function uf_join_get_expectedresult(){
@@ -39,7 +47,7 @@ function uf_join_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

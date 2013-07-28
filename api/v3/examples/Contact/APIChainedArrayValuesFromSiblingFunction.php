@@ -1,12 +1,11 @@
 <?php
-
-/*
- /*this demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
-    2 child functions - one receives values from the parent (Contact) and the other child (Tag). 
+/**
+ * Test Generated example of using contact create API
+ * /*this demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
+    2 child functions - one receives values from the parent (Contact) and the other child (Tag).  *
  */
 function contact_create_example(){
 $params = array(
-  'version' => 3,
   'display_name' => 'batman',
   'contact_type' => 'Individual',
   'api.tag.create' => array(
@@ -19,12 +18,21 @@ $params = array(
     ),
 );
 
-  $result = civicrm_api( 'contact','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_create_expectedresult(){
@@ -60,8 +68,6 @@ function contact_create_expectedresult(){
           'first_name' => '',
           'middle_name' => '',
           'last_name' => '',
-          'prefix_id' => '',
-          'suffix_id' => '',
           'email_greeting_id' => '1',
           'email_greeting_custom' => '',
           'email_greeting_display' => '',
@@ -81,7 +87,7 @@ function contact_create_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'user_unique_id' => '',
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 05:52:14',
           'modified_date' => '2012-11-14 16:02:35',
           'api.tag.create' => 6,
           'api.entity_tag.create' => array(
@@ -94,7 +100,7 @@ function contact_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

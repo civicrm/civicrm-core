@@ -1,7 +1,7 @@
 <?php
-
-/*
- Get with Contact Ref Custom Field
+/**
+ * Test Generated example of using activity create API
+ * Get with Contact Ref Custom Field *
  */
 function activity_create_example(){
 $params = array(
@@ -14,16 +14,24 @@ $params = array(
   'duration' => 120,
   'location' => 'Pensulvania',
   'details' => 'a test activity',
-  'version' => 3,
   'custom_2' => '17',
 );
 
-  $result = civicrm_api( 'activity','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function activity_create_expectedresult(){
@@ -57,7 +65,7 @@ function activity_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

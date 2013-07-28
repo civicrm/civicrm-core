@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contact get API
+ * *
  */
 function contact_get_example(){
 $params = array(
   'email' => 'man2@yahoo.com',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_get_expectedresult(){
@@ -85,7 +93,7 @@ function contact_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

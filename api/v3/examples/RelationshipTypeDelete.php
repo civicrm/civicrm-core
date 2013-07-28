@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using relationship_type delete API
+ * *
  */
 function relationship_type_delete_example(){
 $params = array(
   'id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'relationship_type','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('relationship_type', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function relationship_type_delete_expectedresult(){
@@ -23,10 +31,10 @@ function relationship_type_delete_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'values' => 1,
+  'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

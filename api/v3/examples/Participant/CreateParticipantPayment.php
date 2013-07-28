@@ -1,16 +1,15 @@
 <?php
-
-/*
- single function to create contact w partipation & contribution. Note that in the
-      case of 'contribution' the 'create' is implied (api.contribution.create)
+/**
+ * Test Generated example of using participant create API
+ * single function to create contact w partipation & contribution. Note that in the
+      case of 'contribution' the 'create' is implied (api.contribution.create) *
  */
 function participant_create_example(){
 $params = array(
   'contact_type' => 'Individual',
   'display_name' => 'dlobo',
-  'version' => 3,
   'api.participant' => array(
-      'event_id' => 38,
+      'event_id' => 39,
       'status_id' => 1,
       'role_id' => 1,
       'format.only_id' => 1,
@@ -26,12 +25,21 @@ $params = array(
     ),
 );
 
-  $result = civicrm_api( 'participant','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_create_expectedresult(){
@@ -67,8 +75,6 @@ function participant_create_expectedresult(){
           'first_name' => '',
           'middle_name' => '',
           'last_name' => '',
-          'prefix_id' => '',
-          'suffix_id' => '',
           'email_greeting_id' => '1',
           'email_greeting_custom' => '',
           'email_greeting_display' => '',
@@ -88,7 +94,7 @@ function participant_create_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'user_unique_id' => '',
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 05:52:14',
           'modified_date' => '2012-11-14 16:02:35',
           'api.participant' => 4,
           'api.contribution.create' => 1,
@@ -109,7 +115,7 @@ function participant_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

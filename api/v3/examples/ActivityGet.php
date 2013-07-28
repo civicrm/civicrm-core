@@ -1,23 +1,31 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using activity get API
+ * *
  */
 function activity_get_example(){
 $params = array(
   'contact_id' => 17,
   'activity_type_id' => '46',
-  'version' => 3,
   'sequential' => 1,
   'return.custom_1' => 1,
 );
 
-  $result = civicrm_api( 'activity','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function activity_get_expectedresult(){
@@ -45,7 +53,7 @@ function activity_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

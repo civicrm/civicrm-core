@@ -623,7 +623,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     if(!empty($apiResult['trace'])){
       $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
     }
-
     $this->assertEquals(0, $apiResult['is_error'], $prefix . $errorMessage);
   }
 
@@ -1147,19 +1146,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create Tag
    *
-   * @return int tag_id of created tag
+   * @return array result of created tag
    */
-  function tagCreate($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
-        'name' => 'New Tag3' . rand(),
-        'description' => 'This is description for New Tag ' . rand(),
-        'domain_id' => '1',
-      );
-    }
-
-    $result = $this->callAPISuccess('Tag', 'create', $params);
-    return $result;
+  function tagCreate($params = array()) {
+    $defaults = array(
+      'name' => 'New Tag3',
+      'description' => 'This is description for Our New Tag ',
+      'domain_id' => '1',
+    );
+    $params = array_merge($defaults, $params);
+    $result =  $this->callAPISuccess('Tag', 'create', $params);
+    return $result['values'][$result['id']];
   }
 
   /**
@@ -1879,6 +1876,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
 
     $this->tidyExampleResult($result);
+    if(isset($params['version'])) {
+      unset($params['version']);
+    }
     // a cleverer person than me would do it in a single regex
     if (strstr($entity, 'UF')) {
       $fnPrefix = strtolower(preg_replace('/(?<! )(?<!^)(?<=UF)[A-Z]/', '_$0', $entity));
@@ -1929,11 +1929,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $fieldsToChange = array(
       'hash' => '67eac7789eaee00',
       'modified_date' => '2012-11-14 16:02:35',
-      'created_date' => '20120130621222105',
+      'created_date' => '2013-07-28 05:52:14',
       'create_date' => '20120130621222105',
     );
 
-    $keysToUnset = array('xdebug', 'undefined_fields');
+    $keysToUnset = array('xdebug', 'undefined_fields',);
     foreach ($keysToUnset as $unwantedKey) {
       if(isset($result[$unwantedKey])) {
         unset($result[$unwantedKey]);
@@ -2249,6 +2249,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       $entityFinancialType->financial_account_id = $financialAccount->id;
       $entityFinancialType->delete();
       $financialAccount->delete();
+    }
+  }
+
+  /**
+   * Use $ids as an instruction to do test cleanup
+   */
+  function deleteFromIDSArray() {
+    foreach ($this->ids as $entity => $ids) {
+      foreach ($ids as $id) {
+        $this->callAPISuccess($entity, 'delete', array('id' => $id));
+      }
     }
   }
 }

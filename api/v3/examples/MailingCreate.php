@@ -1,23 +1,31 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using mailing create API
+ * *
  */
 function mailing_create_example(){
 $params = array(
   'subject' => 'maild',
   'body_text' => 'bdkfhdskfhduew',
-  'version' => 3,
   'name' => 'mailing name',
   'created_id' => 1,
 );
 
-  $result = civicrm_api( 'mailing','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('mailing', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function mailing_create_expectedresult(){
@@ -52,11 +60,11 @@ function mailing_create_expectedresult(){
           'msg_template_id' => '',
           'override_verp' => '1',
           'created_id' => '1',
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 05:52:14',
           'scheduled_id' => '',
-          'scheduled_date' => '20130622085501',
+          'scheduled_date' => '20130728085413',
           'approver_id' => '1',
-          'approval_date' => '20130622085501',
+          'approval_date' => '20130728085413',
           'approval_status_id' => '',
           'approval_note' => '',
           'is_archived' => '',
@@ -73,7 +81,7 @@ function mailing_create_expectedresult(){
                   '0' => array(
                       'id' => '1',
                       'mailing_id' => '1',
-                      'scheduled_date' => '20130622085501',
+                      'scheduled_date' => '20130728085413',
                       'start_date' => '',
                       'end_date' => '',
                       'status' => 'Scheduled',
@@ -89,7 +97,7 @@ function mailing_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

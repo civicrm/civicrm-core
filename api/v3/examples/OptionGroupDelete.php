@@ -1,21 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using option_group delete API
+ * *
  */
 function option_group_delete_example(){
 $params = array(
-  'id' => 89,
-  'version' => 3,
-  'debug' => 0,
+  'id' => 91,
 );
 
-  $result = civicrm_api( 'option_group','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('option_group', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function option_group_delete_expectedresult(){
@@ -27,7 +34,7 @@ function option_group_delete_expectedresult(){
   'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

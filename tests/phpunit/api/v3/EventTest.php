@@ -353,7 +353,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'id' => $result['id'], 'max_participants' => 150,
     );
     $this->callAPISuccess('Event', 'Create', $params);
-    $updated = $this->callAPIAndDocument('Event', 'Get', $params, __FUNCTION__, __FILE__);
+    $updated = $this->callAPISuccess('Event', 'Get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(150, $updated['values'][$result['id']]['max_participants']);
     $this->assertEquals('Annual CiviCRM meet 2', $updated['values'][$result['id']]['title']);
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));

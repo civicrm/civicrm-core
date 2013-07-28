@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using tag delete API
+ * *
  */
 function tag_delete_example(){
 $params = array(
-  'id' => 11,
-  'version' => 3,
+  'id' => '17',
 );
 
-  $result = civicrm_api( 'tag','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('tag', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function tag_delete_expectedresult(){
@@ -26,7 +34,7 @@ function tag_delete_expectedresult(){
   'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

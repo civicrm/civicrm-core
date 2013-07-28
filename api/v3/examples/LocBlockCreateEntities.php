@@ -1,7 +1,7 @@
 <?php
-
-/*
- Create entities and location block in 1 api call
+/**
+ * Test Generated example of using loc_block createEntities API
+ * Create entities and location block in 1 api call *
  */
 function loc_block_createentities_example(){
 $params = array(
@@ -21,16 +21,23 @@ $params = array(
       'location_type_id' => 1,
       'street_address' => '987654321',
     ),
-  'version' => 3,
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'loc_block','createEntities',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('loc_block', 'createEntities', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function loc_block_createentities_expectedresult(){
@@ -101,7 +108,7 @@ function loc_block_createentities_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

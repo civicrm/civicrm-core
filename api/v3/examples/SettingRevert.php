@@ -1,20 +1,28 @@
 <?php
-
-/*
- Demonstrates reverting a parameter to default value
+/**
+ * Test Generated example of using setting revert API
+ * Demonstrates reverting a parameter to default value *
  */
 function setting_revert_example(){
 $params = array(
-  'version' => 3,
   'name' => 'address_format',
 );
 
-  $result = civicrm_api( 'setting','revert',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('setting', 'revert', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function setting_revert_expectedresult(){
@@ -42,7 +50,7 @@ function setting_revert_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,22 +1,30 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using website create API
+ * *
  */
 function website_create_example(){
 $params = array(
-  'version' => 3,
   'contact_id' => 3,
   'url' => 'website.com',
   'website_type_id' => 1,
 );
 
-  $result = civicrm_api( 'website','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('website', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function website_create_expectedresult(){
@@ -36,7 +44,7 @@ function website_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,7 +1,7 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using batch create API
+ * *
  */
 function batch_create_example(){
 $params = array(
@@ -11,16 +11,23 @@ $params = array(
   'total' => '300.33',
   'item_count' => 3,
   'status_id' => 1,
-  'version' => 3,
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'batch','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('batch', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function batch_create_expectedresult(){
@@ -37,7 +44,7 @@ function batch_create_expectedresult(){
           'title' => 'New Batch 03',
           'description' => 'This is description for New Batch 03',
           'created_id' => '',
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 05:52:14',
           'modified_id' => '',
           'modified_date' => '2012-11-14 16:02:35',
           'saved_search_id' => '',
@@ -52,7 +59,7 @@ function batch_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

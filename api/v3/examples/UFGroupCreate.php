@@ -1,7 +1,7 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using uf_group create API
+ * *
  */
 function uf_group_create_example(){
 $params = array(
@@ -25,15 +25,23 @@ $params = array(
   'notify' => 'admin@example.org',
   'post_URL' => 'http://example.org/post',
   'title' => 'Test Group',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'uf_group','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('uf_group', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function uf_group_create_expectedresult(){
@@ -65,13 +73,13 @@ function uf_group_create_expectedresult(){
           'is_reserved' => '1',
           'name' => 'Test_Group_12',
           'created_id' => '69',
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 05:52:14',
           'is_proximity_search' => '',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

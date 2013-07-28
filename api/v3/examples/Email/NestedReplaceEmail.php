@@ -1,11 +1,10 @@
 <?php
-
-/*
- example demonstrates use of Replace in a nested API call
+/**
+ * Test Generated example of using email replace API
+ * example demonstrates use of Replace in a nested API call *
  */
 function email_replace_example(){
 $params = array(
-  'version' => 3,
   'id' => 10,
   'api.email.replace' => array(
       'values' => array(
@@ -38,12 +37,21 @@ $params = array(
     ),
 );
 
-  $result = civicrm_api( 'email','replace',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('email', 'replace', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function email_replace_expectedresult(){
@@ -191,7 +199,7 @@ function email_replace_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using membership_type get API
+ * *
  */
 function membership_type_get_example(){
 $params = array(
   'id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'membership_type','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('membership_type', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function membership_type_get_expectedresult(){
@@ -42,7 +50,7 @@ function membership_type_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

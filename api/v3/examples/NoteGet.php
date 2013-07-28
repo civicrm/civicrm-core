@@ -1,25 +1,29 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using note get API
+ * *
  */
 function note_get_example(){
 $params = array(
   'entity_table' => 'civicrm_contact',
   'entity_id' => 1,
-  'note' => 'Hello!!! m testing Note',
-  'contact_id' => 1,
-  'modified_date' => '2011-01-31',
-  'subject' => 'Test Note',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'note','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('note', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function note_get_expectedresult(){
@@ -43,7 +47,7 @@ function note_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

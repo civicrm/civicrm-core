@@ -1,7 +1,7 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using custom_group create API
+ * *
  */
 function custom_group_create_example(){
 $params = array(
@@ -16,15 +16,23 @@ $params = array(
   'help_pre' => 'This is Pre Help For Test Group 1',
   'help_post' => 'This is Post Help For Test Group 1',
   'is_active' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'custom_group','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('custom_group', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function custom_group_create_expectedresult(){
@@ -54,13 +62,13 @@ function custom_group_create_expectedresult(){
           'max_multiple' => 'null',
           'collapse_adv_display' => '',
           'created_id' => '',
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 05:52:14',
           'is_reserved' => '',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 
