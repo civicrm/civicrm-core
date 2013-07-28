@@ -23,6 +23,11 @@
       <required>true</required>
       <comment>Group which this option belongs to.</comment>
        <add>1.5</add>
+      <pseudoconstant>
+        <table>civicrm_option_group</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
   </field>
   <foreignKey>
        <name>option_group_id</name>

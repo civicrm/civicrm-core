@@ -239,20 +239,38 @@ class CRM_Core_PseudoConstant {
 
     // Custom fields are not in the schema
     if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
-      $customFieldID = (int) substr($fieldName, 7);
-      $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customFieldID, 'option_group_id');
+      $customField = new CRM_Core_DAO_CustomField();
+      $customField->id = (int) substr($fieldName, 7);
+      $customField->find(TRUE);
+      $options = FALSE;
 
-      $options = CRM_Core_OptionGroup::valuesByID($optionGroupID,
-        $flip,
-        $params['grouping'],
-        $params['localize'],
-        // Note: for custom fields the 'name' column is NULL
-        CRM_Utils_Array::value('labelColumn', $params, 'label'),
-        $params['onlyActive'],
-        $params['fresh']
-      );
-
-      CRM_Utils_Hook::customFieldOptions($customFieldID, $options, FALSE);
+      if (!empty($customField->option_group_id)) {
+        $options = CRM_Core_OptionGroup::valuesByID($customField->option_group_id,
+          $flip,
+          $params['grouping'],
+          $params['localize'],
+          // Note: for custom fields the 'name' column is NULL
+          CRM_Utils_Array::value('labelColumn', $params, 'label'),
+          $params['onlyActive'],
+          $params['fresh']
+        );
+      }
+      else {
+        if ($customField->data_type === 'StateProvince') {
+          $options = self::stateProvince();
+        }
+        elseif ($customField->data_type === 'Country') {
+          $options = $context == 'validate' ? self::countryIsoCode() : self::country();
+        }
+        elseif ($customField->data_type === 'Boolean') {
+          $options = $context == 'validate' ? array(0, 1) : array(1 => ts('Yes'), 0 => ts('No'));
+        }
+        $options = $options && $flip ? array_flip($options) : $options;
+      }
+      if ($options !== FALSE) {
+        CRM_Utils_Hook::customFieldOptions($customField->id, $options, FALSE);
+      }
+      $customField->free();
       return $options;
     }
 
@@ -390,9 +408,17 @@ class CRM_Core_PseudoConstant {
             $output[$dao->id] = $dao->label;
           }
           $dao->free();
-          if (!empty($params['localize'])) {
+          // Localize results
+          if (!empty($params['localize']) || $pseudoconstant['table'] == 'civicrm_country' || $pseudoconstant['table'] == 'civicrm_state_province') {
+            $I18nParams = array();
+            if ($pseudoconstant['table'] == 'civicrm_country') {
+              $I18nParams['context'] = 'country';
+            }
+            if ($pseudoconstant['table'] == 'civicrm_state_province') {
+              $I18nParams['context'] = 'province';
+            }
             $i18n = CRM_Core_I18n::singleton();
-            $i18n->localizeArray($output);
+            $i18n->localizeArray($output, $I18nParams);
             // Maintain sort by label
             if ($order == "ORDER BY %2") {
               CRM_Utils_Array::asort($output);
@@ -402,6 +428,12 @@ class CRM_Core_PseudoConstant {
         }
         return $flip ? array_flip($output) : $output;
       }
+    }
+
+    // Return "Yes" and "No" for boolean fields
+    elseif (CRM_Utils_Array::value('type', $fieldSpec) === CRM_Utils_Type::T_BOOLEAN) {
+      $output = $context == 'validate' ? array(0, 1) : array(1 => ts('Yes'), 0 => ts('No'));
+      return $flip ? array_flip($output) : $output;
     }
     // If we're still here, it's an error. Return FALSE.
     return FALSE;
