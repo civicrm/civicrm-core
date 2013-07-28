@@ -156,11 +156,15 @@
     // Defaults - if specified in ModelClass, preserve
     _.defaults(ModelClass.prototype, {
       isSaved: function() {
-        var result = !this.isNew() && !this._modified;
+        var result = !this.isNew() && !this.isModified();
         return result;
+      },
+      isModified: function() {
+        return !this._modified;
       },
       _saved_onchange: function(model, options) {
         if (options.parse) return;
+        // console.log('change', model.changedAttributes(), model.previousAttributes());
         this.setModified();
       },
       setModified: function() {
