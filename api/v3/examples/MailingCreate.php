@@ -60,7 +60,7 @@ function mailing_create_expectedresult(){
           'msg_template_id' => '',
           'override_verp' => '1',
           'created_id' => '1',
-          'created_date' => '2013-07-28 05:52:14',
+          'created_date' => '2013-07-28 08:49:19',
           'scheduled_id' => '',
           'scheduled_date' => '20130728085413',
           'approver_id' => '1',

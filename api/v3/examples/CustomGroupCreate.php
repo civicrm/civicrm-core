@@ -62,7 +62,7 @@ function custom_group_create_expectedresult(){
           'max_multiple' => 'null',
           'collapse_adv_display' => '',
           'created_id' => '',
-          'created_date' => '2013-07-28 05:52:14',
+          'created_date' => '2013-07-28 08:49:19',
           'is_reserved' => '',
         ),
     ),

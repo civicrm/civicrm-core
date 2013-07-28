@@ -36,7 +36,7 @@ function grant_get_expectedresult(){
       '2' => array(
           'id' => '2',
           'contact_id' => '4',
-          'application_received_date' => '2013-07-28',
+          'application_received_date' => '20130728084957',
           'decision_date' => '2013-07-29',
           'grant_type_id' => '1',
           'amount_total' => '500.00',

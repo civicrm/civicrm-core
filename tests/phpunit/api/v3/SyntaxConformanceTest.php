@@ -564,10 +564,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities_create
    */
   public function testEmptyParam_create($Entity) {
-    $this->markTestIncomplete("fixing this test to test the api functions fails on numberous tests 
-      which will either create a completely blank entity (batch, participant status) or 
+    $this->markTestIncomplete("fixing this test to test the api functions fails on numberous tests
+      which will either create a completely blank entity (batch, participant status) or
       have a damn good crack at it (e.g mailing job). Marking this as incomplete beats false success");
-    // 
+    //
     return;
     if (in_array($Entity, $this->toBeImplemented['create'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
@@ -717,7 +717,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       if (!empty($specs['pseudoconstant']) || !empty($specs['enumValues'])) {
         $options = civicrm_api($entityName, 'getoptions', array('context' => 'create', 'field' => $field, 'version' => 3));
         if (empty($options['values'])) {
-          print_r($options);
         }
         $entity[$field] = array_rand($options['values']);
       }
@@ -727,11 +726,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $field => $entity[$field],
       );
 
-      $update = civicrm_api($entityName, 'create', $updateParams);
-      if(!empty($update['is_error'])){
-        print_r($update);
-      }
-      $this->assertAPISuccess($update, print_r($updateParams, TRUE) . 'in line ' . __LINE__);
+      $update = $this->callAPISuccess($entityName, 'create', $updateParams);
       $checkParams = array(
         'id' => $entity['id'],
         'version' => 3,
@@ -743,11 +738,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         ),
       );
 
-      $checkEntity = civicrm_api($entityName, 'getsingle', $checkParams);
-      $this->assertEquals($entity, $checkEntity, "changing field $fieldName\n" .
-        print_r($entity, TRUE)
+      $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
+      $this->assertAPIArrayComparison($entity, $checkEntity, array(), "changing field $fieldName\n");
         //print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE)
-      );
 
     }
     $baoObj->deleteTestObjects($baoString);

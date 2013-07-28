@@ -41,7 +41,7 @@ function campaign_get_expectedresult(){
           'title' => 'campaign title',
           'description' => 'Call people, ask for money',
           'is_active' => '1',
-          'created_date' => '2013-07-28 05:52:14',
+          'created_date' => '2013-07-28 08:49:19',
         ),
     ),
 );

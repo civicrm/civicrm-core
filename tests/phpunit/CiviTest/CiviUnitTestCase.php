@@ -1929,8 +1929,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $fieldsToChange = array(
       'hash' => '67eac7789eaee00',
       'modified_date' => '2012-11-14 16:02:35',
-      'created_date' => '2013-07-28 05:52:14',
+      'created_date' => '2013-07-28 08:49:19',
       'create_date' => '20120130621222105',
+      'application_received_date' => '20130728084957',
+      'in_date' => '2013-07-28 08:50:19',
+      'scheduled_date' => '20130728085413',
+      'approval_date' => '20130728085413',
+      'pledge_start_date_high' => '20130726090416',
     );
 
     $keysToUnset = array('xdebug', 'undefined_fields',);

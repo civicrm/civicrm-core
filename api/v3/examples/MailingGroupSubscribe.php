@@ -38,7 +38,7 @@ function mailing_group_subscribe_expectedresult(){
   'values' => array(
       'contact_id' => '3',
       'subscribe_id' => '1',
-      'hash' => 'fcf4e727e2a34e5d',
+      'hash' => 'bf4d724dbbb38c0c',
       'is_error' => 0,
     ),
 );

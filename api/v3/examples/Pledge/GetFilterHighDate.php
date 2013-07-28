@@ -5,7 +5,7 @@
  */
 function pledge_get_example(){
 $params = array(
-  'pledge_start_date_high' => '20130726090416',
+  'pledge_start_date_high' => '20130726201306',
 );
 
 try{

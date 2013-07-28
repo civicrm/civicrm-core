@@ -44,7 +44,7 @@ function batch_update_expectedresult(){
           'title' => 'New Batch 04',
           'description' => 'This is description for New Batch 04',
           'created_id' => '',
-          'created_date' => '2013-07-28 05:52:14',
+          'created_date' => '2013-07-28 08:49:19',
           'modified_id' => '',
           'modified_date' => '2012-11-14 16:02:35',
           'saved_search_id' => '',

@@ -5,26 +5,7 @@
  */
 function uf_group_delete_example(){
 $params = array(
-  'add_captcha' => 1,
-  'add_contact_to_group' => 2,
-  'cancel_URL' => 'http://example.org/cancel',
-  'created_date' => '2009-06-27 00:00:00',
-  'created_id' => 69,
-  'group' => 2,
-  'group_type' => 'Individual,Contact',
-  'help_post' => 'help post',
-  'help_pre' => 'help pre',
-  'is_active' => 0,
-  'is_cms_user' => 1,
-  'is_edit_link' => 1,
-  'is_map' => 1,
-  'is_reserved' => 1,
-  'is_uf_link' => 1,
-  'is_update_dupe' => 1,
-  'name' => 'Test_Group',
-  'notify' => 'admin@example.org',
-  'post_URL' => 'http://example.org/post',
-  'title' => 'Test Group',
+  'id' => 2,
 );
 
 try{

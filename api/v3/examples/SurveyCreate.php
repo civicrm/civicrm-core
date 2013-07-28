@@ -49,7 +49,7 @@ function survey_create_expectedresult(){
           'is_active' => '',
           'is_default' => '',
           'created_id' => '',
-          'created_date' => '2013-07-28 05:52:14',
+          'created_date' => '2013-07-28 08:49:19',
           'last_modified_id' => '',
           'last_modified_date' => '',
           'result_id' => '',
