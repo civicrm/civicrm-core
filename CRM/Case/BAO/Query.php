@@ -521,7 +521,10 @@ class CRM_Case_BAO_Query {
         break;
 
       case 'civicrm_case_reporter':
-        $from .= " $side JOIN civicrm_contact as civicrm_case_reporter ON case_activity.source_contact_id = civicrm_case_reporter.id ";
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $from .= " $side JOIN civicrm_activity_contact as case_activity_contact ON (case_activity.id = case_activity_contact.activity_id AND  case_activity_contact.record_type_id = {$sourceID} ) ";
+        $from .= " $side JOIN civicrm_contact as civicrm_case_reporter ON case_activity_contact.contact_id = civicrm_case_reporter.id ";
         break;
 
       case 'civicrm_case':
