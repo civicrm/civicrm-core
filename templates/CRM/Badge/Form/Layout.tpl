@@ -40,7 +40,7 @@
       </tr>
       <tr class="crm-badge-layout-form-block-label_format_name">
         <td class="label">{$form.label_format_name.label}</td>
-        <td>{$form.label_format_name.html}</td>
+        <td>{$form.label_format_name.html} {help id="id-label_format"}</td>
       </tr>
       <tr class="crm-badge-layout-form-block-description">
         <td class="label">{$form.description.label}</td>
@@ -53,7 +53,7 @@
           <span class="crm-clear-link">
             (<a href="#" class="clear-image" imgname='image_1'>{ts}clear{/ts}</a>)
           </span>
-          <br/><span class="description">{ts}Click above and select a file double clicking on it.{/ts}</span>
+          <br/><span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-image_2">
@@ -63,7 +63,7 @@
           <span class="crm-clear-link">
             (<a href="#" class="clear-image" imgname='image_2'>{ts}clear{/ts}</a>)
           </span>
-          <br/><span class="description">{ts}Click above and select a file double clicking on it.{/ts}</span>
+          <br/><span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-elements">
