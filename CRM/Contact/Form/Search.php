@@ -924,15 +924,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
       $selector->setKey($this->controller->_key);
 
       // added the sorting  character to the form array
-      // lets recompute the aToZ bar without the sortByCharacter
-      // we need this in most cases except when just pager or sort values change, which
-      // we'll ignore for now
       $config = CRM_Core_Config::singleton();
       // do this only for contact search
       if ($setDynamic && $config->includeAlphabeticalPager) {
-        if ($this->_reset ||
-          ($this->_sortByCharacter === NULL || $this->_sortByCharacter == '')
-        ) {
+        // Don't recompute if we are just paging/sorting
+        if ($this->_reset || (empty($_GET['crmPID']) && empty($_GET['crmSID']) && !$this->_sortByCharacter)) {
           $aToZBar = CRM_Utils_PagerAToZ::getAToZBar($selector, $this->_sortByCharacter);
           $this->set('AToZBar', $aToZBar);
         }

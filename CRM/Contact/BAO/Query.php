@@ -1231,13 +1231,12 @@ class CRM_Contact_BAO_Query {
       $this->filterRelatedContacts($from, $where, $having);
     }
 
-    // CRM_Core_Error::debug($this);
     return array($select, $from, $where, $having);
   }
 
   function &getWhereValues($name, $grouping) {
     $result = NULL;
-    foreach ($this->_params as $id => $values) {
+    foreach ($this->_params as $values) {
       if ($values[0] == $name && $values[3] == $grouping) {
         return $values;
       }
@@ -3527,7 +3526,7 @@ WHERE  id IN ( $groupIDs )
       $this->_qill[$grouping][] = ts('State/Province') . " $op " . implode(' ' . ts('or') . ' ', $names) . $countryQill;
     }
     else {
-      return implode(' ' . ts('or') . ' ', $names) . $countryQill;;
+      return implode(' ' . ts('or') . ' ', $names) . $countryQill;
     }
   }
 
@@ -3610,10 +3609,8 @@ WHERE  id IN ( $groupIDs )
   function privacyOptions($values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    if (empty($value) ||
-      !is_array($value)
-    ) {
-      continue;
+    if (empty($value) || !is_array($value)) {
+      return;
     }
 
     // get the operator and toggle values
@@ -4054,7 +4051,7 @@ civicrm_relationship.start_date > {$today}
 
     $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
 
-    // if we’re explicitely looking for a certain contact’s contribs, events, etc.
+    // if we’re explicitly looking for a certain contact’s contribs, events, etc.
     // and that contact happens to be deleted, set $onlyDeleted to true
     foreach ($this->_params as $values) {
       $name = CRM_Utils_Array::value(0, $values);
@@ -4068,13 +4065,6 @@ civicrm_relationship.start_date > {$today}
       }
     }
     $this->generatePermissionClause($onlyDeleted, $count);
-
-    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
-
-    //additional from clause should be w/ proper joins.
-    if ($additionalFromClause) {
-      $from .= "\n" . $additionalFromClause;
-    }
 
     if (empty($where)) {
       $where = "WHERE $this->_permissionWhereClause";
@@ -4142,7 +4132,6 @@ civicrm_relationship.start_date > {$today}
         }
       }
 
-      $doOpt = TRUE;
       // hack for order clause
       if ($order) {
         $fieldStr = trim(str_replace('ORDER BY', '', $order));
@@ -4173,72 +4162,22 @@ civicrm_relationship.start_date > {$today}
               $this->_whereTables["civicrm_email"] = 1;
               $order = str_replace($field, "civicrm_email.{$field}", $order);
               break;
-
-            default:
-              $doOpt = FALSE;
           }
+          $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+          $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
         }
       }
-
 
       if ($rowCount > 0 && $offset >= 0) {
         $limit = " LIMIT $offset, $rowCount ";
-
-        // ok here is a first hack at an optimization, lets get all the contact ids
-        // that are restricted and we'll then do the final clause with it
-        // CRM-5954
-        if (isset($this->_distinctComponentClause)) {
-          if (strpos($this->_distinctComponentClause, 'DISTINCT') == FALSE) {
-            $limitSelect = "SELECT DISTINCT {$this->_distinctComponentClause}";
-          }
-          else {
-            $limitSelect = "SELECT {$this->_distinctComponentClause}";
-          }
-        }
-        else {
-          $limitSelect = 'SELECT DISTINCT contact_a.id as id';
-        }
-
-        if ($doOpt) {
-          $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL,
-            $this->_primaryLocation, $this->_mode
-          );
-
-          if ($additionalFromClause) {
-            $this->_simpleFromClause .= "\n" . $additionalFromClause;
-          }
-          // if we are doing a transform, do it here
-          // CRM-7969
-          $having = NULL;
-          if ($this->_displayRelationshipType) {
-            $this->filterRelatedContacts($this->_simpleFromClause, $where, $having);
-          }
-
-          $limitQuery = "$limitSelect {$this->_simpleFromClause} $where $groupBy $order $limit";
-          $limitDAO = CRM_Core_DAO::executeQuery($limitQuery);
-          $limitIDs = array();
-          while ($limitDAO->fetch()) {
-            if ($limitDAO->id) {
-              $limitIDs[] = $limitDAO->id;
-            }
-          }
-          if (empty($limitIDs)) {
-            $limitClause = ' AND ( 0 ) ';
-          }
-          else {
-            if (isset($this->_distinctComponentClause)) {
-              $limitClause = " AND {$this->_distinctComponentClause} IN ( ";
-            }
-            else {
-              $limitClause = ' AND contact_a.id IN ( ';
-            }
-            $limitClause .= implode(',', $limitIDs) . ' ) ';
-          }
-          $where .= $limitClause;
-          // reset limit clause since we already restrict what records we want
-          $limit = NULL;
-        }
       }
+    }
+
+    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
+
+    //additional from clause should be w/ proper joins.
+    if ($additionalFromClause) {
+      $from .= "\n" . $additionalFromClause;
     }
 
     // if we are doing a transform, do it here
@@ -4262,8 +4201,6 @@ civicrm_relationship.start_date > {$today}
       return CRM_Core_DAO::singleValueQuery($query);
     }
 
-    // crm_core_error::debug('$query', $query); exit;
-
     $dao = CRM_Core_DAO::executeQuery($query);
     if ($groupContacts) {
       $ids = array();
@@ -4274,6 +4211,26 @@ civicrm_relationship.start_date > {$today}
     }
 
     return $dao;
+  }
+
+  /**
+   * Fetch a list of contacts from the prev/next cache for displaying a search results page
+   *
+   * @param string $cacheKey
+   * @param int    $offset
+   * @param int    $rowCount
+   * @param bool   $includeContactIds
+   * @return CRM_Core_DAO
+   */
+  function getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds) {
+    $this->_includeContactIds = $includeContactIds;
+    list($select, $from) = $this->query();
+    $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
+    $order = " ORDER BY pnc.id";
+    $groupBy = " GROUP BY contact_a.id";
+    $limit = " LIMIT $offset, $rowCount";
+    $query = "$select $from $groupBy $order $limit";
+    return CRM_Core_DAO::executeQuery($query);
   }
 
   /**
