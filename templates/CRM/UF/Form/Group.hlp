@@ -166,6 +166,6 @@
   {ts}Set Proximity Search as required if you want all searches using this profile to require the user to enter a start address and a radius.{/ts}
 </p>
 <p>
-  {ts}IMPORTANT: You must enable a Mapping Provider in order to use the Proximity Search feature (Administer > Configure > Global Settings > Mapping and Geocoding).{/ts}
+  {ts}IMPORTANT: You must enable a Mapping Provider in order to use the Proximity Search feature (Administer > System Settings > Mapping and Geocoding).{/ts}
 </p>
 {/htxt}

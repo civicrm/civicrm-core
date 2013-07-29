@@ -620,7 +620,7 @@
   <item>
      <path>civicrm/admin/options/grant_type</path>
      <title>Grant Types</title>
-     <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Global Settings - Enable Components if you want to track grants.)</desc>
+     <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Administer > Systme Settings > Enable Components if you want to track grants.)</desc>
      <path_arguments>group=grant_type</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Option Lists</adminGroup>
