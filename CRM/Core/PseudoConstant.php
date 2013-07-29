@@ -453,7 +453,7 @@ class CRM_Core_PseudoConstant {
    *   String if label is found
    */
   static function getValue($daoName, $fieldName, $key, $params = array()) {
-    $values = self::get($daoName, $fieldName, $params);
+    $values = self::get($daoName, $fieldName, $params, 'get');
     if ($values === FALSE) {
       return FALSE;
     }
@@ -461,7 +461,7 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * Fetch the key for a field option given its label/name
+   * Fetch the key for a field option given its name
    *
    * @param String $daoName
    * @param String $fieldName
@@ -474,7 +474,7 @@ class CRM_Core_PseudoConstant {
    *   String|Number if key is found
    */
   static function getKey($daoName, $fieldName, $value, $params = array()) {
-    $values = self::get($daoName, $fieldName, $params);
+    $values = self::get($daoName, $fieldName, $params, 'validate');
     if ($values === FALSE) {
       return FALSE;
     }
