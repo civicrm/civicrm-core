@@ -75,21 +75,21 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       $links[CRM_Core_Action::VIEW] = array(
         'name' => ts('View'),
         'url' => 'civicrm/profile/view',
-        'qs' => "id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$view}&snippet=1&context=multiProfileDialog",
+        'qs' => "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$view}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%",
         'title' => ts('View %1', array( 1 => $this->_customGroupTitle . ' record')),
       );
 
       $links[CRM_Core_Action::UPDATE] = array(
         'name' => ts('Edit'),
         'url' => 'civicrm/profile/edit',
-        'qs' => "id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$update}&snippet=1&context=multiProfileDialog",
+        'qs' => "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$update}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%",
         'title' => ts('Edit %1', array( 1 => $this->_customGroupTitle . ' record')),
       );
 
       $links[CRM_Core_Action::DELETE] = array(
         'name' => ts('Delete'),
         'url' => 'civicrm/profile/edit',
-        'qs' => "id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$delete}&snippet=1&context=multiProfileDialog",
+        'qs' => "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$delete}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%",
         'title' => ts('Delete %1', array( 1 => $this->_customGroupTitle . ' record')),
       );
 
@@ -112,6 +112,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   function run() {
     // get the requested action, default to 'browse'
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, FALSE);
+    $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
 
     // assign vars to templates
     $this->assign('action', $action);
@@ -229,7 +230,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                $customValue = "";
              }
              $actionParams = array('recordId' => $recId, 'gid' => $this->_profileId,
-               'id' => $this->_contactId);
+               'id' => $this->_contactId, 'onPopupClose' => $this->_onPopupClose);
              if ($pageCheckSum) {
                $actionParams['cs'] = $pageCheckSum;
              }
