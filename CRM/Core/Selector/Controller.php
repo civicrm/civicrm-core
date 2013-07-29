@@ -222,9 +222,9 @@ class CRM_Core_Selector_Controller {
     $this->_sort = new CRM_Utils_Sort($this->_sortOrder, $this->_sortID);
 
     /*
-         * if we are in transfer mode, do not goto database, use the
-         * session values instead
-         */
+     * if we are in transfer mode, do not goto database, use the
+     * session values instead
+     */
 
     if ($output == self::TRANSFER) {
       $params['total'] = $this->_store->get($this->_prefix . 'rowCount');
@@ -237,8 +237,8 @@ class CRM_Core_Selector_Controller {
     $this->_object->getPagerParams($action, $params);
 
     /*
-         * Set the default values of RowsPerPage
-         */
+     * Set the default values of RowsPerPage
+     */
 
     $storeRowCount = $store->get($this->_prefix . CRM_Utils_Pager::PAGE_ROWCOUNT);
     if ($storeRowCount) {

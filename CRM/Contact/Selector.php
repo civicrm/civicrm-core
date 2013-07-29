@@ -467,7 +467,15 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @access public
    */
   function getTotalCount($action) {
-    return $this->_query->searchQuery(0, 0, NULL, TRUE);
+    // Use count from cache during paging/sorting
+    if (!empty($_GET['crmPID']) || !empty($_GET['crmSID'])) {
+      $count = CRM_Core_BAO_Cache::getItem('Search Results Count', $this->_key);
+    }
+    if (empty($count)) {
+      $count = $this->_query->searchQuery(0, 0, NULL, TRUE);
+      CRM_Core_BAO_Cache::setItem($count, 'Search Results Count', $this->_key);
+    }
+    return $count;
   }
 
   /**
@@ -498,7 +506,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // note the formvalues were given by CRM_Contact_Form_Search to us
     // and contain the search criteria (parameters)
     // note that the default action is basic
-    $result = $this->_query->searchQuery($offset, $rowCount, $sort, FALSE, $includeContactIds);
+    if ($rowCount) {
+      $cacheKey = $this->buildPrevNextCache($sort);
+      $result = $this->_query->getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds);
+    }
+    else {
+      $result = $this->_query->searchQuery($offset, $rowCount, $sort, FALSE, $includeContactIds);
+    }
 
     // process the result of the query
     $rows = array();
@@ -780,35 +794,38 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       }
     }
 
-    $this->buildPrevNextCache($sort);
-
     return $rows;
   }
 
   function buildPrevNextCache($sort) {
-    $cacheKey = CRM_Utils_Array::value('qfKey', $this->_formValues);
+    $cacheKey = 'civicrm search ' . $this->_key;
 
-    //for prev/next pagination
-    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+    // Get current page requested
+    $pageNum = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+    // When starting from scratch, clear any old cache
+    if (!$pageNum) {
+      CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey, 'civicrm_contact');
+      $pageNum = 1;
+    }
+
+    $pageSize = CRM_Utils_Request::retrieve('crmRowCount', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, 50);
+    $firstRecord = ($pageNum - 1) * $pageSize;
 
     //for alphabetic pagination selection save
     $sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String', CRM_Core_DAO::$_nullObject);
 
     //for text field pagination selection save
-    $countRow = CRM_Core_BAO_PrevNextCache::getCount("%civicrm search {$cacheKey}%", NULL, "entity_table = 'civicrm_contact'", "LIKE");
+    $countRow = CRM_Core_BAO_PrevNextCache::getCount($cacheKey, NULL, "entity_table = 'civicrm_contact'");
 
-    if ((!$crmPID || $countRow == 0) && !$sortByCharacter) {
-      $this->fillupPrevNextCache($sort);
+    // $sortByCharacter triggers a refresh in the prevNext cache
+    if ($sortByCharacter && $sortByCharacter != 'all') {
+      $cacheKey .= "_alphabet";
+      $this->fillupPrevNextCache($sort, $cacheKey);
     }
-    elseif ($sortByCharacter) {
-      $cacheKeyCharacter = "civicrm search {$cacheKey}_alphabet";
-      if ($sortByCharacter == 'all') {
-        //delete the alphabet key corresponding records in prevnext_cache
-        CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKeyCharacter, 'civicrm_contact');
-        $cacheKeyCharacter = NULL;
-      }
-      $this->fillupPrevNextCache($sort, $cacheKeyCharacter);
+    elseif ($firstRecord >= $countRow) {
+      $this->fillupPrevNextCache($sort, $cacheKey, $countRow, $firstRecord + 500);
     }
+    return $cacheKey;
   }
 
   function addActions(&$rows) {
@@ -885,21 +902,23 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
   }
 
-  function fillupPrevNextCache($sort, $cacheKey = NULL) {
-    if (!$cacheKey) {
-      $cacheKey = "civicrm search {$this->_key}";
-    }
+  /**
+   * @param object $sort
+   * @param string $cacheKey
+   * @param int $start
+   * @param int $end
+   */
+  function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = 500) {
 
-    CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey, 'civicrm_contact');
-
-    // lets fill up the prev next cache here, so view can scroll thru
+    // For custom searches, use the contactIDs method
     if (is_a($this, 'CRM_Contact_Selector_Custom')) {
-      $sql = $this->_search->contactIDs(0, 0, $sort, TRUE);
+      $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
       $replaceSQL = "SELECT contact_a.id as contact_id";
     }
+    // For core searches use the searchQuery method
     else {
       $sql = $this->_query->searchQuery(
-        0, 0, $sort,
+        $start, $end, $sort,
         FALSE, FALSE,
         FALSE, TRUE, TRUE, NULL
       );

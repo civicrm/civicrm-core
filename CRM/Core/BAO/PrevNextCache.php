@@ -193,7 +193,7 @@ WHERE cacheKey $op %1
     }
 
     $params = array(1 => array($cacheKey, 'String'));
-    return CRM_Core_DAO::singleValueQuery($query, $params);
+    return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
   }
 
   static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL) {
