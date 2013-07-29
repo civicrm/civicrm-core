@@ -62,7 +62,7 @@
   {/if}
 
   {if !$reachedMax}
-    <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="id=`$contactId`&multiRecord=add&gid=`$gid`&snippet=1&context=multiProfileDialog"}"
+    <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&snippet=1&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
        class="button action-item"><span><div class="icon add-icon"></div>{ts}Add New Record{/ts}</span></a>
   {/if}
 {/if}
@@ -91,12 +91,15 @@
         }});
       }
 
+      var profileName = {/literal}"{$ufGroupName}"{literal};
       cj('.action-item').each(function () {
-        cj(this).attr('jshref', cj(this).attr('href'));
-        cj(this).attr('href', '#browseValues');
+        if (!cj(this).attr('jshref')) {
+          cj(this).attr('jshref', cj(this).attr('href'));
+          cj(this).attr('href', '#browseValues');
+        }
       });
 
-      cj(".action-item").click(function () {
+      cj(".crm-profile-name-" + profileName + " .action-item").click(function () {
         dataURL = cj(this).attr('jshref');
         dialogTitle = cj(this).attr('title');
         formDialog(dataURL, dialogTitle);

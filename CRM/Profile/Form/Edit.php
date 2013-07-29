@@ -63,6 +63,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
 
     $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
+    $this->assign('onPopupClose', $this->_onPopupClose);
 
     //set the context for the profile
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
