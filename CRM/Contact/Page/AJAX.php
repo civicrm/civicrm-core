@@ -987,6 +987,8 @@ LIMIT {$offset}, {$rowCount}
       $config = CRM_Core_Config::singleton();
 
       while ($result->fetch()) {
+      $query->convertToPseudoNames($result);
+
         $contactID = $result->contact_id;
         $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
           $result->contact_sub_type : $result->contact_type,

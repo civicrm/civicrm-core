@@ -571,6 +571,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     $showProfileOverlay = CRM_Core_BAO_UFGroup::showOverlayProfile();
 
     while ($result->fetch()) {
+      $this->_query->convertToPseudoNames($result);
+
       if (isset($result->country)) {
         // the query returns the untranslated country name
         $i18n = CRM_Core_I18n::singleton();

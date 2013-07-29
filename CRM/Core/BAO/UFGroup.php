@@ -911,6 +911,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       return;
     }
 
+    $query->convertToPseudoNames($details);
     $config = CRM_Core_Config::singleton();
 
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
