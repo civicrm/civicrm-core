@@ -96,7 +96,7 @@
         if (!cj(this).attr('jshref')) {
           cj(this).attr('jshref', cj(this).attr('href'));
           cj(this).attr('href', '#browseValues');
-	}
+        }
       });
 
       cj(".crm-profile-name-" + profileName + " .action-item").click(function () {
