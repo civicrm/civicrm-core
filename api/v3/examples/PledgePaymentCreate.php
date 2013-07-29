@@ -1,24 +1,32 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using pledge_payment create API
+ * *
  */
 function pledge_payment_create_example(){
 $params = array(
   'contact_id' => 1,
   'pledge_id' => 1,
   'contribution_id' => 1,
-  'version' => 3,
   'status_id' => 1,
   'actual_amount' => 20,
 );
 
-  $result = civicrm_api( 'pledge_payment','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('pledge_payment', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function pledge_payment_create_expectedresult(){
@@ -36,7 +44,7 @@ function pledge_payment_create_expectedresult(){
           'scheduled_amount' => '',
           'actual_amount' => '20',
           'currency' => 'USD',
-          'scheduled_date' => '',
+          'scheduled_date' => '20130728085413',
           'reminder_date' => '',
           'reminder_count' => '',
           'status_id' => '1',
@@ -44,7 +52,7 @@ function pledge_payment_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

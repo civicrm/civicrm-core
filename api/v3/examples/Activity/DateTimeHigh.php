@@ -1,22 +1,30 @@
 <?php
-
-/*
- demonstrates _high filter (at time of writing doesn't work if contact_id is set
+/**
+ * Test Generated example of using activity get API
+ * demonstrates _high filter (at time of writing doesn't work if contact_id is set *
  */
 function activity_get_example(){
 $params = array(
   'source_contact_id' => 17,
-  'version' => 3,
   'filter.activity_date_time_high' => '20120101000000',
   'sequential' => 1,
 );
 
-  $result = civicrm_api( 'activity','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function activity_get_expectedresult(){
@@ -46,7 +54,7 @@ function activity_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

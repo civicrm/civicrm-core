@@ -80,8 +80,6 @@ function _civicrm_api3_entity_tag_get_spec(&$params) {
  * @example EntityTagCreate.php
  */
 function civicrm_api3_entity_tag_create($params) {
-
-
   return _civicrm_api3_entity_tag_common($params, 'add');
 }
 

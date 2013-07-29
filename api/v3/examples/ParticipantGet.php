@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using participant get API
+ * *
  */
 function participant_get_example(){
 $params = array(
   'id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'participant','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_get_expectedresult(){
@@ -56,7 +64,7 @@ function participant_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

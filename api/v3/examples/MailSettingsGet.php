@@ -1,7 +1,7 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using mail_settings get API
+ * *
  */
 function mail_settings_get_example(){
 $params = array(
@@ -12,15 +12,23 @@ $params = array(
   'server' => 'localhost',
   'username' => 'sue',
   'password' => 'pass',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'mail_settings','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('mail_settings', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function mail_settings_get_expectedresult(){
@@ -45,7 +53,7 @@ function mail_settings_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

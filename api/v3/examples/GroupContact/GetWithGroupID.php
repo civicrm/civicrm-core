@@ -1,22 +1,30 @@
 <?php
-
-/*
- Get all from group and display contacts
+/**
+ * Test Generated example of using group_contact get API
+ * Get all from group and display contacts *
  */
 function group_contact_get_example(){
 $params = array(
   'group_id' => 1,
-  'version' => 3,
   'api.group.get' => 1,
   'sequential' => 1,
 );
 
-  $result = civicrm_api( 'group_contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group_contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_contact_get_expectedresult(){
@@ -105,7 +113,7 @@ function group_contact_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

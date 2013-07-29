@@ -161,6 +161,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     catch (CRM_Exception $e){
       $this->fail("This should have been a success test");
     }
+    $this->assertTrue(is_array($result));
     $this->assertAPISuccess($result);
   }
 

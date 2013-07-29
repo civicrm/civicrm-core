@@ -1,22 +1,29 @@
 <?php
-
-/*
- demonstrates get + delete in the same call
+/**
+ * Test Generated example of using survey get API
+ * demonstrates get + delete in the same call *
  */
 function survey_get_example(){
 $params = array(
   'title' => 'survey title',
   'api.survey.delete' => 1,
-  'version' => 3,
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'survey','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('survey', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function survey_get_expectedresult(){
@@ -35,7 +42,7 @@ function survey_get_expectedresult(){
           'max_number_of_contacts' => '12',
           'is_active' => '1',
           'is_default' => 0,
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 08:49:19',
           'bypass_confirm' => 0,
           'api.survey.delete' => array(
               'is_error' => 0,
@@ -47,7 +54,7 @@ function survey_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

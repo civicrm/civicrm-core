@@ -1,28 +1,36 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using membership create API
+ * *
  */
 function membership_create_example(){
 $params = array(
-  'contact_id' => 26,
-  'membership_type_id' => 23,
+  'contact_id' => 25,
+  'membership_type_id' => 22,
   'join_date' => '2009-01-21',
   'start_date' => '2009-01-21',
   'end_date' => '2009-12-21',
   'source' => 'Payment',
   'is_override' => 1,
-  'status_id' => 29,
-  'version' => 3,
-  'custom_2' => 'custom string',
+  'status_id' => 28,
+  'custom_1' => 'custom string',
 );
 
-  $result = civicrm_api( 'membership','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('membership', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function membership_create_expectedresult(){
@@ -35,13 +43,13 @@ function membership_create_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'contact_id' => '26',
-          'membership_type_id' => '23',
+          'contact_id' => '25',
+          'membership_type_id' => '22',
           'join_date' => '20090121000000',
           'start_date' => '20090121000000',
           'end_date' => '20091221000000',
           'source' => 'Payment',
-          'status_id' => '29',
+          'status_id' => '28',
           'is_override' => '1',
           'owner_membership_id' => '',
           'max_related' => '',
@@ -53,7 +61,7 @@ function membership_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

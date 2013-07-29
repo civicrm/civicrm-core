@@ -1,25 +1,33 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using activity_type create API
+ * *
  */
 function activity_type_create_example(){
 $params = array(
   'weight' => '2',
   'label' => 'send out letters',
-  'version' => 3,
   'filter' => 0,
   'is_active' => 1,
   'is_optgroup' => 1,
   'is_default' => 0,
 );
 
-  $result = civicrm_api( 'activity_type','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity_type', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function activity_type_create_expectedresult(){
@@ -51,7 +59,7 @@ function activity_type_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

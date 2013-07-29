@@ -1,26 +1,33 @@
 <?php
-
-/*
- demonstrates use of Not BETWEEN filter
+/**
+ * Test Generated example of using relationship get API
+ * demonstrates use of Not BETWEEN filter *
  */
 function relationship_get_example(){
 $params = array(
-  'version' => 3,
   'relationship_type_id' => array(
       'NOT BETWEEN' => array(
-          '0' => 33,
-          '1' => 35,
+          '0' => 32,
+          '1' => 34,
         ),
     ),
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'relationship','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('relationship', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function relationship_get_expectedresult(){
@@ -33,9 +40,9 @@ function relationship_get_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'contact_id_a' => '66',
-          'contact_id_b' => '67',
-          'relationship_type_id' => '32',
+          'contact_id_a' => '63',
+          'contact_id_b' => '64',
+          'relationship_type_id' => '31',
           'start_date' => '2008-12-20',
           'is_active' => '1',
           'description' => '',
@@ -45,7 +52,7 @@ function relationship_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

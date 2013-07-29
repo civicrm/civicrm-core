@@ -1,7 +1,7 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using survey create API
+ * *
  */
 function survey_create_example(){
 $params = array(
@@ -9,16 +9,23 @@ $params = array(
   'activity_type_id' => '35',
   'max_number_of_contacts' => 12,
   'instructions' => 'Call people, ask for money',
-  'version' => 3,
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'survey','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('survey', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function survey_create_expectedresult(){
@@ -42,7 +49,7 @@ function survey_create_expectedresult(){
           'is_active' => '',
           'is_default' => '',
           'created_id' => '',
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 08:49:19',
           'last_modified_id' => '',
           'last_modified_date' => '',
           'result_id' => '',
@@ -53,7 +60,7 @@ function survey_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

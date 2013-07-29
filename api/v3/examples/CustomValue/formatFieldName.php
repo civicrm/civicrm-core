@@ -1,22 +1,30 @@
 <?php
-
-/*
- utilises field names
+/**
+ * Test Generated example of using custom_value get API
+ * utilises field names *
  */
 function custom_value_get_example(){
 $params = array(
   'id' => 2,
-  'version' => 3,
   'entity_id' => 2,
   'format.field_names' => 1,
 );
 
-  $result = civicrm_api( 'custom_value','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('custom_value', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function custom_value_get_expectedresult(){
@@ -30,7 +38,6 @@ function custom_value_get_expectedresult(){
           'entity_id' => '2',
           'latest' => 'value 1',
           'id' => 'mySingleField',
-          '0' => 'value 1',
         ),
       'Cust_Field' => array(
           'entity_id' => '2',
@@ -56,7 +63,7 @@ function custom_value_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

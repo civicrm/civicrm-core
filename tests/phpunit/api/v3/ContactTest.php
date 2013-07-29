@@ -321,7 +321,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params['custom_' . $ids['custom_field_id']] = "custom string";
     $description = "/*this demonstrates setting a custom field through the API ";
     $subfile = "CustomFieldCreate";
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description);
 
     $check = $this->callAPISuccess($this->_entity, 'get', array('return.custom_' . $ids['custom_field_id'] => 1, 'id' => $result['id']));
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);

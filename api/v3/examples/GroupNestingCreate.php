@@ -1,21 +1,29 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using group_nesting create API
+ * *
  */
 function group_nesting_create_example(){
 $params = array(
   'parent_group_id' => 1,
   'child_group_id' => 3,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'group_nesting','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group_nesting', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_nesting_create_expectedresult(){
@@ -30,7 +38,7 @@ function group_nesting_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

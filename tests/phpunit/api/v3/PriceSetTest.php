@@ -38,7 +38,6 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->_params = array(
-      'version' => $this->_apiversion,
 #     [domain_id] =>
       'name' => 'default_goat_priceset',
       'title' => 'Goat accessories',
@@ -56,10 +55,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   }
 
   public function testCreatePriceSet() {
-    $result = civicrm_api($this->_entity, 'create', $this->_params);
-    $this->id = $result['id'];
-    $this->documentMe($this->_params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
@@ -67,18 +63,14 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
 
   public function testGetBasicPriceSet() {
     $getParams = array(
-      'version' => $this->_apiversion,
       'name' => 'default_contribution_amount',
     );
-    $getResult = civicrm_api($this->_entity, 'get', $getParams);
-    $this->documentMe($getParams, $getResult, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($getResult, 'In line ' . __LINE__);
+    $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
   }
 
   public function testEventPriceSet() {
-    $event = civicrm_api('event', 'create', array(
-      'version' => $this->_apiversion,
+    $event = $this->callAPISuccess('event', 'create', array(
       'title' => 'Event with Price Set',
       'event_type_id' => 1,
       'is_public' => 1,
@@ -86,44 +78,31 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
       'end_date' => 20151023,
       'is_active' => 1,
     ));
-    $this->assertAPISuccess($event);
     $createParams = array(
-      'version' => $this->_apiversion,
       'entity_table' => 'civicrm_event',
       'entity_id' => $event['id'],
       'name' => 'event price',
       'title' => 'event price',
       'extends' => 1,
     );
-    $createResult = civicrm_api($this->_entity, 'create', $createParams);
-    $this->documentMe($createParams, $createResult, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($createResult, 'In line ' . __LINE__);
-    $id = $createResult['id'];
-    $result = civicrm_api($this->_entity, 'get', array(
-      'version' => $this->_apiversion,
-      'id' => $id,
+    $createResult = $this->callAPIAndDocument($this->_entity, 'create', $createParams, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'id' => $createResult['id'],
     ));
-    $this->assertEquals(array('civicrm_event' => array($event['id'])), $result['values'][$id]['entity'], 'In line ' . __LINE__);
+    $this->assertEquals(array('civicrm_event' => array($event['id'])), $result['values'][$createResult['id']]['entity'], 'In line ' . __LINE__);
   }
 
   public function testDeletePriceSet() {
-    $startCount = civicrm_api($this->_entity, 'getcount', array(
-      'version' => $this->_apiversion,
-      ));
-    $createResult = civicrm_api($this->_entity, 'create', $this->_params);
-    $deleteParams = array('version' => $this->_apiversion, 'id' => $createResult['id']);
-    $deleteResult = civicrm_api($this->_entity, 'delete', $deleteParams);
-    $this->documentMe($deleteParams, $deleteResult, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($deleteResult, 'In line ' . __LINE__);
-    $endCount = civicrm_api($this->_entity, 'getcount', array(
-      'version' => $this->_apiversion,
-      ));
+    $startCount = $this->callAPISuccess($this->_entity, 'getcount', array());
+    $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $deleteParams = array('id' => $createResult['id']);
+    $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $endCount = $this->callAPISuccess($this->_entity, 'getcount', array());
     $this->assertEquals($startCount, $endCount, 'In line ' . __LINE__);
   }
 
   public function testGetFieldsPriceSet() {
-    $result = civicrm_api($this->_entity, 'getfields', array('version' => $this->_apiversion, 'action' => 'create'));
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(16, $result['values']['is_quick_config']['type']);
   }
 
