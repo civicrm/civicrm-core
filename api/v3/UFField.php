@@ -114,7 +114,7 @@ function civicrm_api3_uf_field_create($params) {
 function _civicrm_api3_uf_field_create_spec(&$params) {
   $params['option.autoweight'] = array(
     'title' => "Automatically adjust weights in UFGroup to align with UFField",
-    'type' => CRM_Utils_Type::T_BOOL
+    'type' => CRM_Utils_Type::T_BOOLEAN
   );
 }
 

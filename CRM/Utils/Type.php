@@ -39,7 +39,6 @@ class CRM_Utils_Type {
     T_ENUM       = 2,
     T_DATE       = 4,
     T_TIME       = 8,
-    T_BOOL       = 16,
     T_BOOLEAN    = 16,
     T_TEXT       = 32,
     T_LONGTEXT   = 32,

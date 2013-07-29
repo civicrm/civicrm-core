@@ -700,7 +700,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           }
           break;
 
-        case CRM_Utils_Type::T_BOOL:
         case CRM_Utils_Type::T_BOOLEAN:
           // probably created with a 1
           $entity[$fieldName] = '0';
