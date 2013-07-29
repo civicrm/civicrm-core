@@ -1,20 +1,28 @@
 <?php
-
-/*
- gets defaults setting a variable for a given domain - if no domain is set current is assumed
+/**
+ * Test Generated example of using setting getdefaults API
+ * gets defaults setting a variable for a given domain - if no domain is set current is assumed *
  */
 function setting_getdefaults_example(){
 $params = array(
-  'version' => 3,
   'name' => 'address_format',
 );
 
-  $result = civicrm_api( 'setting','getdefaults',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('setting', 'getdefaults', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function setting_getdefaults_expectedresult(){
@@ -36,7 +44,7 @@ function setting_getdefaults_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

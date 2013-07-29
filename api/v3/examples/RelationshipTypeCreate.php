@@ -1,7 +1,7 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using relationship_type create API
+ * *
  */
 function relationship_type_create_example(){
 $params = array(
@@ -11,16 +11,24 @@ $params = array(
   'contact_type_b' => 'Organization',
   'is_reserved' => 1,
   'is_active' => 1,
-  'version' => 3,
   'sequential' => 1,
 );
 
-  $result = civicrm_api( 'relationship_type','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('relationship_type', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function relationship_type_create_expectedresult(){
@@ -48,7 +56,7 @@ function relationship_type_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

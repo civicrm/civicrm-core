@@ -46,8 +46,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   function tearDown() {}
 
   public function testReportTemplate() {
-    $result = civicrm_api('ReportTemplate', 'create', array(
-      'version' => $this->_apiversion,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(
       'label' => 'Example Form',
       'description' => 'Longish description of the example form',
       'class_name' => 'CRM_Report_Form_Examplez',
@@ -66,9 +65,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       WHERE name = "CRM_Report_Form_Examplez"');
 
     // change component to null
-    $result = civicrm_api('ReportTemplate', 'create', array(
-      'version' => $this->_apiversion,
-      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(      'id' => $entityId,
       'component' => '',
     ));
     $this->assertAPISuccess($result);
@@ -81,9 +78,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       AND component_id IS NULL');
 
     // deactivate
-    $result = civicrm_api('ReportTemplate', 'create', array(
-      'version' => $this->_apiversion,
-      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(      'id' => $entityId,
       'is_active' => 0,
     ));
     $this->assertAPISuccess($result);
@@ -95,9 +90,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       WHERE name = "CRM_Report_Form_Examplez"');
 
     // activate
-    $result = civicrm_api('ReportTemplate', 'create', array(
-      'version' => $this->_apiversion,
-      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(      'id' => $entityId,
       'is_active' => 1,
     ));
     $this->assertAPISuccess($result);
@@ -108,9 +101,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"');
 
-    $result = civicrm_api('ReportTemplate', 'delete', array(
-      'version' => $this->_apiversion,
-      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'delete', array(      'id' => $entityId,
     ));
     $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);

@@ -1,7 +1,7 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using batch update API
+ * *
  */
 function batch_update_example(){
 $params = array(
@@ -11,16 +11,23 @@ $params = array(
   'total' => '400.44',
   'item_count' => 4,
   'id' => 1,
-  'version' => 3,
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'batch','update',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('batch', 'update', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function batch_update_expectedresult(){
@@ -37,7 +44,7 @@ function batch_update_expectedresult(){
           'title' => 'New Batch 04',
           'description' => 'This is description for New Batch 04',
           'created_id' => '',
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 08:49:19',
           'modified_id' => '',
           'modified_date' => '2012-11-14 16:02:35',
           'saved_search_id' => '',
@@ -52,7 +59,7 @@ function batch_update_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

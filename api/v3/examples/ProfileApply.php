@@ -1,13 +1,12 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using profile apply API
+ * *
  */
 function profile_apply_example(){
 $params = array(
   'profile_id' => 25,
   'contact_id' => 1,
-  'version' => 3,
   'first_name' => 'abc2',
   'last_name' => 'xyz2',
   'email-Primary' => 'abc2.xyz2@gmail.com',
@@ -16,12 +15,21 @@ $params = array(
   'state_province-1' => '1000',
 );
 
-  $result = civicrm_api( 'profile','apply',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('profile', 'apply', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function profile_apply_expectedresult(){
@@ -29,13 +37,14 @@ function profile_apply_expectedresult(){
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 10,
+  'count' => 11,
   'values' => array(
       'contact_type' => 'Individual',
       'contact_sub_type' => '',
       'contact_id' => 1,
-      'profile_id' => 25,
       'version' => 3,
+      'debug' => 1,
+      'profile_id' => 25,
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
       'email' => array(
@@ -64,7 +73,7 @@ function profile_apply_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

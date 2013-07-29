@@ -623,7 +623,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     if(!empty($apiResult['trace'])){
       $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
     }
-
     $this->assertEquals(0, $apiResult['is_error'], $prefix . $errorMessage);
   }
 
@@ -804,9 +803,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
     $params['version'] = $this->_apiversion;
     $result = $this->callAPISuccess($entity, $action, $params);
-    if (is_array($result)) {
-      unset($result['xdebug']);
-    }
     $this->documentMe($params, $result, $function, $file, $description, $subfile, $actionName);
     return $result;
   }
@@ -1150,19 +1146,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create Tag
    *
-   * @return int tag_id of created tag
+   * @return array result of created tag
    */
-  function tagCreate($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
-        'name' => 'New Tag3' . rand(),
-        'description' => 'This is description for New Tag ' . rand(),
-        'domain_id' => '1',
-      );
-    }
-
-    $result = $this->callAPISuccess('Tag', 'create', $params);
-    return $result;
+  function tagCreate($params = array()) {
+    $defaults = array(
+      'name' => 'New Tag3',
+      'description' => 'This is description for Our New Tag ',
+      'domain_id' => '1',
+    );
+    $params = array_merge($defaults, $params);
+    $result =  $this->callAPISuccess('Tag', 'create', $params);
+    return $result['values'][$result['id']];
   }
 
   /**
@@ -1881,24 +1875,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $entityAction = ucwords($action);
     }
 
-    $fieldsToChange = array(
-      'hash' => '67eac7789eaee00',
-      'modified_date' => '2012-11-14 16:02:35',
-      'created_date' => '20120130621222105',
-      'create_date' => '20120130621222105',
-    );
-
-    //swap out keys that change too often
-    foreach ($fieldsToChange as $changeKey => $changeValue) {
-      if (isset($result['values']) && is_array($result['values'])) {
-        foreach ($result['values'] as $key => $value) {
-          if (is_array($value) && array_key_exists($changeKey, $value)) {
-            $result['values'][$key][$changeKey] = $changeValue;
-          }
-        }
-      }
+    $this->tidyExampleResult($result);
+    if(isset($params['version'])) {
+      unset($params['version']);
     }
-
     // a cleverer person than me would do it in a single regex
     if (strstr($entity, 'UF')) {
       $fnPrefix = strtolower(preg_replace('/(?<! )(?<!^)(?<=UF)[A-Z]/', '_$0', $entity));
@@ -1933,6 +1913,63 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         $f = fopen("../api/v3/examples/$entity/$subfile.php", "w+b");
         fwrite($f, $smarty->fetch('../tests/templates/documentFunction.tpl'));
         fclose($f);
+      }
+    }
+  }
+
+  /**
+   * Tidy up examples array so that fields that change often ..don't
+   * and debug related fields are unset
+   * @param array $params
+   */
+  function tidyExampleResult(&$result){
+    if(!is_array($result)) {
+      return;
+    }
+    $fieldsToChange = array(
+      'hash' => '67eac7789eaee00',
+      'modified_date' => '2012-11-14 16:02:35',
+      'created_date' => '2013-07-28 08:49:19',
+      'create_date' => '20120130621222105',
+      'application_received_date' => '20130728084957',
+      'in_date' => '2013-07-28 08:50:19',
+      'scheduled_date' => '20130728085413',
+      'approval_date' => '20130728085413',
+      'pledge_start_date_high' => '20130726090416',
+    );
+
+    $keysToUnset = array('xdebug', 'undefined_fields',);
+    foreach ($keysToUnset as $unwantedKey) {
+      if(isset($result[$unwantedKey])) {
+        unset($result[$unwantedKey]);
+      }
+    }
+
+    if (isset($result['values']) && is_array($result['values'])) {
+      foreach ($result['values'] as $index => &$values) {
+        if(!is_array($values)) {
+          continue;
+        }
+        foreach($values as $key => &$value) {
+          if(substr($key, 0, 3)  == 'api' && is_array($value)) {
+            if(isset($value['is_error'])) {
+              // we have a std nested result format
+              $this->tidyExampleResult($value);
+            }
+            else{
+              foreach ($value as &$nestedResult) {
+                // this is an alternative syntax for nested results a keyed array of results
+                $this->tidyExampleResult($nestedResult);
+              }
+            }
+          }
+          if(in_array($key, $keysToUnset)) {
+            unset($values[$key]);
+          }
+          if(array_key_exists($key, $fieldsToChange)) {
+            $value = $fieldsToChange[$key];
+          }
+        }
       }
     }
   }
@@ -2217,6 +2254,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       $entityFinancialType->financial_account_id = $financialAccount->id;
       $entityFinancialType->delete();
       $financialAccount->delete();
+    }
+  }
+
+  /**
+   * Use $ids as an instruction to do test cleanup
+   */
+  function deleteFromIDSArray() {
+    foreach ($this->ids as $entity => $ids) {
+      foreach ($ids as $id) {
+        $this->callAPISuccess($entity, 'delete', array('id' => $id));
+      }
     }
   }
 }

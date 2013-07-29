@@ -1,21 +1,29 @@
 <?php
-
-/*
- Criteria delete by nesting a GET & a DELETE
+/**
+ * Test Generated example of using participant Get API
+ * Criteria delete by nesting a GET & a DELETE *
  */
 function participant_get_example(){
 $params = array(
-  'version' => 3,
   'contact_id' => 4,
   'api.participant.delete' => 1,
 );
 
-  $result = civicrm_api( 'participant','Get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant', 'Get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_get_expectedresult(){
@@ -31,7 +39,7 @@ function participant_get_expectedresult(){
           'contact_sub_type' => '',
           'sort_name' => 'Anderson, Anthony',
           'display_name' => 'Mr. Anthony Anderson II',
-          'event_id' => '37',
+          'event_id' => '38',
           'event_title' => 'Annual CiviCRM meet',
           'event_start_date' => '2008-10-21 00:00:00',
           'event_end_date' => '2008-10-23 00:00:00',
@@ -65,7 +73,7 @@ function participant_get_expectedresult(){
           'contact_sub_type' => '',
           'sort_name' => 'Anderson, Anthony',
           'display_name' => 'Mr. Anthony Anderson II',
-          'event_id' => '37',
+          'event_id' => '38',
           'event_title' => 'Annual CiviCRM meet',
           'event_start_date' => '2008-10-21 00:00:00',
           'event_end_date' => '2008-10-23 00:00:00',
@@ -96,7 +104,7 @@ function participant_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

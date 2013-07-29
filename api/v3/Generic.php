@@ -139,6 +139,9 @@ function civicrm_api3_generic_getcount($apiRequest) {
   if(is_numeric (CRM_Utils_Array::value('values', $result))) {
     return (int) $result['values'];
   }
+  if(!isset($result['count'])) {
+    throw new API_Exception(ts('Unexpected result from getcount') . print_r($result, TRUE));
+  }
   return $result['count'];
 }
 

@@ -1,21 +1,29 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using participant_payment create API
+ * *
  */
 function participant_payment_create_example(){
 $params = array(
   'participant_id' => 1,
   'contribution_id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'participant_payment','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant_payment', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_payment_create_expectedresult(){
@@ -34,7 +42,7 @@ function participant_payment_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

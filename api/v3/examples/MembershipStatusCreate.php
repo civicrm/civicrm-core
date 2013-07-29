@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using membership_status create API
+ * *
  */
 function membership_status_create_example(){
 $params = array(
   'name' => 'test membership status',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'membership_status','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('membership_status', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function membership_status_create_expectedresult(){
@@ -23,10 +31,10 @@ function membership_status_create_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 19,
+  'id' => 15,
   'values' => array(
-      '19' => array(
-          'id' => '19',
+      '15' => array(
+          'id' => '15',
           'name' => 'test membership status',
           'label' => 'test membership status',
           'start_event' => '',
@@ -45,7 +53,7 @@ function membership_status_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

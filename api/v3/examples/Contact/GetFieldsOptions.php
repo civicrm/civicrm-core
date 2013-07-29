@@ -1,23 +1,31 @@
 <?php
-
-/*
- Demonstrate retrieving metadata with custom field options
+/**
+ * Test Generated example of using contact GetFields API
+ * Demonstrate retrieving metadata with custom field options *
  */
 function contact_getfields_example(){
 $params = array(
   'options' => array(
       'get_options' => 'custom_1',
     ),
-  'version' => 3,
   'action' => 'create',
 );
 
-  $result = civicrm_api( 'contact','GetFields',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'GetFields', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_getfields_expectedresult(){
@@ -300,32 +308,6 @@ function contact_getfields_expectedresult(){
           'dataPattern' => '/^\w+(\s\w+)?+$/',
           'export' => true,
         ),
-      'prefix_id' => array(
-          'name' => 'prefix_id',
-          'type' => 1,
-          'title' => 'Individual Prefix',
-          'import' => true,
-          'where' => 'civicrm_contact.prefix_id',
-          'headerPattern' => '/^(prefix|title)/i',
-          'dataPattern' => '/^(mr|ms|mrs|sir|dr)\.?$/i',
-          'export' => true,
-          'pseudoconstant' => array(
-              'optionGroupName' => 'individual_prefix',
-            ),
-        ),
-      'suffix_id' => array(
-          'name' => 'suffix_id',
-          'type' => 1,
-          'title' => 'Individual Suffix',
-          'import' => true,
-          'where' => 'civicrm_contact.suffix_id',
-          'headerPattern' => '/^suffix$/i',
-          'dataPattern' => '/^(sr|jr)\.?|i{2,}$/',
-          'export' => true,
-          'pseudoconstant' => array(
-              'optionGroupName' => 'individual_suffix',
-            ),
-        ),
       'email_greeting_id' => array(
           'name' => 'email_greeting_id',
           'type' => 1,
@@ -521,6 +503,34 @@ function contact_getfields_expectedresult(){
           'export' => true,
           'uniqueName' => 'contact_source',
         ),
+      'prefix_id' => array(
+          'name' => 'prefix_id',
+          'type' => 1,
+          'title' => 'Individual Prefix',
+          'import' => true,
+          'where' => 'civicrm_contact.prefix_id',
+          'headerPattern' => '/^(prefix|title)/i',
+          'dataPattern' => '/^(mr|ms|mrs|sir|dr)\.?$/i',
+          'export' => true,
+          'pseudoconstant' => array(
+              'optionGroupName' => 'individual_prefix',
+            ),
+          'uniqueName' => 'individual_prefix_id',
+        ),
+      'suffix_id' => array(
+          'name' => 'suffix_id',
+          'type' => 1,
+          'title' => 'Individual Suffix',
+          'import' => true,
+          'where' => 'civicrm_contact.suffix_id',
+          'headerPattern' => '/^suffix$/i',
+          'dataPattern' => '/^(sr|jr)\.?|i{2,}$/',
+          'export' => true,
+          'pseudoconstant' => array(
+              'optionGroupName' => 'individual_suffix',
+            ),
+          'uniqueName' => 'individual_suffix_id',
+        ),
       'employer_id' => array(
           'name' => 'employer_id',
           'type' => 1,
@@ -553,7 +563,7 @@ function contact_getfields_expectedresult(){
           'extends_entity_column_id' => '',
           'is_view' => 0,
           'is_multiple' => 0,
-          'option_group_id' => '97',
+          'option_group_id' => '99',
           'date_format' => '',
           'time_format' => '',
           'name' => 'custom_1',
@@ -573,7 +583,7 @@ function contact_getfields_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

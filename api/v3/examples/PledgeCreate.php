@@ -1,14 +1,14 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using pledge create API
+ * *
  */
 function pledge_create_example(){
 $params = array(
   'contact_id' => 11,
-  'pledge_create_date' => '20130622',
-  'start_date' => '20130622',
-  'scheduled_date' => '20130624',
+  'pledge_create_date' => '20130728',
+  'start_date' => '20130728',
+  'scheduled_date' => '20130730',
   'amount' => '100',
   'pledge_status_id' => '2',
   'pledge_financial_type_id' => '1',
@@ -18,15 +18,23 @@ $params = array(
   'frequency_day' => 15,
   'installments' => 5,
   'sequential' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'pledge','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('pledge', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function pledge_create_expectedresult(){
@@ -49,8 +57,8 @@ function pledge_create_expectedresult(){
           'frequency_interval' => '5',
           'frequency_day' => '15',
           'installments' => '5',
-          'start_date' => '20130622000000',
-          'create_date' => '20130622000000',
+          'start_date' => '20130728000000',
+          'create_date' => '20120130621222105',
           'acknowledge_date' => '',
           'modified_date' => '2012-11-14 16:02:35',
           'cancel_date' => '',
@@ -67,7 +75,7 @@ function pledge_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

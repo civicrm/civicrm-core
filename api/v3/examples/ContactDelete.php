@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contact delete API
+ * *
  */
 function contact_delete_example(){
 $params = array(
-  'id' => 17,
-  'version' => 3,
+  'id' => 1,
 );
 
-  $result = civicrm_api( 'contact','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_delete_expectedresult(){
@@ -26,7 +34,7 @@ function contact_delete_expectedresult(){
   'values' => 1,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

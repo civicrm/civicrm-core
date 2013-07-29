@@ -1,24 +1,32 @@
 <?php
-
-/*
- demonstrates use of Sort param (available in many api functions). Also, getsingle
+/**
+ * Test Generated example of using option_value getsingle API
+ * demonstrates use of Sort param (available in many api functions). Also, getsingle *
  */
 function option_value_getsingle_example(){
 $params = array(
   'option_group_id' => 1,
-  'version' => 3,
   'options' => array(
       'sort' => 'label DESC',
       'limit' => 1,
     ),
 );
 
-  $result = civicrm_api( 'option_value','getsingle',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('option_value', 'getsingle', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function option_value_getsingle_expectedresult(){
@@ -35,7 +43,7 @@ function option_value_getsingle_expectedresult(){
   'is_active' => '1',
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

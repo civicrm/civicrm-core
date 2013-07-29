@@ -1,21 +1,29 @@
 <?php
-
-/*
- demonstrates get + delete in the same call
+/**
+ * Test Generated example of using mail_settings get API
+ * demonstrates get + delete in the same call *
  */
 function mail_settings_get_example(){
 $params = array(
-  'version' => 3,
   'title' => 'MailSettings title',
   'api.MailSettings.delete' => 1,
 );
 
-  $result = civicrm_api( 'mail_settings','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('mail_settings', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function mail_settings_get_expectedresult(){
@@ -58,7 +66,7 @@ function mail_settings_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

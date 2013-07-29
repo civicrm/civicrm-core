@@ -1,21 +1,28 @@
 <?php
-
-/*
- demonstrates use of is.Current option
+/**
+ * Test Generated example of using event get API
+ * demonstrates use of is.Current option *
  */
 function event_get_example(){
 $params = array(
   'isCurrent' => 1,
-  'version' => 3,
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'event','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('event', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function event_get_expectedresult(){
@@ -36,10 +43,10 @@ function event_get_expectedresult(){
           'event_type_id' => '1',
           'participant_listing_id' => 0,
           'is_public' => '1',
-          'start_date' => '2013-06-23 00:00:00',
-          'event_start_date' => '2013-06-23 00:00:00',
-          'end_date' => '2013-06-29 00:00:00',
-          'event_end_date' => '2013-06-29 00:00:00',
+          'start_date' => '2013-07-29 00:00:00',
+          'event_start_date' => '2013-07-29 00:00:00',
+          'end_date' => '2013-08-04 00:00:00',
+          'event_end_date' => '2013-08-04 00:00:00',
           'is_online_registration' => '1',
           'registration_start_date' => '2010-06-01 00:00:00',
           'registration_end_date' => '2010-10-15 00:00:00',
@@ -56,13 +63,13 @@ function event_get_expectedresult(){
           'is_multiple_registrations' => 0,
           'allow_same_participant_emails' => 0,
           'is_template' => 0,
-          'created_date' => '20120130621222105',
+          'created_date' => '2013-07-28 08:49:19',
           'is_share' => '1',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

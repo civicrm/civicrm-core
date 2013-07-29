@@ -1,21 +1,29 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using entity_tag create API
+ * *
  */
 function entity_tag_create_example(){
 $params = array(
   'contact_id' => 12,
-  'tag_id' => 1,
-  'version' => 3,
+  'tag_id' => '1',
 );
 
-  $result = civicrm_api( 'entity_tag','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('entity_tag', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function entity_tag_create_expectedresult(){
@@ -27,7 +35,7 @@ function entity_tag_create_expectedresult(){
   'total_count' => 1,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

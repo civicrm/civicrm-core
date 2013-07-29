@@ -1,19 +1,26 @@
 <?php
-
-/*
- Demonstrate return from getfields - see subfolder for variants
+/**
+ * Test Generated example of using setting getfields API
+ * Demonstrate return from getfields - see subfolder for variants *
  */
 function setting_getfields_example(){
-$params = array(
-  'version' => 3,
-);
+$params = array();
 
-  $result = civicrm_api( 'setting','getfields',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('setting', 'getfields', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function setting_getfields_expectedresult(){
@@ -21,7 +28,7 @@ function setting_getfields_expectedresult(){
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 75,
+  'count' => 78,
   'values' => array(
       'address_standardization_provider' => array(
           'group_name' => 'Address Preferences',
@@ -481,6 +488,20 @@ function setting_getfields_expectedresult(){
           'description' => 'If enabled, deleted contacts will be moved to trash (instead of being destroyed). Users with the proper permission are able to search for the deleted contacts and restore them (or delete permanently).',
           'help_text' => '',
         ),
+      'allowPermDeleteFinancial' => array(
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'allowPermDeleteFinancial',
+          'type' => 'Boolean',
+          'quick_form_type' => 'YesNo',
+          'default' => '',
+          'add' => '4.3',
+          'title' => 'Contact Permanent Delete',
+          'is_domain' => 1,
+          'is_contact' => 0,
+          'description' => 'Allow Permanent Delete for contacts who are linked to live financial transactions',
+          'help_text' => '',
+        ),
       'versionAlert' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
@@ -627,7 +648,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
             ),
           'default' => 7,
           'add' => '4.3',
-          'title' => 'Dashboard cache timeout',
+          'title' => 'Checksum Lifespan',
           'is_domain' => 1,
           'is_contact' => 0,
           'description' => '',
@@ -706,21 +727,48 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'help_text' => 'By default, CiviCRM will generate front-facing pages using the home page at http://wp/ as its base. If you want to use a different template for CiviCRM pages, set the path here.',
         ),
       'secondDegRelPermissions' => array(
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'secondDegRelPermissions',
-        'prefetch' => 1,
-        'config_only'=> 1,
-        'type' => 'Boolean',
-        'quick_form_type' => 'YesNo',
-        'default' => 0,
-        'add' => '4.3',
-        'title' => 'Allow second-degree relationship permissions',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => "If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts",
-        'help_text' => null,
-      ),
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'secondDegRelPermissions',
+          'prefetch' => 1,
+          'config_only' => 1,
+          'type' => 'Boolean',
+          'quick_form_type' => 'YesNo',
+          'default' => 0,
+          'add' => '4.3',
+          'title' => 'Allow second-degree relationship permissions',
+          'is_domain' => 1,
+          'is_contact' => 0,
+          'description' => 'If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts',
+          'help_text' => '',
+        ),
+      'enable_components' => array(
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'enable_components',
+          'type' => 'Array',
+          'quick_form_type' => 'Element',
+          'html_type' => 'advmultiselect',
+          'html_attributes' => array(
+              'size' => 5,
+              'style' => 'width:150px',
+              'class' => 'advmultiselect',
+            ),
+          'default' => array(
+              '0' => 'CiviEvent',
+              '1' => 'CiviContribute',
+              '2' => 'CiviMember',
+              '3' => 'CiviMail',
+              '4' => 'CiviReport',
+              '5' => 'CiviPledge',
+            ),
+          'add' => '4.4',
+          'title' => 'Enable Components',
+          'is_domain' => '1',
+          'is_contact' => 0,
+          'description' => '',
+          'help_text' => '',
+        ),
       'debug_enabled' => array(
           'group_name' => 'Developer Preferences',
           'group' => 'developer',
@@ -734,7 +782,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'title' => 'Enable Debugging',
           'is_domain' => 1,
           'is_contact' => 0,
-          'description' => 'Set this value to Yes if you want to use one of CiviCRM\'s debugging tools. This feature should NOT be enabled for production sites',
+          'description' => 'Set this value to Yes if you want to use one of CiviCRM's debugging tools. This feature should NOT be enabled for production sites',
           'prefetch' => 1,
           'help_text' => 'Do not turn this on on production sites',
         ),
@@ -752,8 +800,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'is_contact' => 0,
           'description' => 'Set this value to Yes if you want CiviCRM error/debugging messages to also appear in Drupal error logs',
           'prefetch' => 1,
-          'help_text' => 'Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS\' error log.
-In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal\'s watchdog enabled)',
+          'help_text' => 'Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS' error log.
+In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)',
         ),
       'backtrace' => array(
           'group_name' => 'Developer Preferences',
@@ -1333,7 +1381,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,28 +1,36 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using membership update API
+ * *
  */
 function membership_update_example(){
 $params = array(
-  'contact_id' => 32,
-  'membership_type_id' => 29,
+  'contact_id' => 31,
+  'membership_type_id' => 28,
   'join_date' => '2009-01-21',
   'start_date' => '2009-01-21',
   'end_date' => '2009-12-21',
   'source' => 'Payment',
   'is_override' => 1,
-  'status_id' => 35,
-  'version' => 3,
-  'custom_3' => 'custom string',
+  'status_id' => 34,
+  'custom_1' => 'custom string',
 );
 
-  $result = civicrm_api( 'membership','update',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('membership', 'update', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function membership_update_expectedresult(){
@@ -35,13 +43,13 @@ function membership_update_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'contact_id' => '32',
-          'membership_type_id' => '29',
+          'contact_id' => '31',
+          'membership_type_id' => '28',
           'join_date' => '20090121000000',
           'start_date' => '20090121000000',
           'end_date' => '20091221000000',
           'source' => 'Payment',
-          'status_id' => '35',
+          'status_id' => '34',
           'is_override' => '1',
           'owner_membership_id' => '',
           'max_related' => '',
@@ -53,7 +61,7 @@ function membership_update_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

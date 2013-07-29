@@ -109,7 +109,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $customField  = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField  = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
     $params['id'] = $customField['id'];
     $customField  = $this->callAPISuccess('custom_field', 'create', $params);
 

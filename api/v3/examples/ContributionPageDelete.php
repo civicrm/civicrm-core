@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contribution_page delete API
+ * *
  */
 function contribution_page_delete_example(){
 $params = array(
-  'version' => 3,
   'id' => 4,
 );
 
-  $result = civicrm_api( 'contribution_page','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contribution_page', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contribution_page_delete_expectedresult(){
@@ -26,7 +34,7 @@ function contribution_page_delete_expectedresult(){
   'values' => 1,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -58,12 +58,10 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   }
 
   public function testCreateCustomValue() {
-
     $params = array(
       'custom_' . $this->ids['single']['custom_field_id'] => 'customString') + $this->params;
 
-    $result = $this->callAPISuccess('custom_value', 'create', $params);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument('custom_value', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $result = $this->callAPISuccess('custom_value', 'get', $params);
   }
@@ -86,7 +84,6 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
 
     $result = $this->callAPISuccess('Contact', 'create', $params);
-    $this->assertAPISuccess($result, __LINE__);
     $contact_id = $result['id'];
     $result = $this->callAPISuccess('Contact', 'create',
       array(

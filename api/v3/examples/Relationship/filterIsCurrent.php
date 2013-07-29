@@ -1,23 +1,30 @@
 <?php
-
-/*
- demonstrates is_current filter
+/**
+ * Test Generated example of using relationship get API
+ * demonstrates is_current filter *
  */
 function relationship_get_example(){
 $params = array(
   'filters' => array(
       'is_current' => 1,
     ),
-  'version' => 3,
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'relationship','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('relationship', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function relationship_get_expectedresult(){
@@ -30,9 +37,9 @@ function relationship_get_expectedresult(){
   'values' => array(
       '2' => array(
           'id' => '2',
-          'contact_id_a' => '63',
-          'contact_id_b' => '64',
-          'relationship_type_id' => '31',
+          'contact_id_a' => '60',
+          'contact_id_b' => '61',
+          'relationship_type_id' => '30',
           'start_date' => '2008-12-20',
           'is_active' => '1',
           'description' => '',
@@ -42,7 +49,7 @@ function relationship_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

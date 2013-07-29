@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contribution_soft get API
+ * *
  */
 function contribution_soft_get_example(){
 $params = array(
   'id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'contribution_soft','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contribution_soft', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contribution_soft_get_expectedresult(){
@@ -28,7 +36,7 @@ function contribution_soft_get_expectedresult(){
       '1' => array(
           'id' => '1',
           'contribution_id' => '1',
-          'contact_id' => '2',
+          'contact_id' => '4',
           'amount' => '10.00',
           'currency' => 'USD',
           'pcp_display_in_roll' => 0,
@@ -36,7 +44,7 @@ function contribution_soft_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 
