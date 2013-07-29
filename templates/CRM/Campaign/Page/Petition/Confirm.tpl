@@ -40,5 +40,7 @@
     <p><div class="bold">{ts}Thank you for signing the petition.{/ts}</div></p>
   {/if}
   </div>
+  {if $is_share}
     {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl"}
+  {/if}
 {/if}
