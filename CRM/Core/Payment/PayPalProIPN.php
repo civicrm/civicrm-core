@@ -279,13 +279,12 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
   }
 
-  function main($component = 'contribute') {
+  function main() {
     CRM_Core_Error::debug_var('GET', $_GET, TRUE, TRUE);
     CRM_Core_Error::debug_var('POST', $_POST, TRUE, TRUE);
 
-
     $objects = $ids = $input = array();
-    $input['component'] = $component;
+    $input['component'] = self::getValue('m');
 
     // get the contribution and contact ids from the GET params
     $ids['contact'] = self::getValue('c', TRUE);
