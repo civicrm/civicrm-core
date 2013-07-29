@@ -36,7 +36,7 @@
   Note: This file is used by CivHR
 *}
 
-<a class="css_right {$snippet.css_class}" href="#" title="{ts}View Revisions{/ts}">Revisions</a>
+<a class="css_right {$snippet.css_class}" href="#" title="{ts}View Revisions{/ts}">View Revisions</a>
 <div class="dialog-{$snippet.css_class}">
   <div class="revision-content"></div>
 </div>
@@ -49,20 +49,20 @@ cj(document).on("click", ".{/literal}{$snippet.css_class}{literal}", function() 
     title: "{/literal}{ts}Revisions{/ts}{literal}",
     modal: true,
     width: "680px",
-    height: "380",
     bgiframe: true,
     overlay: { opacity: 0.5, background: "black" },
     open:function() {
-      var url = CRM.url("civicrm/report/instance/{/literal}{$snippet.instance_id}{literal}", {
-        reset:1,
-        snippet:4,
-        section:2,
-        altered_contact_id_op:"eq",
-        altered_contact_id_value:"{/literal}{$snippet.contact_id}{literal}",
-        log_type_table_op:"has",
-        log_type_table_value:"{/literal}{$snippet.table_name}{literal}"
+      var ajaxurl = {/literal}'{crmURL p="civicrm/report/instance/`$snippet.instance_id`" h=0 }'{literal};
+      cj.ajax({
+        data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value={/literal}{$snippet.contact_id}{literal}&log_type_table_op=has&log_type_table_value={/literal}{$snippet.table_name}{literal}",
+        url:  ajaxurl,
+        success: function (data) {
+          cj(".dialog-{/literal}{$snippet.css_class}{literal} .revision-content").html(data);
+          if (!cj(".dialog-{/literal}{$snippet.css_class}{literal} .revision-content .report-layout").length) {
+            cj(".dialog-{/literal}{$snippet.css_class}{literal} .revision-content").html("Sorry, couldn't find any revisions.");
+          }
+        }
       });
-      cj(".revision-content", this).load(url);
     },
     buttons: {
       "Done": function() {
