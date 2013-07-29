@@ -603,7 +603,8 @@ class CRM_Contact_BAO_Query {
           $dao->$key = CRM_Core_PseudoConstant::county($val);
         }
         else {
-          $dao->$key = CRM_Core_PseudoConstant::accountOptionValues($value['pseudoField'], $val);
+          $labels = CRM_Core_OptionGroup::values($value['pseudoField']);
+          $dao->$key = $labels[$val];
         }
         $values[$key] = $dao->$key;
       }
