@@ -1,13 +1,12 @@
 <?php
-
-/*
- /*this demonstrates the usage of chained api functions. A variety of return formats are used. Note that no notes
-    *custom fields or memberships exist
+/**
+ * Test Generated example of using contact get API
+ * /*this demonstrates the usage of chained api functions. A variety of return formats are used. Note that no notes
+    *custom fields or memberships exist *
  */
 function contact_get_example(){
 $params = array(
   'id' => 1,
-  'version' => 3,
   'api.website.getValue' => array(
       'return' => 'url',
     ),
@@ -17,12 +16,21 @@ $params = array(
   'api.Membership.getCount' => array(),
 );
 
-  $result = civicrm_api( 'contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_get_expectedresult(){
@@ -108,7 +116,7 @@ function contact_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

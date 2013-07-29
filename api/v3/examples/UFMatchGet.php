@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using uf_match get API
+ * *
  */
 function uf_match_get_example(){
 $params = array(
   'contact_id' => 69,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'uf_match','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('uf_match', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function uf_match_get_expectedresult(){
@@ -34,7 +42,7 @@ function uf_match_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

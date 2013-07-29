@@ -1,11 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using grant create API
+ * *
  */
 function grant_create_example(){
 $params = array(
-  'version' => 3,
   'contact_id' => 3,
   'application_received_date' => 'now',
   'decision_date' => 'next Monday',
@@ -16,12 +15,21 @@ $params = array(
   'grant_type_id' => 1,
 );
 
-  $result = civicrm_api( 'grant','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('grant', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function grant_create_expectedresult(){
@@ -35,8 +43,8 @@ function grant_create_expectedresult(){
       '1' => array(
           'id' => '1',
           'contact_id' => '3',
-          'application_received_date' => '20130622084947',
-          'decision_date' => '20130624000000',
+          'application_received_date' => '20130728084957',
+          'decision_date' => '20130729000000',
           'money_transfer_date' => '',
           'grant_due_date' => '',
           'grant_report_received' => '',
@@ -52,7 +60,7 @@ function grant_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

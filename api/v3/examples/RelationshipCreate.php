@@ -1,27 +1,34 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using relationship create API
+ * *
  */
 function relationship_create_example(){
 $params = array(
-  'contact_id_a' => 27,
-  'contact_id_b' => 28,
-  'relationship_type_id' => 19,
+  'contact_id_a' => 24,
+  'contact_id_b' => 25,
+  'relationship_type_id' => 18,
   'start_date' => '2010-10-30',
   'end_date' => '2010-12-30',
   'is_active' => 1,
   'note' => 'note',
-  'version' => 3,
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'relationship','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('relationship', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function relationship_create_expectedresult(){
@@ -34,9 +41,9 @@ function relationship_create_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'contact_id_a' => '27',
-          'contact_id_b' => '28',
-          'relationship_type_id' => '19',
+          'contact_id_a' => '24',
+          'contact_id_b' => '25',
+          'relationship_type_id' => '18',
           'start_date' => '20101030000000',
           'end_date' => '20101230000000',
           'is_active' => '1',
@@ -48,7 +55,7 @@ function relationship_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

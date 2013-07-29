@@ -103,7 +103,7 @@ function civicrm_api3_group_get($params) {
     $returnProperties['id'] = 1;
     $returnProperties = array_keys($returnProperties);
   }
-  if (CRM_Utils_Array::value('group_id', $inputParams)) {
+  if (!empty($inputParams['group_id'])) {
     $inputParams['id'] = $inputParams['group_id'];
   }
   $groupObjects = CRM_Contact_BAO_Group::getGroups($inputParams, $returnProperties, $sort, $offset, $rowCount);

@@ -1,21 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using batch delete API
+ * *
  */
 function batch_delete_example(){
 $params = array(
   'id' => 1,
-  'version' => 3,
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'batch','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('batch', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function batch_delete_expectedresult(){
@@ -27,7 +34,7 @@ function batch_delete_expectedresult(){
   'values' => 1,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

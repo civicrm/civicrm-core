@@ -107,12 +107,8 @@ class api_v3_SystemTest extends CiviUnitTestCase {
 
     $this->assertEquals('abc', CRM_Core_BAO_Cache::getItem(self::TEST_CACHE_GROUP, self::TEST_CACHE_PATH));
 
-    $params = array(
-      'version' => 3,
-    );
-    $result = civicrm_api('system', 'flush', $params);
-    $this->assertAPISuccess($result);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__, "Flush all system caches", 'Flush', 'flush');
+    $params = array();
+    $result = $this->callAPIAndDocument('system', 'flush', $params, __FUNCTION__, __FILE__, "Flush all system caches", 'Flush', 'flush');
 
     $this->assertTrue(NULL === CRM_Core_BAO_Cache::getItem(self::TEST_CACHE_GROUP, self::TEST_CACHE_PATH));
   }

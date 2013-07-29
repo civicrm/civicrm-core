@@ -49,20 +49,7 @@
  * @access public
  */
 function civicrm_api3_membership_delete($params) {
-
-  // membershipID should be numeric
-  // this check should be done @ wrapper level
-  if (!is_numeric($params['id'])) {
-    return civicrm_api3_create_error('Input parameter should be numeric');
-  }
-
-  CRM_Member_BAO_Membership::deleteRelatedMemberships($params['id']);
-
-  $membership = new CRM_Member_BAO_Membership();
-  $result = $membership->deleteMembership($params['id']);
-
-  return $result ? civicrm_api3_create_success() : civicrm_api3_create_error('Error while deleting Membership');
-
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**

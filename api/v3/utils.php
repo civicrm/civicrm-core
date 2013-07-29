@@ -1024,7 +1024,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
     if ($bao !== FALSE) {
       return civicrm_api3_create_success(TRUE);
     }
-    return civicrm_api3_create_error('Could not delete entity id ' . $params['id']);
+    throw new API_Exception('Could not delete entity id ' . $params['id']);
   }
   elseif (method_exists($bao_name, 'delete')) {
     $dao = new $bao_name();
@@ -1036,11 +1036,11 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
       }
     }
     else {
-      return civicrm_api3_create_error('Could not delete entity id ' . $params['id']);
+      throw new API_Exception('Could not delete entity id ' . $params['id']);
     }
   }
 
-  return civicrm_api3_create_error('no delete method found');
+  throw new API_Exception('no delete method found');
 }
 
 /**

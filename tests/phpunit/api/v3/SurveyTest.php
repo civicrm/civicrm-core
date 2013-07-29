@@ -122,7 +122,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('survey', 'create', $this->params);
     $result = $this->callAPIAndDocument('survey', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals(0, civicrm_api('survey', 'getcount', array('version' => 3)), 'In line ' . __LINE__);
+    $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', array()), 'In line ' . __LINE__);
   }
 
 }

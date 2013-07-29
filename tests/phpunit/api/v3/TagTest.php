@@ -37,46 +37,49 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 class api_v3_TagTest extends CiviUnitTestCase {
   protected $_apiversion =3;
+  /**
+   * @ids array of values to be cleaned up in the tear down
+   */
+  protected $ids = array();
+  /**
+   * tag id
+   * @var integer
+   */
+  protected $tag = array();
+
+  protected $tagID;
   public $_eNoticeCompliant = TRUE;
   function setUp() {
     parent::setUp();
+    $this->tag = $this->tagCreate();
+    $this->ids['tag'][] = $this->tagID = $this->tag['id'];
   }
 
-  function tearDown() {}
+  function tearDown() {
+    $this->deleteFromIDSArray();
+  }
 
   ///////////////// civicrm_tag_get methods
-
-  /**
-   * Test civicrm_tag_get with wrong params type.
-   */
-  public function testGetWrongParamsType() {
-    $params = 'is_string';
-    $result = $this->callAPIFailure('tag', 'get', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
-  }
-
   /**
    * Test civicrm_tag_get with wrong params.
    */
   public function testGetWrongParams() {
     $params = array('name' => 'Wrong Tag Name');
     $result = $this->callAPISuccess('tag', 'get', $params);
-    $this->assertEquals(0, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $result['count']);
   }
 
   /**
    * Test civicrm_tag_get - success expected.
    */
   public function testGet() {
-    $tag = $this->tagCreate(NULL);
-
     $params = array(
-      'id' => $tag['id'],
-      'name' => $tag['values'][$tag['id']]['name'],
+      'id' => $this->tagID,
+      'name' => $this->tag['name'],
     );
     $result = $this->callAPIAndDocument('tag', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($tag['values'][$tag['id']]['description'], $result['values'][$tag['id']]['description'], 'In line ' . __LINE__);
-    $this->assertEquals($tag['values'][$tag['id']]['name'], $result['values'][$tag['id']]['name'], 'In line ' . __LINE__);
+    $this->assertEquals($this->tag['description'], $result['values'][$this->tagID]['description'], 'In line ' . __LINE__);
+    $this->assertEquals($this->tag['name'], $result['values'][$this->tagID]['name']);
   }
 
   /**
@@ -85,28 +88,18 @@ class api_v3_TagTest extends CiviUnitTestCase {
   public function testGetReturnArray() {
     $description = "demonstrates use of Return as an array";
     $subfile     = "getReturnArray";
-    $tag         = $this->tagCreate(NULL);
 
     $params = array(
-      'id' => $tag['id'],
-      'name' => $tag['values'][$tag['id']]['name'],
+      'id' => $this->tagID,
+      'name' => $this->tag['name'],
       'return' => array('name'),
     );
     $result = $this->callAPIAndDocument('tag', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertTrue(empty($result['values'][$tag['id']]['description']), 'In line ' . __LINE__);
-    $this->assertEquals($tag['values'][$tag['id']]['name'], $result['values'][$tag['id']]['name'], 'In line ' . __LINE__);
+    $this->assertTrue(empty($result['values'][$this->tagID]['description']));
+    $this->assertEquals($this->tag['name'], $result['values'][$this->tagID]['name']);
   }
 
   ///////////////// civicrm_tag_create methods
-
-  /**
-   * Test civicrm_tag_create with wrong params type.
-   */
-  function testCreateWrongParamsType() {
-    $params = 'a string';
-    $result = $this->callAPIFailure('tag', 'create', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
-  }
 
   /**
    * Test civicrm_tag_create with empty params.
@@ -133,10 +126,9 @@ class api_v3_TagTest extends CiviUnitTestCase {
    */
   function testCreate() {
     $params = array(
-      'name' => 'New Tag3',
-      'description' => 'This is description for New Tag 02',
+      'name' => 'Super Heros',
+      'description' => 'Outside undie-wearers',
     );
-
     $result = $this->callAPIAndDocument('tag', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
     $params['used_for'] = 'civicrm_contact';
@@ -165,22 +157,6 @@ class api_v3_TagTest extends CiviUnitTestCase {
   ///////////////// civicrm_tag_delete methods
 
   /**
-   * Test civicrm_tag_delete with wrong parameters type.
-   */
-  function testDeleteWrongParamsType() {
-    $tag = 'is string';
-    $result = $this->callAPIFailure('tag', 'delete', $tag);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
-  }
-
-  /**
-   * Test civicrm_tag_delete with empty parameters.
-   */
-  function testDeleteEmptyParams() {
-    $result = $this->callAPIFailure('tag', 'delete', array(), 'Mandatory key(s) missing from params array: id');
-  }
-
-  /**
    * Test civicrm_tag_delete without tag id.
    */
   function testDeleteWithoutTagId() {
@@ -191,22 +167,22 @@ class api_v3_TagTest extends CiviUnitTestCase {
    * Test civicrm_tag_delete .
    */
   function testTagDeleteOldSyntax() {
-    $tagID = $this->tagCreate(NULL);
     $params = array(
-      'tag_id' => $tagID['id'],
+      'tag_id' => $this->tagID,
     );
     $result = $this->callAPISuccess('tag', 'delete', $params);
+    unset($this->ids['tag']);
   }
 
   /**
    * Test civicrm_tag_delete = $params['id'] is correct
    */
   function testTagDeleteCorrectSyntax() {
-    $tagID = $this->tagCreate(NULL);
     $params = array(
-      'id' => $tagID['id'],
+      'id' => $this->tagID,
     );
     $result = $this->callAPIAndDocument('tag', 'delete', $params, __FUNCTION__, __FILE__);
+    unset($this->ids['tag']);
   }
 
   function testTagGetfields() {

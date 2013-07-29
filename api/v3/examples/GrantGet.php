@@ -1,27 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using grant get API
+ * *
  */
 function grant_get_example(){
 $params = array(
-  'version' => 3,
-  'contact_id' => 4,
-  'application_received_date' => 'now',
-  'decision_date' => 'next Monday',
-  'amount_total' => '500',
-  'status_id' => 1,
   'rationale' => 'Just Because',
-  'currency' => 'USD',
-  'grant_type_id' => 1,
 );
 
-  $result = civicrm_api( 'grant','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('grant', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function grant_get_expectedresult(){
@@ -35,8 +36,8 @@ function grant_get_expectedresult(){
       '2' => array(
           'id' => '2',
           'contact_id' => '4',
-          'application_received_date' => '2013-06-22',
-          'decision_date' => '2013-06-24',
+          'application_received_date' => '20130728084957',
+          'decision_date' => '2013-07-29',
           'grant_type_id' => '1',
           'amount_total' => '500.00',
           'currency' => 'USD',
@@ -46,7 +47,7 @@ function grant_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

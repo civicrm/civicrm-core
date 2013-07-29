@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using group_contact get API
+ * *
  */
 function group_contact_get_example(){
 $params = array(
   'contact_id' => 3,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'group_contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group_contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_contact_get_expectedresult(){
@@ -31,13 +39,13 @@ function group_contact_get_expectedresult(){
           'title' => 'New Test Group Created',
           'visibility' => 'Public Pages',
           'is_hidden' => 0,
-          'in_date' => '2013-06-22 08:50:14',
+          'in_date' => '2013-07-28 08:50:19',
           'in_method' => 'API',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

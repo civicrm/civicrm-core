@@ -55,19 +55,18 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
+
     $this->quickCleanup(array(
         'civicrm_uf_field',
         'civicrm_uf_join',
         'civicrm_uf_group',
-        'civicrm_custom_field',
-        'civicrm_custom_group',
         'civicrm_contact',
         'civicrm_phone',
         'civicrm_address',
-      ));
+      ), TRUE);
   }
 
-  ////////////// test civicrm_api3_profile_get //////////////////
+  ////////////// test $this->callAPISuccess3_profile_get //////////////////
 
   /**
    * check Without ProfileId
@@ -75,10 +74,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   function testProfileGetWithoutProfileId() {
     $params = array(
       'contact_id' => 1,
-      'version' => 3,
     );
-    $result = $this->callAPIFailure('profile', 'get', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: profile_id');
+    $result = $this->callAPIFailure('profile', 'get', $params,
+      'Mandatory key(s) missing from params array: profile_id'
+    );
   }
 
   /**
@@ -88,7 +87,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => 1,
       'profile_id' => 1000,
-      'version' => 3,
     );
     $result = $this->callAPIFailure('profile', 'get', $params);
   }
@@ -103,45 +101,36 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params            = array(
       'profile_id' => 25,
       'contact_id' => $contactId,
-      'version' => 3,
     );
 
-    $result = civicrm_api('profile', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-
-    $this->assertEquals(0, $result['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $result)
-    );
+    $result = $this->callAPIAndDocument('profile', 'get', $params, __FUNCTION__, __FILE__);
 
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"
       );
     }
-
-    $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_contact'));
   }
 
-  /*
-     * check contact activity profile without activity id
-     */
+  /**
+   * check contact activity profile without activity id
+   */
   function testContactActivityGetWithoutActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
 
     unset($params['activity_id']);
-    $result = $this->callAPIFailure('profile', 'get', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: activity_id');
+    $result = $this->callAPIFailure('profile', 'get', $params,
+      'Mandatory key(s) missing from params array: activity_id');
   }
 
-  /*
-     * check contact activity profile wrong activity id
-     */
+  /**
+   * check contact activity profile wrong activity id
+   */
   function testContactActivityGetWrongActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
 
     $params['activity_id'] = 100001;
-    $result = $this->callAPIFailure('profile', 'get', $params);
-    $this->assertEquals($result['error_message'], 'Invalid Activity Id (aid).');
-
-    $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
+    $result = $this->callAPIFailure('profile', 'get', $params,
+       'Invalid Activity Id (aid).');
   }
 
   /*
@@ -162,23 +151,19 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'location' => 'Pensulvania',
       'details' => 'a test activity',
       'status_id' => '1',
-      'version' => '3',
       'priority_id' => '1',
     );
 
-    $activity = civicrm_api('activity', 'create', $activityparams);
-    $this->assertEquals(0, $activity['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $activity)
-    );
+    $activity = $this->callAPISuccess('activity', 'create', $activityparams);
 
     $activityValues = array_pop($activity['values']);
 
     list($params, $expected) = $this->_createContactWithActivity();
 
     $params['activity_id'] = $activityValues['id'];
-    $result = $this->callAPIFailure('profile', 'get', $params);
-    $this->assertEquals($result['error_message'], 'This activity cannot be edited or viewed via this profile.');
-
-    $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
+    $result = $this->callAPIFailure('profile', 'get', $params,
+      'This activity cannot be edited or viewed via this profile.'
+    );
   }
 
   /*
@@ -187,20 +172,15 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   function testContactActivityGetSuccess() {
     list($params, $expected) = $this->_createContactWithActivity();
 
-    $result = civicrm_api('profile', 'get', $params);
-
-    $this->assertEquals(0, $result['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $result)
-    );
+    $result = $this->callAPISuccess('profile', 'get', $params);
 
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"
       );
     }
-
-    $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
   }
 
-  /////////////// test civicrm_api3_profile_set //////////////////
+  /////////////// test $this->callAPISuccess3_profile_set //////////////////
 
   /**
    * check with no array
@@ -217,10 +197,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   function testProfileSetWithoutProfileId() {
     $params = array(
       'contact_id' => 1,
-      'version' => 3,
     );
-    $result = $this->callAPIFailure('profile', 'set', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: profile_id');
+    $result = $this->callAPIFailure('profile', 'set', $params,
+      'Mandatory key(s) missing from params array: profile_id'
+    );
   }
 
   /**
@@ -230,7 +210,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => 1,
       'profile_id' => 1000,
-      'version' => 3,
     );
     $result = $this->callAPIFailure('profile', 'set', $params);
   }
@@ -250,14 +229,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'state_province-1' => '1000',
     );
 
-    $params = array_merge(array('profile_id' => 25, 'contact_id' => $contactId, 'version' => 3),
+    $params = array_merge(array('profile_id' => 25, 'contact_id' => $contactId),
       $updateParams
     );
 
-    $result = $this->callAPIFailure('profile', 'set', $params);
-    $this->assertEquals($result['error_message'], 'Missing required parameters for profile id 25: email-Primary');
-
-    $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_contact'));
+    $result = $this->callAPIFailure('profile', 'set', $params,
+      'Missing required parameters for profile id 25: email-Primary'
+    );
   }
 
   /**
@@ -280,23 +258,15 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params = array_merge(array(
         'profile_id' => 25,
         'contact_id' => $contactId,
-        'version' => 3,
       ), $updateParams);
 
-    $result = civicrm_api('profile', 'set', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-
-    $this->assertEquals(0, $result['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $result)
-    );
+    $result = $this->callAPIAndDocument('profile', 'set', $params, __FUNCTION__, __FILE__);
 
     $getParams = array(
       'profile_id' => 25,
       'contact_id' => $contactId,
-      'version' => 3,
     );
-    $profileDetails = civicrm_api('profile', 'get', $getParams);
-    $this->assertEquals(0, $profileDetails['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $profileDetails)
-    );
+    $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
 
     foreach ($updateParams as $profileField => $value) {
       $this->assertEquals($value, CRM_Utils_Array::value($profileField, $profileDetails['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"
@@ -350,13 +320,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'location' => 'Pensulvania',
       'details' => 'a test activity',
       'status_id' => '1',
-      'version' => '3',
       'priority_id' => '1',
     );
 
-    $activity = civicrm_api('activity', 'create', $activityparams);
-    $this->assertEquals(0, $activity['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $activity)
-    );
+    $activity = $this->callAPISuccess('activity', 'create', $activityparams);
 
     $activityValues = array_pop($activity['values']);
 
@@ -364,10 +331,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     $params = array_merge($params, $expected);
     $params['activity_id'] = $activityValues['id'];
-    $result = $this->callAPIFailure('profile', 'set', $params);
-    $this->assertEquals($result['error_message'], 'This activity cannot be edited or viewed via this profile.');
-
-    $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
+    $result = $this->callAPIFailure('profile', 'set', $params,
+      'This activity cannot be edited or viewed via this profile.');
   }
 
   /*
@@ -387,50 +352,33 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'activity_status_id' => '2',
     );
     $profileParams = array_merge($params, $updateParams);
-    $profile       = civicrm_api('profile', 'set', $profileParams);
-    $result        = civicrm_api('profile', 'get', $params);
-    $this->assertEquals(0, $result['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $result)
-    );
+    $profile       = $this->callAPISuccess('profile', 'set', $profileParams);
+    $result        = $this->callAPISuccess('profile', 'get', $params);
 
     foreach ($updateParams as $profileField => $value) {
       $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"
       );
     }
-
-    $this->quickCleanup(array(
-      'civicrm_uf_field',
-        'civicrm_uf_join',
-        'civicrm_uf_group',
-        'civicrm_custom_field',
-        'civicrm_custom_group',
-        'civicrm_contact',
-      ),
-      TRUE
-    );
   }
 
-  /////////////// test civicrm_api3_profile_apply //////////////////
-
   /**
-   * check Without ProfileId
+   * check profile apply Without ProfileId
    */
   function testProfileApplyWithoutProfileId() {
     $params = array(
       'contact_id' => 1,
-      'version' => 3,
     );
-    $result = $this->callAPIFailure('profile', 'apply', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: profile_id');
+    $result = $this->callAPIFailure('profile', 'apply', $params,
+      'Mandatory key(s) missing from params array: profile_id');
   }
 
   /**
-   * check with no invalid profile Id
+   * check profile apply with no invalid profile Id
    */
   function testProfileApplyInvalidProfileId() {
     $params = array(
       'contact_id' => 1,
       'profile_id' => 1000,
-      'version' => 3,
     );
     $result = $this->callAPIFailure('profile', 'apply', $params);
   }
@@ -446,7 +394,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params = array(
       'profile_id' => 25,
       'contact_id' => $contactId,
-      'version' => 3,
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
       'email-Primary' => 'abc2.xyz2@gmail.com',
@@ -455,11 +402,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'state_province-1' => '1000',
     );
 
-    $result = civicrm_api('profile', 'apply', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-
-    $this->assertEquals(0, $result['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $result)
-    );
+    $result = $this->callAPIAndDocument('profile', 'apply', $params, __FUNCTION__, __FILE__);
 
     // Expected field values
     $expected['contact'] = array(
@@ -511,7 +454,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'last_name' => 'xyz1',
       'contact_type' => 'Individual',
       'email' => 'abc1.xyz1@yahoo.com',
-      'version' => '3',
       'api.address.create' => array(
         'location_type_id' => 1,
         'is_primary' => 1,
@@ -530,10 +472,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       ),
     );
 
-    $contact = civicrm_api('contact', 'create', $contactParams);
-
-    $this->assertEquals(0, $contact['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $contact)
-    );
+    $contact = $this->callAPISuccess('contact', 'create', $contactParams);
 
     $keys  = array_keys($contact['values']);
     $contactId = array_pop($keys);
@@ -589,7 +528,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'last_name' => 'xyz1',
       'contact_type' => 'Individual',
       'email' => 'abc1.xyz1@yahoo.com',
-      'version' => '3',
       'api.address.create' => array(
         'location_type_id' => 1,
         'is_primary' => 1,
@@ -602,10 +540,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       ),
     );
 
-    $contact = civicrm_api('contact', 'create', $contactParams);
-
-    $this->assertEquals(0, $contact['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $contact)
-    );
+    $contact = $this->callAPISuccess('contact', 'create', $contactParams);
 
     $keys = array_keys($contact['values']);
     $contactId = array_pop($keys);
@@ -623,12 +558,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'location' => 'Pensulvania',
       'details' => 'a test activity',
       'status_id' => '1',
-      'version' => '3',
       'priority_id' => '1',
     );
-    $activity = civicrm_api('activity', 'create', $activityParams);
-    $this->assertEquals(0, $activity['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $activity)
-    );
+    $activity = $this->callAPISuccess('activity', 'create', $activityParams);
 
     $activityValues = array_pop($activity['values']);
 
@@ -637,8 +569,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'profile_id' => 26,
       'contact_id' => $contactId,
       'activity_id' => $activityValues['id'],
-      'version' => 3,
-    );
+         );
 
     // expected result of above created profile
     $expected = array(

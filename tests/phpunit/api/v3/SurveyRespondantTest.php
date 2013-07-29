@@ -28,27 +28,24 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion =3;
   protected $params;
   public $_eNoticeCompliant = TRUE;
 
   function setUp() {
-    $this->_apiversion = 3;
-    $phoneBankActivity = civicrm_api('Option_value', 'Get', array('label' => 'PhoneBank', 'version' => $this->_apiversion, 'sequential' => 1));
+    $phoneBankActivity = $this->callAPISuccess('Option_value', 'Get', array('label' => 'PhoneBank', 'sequential' => 1));
     $phoneBankActivityTypeID = $phoneBankActivity['values'][0]['value'];
     $surveyParams = array(
-      'version' => $this->_apiversion,
       'title' => "survey respondent",
       'activity_type_id' => $phoneBankActivityTypeID,
       'instructions' => "Call people, ask for money",
     );
-    $survey = civicrm_api('survey', 'create', $surveyParams);
+    $survey = $this->callAPISuccess('survey', 'create', $surveyParams);
     $surveyID = $survey['id'];
     $this->params = array (
-                           'version' => $this->_apiversion,
-                           'sequential' =>'1',
-                           'survey_id' => $surveyID
-                           );
+      'sequential' =>'1',
+      'survey_id' => $surveyID
+    );
     parent::setUp();
   }
 
@@ -57,22 +54,10 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test surveyRespondent get with wrong params type.
-   */
-  public function testGetWrongParamsType() {
-    $params = 'abc';
-    $GetWrongParamsType = civicrm_api("SurveyRespondant","get", $params );
-    $this->assertEquals($GetWrongParamsType['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
    * Test survey respondent get.
    */
   public function testGetSurveyRespondants() {
-    $result = civicrm_api("SurveyRespondant","get", $this->params );
-    $this->assertAPISuccess($result);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument("SurveyRespondant","get", $this->params, __FUNCTION__, __FILE__);
   }
 
 }

@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using option_value get API
+ * *
  */
 function option_value_get_example(){
 $params = array(
   'option_group_id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'option_value','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('option_value', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function option_value_get_expectedresult(){
@@ -82,7 +90,7 @@ function option_value_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1485,7 +1485,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             "reset=1&id=$fileID&eid=$contactID",
             $absolute, NULL, TRUE, TRUE
           );
-          $result['file_url'] = "<a href='javascript:imagePopUp(\"$url\");'><img src=\"$url\" width=$imageThumbWidth height=$imageThumbHeight/></a>";
+          $result['file_url'] = "
+          <a href=\"$url\" class='crm-image-popup'>
+          <img src=\"$url\" width=$imageThumbWidth height=$imageThumbHeight/>
+          </a>";
           // for non image files
         }
         else {

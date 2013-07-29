@@ -1,11 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using line_item create API
+ * *
  */
 function line_item_create_example(){
 $params = array(
-  'version' => 3,
   'price_field_value_id' => 1,
   'price_field_id' => 1,
   'entity_table' => 'civicrm_contribution',
@@ -13,30 +12,30 @@ $params = array(
   'qty' => 1,
   'unit_price' => 50,
   'line_total' => 50,
+  'debug' => 1,
 );
 
-  $result = civicrm_api( 'line_item','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('line_item', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function line_item_create_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
-  'undefined_fields' => array(
-      '0' => 'label',
-      '1' => 'price_field_value_id',
-      '2' => 'price_field_id',
-      '3' => 'entity_table',
-      '4' => 'entity_id',
-      '5' => 'qty',
-      '6' => 'unit_price',
-      '7' => 'line_total',
-    ),
   'version' => 3,
   'count' => 1,
   'id' => 1,
@@ -56,14 +55,9 @@ function line_item_create_expectedresult(){
           'deductible_amount' => '',
         ),
     ),
-  'xdebug' => array(
-      'peakMemory' => 144948640,
-      'memory' => 131358352,
-      'timeIndex' => '1877.7615101337',
-    ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

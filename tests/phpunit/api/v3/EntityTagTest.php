@@ -50,7 +50,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     parent::setUp();
 
     $this->_individualID = $this->individualCreate(NULL);
-    $this->_tag = $this->tagCreate(NULL);
+    $this->_tag = $this->tagCreate();
     $this->_tagID = $this->_tag['id'];
     $this->_householdID = $this->houseHoldCreate(NULL);
     $this->_organizationID = $this->organizationCreate(NULL);
@@ -145,7 +145,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
       'tag_id' => $tagID,
     );
 
-    $individualEntity = $this->callAPISuccess('entity_tag', 'create', $params);
+    $individualEntity = $this->callAPIAndDocument('entity_tag', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($individualEntity['added'], 1);
 
     $paramsEntity = array(

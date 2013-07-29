@@ -97,10 +97,8 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $relTypeParams = array(
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Organization',
-      'version' => $this->_apiversion,
     );
-    $result = $this->callAPIFailure('relationship_type', 'create', $relTypeParams);
-    $this->assertEquals($result['error_message'],
+    $result = $this->callAPIFailure('relationship_type', 'create', $relTypeParams,
       'Mandatory key(s) missing from params array: name_a_b, name_b_a'
     );
   }
@@ -112,10 +110,8 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $relTypeParams = array(
       'name_a_b' => 'Relation 1 without contact type',
       'name_b_a' => 'Relation 2 without contact type',
-      'version' => $this->_apiversion,
     );
-    $result = $this->callAPIFailure('relationship_type', 'create', $relTypeParams);
-    $this->assertEquals($result['error_message'],
+    $result = $this->callAPIFailure('relationship_type', 'create', $relTypeParams,
       'Mandatory key(s) missing from params array: contact_type_a, contact_type_b'
     );
   }
@@ -131,13 +127,10 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'contact_type_b' => 'Organization',
       'is_reserved' => 1,
       'is_active' => 1,
-      'version' => $this->_apiversion,
       'sequential' => 1,
     );
-    $result = civicrm_api('relationship_type', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('relationship_type', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['values'][0]['id'], 'in line ' . __LINE__);
-    unset($params['version']);
     unset($params['sequential']);
     //assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Contact_DAO_RelationshipType', $result['id'], $params);
@@ -248,12 +241,11 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'contact_type_b' => 'Individual',
       'is_reserved' => 0,
       'is_active' => 0,
-      'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('relationship_type', 'create', $params);
+    $result = $this->callAPISuccess('relationship_type', 'create', $params);
     $this->assertNotNull($result['id']);
-    unset($params['version']);
+
     // assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Contact_DAO_RelationshipType', $result['id'], $params);
   }
@@ -272,10 +264,9 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'contact_type_b' => 'Organization',
       'is_reserved' => 1,
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $first = civicrm_api('RelationshipType', 'Create', $firstRelTypeParams);
+    $first = $this->callAPISuccess('RelationshipType', 'Create', $firstRelTypeParams);
 
     $secondRelTypeParams = array(
       'name_a_b' => 'Relation 25 for create',
@@ -285,15 +276,11 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'contact_type_b' => 'Organization',
       'is_reserved' => 0,
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
-    $second = civicrm_api('RelationshipType', 'Create', $secondRelTypeParams);
-    $results = civicrm_api('relationship_type', 'get', array(
-      'version' => $this->_apiversion,
-      ));
+    $second = $this->callAPISuccess('RelationshipType', 'Create', $secondRelTypeParams);
+    $results = $this->callAPISuccess('relationship_type', 'get', array());
 
     $this->assertEquals(2, $results['count']);
-    $this->assertEquals(0, $results['is_error']);
   }
 
   /**
@@ -316,10 +303,9 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'contact_type_b' => 'Organization',
       'is_reserved' => 1,
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $first = civicrm_api('RelationshipType', 'Create', $firstRelTypeParams);
+    $first = $this->callAPISuccess('RelationshipType', 'Create', $firstRelTypeParams);
 
     $secondRelTypeParams = array(
       'name_a_b' => 'Relation 32 for create',
@@ -329,19 +315,16 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'contact_type_b' => 'Organization',
       'is_reserved' => 0,
       'is_active' => 1,
-      'version' => $this->_apiversion,
     );
-    $second = civicrm_api('RelationshipType', 'Create', $secondRelTypeParams);
+    $second = $this->callAPISuccess('RelationshipType', 'Create', $secondRelTypeParams);
 
     $params = array(
       'name_a_b' => 'Relation 32 for create',
       'name_b_a' => 'Relation 33 for create',
       'description' => 'Testing relationship type second',
-      'version' => $this->_apiversion,
     );
-    $results = civicrm_api('relationship_type', 'get', $params);
+    $results = $this->callAPISuccess('relationship_type', 'get', $params);
 
-    $this->assertEquals(0, $results['is_error'], ' in line ' . __LINE__);
     $this->assertEquals(1, $results['count'], ' in line ' . __LINE__);
     $this->assertEquals(1, $results['values'][$results['id']]['is_active'], ' in line ' . __LINE__);
   }
@@ -359,7 +342,6 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
         'contact_type_b' => 'Organization',
         'is_reserved' => 1,
         'is_active' => 1,
-        'version' => API_LATEST_VERSION,
       );
     }
 

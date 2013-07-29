@@ -1,7 +1,7 @@
 <?php
-
-/*
- Demonstrates creating contribution with SoftCredit
+/**
+ * Test Generated example of using contribution create API
+ * Demonstrates creating contribution with SoftCredit *
  */
 function contribution_create_example(){
 $params = array(
@@ -14,16 +14,24 @@ $params = array(
   'net_amount' => '95',
   'source' => 'SSF',
   'contribution_status_id' => 1,
-  'version' => 3,
   'soft_credit_to' => 2,
 );
 
-  $result = civicrm_api( 'contribution','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contribution', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contribution_create_expectedresult(){
@@ -68,7 +76,7 @@ function contribution_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

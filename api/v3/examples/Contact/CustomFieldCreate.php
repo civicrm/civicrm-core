@@ -1,23 +1,32 @@
 <?php
-
-/*
- /*this demonstrates setting a custom field through the API 
+/**
+ * Test Generated example of using contact create API
+ * /*this demonstrates setting a custom field through the API  *
  */
 function contact_create_example(){
 $params = array(
   'first_name' => 'abc1',
   'contact_type' => 'Individual',
   'last_name' => 'xyz1',
-  'version' => 3,
   'custom_1' => 'custom string',
+  'version' => 3,
 );
 
-  $result = civicrm_api( 'contact','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_create_expectedresult(){
@@ -53,8 +62,6 @@ function contact_create_expectedresult(){
           'first_name' => 'abc1',
           'middle_name' => '',
           'last_name' => 'xyz1',
-          'prefix_id' => '',
-          'suffix_id' => '',
           'email_greeting_id' => '1',
           'email_greeting_custom' => '',
           'email_greeting_display' => '',
@@ -80,7 +87,7 @@ function contact_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -139,6 +139,9 @@ function civicrm_api3_generic_getcount($apiRequest) {
   if(is_numeric (CRM_Utils_Array::value('values', $result))) {
     return (int) $result['values'];
   }
+  if(!isset($result['count'])) {
+    throw new API_Exception(ts('Unexpected result from getcount') . print_r($result, TRUE));
+  }
   return $result['count'];
 }
 
@@ -222,9 +225,10 @@ function civicrm_api3_generic_getoptions($apiRequest) {
   // Validate 'context' from params
   $context = CRM_Utils_Array::value('context', $apiRequest['params']);
   CRM_Core_DAO::buildOptionsContext($context);
+  unset($apiRequest['params']['context'], $apiRequest['params']['field']);
 
   $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
-  $options = $baoName::buildOptions($fieldName, $context);
+  $options = $baoName::buildOptions($fieldName, $context, $apiRequest['params']);
   if ($options === FALSE) {
     return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");
   }

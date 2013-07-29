@@ -1,20 +1,28 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using price_field_value delete API
+ * *
  */
 function price_field_value_delete_example(){
 $params = array(
-  'version' => 3,
   'id' => 7,
 );
 
-  $result = civicrm_api( 'price_field_value','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('price_field_value', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function price_field_value_delete_expectedresult(){
@@ -26,7 +34,7 @@ function price_field_value_delete_expectedresult(){
   'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

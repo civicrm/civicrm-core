@@ -1,7 +1,7 @@
 <?php
-
-/*
- Demonstrates use of 'filter' active_only' param
+/**
+ * Test Generated example of using membership get API
+ * Demonstrates use of 'filter' active_only' param *
  */
 function membership_get_example(){
 $params = array(
@@ -9,15 +9,23 @@ $params = array(
   'filters' => array(
       'is_current' => 1,
     ),
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'membership','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('membership', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function membership_get_expectedresult(){
@@ -53,7 +61,7 @@ function membership_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

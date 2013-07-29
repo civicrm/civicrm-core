@@ -1,11 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using uf_field replace API
+ * *
  */
 function uf_field_replace_example(){
 $params = array(
-  'version' => 3,
   'uf_group_id' => 11,
   'option.autoweight' => '',
   'values' => array(
@@ -42,12 +41,21 @@ $params = array(
     ),
 );
 
-  $result = civicrm_api( 'uf_field','replace',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('uf_field', 'replace', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function uf_field_replace_expectedresult(){
@@ -120,7 +128,7 @@ function uf_field_replace_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

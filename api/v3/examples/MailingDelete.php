@@ -1,38 +1,48 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using mailing delete API
+ * *
  */
-function activity_type_delete_example(){
+function mailing_delete_example(){
 $params = array(
-  'activity_type_id' => 724,
-  'version' => 3,
+  'id' => 2,
 );
 
-  $result = civicrm_api( 'activity_type','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('mailing', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
-function activity_type_delete_expectedresult(){
+function mailing_delete_expectedresult(){
 
   $expectedResult = array(
-  'is_error' => 1,
-  'error_message' => 'Undefined index: activity_type_id',
+  'is_error' => 0,
+  'version' => 3,
+  'count' => 1,
+  'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 
 /*
 * This example has been generated from the API test suite. The test that created it is called
 *
-* testActivityTypeDelete and can be found in
-* http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/ActivityTypeTest.php
+* testMailerDeleteSuccess and can be found in
+* http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/MailingTest.php
 *
 * You can see the outcome of the API tests at
 * http://tests.dev.civicrm.org/trunk/results-api_v3

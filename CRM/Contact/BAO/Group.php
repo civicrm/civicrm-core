@@ -241,13 +241,23 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $rowCount = NULL
   ) {
     $dao = new CRM_Contact_DAO_Group();
-    $dao->is_active = 1;
+    if (!isset($params['is_active'])) {
+      $dao->is_active = 1;
+    }
     if ($params) {
       foreach ($params as $k => $v) {
         if ($k == 'name' || $k == 'title') {
           $dao->whereAdd($k . ' LIKE "' . CRM_Core_DAO::escapeString($v) . '"');
         }
+        elseif ($k == 'group_type') {
+          foreach ((array) $v as $type) {
+            $dao->whereAdd($k . " LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . (int) $type . CRM_Core_DAO::VALUE_SEPARATOR . "%'");
+          }
+        }
         elseif (is_array($v)) {
+          foreach ($v as &$num) {
+            $num = (int) $num;
+          }
           $dao->whereAdd($k . ' IN (' . implode(',', $v) . ')');
         }
         else {

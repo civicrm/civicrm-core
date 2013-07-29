@@ -1,12 +1,11 @@
 <?php
-
-/*
- /*this demonstrates the usage of chained api functions. A variety of techniques are used
+/**
+ * Test Generated example of using contact get API
+ * /*this demonstrates the usage of chained api functions. A variety of techniques are used *
  */
 function contact_get_example(){
 $params = array(
   'id' => 1,
-  'version' => 3,
   'api.website.getValue' => array(
       'return' => 'url',
     ),
@@ -14,12 +13,21 @@ $params = array(
   'api.CustomValue.get' => 1,
 );
 
-  $result = civicrm_api( 'contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_get_expectedresult(){
@@ -91,13 +99,13 @@ function contact_get_expectedresult(){
           'api.CustomValue.get' => array(
               'is_error' => 0,
               'version' => 3,
-              'count' => 10,
+              'count' => 8,
               'values' => array(
                   '0' => array(
                       'entity_id' => '1',
                       'latest' => 'value 4',
-                      'id' => '13',
-                      '0' => 'value 4',
+                      'id' => '1',
+                      'entity_table' => 'Contact',
                     ),
                   '1' => array(
                       'entity_table' => 'Contact',
@@ -105,46 +113,41 @@ function contact_get_expectedresult(){
                   '2' => array(
                       'entity_id' => '1',
                       'latest' => 'value 3',
-                      'id' => '14',
+                      'id' => '2',
                       '1' => 'value 2',
+                      'entity_table' => 'Contact',
                       '2' => 'value 3',
                     ),
                   '3' => array(
-                      'entity_table' => 'Contact',
+                      'entity_id' => '1',
+                      'latest' => '',
+                      'id' => '3',
+                      '1' => 'warm beer',
+                      '2' => '',
                     ),
                   '4' => array(
                       'entity_id' => '1',
                       'latest' => '',
-                      'id' => '15',
-                      '1' => 'warm beer',
+                      'id' => '4',
+                      '1' => '',
                       '2' => '',
                     ),
                   '5' => array(
                       'entity_id' => '1',
                       'latest' => '',
-                      'id' => '16',
+                      'id' => '5',
                       '1' => '',
-                      '2' => '',
                     ),
                   '6' => array(
-                      'entity_table' => 'Contact',
+                      'entity_id' => '1',
+                      'latest' => 'vegemite',
+                      'id' => '6',
+                      '1' => 'vegemite',
                     ),
                   '7' => array(
                       'entity_id' => '1',
                       'latest' => '',
-                      'id' => '17',
-                      '1' => '',
-                    ),
-                  '8' => array(
-                      'entity_id' => '1',
-                      'latest' => 'vegemite',
-                      'id' => '18',
-                      '1' => 'vegemite',
-                    ),
-                  '9' => array(
-                      'entity_id' => '1',
-                      'latest' => '',
-                      'id' => '19',
+                      'id' => '7',
                       '1' => '',
                     ),
                 ),
@@ -153,7 +156,7 @@ function contact_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

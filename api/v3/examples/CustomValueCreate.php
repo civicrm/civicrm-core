@@ -1,33 +1,41 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using custom_value create API
+ * *
  */
 function custom_value_create_example(){
-$params = array( 
+$params = array(
   'custom_1' => 'customString',
-  'version' => 3,
   'entity_id' => 3,
 );
 
-  $result = civicrm_api( 'custom_value','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('custom_value', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function custom_value_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

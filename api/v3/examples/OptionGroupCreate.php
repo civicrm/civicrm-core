@@ -1,11 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using option_group create API
+ * *
  */
 function option_group_create_example(){
 $params = array(
-  'version' => 3,
   'sequential' => 1,
   'name' => 'civicrm_event.amount.560',
   'is_reserved' => 1,
@@ -17,15 +16,23 @@ $params = array(
       'is_active' => 1,
       'format.only_id' => 1,
     ),
-  'debug' => 0,
 );
 
-  $result = civicrm_api( 'option_group','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('option_group', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function option_group_create_expectedresult(){
@@ -34,21 +41,21 @@ function option_group_create_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 84,
+  'id' => 86,
   'values' => array(
       '0' => array(
-          'id' => '84',
+          'id' => '86',
           'name' => 'civicrm_event.amount.560',
           'title' => '',
           'description' => '',
           'is_reserved' => '1',
           'is_active' => '1',
-          'api.OptionValue.create' => 720,
+          'api.OptionValue.create' => 722,
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

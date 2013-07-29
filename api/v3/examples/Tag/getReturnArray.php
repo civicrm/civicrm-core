@@ -1,24 +1,32 @@
 <?php
-
-/*
- demonstrates use of Return as an array
+/**
+ * Test Generated example of using tag get API
+ * demonstrates use of Return as an array *
  */
 function tag_get_example(){
 $params = array(
-  'id' => 7,
-  'name' => 'New Tag325818',
-  'version' => 3,
+  'id' => '8',
+  'name' => 'New Tag3',
   'return' => array(
       '0' => 'name',
     ),
 );
 
-  $result = civicrm_api( 'tag','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('tag', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function tag_get_expectedresult(){
@@ -27,16 +35,16 @@ function tag_get_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 7,
+  'id' => 8,
   'values' => array(
-      '7' => array(
-          'id' => '7',
-          'name' => 'New Tag325818',
+      '8' => array(
+          'id' => '8',
+          'name' => 'New Tag3',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -86,8 +86,7 @@ var CRM = CRM || {};
    */
   CRM.api = function(entity, action, params, options) {
     // Default settings
-    var json = false,
-    settings = {
+    var settings = {
       context: null,
       success: function(result, settings) {
         return true;
@@ -102,7 +101,7 @@ var CRM = CRM || {};
         }
         return settings.success.call(this, result, settings);
       },
-      ajaxURL: 'civicrm/ajax/rest',
+      ajaxURL: 'civicrm/ajax/rest'
     };
     action = action.toLowerCase();
     // Default success handler
@@ -122,24 +121,11 @@ var CRM = CRM || {};
           return true;
         };
     }
-    for (var i in params) {
-      if (i.slice(0, 4) == 'api.' || typeof(params[i]) == 'Object') {
-        json = true;
-        break;
-      }
-    }
-    if (json) {
-      params = {
-        entity: entity,
-        action: action,
-        json: JSON.stringify(params)
-      };
-    }
-    else {
-      params.entity = entity;
-      params.action = action;
-      params.json = 1;
-    }
+    params = {
+      entity: entity,
+      action: action,
+      json: JSON.stringify(params)
+    };
     // Pass copy of settings into closure to preserve its value during multiple requests
     (function(stg) {
       $.ajax({
