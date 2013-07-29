@@ -1317,7 +1317,7 @@ SELECT contact_id
             continue;
           }
           // Pick an option value if needed
-          if ($value['type'] !== CRM_Utils_Type::T_BOOL) {
+          if ($value['type'] !== CRM_Utils_Type::T_BOOLEAN) {
             $options = $daoName::buildOptions($dbName, 'create');
             if ($options) {
               $object->$dbName = key($options);
@@ -1332,7 +1332,7 @@ SELECT contact_id
               $object->$dbName = $counter;
               break;
 
-            case CRM_Utils_Type::T_BOOL:
+            case CRM_Utils_Type::T_BOOLEAN:
               if (isset($value['default'])) {
                 $object->$dbName = $value['default'];
               }

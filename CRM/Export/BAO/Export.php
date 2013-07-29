@@ -1230,7 +1230,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if (isset($query->_fields[$field]['type'])) {
       switch ($query->_fields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
-        case CRM_Utils_Type::T_BOOL:
         case CRM_Utils_Type::T_BOOLEAN:
           $sqlColumns[$fieldName] = "$fieldName varchar(16)";
           break;
