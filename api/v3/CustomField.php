@@ -92,7 +92,7 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['option_type'] = array(
     'title' => 'This (boolean) field tells the BAO to create an option group for the field if the field type is appropriate',
     'api.default' => 1,
-    'type' => CRM_Utils_Type::T_BOOL,
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   );
   $params['data_type']['api.default'] = 'String';
   $params['is_active']['api.default'] = 1;
