@@ -160,7 +160,7 @@
         return result;
       },
       isModified: function() {
-        return !this._modified;
+        return this._modified;
       },
       _saved_onchange: function(model, options) {
         if (options.parse) return;
