@@ -1317,10 +1317,12 @@ SELECT contact_id
             continue;
           }
           // Pick an option value if needed
-          $options = $daoName::buildOptions($dbName);
-          if ($options) {
-            $object->$dbName = key($options);
-            continue;
+          if ($value['type'] !== CRM_Utils_Type::T_BOOL) {
+            $options = $daoName::buildOptions($dbName, 'create');
+            if ($options) {
+              $object->$dbName = key($options);
+              continue;
+            }
           }
 
           switch ($value['type']) {
@@ -1331,7 +1333,6 @@ SELECT contact_id
               break;
 
             case CRM_Utils_Type::T_BOOL:
-            case CRM_Utils_Type::T_BOOLEAN:
               if (isset($value['default'])) {
                 $object->$dbName = $value['default'];
               }

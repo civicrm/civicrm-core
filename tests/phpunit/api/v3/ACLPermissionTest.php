@@ -67,7 +67,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     unset($config->userPermissionClass->permissions);
   }
 /**
- * Function just tests that an empty where hook returns the 2 expected results
+ * Function tests that an empty where hook returns no results
  */
   function testContactGetNoResultsHook(){
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
@@ -91,10 +91,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertEquals(2, $result['count']);
   }
   /**
-   * Function just tests that an empty where hook returns the 2 expected results
+   * Function tests that deleted contacts are not returned
   */
   function testContactGetPermissionHookNoDeleted(){
-    $this->callAPISuccess('contact', 'create', array('id' => 2, 'is_deleted' => 1));
+    $result = $this->callAPISuccess('contact', 'create', array('id' => 2, 'is_deleted' => 1));print "\n";print_r($result);
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $result = $this->callAPISuccess('contact', 'get', array(
         'check_permissions' => 1,
