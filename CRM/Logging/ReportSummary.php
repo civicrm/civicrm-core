@@ -105,7 +105,6 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
             'column' => 'label_a_b'
           ),
         ),
-        // FIXME: activity table structure has changed. Below activity code needs to be fixed based on new structure - CRM-12274
         'log_civicrm_activity_for_target' =>
         array(
           'fk' => 'contact_id',
