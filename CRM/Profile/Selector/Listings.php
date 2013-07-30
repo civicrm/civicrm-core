@@ -605,7 +605,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         ) {
           $url      = CRM_Utils_System::fixURL($result->$name);
           $typeId   = substr($name, 0, -4) . "-website_type_id";
-          $typeName = CRM_Core_PseudoConstant::getValue('CRM_Core_DAO_Website', 'website_type_id', $result->$typeId);
+          $typeName = CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Website', 'website_type_id', $result->$typeId);
           if ($typeName) {
             $row[] = "<a href=\"$url\">{$result->$name} (${typeName})</a>";
           }
@@ -614,7 +614,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           }
         }
         elseif ($name == 'preferred_language') {
-          $row[] = CRM_Core_PseudoConstant::getValue('CRM_Contact_DAO_Contact', 'preferred_language', $result->$name);
+          $row[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $result->$name);
         }
         elseif ($multipleSelectFields &&
           array_key_exists($name, $multipleSelectFields)
@@ -641,7 +641,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         elseif (strpos($name, '-im')) {
           if (!empty($result->$name)) {
             $providerId   = $name . "-provider_id";
-            $providerName = CRM_Core_PseudoConstant::getValue('CRM_Core_DAO_IM', 'provider_id', $result->$providerId);
+            $providerName = CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $result->$providerId);
             $row[]        = $result->$name . " ({$providerName})";
           }
           else {

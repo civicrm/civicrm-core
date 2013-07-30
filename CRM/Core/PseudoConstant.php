@@ -440,20 +440,41 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * Fetch the label (or other value) for a field given its key
+   * Fetch the translated label for a field given its key
    *
-   * @param String $daoName
+   * @param String $baoName
    * @param String $fieldName
    * @param String|Int $key
-   * @param Array $params will be passed into self::get
+   *
+   * TODO: Accept multivalued input?
    *
    * @return bool|null|string
    *   FALSE if the given field has no associated option list
    *   NULL if the given key has no corresponding option
    *   String if label is found
    */
-  static function getValue($daoName, $fieldName, $key, $params = array()) {
-    $values = self::get($daoName, $fieldName, $params, 'get');
+  static function getLabel($baoName, $fieldName, $key) {
+    $values = $baoName::buildOptions($fieldName, 'get');
+    if ($values === FALSE) {
+      return FALSE;
+    }
+    return CRM_Utils_Array::value($key, $values);
+  }
+
+  /**
+   * Fetch the machine name for a field given its key
+   *
+   * @param String $baoName
+   * @param String $fieldName
+   * @param String|Int $key
+   *
+   * @return bool|null|string
+   *   FALSE if the given field has no associated option list
+   *   NULL if the given key has no corresponding option
+   *   String if label is found
+   */
+  static function getName($baoName, $fieldName, $key) {
+    $values = $baoName::buildOptions($fieldName, 'validate');
     if ($values === FALSE) {
       return FALSE;
     }
@@ -463,18 +484,17 @@ class CRM_Core_PseudoConstant {
   /**
    * Fetch the key for a field option given its name
    *
-   * @param String $daoName
+   * @param String $baoName
    * @param String $fieldName
    * @param String|Int $value
-   * @param Array $params will be passed into self::get
    *
    * @return bool|null|string|number
    *   FALSE if the given field has no associated option list
    *   NULL if the given key has no corresponding option
    *   String|Number if key is found
    */
-  static function getKey($daoName, $fieldName, $value, $params = array()) {
-    $values = self::get($daoName, $fieldName, $params, 'validate');
+  static function getKey($baoName, $fieldName, $value) {
+    $values = $baoName::buildOptions($fieldName, 'validate');
     if ($values === FALSE) {
       return FALSE;
     }
