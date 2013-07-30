@@ -418,33 +418,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         continue;
       }
       elseif (!CRM_Utils_System::isNull($value)) {
-        // name could be country or country id
-        if (substr($name, 0, 7) == 'country') {
-          // make sure its different from the default country
-          // iso code
-          $defaultCountry = $config->defaultContactCountry();
-          // full name
-          $defaultCountryName = $config->defaultContactCountryName();
-
-          if ($defaultCountry) {
-            if ($value == $defaultCountry ||
-              $value == $defaultCountryName ||
-              $value == $config->defaultContactCountry
-            ) {
-              // do nothing
-            }
-            else {
-              return TRUE;
-            }
-          }
-          else {
-            // return if null default
-            return TRUE;
-          }
-        }
-        else {
-          return TRUE;
-        }
+        //CRM-13053 fix
+        return TRUE;
       }
     }
 
