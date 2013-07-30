@@ -80,8 +80,12 @@ class CRM_Utils_GlobalStack {
   public function createBackup($new) {
     $frame = array();
     foreach ($new as $globalKey => $values) {
-      foreach ($values as $key => $value) {
-        $frame[$globalKey][$key] = CRM_Utils_Array::value($key, $GLOBALS[$globalKey]);
+      if (is_array($values)) {
+        foreach ($values as $key => $value) {
+          $frame[$globalKey][$key] = CRM_Utils_Array::value($key, $GLOBALS[$globalKey]);
+        }
+      } else {
+        $frame[$globalKey] = CRM_Utils_Array::value($globalKey, $GLOBALS);
       }
     }
     return $frame;
@@ -89,8 +93,12 @@ class CRM_Utils_GlobalStack {
 
   public function applyFrame($newFrame) {
     foreach ($newFrame as $globalKey => $values) {
-      foreach ($values as $key => $value) {
-        $GLOBALS[$globalKey][$key] = $value;
+      if (is_array($values)) {
+        foreach ($values as $key => $value) {
+          $GLOBALS[$globalKey][$key] = $value;
+        }
+      } else {
+        $GLOBALS[$globalKey] = $values;
       }
     }
   }
