@@ -533,7 +533,10 @@ LIMIT 1;";
         $paymentProcessorId = $objects['paymentProcessor']->id;
       }
     }
-
+    //it's hard to see how it could reach this point without a contributon id as it is saved in line 511 above
+    // which raised the question as to whether this check preceded line 511 & if so whether something could be broken
+    // From a lot of code reading /debugging I'm still not sure the intent WRT first & subsequent payments in this code
+    // it would be good if someone added some comments or refactored this
     if ($contribution->id) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       if (isset($input['prevContribution']) && !$input['prevContribution']->is_pay_later &&
@@ -550,7 +553,15 @@ LIMIT 1;";
         $input['participant_id'] = $contribution->_relatedObjects['participant']->id;
         $input['skipLineItem'] = 1;
       }
-
+      //@todo writing a unit test I was unable to create a scenario where this line did not fatal on second
+      // and subsequent payments. In this case the line items are created at $this->addrecurLineItems
+      // and since the contribution is saved prior to this line there is always a contribution-id,
+      // however there is never a prevContribution (which appears to mean original contribution not previous
+      // contribution - or preUpdateContributionObject most accurately)
+      // so, this is always called & only appears to succeed when prevContribution exists - which appears
+      // to mean "are we updating an exisitng pending contribution"
+      //I was able to make the unit test complete as fataling here doesn't prevent
+      // the contribution being created - but activities would not be created or emails sent
       CRM_Contribute_BAO_Contribution::recordFinancialAccounts($input, NULL);
     }
 
