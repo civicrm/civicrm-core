@@ -30,6 +30,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CiviReportTestCase extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();
+    $this->_sethtmlGlobals();
   }
 
   function tearDown() {
