@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviReportTestCase.php';
 /**
  *  Test report outcome
  *
- *  @package CiviCRM
+ * @package CiviCRM
  */
 class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   static $_tablesToTruncate = array(
@@ -52,7 +52,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
             'total_amount',
           ),
           'filters' => array(
-            'total_amount_op'    => 'gte',
+            'total_amount_op' => 'gte',
             'total_amount_value' => 50,
           ),
           // FIXME: add filters
@@ -67,10 +67,11 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     parent::setUp();
   }
 
-  function tearDown() {}
+  function tearDown() {
+  }
 
   /**
-   *  @dataProvider dataProvider
+   * @dataProvider dataProvider
    */
   public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
     $this->foreignKeyChecksOff();
@@ -80,7 +81,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $config = CRM_Core_Config::singleton();
     CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
 
-    $reportCsvFile  = $this->getReportOutputAsCsv($reportClass, $inputParams);
+    $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
