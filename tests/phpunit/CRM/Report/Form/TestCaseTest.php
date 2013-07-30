@@ -28,11 +28,16 @@
 require_once 'CiviTest/CiviReportTestCase.php';
 
 /**
- *  Test report outcome
+ * Verify that the CiviReportTestCase provides a working set of
+ * primitives for tests. Do this by running various scenarios
+ * that should yield positive and negative results.
+ *
+ * Note: We need some report class to use as an example.
+ * CRM_Report_Form_Contribute_DetailTest is chosen arbitrarily.
  *
  * @package CiviCRM
  */
-class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
+class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   static $_tablesToTruncate = array(
     'civicrm_contact',
     'civicrm_email',
@@ -42,7 +47,39 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   );
 
   public function dataProvider() {
+    $testCaseA = array(
+      'CRM_Report_Form_Contribute_Detail',
+      array(
+        'fields' => array(
+          'first_name',
+          'email',
+          'total_amount',
+        ),
+        'filters' => array(
+          'total_amount_op' => 'gte',
+          'total_amount_value' => 50,
+        ),
+        // FIXME: add filters
+      ),
+      'Contribute/fixtures/dataset-ascii.sql',
+      'Contribute/fixtures/report-ascii.csv',
+    );
+
     return array(
+      $testCaseA,
+      $testCaseA,
+      $testCaseA,
+      // We repeat the test a second time to
+      // ensure that CiviReportTestCase can
+      // clean up sufficiently to run
+      // multiple tests.
+    );
+  }
+
+  public function badDataProvider() {
+    return array(
+      // This test-case is bad because the dataset-ascii.sql does not match the
+      // report.csv (due to differences in international chars)
       array(
         'CRM_Report_Form_Contribute_Detail',
         array(
@@ -57,9 +94,29 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
           ),
           // FIXME: add filters
         ),
-        'fixtures/dataset-ascii.sql',
-        'fixtures/report-ascii.csv',
-      )
+        'Contribute/fixtures/dataset-ascii.sql',
+        'Contribute/fixtures/report.csv',
+      ),
+      // This test-case is bad because the filters check for
+      // an amount >= $100, but the test data includes records
+      // for $50.
+      array(
+        'CRM_Report_Form_Contribute_Detail',
+        array(
+          'fields' => array(
+            'first_name',
+            'email',
+            'total_amount',
+          ),
+          'filters' => array(
+            'total_amount_op' => 'gte',
+            'total_amount_value' => 100,
+          ),
+          // FIXME: add filters
+        ),
+        'Contribute/fixtures/dataset-ascii.sql',
+        'Contribute/fixtures/report.csv',
+      ),
     );
   }
 
@@ -80,6 +137,21 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
    * @dataProvider dataProvider
    */
   public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
+    $config = CRM_Core_Config::singleton();
+    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
+
+    $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
+    $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
+
+    $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
+    $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
+  }
+
+  /**
+   * @expectedException PHPUnit_Framework_AssertionFailedError
+   * @dataProvider badDataProvider
+   */
+  public function testBadReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
     $config = CRM_Core_Config::singleton();
     CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
 
