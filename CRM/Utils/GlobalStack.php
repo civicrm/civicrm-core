@@ -1,5 +1,4 @@
-<?php
-/*
+<?php /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
@@ -25,67 +24,74 @@
  +--------------------------------------------------------------------+
 */
 
-require_once 'CiviTest/CiviReportTestCase.php';
-
 /**
- *  Test report outcome
+ * Temporarily change a global variable.
  *
- * @package CiviCRM
+ * @code
+ * $globals = CRM_Utils_GlobalStack::singleton();
+ * $globals->push(array(
+ *   '_GET' => array(
+ *     'q' => 'some-value
+ *   ),
+ * ));
+ * ...do stuff...
+ * $globals->pop();
+ * @endcode
+ *
+ * Note: for purposes of this class, we'll refer to the array passed into
+ * push() as a frame.
  */
-class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
-  static $_tablesToTruncate = array(
-    'civicrm_contact',
-    'civicrm_email',
-    'civicrm_phone',
-    'civicrm_address',
-    'civicrm_contribution',
-  );
+class CRM_Utils_GlobalStack {
+  /**
+   * We don't have a container or dependency-injection, so use singleton instead
+   *
+   * @var object
+   * @static
+   */
+  private static $_singleton = NULL;
 
-  public function dataProvider() {
-    return array(
-      array(
-        'CRM_Report_Form_Contribute_Detail',
-        array(
-          'fields' => array(
-            'first_name',
-            'email',
-            'total_amount',
-          ),
-          'filters' => array(
-            'total_amount_op' => 'gte',
-            'total_amount_value' => 50,
-          ),
-          // FIXME: add filters
-        ),
-        'fixtures/dataset.sql',
-        'fixtures/report.csv',
-      ),
-    );
+  private $backups = array();
+
+  /**
+   * Get or set the single instance of CRM_Utils_GlobalStack
+   *
+   * @return CRM_Utils_GlobalStack
+   */
+  static public function singleton() {
+    if (self::$_singleton === NULL) {
+      self::$_singleton = new CRM_Utils_GlobalStack();
+    }
+    return self::$_singleton;
   }
 
-  function setUp() {
-    parent::setUp();
+  public function push($newFrame) {
+    $this->backups[] = $this->createBackup($newFrame);
+    $this->applyFrame($newFrame);
   }
 
-  function tearDown() {
+  public function pop() {
+    $this->applyFrame(array_pop($this->backups));
   }
 
   /**
-   * @dataProvider dataProvider
+   * @param array $new the new, incoming frame
+   * @return array frame
    */
-  public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
-    $this->foreignKeyChecksOff();
-
-    $this->quickCleanup(self::$_tablesToTruncate);
-
-    $config = CRM_Core_Config::singleton();
-    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
-
-    $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
-    $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
-
-    $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
-    $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
+  public function createBackup($new) {
+    $frame = array();
+    foreach ($new as $globalKey => $values) {
+      foreach ($values as $key => $value) {
+        $frame[$globalKey][$key] = CRM_Utils_Array::value($key, $GLOBALS[$globalKey]);
+      }
+    }
+    return $frame;
   }
 
+  public function applyFrame($newFrame) {
+    foreach ($newFrame as $globalKey => $values) {
+      foreach ($values as $key => $value) {
+        $GLOBALS[$globalKey][$key] = $value;
+      }
+    }
+  }
 }
