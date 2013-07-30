@@ -2448,10 +2448,7 @@ AND       civicrm_openid.is_primary = 1";
         return CRM_Activity_BAO_Activity::getActivitiesCount($input);
 
       case 'mailing':
-        $params = array(
-          'contact_id' => $contactId,
-          'admin' => FALSE,
-        );
+        $params = array('contact_id' => $contactId);
         return CRM_Mailing_BAO_Mailing::getContactMailingsCount($params);
 
       default:
