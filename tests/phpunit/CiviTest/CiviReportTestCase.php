@@ -32,29 +32,45 @@ class CiviReportTestCase extends CiviUnitTestCase {
     parent::setUp();
   }
 
+  function tearDown() {
+    parent::tearDown();
+  }
+
   function getReportOutputAsCsv($reportClass, $inputParams) {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
     $controller = new CRM_Core_Controller_Simple($reportClass, ts('some title'));
     $reportObj =& $controller->_pages['Detail'];//FIXME - Detail is going to change
-    $_REQUEST['force'] = 1;
+
+    $tmpGlobals = array();
+    $tmpGlobals['_REQUEST']['force'] = 1;
+    $tmpGlobals['_GET'][$config->userFrameworkURLVar] = 'civicrm/placeholder';
+    $tmpGlobals['_SERVER']['QUERY_STRING'] = '';
     if (!empty($inputParams['fields'])) {
       $fields = implode(',', $inputParams['fields']);
-      $_GET['fld']  = $fields;
-      $_GET['ufld'] = 1;
+      $tmpGlobals['_GET']['fld']  = $fields;
+      $tmpGlobals['_GET']['ufld'] = 1;
     }
     if (!empty($inputParams['filters'])) {
       foreach ($inputParams['filters'] as $key => $val) {
-        $_GET[$key] = $val;
+        $tmpGlobals['_GET'][$key] = $val;
       }
     }
-    $reportObj->storeResultSet();
-    $reportObj->buildForm();
-    $rows = $reportObj->getResultSet();
+    CRM_Utils_GlobalStack::singleton()->push($tmpGlobals);
 
-    $tmpFile = $this->createTempDir() . CRM_Utils_File::makeFileName('CiviReport.csv');
-    $csvContent = CRM_Report_Utils_Report::makeCsv($reportObj, $rows);
-    file_put_contents($tmpFile, $csvContent);
+    try {
+      $reportObj->storeResultSet();
+      $reportObj->buildForm();
+      $rows = $reportObj->getResultSet();
+
+      $tmpFile = $this->createTempDir() . CRM_Utils_File::makeFileName('CiviReport.csv');
+      $csvContent = CRM_Report_Utils_Report::makeCsv($reportObj, $rows);
+      file_put_contents($tmpFile, $csvContent);
+    } catch (Exception $e) {
+      CRM_Utils_GlobalStack::singleton()->pop();
+      throw $e;
+    }
+    CRM_Utils_GlobalStack::singleton()->pop();
 
     return $tmpFile;
   }
