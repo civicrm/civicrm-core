@@ -189,6 +189,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_csvSupported = TRUE;
   protected $_add2groupSupported = TRUE;
   protected $_groups = NULL;
+  protected $_grandFlag = FALSE;
   protected $_rowsFound = NULL;
   protected $_selectAliases = array();
   protected $_rollup = NULL;

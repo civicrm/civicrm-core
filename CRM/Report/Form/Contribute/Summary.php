@@ -128,13 +128,12 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'no_display' => TRUE,
           ),
           'total_amount' =>
-          array('title' => ts('Amount Statistics'),
+          array('title' => ts('Contribution Amount Stats'),
             'default' => TRUE,
-            'required' => TRUE,
             'statistics' =>
-            array('sum' => ts('Aggregate Amount'),
-              'count' => ts('Donations'),
-              'avg' => ts('Average'),
+            array('sum' => ts('Contributions Aggregate'),
+              'count' => ts('Contributions'),
+              'avg' => ts('Contributions Avg'),
             ),
           ),
         ),
@@ -164,22 +163,22 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           'total_amount' =>
-          array('title' => ts('Donation Amount'),
+          array('title' => ts('Contribution Amount'),
           ),
           'total_sum' =>
-          array('title' => ts('Aggregate Amount'),
+          array('title' => ts('Contributions Aggregate'),
             'type' => CRM_Report_Form::OP_INT,
             'dbAlias' => 'civicrm_contribution_total_amount_sum',
             'having' => TRUE,
           ),
           'total_count' =>
-          array('title' => ts('Donation Count'),
+          array('title' => ts('Contributions Count'),
             'type' => CRM_Report_Form::OP_INT,
             'dbAlias' => 'civicrm_contribution_total_amount_count',
             'having' => TRUE,
           ),
           'total_avg' =>
-          array('title' => ts('Average'),
+          array('title' => ts('Contributions Avg'),
             'type' => CRM_Report_Form::OP_INT,
             'dbAlias' => 'civicrm_contribution_total_amount_avg',
             'having' => TRUE,
@@ -194,6 +193,48 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'chart' => TRUE,
           ),
           'contribution_source' => NULL,
+        ),
+      ),
+      'civicrm_contribution_soft' =>
+      array(
+        'dao' => 'CRM_Contribute_DAO_ContributionSoft',
+        'fields' =>
+        array(
+          'soft_amount' =>
+          array(
+            'title' => ts('Soft Credit Amount Stats'),
+            'name'  => 'amount',
+            'statistics' =>
+            array('sum' => ts('Soft Credit Aggregate'),
+              'count' => ts('Soft Credits'),
+              'avg' => ts('Soft Credit Avg'),
+            ),
+          ),
+        ),
+        'grouping' => 'contri-fields',
+        'filters' =>
+        array(
+          'amount' =>
+          array('title' => ts('Soft Credit Amount'),
+          ),
+          'soft_sum' =>
+          array('title' => ts('Soft Credit Aggregate'),
+            'type' => CRM_Report_Form::OP_INT,
+            'dbAlias' => 'civicrm_contribution_soft_soft_amount_sum',
+            'having' => TRUE,
+          ),
+          'soft_count' =>
+          array('title' => ts('Soft Credits Count'),
+            'type' => CRM_Report_Form::OP_INT,
+            'dbAlias' => 'civicrm_contribution_soft_soft_amount_count',
+            'having' => TRUE,
+          ),
+          'soft_avg' =>
+          array('title' => ts('Soft Credit Avg'),
+            'type' => CRM_Report_Form::OP_INT,
+            'dbAlias' => 'civicrm_contribution_soft_soft_amount_avg',
+            'having' => TRUE,
+          ),
         ),
       ),
       'civicrm_group' =>
@@ -373,11 +414,20 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   }
 
   function from() {
+    $softCreditJoin = "LEFT";
+    if (CRM_Utils_Array::value('soft_amount', $this->_params['fields']) && 
+      !CRM_Utils_Array::value('total_amount', $this->_params['fields'])) {
+      // if its only soft credit stats, use inner join
+      $softCreditJoin = "INNER";
+    }
+
     $this->_from = "
         FROM civicrm_contact  {$this->_aliases['civicrm_contact']}
              INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
                         {$this->_aliases['civicrm_contribution']}.is_test = 0
+             {$softCreditJoin} JOIN civicrm_contribution_soft {$this->_aliases['civicrm_contribution_soft']}
+                       ON {$this->_aliases['civicrm_contribution_soft']}.contribution_id = {$this->_aliases['civicrm_contribution']}.id
              LEFT  JOIN civicrm_financial_type  {$this->_aliases['civicrm_financial_type']}
                      ON {$this->_aliases['civicrm_contribution']}.financial_type_id ={$this->_aliases['civicrm_financial_type']}.id
              LEFT  JOIN civicrm_email {$this->_aliases['civicrm_email']}
@@ -447,24 +497,40 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    if (!$this->_having) {
-      $select = "
-            SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount )       as count,
-                   SUM({$this->_aliases['civicrm_contribution']}.total_amount )         as amount,
-                   ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,                                                                                                                              {$this->_aliases['civicrm_contribution']}.currency as currency
-            ";
-      $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
-      $sql = "{$select} {$this->_from} {$this->_where}{$group}";
+    $softCredit = CRM_Utils_Array::value('soft_amount', $this->_params['fields']);
+    $onlySoftCredit = $softCredit && !CRM_Utils_Array::value('total_amount', $this->_params['fields']);
 
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      $totalAmount = $average = array();
-      $count = 0;
-      while ($dao->fetch()) {
-        $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)."(".$dao->count.")";
-        $average[] =   CRM_Utils_Money::format($dao->avg, $dao->currency);
-        $count += $dao->count;
+    $select = "SELECT 
+COUNT({$this->_aliases['civicrm_contribution']}.total_amount )        as civicrm_contribution_total_amount_count,
+SUM({$this->_aliases['civicrm_contribution']}.total_amount )          as civicrm_contribution_total_amount_sum,
+ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm_contribution_total_amount_avg,
+{$this->_aliases['civicrm_contribution']}.currency                    as currency";
+
+    if ($softCredit) {
+      $select .= ", 
+COUNT({$this->_aliases['civicrm_contribution_soft']}.amount )        as civicrm_contribution_soft_soft_amount_count,
+SUM({$this->_aliases['civicrm_contribution_soft']}.amount )          as civicrm_contribution_soft_soft_amount_sum,
+ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_contribution_soft_soft_amount_avg";
+    }
+    $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
+    $sql = "{$select} {$this->_from} {$this->_where} {$group} {$this->_having}";
+    
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $totalAmount = $average = $softTotalAmount = $softAverage = array();
+    $count = $softCount = 0;
+    while ($dao->fetch()) {
+      $totalAmount[] = CRM_Utils_Money::format($dao->civicrm_contribution_total_amount_sum, $dao->currency)."(".$dao->civicrm_contribution_total_amount_count.")";
+      $average[] = CRM_Utils_Money::format($dao->civicrm_contribution_total_amount_avg, $dao->currency);
+      $count += $dao->civicrm_contribution_total_amount_count;
+      
+      if ($softCredit) {
+        $softTotalAmount[] = CRM_Utils_Money::format($dao->civicrm_contribution_soft_soft_amount_sum, $dao->currency)."(".$dao->civicrm_contribution_soft_soft_amount_count.")";
+        $softAverage[] = CRM_Utils_Money::format($dao->civicrm_contribution_soft_soft_amount_avg, $dao->currency);
+        $softCount += $dao->civicrm_contribution_soft_soft_amount_count;
       }
-
+    }
+    
+    if (!$onlySoftCredit) {
       $statistics['counts']['amount'] = array(
         'title' => ts('Total Amount'),
         'value' => implode(',  ', $totalAmount),
@@ -479,7 +545,22 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'value' => implode(',  ', $average),
         'type' => CRM_Utils_Type::T_STRING,
       );
-
+    }
+    if ($softCredit) {
+      $statistics['counts']['soft_amount'] = array(
+        'title' => ts('Total Soft Credit Amount'),
+        'value' => implode(',  ', $softTotalAmount),
+        'type' => CRM_Utils_Type::T_STRING,
+      );
+      $statistics['counts']['soft_count'] = array(
+        'title' => ts('Total Soft Credits'),
+        'value' => $softCount,
+      );
+      $statistics['counts']['soft_avg'] = array(
+        'title' => ts('Average Soft Credit'),
+        'value' => implode(',  ', $softAverage),
+        'type' => CRM_Utils_Type::T_STRING,
+      );
     }
     return $statistics;
   }
