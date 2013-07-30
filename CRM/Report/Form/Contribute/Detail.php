@@ -434,8 +434,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   }
 
   function from($softcredit = false) {
-
-    $this->_from = NULL;
     $this->_from = "
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
@@ -590,8 +588,6 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
   }
 
   function postProcess() {
-    $temp3 = false;
-
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
 
