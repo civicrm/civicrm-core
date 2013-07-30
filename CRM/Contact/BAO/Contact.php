@@ -2356,7 +2356,7 @@ AND       civicrm_openid.is_primary = 1";
 
       // get preferred languages
       if (!empty($contact->preferred_language)) {
-        $values['preferred_language'] = CRM_Core_PseudoConstant::getValue('CRM_Contact_DAO_Contact', 'preferred_language', $contact->preferred_language);
+        $values['preferred_language'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $contact->preferred_language);
       }
 
       // Calculating Year difference

@@ -982,7 +982,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         }
         elseif ($name === 'preferred_language') {
           $params[$index] = $details->$name;
-          $values[$index] = CRM_Core_PseudoConstant::getValue('CRM_Contact_DAO_Contact', 'preferred_language', $details->$name);
+          $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $details->$name);
         }
         elseif ($name == 'group') {
           $groups = CRM_Contact_BAO_GroupContact::getContactGroup($cid, 'Added', NULL, FALSE, TRUE);

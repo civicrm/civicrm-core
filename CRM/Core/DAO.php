@@ -1782,7 +1782,7 @@ EOS;
     foreach ($fields as $field) {
       $name = CRM_Utils_Array::value('name', $field);
       if ($name && isset($this->$name)) {
-        $label = CRM_Core_PseudoConstant::getValue(get_class($this), $name, $this->$name);
+        $label = CRM_Core_PseudoConstant::getLabel(get_class($this), $name, $this->$name);
         if ($label !== FALSE) {
           // Append 'label' onto the field name
           $labelName = $name . '_label';
