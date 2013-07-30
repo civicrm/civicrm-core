@@ -76,7 +76,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'), true);
 
     $labelStyle = CRM_Core_BAO_LabelFormat::getList(TRUE, 'name_badge');
-    $this->add('select', 'label_format_name', ts('Label Style'), array('' => ts('- select -')) + $labelStyle, TRUE);
+    $this->add('select', 'label_format_name', ts('Label Format'), array('' => ts('- select -')) + $labelStyle, TRUE);
 
     $this->add('text', 'description', ts('Description'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
