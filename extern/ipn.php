@@ -40,11 +40,20 @@ require_once '../civicrm.config.php';
 $config = CRM_Core_Config::singleton();
 
 if (empty($_GET)) {
-  $paypalIPN = new CRM_Core_Payment_PayPalProIPN();
+  $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
 }
 else {
   $paypalIPN = new CRM_Core_Payment_PayPalIPN();
+  // @todo upgrade standard per Pro
 }
-
-$paypalIPN->main();
+try{
+  $paypalIPN->main();
+}
+catch(CRM_Core_Exception $e) {
+  CRM_Core_Error::debug_log_message($e->getMessage());
+  CRM_Core_Error::debug_var('error data', $e->getErrorData(), TRUE, TRUE);
+  CRM_Core_Error::debug_var('REQUEST', $_REQUEST, TRUE, TRUE);
+  //@todo give better info to logged in user - ie dev
+  echo "The transaction has failed. Please review the log for more detail";
+}
 
