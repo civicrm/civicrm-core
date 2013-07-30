@@ -84,11 +84,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
-    $this->assertEquals(count($reportCsvArray[0]), count($expectedOutputCsvArray[0]), 'In line ' . __LINE__);
-
-    foreach($reportCsvArray as $intKey => $strVal) {
-      $this->assertNotNull($expectedOutputCsvArray[$intKey], 'In line ' . __LINE__);
-      $this->assertEquals($expectedOutputCsvArray[$intKey], $strVal);
-    }
+    $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
+
 }

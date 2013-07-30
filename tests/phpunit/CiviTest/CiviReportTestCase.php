@@ -85,4 +85,28 @@ class CiviReportTestCase extends CiviUnitTestCase {
     }
     return $arrFile;
   }
+
+  /**
+   * @param array $expectedCsvArray two-dimensional array representing a CSV table
+   * @param array $actualCsvArray two-dimensional array representing a CSV table
+   */
+  public function assertCsvArraysEqual($expectedCsvArray, $actualCsvArray) {
+    // TODO provide better debug output
+
+    $this->assertEquals(
+      count($actualCsvArray),
+      count($expectedCsvArray),
+      'Arrays have different number of rows; in line ' . __LINE__
+    );
+
+    foreach ($actualCsvArray as $intKey => $strVal) {
+      $this->assertNotNull($expectedCsvArray[$intKey], 'In line ' . __LINE__);
+      $this->assertEquals(
+        count($actualCsvArray[$intKey]),
+        count($expectedCsvArray[$intKey]),
+        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__
+      );
+      $this->assertEquals($expectedCsvArray[$intKey], $strVal);
+    }
+  }
 }
