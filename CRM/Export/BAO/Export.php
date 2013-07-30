@@ -630,6 +630,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $count++;
         $row = array();
 
+        //convert the pseudo constants
+        $query->convertToPseudoNames($dao);
+
         //first loop through returnproperties so that we return what is required, and in same order.
         $relationshipField = 0;
         foreach ($returnProperties as $field => $value) {
@@ -791,6 +794,17 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
           elseif ($field == 'pledge_next_pay_amount') {
             $row[$field] = $dao->pledge_next_pay_amount + $dao->pledge_outstanding_amount;
+          }
+          elseif ($field == 'prefix_id' || $field == 'suffix_id' || $field == 'gender_id') {
+            if ($field == 'prefix_id') {
+              $row[$field] = $dao->individual_prefix;
+            }
+            elseif ($field == 'suffix_id') {
+              $row[$field] = $dao->individual_suffix;
+            }
+            else {
+              $row[$field] = $dao->gender;
+            }
           }
           elseif (is_array($value) && $field == 'location') {
             // fix header for location type case
