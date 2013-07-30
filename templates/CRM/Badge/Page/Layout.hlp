@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-label_format"}
+{htxt id="id-label_format-text"}
   {ts}Label Formats{/ts}
 {/htxt}
 {htxt id="id-label_format"}
