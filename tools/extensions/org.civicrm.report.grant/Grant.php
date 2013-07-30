@@ -309,13 +309,13 @@ class org_civicrm_report_grant extends CRM_Report_Form {
     foreach ($rows as $rowNum => $row) {
       if (array_key_exists('civicrm_grant_grant_type_id', $row)) {
         if ($value = $row['civicrm_grant_grant_type_id']) {
-          $rows[$rowNum]['civicrm_grant_grant_type_id'] = CRM_Core_PseudoConstant::getValue('CRM_Grant_DAO_Grant', 'grant_type_id', $value);
+          $rows[$rowNum]['civicrm_grant_grant_type_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Grant_DAO_Grant', 'grant_type_id', $value);
         }
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_grant_status_id', $row)) {
         if ($value = $row['civicrm_grant_status_id']) {
-          $rows[$rowNum]['civicrm_grant_status_id'] = CRM_Core_PseudoConstant::getValue('CRM_Grant_DAO_Grant', 'status_id', $value);
+          $rows[$rowNum]['civicrm_grant_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Grant_DAO_Grant', 'status_id', $value);
         }
         $entryFound = TRUE;
       }
