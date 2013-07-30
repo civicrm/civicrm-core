@@ -253,6 +253,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
       $duplicateRelationship = 0;
 
       while ($result->fetch()) {
+        $query->convertToPseudoNames($result);
         $contactID = $result->contact_id;
         if (in_array($contactID, $excludedContactIds)) {
           $duplicateRelationship++;
