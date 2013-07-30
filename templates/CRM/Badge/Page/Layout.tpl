@@ -69,7 +69,7 @@
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
           <a href="{crmURL q="action=add&reset=1"}" id="newbadge-layout"
-             class="button"><span>&raquo; {ts}New Badge Layout{/ts}</span></a>
+             class="button"><span><div class="icon add-icon"></div> {ts}New Badge Layout{/ts}</span></a>
         </div>
       {/if}
     </div>
