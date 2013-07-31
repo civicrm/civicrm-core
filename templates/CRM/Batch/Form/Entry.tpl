@@ -103,7 +103,7 @@
 {literal}
 <script type="text/javascript">
 cj(function () {
-  cj('.selector-rows').change(function () {
+  cj('#crm-container').on('keyup change', '*', function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
     };
