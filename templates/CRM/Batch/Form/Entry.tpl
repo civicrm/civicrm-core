@@ -103,13 +103,15 @@
 {literal}
 <script type="text/javascript">
 cj(function () {
-  cj('#crm-container').on('keyup change', '*', function () {
+  cj('.selector-rows').change(function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
     };
 
     cj("#Entry").ajaxSubmit(options);
+  });
 
+  cj('#crm-container').on('keyup change', '*', function () {
     // validate rows
     checkColumns(cj(this));
   });
