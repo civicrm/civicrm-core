@@ -128,6 +128,7 @@ class CRM_Badge_BAO_Badge {
   public function generateLabel($formattedRow) {
     switch ($formattedRow['labelFormat']) {
       case 'Avery 5395':
+      default:
         self::labelAvery5395($formattedRow);
         break;
     }
