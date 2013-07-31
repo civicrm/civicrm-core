@@ -511,6 +511,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
     // serialize label format fields into a single string to store in the 'value' column of the Option Value table
     $v = json_decode($this->value, TRUE);
     foreach (self::$optionValueFields as $name => $field) {
+      if (!isset($v[$name])) {
+        $v[$name] = NULL;
+      }
       $v[$name] = self::getValue($name, $values, $v[$name]);
     }
     $this->value = json_encode($v);
