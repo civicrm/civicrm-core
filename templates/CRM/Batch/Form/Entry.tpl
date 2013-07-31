@@ -106,7 +106,7 @@
 cj(function () {
   cj('.selector-rows').change(function () {
     var options = {
-      'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
+      'url': CRM.url('civicrm/ajax/batch')
     };
 
     cj("#Entry").ajaxSubmit(options);
@@ -132,21 +132,22 @@ cj(function () {
     calculateActualTotal();
   });
 
-  {/literal}{if $batchType eq 1 }{literal}
-  // hide all dates if send receipt is checked
-  hideSendReceipt();
+  if (CRM.batch.type_id == 1) {
+    // hide all dates if send receipt is checked
+    hideSendReceipt();
 
-  // hide the receipt date if send receipt is checked
-  cj('input[id*="][send_receipt]"]').change(function () {
-    showHideReceipt(cj(this));
-  });
+    // hide the receipt date if send receipt is checked
+    cj('input[id*="][send_receipt]"]').change(function () {
+      showHideReceipt(cj(this));
+    });
 
-  {/literal}{else}{literal}
-  cj('select[id^="member_option_"]').each(function () {
-    if (cj(this).val() == 1) {
-      cj(this).attr('disabled', true);
-    }
-  });
+  }
+  else{
+    cj('select[id^="member_option_"]').each(function () {
+      if (cj(this).val() == 1) {
+        cj(this).attr('disabled', true);
+      }
+    });
 
   // set payment info accord to membership type
   cj('select[id*="_membership_type_0"]').change(function () {
@@ -157,7 +158,7 @@ cj(function () {
     setPaymentBlock(cj(this), cj(this).val());
   });
 
-  {/literal}{/if}{literal}
+  }
 
   // line breaks between radio buttons and checkboxes
   cj('input.form-radio').next().after('<br />');
@@ -170,7 +171,7 @@ cj(function () {
 
 function setPaymentBlock(form, memType) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');
-  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/memType' h=0}"{literal};
+  var dataUrl = CRM.url('civicrm/ajax/memType');
 
   if (!memType) {
     memType = cj('select[id="field_' + rowID + '_membership_type_1"]').val();
@@ -321,7 +322,7 @@ function updateContactInfo(blockNo, prefix) {
 
       // for membership batch entry based on contact we need to enable / disable
       // add membership select
-      {/literal}{if $batchType eq 2}{literal}
+      if(CRM.batch.type_id == 2) {
       CRM.api('Membership', 'get', {
           'sequential': '1',
           'contact_id': contactId,
@@ -346,7 +347,7 @@ function updateContactInfo(blockNo, prefix) {
           }
         }
         });
-      {/literal}{/if}{literal}
+      }
     }
     });
 }
