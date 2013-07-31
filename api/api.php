@@ -247,12 +247,13 @@ function _civicrm_api_resolve($apiRequest) {
  * @return array
  *
  */
-function civicrm_api3($entity, $action, $params){
+function civicrm_api3($entity, $action, $params) {
   $params['version'] = 3;
   $result = civicrm_api($entity, $action, $params);
-  if($result['is_error']){
+  if(is_array($result) && !empty($result['is_error'])){
     throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
   }
+  return $result;
 }
 
 /**
