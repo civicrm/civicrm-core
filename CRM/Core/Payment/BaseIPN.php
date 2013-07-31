@@ -42,7 +42,7 @@ class CRM_Core_Payment_BaseIPN {
   function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
     // make sure contact exists and is valid
-    $contact = new CRM_Contact_DAO_Contact();
+    $contact = new CRM_Contact_BAO_Contact();
     $contact->id = $ids['contact'];
     if (!$contact->find(TRUE)) {
       CRM_Core_Error::debug_log_message("Could not find contact record: {$ids['contact']} in IPN request: ".print_r($input, TRUE));
@@ -51,7 +51,7 @@ class CRM_Core_Payment_BaseIPN {
     }
 
     // make sure contribution exists and is valid
-    $contribution = new CRM_Contribute_DAO_Contribution();
+    $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $ids['contribution'];
     if (!$contribution->find(TRUE)) {
       CRM_Core_Error::debug_log_message("Could not find contribution record: {$contribution->id} in IPN request: ".print_r($input, TRUE));
@@ -156,6 +156,9 @@ class CRM_Core_Payment_BaseIPN {
     $participant = &$objects['participant'];
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
+    $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
+    $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
     $contribution->contribution_status_id = array_search('Failed', $contributionStatus);
     $contribution->save();
 
