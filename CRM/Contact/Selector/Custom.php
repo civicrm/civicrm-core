@@ -278,6 +278,12 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     }
 
     $sql = $this->_search->all($offset, $rowCount, $sort, $includeContactIDs);
+    // contact query object used for creating $sql
+    $contactQueryObj = NULL;
+    if (method_exists($this->_search, 'getQueryObj') &&
+      is_a($this->_search->getQueryObj(), 'CRM_Contact_BAO_Query')) {
+      $contactQueryObj = $this->_search->getQueryObj();
+    }
 
     $dao = CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
 
@@ -306,6 +312,12 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     while ($dao->fetch()) {
       $row = array();
       $empty = TRUE;
+
+      // if contact query object present
+      // process pseudo constants
+      if ($contactQueryObj) {
+        $contactQueryObj->convertToPseudoNames($dao);
+      }
 
       // the columns we are interested in
       foreach ($columnNames as $property) {
