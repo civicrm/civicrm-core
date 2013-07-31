@@ -291,6 +291,9 @@ function tokenReplText(element) {
   if ( element.id == 'token3' ) {
     ( isMailing ) ? text_message = "subject" : text_message = "msg_subject";
   }
+  else if ( element.id == 'token1' ) {
+    text_message = "text_message";
+  }
 
   cj( "#"+ text_message ).replaceSelection( token );
 
