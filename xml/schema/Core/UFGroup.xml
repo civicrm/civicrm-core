@@ -49,6 +49,16 @@
        <comment>Form title.</comment>
        <add>1.1</add>
   </field>
+  <field>
+     <name>description</name>
+     <type>text</type>
+     <localizable>true</localizable>
+     <comment>Description for profile form.</comment>
+     <htmlType>textarea</htmlType>
+     <rows>4</rows>
+     <cols>80</cols>
+     <add>4.4</add>
+ </field>
  <field>
      <name>collapse_display</name>
      <type>int unsigned</type>

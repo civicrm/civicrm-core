@@ -23,6 +23,13 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{htxt id='id-description-title'}
+  {ts}Help Description{/ts}
+{/htxt}
+{htxt id='id-description'}
+{ts}Explanatory text for profile.{/ts}
+{/htxt}
+
 {htxt id='id-used_for-title'}
   {ts}Used For{/ts}
 {/htxt}

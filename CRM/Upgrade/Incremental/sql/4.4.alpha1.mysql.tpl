@@ -127,3 +127,6 @@ UPDATE civicrm_option_value
 UPDATE civicrm_option_value
   SET {localize field="label"}label = '{ts escape="sql"}Supplemental Address 2{/ts}'{/localize}
   WHERE name = 'supplemental_address_2' AND option_group_id = @option_group_id_addroptions;
+
+-- CRM-12439
+ALTER TABLE `civicrm_uf_group` ADD `description` TEXT NULL DEFAULT NULL COMMENT 'Description about the profile.' AFTER `title`;

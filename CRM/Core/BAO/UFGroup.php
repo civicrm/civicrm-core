@@ -1587,7 +1587,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @static
    */
   public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW) {
-    $queryString = 'SELECT civicrm_uf_group.id, title, civicrm_uf_group.is_active, is_reserved, group_type
+    $queryString = 'SELECT civicrm_uf_group.id, title, created_id, civicrm_uf_group.is_active, is_reserved, group_type
                         FROM civicrm_uf_group
                         LEFT JOIN civicrm_uf_join ON (civicrm_uf_group.id = uf_group_id)';
     $p = array();
@@ -1622,6 +1622,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
       $ufGroups[$dao->id]['name'] = $dao->title;
       $ufGroups[$dao->id]['title'] = $dao->title;
+      $ufGroups[$dao->id]['created_id'] = $dao->created_id;
       $ufGroups[$dao->id]['is_active'] = $dao->is_active;
       $ufGroups[$dao->id]['group_type'] = $dao->group_type;
       $ufGroups[$dao->id]['is_reserved'] = $dao->is_reserved;
