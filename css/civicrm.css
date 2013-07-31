@@ -42,6 +42,7 @@ div.crm-container label {
   margin: 0em 0em 1em;
   border-collapse: collapse;
   width: 100%;
+  font-size: 12px;
 }
 
 .crm-container table.criteria-group {
