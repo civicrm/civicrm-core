@@ -41,7 +41,7 @@ class CRM_Mailing_Page_AJAX {
   /**
    * Function to fetch the template text/html messages
    */
-  static function template() {
+  public static function template() {
     $templateId = CRM_Utils_Type::escape($_POST['tid'], 'Integer');
 
     $messageTemplate = new CRM_Core_DAO_MessageTemplates();
@@ -63,9 +63,8 @@ class CRM_Mailing_Page_AJAX {
   /**
    * Function to retrieve contact mailings
    */
-  function getContactMailings() {
+  public static function getContactMailings() {
     $contactID = CRM_Utils_Type::escape($_GET['contact_id'], 'Integer');
-    //$context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
 
     $sortMapper = array(
       0 => 'subject', 1 => 'creator_name', 2 => '', 3 => 'start_date', 4 => '', 5 => 'links',
