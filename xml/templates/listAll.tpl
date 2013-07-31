@@ -87,6 +87,10 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
     return FALSE !== array_search($tableName, self::tables());
   {rdelim}
 
+  static public function getCanonicalClassName($className) {ldelim}
+    return str_replace('_BAO_', '_DAO_', $className);
+  {rdelim}
+
   static public function getClasses() {ldelim}
     return array_values(self::daoToClass());
   {rdelim}
@@ -102,5 +106,14 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
   static public function getBriefName($className) {ldelim}
     return CRM_Utils_Array::value($className, array_flip(self::daoToClass()));
   {rdelim}
+
+  /**
+   * @param string $className DAO or BAO name
+   * @return string|FALSE SQL table name
+   */
+  static public function getTableForClass($className) {ldelim}
+    return array_search(self::getCanonicalClassName($className), self::tables());
+  {rdelim}
+
 
 {rdelim}
