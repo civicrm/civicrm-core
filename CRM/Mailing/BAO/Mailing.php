@@ -2762,7 +2762,7 @@ AND        m.id = %1
     $params['total'] = CRM_Mailing_BAO_Mailing::getContactMailingsCount($params);
 
     //CRM-12814
-    if ( !empty($mailings) ) {
+    if (!empty($mailings)) {
       $openCounts = CRM_Mailing_Event_BAO_Opened::getMailingTotalCount(array_keys($mailings));
       $clickCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getMailingTotalCount(array_keys($mailings));
     }
@@ -2774,20 +2774,21 @@ AND        m.id = %1
       $contactMailings[$mailingId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
       $contactMailings[$mailingId]['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report/event',
         "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&event=queue&context=mailing");
+
       $contactMailings[$mailingId]['mailing_creator'] = CRM_Utils_System::href(
-          $values['creator_name'],
-          'civicrm/contact/view',
-          "reset=1&cid={$values['creator_id']}");
+        $values['creator_name'],
+        'civicrm/contact/view',
+        "reset=1&cid={$values['creator_id']}");
 
       //CRM-12814
-      $contactMailings[$mailingId]['openstats'] = "Opens: ".$openCounts[$values['mailing_id']].
-        "<br />Clicks: ".$clickCounts[$values['mailing_id']];
+      $contactMailings[$mailingId]['openstats'] = ts('Opens') . ': ' . $openCounts[$values['mailing_id']] .
+        '<br />' . ts('Clicks') . ': ' . $clickCounts[$values['mailing_id']];
 
       $actionLinks = array(
         CRM_Core_Action::VIEW => array(
-          'name'  => ts('View'),
-          'url'   => 'civicrm/mailing/view',
-          'qs'    => "reset=1&id={$values['mailing_id']}",
+          'name' => ts('View'),
+          'url' => 'civicrm/mailing/view',
+          'qs' => "reset=1&id={$values['mailing_id']}",
           'title' => ts('View Mailing'),
           'class' => 'crm-mailing-view',
         ),
@@ -2837,9 +2838,7 @@ AND        m.id = %1
    */
   static public function getContactMailingsCount(&$params) {
     $params['version'] = 3;
-
-    $result = civicrm_api('MailingContact', 'getcount', $params);
-    return $result['values']['count'];
+    return civicrm_api('MailingContact', 'getcount', $params);
   }
 }
 
