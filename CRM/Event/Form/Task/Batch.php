@@ -269,6 +269,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    */
   public function postProcess() {
     $params = $this->exportValues();
+    $statusClasses = CRM_Event_PseudoConstant::participantStatusClass();
     if (isset($params['field'])) {
       foreach ($params['field'] as $key => $value) {
 
@@ -296,6 +297,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
         //need to send mail when status change
         $statusChange = FALSE;
+        $relatedStatusChange = FALSE;
         if (CRM_Utils_Array::value('participant_status', $value)) {
           $value['status_id'] = $value['participant_status'];
           $fromStatusId = CRM_Utils_Array::value($key, $this->_fromStatusIds);
@@ -304,6 +306,9 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           }
 
           if ($fromStatusId != $value['status_id']) {
+            $relatedStatusChange = TRUE;
+          }
+          if ($statusClasses[$fromStatusId] != $statusClasses[$value['status_id']]) {
             $statusChange = TRUE;
           }
         }
@@ -320,7 +325,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
         //need to trigger mails when we change status
         if ($statusChange) {
           CRM_Event_BAO_Participant::transitionParticipants(array($key), $value['status_id'], $fromStatusId);
-
+        }
+        if ($relatedStatusChange) {
           //update related contribution status, CRM-4395
           self::updatePendingOnlineContribution($key, $value['status_id']);
         }
