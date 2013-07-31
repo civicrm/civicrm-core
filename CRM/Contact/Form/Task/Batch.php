@@ -291,13 +291,11 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
    * parse street address
-   * @param unknown_type $contactValues
-   * @param unknown_type $form
+   * @param array $contactValues contact values
+   * @param object $form form object
    */
-  static function parseStreetAddress(&$contactValues, &$form) {
-    if (!is_array($contactValues) ||
-      !is_array($form->_fields)
-    ) {
+  public static function parseStreetAddress(&$contactValues, &$form) {
+    if (!is_array($contactValues) || !is_array($form->_fields)) {
       return;
     }
 

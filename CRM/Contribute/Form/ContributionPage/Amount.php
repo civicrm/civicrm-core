@@ -526,6 +526,7 @@ SELECT id
                 $setParams['name'] = $pageTitle . '_' . date('is', $timeSec[0]) . $timeSec[1];
               }
               $setParams['is_quick_config'] = 1;
+              $setParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_values);
               $setParams['extends'] = CRM_Core_Component::getComponentID('CiviContribute');
               $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
               $priceSetId = $priceSet->id;

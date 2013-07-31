@@ -36,7 +36,7 @@
                 {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout'}
                     {ts}Click the <strong>Google Checkout</strong> button to checkout to Google, where you will select your payment method and complete the contribution.{/ts}
                 {else}
-                    {ts 1=$paymentProcessor.processorName 2=$button}Click the <strong>%2</strong> button to go to %1, where you will select your payment method and complete the contribution.{/ts}
+                    {ts 1=$paymentProcessor.name 2=$button}Click the <strong>%2</strong> button to go to %1, where you will select your payment method and complete the contribution.{/ts}
                 {/if}
             {elseif ! $is_monetary or $amount LE 0.0 or $is_pay_later}
                 {ts 1=$button}To complete this transaction, click the <strong>%1</strong> button below.{/ts}
