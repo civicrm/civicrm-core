@@ -483,15 +483,17 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               $component = 'civicrm_pledge';
               break;
 
-            case CRM_Export_Form_Select::CASE_EXPORT:
-              $component = 'civicrm_case';
-              break;
-
             case CRM_Export_Form_Select::GRANT_EXPORT:
               $component = 'civicrm_grant';
               break;
           }
-          $relIDs = CRM_Core_DAO::getContactIDsFromComponent($ids, $component);
+
+          if ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
+            $relIDs = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($ids);
+          }
+          else {
+            $relIDs = CRM_Core_DAO::getContactIDsFromComponent($ids, $component);
+          }
         }
 
         $relationshipJoin = $relationshipClause = '';
