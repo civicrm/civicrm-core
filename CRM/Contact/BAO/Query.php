@@ -705,7 +705,7 @@ class CRM_Contact_BAO_Query {
               if (in_array($tName, array('country', 'state_province', 'county'))) {
                 $pf = ($tName == 'state_province') ? 'state_province_name' : $name;
                 $this->_pseudoConstantsSelect[$pf] =
-                  array('pseudoField' => $tName, 'idCol' => "{$tName}_id",
+                  array('pseudoField' => "{$tName}_id", 'idCol' => "{$tName}_id", 'bao' => 'CRM_Core_BAO_Address',
                     'table' => "civicrm_{$tName}", 'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ");
 
                 if ($tName == 'state_province') {
@@ -742,13 +742,13 @@ class CRM_Contact_BAO_Query {
                 }
                 elseif ($fieldName != 'id') {
                   if ($fieldName == 'prefix_id') {
-                    $this->_pseudoConstantsSelect['individual_prefix'] = array('pseudoField' => 'individual_prefix', 'idCol' => "prefix_id");
+                    $this->_pseudoConstantsSelect['individual_prefix'] = array('pseudoField' => 'prefix_id', 'idCol' => "prefix_id", 'bao' => 'CRM_Contact_BAO_Contact');
                   }
                   if ($fieldName == 'suffix_id') {
-                    $this->_pseudoConstantsSelect['individual_suffix'] = array('pseudoField' => 'individual_suffix', 'idCol' => "suffix_id");
+                    $this->_pseudoConstantsSelect['individual_suffix'] = array('pseudoField' => 'suffix_id', 'idCol' => "suffix_id", 'bao' => 'CRM_Contact_BAO_Contact');
                   }
                   if ($fieldName == 'gender_id') {
-                    $this->_pseudoConstantsSelect['gender'] = array('pseudoField' => 'gender', 'idCol' => "gender_id");
+                    $this->_pseudoConstantsSelect['gender'] = array('pseudoField' => 'gender_id', 'idCol' => "gender_id", 'bao' => 'CRM_Contact_BAO_Contact');
                   }
                   $this->_select[$name] = "contact_a.{$fieldName}  as `$name`";
                 }
@@ -1044,7 +1044,7 @@ class CRM_Contact_BAO_Query {
 
               if (substr_count($a, 'state_province_name') > 0) {
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"] =
-                  array('pseudoField' => 'state_province_name', 'idCol' => "{$tName}_id");
+                  array('pseudoField' => '{$pf}_id', 'idCol' => "{$tName}_id", 'bao' => 'CRM_Core_BAO_Address');
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['select'] = "`$tName`.name as `{$name}-{$elementFullName}`";
               }
               else {
@@ -1060,7 +1060,7 @@ class CRM_Contact_BAO_Query {
                 $this->_element[$provider] = 1;
               }
               if ($pf == 'country' || $pf == 'county') {
-                $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"] = array('pseudoField' => $pf, 'idCol' => "{$tName}_id");
+                $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"] = array('pseudoField' => "{$pf}_id", 'idCol' => "{$tName}_id", 'bao' => 'CRM_Core_BAO_Address');
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['select'] = "`$tName`.$fieldName as `{$name}-{$elementFullName}`";
               }
               else {
@@ -5052,17 +5052,11 @@ AND   displayRelType.is_active = 1
           continue;
         }
 
-        if ($value['pseudoField'] == 'state_province') {
-          $dao->$key = CRM_Core_PseudoConstant::stateProvince($val);
+        if ($baoName = CRM_Utils_Array::value('bao', $value, NULL)) {
+          $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {
           $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
-        }
-        elseif ($value['pseudoField'] == 'country') {
-          $dao->$key = CRM_Core_PseudoConstant::country($val);
-        }
-        elseif ($value['pseudoField'] == 'county') {
-          $dao->$key = CRM_Core_PseudoConstant::county($val);
         }
         else {
           $labels = CRM_Core_OptionGroup::values($value['pseudoField']);
