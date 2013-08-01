@@ -754,6 +754,10 @@ CRM.validate = CRM.validate || {
     });
     // Handle qf form errors
     $('form :input.error', this).one('blur', function() {
+      // Ignore autocomplete fields
+      if ($(this).is('.ac_input')) {
+        return;
+      }
       $('.ui-notify-message.error a.ui-notify-close').click();
       $(this).removeClass('error');
       $(this).next('span.crm-error').remove();
