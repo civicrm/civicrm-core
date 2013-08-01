@@ -124,7 +124,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
   $params['skipRecentView'] = array(
     'name' => 'skipRecentView',
     'title' => 'Skip adding to recent view',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_BOOLEAN,
     'description' => 'Do not add to recent view (setting this improves performance)',
   );
   $params['skipLineItem'] = array(

@@ -158,6 +158,8 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
    * test checkRecurPaymentProcessor() method
    */
   function testcheckRecurPaymentProcessor() {
+    //@todo paypalpro create seems to fail silently without causing this class to fail
+    // $this->paymentProcessorCreate may be a better option
     $paymentProcessor = PaypalPro::create();
     $params = array(
       'title' => 'Test Contribution Page',
