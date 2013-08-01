@@ -135,3 +135,7 @@ WHERE url = 'civicrm/admin/setting/misc&reset=1';
 -- CRM-13112
 ALTER TABLE civicrm_survey
   ADD is_share TINYINT( 4 ) NULL DEFAULT '1' COMMENT 'Can people share the petition through social media?';
+
+-- CRM-12439
+ALTER TABLE `civicrm_uf_group` 
+  ADD `description` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'Optional verbose description of the profile.' AFTER `title`;
