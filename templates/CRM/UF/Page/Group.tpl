@@ -87,7 +87,7 @@
                 <td><span class="crmf-title crm-editable">{$row.title}</span></td>
                 <td>
                   {if $row.created_id && $row.created_by}
-		    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
+                    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
                   {/if}
                 </td>
                 <td>{$row.description}</td>
@@ -130,7 +130,7 @@
                 <td>{$row.title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
-		    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
+                    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
                   {/if}
                 </td>
                 <td>{$row.description}</td>
