@@ -206,33 +206,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    */
   static function formRule($fields, $files, $form) {
     $errors = array();
-
-    // Petitions and Surveys are unique by: title, campaign ID and activity type ID
-    if (!CRM_Utils_Rule::integer($fields['campaign_id'])) {
-      $errors['campaign_id'] = ts('Please enter a valid integer.');
-    }
-    else if (!CRM_Utils_Rule::integer($fields['activity_type_id'])) {
-      $errors['activity_type_id'] = ts('Please enter a valid integer.');
-    }
-    else {
-      $query = "
-SELECT COUNT(*) AS row_count
-FROM   civicrm_survey
-WHERE  campaign_id = %1
-AND    activity_type_id = %2
-AND    title = %3
-";
-      $params = array(
-        1 => array($fields['campaign_id'], 'Integer'),
-        2 => array($fields['activity_type_id'], 'Integer'),
-        3 => array($fields['title'], 'String'),
-      );
-      $result = CRM_Core_DAO::singleValueQuery($query, $params);
-      if ($result >= 1) {
-        $errors['title'] = ts('Title is already associated with the specified campaign and activity type. Please specify a unique title.');
-      }
-    }
-
     if (
       CRM_Utils_Array::value('option_label', $fields) &&
       CRM_Utils_Array::value('option_value', $fields) &&
