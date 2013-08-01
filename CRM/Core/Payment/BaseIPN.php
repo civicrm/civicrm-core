@@ -539,9 +539,9 @@ LIMIT 1;";
     // it would be good if someone added some comments or refactored this
     if ($contribution->id) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      if (isset($input['prevContribution']) && !$input['prevContribution']->is_pay_later &&
-        $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)) {
-        $input['payment_processor'] = $paymentProcessorId;
+      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later &&
+-      $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses))) {
+       $input['payment_processor'] = $paymentProcessorId;
       }
       $input['contribution_status_id'] = array_search('Completed', $contributionStatuses);
       $input['total_amount'] = $input['amount'];
