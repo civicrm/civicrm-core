@@ -226,12 +226,107 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
   function _testdeleteProfile($profileTitle) {
     //$this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("//div[@id='user-profiles']/div/div/table/tbody//tr/td[1]/span[text() = '$profileTitle']/../following-sibling::td[4]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
-    $this->click("//div[@id='user-profiles']/div/div/table/tbody//tr/td[1]/span[text() = '$profileTitle']/../following-sibling::td[4]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
+    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
+    $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
 
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('newCiviCRMProfile-bottom');
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
+  }
+
+  /**
+   * CRM-12439
+   * Test to check profile description field
+   * which has a rich text editor (CKEditor)
+   */
+  function testCheckDescAndCreatedIdFields() {
+    // Log in using webtestLogin() method
+    $this->webtestLogin();
+
+    // open Add Profile page
+    $this->openCiviPage("admin/uf/group/add", "action=add&reset=1");
+    
+    $this->waitForElementPresent('_qf_Group_next-bottom');
+    $profileTitle = 'Test Profile' . substr(sha1(rand()), 0, 7);
+    $this->type('title', $profileTitle);
+    
+    // check if description field is present
+    $this->waitForElementPresent('description');
+
+    $profileDescription = "Test Profile description" . substr(sha1(rand()), 0, 7);
+    $this->type('description', $profileDescription);
+    $this->check('uf_group_type_Search Profile');
+
+    // click save button
+    $this->clickLink('_qf_Group_next-bottom');
+
+    // Wait for "saved" status msg
+    $this->waitForText('crm-notification-container', 'Profile Added');
+    
+    $this->waitForElementPresent('_qf_Field_next-bottom');
+
+    // select field(s) to be added in profile
+    $this->select("field_name_0", "value=Contact");
+    $this->select("field_name_1", "value=email");
+    $this->select("field_name_2", "value=2");
+
+    // click on Save buttonProfile Field Saved
+    $this->clickLink('_qf_Field_next-bottom');
+
+    // Wait for "saved" status msg
+    $this->waitForText('crm-notification-container', "Profile Field Saved");
+
+    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[4]/a[2]");
+    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[4]/a[4]");
+
+    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[3]/table/tbody/tr[1]/td[9]/span/a[text()='Edit']");
+    // extract profile Id
+    $id = explode("gid=", $this->getAttribute("xpath=//div[@id='field_page']/div[3]/table/tbody/tr/td[9]/span/a[text()='Edit']/@href"));
+    $id = $id[1];
+
+    // click on Edit Settings
+    $this->clickLink("xpath=//div[@id='field_page']/div[4]/a[2]", '_qf_Group_next-bottom');
+
+    // check for description field
+    $this->waitForElementPresent('description');
+    // check value of description field is retrieved correctly
+    $this->assertEquals($this->getValue('description'), $profileDescription);
+
+    // click on save button
+    $this->clickLink('_qf_Group_next-bottom');
+
+    // Wait for "saved" status msg
+    $this->waitForText('crm-notification-container', 'Profile Saved');
+  
+    $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']/a[@id='newCiviCRMProfile-bottom']");
+    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[2]/a");
+    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[3]");
+
+    // check description is displayed on profile listing page
+    $this->assertEquals($this->getText("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[3]"), $profileDescription);
+    // fetch created by
+    $createdBy = $this->getText("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[2]/a");
+
+    // check if created by contact exists
+    $this->openCiviPage("dashboard", "reset=1");
+
+    // type sortname in autocomplete
+    $this->click("css=input#sort_name_navigation");
+    $this->type("css=input#sort_name_navigation", $createdBy);
+    $this->typeKeys("css=input#sort_name_navigation", $createdBy);
+
+    // wait for result list
+    $this->waitForElementPresent("css=div.ac_results-inner li");
+
+    // visit contact summary page
+    $this->clickLink("css=div.ac_results-inner li");
+
+    // Is contact present?
+    $this->assertTrue($this->isTextPresent("$createdBy"), "Contact did not find!");
+    
+    $this->openCiviPage('admin/uf/group', 'reset=1');
+    // delete created profile
+    $this->_testdeleteProfile($profileTitle);
   }
 }

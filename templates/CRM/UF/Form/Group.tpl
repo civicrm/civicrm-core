@@ -47,6 +47,10 @@
             <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='title' id=$gid}{/if}</td>
             <td class="html-adjust">{$form.title.html}</td>
         </tr>
+        <tr class="crm-uf_group-form-block-description">
+            <td class="label">{$form.description.label} {help id='id-description' file="CRM/UF/Form/Group.hlp"}</td>
+            <td class="html-adjust">{$form.description.html}</td>   
+        </tr>
         <tr class="crm-uf_group-form-block-uf_group_type">
             <td class="label">{$form.uf_group_type.label} {help id='id-used_for' file="CRM/UF/Form/Group.hlp"}</td>
             <td class="html-adjust">{$form.uf_group_type.html}&nbsp;{$otherModuleString}</td>
