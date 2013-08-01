@@ -1828,8 +1828,19 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif (CRM_Utils_Array::value('name',$field) == 'membership_type') {
       list($orgInfo, $types) = CRM_Member_BAO_MembershipType::getMembershipTypeInfo();
       $sel = &$form->addElement('hierselect', $name, $title);
-      $select = array( '' => ts('- select -') );
-      $sel->setOptions(array( $select + $orgInfo, $types));
+      $select = array('' => ts('- select -') );
+      if(count($orgInfo) == 1 && $field['is_required']) {
+        // we only have one org - so we should default to it. Not sure about defaulting to first type
+        // as it could be missed - so adding a select
+        // however, possibly that is more similar to the membership form
+        if(count($types[1]) > 1) {
+          $types[1] = $select + $types[1];
+        }
+      }
+      else {
+        $orgInfo = $select + $orgInfo;
+      }
+      $sel->setOptions(array($orgInfo, $types));
     }
     elseif (CRM_Utils_Array::value('name',$field) == 'membership_status') {
       $form->add('select', $name, $title,

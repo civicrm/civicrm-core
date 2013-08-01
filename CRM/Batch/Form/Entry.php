@@ -106,6 +106,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       // get the profile id associted with this batch type
       $this->_profileId = CRM_Batch_BAO_Batch::getProfileId($this->_batchInfo['type_id']);
     }
+    CRM_Core_Resources::singleton()
+    ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])));
   }
 
   /**
