@@ -2491,16 +2491,19 @@ WHERE  contribution_id = %1 ";
       $entityId = $params['contribution']->id;
       $entityTable = 'civicrm_contribution';
     }
+
     $entityID[] = $entityId;
     if (!empty($additionalParticipantId)) {
       $entityID += $additionalParticipantId;
     }
+    // prevContribution appears to mean - original contribution object- ie copy of contribution from before the update started that is being updated
     if (!CRM_Utils_Array::value('prevContribution', $params)) {
       $entityID = NULL;
     }
     else {
       $update = TRUE;
     }
+
     // build line item array if its not set in $params
     if (!CRM_Utils_Array::value('line_item', $params) || $additionalParticipantId) {
       CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));

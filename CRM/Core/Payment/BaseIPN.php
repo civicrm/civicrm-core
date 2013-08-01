@@ -37,12 +37,30 @@ class CRM_Core_Payment_BaseIPN {
   static $_now = NULL;
 
   /**
+   * Input parameters from payment processor. Store these so that
+   * the code does not need to keep retrieving from the http request
+   * @var array
+   */
+  protected $_inputParameters = array();
+
+  /**
    * Constructor
    */
   function __construct() {
     self::$_now = date('YmdHis');
   }
 
+  /**
+   * Store input array on the class
+   * @param array $parameters
+   * @throws CRM_Core_Exceptions
+   */
+  function setInputParameters($parameters) {
+    if(!is_array($parameters)) {
+      throw new CRM_Core_Exceptions('Invalid input parameters');
+    }
+    $this->_inputParameters = $parameters;
+  }
   /**
    * Validate incoming data. This function is intended to ensure that incoming data matches
    * It provides a form of pseudo-authentication - by checking the calling fn already knows
@@ -123,7 +141,7 @@ class CRM_Core_Payment_BaseIPN {
     try {
       $success = $contribution->loadRelatedObjects($input, $ids, $required);
     }
-    catch(Exception$e) {
+    catch(Exception $e) {
       if (CRM_Utils_Array::value('log_error', $error_handling)) {
         CRM_Core_Error::debug_log_message($e->getMessage());
       }
@@ -515,12 +533,15 @@ LIMIT 1;";
         $paymentProcessorId = $objects['paymentProcessor']->id;
       }
     }
-
+    //it's hard to see how it could reach this point without a contributon id as it is saved in line 511 above
+    // which raised the question as to whether this check preceded line 511 & if so whether something could be broken
+    // From a lot of code reading /debugging I'm still not sure the intent WRT first & subsequent payments in this code
+    // it would be good if someone added some comments or refactored this
     if ($contribution->id) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      if ((!$input['prevContribution'] && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later &&
-        $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses))) {
-        $input['payment_processor'] = $paymentProcessorId;
+      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later &&
+-      $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses))) {
+       $input['payment_processor'] = $paymentProcessorId;
       }
       $input['contribution_status_id'] = array_search('Completed', $contributionStatuses);
       $input['total_amount'] = $input['amount'];
@@ -532,7 +553,15 @@ LIMIT 1;";
         $input['participant_id'] = $contribution->_relatedObjects['participant']->id;
         $input['skipLineItem'] = 1;
       }
-
+      //@todo writing a unit test I was unable to create a scenario where this line did not fatal on second
+      // and subsequent payments. In this case the line items are created at $this->addrecurLineItems
+      // and since the contribution is saved prior to this line there is always a contribution-id,
+      // however there is never a prevContribution (which appears to mean original contribution not previous
+      // contribution - or preUpdateContributionObject most accurately)
+      // so, this is always called & only appears to succeed when prevContribution exists - which appears
+      // to mean "are we updating an exisitng pending contribution"
+      //I was able to make the unit test complete as fataling here doesn't prevent
+      // the contribution being created - but activities would not be created or emails sent
       CRM_Contribute_BAO_Contribution::recordFinancialAccounts($input, NULL);
     }
 
