@@ -190,6 +190,7 @@ class CRM_Utils_Type {
 
       case 'String':
       case 'Memo':
+      case 'Text':
         return CRM_Core_DAO::escapeString($data);
 
       case 'Date':
