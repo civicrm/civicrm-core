@@ -110,7 +110,9 @@ cj(function () {
     };
 
     cj("#Entry").ajaxSubmit(options);
+  });
 
+  cj('#crm-container').on('keyup change', '*', function () {
     // validate rows
     checkColumns(cj(this));
   });
