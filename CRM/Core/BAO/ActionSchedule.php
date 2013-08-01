@@ -583,7 +583,7 @@ WHERE   cas.entity_value = $id AND
     $session = CRM_Core_Session::singleton();
 
     while ($actionSchedule->fetch()) {
-      $extraSelect = $extraJoin = $extraWhere = '';
+      $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
 
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {
@@ -606,12 +606,11 @@ WHERE   cas.entity_value = $id AND
         $extraJoin   = "
 INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
 INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
-        $extraWhere = 'AND e.is_current_revision = 1 AND e.is_deleted = 0';
+        $extraOn = 'AND e.is_current_revision = 1 AND e.is_deleted = 0';
         if ($actionSchedule->limit_to == 0) {
           $extraJoin   = "
 LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
 LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
-          $extraWhere = '';
         }
       }
 
@@ -662,6 +661,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
         $entityJoinClause = "LEFT JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
         $extraWhere .= " AND (e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact')";
       }
+      $entityJoinClause .= $extraOn;
 
       $query = "
 SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.*, e.id as entityID, e.* {$extraSelect}
@@ -790,20 +790,25 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
-        switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
-          case 'Activity Assignees':
-            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$assigneeID}";
-            break;
+        if ($limitTo == 0) {
+          // including the activity target contacts if 'in addition' is defined
+          $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
+        }
+        else {
+          switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
+            case 'Activity Assignees':
+              $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$assigneeID}";
+              break;
 
-          case 'Activity Source':
-            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$sourceID}";
-            break;
+            case 'Activity Source':
+              $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$sourceID}";
+              break;
 
-          default:
-          case 'Activity Targets':
-            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
-            break;
-
+            default:
+            case 'Activity Targets':
+              $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
+              break;
+          }
         }
         // build where clause
         if (!empty($value)) {
@@ -825,7 +830,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $table = 'civicrm_event r';
         $contactField = 'e.contact_id';
         $join[] = 'INNER JOIN civicrm_event r ON e.event_id = r.id';
-        if ($actionSchedule->recipient_listing) {
+        if ($actionSchedule->recipient_listing && $limitTo) {
           $rList = explode(CRM_Core_DAO::VALUE_SEPARATOR,
             trim($actionSchedule->recipient_listing, CRM_Core_DAO::VALUE_SEPARATOR)
           );
@@ -947,21 +952,7 @@ reminder.action_schedule_id = %1";
       $fromClause = "FROM $from";
       $joinClause = !empty($join) ? implode(' ', $join) : '';
       $whereClause = 'WHERE ' . implode(' AND ', $where);
-      $union = '';
 
-    if ($limitTo == 0) {
-      $union ="
-UNION
-     SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id
-FROM (civicrm_contact c, {$table})
-LEFT JOIN civicrm_action_log reminder ON reminder.contact_id = c.id AND
-        reminder.entity_id          = c.id AND
-        reminder.entity_table       = 'civicrm_contact' AND
-        reminder.action_schedule_id = {$actionSchedule->id}
-{$addGroup}
-WHERE (reminder.id IS NULL AND c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere}) AND
- {$dateClause}";
-    }
       $query = "
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
 {$selectClause}
@@ -969,10 +960,31 @@ INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_sche
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
 {$whereClause} AND {$dateClause} {$notINClause}
-{$union}";
+";
 
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
+      if ($limitTo == 0) {
+        $insertAdditionalSql ="
+INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
+     SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id
+FROM (civicrm_contact c, {$table})
+LEFT JOIN civicrm_action_log reminder ON reminder.contact_id = c.id AND
+        reminder.entity_id          = c.id AND
+        reminder.entity_table       = 'civicrm_contact' AND
+        reminder.action_schedule_id = {$actionSchedule->id}
+{$addGroup}
+WHERE (reminder.id IS NULL AND c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere})
+ AND {$dateClause} AND {$whereClause}
+ AND c.id NOT IN (
+     SELECT rem.contact_id
+     FROM civicrm_action_log rem INNER JOIN {$mapping->entity} e ON rem.entity_id = e.id
+     WHERE rem.action_schedule_id = {$actionSchedule->id}
+      AND rem.entity_table = '{$mapping->entity}'
+    )
+";
+        CRM_Core_DAO::executeQuery($insertAdditionalSql);
+      }
       // if repeat is turned ON:
       if ($actionSchedule->is_repeat) {
         $repeatEvent = ($actionSchedule->end_action == 'before' ? 'DATE_SUB' : 'DATE_ADD') . "({$dateField}, INTERVAL {$actionSchedule->end_frequency_interval} {$actionSchedule->end_frequency_unit})";
