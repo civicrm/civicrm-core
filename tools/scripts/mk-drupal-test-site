@@ -112,7 +112,7 @@ done
 
 ln -s "$CIVI_ROOT" "sites/$SITE_URL/modules/civicrm"
 
-cat "$CIVI_ROOT/templates/CRM/common/civicrm.settings.php.tpl" \
+cat "$CIVI_ROOT/templates/CRM/common/civicrm.settings.php.template" \
   | sed "s;%%baseURL%%;http://${SITE_URL};" \
   | sed "s;%%cms%%;Drupal;" \
   | sed "s;%%CMSdbHost%%;${DB_HOST};" \
