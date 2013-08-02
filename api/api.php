@@ -19,7 +19,10 @@
  *   array to be passed to function
  */
 function civicrm_api($entity, $action, $params, $extra = NULL) {
-  $apiWrappers = array(CRM_Core_HTMLInputCoder::singleton());
+  $apiWrappers = array(
+    CRM_Utils_API_HTMLInputCoder::singleton(),
+    CRM_Utils_API_NullOutputCoder::singleton()
+  );
   try {
     require_once ('api/v3/utils.php');
     require_once 'api/Exception.php';
@@ -58,6 +61,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
       civicrm_api3_verify_mandatory($apiRequest['params'], NULL, _civicrm_api3_getrequired($apiRequest));
     }
 
+    // For input filtering, process $apiWrappers in forward order
     foreach ($apiWrappers as $apiWrapper) {
       $apiRequest = $apiWrapper->fromApiInput($apiRequest);
     }
@@ -78,7 +82,8 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
       return civicrm_api3_create_error("API (" . $apiRequest['entity'] . "," . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
     }
 
-    foreach ($apiWrappers as $apiWrapper) {
+    // For output filtering, process $apiWrappers in reverse order
+    foreach (array_reverse($apiWrappers) as $apiWrapper) {
       $result = $apiWrapper->toApiOutput($apiRequest, $result);
     }
 

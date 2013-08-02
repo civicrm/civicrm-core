@@ -182,5 +182,37 @@ class api_v3_APITest extends CiviUnitTestCase {
     $this->fail('Exception was expected');
   }
 
+  public function testCreate_NoStringNullResult() {
+    // create an example contact
+    // $contact = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->toArray();
+    $result = $this->callAPISuccess('ContributionPage', 'create', array(
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'USD',
+      'goal_amount' => 100,
+    ));
+    $contact = array_shift($result['values']);
+
+    $this->assertTrue(is_numeric($contact['id']));
+    $this->assertNotEmpty($contact['title']);
+    // preferred_mail_format preferred_communication_method preferred_language gender_id
+    // currency
+    $this->assertNotEmpty($contact['currency']);
+
+    // update the contact
+    $result = $this->callAPISuccess('ContributionPage', 'create', array(
+      'id' => $contact['id'],
+      'title' => 'New title',
+      'currency' => '',
+    ));
+
+    // check return format
+    $this->assertEquals(1, $result['count']);
+    foreach ($result['values'] as $resultValue) {
+      $this->assertEquals('New title', $resultValue['title']);
+      $this->assertEquals('', $resultValue['currency']); // BUG: $resultValue['location'] === 'null'
+    }
+  }
+
 }
 

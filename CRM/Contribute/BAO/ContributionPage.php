@@ -49,7 +49,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    */
   public static function &create(&$params) {
     $financialTypeId = NULL;
-    if (CRM_Utils_Array::value('id', $params) && !CRM_Price_BAO_Set::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
+    if (CRM_Utils_Array::value('id', $params) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $params['id'], 'financial_type_id');
     }
     $dao = new CRM_Contribute_DAO_ContributionPage();
