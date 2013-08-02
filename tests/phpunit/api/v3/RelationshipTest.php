@@ -924,5 +924,43 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       $this->assertTrue(in_array($value['relationship_type_id'], array($this->_relTypeID, $relType3)));
     }
   }
+
+  /**
+   * Checks that passing in 'contact_id_b' + a relationship type
+   * will filter by relationship type for contact b
+   *
+   * We should get 1 result without or with correct relationship type id & 0 with
+   * an incorrect one
+   */
+  function testGetRelationshipByTypeArrayReciprocal() {
+    $created = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $org3 = $this->organizationCreate();
+    $relType2 = 5; // lets just assume built in ones aren't being messed with!
+    $relType3 = 6; // lets just assume built in ones aren't being messed with!
+
+    //relationshp 2
+    $this->callAPISuccess($this->_entity, 'create',
+      array_merge($this->_params, array(
+        'relationship_type_id' => $relType2,
+        'contact_id_b' => $this->_cId_b2))
+    );
+
+    //relationshp 3
+    $this->callAPISuccess($this->_entity, 'create',
+      array_merge($this->_params, array(
+        'relationship_type_id' => $relType3,
+        'contact_id_b' => $org3))
+    );
+
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'contact_id' => $this->_cId_a,
+      'relationship_type_id' => array('IN' => array($this->_relTypeID, $relType3)),
+    ));
+
+    $this->assertEquals(2, $result['count']);
+    foreach ($result['values'] as $key => $value) {
+      $this->assertTrue(in_array($value['relationship_type_id'], array($this->_relTypeID, $relType3)));
+    }
+  }
 }
 
