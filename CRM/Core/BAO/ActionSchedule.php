@@ -973,6 +973,11 @@ LEFT JOIN {$reminderJoinClause}
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
       if ($limitTo == 0) {
+        $additionWhere = ' WHERE ';
+        if ($actionSchedule->start_action_date) {
+          $additionWhere = $whereClause;
+        }
+
         $insertAdditionalSql ="
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
      SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id
@@ -982,9 +987,9 @@ LEFT JOIN civicrm_action_log reminder ON reminder.contact_id = c.id AND
         reminder.entity_table       = 'civicrm_contact' AND
         reminder.action_schedule_id = {$actionSchedule->id}
 {$addGroup}
-WHERE (reminder.id IS NULL AND c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere})
- AND {$dateClause} AND {$whereClause}
- AND c.id NOT IN (
+{$additionWhere} (reminder.id IS NULL AND c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere})
+AND {$dateClause}
+AND c.id NOT IN (
      SELECT rem.contact_id
      FROM civicrm_action_log rem INNER JOIN {$mapping->entity} e ON rem.entity_id = e.id
      WHERE rem.action_schedule_id = {$actionSchedule->id}
