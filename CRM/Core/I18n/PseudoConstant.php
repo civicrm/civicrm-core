@@ -51,7 +51,7 @@ class CRM_Core_I18n_PseudoConstant {
       }
       // hand-crafted enforced overrides for language variants
       // NB: when adding support for a regional override for a new language below, update
-      // relevant comments in templates/CRM/common/civicrm.settings.php.tpl as well
+      // relevant comments in templates/CRM/common/civicrm.settings.php.template as well
       $longForShortMapping['zh'] = defined("CIVICRM_LANGUAGE_MAPPING_ZH") ? CIVICRM_LANGUAGE_MAPPING_ZH : 'zh_CN';
       $longForShortMapping['en'] = defined("CIVICRM_LANGUAGE_MAPPING_EN") ? CIVICRM_LANGUAGE_MAPPING_EN : 'en_US';
       $longForShortMapping['fr'] = defined("CIVICRM_LANGUAGE_MAPPING_FR") ? CIVICRM_LANGUAGE_MAPPING_FR : 'fr_FR';
