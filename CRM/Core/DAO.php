@@ -1826,7 +1826,6 @@ EOS;
   public function createSQLFilter($fieldName, $filter, $type, $alias = NULL) {
     // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
     // support for other syntaxes is discussed in ticket but being put off for now
-    //@todo consolidate this and the version from api/v3/utils.php into one location
     $acceptedSQLOperators = array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN');
     foreach ($filter as $operator => $criteria) {
       if (in_array($operator, $acceptedSQLOperators)) {
