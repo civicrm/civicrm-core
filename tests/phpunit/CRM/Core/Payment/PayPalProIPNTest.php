@@ -26,7 +26,7 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
-class CRM_Core_Payment_PaypalProIPNTest extends CiviUnitTestCase {
+class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   protected $_contributionID;
   protected $_invoiceID = 'c2r9c15f7be20b4f3fef1f77e4c37424';
   protected $_financialTypeID = 1;
