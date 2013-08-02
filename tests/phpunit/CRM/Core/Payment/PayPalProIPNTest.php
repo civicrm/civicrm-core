@@ -80,8 +80,6 @@ class CRM_Core_Payment_PaypalProIPNTest extends CiviUnitTestCase {
 
   /**
    * test IPN response updates contribution_recur & contribution for first & second contribution
-   * @todo I was unable to get this to finish without a fatal error (trying to insert the same line items twice)
-   * If that is fixed then the try catch should be removed & tests added to check that
    */
   function testIPNPaymentRecurSuccess() {
     $this->setupPaymentProcessorTransaction();
@@ -94,13 +92,8 @@ class CRM_Core_Payment_PaypalProIPNTest extends CiviUnitTestCase {
     $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
-    try{
-      $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
-      $paypalIPN->main();
-    }
-    catch(Exception $e) {
-      // expected failure as code currently appears to fail when the line items are created for the second time
-    }
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
+    $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array('contribution_recur_id' => $this->_contributionRecurID, 'sequential' => 1));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
