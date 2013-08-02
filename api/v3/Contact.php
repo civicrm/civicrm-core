@@ -298,7 +298,7 @@ function civicrm_api3_contact_delete($params) {
   // restrict permanent delete if a contact has financial trxn associated with it
   $error = NULL;
   if ($skipUndelete && CRM_Financial_BAO_FinancialItem::checkContactPresent(array($contactID), $error)) {
-    return civicrm_api3_create_error($error['_qf_default']);  
+    return civicrm_api3_create_error($error['_qf_default']);
   }
   if (CRM_Contact_BAO_Contact::deleteContact($contactID, $restore, $skipUndelete)) {
     return civicrm_api3_create_success();
@@ -496,10 +496,13 @@ function _civicrm_api3_greeting_format_params($params) {
       $greetingId = CRM_Utils_Array::key('Customized', $greetings);
     }
 
-    $customValue = $params['contact_id'] ? CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $params['contact_id'],
-      "{$key}{$greeting}_custom"
-    ) : FALSE;
+    $customValue = isset($params['contact_id']) ?
+      CRM_Core_DAO::getFieldValue(
+        'CRM_Contact_DAO_Contact',
+        $params['contact_id'],
+        "{$key}{$greeting}_custom"
+      ) :
+      FALSE;
 
     if (array_key_exists("{$key}{$greeting}_id", $params) && empty($params["{$key}{$greeting}_id"])) {
       $nullValue = TRUE;
