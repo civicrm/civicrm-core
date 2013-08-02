@@ -73,7 +73,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
      );
 
     $membershipOrgId = $this->organizationCreate(NULL);
-    $this->_membershipTypeID = $this->membershipTypeCreate($membershipOrgId);
+    $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $membershipOrgId));
     $priceSetparams1 = array(
       'name' => 'priceset',
       'title' => 'Priceset with Multiple Terms',
