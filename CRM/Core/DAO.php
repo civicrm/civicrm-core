@@ -1811,5 +1811,59 @@ EOS;
     return $contexts;
   }
 
-}
+  /**
+   * SQL version of api function to assign filters to the DAO based on the syntax
+   * $field => array('IN' => array(4,6,9))
+   * OR
+   * $field => array('LIKE' => array('%me%))
+   * etc
+   *
+   * @param $field sql filter to be applied
+   * @param $fi
+   */
+  public function createSQLFilter($fieldName, $filter, $type, $alias = NULL) {
+    // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
+    // support for other syntaxes is discussed in ticket but being put off for now
+    //@todo consolidate this and the version from api/v3/utils.php into one location
+    $acceptedSQLOperators = array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN');
+    foreach ($filter as $operator => $criteria) {
+      if (in_array($operator, $acceptedSQLOperators)) {
+        switch ($operator) {
+          // unary operators
 
+          case 'IS NULL':
+          case 'IS NOT NULL':
+            return (sprintf('%s %s', $fieldName, $operator));
+            break;
+
+          // ternary operators
+          case 'BETWEEN':
+          case 'NOT BETWEEN':
+            if (empty($criteria[0]) || empty($criteria[1])) {
+              throw new exception("invalid criteria for $operator");
+            }
+            return (sprintf('%s ' . $operator . ' "%s" AND "%s"', $fieldName, CRM_Core_DAO::escapeString($criteria[0]), CRM_Core_DAO::escapeString($criteria[1])));
+            break;
+
+          // n-ary operators
+          case 'IN':
+          case 'NOT IN':
+            if (empty($criteria)) {
+              throw new exception("invalid criteria for $operator");
+            }
+            $escapedCriteria = array_map(array(
+              'CRM_Core_DAO',
+              'escapeString'
+            ), $criteria);
+            return (sprintf('%s %s ("%s")', $fieldName, $operator, implode('", "', $escapedCriteria)));
+            break;
+
+          // binary operators
+
+          default:
+            return(sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
+        }
+      }
+    }
+  }
+}
