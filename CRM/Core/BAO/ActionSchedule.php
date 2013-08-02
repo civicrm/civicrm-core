@@ -765,7 +765,11 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $mapping->id = $mappingID;
       $mapping->find(TRUE);
 
-      $select = $join = $where = array();
+      // note: $where - this filtering applies for both
+      // 'limit to' and 'addition to' options
+      // $limitWhere - this filtering applies only for
+      // 'limit to' option
+      $select = $join = $where = $limitWhere = array();
       $limitTo = $actionSchedule->limit_to;
       $value = explode(CRM_Core_DAO::VALUE_SEPARATOR,
         trim($actionSchedule->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)
@@ -854,8 +858,10 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $where[] = ($mapping->entity_value == 'event_type') ? "r.event_type_id IS NULL" : "r.id IS NULL";
         }
 
+        // participant status criteria not to be implemented
+        // for additional recipients
         if (!empty($status)) {
-          $where[] = "e.status_id IN ({$status})";
+          $limitWhere[] = "e.status_id IN ({$status})";
         }
 
         $where[] = 'r.is_active = 1';
@@ -891,8 +897,8 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
         $mStatus = implode (',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
-
       }
+
       if ($limitTo) {
         if ($actionSchedule->group_id) {
           $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
@@ -914,6 +920,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $addWhere = "c.id IN ({$rList})";
         }
       }
+
       $select[] = "{$contactField} as contact_id";
       $select[] = 'e.id as entity_id';
       $select[] = "'{$mapping->entity}' as entity_table";
@@ -952,6 +959,7 @@ reminder.action_schedule_id = %1";
       $fromClause = "FROM $from";
       $joinClause = !empty($join) ? implode(' ', $join) : '';
       $whereClause = 'WHERE ' . implode(' AND ', $where);
+      $limitWhere .= implode(' AND ', $limitWhere);
 
       $query = "
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
@@ -959,7 +967,7 @@ INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_sche
 {$fromClause}
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
-{$whereClause} AND {$dateClause} {$notINClause}
+{$whereClause} {$limitWhere} AND {$dateClause} {$notINClause}
 ";
 
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
