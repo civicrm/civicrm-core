@@ -322,7 +322,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     //record contribution for this membership
     if (CRM_Utils_Array::value('contribution_status_id', $params) && !CRM_Utils_Array::value('relate_contribution_id', $params)) {
-      $params['contribution'] = self::recordMembershipContribution( $params, $ids, $membership->id );
+      $params['contribution'] = self::recordMembershipContribution( array_merge($params, array('membership_id' => $membership->id), $ids);
     }
 
     //insert payment record for this membership
@@ -579,9 +579,9 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   static function del($membershipId) {
     //delete related first and then delete parent.
     self::deleteRelatedMemberships($membershipId);
-    return self::deleteMembership($membershipId);    
+    return self::deleteMembership($membershipId);
   }
-  
+
   /**
    * Function to delete membership.
    *
@@ -2676,13 +2676,13 @@ WHERE      civicrm_membership.is_test = 0";
    * Function to record contribution record associated with membership
    *
    * @param array  $params array of submitted params
-   * @param array  $ids    array of ids
-   * @param object $membershipId  membership id
+   * @param array  $ids (param in process of being removed - try to use params)   array of ids
    *
    * @return void
    * @static
    */
-  static function recordMembershipContribution( &$params, &$ids, $membershipId ) {
+  static function recordMembershipContribution( &$params, $ids = array()) {
+    $membershipId = $params['membership_id'];
     $contributionParams = array();
     $config = CRM_Core_Config::singleton();
     $contributionParams['currency'] = $config->defaultCurrency;
