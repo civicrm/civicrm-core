@@ -46,7 +46,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
     parent::setUp();
 
     $this->_contactID = $this->organizationCreate(NULL);
-    $this->_membershipTypeID = $this->membershipTypeCreate($this->_contactID, 1);
+    $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
     $params = array(

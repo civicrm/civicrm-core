@@ -779,12 +779,13 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $count get the no of relationships
    * $param int $relationshipId relationship id
    * @param string $direction   the direction we are interested in a_b or b_a
+   * @param array $params array of extra values including relationship_type_id per api spec
    *
    * return string the query for this diretion
    * @static
    * @access public
    */
-  static function makeURLClause($contactId, $status, $numRelationship, $count, $relationshipId, $direction) {
+  static function makeURLClause($contactId, $status, $numRelationship, $count, $relationshipId, $direction, $params = array()) {
     $select = $from = $where = '';
 
     $select = '( ';
@@ -886,7 +887,14 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
     // CRM-6181
     $where .= ' AND civicrm_contact.is_deleted = 0';
-
+    if(!empty($params['relationship_type_id'])) {
+      if(is_array($params['relationship_type_id'])) {
+        $where .=  " AND " . CRM_Core_DAO::createSQLFilter('relationship_type_id', $params['relationship_type_id'], 'Integer');
+      }
+      else {
+        $where .= ' AND relationship_type_id = ' . CRM_Utils_Type::escape($params['relationship_type_id'], 'Positive');
+      }
+    }
     if ($direction == 'a_b') {
       $where .= ' ) UNION ';
     }
@@ -908,7 +916,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * $param array $links the list of links to display
    * $param int   $permissionMask  the permission mask to be applied for the actions
    * $param boolean $permissionedContact to return only permissioned Contact
-   *
+   * $param array $params array of variables consistent with filters supported by the api
    * return array $values relationship records
    * @static
    * @access public
@@ -917,7 +925,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $status              = 0, $numRelationship = 0,
     $count               = 0, $relationshipId = 0,
     $links               = NULL, $permissionMask = NULL,
-    $permissionedContact = FALSE
+    $permissionedContact = FALSE,
+    $params = array()
   ) {
     $values = array();
     if (!$contactId && !$relationshipId) {
@@ -925,10 +934,10 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     }
 
     list($select1, $from1, $where1) = self::makeURLClause($contactId, $status, $numRelationship,
-      $count, $relationshipId, 'a_b'
+      $count, $relationshipId, 'a_b', $params
     );
     list($select2, $from2, $where2) = self::makeURLClause($contactId, $status, $numRelationship,
-      $count, $relationshipId, 'b_a'
+      $count, $relationshipId, 'b_a', $params
     );
 
     $order = $limit = '';

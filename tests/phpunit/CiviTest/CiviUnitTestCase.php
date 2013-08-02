@@ -940,36 +940,26 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
-  function membershipTypeCreate($contactID, $contributionTypeID = 1, $version = 3) {
-    require_once 'CRM/Member/PseudoConstant.php';
+  function membershipTypeCreate($params = array()) {
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Core_Config::clearDBCache();
-    $params = array(
+    $params = array_merge(array(
       'name' => 'General',
       'duration_unit' => 'year',
       'duration_interval' => 1,
       'period_type' => 'rolling',
-      'member_of_contact_id' => $contactID,
+      'member_of_contact_id' => 1,
       'domain_id' => 1,
-      // FIXME: I know it's 1, cause it was loaded directly to the db.
-      // FIXME: when we load all the data, we'll need to address this to
-      // FIXME: avoid hunting numbers around.
-      'financial_type_id' => $contributionTypeID,
+      'financial_type_id' => 1,
       'is_active' => 1,
-      'version' => $version,
       'sequential' => 1,
       'visibility' => 1,
-    );
+    ), $params);
 
-    $result = civicrm_api('MembershipType', 'Create', $params);
-    require_once 'CRM/Member/PseudoConstant.php';
+    $result = $this->callAPISuccess('MembershipType', 'Create', $params);
+
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Utils_Cache::singleton()->flush();
-    if (CRM_Utils_Array::value('is_error', $result) ||
-      (!CRM_Utils_Array::value('id', $result) && !CRM_Utils_Array::value('id', $result['values'][0]))
-    ) {
-      throw new Exception('Could not create membership type, with message: ' . CRM_Utils_Array::value('error_message', $result));
-    }
 
     return $result['id'];
   }
@@ -1028,17 +1018,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return;
   }
 
-  function relationshipTypeCreate($params = NULL) {
-    if (is_null($params)) {
-      $params = array(
+  function relationshipTypeCreate($params = array()) {
+    $params = array_merge(array(
         'name_a_b' => 'Relation 1 for relationship type create',
         'name_b_a' => 'Relation 2 for relationship type create',
         'contact_type_a' => 'Individual',
         'contact_type_b' => 'Organization',
         'is_reserved' => 1,
         'is_active' => 1,
-      );
-    }
+      ),
+       $params
+    );
 
     $result = $this->callAPISuccess('relationship_type', 'create', $params);
     CRM_Core_PseudoConstant::flush('relationshipType');
