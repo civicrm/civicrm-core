@@ -473,7 +473,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
     }
 
-    // write to changelog before transation is committed/rolled
+    // write to changelog before transaction is committed/rolled
     // back (and prepare status to display)
     if (CRM_Utils_Array::value('id', $params)) {
       $logMsg = "Activity (id: {$result->id} ) updated with ";
@@ -642,11 +642,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * function to get the list Actvities
+   * function to get the list Activities
    *
    * @param array   $input            array of parameters
    *    Keys include
-   *    - contact_id  int            contact_id whose activties we want to retrieve
+   *    - contact_id  int            contact_id whose activities we want to retrieve
    *    - offset      int            which row to start from ?
    *    - rowCount    int            how many rows to fetch
    *    - sort        object|array   object or array describing sort order for sql query.
@@ -655,7 +655,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *    - context     string         page on which selector is build
    *    - activity_type_id int|string the activitiy types we want to restrict by
    *
-   * @return array (reference)      $values the relevant data object values of open activitie
+   * @return array (reference)      $values the relevant data object values of open activities
    *
    * @access public
    * @static
@@ -921,11 +921,11 @@ INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$a
    *
    * @param array   $input            array of parameters
    *    Keys include
-   *    - contact_id  int            contact_id whose activties we want to retrieve
+   *    - contact_id  int            contact_id whose activities we want to retrieve
    *    - admin       boolean        if contact is admin
    *    - caseId      int            case ID
    *    - context     string         page on which selector is build
-   *    - activity_type_id int|string the activitiy types we want to restrict by
+   *    - activity_type_id int|string the activity types we want to restrict by
    *
    * @return int   count of activities
    *
@@ -957,12 +957,12 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
    *
    * @param array   $input            array of parameters
    *    Keys include
-   *    - contact_id  int            contact_id whose activties we want to retrieve
+   *    - contact_id  int            contact_id whose activities we want to retrieve
    *    - admin       boolean        if contact is admin
    *    - caseId      int            case ID
    *    - context     string         page on which selector is build
    *    - count       boolean        are we interested in the count clause only?
-   *    - activity_type_id int|string the activitiy types we want to restrict by
+   *    - activity_type_id int|string the activity types we want to restrict by
    *
    * @return int   count of activities
    *
@@ -1136,8 +1136,8 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
    * @param int    $userID       use this userID if set
    * @param string $from
    * @param array  $attachments  the array of attachments if any
-   * @param string $cc           cc recepient
-   * @param string $bcc          bcc recepient
+   * @param string $cc           cc recipient
+   * @param string $bcc          bcc recipient
    * @param array $contactIds    contact ids
    *
    * @return array               ( sent, activityId) if any email is sent and activityId
@@ -1737,7 +1737,7 @@ WHERE      activity.id IN ($activityIds)";
   /**
    * Function to add activity for Membership/Event/Contribution
    *
-   * @param object  $activity   (reference) perticular component object
+   * @param object  $activity   (reference) particular component object
    * @param string  $activityType for Membership Signup or Renewal
    *
    *
@@ -1848,11 +1848,11 @@ SELECT  display_name
   }
 
   /**
-   * Function to get Parent activity for currently viewd activity
+   * Function to get Parent activity for currently viewed activity
    *
    * @param int  $activityId   current activity id
    *
-   * @return int $parentId  Id of parent acyivity otherwise false.
+   * @return int $parentId  Id of parent activity otherwise false.
    * @access public
    */
   static function getParentActivity($activityId) {
@@ -1879,7 +1879,7 @@ SELECT  display_name
    *
    * @param int  $activityId   current activity id
    *
-   * @return int $params  count of prior acyivities otherwise false.
+   * @return int $params  count of prior activities otherwise false.
    * @access public
    */
   static function getPriorCount($activityID) {
@@ -1912,11 +1912,12 @@ AND id < {$activityID}
   }
 
   /**
-   * Function to get all prior activities of currently viewd activity
+   * Function to get all prior activities of currently viewe
+   * d activity
    *
    * @param int  $activityId   current activity id
    *
-   * @return array $result  prior acyivities info.
+   * @return array $result  prior activities info.
    * @access public
    */
   static function getPriorAcitivities($activityID, $onlyPriorRevisions = FALSE) {
