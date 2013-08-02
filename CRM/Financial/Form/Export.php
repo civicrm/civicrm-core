@@ -95,7 +95,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       $this->_batchIds = $this->_id;
     }
 
-    $allBatchStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+    $allBatchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
     $this->_exportStatusId = CRM_Utils_Array::key('Exported', $allBatchStatus);
 
     //check if batch status is valid, do not allow exported batches to export again
