@@ -34,7 +34,7 @@
  */
 
 /**
- * This class contains the funtions for Case Management
+ * This class contains the functions for Case Management
  *
  */
 class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
@@ -1604,7 +1604,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   }
 
   /**
-   * Function to retrive the scheduled activity type and date
+   * Function to retrieve the scheduled activity type and date
    *
    * @param  array $cases  Array of contact and case id
    *
@@ -1814,7 +1814,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
    *
    * @param int $caseID case id
    * @param int $relationshipId relationship id
-   * @param int $relContactId case role assigne contactId.
+   * @param int $relContactId case role assignee contactId.
    *
    * @return void on success creates activity and case activity
    *
