@@ -41,10 +41,11 @@
 class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
   /**
+   * Making this public so we can reference it in the formRule
    * @var int
-   * @protected
+   * @public
    */
-  protected $_surveyId;
+  public $_surveyId;
 
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
@@ -248,7 +249,51 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     );
 
     // add a form rule to check default value
-    $this->addFormRule(array('CRM_Campaign_Form_Survey_Results', 'formRule'), $this);
+    $this->addFormRule(array('CRM_Campaign_Form_Petition', 'formRule'), $this);
+  }
+
+  /**
+   * global validation rules for the form
+   *
+   */
+  static function formRule($fields, $files, $form) {
+    $errors = array();
+    // Petitions should be unique by: title, campaign ID (if assigned) and activity type ID
+    // NOTE: This class is called for both Petition create / update AND for Survey Results tab, but this rule is only for Petition.
+    $where = array('activity_type_id = %1', 'title = %2');
+    $params = array(
+      1 => array($fields['activity_type_id'], 'Integer'),
+      2 => array($fields['title'], 'String'),
+    );
+    $uniqueRule = ts('activity type');
+
+    if (empty($fields['campaign_id'])) {
+      $where[] = 'campaign_id IS NULL';
+    } else {
+      $where[] = 'campaign_id = %3';
+      $params[3] = array($fields['campaign_id'], 'Integer');        
+      $uniqueRule = ts('campaign and activity type');
+    }
+
+    // Exclude current Petition row if UPDATE.
+    if ($form->_surveyId) {
+      $where[] = 'id != %4';
+      $params[4] = array($form->_surveyId, 'Integer');              
+    }
+    
+    $whereClause = implode(' AND ', $where);
+
+    $query = "
+SELECT COUNT(*) AS row_count
+FROM   civicrm_survey
+WHERE  $whereClause
+";
+
+    $result = CRM_Core_DAO::singleValueQuery($query, $params);
+    if ($result >= 1) {
+      $errors['title'] = ts('This title is already associated with the selected %1. Please specify a unique title.', array(1 => $uniqueRule));
+    }
+    return empty($errors) ? TRUE : $errors;
   }
 
 
