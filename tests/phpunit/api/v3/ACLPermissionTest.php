@@ -94,7 +94,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * Function tests that deleted contacts are not returned
   */
   function testContactGetPermissionHookNoDeleted(){
-    $result = $this->callAPISuccess('contact', 'create', array('id' => 2, 'is_deleted' => 1));print "\n";print_r($result);
+    $result = $this->callAPISuccess('contact', 'create', array('id' => 2, 'is_deleted' => 1));
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $result = $this->callAPISuccess('contact', 'get', array(
         'check_permissions' => 1,
