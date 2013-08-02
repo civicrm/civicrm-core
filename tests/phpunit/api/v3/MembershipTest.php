@@ -50,7 +50,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     parent::setUp();
     $this->_apiversion = 3;
     $this->_contactID = $this->individualCreate();
-    $this->_membershipTypeID = $this->membershipTypeCreate($this->_contactID);
+    $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
 
     require_once 'CRM/Member/PseudoConstant.php';

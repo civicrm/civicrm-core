@@ -66,7 +66,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     );
 
     $this->_contactID = $this->organizationCreate();
-    $this->_membershipTypeID = $this->membershipTypeCreate($this->_contactID);
+    $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
     // add a random number to avoid silly conflicts with old data
     $this->_membershipStatusID = $this->membershipStatusCreate('test status' . rand(1, 1000));
   }

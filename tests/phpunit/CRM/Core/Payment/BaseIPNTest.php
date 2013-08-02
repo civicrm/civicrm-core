@@ -485,7 +485,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
      */
   function _setUpMembershipObjects() {
     try {
-      $this->_membershipTypeID = $this->membershipTypeCreate($this->_contactId);
+      $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
       $this->_membershipStatusID = $this->membershipStatusCreate('test status');
     }
     catch(Exception$e) {

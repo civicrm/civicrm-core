@@ -136,7 +136,7 @@ function civicrm_api3_relationship_delete($params) {
  * @access  public
  */
 function civicrm_api3_relationship_get($params) {
-
+  $options = _civicrm_api3_get_options_from_params($params);
   if (!CRM_Utils_Array::value('contact_id', $params)) {
     $relationships = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
@@ -145,15 +145,21 @@ function civicrm_api3_relationship_get($params) {
     $relationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
       CRM_Utils_Array::value('status_id', $params),
       0,
-      0,
-      CRM_Utils_Array::value('id', $params), NULL
+      CRM_Utils_Array::value('is_count', $options),
+      CRM_Utils_Array::value('id', $params),
+      NULL,
+      NULL,
+      FALSE,
+      $params
     );
+  }
+  //perhaps we should add a 'getcount' but at this stage lets just handle getcount output
+  if($options['is_count']) {
+    return array('count' => $relationships);
   }
   foreach ($relationships as $relationshipId => $values) {
     _civicrm_api3_custom_data_get($relationships[$relationshipId], 'Relationship', $relationshipId, NULL, CRM_Utils_Array::value('relationship_type_id',$values));
   }
-
-
   return civicrm_api3_create_success($relationships, $params);
 }
 

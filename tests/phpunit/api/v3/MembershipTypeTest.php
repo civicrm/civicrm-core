@@ -69,7 +69,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   }
 
   function testGet() {
-    $id = $this->membershipTypeCreate($this->_contactID, 1);
+    $id = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
 
     $params = array(
       'id' => $id,
@@ -237,7 +237,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   }
 
   function testUpdate() {
-    $id = $this->membershipTypeCreate($this->_contactID, 2);
+    $id = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID, 'financial_type_id' => 2));
     $newMembOrgParams = array(
       'organization_name' => 'New membership organisation',
       'contact_type' => 'Organization',
@@ -271,7 +271,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   function testDelete() {
     $orgID = $this->organizationCreate(NULL);
-    $membershipTypeID = $this->membershipTypeCreate($orgID, 1);
+    $membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $orgID));
     $params = array(
       'id' => $membershipTypeID,
     );
