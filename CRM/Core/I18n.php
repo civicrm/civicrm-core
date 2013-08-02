@@ -35,7 +35,8 @@
 class CRM_Core_I18n {
 
   /**
-   * A PHP-gettext instance for string translation; should stay null if the strings are not to be translated (en_US).
+   * A PHP-gettext instance for string translation;
+   * should stay null if the strings are not to be translated (en_US).
    */
   private $_phpgettext = NULL;
 

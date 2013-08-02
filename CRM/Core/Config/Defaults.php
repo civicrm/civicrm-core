@@ -41,6 +41,7 @@
  *
  */
 class CRM_Core_Config_Defaults {
+
   function setCoreVariables() {
     global $civicrm_root;
 
