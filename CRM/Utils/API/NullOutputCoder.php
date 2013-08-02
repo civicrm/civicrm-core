@@ -24,14 +24,32 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
-class CRM_Core_HTMLInputCoder {
+
+/**
+ * Work-around for CRM-13120 - The "create" action incorrectly returns string literal "null"
+ * when the actual value is NULL or "". Rewrite the output.
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2013
+ * $Id$
+ */
+
+require_once 'api/Wrapper.php';
+class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
 
   /**
-   * @param string $fldName
-   * @return bool TRUE if encoding should be skipped for this field
+   * @var CRM_Utils_API_NullOutputCoder
    */
-  public static function isSkippedField($fldName) {
-    return CRM_Utils_API_HTMLInputCoder::singleton()->isSkippedField($fldName);
+  private static $_singleton = NULL;
+
+  /**
+   * @return CRM_Utils_API_NullOutputCoder
+   */
+  public static function singleton() {
+    if (self::$_singleton === NULL) {
+      self::$_singleton = new CRM_Utils_API_NullOutputCoder();
+    }
+    return self::$_singleton;
   }
 
   /**
@@ -42,8 +60,28 @@ class CRM_Core_HTMLInputCoder {
    * @param bool $castToString If TRUE, all scalars will be filtered (and therefore cast to strings)
    *    If FALSE, then non-string values will be preserved
    */
-  public static function encodeInput(&$values, $castToString = TRUE) {
-    return CRM_Utils_API_HTMLInputCoder::singleton()->encodeInput($values, $castToString);
+  public function encodeInput(&$values) {
   }
 
+  public function decodeOutput(&$values, $castToString = FALSE) {
+    if (is_array($values)) {
+      foreach ($values as &$value) {
+        $this->decodeOutput($value, TRUE);
+      }
+    }
+    elseif ($castToString || is_string($values)) {
+      if ($values === 'null') {
+        $values = '';
+      }
+    }
+  }
+
+  public function toApiOutput($apiRequest, $result) {
+    $lowerAction = strtolower($apiRequest['action']);
+    if ($lowerAction === 'create') {
+      return parent::toApiOutput($apiRequest, $result);
+    } else {
+      return $result;
+    }
+  }
 }
