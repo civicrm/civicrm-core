@@ -484,45 +484,9 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
     if (is_array($params[$field])) {
       //get the actual fieldname from db
       $fieldName = $allfields[$field]['name'];
-      //array is the syntax for SQL clause
-      foreach ($params[$field] as $operator => $criteria) {
-        if (in_array($operator, $acceptedSQLOperators)) {
-          switch ($operator) {
-            // unary operators
-
-            case 'IS NULL':
-            case 'IS NOT NULL':
-              $dao->whereAdd(sprintf('%s %s', $fieldName, $operator));
-              break;
-
-            // ternary operators
-
-            case 'BETWEEN':
-            case 'NOT BETWEEN':
-              if (empty($criteria[0]) || empty($criteria[1])) {
-                throw new exception("invalid criteria for $operator");
-              }
-              $dao->whereAdd(sprintf('%s ' . $operator . ' "%s" AND "%s"', $fieldName, CRM_Core_DAO::escapeString($criteria[0]), CRM_Core_DAO::escapeString($criteria[1])));
-              break;
-
-            // n-ary operators
-
-            case 'IN':
-            case 'NOT IN':
-              if (empty($criteria)) {
-                throw new exception("invalid criteria for $operator");
-              }
-              $escapedCriteria = array_map(array('CRM_Core_DAO', 'escapeString'), $criteria);
-              $dao->whereAdd(sprintf('%s %s ("%s")', $fieldName, $operator, implode('", "', $escapedCriteria)));
-              break;
-
-            // binary operators
-
-            default:
-
-              $dao->whereAdd(sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
-          }
-        }
+      $where = CRM_Core_DAO::createSqlFilter($fieldName, $params[$field], 'String');
+      if(!empty($where)) {
+        $dao->whereAdd($where);
       }
     }
     else {

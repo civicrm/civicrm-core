@@ -1818,8 +1818,10 @@ EOS;
    * $field => array('LIKE' => array('%me%))
    * etc
    *
-   * @param $field sql filter to be applied
-   * @param $fi
+   * @param $fieldname string name of fields
+   * @param $filter array filter to be applied indexed by operator
+   * @param $type String type of field (not actually used - nor in api @todo )
+   * @param $alias String alternative field name ('as') @todo- not actually used
    */
   public function createSQLFilter($fieldName, $filter, $type, $alias = NULL) {
     // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
@@ -1830,7 +1832,6 @@ EOS;
       if (in_array($operator, $acceptedSQLOperators)) {
         switch ($operator) {
           // unary operators
-
           case 'IS NULL':
           case 'IS NOT NULL':
             return (sprintf('%s %s', $fieldName, $operator));

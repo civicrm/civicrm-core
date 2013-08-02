@@ -889,7 +889,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $where .= ' AND civicrm_contact.is_deleted = 0';
     if(!empty($params['relationship_type_id'])) {
       if(is_array($params['relationship_type_id'])) {
-        // get our special function from DAO to deal with this
         $where .=  " AND " . CRM_Core_DAO::createSQLFilter('relationship_type_id', $params['relationship_type_id'], 'Integer');
       }
       else {
