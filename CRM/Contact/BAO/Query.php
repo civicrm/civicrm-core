@@ -4081,10 +4081,10 @@ civicrm_relationship.start_date > {$today}
         return array($noRows,NULL);
       }
       $val = $query->store($dao);
-      $convertedVals = $query->convertToPseudoNames($dao);
+      $convertedVals = $query->convertToPseudoNames($dao, TRUE);
 
       if (!empty($convertedVals)) {
-        $val = array_merge($val, $convertedVals);
+        $val = array_merge_recursive($val, $convertedVals);
       }
       $values[$dao->contact_id] = $val;
     }
@@ -5033,11 +5033,10 @@ AND   displayRelType.is_active = 1
    * convert the pseudo constants id's to their names
    * @param  reference parameter $dao
    */
-  function convertToPseudoNames(&$dao) {
+  function convertToPseudoNames(&$dao, $return = FALSE) {
     if (empty($this->_pseudoConstantsSelect)) {
       return;
     }
-
     $values = array();
     foreach ($this->_pseudoConstantsSelect as $key => $value) {
       if (CRM_Utils_Array::value('sorting', $this->_pseudoConstantsSelect[$key])) {
@@ -5049,10 +5048,8 @@ AND   displayRelType.is_active = 1
 
         if (CRM_Utils_System::isNull($val)) {
           $dao->$key = NULL;
-          continue;
         }
-
-        if ($baoName = CRM_Utils_Array::value('bao', $value, NULL)) {
+        elseif ($baoName = CRM_Utils_Array::value('bao', $value, NULL)) {
           $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {
@@ -5062,7 +5059,25 @@ AND   displayRelType.is_active = 1
           $labels = CRM_Core_OptionGroup::values($value['pseudoField']);
           $dao->$key = $labels[$val];
         }
-        $values[$key] = $dao->$key;
+
+        // return converted values in array format
+        if ($return) {
+          if (strpos($key, '-') !== FALSE) {
+            $keyVal = explode('-', $key);
+            $current = &$values;
+            $lastElement = array_pop($keyVal);
+            foreach ($keyVal as $v) {
+              if (!array_key_exists($v, $current)) {
+                $current[$v] = array();
+              }
+              $current = &$current[$v];
+            }
+            $current[$lastElement] = $dao->$key;
+          }
+          else {
+            $values[$key] = $dao->$key;
+          }
+        }
       }
     }
     return $values;
