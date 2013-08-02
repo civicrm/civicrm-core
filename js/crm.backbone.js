@@ -70,7 +70,11 @@
       switch (method) {
         case 'create': // pass-through
         case 'update':
-          CRM.api(model.crmEntityName, 'create', model.toJSON(), apiOptions);
+          if (!model._isDuplicate) {
+            CRM.api(model.crmEntityName, 'create', model.toJSON(), apiOptions);
+          } else {
+            CRM.api(model.crmEntityName, 'duplicate', model.toJSON(), apiOptions);
+          }
           break;
         case 'read':
         case 'delete':
@@ -111,6 +115,16 @@
       crmEntityName: crmEntityName,
       toCrmCriteria: function() {
         return (this.get('id')) ? {id: this.get('id')} : {};
+      },
+      duplicate: function() {
+        var newModel = new ModelClass(this.toJSON());
+        newModel._isDuplicate = true;
+        if (newModel.setModified) newModel.setModified();
+        newModel.listenTo(newModel, 'sync', function(){
+          // may get called on subsequent resaves -- don't care!
+          delete newModel._isDuplicate;
+        });
+        return newModel;
       }
     });
     // Overrides - if specified in ModelClass, replace
