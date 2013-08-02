@@ -74,7 +74,7 @@ class CRM_Financial_BAO_ExportFormat {
 
       case 'iif':
         $tplFile = $this->getTemplateFileName();
-        $out = self::getTemplate()->fetch( $tplFile );
+        $out = self::getTemplate()->fetch($tplFile);
         $fileName = $this->putFile($out);
         self::createActivityExport($this->_batchIds, $fileName);
       break;
@@ -121,26 +121,26 @@ class CRM_Financial_BAO_ExportFormat {
     $config = CRM_Core_Config::singleton();
     //zip files if more than one.
     if (count($this->_downloadFile)>1) {
-      $zip = $config->customFileUploadDir.'Financial_Transactions_'.date('YmdHis').'.zip';
+      $zip = $config->customFileUploadDir . 'Financial_Transactions_' . date('YmdHis') . '.zip';
       $result = $this->createZip($this->_downloadFile, $zip, TRUE);
       if ($result) {
         header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename='.CRM_Utils_File::cleanFileName(basename($zip)));
+        header('Content-Disposition: attachment; filename=' . CRM_Utils_File::cleanFileName(basename($zip)));
         header('Content-Length: ' . filesize($zip));
         ob_clean();
         flush();
-        readfile($config->customFileUploadDir.CRM_Utils_File::cleanFileName(basename($zip)));
+        readfile($config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($zip)));
         unlink($zip); //delete the zip to avoid clutter.
         CRM_Utils_System::civiExit();
       }
     }
     else {
-      header('Content-Type: '.mime_content_type($this->_downloadFile[0]));
-      header('Content-Disposition: attachment; filename='.CRM_Utils_File::cleanFileName(basename($this->_downloadFile[0])));
+      header('Content-Type: text/plain');
+      header('Content-Disposition: attachment; filename=' . CRM_Utils_File::cleanFileName(basename($this->_downloadFile[0])));
       header('Content-Length: ' . filesize($this->_downloadFile[0]));
       ob_clean();
       flush();
-      readfile($config->customFileUploadDir.CRM_Utils_File::cleanFileName(basename($this->_downloadFile[0])));
+      readfile($config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($this->_downloadFile[0])));
       CRM_Utils_System::civiExit();
     }
   }
