@@ -109,7 +109,9 @@ cj(function () {
     };
 
     cj("#Entry").ajaxSubmit(options);
+  });
 
+  cj('#crm-container').on('keyup change', '*.selector-rows', function () {
     // validate rows
     checkColumns(cj(this));
   });
@@ -212,9 +214,14 @@ function checkColumns(parentRow) {
         inValidRow++;
       }
       else {
-        if (cj(this).val() && !cj('input[name="primary_contact_select_id[' + rowID + ']"]').val()) {
+        var contactIdElement = cj('input[name="primary_contact_select_id[' + rowID + ']"]');
+        if (cj(this).val() && !contactIdElement.val()) {
           inValidRow++;
           errorExists = true;
+        }
+        else if (cj(this).val() && contactIdElement.val()) {
+          // this is hack to remove error span because we are skipping this for autocomplete fields
+          cj(this).next('span.crm-error').remove();
         }
       }
     }
@@ -223,7 +230,7 @@ function checkColumns(parentRow) {
         inValidRow++;
       }
       else {
-        if (cj(this).hasClass('error') && !cj(this).hasClass('valid')) {
+        if (cj(this).hasClass('error') && (cj(this).hasClass('valid') || cj(this).hasClass('required'))) {
           errorExists = true;
         }
         else {
