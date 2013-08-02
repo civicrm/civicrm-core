@@ -596,7 +596,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   static function closeReOpen($batchIds = array(), $status) {
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
     $params['status_id'] = CRM_Utils_Array::key( $status, $batchStatus );
     $session = CRM_Core_Session::singleton( );
     $params['modified_date'] = date('YmdHis');
