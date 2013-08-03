@@ -626,7 +626,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $stateCountryMap = array();
 
     if ($id) {
-      $contactID = $this->_userID;
+      $contactID = $this->getContactID();
 
       // we don't allow conflicting fields to be
       // configured via profile - CRM 2100

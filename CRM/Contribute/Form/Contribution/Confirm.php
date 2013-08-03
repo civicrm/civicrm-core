@@ -596,7 +596,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
-    $contactID = $this->_userID;
+    $contactID = $this->getContactID();
 
     // add a description field at the very beginning
     $this->_params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
@@ -751,7 +751,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
 
-    if (!isset($contactID)) {
+    if (empty($contactID)) {
       $dupeParams = $params;
       if (CRM_Utils_Array::value('onbehalf', $dupeParams)) {
         unset($dupeParams['onbehalf']);
