@@ -44,7 +44,7 @@ function grant_create_expectedresult(){
           'id' => '1',
           'contact_id' => '3',
           'application_received_date' => '20130728084957',
-          'decision_date' => '20130729000000',
+          'decision_date' => '20130805000000',
           'money_transfer_date' => '',
           'grant_due_date' => '',
           'grant_report_received' => '',

@@ -86,7 +86,7 @@ function contribution_create_expectedresult(){
           'contribution_status_id' => '1',
           'honor_type_id' => '',
           'address_id' => '',
-          'check_number' => 'null',
+          'check_number' => '',
           'campaign_id' => '',
           'contribution_type_id' => '1',
           'api.line_item.create' => array(

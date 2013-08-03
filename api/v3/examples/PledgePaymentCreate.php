@@ -44,7 +44,7 @@ function pledge_payment_create_expectedresult(){
           'scheduled_amount' => '',
           'actual_amount' => '20',
           'currency' => 'USD',
-          'scheduled_date' => '20130728085413',
+          'scheduled_date' => '',
           'reminder_date' => '',
           'reminder_count' => '',
           'status_id' => '1',

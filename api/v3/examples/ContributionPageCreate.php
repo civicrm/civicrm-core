@@ -81,7 +81,7 @@ function contribution_page_create_expectedresult(){
           'start_date' => '',
           'end_date' => '',
           'created_id' => '',
-          'created_date' => '2013-07-28 08:49:19',
+          'created_date' => '',
           'currency' => 'NZD',
           'campaign_id' => '',
           'is_share' => '',

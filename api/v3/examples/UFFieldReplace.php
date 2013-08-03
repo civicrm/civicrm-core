@@ -78,7 +78,7 @@ function uf_field_replace_expectedresult(){
           'visibility' => 'Public Pages and Listings',
           'in_selector' => '',
           'is_searchable' => '1',
-          'location_type_id' => 'null',
+          'location_type_id' => '',
           'phone_type_id' => '',
           'label' => 'Test First Name',
           'field_type' => 'Contact',

@@ -59,7 +59,7 @@ function loc_block_createentities_expectedresult(){
             ),
           'email' => array(
               'id' => '4',
-              'contact_id' => 'null',
+              'contact_id' => '',
               'location_type_id' => '1',
               'email' => 'test2@loc.block',
               'is_primary' => 0,
@@ -73,7 +73,7 @@ function loc_block_createentities_expectedresult(){
             ),
           'phone' => array(
               'id' => '3',
-              'contact_id' => 'null',
+              'contact_id' => '',
               'location_type_id' => '1',
               'is_primary' => 0,
               'is_billing' => '',
@@ -85,7 +85,7 @@ function loc_block_createentities_expectedresult(){
             ),
           'phone_2' => array(
               'id' => '4',
-              'contact_id' => 'null',
+              'contact_id' => '',
               'location_type_id' => '1',
               'is_primary' => 0,
               'is_billing' => '',

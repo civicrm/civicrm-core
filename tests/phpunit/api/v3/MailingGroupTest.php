@@ -91,7 +91,8 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $params = array(
       'email' => $this->_email,
       'group_id' => $this->_groupID,
-      'contact_id' => $contactID,      'hash' => 'b15de8b64e2cec34',
+      'contact_id' => $contactID,
+      'hash' => 'b15de8b64e2cec34',
       'time_stamp' => '20101212121212',
     );
     $result = $this->callAPIAndDocument('mailing_event_subscribe', 'create', $params, __FUNCTION__, __FILE__);
