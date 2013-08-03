@@ -131,8 +131,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * note object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array $params  (reference ) an assoc array of name/value pairs
-   * @param array $ids  associated array with note id
+   * @param array $params  (reference) an assoc array of name/value pairs
+   * @param array $ids (deprecated) associated array with note id - preferably set $params['id']
    *
    * @return object $note CRM_Core_BAO_Note object
    * @access public

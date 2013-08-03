@@ -322,7 +322,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     //record contribution for this membership
     if (CRM_Utils_Array::value('contribution_status_id', $params) && !CRM_Utils_Array::value('relate_contribution_id', $params)) {
-      $params['contribution'] = self::recordMembershipContribution( array_merge($params, array('membership_id' => $membership->id), $ids);
+      $params['contribution'] = self::recordMembershipContribution( array_merge($params, array('membership_id' => $membership->id)), $ids);
     }
 
     //insert payment record for this membership

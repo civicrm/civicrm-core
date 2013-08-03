@@ -87,15 +87,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @access public
    * @static
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, $ids = array()) {
     if (empty($params)) {
       return;
     }
+    //per http://wiki.civicrm.org/confluence/display/CRM/Database+layer we are moving away from $ids array
+    $contributionID = CRM_Utils_Array::value('contribution', $ids, CRM_Utils_Array::value('id', $params));
 
     $duplicates = array();
-    if (self::checkDuplicate($params, $duplicates,
-        CRM_Utils_Array::value('contribution', $ids)
-      )) {
+    if (self::checkDuplicate($params, $duplicates, $contributionID)) {
       $error = CRM_Core_Error::singleton();
       $d = implode(', ', $duplicates);
       $error->push(CRM_Core_Error::DUPLICATE_CONTRIBUTION,
@@ -138,8 +138,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
 
-    if (CRM_Utils_Array::value('contribution', $ids)) {
-      CRM_Utils_Hook::pre('edit', 'Contribution', $ids['contribution'], $params);
+    if ($contributionID) {
+      CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
     }
     else {
       CRM_Utils_Hook::pre('create', 'Contribution', NULL, $params);
@@ -148,16 +148,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->copyValues($params);
 
-    $contribution->id = CRM_Utils_Array::value('contribution', $ids);
+    $contribution->id = $contributionID;
 
     if (!CRM_Utils_Rule::currencyCode($contribution->currency)) {
       $config = CRM_Core_Config::singleton();
       $contribution->currency = $config->defaultCurrency;
     }
 
-    if (CRM_Utils_Array::value('contribution', $ids)) {
-      $contributionId['id'] = $ids['contribution'];
-      $params['prevContribution'] = self::getValues($contributionId, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+    if ($contributionID) {
+      $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
 
     $result = $contribution->save();
@@ -173,7 +172,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
 
-    if (CRM_Utils_Array::value('contribution', $ids)) {
+    if ($contributionID) {
       CRM_Utils_Hook::post('edit', 'Contribution', $contribution->id, $contribution);
     }
     else {
@@ -195,7 +194,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @access public
    * @static
    */
-  static function &getValues(&$params, &$values, &$ids) {
+  static function &getValues($params, &$values, &$ids) {
     if (empty($params)) {
       return NULL;
     }
@@ -223,7 +222,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @access public
    * @static
    */
-  static function &create(&$params, &$ids) {
+  static function &create(&$params, $ids = array()) {
     $dateFields = array('receive_date', 'cancel_date', 'receipt_date', 'thankyou_date');
     foreach ($dateFields as $df) {
       if (isset($params[$df])) {
@@ -261,9 +260,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       if (!$noteParams['contact_id']) {
         $noteParams['contact_id'] = $params['contact_id'];
       }
-      CRM_Core_BAO_Note::add($noteParams,
-        CRM_Utils_Array::value('note', $ids)
-      );
+      CRM_Core_BAO_Note::add($noteParams);
     }
 
     // make entry in batch entity batch table
@@ -2472,12 +2469,11 @@ WHERE  contribution_id = %1 ";
    *
    * @param array $params contribution object, line item array and params for trxn
    *
-   * @param array $ids of contribution id
    *
    * @access public
    * @static
    */
-  static function recordFinancialAccounts(&$params, $ids) {
+  static function recordFinancialAccounts(&$params) {
     $skipRecords = $update = FALSE;
     $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -2691,7 +2687,7 @@ WHERE  contribution_id = %1 ";
 
         $params['trxnParams']['total_amount'] = - $params['total_amount'];
       }
-      elseif ($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus) 
+      elseif ($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
         && $params['prevContribution']->is_pay_later) {
         $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
         if ($params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)) {
