@@ -96,7 +96,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'time_stamp' => '20101212121212',
     );
     $result = $this->callAPIAndDocument('mailing_event_subscribe', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['values']['contact_id'], $contactID);
+    $this->assertEquals($result['values'][$result['id']]['contact_id'], $contactID);
 
     $this->contactDelete($contactID);
   }
@@ -176,20 +176,16 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('mailing_event_subscribe', 'create', $params);
 
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
-    $this->assertEquals($result['values']['contact_id'], $contactID);
+    $this->assertEquals($result['values'][$result['id']]['contact_id'], $contactID);
 
     $params = array(
-      'contact_id' => $result['values']['contact_id'],
-      'subscribe_id' => $result['values']['subscribe_id'],
-      'hash' => $result['values']['hash'],      'time_stamp' => '20101212121212',
-      'event_subscribe_id' => $result['values']['subscribe_id'],
+      'contact_id' => $result['values'][$result['id']]['contact_id'],
+      'subscribe_id' => $result['values'][$result['id']]['subscribe_id'],
+      'hash' => $result['values'][$result['id']]['hash'],      'time_stamp' => '20101212121212',
+      'event_subscribe_id' => $result['values'][$result['id']]['subscribe_id'],
     );
 
-
     $result = $this->callAPISuccess('mailing_event_confirm', 'create', $params);
-
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
     $this->contactDelete($contactID);
   }
 }

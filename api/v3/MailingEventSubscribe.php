@@ -56,7 +56,7 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
   $group->is_active = 1;
   $group->id        = (int)$group_id;
   if (!$group->find(TRUE)) {
-    return civicrm_api3_create_error('Invalid Group id');
+    throw new API_Exception('Invalid Group id');
   }
 
   $subscribe = CRM_Mailing_Event_BAO_Subscribe::subscribe($group_id, $email, $contact_id);
@@ -68,10 +68,9 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
     $subscribe->send_confirm_request($email);
 
     $values = array();
-    $values['contact_id'] = $subscribe->contact_id;
-    $values['subscribe_id'] = $subscribe->id;
-    $values['hash'] = $subscribe->hash;
-    $values['is_error'] = 0;
+    $values[$subscribe->id]['contact_id'] = $subscribe->contact_id;
+    $values[$subscribe->id]['subscribe_id'] = $subscribe->id;
+    $values[$subscribe->id]['hash'] = $subscribe->hash;
 
     return civicrm_api3_create_success($values);
   }
