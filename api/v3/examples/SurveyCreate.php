@@ -56,6 +56,7 @@ function survey_create_expectedresult(){
           'bypass_confirm' => '',
           'thankyou_title' => '',
           'thankyou_text' => '',
+          'is_share' => '',
         ),
     ),
 );

@@ -38,7 +38,7 @@ function relationship_get_expectedresult(){
           'contact_id_a' => '33',
           'contact_id_b' => '34',
           'relationship_type_id' => '21',
-          'start_date' => '2008-12-20',
+          'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',
           'is_permission_a_b' => 0,

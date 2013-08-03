@@ -39,8 +39,8 @@ function mailing_create_expectedresult(){
       '1' => array(
           'id' => '1',
           'domain_id' => '1',
-          'header_id' => 'null',
-          'footer_id' => 'null',
+          'header_id' => '',
+          'footer_id' => '',
           'reply_id' => '',
           'unsubscribe_id' => '',
           'resubscribe_id' => '',

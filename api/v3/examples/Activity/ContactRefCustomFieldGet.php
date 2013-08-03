@@ -1,24 +1,16 @@
 <?php
 /**
- * Test Generated example of using activity create API
+ * Test Generated example of using activity get API
  * Get with Contact Ref Custom Field *
  */
-function activity_create_example(){
+function activity_get_example(){
 $params = array(
-  'source_contact_id' => 17,
-  'activity_type_id' => '46',
-  'subject' => 'test activity type id',
-  'activity_date_time' => '2011-06-02 14:36:13',
-  'status_id' => 2,
-  'priority_id' => 1,
-  'duration' => 120,
-  'location' => 'Pensulvania',
-  'details' => 'a test activity',
-  'custom_2' => '17',
+  'return.custom_2' => 1,
+  'id' => 1,
 );
 
 try{
-  $result = civicrm_api3('activity', 'create', $params);
+  $result = civicrm_api3('activity', 'get', $params);
 }
 catch (CiviCRM_API3_Exception $e) {
   // handle error here
@@ -34,7 +26,7 @@ return $result;
 /**
  * Function returns array of result expected from previous function
  */
-function activity_create_expectedresult(){
+function activity_get_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
@@ -56,11 +48,11 @@ function activity_create_expectedresult(){
           'is_auto' => 0,
           'is_current_revision' => '1',
           'is_deleted' => 0,
-          'source_contact_id' => '17',
-          'custom_2_id' => '17',
-          'custom_2_1_id' => '17',
-          'custom_2' => 'Contact, Test',
-          'custom_2_1' => 'Contact, Test',
+          'source_contact_id' => '1',
+          'custom_2_id' => '1',
+          'custom_2_1_id' => '1',
+          'custom_2' => 'Anderson, Anthony',
+          'custom_2_1' => 'Anderson, Anthony',
         ),
     ),
 );

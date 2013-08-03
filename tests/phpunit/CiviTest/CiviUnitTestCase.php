@@ -1929,6 +1929,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'scheduled_date' => '20130728085413',
       'approval_date' => '20130728085413',
       'pledge_start_date_high' => '20130726090416',
+      'start_date' => '2013-07-29 00:00:00',
+      'event_start_date' => '2013-07-29 00:00:00',
+      'end_date' => '2013-08-04 00:00:00',
+      'event_end_date' => '2013-08-04 00:00:00',
+      'decision_date' => '20130805000000',
     );
 
     $keysToUnset = array('xdebug', 'undefined_fields',);
@@ -1937,9 +1942,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         unset($result[$unwantedKey]);
       }
     }
+    if (isset($result['values'])) {
+      if(!is_array($result['values'])) {
+        return;
+      }
+      $resultArray = &$result['values'];
+    }
+    elseif(is_array($result)) {
+      $resultArray = &$result;
+    }
+    else {
+      return;
+    }
 
-    if (isset($result['values']) && is_array($result['values'])) {
-      foreach ($result['values'] as $index => &$values) {
+    foreach ($resultArray as $index => &$values) {
         if(!is_array($values)) {
           continue;
         }
@@ -1959,11 +1975,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
           if(in_array($key, $keysToUnset)) {
             unset($values[$key]);
           }
-          if(array_key_exists($key, $fieldsToChange)) {
+          if(array_key_exists($key, $fieldsToChange) && !empty($value)) {
             $value = $fieldsToChange[$key];
           }
         }
-      }
     }
   }
 

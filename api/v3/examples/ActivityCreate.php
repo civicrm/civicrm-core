@@ -5,7 +5,7 @@
  */
 function activity_create_example(){
 $params = array(
-  'source_contact_id' => 17,
+  'source_contact_id' => 1,
   'activity_type_id' => '46',
   'subject' => 'test activity type id',
   'activity_date_time' => '2011-06-02 14:36:13',

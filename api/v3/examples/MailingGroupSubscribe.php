@@ -34,12 +34,14 @@ function mailing_group_subscribe_expectedresult(){
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 4,
+  'count' => 1,
+  'id' => 1,
   'values' => array(
-      'contact_id' => '3',
-      'subscribe_id' => '1',
-      'hash' => 'bf4d724dbbb38c0c',
-      'is_error' => 0,
+      '1' => array(
+          'contact_id' => '3',
+          'subscribe_id' => '1',
+          'hash' => '67eac7789eaee00',
+        ),
     ),
 );
 

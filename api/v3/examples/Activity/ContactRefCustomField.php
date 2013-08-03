@@ -1,11 +1,11 @@
 <?php
 /**
- * Test Generated example of using activity create API
+ * Test Generated example of using activity Create API
  * demonstrates create with Contact Reference Custom Field *
  */
 function activity_create_example(){
 $params = array(
-  'source_contact_id' => 17,
+  'source_contact_id' => 1,
   'activity_type_id' => '46',
   'subject' => 'test activity type id',
   'activity_date_time' => '2011-06-02 14:36:13',
@@ -14,11 +14,11 @@ $params = array(
   'duration' => 120,
   'location' => 'Pensulvania',
   'details' => 'a test activity',
-  'custom_2' => '17',
+  'custom_2' => '1',
 );
 
 try{
-  $result = civicrm_api3('activity', 'create', $params);
+  $result = civicrm_api3('activity', 'Create', $params);
 }
 catch (CiviCRM_API3_Exception $e) {
   // handle error here

@@ -68,6 +68,8 @@ function contact_create_expectedresult(){
           'first_name' => '',
           'middle_name' => '',
           'last_name' => '',
+          'prefix_id' => '',
+          'suffix_id' => '',
           'email_greeting_id' => '1',
           'email_greeting_custom' => '',
           'email_greeting_display' => '',

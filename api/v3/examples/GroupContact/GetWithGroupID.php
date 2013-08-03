@@ -55,7 +55,7 @@ function group_contact_get_expectedresult(){
                       'is_active' => '1',
                       'visibility' => 'Public Pages',
                       'where_clause' => ' ( `civicrm_group_contact-1`.group_id IN ( 1 ) AND `civicrm_group_contact-1`.status IN ("Added") ) ',
-                      'select_tables' => 'a:9:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:22:"civicrm_state_province";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
+                      'select_tables' => 'a:8:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
                       'where_tables' => 'a:2:{s:15:"civicrm_contact";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
                       'group_type' => array(
                           '0' => '1',
@@ -93,7 +93,7 @@ function group_contact_get_expectedresult(){
                       'is_active' => '1',
                       'visibility' => 'Public Pages',
                       'where_clause' => ' ( `civicrm_group_contact-1`.group_id IN ( 1 ) AND `civicrm_group_contact-1`.status IN ("Added") ) ',
-                      'select_tables' => 'a:9:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:22:"civicrm_state_province";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
+                      'select_tables' => 'a:8:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
                       'where_tables' => 'a:2:{s:15:"civicrm_contact";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
                       'group_type' => array(
                           '0' => '1',
