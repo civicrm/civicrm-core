@@ -646,7 +646,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           //have been skip the additional participant.
           if ($button == 'skip') {
             $field['is_required'] = FALSE;
-          }          
+          }
           // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
           elseif ($field['add_captcha']  && !$contactID) {
             // only add captcha for first page
@@ -1165,42 +1165,12 @@ WHERE  v.option_group_id = g.id
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
 
-  function getContactID() {
-    $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-
-    // force to ignore the authenticated user
-    if ($tempID === '0') {
-      return $tempID;
-    }
-
-    // check if the user is logged in and has a contact ID
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-
-    if ($tempID == $userID) {
-      return $userID;
-    }
-
-    //check if this is a checksum authentication
-    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
-    if ($userChecksum) {
-      //check for anonymous user.
-      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
-      if ($validUser) {
-        return $tempID;
-      }
-    }
-    // check if user has permission, CRM-12062
-    else if ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
-      return $tempID;
-    }
-
-    return $userID;
-  }
-
-  /* Validate price set submitted params for price option limit,
+  /**
+   * Validate price set submitted params for price option limit,
    * as well as user should select at least one price field option.
-   *
+   * @param unknown_type $form
+   * @param unknown_type $params
+   * @return multitype:|Ambigous <multitype:, string, string>
    */
   static function validatePriceSet(&$form, $params) {
     $errors = array();
