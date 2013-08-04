@@ -6,7 +6,7 @@
 function membership_create_example(){
 $params = array(
   'contact_id' => 25,
-  'membership_type_id' => 22,
+  'membership_type_id' => 42,
   'join_date' => '2009-01-21',
   'start_date' => '2009-01-21',
   'end_date' => '2009-12-21',
@@ -44,7 +44,7 @@ function membership_create_expectedresult(){
       '1' => array(
           'id' => '1',
           'contact_id' => '25',
-          'membership_type_id' => '22',
+          'membership_type_id' => '42',
           'join_date' => '20090121000000',
           'start_date' => '2013-07-29 00:00:00',
           'end_date' => '2013-08-04 00:00:00',

@@ -5,7 +5,7 @@
  */
 function membership_get_example(){
 $params = array(
-  'membership_type_id' => 8,
+  'membership_type_id' => 15,
 );
 
 try{
@@ -36,7 +36,7 @@ function membership_get_expectedresult(){
       '1' => array(
           'id' => '1',
           'contact_id' => '10',
-          'membership_type_id' => '8',
+          'membership_type_id' => '15',
           'join_date' => '2009-01-21',
           'start_date' => '2013-07-29 00:00:00',
           'end_date' => '2013-08-04 00:00:00',

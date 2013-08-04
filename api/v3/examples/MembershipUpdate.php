@@ -6,7 +6,7 @@
 function membership_update_example(){
 $params = array(
   'contact_id' => 31,
-  'membership_type_id' => 28,
+  'membership_type_id' => 54,
   'join_date' => '2009-01-21',
   'start_date' => '2009-01-21',
   'end_date' => '2009-12-21',
@@ -44,7 +44,7 @@ function membership_update_expectedresult(){
       '1' => array(
           'id' => '1',
           'contact_id' => '31',
-          'membership_type_id' => '28',
+          'membership_type_id' => '54',
           'join_date' => '20090121000000',
           'start_date' => '2013-07-29 00:00:00',
           'end_date' => '2013-08-04 00:00:00',

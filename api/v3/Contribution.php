@@ -50,39 +50,27 @@
  */
 function civicrm_api3_contribution_create(&$params) {
   $values = array();
-
-  _civicrm_api3_contribute_format_params($params, $values);
-
   _civicrm_api3_custom_format_params($params, $values, 'Contribution');
-  $values["contact_id"] = CRM_Utils_Array::value('contact_id', $params);
-  $values["source"] = CRM_Utils_Array::value('source', $params);
-  //legacy soft credit handling
+  $params = array_merge($params, $values);
+
+  //legacy soft credit handling - recommended approach is chaining
   if(!empty($params['soft_credit_to'])){
-    $values['soft_credit'] = array(array(
+    $params['soft_credit'] = array(array(
       'contact_id' => $params['soft_credit_to'],
       'amount' => $params['total_amount']));
   }
-  $ids = array();
-  if (CRM_Utils_Array::value('id', $params)) {
-    $ids['contribution'] = $params['id'];
-    // CRM-12498
-    if (CRM_Utils_Array::value('contribution_status_id', $params)) {
-      $error = array();
-      //throw error for invalid status change
-      CRM_Contribute_BAO_Contribution::checkStatusValidation(NULL, $params, $error);
-      if (array_key_exists('contribution_status_id', $error)) {
-        return civicrm_api3_create_error($error['contribution_status_id']);
-      }
+
+  if (CRM_Utils_Array::value('id', $params) && CRM_Utils_Array::value('contribution_status_id', $params)) {
+    $error = array();
+    //throw error for invalid status change such as setting completed back to pending
+    //@todo this sort of validation belongs in the BAO not the API - if it is not an OK
+    // action it needs to be blocked there. If it is Ok through a form it needs to be OK through the api
+    CRM_Contribute_BAO_Contribution::checkStatusValidation(NULL, $params, $error);
+    if (array_key_exists('contribution_status_id', $error)) {
+      throw new API_Exception($error['contribution_status_id']);
     }
   }
-  $contribution = CRM_Contribute_BAO_Contribution::create($values, $ids);
-
-  if (is_a($contribution, 'CRM_Core_Error')) {
-    return civicrm_api3_create_error($contribution->_errors[0]['message']);
-  }
-  _civicrm_api3_object_to_array($contribution, $contributeArray[$contribution->id]);
-
-  return civicrm_api3_create_success($contributeArray, $params, 'contribution', 'create', $contribution);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
 }
 
 /**

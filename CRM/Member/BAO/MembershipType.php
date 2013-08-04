@@ -131,7 +131,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param int $membershipTypeId
    * @static
    */
-  static function del($membershipTypeId, $skipRedirect = FALSE) {
+  static function del($membershipTypeId) {
     //check dependencies
     $check      = FALSE;
     $status     = array();
@@ -150,8 +150,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
     }
     if ($check) {
-
-
       $cnt = 1;
       $message = ts('This membership type cannot be deleted due to following reason(s):');
       if (in_array('Membership', $status)) {
@@ -175,8 +173,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     //fix for membership type delete api
     $result = FALSE;
     if ($membershipType->find(TRUE)) {
-      $membershipType->delete();
-      $result = TRUE;
+      return $membershipType->delete();
     }
 
     return $result;

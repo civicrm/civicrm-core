@@ -226,6 +226,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @static
    */
   static function &create(&$params, &$ids, $skipRedirect = FALSE, $activityType = 'Membership Signup') {
+    $membershipID = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
     // always calculate status if is_override/skipStatusCal is not true.
     // giving respect to is_override during import.  CRM-4012
 
@@ -237,7 +238,30 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     ) {
       $dates = array('start_date', 'end_date', 'join_date');
       foreach ($dates as $date) {
-        $$date = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, TRUE, 'Ymd');
+        // see notes below if id is not passed in we will calc the dates, not sure impact of not
+        // changing the return null if doing an update so being cautious
+        // and leaving behaviour unchanged if id exists (null doesn't seem valid...)
+        $returnNull = TRUE;
+        if(!$membershipID) {
+          $returnNull = FALSE;
+        }
+        $$date = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, $returnNull, 'Ymd');
+        if(!empty($$date)) {
+          $params[$date] = $$date;
+        }
+      }
+      /*
+      * if we have not been given the start date or the end date we will calculate them.
+      * In the interests of being cautious we won't do this if 'id'  is set
+      * even though skipStatusCal is the default from the api when id is set
+      * AND the forms currently take care of the dates
+      * this could possibly be revised to a less cautious approach
+      */
+      if(!$membershipID && (empty($start_date) || empty($end_date))) {
+        $defaults = CRM_Member_BAO_MembershipType::getDatesForMembershipType($params['membership_type_id'],
+        $join_date, $start_date, $end_date
+        );
+        $params = array_merge($defaults, $params);
       }
 
       //fix for CRM-3570, during import exclude the statuses those having is_admin = 1
@@ -250,7 +274,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $excludeIsAdmin = TRUE;
       }
 
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
+      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($params['start_date'], $params['end_date'], $params['join_date'],
         'today', $excludeIsAdmin
       );
       if (empty($calcStatus)) {
@@ -264,7 +288,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           'legacy_redirect_path' => 'civicrm/contact/view',
           'legacy_redirect_query' => "reset=1&force=1&cid={$params['contact_id']}&selectedChild=member",
         );
-        throw new CRM_Core_Exception(ts('The membership cannot be saved.'), 0, $errorParams);
+        throw new CRM_Core_Exception(ts('The membership cannot be saved because the status cannot be calculated.'), 0, $errorParams);
       }
       $params['status_id'] = $calcStatus['id'];
     }
@@ -311,7 +335,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     //record contribution for this membership
     if (CRM_Utils_Array::value('contribution_status_id', $params) && !CRM_Utils_Array::value('relate_contribution_id', $params)) {
-      $params['contribution'] = self::recordMembershipContribution( $params, $ids, $membership->id );
+      $params['contribution'] = self::recordMembershipContribution( array_merge($params, array('membership_id' => $membership->id)), $ids);
     }
 
     //insert payment record for this membership
@@ -568,9 +592,9 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   static function del($membershipId) {
     //delete related first and then delete parent.
     self::deleteRelatedMemberships($membershipId);
-    return self::deleteMembership($membershipId);    
+    return self::deleteMembership($membershipId);
   }
-  
+
   /**
    * Function to delete membership.
    *
@@ -2665,13 +2689,13 @@ WHERE      civicrm_membership.is_test = 0";
    * Function to record contribution record associated with membership
    *
    * @param array  $params array of submitted params
-   * @param array  $ids    array of ids
-   * @param object $membershipId  membership id
+   * @param array  $ids (param in process of being removed - try to use params)   array of ids
    *
    * @return void
    * @static
    */
-  static function recordMembershipContribution( &$params, &$ids, $membershipId ) {
+  static function recordMembershipContribution( &$params, $ids = array()) {
+    $membershipId = $params['membership_id'];
     $contributionParams = array();
     $config = CRM_Core_Config::singleton();
     $contributionParams['currency'] = $config->defaultCurrency;

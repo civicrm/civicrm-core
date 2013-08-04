@@ -778,9 +778,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
       $formValues['contact_id'] = $this->_contactID;
 
-      CRM_Member_BAO_Membership::recordMembershipContribution( $formValues,
-        CRM_Core_DAO::$_nullArray,
-        $renewMembership->id );
+      CRM_Member_BAO_Membership::recordMembershipContribution(array_merge($formValues, array('membership_id' => $renewMembership->id)));
     }
 
     if (CRM_Utils_Array::value('send_receipt', $formValues)) {
