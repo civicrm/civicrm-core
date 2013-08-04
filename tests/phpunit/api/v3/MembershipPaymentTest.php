@@ -95,7 +95,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
    * Test civicrm_membership_payment_create - success expected.
    */
   public function testCreate() {
-    $contactId = $this->individualCreate(NULL);
+    $contactId = $this->individualCreate();
 
     $params = array(
       'contact_id' => $contactId,
@@ -135,7 +135,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
    * Test civicrm_membershipPayment_get - success expected.
    */
   public function testGet() {
-    $contactId = $this->individualCreate(NULL);
+    $contactId = $this->individualCreate();
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,

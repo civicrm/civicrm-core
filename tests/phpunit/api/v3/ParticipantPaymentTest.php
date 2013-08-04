@@ -63,16 +63,16 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate);
     $event = $this->eventCreate(NULL);
     $this->_eventID = $event['id'];
-    $this->_contactID = $this->individualCreate(NULL);
+    $this->_contactID = $this->individualCreate();
     $this->_createdParticipants = array();
-    $this->_individualId = $this->individualCreate(NULL);
+    $this->_individualId = $this->individualCreate();
 
     $this->_participantID = $this->participantCreate(array('contactID' => $this->_contactID, 'eventID' => $this->_eventID));
-    $this->_contactID2 = $this->individualCreate(NULL);
+    $this->_contactID2 = $this->individualCreate();
     $this->_participantID2 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID));
     $this->_participantID3 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID));
 
-    $this->_contactID3 = $this->individualCreate(NULL);
+    $this->_contactID3 = $this->individualCreate();
     $this->_participantID4 = $this->participantCreate(array('contactID' => $this->_contactID3, 'eventID' => $this->_eventID));
   }
 
