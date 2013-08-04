@@ -5,7 +5,7 @@
  */
 function activity_get_example(){
 $params = array(
-  'source_contact_id' => 17,
+  'source_contact_id' => 1,
   'filter.activity_date_time_high' => '20120101000000',
   'sequential' => 1,
 );
@@ -49,7 +49,7 @@ function activity_get_expectedresult(){
           'is_auto' => 0,
           'is_current_revision' => '1',
           'is_deleted' => 0,
-          'source_contact_id' => '17',
+          'source_contact_id' => '1',
         ),
     ),
 );

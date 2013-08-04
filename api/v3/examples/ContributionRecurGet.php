@@ -41,7 +41,7 @@ function contribution_recur_get_expectedresult(){
           'frequency_unit' => 'day',
           'frequency_interval' => '1',
           'installments' => '12',
-          'start_date' => '2012-01-01 00:00:00',
+          'start_date' => '2013-07-29 00:00:00',
           'create_date' => '20120130621222105',
           'contribution_status_id' => '1',
           'is_test' => 0,

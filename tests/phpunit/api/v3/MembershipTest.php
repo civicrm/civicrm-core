@@ -659,7 +659,92 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $result['id'],
     ));
   }
+  /**
+   * Test civicrm_contact_memberships_create with membership_contact_id
+   * membership).
+   * Success expected.
+   */
+  function testMembershipCreateValidMembershipTypeString() {
+    $params = array(
+      'membership_contact_id' => $this->_contactID,
+      'membership_type_id' => 'General',
+      'join_date' => '2011-01-21',
+      'start_date' => '2010-01-21',
+      'end_date' => '2008-12-21',
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_id' => $this->_membershipStatusID,
+    );
 
-  ///////////////// civicrm_membership_delete methods
+    $result = $this->callAPISuccess('membership', 'create', $params);
+    $this->assertEquals($this->_membershipTypeID, $result['values'][$result['id']]['membership_type_id']);
+    $result = $this->callAPISuccess('Membership', 'Delete', array(
+      'id' => $result['id'],
+    ));
+  }
+
+  /**
+   * Test civicrm_contact_memberships_create with membership_contact_id
+   * membership).
+   * Success expected.
+   */
+  function testMembershipCreateInValidMembershipTypeString() {
+    $params = array(
+      'membership_contact_id' => $this->_contactID,
+      'membership_type_id' => 'invalid',
+      'join_date' => '2011-01-21',
+      'start_date' => '2010-01-21',
+      'end_date' => '2008-12-21',
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_id' => $this->_membershipStatusID,
+    );
+
+    $result = $this->callAPIFailure('membership', 'create', $params);
+  }
+
+  /**
+   * Test civicrm_contact_memberships_create with membership_contact_id
+   * membership).
+   * Success expected.
+   */
+  function testMembershipCreateInValidMembershipTypeStringOldFormat() {
+    $params = array(
+      'membership_contact_id' => $this->_contactID,
+      'membership_type' => 'invalid',
+      'join_date' => '2011-01-21',
+      'start_date' => '2010-01-21',
+      'end_date' => '2008-12-21',
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_id' => $this->_membershipStatusID,
+    );
+
+    $result = $this->callAPIFailure('membership', 'create', $params);
+  }
+
+  /**
+   * Test civicrm_contact_memberships_create with membership_contact_id
+   * membership).
+   * Success expected.
+   */
+  function testMembershipCreateValidMembershipTypeStringOldFormat() {
+    $params = array(
+      'membership_contact_id' => $this->_contactID,
+      'membership_type' => 'General',
+      'join_date' => '2011-01-21',
+      'start_date' => '2010-01-21',
+      'end_date' => '2008-12-21',
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_id' => $this->_membershipStatusID,
+    );
+
+    $result = $this->callAPISuccess('membership', 'create', $params);
+    $this->assertEquals($this->_membershipTypeID, $result['values'][$result['id']]['membership_type_id']);
+    $result = $this->callAPISuccess('Membership', 'Delete', array(
+      'id' => $result['id'],
+    ));
+  }
 }
 

@@ -5,7 +5,7 @@
  */
 function pledge_get_example(){
 $params = array(
-  'pledge_start_date_high' => '20130726201306',
+  'pledge_start_date_high' => '20130801213843',
 );
 
 try{
@@ -41,7 +41,7 @@ function pledge_get_expectedresult(){
           'display_name' => 'Mr. Anthony Anderson II',
           'pledge_id' => '2',
           'pledge_amount' => '100.00',
-          'pledge_create_date' => '2013-07-28 00:00:00',
+          'pledge_create_date' => '2013-08-03 00:00:00',
           'pledge_status' => 'Overdue',
           'pledge_total_paid' => '',
           'pledge_next_pay_date' => '2012-03-02 00:00:00',

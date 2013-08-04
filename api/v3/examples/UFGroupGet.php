@@ -54,7 +54,7 @@ function uf_group_get_expectedresult(){
           'is_reserved' => '1',
           'name' => 'Test_Group_2',
           'created_id' => '1',
-          'created_date' => '2013-07-28 05:52:14',
+          'created_date' => '2013-07-28 08:49:19',
           'is_proximity_search' => 0,
         ),
     ),

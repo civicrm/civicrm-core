@@ -5,7 +5,7 @@
  */
 function activity__example(){
 $params = array(
-  'source_contact_id' => 17,
+  'source_contact_id' => 1,
   'subject' => 'Make-it-Happen Meeting',
   'activity_date_time' => '20110316',
   'duration' => 120,
@@ -14,8 +14,8 @@ $params = array(
   'status_id' => 1,
   'activity_type_id' => 1,
   'priority_id' => 1,
-  'target_contact_id' => 17,
-  'assignee_contact_id' => 17,
+  'target_contact_id' => 1,
+  'assignee_contact_id' => 1,
 );
 
 try{

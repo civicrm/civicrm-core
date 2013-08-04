@@ -42,7 +42,7 @@ function tag_get_expectedresult(){
           'is_reserved' => 0,
           'is_tagset' => 0,
           'used_for' => 'civicrm_contact',
-          'created_date' => '2013-07-28 05:52:14',
+          'created_date' => '2013-07-28 08:49:19',
         ),
     ),
 );

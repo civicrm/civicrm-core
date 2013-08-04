@@ -5,7 +5,7 @@
  */
 function activity_get_example(){
 $params = array(
-  'contact_id' => 17,
+  'contact_id' => 1,
   'activity_type_id' => '46',
   'sequential' => 1,
   'return.custom_1' => 1,
@@ -37,7 +37,7 @@ function activity_get_expectedresult(){
   'id' => 1,
   'values' => array(
       '0' => array(
-          'source_contact_id' => '17',
+          'source_contact_id' => '1',
           'id' => '1',
           'activity_type_id' => '46',
           'subject' => 'test activity type id',

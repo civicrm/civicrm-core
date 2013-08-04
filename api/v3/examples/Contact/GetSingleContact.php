@@ -69,10 +69,7 @@ function contact_getsingle_expectedresult(){
   'geo_code_1' => '',
   'geo_code_2' => '',
   'state_province_id' => '',
-  'state_province_name' => '',
-  'state_province' => '',
   'country_id' => '',
-  'country' => '',
   'phone_id' => '',
   'phone_type_id' => '',
   'phone' => '',
@@ -84,6 +81,9 @@ function contact_getsingle_expectedresult(){
   'im' => '',
   'worldregion_id' => '',
   'world_region' => '',
+  'state_province_name' => '',
+  'state_province' => '',
+  'country' => '',
   'id' => '17',
 );
 
