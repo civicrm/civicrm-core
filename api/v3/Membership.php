@@ -67,7 +67,7 @@ function civicrm_api3_membership_delete($params) {
 function civicrm_api3_membership_create($params) {
   // check params for membership id during update
   if (!empty($params['id']) && !isset($params['skipStatusCal'])) {
-    //don't calculate dates on exisiting membership - expect API use to pass them in
+    //don't calculate status on exisiting membership - expect API use to pass them in
     // or leave unchanged
     $params['skipStatusCal'] = 1;
   }
@@ -82,6 +82,33 @@ function civicrm_api3_membership_create($params) {
   _civicrm_api3_custom_format_params($params, $values, 'Membership');
   $params = array_merge($params, $values);
 
+  // Fixme: This code belongs in the BAO
+  if (empty($params['id']) || !empty($params['num_terms'])) {
+    if (empty($params['id'])) {
+      $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
+        $params['membership_type_id'],
+        CRM_Utils_Array::value('join_date', $params),
+        CRM_Utils_Array::value('start_date', $params),
+        CRM_Utils_Array::value('end_date', $params),
+        CRM_Utils_Array::value('num_terms', $params, 1)
+      );
+    }
+    else {
+      $calcDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
+        $params['id'],
+        NULL,
+        CRM_Utils_Array::value('membership_type_id', $params),
+        $params['num_terms']
+      );
+    }
+    foreach (array('join_date', 'start_date', 'end_date') as $date) {
+      if (empty($params[$date]) && isset($calcDates[$date])) {
+        $params[$date] = $calcDates[$date];
+      }
+    }
+  }
+
+  // Fixme: This code belongs in the BAO
   $action = CRM_Core_Action::ADD;
   // we need user id during add mode
     $ids = array ();
@@ -93,7 +120,6 @@ function civicrm_api3_membership_create($params) {
     $ids['membership'] = $params['id'];
     $action = CRM_Core_Action::UPDATE;
   }
-
   //need to pass action to handle related memberships.
   $params['action'] = $action;
 
@@ -121,8 +147,14 @@ function civicrm_api3_membership_create($params) {
 function _civicrm_api3_membership_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
   $params['membership_type_id']['api.required'] = 1;
+  $params['is_test']['api.default'] = 0;
   $params['membership_type_id']['api.aliases'] = array('membership_type');
-  $params['skipStatusCal'] = array('title' => 'skip status calculation. By default this is 0 if id is not set and 1 if it is set');
+  $params['skipStatusCal'] = array(
+    'title' => 'Skip status calculation. By default this is 0 if id is not set and 1 if it is set.'
+  );
+  $params['num_terms'] = array(
+    'title' => 'Number of terms to add/renew. If this parameter is passed, dates will be calculated automatically. If no id is passed (new membership) and no dates are given, num_terms will be assumed to be 1.'
+  );
 }
 /**
  * Adjust Metadata for Get action
