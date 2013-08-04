@@ -384,7 +384,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
      * Trying to delete an event with participants should return error
      */
   function testDeleteWithExistingParticipant() {
-    $contactID = $this->individualCreate(NULL);
+    $contactID = $this->individualCreate();
     $participantID = $this->participantCreate(
       array(
         'contactID' => $contactID,

@@ -53,7 +53,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
 
-    require_once 'CRM/Member/PseudoConstant.php';
     CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
     CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
@@ -307,7 +306,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   function testGetWithRelationship() {
     $membershipOrgId = $this->organizationCreate(NULL);
-    $memberContactId = $this->individualCreate(NULL);
+    $memberContactId = $this->individualCreate();
 
     $relTypeParams = array(
       'name_a_b' => 'Relation 1',

@@ -52,7 +52,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();
 
-    $this->_contactId = $this->individualCreate(NULL);
+    $this->_contactId = $this->individualCreate();
 
     $this->_groupId1 = $this->groupCreate(NULL);
     $params = array(
