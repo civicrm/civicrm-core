@@ -943,7 +943,7 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
   else {
     $values = array();
     _civicrm_api3_object_to_array($bao, $values[$bao->id]);
-    return civicrm_api3_create_success($values, $params, NULL, 'create', $bao);
+    return civicrm_api3_create_success($values, $params, $entity, 'create', $bao);
   }
 }
 

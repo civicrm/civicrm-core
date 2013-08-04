@@ -47,24 +47,7 @@
  * @access public
  */
 function civicrm_api3_membership_payment_create($params) {
-
-  $transaction = new CRM_Core_Transaction();
-
-
-  $mpDAO = new CRM_Member_DAO_MembershipPayment();
-  $mpDAO->copyValues($params);
-  $result = $mpDAO->save();
-
-  if (is_a($result, 'CRM_Core_Error')) {
-    $transaction->rollback();
-    return civicrm_api3_create_error($result->_errors[0]['message']);
-  }
-
-  $transaction->commit();
-
-  _civicrm_api3_object_to_array($mpDAO, $mpArray[$mpDAO->id]);
-
-  return civicrm_api3_create_success($mpArray, $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -90,8 +73,6 @@ function _civicrm_api3_membership_payment_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_membership_payment_get($params) {
-
-
   return _civicrm_api3_basic_get('CRM_Member_DAO_MembershipPayment', $params);
 }
 

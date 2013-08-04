@@ -866,9 +866,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @return int    id of Individual created
    */
-  function individualCreate($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
+  function individualCreate($params = array()) {
+    $params = array_merge(array(
         'first_name' => 'Anthony',
         'middle_name' => 'J.',
         'last_name' => 'Anderson',
@@ -876,8 +875,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'suffix_id' => 3,
         'email' => 'anthony_anderson@civicrm.org',
         'contact_type' => 'Individual',
-      );
-    }
+      ),$params);
+
     return $this->_contactCreate($params);
   }
 
