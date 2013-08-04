@@ -39,13 +39,12 @@ class CRM_Utils_Array {
    *
    * @access public
    *
-   * @param array  $list  the array to be searched
    * @param string $key   the key value
+   * @param array $list  the array to be searched
+   * @param mixed $default
    *
-   * @return value if exists else null
+   * @return mixed value if exists else $default
    * @static
-   * @access public
-   *
    */
   static function value($key, $list, $default = NULL) {
     if (is_array($list)) {

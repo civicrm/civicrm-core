@@ -66,9 +66,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    */
   static function &add(&$params, &$ids) {
 
-    // get activity types for use in activity record creation
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-
     if (CRM_Utils_Array::value('membership', $ids)) {
       CRM_Utils_Hook::pre('edit', 'Membership', $ids['membership'], $params);
       $oldStatus         = NULL;
@@ -142,40 +139,32 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     if (CRM_Utils_Array::value('membership', $ids)) {
       if ($membership->status_id != $oldStatus) {
-        $allStatus     = CRM_Member_PseudoConstant::membershipStatus();
+        $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
         $activityParam = array(
           'subject' => "Status changed from {$allStatus[$oldStatus]} to {$allStatus[$membership->status_id]}",
           'source_contact_id' => $membershipLog['modified_id'],
           'target_contact_id' => $membership->contact_id,
           'source_record_id' => $membership->id,
-          'activity_type_id' => array_search('Change Membership Status', $activityTypes),
+          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Membership Status'),
           'status_id' => 2,
-          'version' => 3,
           'priority_id' => 2,
           'activity_date_time' => date('Y-m-d H:i:s'),
-          'is_auto' => 0,
-          'is_current_revision' => 1,
-          'is_deleted' => 0,
         );
-        $activityResult = civicrm_api('activity', 'create', $activityParam);
+        civicrm_api3('activity', 'create', $activityParam);
       }
       if (isset($membership->membership_type_id) && $membership->membership_type_id != $oldType) {
-        $membershipTypes = CRM_Member_PseudoConstant::membershipType();
+        $membershipTypes = CRM_Member_BAO_Membership::buildOptions('membership_type_id', 'get');
         $activityParam = array(
           'subject' => "Type changed from {$membershipTypes[$oldType]} to {$membershipTypes[$membership->membership_type_id]}",
           'source_contact_id' => $membershipLog['modified_id'],
           'target_contact_id' => $membership->contact_id,
           'source_record_id' => $membership->id,
-          'activity_type_id' => array_search('Change Membership Type', $activityTypes),
+          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Membership Status'),
           'status_id' => 2,
-          'version' => 3,
           'priority_id' => 2,
           'activity_date_time' => date('Y-m-d H:i:s'),
-          'is_auto' => 0,
-          'is_current_revision' => 1,
-          'is_deleted' => 0,
         );
-        $activityResult = civicrm_api('activity', 'create', $activityParam);
+        civicrm_api3('activity', 'create', $activityParam);
       }
       CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership);
     }
