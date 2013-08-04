@@ -79,17 +79,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->assign('isConfirmEnabled', CRM_Utils_Array::value('is_confirm_enabled', $this->_values));
 
     // make sure we have right permission to edit this user
-    $csContactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, $this->_userID);
+    $csContactID = $this->getContactID();
     $reset       = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
     $mainDisplay = CRM_Utils_Request::retrieve('_qf_Main_display', 'Boolean', CRM_Core_DAO::$_nullObject);
-
-    if ($csContactID != $this->_userID) {
-      if (CRM_Contact_BAO_Contact_Permission::validateChecksumContact($csContactID, $this)) {
-        $session = CRM_Core_Session::singleton();
-        $session->set('userID', $csContactID);
-        $this->_userID = $csContactID;
-      }
-    }
 
     if ($reset) {
       $this->assign('reset', $reset);
@@ -174,9 +166,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   function setDefaultValues() {
     // check if the user is registered and we have a contact ID
-    $contactID = $this->_userID;
+    $contactID = $this->getContactID();
 
-    if ($contactID) {
+    if (!empty($contactID)) {
       $fields = array();
       $removeCustomFieldTypes = array('Contribution', 'Membership');
       $contribFields = CRM_Contribute_BAO_Contribution::getContributionFields();
@@ -1095,6 +1087,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+
     if (CRM_Utils_Array::value('priceSetId', $params)) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
       $formValue = array();
