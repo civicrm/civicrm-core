@@ -53,15 +53,6 @@ function civicrm_api3_membership_delete($params) {
 }
 
 /**
- * modify metadata
- */
-function _civicrm_api3_membership_delete_spec(&$params) {
-  // set as not required as membership_id also acceptable & no either/or std yet
-  $params['id']['api.required'] = 1;
-  $params['id']['api.aliases'] = array('membership_id');
-}
-
-/**
  * Create a Contact Membership
  *
  * This API is used for creating a Membership for a contact.
@@ -74,49 +65,63 @@ function _civicrm_api3_membership_delete_spec(&$params) {
  * @access public
  */
 function civicrm_api3_membership_create($params) {
-// @todo shouldn't be required - should be handling by api.aliases & api.required in _spec
-  civicrm_api3_verify_one_mandatory($params, NULL, array('membership_type_id', 'membership_type'));
   // check params for membership id during update
-  if (CRM_Utils_Array::value('id', $params) && !isset($params['skipStatusCal'])) {
-    //don't calculate dates on exisiting membership - expect API use to pass them in
+  if (!empty($params['id']) && !isset($params['skipStatusCal'])) {
+    //don't calculate status on exisiting membership - expect API use to pass them in
     // or leave unchanged
     $params['skipStatusCal'] = 1;
   }
   else {
     // also check for status id if override is set (during add/update)
-    if (isset($params['is_override']) &&
-      !CRM_Utils_Array::value('status_id', $params)
-    ) {
+    if (!empty($params['is_override']) && empty($params['status_id'])) {
       return civicrm_api3_create_error('Status ID required');
     }
   }
 
-
   $values = array();
-  $error = _civicrm_api3_membership_format_params($params, $values);
-
-  if (civicrm_error($error)) {
-    return $error;
-  }
   _civicrm_api3_custom_format_params($params, $values, 'Membership');
   $params = array_merge($params, $values);
 
+  // Fixme: This code belongs in the BAO
+  if (empty($params['id']) || !empty($params['num_terms'])) {
+    if (empty($params['id'])) {
+      $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
+        $params['membership_type_id'],
+        CRM_Utils_Array::value('join_date', $params),
+        CRM_Utils_Array::value('start_date', $params),
+        CRM_Utils_Array::value('end_date', $params),
+        CRM_Utils_Array::value('num_terms', $params, 1)
+      );
+    }
+    else {
+      $calcDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
+        $params['id'],
+        NULL,
+        CRM_Utils_Array::value('membership_type_id', $params),
+        $params['num_terms']
+      );
+    }
+    foreach (array('join_date', 'start_date', 'end_date') as $date) {
+      if (empty($params[$date]) && isset($calcDates[$date])) {
+        $params[$date] = $calcDates[$date];
+      }
+    }
+  }
 
+  // Fixme: This code belongs in the BAO
   $action = CRM_Core_Action::ADD;
   // we need user id during add mode
     $ids = array ();
-    if(CRM_Utils_Array::value('contact_id',$params)){
+    if(CRM_Utils_Array::value('contact_id', $params)) {
       $ids['userId'] = $params['contact_id'];
     }
   //for edit membership id should be present
   if (CRM_Utils_Array::value('id', $params)) {
-      $ids['membership'] = $params['id'];
+    $ids['membership'] = $params['id'];
     $action = CRM_Core_Action::UPDATE;
   }
-
   //need to pass action to handle related memberships.
   $params['action'] = $action;
-
 
   $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids, TRUE);
 
@@ -141,8 +146,26 @@ function civicrm_api3_membership_create($params) {
  */
 function _civicrm_api3_membership_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
-  $params['skipStatusCal'] = array('title' => 'skip status calculation. By default this is 0 if id is not set and 1 if it is set');
+  $params['membership_type_id']['api.required'] = 1;
+  $params['is_test']['api.default'] = 0;
+  $params['membership_type_id']['api.aliases'] = array('membership_type');
+  $params['skipStatusCal'] = array(
+    'title' => 'Skip status calculation. By default this is 0 if id is not set and 1 if it is set.'
+  );
+  $params['num_terms'] = array(
+    'title' => 'Number of terms to add/renew. If this parameter is passed, dates will be calculated automatically. If no id is passed (new membership) and no dates are given, num_terms will be assumed to be 1.'
+  );
 }
+/**
+ * Adjust Metadata for Get action
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
+function _civicrm_api3_membership_get_spec(&$params) {
+  $params['membership_type_id']['api.aliases'] = array('membership_type');
+}
+
 /**
  * Get contact membership record.
  *
@@ -159,35 +182,24 @@ function _civicrm_api3_membership_create_spec(&$params) {
  * {@getfields membership_get}
  */
 function civicrm_api3_membership_get($params) {
-  $contactID = $activeOnly = $membershipTypeId = $membershipType = NULL;
+  $activeOnly = $membershipTypeId = $membershipType = NULL;
 
   $contactID = CRM_Utils_Array::value('contact_id', $params);
-  if (is_array(CRM_Utils_Array::value('filters', $params)) && !empty($params['filters'])) {
+  if (!empty($params['filters']) && is_array($params['filters'])) {
     $activeOnly = CRM_Utils_Array::value('is_current', $params['filters'], FALSE);
   }
   $activeOnly = CRM_Utils_Array::value('active_only', $params, $activeOnly);
-  //@todo replace this by handling in API layer - we should have enough info to do this
-  // between pseudoconstant & fk - see comments in format_params
-  $membershipTypeId = CRM_Utils_Array::value('membership_type_id', $params);
-  if (!$membershipTypeId) {
-    $membershipType = CRM_Utils_Array::value('membership_type', $params);
-    if ($membershipType) {
-      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $membershipType, 'id', 'name'
-      );
-    }
+
+  if (CRM_Utils_Array::value('contact_id', $params)) {
+    $membershipValues = _civicrm_api3_membership_get_customv2behaviour($params, $contactID, $membershipTypeId, $activeOnly );
   }
-    if(CRM_Utils_Array::value('contact_id',$params)){
-      $membershipValues = _civicrm_api3_membership_get_customv2behaviour($params, $contactID, $membershipTypeId, $activeOnly );
-  }
-    else{
-      //legacy behaviour only ever worked when contact_id passed in - use standard api function otherwise
+  else {
+    //legacy behaviour only ever worked when contact_id passed in - use standard api function otherwise
     $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
 
-
   if (empty($membershipValues)) {
-    # No results is NOT an error!
+    // No results is NOT an error!
     return civicrm_api3_create_success($membershipValues, $params);
   }
 
@@ -235,67 +247,6 @@ function civicrm_api3_membership_get($params) {
   }
 
   return civicrm_api3_create_success($members, $params, 'membership', 'get');
-
-}
-
-
-/**
- * @deprecated
- * Deprecated function to support membership create. Do not call this. It will be removed in favour of
- * wrapper layer formatting
- * take the input parameter list as specified in the data model and
- * convert it into the same format that we use in QF and BAO object
- *
- * @param array  $params       Associative array of property name/value
- *                             pairs to insert in new contact.
- * @param array  $values       The reformatted properties that we can use internally
- *
- * @param array  $create       Is the formatted Values array going to
- *                             be used for CRM_Member_BAO_Membership:create()
- *
- * @return array|error
- * @access public
- */
-function _civicrm_api3_membership_format_params($params, &$values, $create = FALSE) {
-
-  $fields = CRM_Member_DAO_Membership::fields();
-  _civicrm_api3_store_values($fields, $params, $values);
-
-  foreach ($params as $key => $value) {
-    // ignore empty values or empty arrays etc
-    if (CRM_Utils_System::isNull($value)) {
-      continue;
-    }
-
-    switch ($key) {
-
-      case 'membership_type':
-        // @todo we still need to adequately figure out how to handle this @ the API layer.
-        // it is an FK & a pseudoconstant - we should probably alias it onto membership_type_id &
-        // then in the validate_integer function do an if(!is_integer && $fieldInfo['pseudoconstant) look
-        // up pseudoconstant & flip it over. By the time it hits api it will be a valid membership_type & handling @
-        // api layer not required
-        $membershipTypeId = CRM_Utils_Array::key(ucfirst($value),
-          CRM_Member_PseudoConstant::membershipType()
-        );
-        if ($membershipTypeId) {
-          if (CRM_Utils_Array::value('membership_type_id', $values) &&
-            $membershipTypeId != $values['membership_type_id']
-          ) {
-            return civicrm_api3_create_error('Mismatched membership Type and Membership Type Id');
-          }
-        }
-        else {
-          return civicrm_api3_create_error('Invalid Membership Type');
-        }
-        $values['membership_type_id'] = $membershipTypeId;
-        break;
-      default:
-        break;
-    }
-  }
-
-  return NULL;
 }
 
 /**
@@ -308,13 +259,13 @@ function _civicrm_api3_membership_format_params($params, &$values, $create = FAL
  * @param array $params parameters passed into get function
  * @return array result for calling function
  */
-function _civicrm_api3_membership_get_customv2behaviour(&$params, $contactID, $membershipTypeId, $activeOnly ){
-    // get the membership for the given contact ID
-    $membershipParams = array( 'contact_id' => $contactID );
-    if ( $membershipTypeId ) {
-      $membershipParams['membership_type_id'] = $membershipTypeId;
-    }
-    $membershipValues = array();
-    CRM_Member_BAO_Membership::getValues( $membershipParams, $membershipValues, $activeOnly );
-    return $membershipValues;
+function _civicrm_api3_membership_get_customv2behaviour(&$params, $contactID, $membershipTypeId, $activeOnly) {
+  // get the membership for the given contact ID
+  $membershipParams = array('contact_id' => $contactID);
+  if ($membershipTypeId) {
+    $membershipParams['membership_type_id'] = $membershipTypeId;
+  }
+  $membershipValues = array();
+  CRM_Member_BAO_Membership::getValues($membershipParams, $membershipValues, $activeOnly);
+  return $membershipValues;
 }
