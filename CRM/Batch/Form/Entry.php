@@ -107,7 +107,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $this->_profileId = CRM_Batch_BAO_Batch::getProfileId($this->_batchInfo['type_id']);
     }
     CRM_Core_Resources::singleton()
-    ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])));
+    ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])))
+    ->addSetting(array('setting' => array('monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator)))
+    ->addSetting(array('setting' => array('monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint)));
+
   }
 
   /**

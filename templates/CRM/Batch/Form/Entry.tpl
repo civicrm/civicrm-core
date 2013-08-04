@@ -270,8 +270,8 @@ function calculateActualTotal() {
 //money formatting/localization
 function formatMoney(amount) {
   var c = 2;
-  var t = '{/literal}{$config->monetaryThousandSeparator}{literal}';
-  var d = '{/literal}{$config->monetaryDecimalPoint}{literal}';
+  var t = CRM.setting.monetaryThousandSeparator;
+  var d = CRM.setting.monetaryDecimalPoint;
 
   var n = amount,
     c = isNaN(c = Math.abs(c)) ? 2 : c,
