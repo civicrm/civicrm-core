@@ -57,6 +57,19 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * @var String
    */
   protected $_contactID2 = NULL;
+
+  /**
+   * Contact id used in test function
+   * @var String
+   */
+  protected $_contactID3 = NULL;
+
+  /**
+   * Contact id used in test function
+   * @var String
+   */
+  protected $_contactID4 = NULL;
+
   /**
    * Describe test class
    * @return array
@@ -112,6 +125,9 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     );
     $this->_contactID2 = $this->individualCreate($contact2Params);
+    $this->_contactID3 = $this->individualCreate(array('first_name' => 'bobby', 'email' => 'c@d.com'));
+    $this->_contactID4 = $this->individualCreate(array('first_name' => 'bobbynita', 'email' => 'c@de.com'));
+
     $session = CRM_Core_Session::singleton();
     $session->set('dateTypes', 1);
 
@@ -141,7 +157,22 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $params = $this->getMembershipData();
     $this->assertTrue($form->testProcessMembership($params));
     $result = $this->callAPISuccess('membership', 'get', array());
-    $this->assertEquals(2, $result['count']);
+    $this->assertEquals(3, $result['count']);
+
+    //check start dates #1 should default to 1 Jan this year, #2 should be as entered
+    $this->assertEquals(date('Y-m-d', strtotime('first day of January this year')), $result['values'][1]['start_date']);
+    $this->assertEquals('2013-02-03', $result['values'][2]['start_date']);
+
+    //check start dates #1 should default to 1 Jan this year, #2 should be as entered
+    $this->assertEquals(date('Y-m-d', strtotime('last day of December this year')), $result['values'][1]['end_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('last day of December this year')), $result['values'][2]['end_date']);
+    $this->assertEquals('2013-12-01', $result['values'][3]['end_date']);
+
+    //check start dates #1 should default to 1 Jan this year, #2 should be as entered
+    $this->assertEquals(date('Y-m-d', strtotime('07/22/2013')), $result['values'][1]['join_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('07/03/2013')), $result['values'][2]['join_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('now')), $result['values'][3]['join_date']);
+
   }
 
   /*
@@ -156,8 +187,12 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     */
     return array(
       'batch_id' => 4,
-      'primary_profiles' => array(1 => NULL, 2 => NULL),
-      'primary_contact_select_id' => Array (1 => $this->_contactID, 2 => $this->_contactID2),
+      'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
+      'primary_contact_select_id' => Array (
+        1 => $this->_contactID,
+        2 => $this->_contactID2,
+        3 => $this->_contactID3,
+        ),
       'field' => array(
         1 => array(
           'membership_type' => Array (0 => 1, 1 => 1),// (I was unable to determine what these both mean but both are refered to in code
@@ -176,7 +211,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       2 => array(
         'membership_type' => Array (0 => 1, 1 => 1 ),
         'join_date' => '07/03/2013',
-        'membership_start_date' => NULL,
+        'membership_start_date' => '02/03/2013',
         'membership_end_date' => NULL,
         'membership_source' => NULL,
         'financial_type' => 2,
@@ -186,9 +221,26 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         'payment_instrument' => NULL,
         'check_number' => NULL,
         'contribution_status_id' => 1,
-       )
+       ),
+        // no join date, coded end date
+       3 => array(
+         'membership_type' => Array (0 => 1, 1 => 1 ),
+         'join_date' => NULL,
+         'membership_start_date' => NULL,
+         'membership_end_date' => '2013-12-01',
+         'membership_source' => NULL,
+         'financial_type' => 2,
+         'total_amount' => 1,
+         'receive_date' => '07/17/2013',
+         'receive_date_time' => NULL,
+         'payment_instrument' => NULL,
+         'check_number' => NULL,
+         'contribution_status_id' => 1,
+       ),
+
       ),
       'actualBatchTotal' => 0,
+
     );
   }
 }
