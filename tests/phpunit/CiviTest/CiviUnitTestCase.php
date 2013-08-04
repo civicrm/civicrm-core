@@ -1568,7 +1568,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function activityCreate($params = NULL) {
 
     if ($params === NULL) {
-      $individualSourceID = $this->individualCreate(NULL);
+      $individualSourceID = $this->individualCreate();
 
       $contactParams = array(
         'first_name' => 'Julia',

@@ -49,7 +49,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->_individualId = $this->individualCreate(NULL);
+    $this->_individualId = $this->individualCreate();
     $this->_pledgeID = $this->pledgeCreate($this->_individualId);
     $this->_contributionID = $this->contributionCreate($this->_individualId);
   }

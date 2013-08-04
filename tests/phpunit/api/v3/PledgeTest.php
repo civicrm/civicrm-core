@@ -54,7 +54,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     //due to timezone issues
     $this->scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
     $this->_entity = 'Pledge';
-    $this->_individualId = $this->individualCreate(NULL);
+    $this->_individualId = $this->individualCreate();
     $this->_params = array(
       'contact_id' => $this->_individualId,
       'pledge_create_date' => date('Ymd'),
