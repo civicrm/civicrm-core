@@ -87,7 +87,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_contributionParams = array(
       'contact_id' => $this->_contactId,
       'version' => 3,
-                                     'financial_type_id'   => $this->_contributionTypeId,
+      'financial_type_id'   => $this->_contributionTypeId,
       'recieve_date' => date('Ymd'),
       'total_amount' => 150.00,
       'invoice_id' => 'c8acb91e080ad7bd8a2adc119c192885',
@@ -485,7 +485,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
      */
   function _setUpMembershipObjects() {
     try {
-      $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
+      $this->_membershipTypeID = $this->membershipTypeCreate();
       $this->_membershipStatusID = $this->membershipStatusCreate('test status');
     }
     catch(Exception$e) {
@@ -505,8 +505,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'version' => 3,
     );
 
-    $membership = civicrm_api('membership', 'create', $this->_membershipParams);
-    $this->assertAPISuccess($membership, 'line ' . __LINE__ . ' set-up of membership');
+    $membership = $this->callAPISuccess('membership', 'create', $this->_membershipParams);
 
     $this->_membershipId = $membership['id'];
     //we'll create membership payment here because to make setup more re-usable
