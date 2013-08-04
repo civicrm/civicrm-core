@@ -200,7 +200,7 @@
         <div class="content" >
           {$form.honor_type_id.html}
           <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('honor_type_id', '{$form.formName}');enableHonorType(); return false;">{ts}clear{/ts}</a>)</span>
-          <div class="description">{ts}Please include the name, and / or email address of the person you are honoring.{/ts}</div>
+          <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
         </div>
       </div>
     {/if}
