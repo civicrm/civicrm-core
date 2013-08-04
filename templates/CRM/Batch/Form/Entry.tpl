@@ -174,28 +174,12 @@ function updateContactInfo(blockNo, prefix) {
   var contactHiddenElement = 'input[name="' + prefix + 'contact_select_id[' + blockNo + ']"]';
   var contactId = cj(contactHiddenElement).val();
 
-  var returnProperties = '';
-  var profileFields = new Array();
-  {/literal}
-  {if $contactFields}
-  {foreach from=$contactFields item=val key=fldName}
-  var fldName = "{$fldName}";
-  {literal}
-  if (returnProperties) {
-    returnProperties = returnProperties + ',';
-  }
-  var fld = fldName.split('-');
-  returnProperties = returnProperties + fld[0];
-  profileFields[fld[0]] = fldName;
-  {/literal}
-  {/foreach}
-  {/if}
-  {literal}
+  var profileFields = CRM.contact.fieldmap;
 
   CRM.api('Contact', 'get', {
       'sequential': '1',
       'contact_id': contactId,
-      'return': returnProperties },
+      'return': CRM.contact.return },
     { success: function (data) {
       cj.each(data.values[0], function (key, value) {
         // set the values
