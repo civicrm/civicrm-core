@@ -123,7 +123,7 @@ SELECT @option_group_id_addroptions := max(id) from civicrm_option_group where n
 UPDATE civicrm_option_value
   SET {localize field="label"}label = '{ts escape="sql"}Supplemental Address 1{/ts}'{/localize}
   WHERE name = 'supplemental_address_1' AND option_group_id = @option_group_id_addroptions;
-  
+
 UPDATE civicrm_option_value
   SET {localize field="label"}label = '{ts escape="sql"}Supplemental Address 2{/ts}'{/localize}
   WHERE name = 'supplemental_address_2' AND option_group_id = @option_group_id_addroptions;
@@ -137,5 +137,13 @@ ALTER TABLE civicrm_survey
   ADD is_share TINYINT( 4 ) NULL DEFAULT '1' COMMENT 'Can people share the petition through social media?';
 
 -- CRM-12439
-ALTER TABLE `civicrm_uf_group` 
+ALTER TABLE `civicrm_uf_group`
   ADD `description` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'Optional verbose description of the profile.' AFTER `title`;
+
+--CRM-13142
+UPDATE
+  civicrm_uf_field uf
+  INNER JOIN
+  civicrm_uf_group ug ON uf.uf_group_id = ug.id AND ug.is_reserved = 1 AND name = 'membership_batch_entry'
+SET uf.is_reserved = 0
+WHERE uf.field_name IN ('join_date', 'membership_start_date', 'membership_end_date');
