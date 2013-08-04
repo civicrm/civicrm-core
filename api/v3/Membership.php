@@ -141,6 +141,7 @@ function civicrm_api3_membership_create($params) {
  */
 function _civicrm_api3_membership_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
+  $params['join_date']['api.default'] = 'now';
   $params['skipStatusCal'] = array('title' => 'skip status calculation. By default this is 0 if id is not set and 1 if it is set');
 }
 /**
