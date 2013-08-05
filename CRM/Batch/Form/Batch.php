@@ -60,7 +60,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_BAO_Batch');
     $this->add('text', 'title', ts('Batch Name'), $attributes['name'], TRUE);
 
     $batchTypes = CRM_Batch_DAO_Batch::buildOptions('type_id');
