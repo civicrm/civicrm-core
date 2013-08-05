@@ -63,7 +63,9 @@ class CRM_Contact_Form_Edit_Individual {
 
       $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
 
-      $form->addElement('text', 'formal_title', ts('Title'), $attributes['formal_title']);
+      if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'formal_title')) {
+        $form->addElement('text', 'formal_title', ts('Title'), $attributes['formal_title']);
+      }
 
       // first_name
       $form->addElement('text', 'first_name', ts('First Name'), $attributes['first_name']);
