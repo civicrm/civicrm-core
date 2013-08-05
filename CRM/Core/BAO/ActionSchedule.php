@@ -214,7 +214,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
       }
     }
-
     return array(
       'sel1' => $sel1,
       'sel2' => $sel2,
@@ -606,7 +605,7 @@ WHERE   cas.entity_value = $id AND
         $extraJoin   = "
 INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
 INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
-        $extraOn = 'AND e.is_current_revision = 1 AND e.is_deleted = 0';
+        $extraOn = ' AND e.is_current_revision = 1 AND e.is_deleted = 0 ';
         if ($actionSchedule->limit_to == 0) {
           $extraJoin   = "
 LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
@@ -959,7 +958,10 @@ reminder.action_schedule_id = %1";
       $fromClause = "FROM $from";
       $joinClause = !empty($join) ? implode(' ', $join) : '';
       $whereClause = 'WHERE ' . implode(' AND ', $where);
-      $limitWhere .= implode(' AND ', $limitWhere);
+      $limitWhereClause = '';
+      if (!empty($limitWhere)) {
+        $limitWhereClause = ' AND ' . implode(' AND ', $limitWhere);
+      }
 
       $query = "
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
@@ -967,9 +969,8 @@ INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_sche
 {$fromClause}
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
-{$whereClause} {$limitWhere} AND {$dateClause} {$notINClause}
+{$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
 ";
-
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
       if ($limitTo == 0) {
@@ -987,7 +988,7 @@ LEFT JOIN civicrm_action_log reminder ON reminder.contact_id = c.id AND
         reminder.entity_table       = 'civicrm_contact' AND
         reminder.action_schedule_id = {$actionSchedule->id}
 {$addGroup}
-{$additionWhere} (reminder.id IS NULL AND c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere})
+{$additionWhere} AND c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere}
 AND {$dateClause}
 AND c.id NOT IN (
      SELECT rem.contact_id
@@ -995,6 +996,7 @@ AND c.id NOT IN (
      WHERE rem.action_schedule_id = {$actionSchedule->id}
       AND rem.entity_table = '{$mapping->entity}'
     )
+GROUP BY c.id
 ";
         CRM_Core_DAO::executeQuery($insertAdditionalSql);
       }
