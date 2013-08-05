@@ -166,6 +166,11 @@
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
 campaignTrClass='' campaignTdClass=''}
 
+<tr>
+  <td colspan="2">
+{include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
+</tr>
+
 {if $contributeGroupTree}
 <tr>
   <td colspan="2">

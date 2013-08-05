@@ -239,7 +239,20 @@ class CRM_Contribute_BAO_Query {
     }
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-
+    $datesToBuild = array(
+      'contribution_recur_start_date' => 'Recurring Contribution Start Date',
+      'contribution_recur_next_sched_contribution_date' => 'Next Scheduled Recurring Payment',
+      'contribution_recur_cancel_date' => 'Recurring Contribution Cancel Date',
+      'contribution_recur_end_date' => 'Recurring Contribution End Date',
+      'contribution_recur_create_date' => 'Recurring Contribution Create Date',
+      'contribution_recur_modified_date' => 'Recurring Contribution Modified Date',
+      'contribution_recur_failure_retry_date' => 'Recurring Contribution Failure Retry Date',
+    );
+    foreach ($datesToBuild as $dateField => $dateFieldTitle) {
+      if(self::buildDateWhere($values, $query, $name, $dateField, $dateFieldTitle)) {
+        return;
+      }
+    }
     switch ($name) {
       case 'contribution_date':
       case 'contribution_date_low':
@@ -588,7 +601,13 @@ class CRM_Contribute_BAO_Query {
         break;
 
       case 'civicrm_contribution_recur':
-        $from = " $side JOIN civicrm_contribution_recur ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id ";
+        if ($mode == 1) {
+          // in contact mode join directly onto profile - in case no contributions exist yet
+          $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
+        }
+        else {
+          $from = " $side JOIN civicrm_contribution_recur ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id ";
+        }
         break;
 
       case 'civicrm_financial_type':
@@ -820,6 +839,16 @@ class CRM_Contribute_BAO_Query {
 
     $form->addYesNo('contribution_pay_later', ts('Contribution is Pay Later?'));
     $form->addYesNo('contribution_recurring', ts('Contribution is Recurring?'));
+//    $form->addElement('contribution_recur_frequency_unit', ts('Recurring Frequency Unit?'));
+//    $form->addElement('contribution_recur_frequency_interval', ts('Recurring Frequency Interval?'));
+//    $form->addElement('contribution_recur_frequency_installments', ts('Number of Recurring Installments?'));
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_start_date', 1, '_low', '_high', ts('Recurring Start Date?'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_next_sched_contribution_date', 1, '_low', '_high', ts('Next scheduled Recurring Contribution?'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_failure_retry_date', 1, '_low', '_high', ts('Retry Date for  Recurring Contribution?'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_end_date', 1, '_low', '_high', ts('End Date for  Recurring Contribution?'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_cancel_date', 1, '_low', '_high', ts('Cancel Date for  Recurring Contribution?'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_modified_date', 1, '_low', '_high', ts('Modified Date for  Recurring Contribution?'), FALSE);
+
     $form->addYesNo('contribution_test', ts('Contribution is a Test?'));
 
     // Add field for transaction ID search
@@ -881,6 +910,28 @@ class CRM_Contribute_BAO_Query {
       !CRM_Utils_Array::value('civicrm_product', $tables)) {
       $tables['civicrm_product'] = 1;
     }
+  }
+
+  /**
+   * Add the where for dates
+   * @param array $values array of query values
+   * @param object $query the query object
+   * @param string $name query field that is set
+   * @param string $field name of field to be set
+   * @param string $title title of the field
+   */
+  static function buildDateWhere(&$values, $query, $name, $field, $title) {
+    $fieldPart = strpos($name, $field);
+    if($fieldPart === FALSE) {
+      return;
+    }
+    // we only have recurring dates using this ATM so lets' short cut to find the table name
+    $table = 'contribution_recur';
+    $fieldName = split($table . '_', $field);
+    $query->dateQueryBuilder($values,
+      'civicrm_' . $table, $field, $fieldName[1], $title
+    );
+    return TRUE;
   }
 }
 
