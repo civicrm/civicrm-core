@@ -2218,17 +2218,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
         if (CRM_Utils_Array::value($name, $details) || isset($details[$name])) {
           //to handle custom data (checkbox) to be written
-          // to handle gender / suffix / prefix / greeting_type
-          if ($name == 'gender') {
-            $defaults[$fldName] = $details['gender_id'];
-          }
-          elseif ($name == 'individual_prefix') {
-            $defaults[$fldName] = $details['individual_prefix_id'];
-          }
-          elseif ($name == 'individual_suffix') {
-            $defaults[$fldName] = $details['individual_suffix_id'];
-          }
-          elseif (($name == 'birth_date') || ($name == 'deceased_date')) {
+          // to handle birth/deceased date, greeting_type and few other fields
+          if (($name == 'birth_date') || ($name == 'deceased_date')) {
             list($defaults[$fldName]) = CRM_Utils_Date::setDateDefaults($details[$name], 'birth');
           }
           elseif (in_array($name, CRM_Contact_BAO_Contact::$_greetingTypes)) {
