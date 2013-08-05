@@ -111,6 +111,41 @@
             </span>
         </td>
       </tr>
+      <tr><td>{ts}Recurring Payments Start Date{/ts}</td>
+        <td>
+          {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_start_date" from='_low' to='_high'}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Recurring Contribution End Date{/ts}</td>
+        <td>
+          {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_end_date" from='_low' to='_high'}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Recurring Contribution Modified Date{/ts}</td>
+        <td>
+          {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_modified_date" from='_low' to='_high'}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Next Scheduled Recurring Contribution{/ts}</td>
+        <td>
+          {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_next_sched_contribution_date" from='_low' to='_high'}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Retry Failed Recurring Contribution On{/ts}</td>
+        <td>
+          {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_failure_retry_date" from='_low' to='_high'}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Recurring Contribution Cancel Date{/ts}</td>
+        <td>
+          {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_cancel_date" from='_low' to='_high'}
+        </td>
+      </tr>
       </tbody>
     </table>
   </td>
