@@ -709,23 +709,16 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    */
   static function buildMembershipBlock(&$form,
     $pageID,
+    $cid,
     $formItems = FALSE,
     $selectedMembershipTypeID = NULL,
     $thankPage = FALSE,
-    $isTest = NULL,
-    $memberContactId = NULL
+    $isTest = NULL
   ) {
 
     $separateMembershipPayment = FALSE;
     if ($form->_membershipBlock) {
       $form->_currentMemberships = array();
-      if (!$memberContactId) {
-        $session = CRM_Core_Session::singleton();
-        $cid = $session->get('userID');
-      }
-      else {
-        $cid = $memberContactId;
-      }
 
       $membershipBlock    = $form->_membershipBlock;
       $membershipTypeIds  = $membershipTypes = $radio = array();
