@@ -601,7 +601,13 @@ class CRM_Contribute_BAO_Query {
         break;
 
       case 'civicrm_contribution_recur':
-        $from = " $side JOIN civicrm_contribution_recur ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id ";
+        if ($mode == 1) {
+          // in contact mode join directly onto profile - in case no contributions exist yet
+          $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
+        }
+        else {
+          $from = " $side JOIN civicrm_contribution_recur ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id ";
+        }
         break;
 
       case 'civicrm_financial_type':
