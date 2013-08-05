@@ -107,6 +107,7 @@ class CRM_Utils_Address {
       $replacements = array(
         'contact.display_name' => CRM_Utils_Array::value('display_name', $fields),
         'contact.individual_prefix' => CRM_Utils_Array::value('individual_prefix', $fields),
+        'contact.formal_title' => CRM_Utils_Array::value('formal_title', $fields),
         'contact.first_name' => CRM_Utils_Array::value('first_name', $fields),
         'contact.middle_name' => CRM_Utils_Array::value('middle_name', $fields),
         'contact.last_name' => CRM_Utils_Array::value('last_name', $fields),

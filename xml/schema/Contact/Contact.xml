@@ -382,6 +382,15 @@
       <add>1.6</add>
   </index>
   <field>
+      <name>formal_title</name>
+      <type>varchar</type>
+      <length>64</length>
+      <import>true</import>
+      <headerPattern>/^title/i</headerPattern>
+      <comment>Formal (academic or similar) title in front of name. (Prof., Dr. etc.)</comment>
+      <add>4.5</add>
+  </field>
+  <field>
        <name>greeting_type</name>
        <type>varchar</type>
        <length>128</length>

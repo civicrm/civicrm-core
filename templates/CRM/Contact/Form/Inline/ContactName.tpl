@@ -36,6 +36,12 @@
         {$form.prefix_id.html}
       </div>
     {/if}
+    {if $form.formal_title}
+      <div class="crm-inline-edit-field">
+        {$form.formal_title.label}<br/>
+        {$form.formal_title.html}
+      </div>
+    {/if}
     <div class="crm-inline-edit-field">
       {$form.first_name.label}<br /> 
       {$form.first_name.html}
