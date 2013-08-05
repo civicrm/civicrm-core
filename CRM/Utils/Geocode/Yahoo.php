@@ -45,7 +45,7 @@ class CRM_Utils_Geocode_Yahoo {
    * @var string
    * @static
    */
-  static protected $_server = 'where.yahooapis.com';
+  static protected $_server = 'query.yahooapis.com';
 
   /**
    * uri of service
@@ -53,7 +53,7 @@ class CRM_Utils_Geocode_Yahoo {
    * @var string
    * @static
    */
-  static protected $_uri = '/geocode';
+  static protected $_uri = '/v1/public/yql';
 
   /**
    * function that takes an address array and gets the latitude / longitude
@@ -71,18 +71,14 @@ class CRM_Utils_Geocode_Yahoo {
 
     $config = CRM_Core_Config::singleton();
 
-    $add = "appid=" . urlencode($config->mapAPIKey);
-
-    $add .= '&location=';
+    $whereComponents = array();
 
     if (CRM_Utils_Array::value('street_address', $values)) {
-      $add .= urlencode($values['street_address']);
-      $add .= ',+';
+      $whereComponents['street'] = $values['street_address'];
     }
 
     if ($city = CRM_Utils_Array::value('city', $values)) {
-      $add .= urlencode($city);
-      $add .= ',+';
+      $whereComponents['city'] = $city;
     }
 
     if (CRM_Utils_Array::value('state_province', $values)) {
@@ -104,19 +100,27 @@ class CRM_Utils_Geocode_Yahoo {
 
       // dont add state twice if replicated in city (happens in NZ and other countries, CRM-2632)
       if ($stateProvince != $city) {
-        $add .= urlencode($stateProvince);
-        $add .= ',+';
+        $whereComponents['state'] = $stateProvince;
       }
     }
 
     if (CRM_Utils_Array::value('postal_code', $values)) {
-      $add .= urlencode($values['postal_code']);
-      $add .= ',+';
+      $whereComponents['postal'] = $values['postal_code'];
     }
 
     if (CRM_Utils_Array::value('country', $values)) {
-      $add .= urlencode($values['country']);
+      $whereComponents['country'] = $values['country'];
     }
+
+    foreach ($whereComponents as $componentName => $componentValue) {
+      $whereComponents[$componentName] = urlencode("$componentName=\"$componentValue\"");
+    }
+
+    $add = 'q=' . urlencode('select * from geo.placefinder where ');
+
+    $add .= join(urlencode(' and '), $whereComponents);
+
+    $add .= "&appid=" . urlencode($config->mapAPIKey);
 
     $query = 'http://' . self::$_server . self::$_uri . '?' . $add;
 
@@ -133,20 +137,20 @@ class CRM_Utils_Geocode_Yahoo {
       return FALSE;
     }
 
-    if ((integer)$xml->Error != 0) {
-      CRM_Core_Error::debug_var('Geocoding failed.  Message from Yahoo:', (string)$xml->ErrorMessage);
+    if ($xml->getName() == 'error') {
+      CRM_Core_Error::debug_var('query', $query);
+      CRM_Core_Error::debug_log_message('Geocoding failed.  Message from Yahoo: ' . (string) $xml->description);
       return FALSE;
     }
 
-    if (is_a($xml->Result[0], 'SimpleXMLElement')) {
+    if (is_a($xml->results->Result, 'SimpleXMLElement')) {
       $result = array();
-      $result = get_object_vars($xml->Result[0]);
-
+      $result = get_object_vars($xml->results->Result);
       foreach ($result as $key => $val) {
         if (is_scalar($val) &&
           strlen($val)
         ) {
-          $ret[(string)$key] = (string)$val;
+          $ret[(string) $key] = (string) $val;
         }
       }
 
@@ -158,14 +162,14 @@ class CRM_Utils_Geocode_Yahoo {
         $skip_postal = FALSE;
 
         if ($current_pc) {
-          $current_pc_suffix   = CRM_Utils_Array::value('postal_code_suffix', $values);
+          $current_pc_suffix = CRM_Utils_Array::value('postal_code_suffix', $values);
           $current_pc_complete = $current_pc . $current_pc_suffix;
-          $new_pc_complete     = preg_replace("/[+-]/", '', $ret['postal']);
+          $new_pc_complete = preg_replace("/[+-]/", '', $ret['postal']);
 
           // if a postal code was already entered, don't change it, except to make it more precise
           if (strpos($new_pc_complete, $current_pc_complete) !== 0) {
             // Don't bother anonymous users with the message - they can't change a form they just submitted anyway
-            if(CRM_Utils_System::isUserLoggedIn()) {
+            if (CRM_Utils_System::isUserLoggedIn()) {
               $msg = ts('The Yahoo Geocoding system returned a different postal code (%1) than the one you entered (%2). If you want the Yahoo value, please delete the current postal code and save again.', array(
                 1 => $ret['postal'],
                 2 => $current_pc_suffix ? "$current_pc-$current_pc_suffix" : $current_pc
@@ -188,9 +192,10 @@ class CRM_Utils_Geocode_Yahoo {
           */
 
           if (preg_match('/^(\d{4,5})[+-](\d{4})$/',
-              $ret['postal'],
-              $match
-            )) {
+            $ret['postal'],
+            $match
+          )
+          ) {
             $values['postal_code'] = $match[1];
             $values['postal_code_suffix'] = $match[2];
           }
@@ -204,4 +209,3 @@ class CRM_Utils_Geocode_Yahoo {
     return FALSE;
   }
 }
-
