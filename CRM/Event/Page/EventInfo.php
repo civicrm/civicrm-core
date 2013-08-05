@@ -88,6 +88,9 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       CRM_Core_Error::fatal(ts('The page you requested is currently unavailable.'));
     }
 
+    // Add Event Type to $values in case folks want to display it
+    $values['event']['event_type'] = CRM_Utils_Array::value($values['event']['event_type_id'], CRM_Event_PseudoConstant::eventType());
+    
     $this->assign('isShowLocation', CRM_Utils_Array::value('is_show_location', $values['event']));
 
     // show event fees.
