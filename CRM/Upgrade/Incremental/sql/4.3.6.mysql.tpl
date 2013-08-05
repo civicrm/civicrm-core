@@ -42,3 +42,6 @@ SET cft.from_financial_account_id = NULL
 WHERE ceft.entity_table = 'civicrm_contribution'  AND cc.contribution_recur_id IS NOT NULL
 AND ceft1.entity_table = 'civicrm_financial_item' AND cft.id IS NOT NULL AND cft.payment_instrument_id = 1 AND cfi.entity_table = 'civicrm_line_item' AND cft.from_financial_account_id IS NOT NULL
 AND cefa.entity_table = 'civicrm_payment_processor' AND cefa.financial_account_id = cft.to_financial_account_id;
+
+-- CRM-13096
+DROP TABLE IF EXISTS civicrm_official_receipt;
