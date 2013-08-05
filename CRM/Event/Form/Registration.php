@@ -626,7 +626,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'));
       }
       $addCaptcha = FALSE;
-      $fields = array_diff_assoc($fields, $this->_fields);
+
+      if (!empty($this->_fields)) {
+        $fields = @array_diff_assoc($fields, $this->_fields);
+      }
+
       if (!CRM_Utils_Array::value('additional_participants', $this->_params[0]) &&
         is_null($cid)
       ) {
