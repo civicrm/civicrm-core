@@ -63,7 +63,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
     $this->add('text', 'title', ts('Batch Name'), $attributes['name'], TRUE);
 
-    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id');
+    $batchTypes = CRM_Batch_BAO_Batch::buildOptions('type_id');
 
     // unset non-related types
     unset($batchTypes[3]);
@@ -96,8 +96,6 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     else {
       $defaults = $this->_values;
     }
-
-
     return $defaults;
   }
 
