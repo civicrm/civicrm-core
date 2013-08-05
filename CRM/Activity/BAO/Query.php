@@ -372,7 +372,7 @@ class CRM_Activity_BAO_Query {
     $from = NULL;
     switch ($name) {
       case 'civicrm_activity':
-        //CRM-7480 we are going to civicrm_activitty table either
+        //CRM-7480 we are going to civicrm_activity table either
         //from civicrm_activity_target or civicrm_activity_assignment.
         //as component specific activities does not have entry in
         //activity target table so lets consider civicrm_activity_assignment.
@@ -402,7 +402,7 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'source_contact':
-        $from = " $side JOIN civicrm_contact source_contact ON source_contact.id = civicrm_activity.source_contact_id";
+        $from = " $side JOIN civicrm_contact source_contact ON source_contact.id = civicrm_activity_contact.contact_id";
         break;
     }
 
