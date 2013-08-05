@@ -100,14 +100,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $params = array('id' => $this->_batchId);
       CRM_Batch_BAO_Batch::retrieve($params, $this->_batchInfo);
 
-      $this->assign('batchTotal', $this->_batchInfo['total']);
+      $this->assign('batchTotal', !empty($this->_batchInfo['total']) ? $this->_batchInfo['total'] : NULL);
       $this->assign('batchType', $this->_batchInfo['type_id']);
 
       // get the profile id associted with this batch type
       $this->_profileId = CRM_Batch_BAO_Batch::getProfileId($this->_batchInfo['type_id']);
     }
     CRM_Core_Resources::singleton()
-    ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])));
+    ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js')
+    ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])))
+    ->addSetting(array('setting' => array('monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator)))
+    ->addSetting(array('setting' => array('monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint)));
+
   }
 
   /**
@@ -202,7 +206,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
       foreach ($this->_fields as $name => $field) {
         if (in_array($field['field_type'], $contactTypes)) {
-          $this->_contactFields[$field['name']] = 1;
+          $fld = explode('-', $field['name']);
+          $contactReturnProperties[$field['name']] = $fld[0];
         }
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, NULL, FALSE, FALSE, $rowNumber);
 
@@ -213,7 +218,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
 
     $this->assign('fields', $this->_fields);
-    $this->assign('contactFields', $this->_contactFields);
+    CRM_Core_Resources::singleton()
+    ->addSetting(array('contact' => array(
+      'return' => implode(',', $contactReturnProperties),
+      'fieldmap' => array_flip($contactReturnProperties),
+    )));
 
     // don't set the status message when form is submitted.
     $buttonName = $this->controller->getButtonName('submit');

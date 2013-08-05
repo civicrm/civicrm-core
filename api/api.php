@@ -123,7 +123,12 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
       $data["sql"] = $error->getDebugInfo();
     }
     if (CRM_Utils_Array::value('debug', $apiRequest['params'])) {
-      $data['debug_info'] = $error->getUserInfo();
+      if(method_exists($e, 'getUserInfo')) {
+        $data['debug_info'] = $error->getUserInfo();
+      }
+      if(method_exists($e, 'getExtraData')) {
+        $data['debug_info'] = $data + $error->getExtraData();
+      }
       $data['trace'] = $e->getTraceAsString();
     }
     else{
