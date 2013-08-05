@@ -93,7 +93,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $membership->save();
     $membership->free();
 
-    $session = CRM_Core_Session::singleton();
     if (empty($membership->contact_id) || empty($membership->status_id)) {
       // this means we are in renewal mode and are just updating the membership
       // record or this is an API update call and all fields are not present in the update record
@@ -226,7 +225,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @static
    */
   static function &create(&$params, &$ids, $skipRedirect = FALSE, $activityType = 'Membership Signup') {
-    $membershipID = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
     // always calculate status if is_override/skipStatusCal is not true.
     // giving respect to is_override during import.  CRM-4012
 
@@ -238,30 +236,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     ) {
       $dates = array('start_date', 'end_date', 'join_date');
       foreach ($dates as $date) {
-        // see notes below if id is not passed in we will calc the dates, not sure impact of not
-        // changing the return null if doing an update so being cautious
-        // and leaving behaviour unchanged if id exists (null doesn't seem valid...)
-        $returnNull = TRUE;
-        if(!$membershipID) {
-          $returnNull = FALSE;
-        }
-        $$date = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, $returnNull, 'Ymd');
-        if(!empty($$date)) {
-          $params[$date] = $$date;
-        }
-      }
-      /*
-      * if we have not been given the start date or the end date we will calculate them.
-      * In the interests of being cautious we won't do this if 'id'  is set
-      * even though skipStatusCal is the default from the api when id is set
-      * AND the forms currently take care of the dates
-      * this could possibly be revised to a less cautious approach
-      */
-      if(!$membershipID && (empty($start_date) || empty($end_date))) {
-        $defaults = CRM_Member_BAO_MembershipType::getDatesForMembershipType($params['membership_type_id'],
-        $join_date, $start_date, $end_date
-        );
-        $params = array_merge($defaults, $params);
+        $$date = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, TRUE, 'Ymd');
       }
 
       //fix for CRM-3570, during import exclude the statuses those having is_admin = 1
@@ -274,7 +249,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $excludeIsAdmin = TRUE;
       }
 
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($params['start_date'], $params['end_date'], $params['join_date'],
+      $calcStatus = $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
         'today', $excludeIsAdmin
       );
       if (empty($calcStatus)) {
