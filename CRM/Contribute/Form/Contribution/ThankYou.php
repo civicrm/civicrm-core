@@ -162,10 +162,11 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
       CRM_Member_BAO_Membership::buildMembershipBlock($this,
         $this->_id,
+        $this->_membershipContactID,
         FALSE,
         $membershipTypeID,
-        TRUE, NULL,
-        $this->_membershipContactID
+        TRUE,
+        NULL
       );
     }
 
