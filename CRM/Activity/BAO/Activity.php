@@ -688,13 +688,20 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     $sql = "CREATE TEMPORARY TABLE {$activityTempTable} ( ";
     $insertValueSQL = array();
+    // The activityTempTable contains the sorted rows
+    // so in order to maintain the sort order as-is we add an auto_increment
+    // field; we can sort by this later to ensure the sort order stays correct.
+    $sql .= " fixed_sort_order INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,";
     foreach ($tableFields as $name => $desc) {
       $sql .= "$name $desc,\n";
       $insertValueSQL[] = $name;
     }
 
+    // add unique key on activity_id just to be sure
+    // this cannot be primary key because we need that for the auto_increment
+    // fixed_sort_order field
     $sql .= "
-          PRIMARY KEY ( activity_id )
+          UNIQUE KEY ( activity_id ) 
         ) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
         ";
 
@@ -717,6 +724,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     if (empty($order)) {
+      // context = 'activity' in Activities tab.
       $order = (CRM_Utils_Array::value('context', $input) == 'activity') ? " ORDER BY tbl.activity_date_time desc " : " ORDER BY tbl.status_id asc, tbl.activity_date_time asc ";
     }
 
@@ -770,6 +778,7 @@ WHERE      c.is_deleted = 0
     CRM_Core_DAO::executeQuery($query);
 
     // step 3: Combine all temp tables to get final query for activity selector
+    // sort by the original sort order, stored in fixed_sort_order
     $query = "
 SELECT     {$activityTempTable}.*,
            {$activityContactTempTable}.contact_id,
@@ -777,6 +786,7 @@ SELECT     {$activityTempTable}.*,
            {$activityContactTempTable}.contact_name
 FROM       {$activityTempTable}
 INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$activityContactTempTable}.activity_id
+ORDER BY    fixed_sort_order
         ";
 
 
