@@ -83,42 +83,26 @@ function civicrm_api3_contact_create($params) {
     );
   }
 
-  if (isset($params['suffix_id']) && !(is_numeric($params['suffix_id']))) {
-    $params['suffix_id'] = array_search($params['suffix_id'], CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'));
-  }
-
-  if (isset($params['prefix_id']) && !(is_numeric($params['prefix_id']))) {
-    $params['prefix_id'] = array_search($params['prefix_id'], CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'));
-  }
-
-  if (isset($params['gender_id']) && !(is_numeric($params['gender_id']))) {
-    $params['gender_id'] = array_search($params['gender_id'], CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'));
-  }
-
-  $error = _civicrm_api3_greeting_format_params($params);
-  if (civicrm_error($error)) {
-    return $error;
-  }
+  _civicrm_api3_greeting_format_params($params);
 
   $values = array();
-  $entityId = $contactID;
 
-  if (empty($params['contact_type']) && $entityId) {
-    $params['contact_type'] = CRM_Contact_BAO_Contact::getContactType($entityId);
+  if (empty($params['contact_type']) && $contactID) {
+    $params['contact_type'] = CRM_Contact_BAO_Contact::getContactType($contactID);
   }
 
-  if (!isset($params['contact_sub_type']) && $entityId) {
-    $params['contact_sub_type'] = CRM_Contact_BAO_Contact::getContactSubType($entityId);
+  if (!isset($params['contact_sub_type']) && $contactID) {
+    $params['contact_sub_type'] = CRM_Contact_BAO_Contact::getContactSubType($contactID);
   }
 
-  _civicrm_api3_custom_format_params($params, $values, $params['contact_type'], $entityId);
+  _civicrm_api3_custom_format_params($params, $values, $params['contact_type'], $contactID);
 
   $params = array_merge($params, $values);
-
+  //@todo we should just call basic_create here - but need to make contact:create accept 'id' on the bao
   $contact = _civicrm_api3_contact_update($params, $contactID);
 
   if (is_a($contact, 'CRM_Core_Error')) {
-    return civicrm_api3_create_error($contact->_errors[0]['message']);
+    throw new API_Exception($contact->_errors[0]['message']);
   }
   else {
     $values = array();
@@ -144,6 +128,8 @@ function _civicrm_api3_contact_create_spec(&$params) {
     'title' => 'Check for Duplicates',
     'description' => 'Throw error if contact create matches dedupe rule',
   );
+  $params['prefix_id']['api.aliases'] = array('individual_prefix', 'individual_prefix_id');
+  $params['suffix_id']['api.aliases'] = array('individual_suffix', 'individual_suffix_id');
 }
 
 /**
@@ -163,26 +149,7 @@ function civicrm_api3_contact_get($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
   $contacts = _civicrm_api3_get_using_query_object('contact', $params, $options);
-
-  // CRM-7929 Quick fix by colemanw
-  // TODO: Figure out what function is responsible for prepending 'individual_' to these keys
-  // and sort it out there rather than going to all this trouble here.
-  // Eileen's note - not sure anymore if we went the right path stripping the 'individual' here
-  // as is arguable whether it makes more sense now I think it would make more sense to rename the table field  or uniquefield to have
-  // the individual prefix but we are stuck with it now for apiv3 series.
-  $returnContacts = array();
-  if (is_array($contacts)) {
-    foreach ($contacts as $cid => $contact) {
-      if (is_array($contact)) {
-        $returnContacts[$cid] = array();
-        foreach ($contact as $key => $value) {
-          $key = str_replace(array('individual_prefix', 'individual_suffix'), array('prefix', 'suffix'), $key);
-          $returnContacts[$cid][$key] = $value;
-        }
-      }
-    }
-  }
-  return civicrm_api3_create_success($returnContacts, $params, 'contact');
+  return civicrm_api3_create_success($contacts, $params, 'contact');
 }
 
 function civicrm_api3_contact_getcount($params) {
@@ -332,7 +299,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
 
   if (CRM_Utils_Array::value('contact_sub_type', $params) && CRM_Utils_Array::value('contact_type', $params)) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
-        return civicrm_api3_create_error("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$params['contact_sub_type']));
+        throw new API_Exception("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$params['contact_sub_type']));
       }
     }
 
@@ -391,17 +358,12 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
  * @static
  */
 function _civicrm_api3_contact_update($params, $contactID = NULL) {
-  $transaction = new CRM_Core_Transaction();
-
+  //@todo - doesn't contact create support 'id' which is already set- check & remove
   if ($contactID) {
     $params['contact_id'] = $contactID;
   }
 
-  $contact = CRM_Contact_BAO_Contact::create($params);
-
-  $transaction->commit();
-
-  return $contact;
+  return CRM_Contact_BAO_Contact::create($params);
 }
 
 /**
@@ -458,7 +420,7 @@ function _civicrm_api3_greeting_format_params($params) {
     if ($customGreeting && $greetingId &&
       ($greetingId != array_search('Customized', $greetings))
     ) {
-      return civicrm_api3_create_error(ts('Provide either %1 greeting id and/or %1 greeting or custom %1 greeting',
+      throw new API_Exception(ts('Provide either %1 greeting id and/or %1 greeting or custom %1 greeting',
           array(1 => $key)
         ));
     }
@@ -466,7 +428,7 @@ function _civicrm_api3_greeting_format_params($params) {
     if ($greetingVal && $greetingId &&
       ($greetingId != CRM_Utils_Array::key($greetingVal, $greetings))
     ) {
-      return civicrm_api3_create_error(ts('Mismatch in %1 greeting id and %1 greeting',
+      throw new API_Exception(ts('Mismatch in %1 greeting id and %1 greeting',
           array(1 => $key)
         ));
     }
@@ -474,11 +436,11 @@ function _civicrm_api3_greeting_format_params($params) {
     if ($greetingId) {
 
       if (!array_key_exists($greetingId, $greetings)) {
-        return civicrm_api3_create_error(ts('Invalid %1 greeting Id', array(1 => $key)));
+        throw new API_Exception(ts('Invalid %1 greeting Id', array(1 => $key)));
       }
 
       if (!$customGreeting && ($greetingId == array_search('Customized', $greetings))) {
-        return civicrm_api3_create_error(ts('Please provide a custom value for %1 greeting',
+        throw new API_Exception(ts('Please provide a custom value for %1 greeting',
             array(1 => $key)
           ));
       }
@@ -486,7 +448,7 @@ function _civicrm_api3_greeting_format_params($params) {
     elseif ($greetingVal) {
 
       if (!in_array($greetingVal, $greetings)) {
-        return civicrm_api3_create_error(ts('Invalid %1 greeting', array(1 => $key)));
+        throw new API_Exception(ts('Invalid %1 greeting', array(1 => $key)));
       }
 
       $greetingId = CRM_Utils_Array::key($greetingVal, $greetings);
