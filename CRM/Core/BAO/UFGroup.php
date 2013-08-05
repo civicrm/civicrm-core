@@ -949,10 +949,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       // hack for CRM-665
       if (isset($details->$name) || $name == 'group' || $name == 'tag') {
         // to handle gender / suffix / prefix
-        if (in_array($name, array(
-          'gender', 'individual_prefix', 'individual_suffix'))) {
-          $values[$index] = $details->$name;
-          $name           = $name . '_id';
+        if (in_array(substr($name, 0, -3), array('gender', 'prefix', 'suffix'))) {
+          $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $details->$name);
           $params[$index] = $details->$name;
         }
         elseif (in_array($name, CRM_Contact_BAO_Contact::$_greetingTypes)) {
