@@ -147,3 +147,8 @@ UPDATE
   civicrm_uf_group ug ON uf.uf_group_id = ug.id AND ug.is_reserved = 1 AND name = 'membership_batch_entry'
 SET uf.is_reserved = 0
 WHERE uf.field_name IN ('join_date', 'membership_start_date', 'membership_end_date');
+
+--CRM-13155 - Add searching for recurring contribution data to search has been successfully created.
+ALTER TABLE `civicrm_contribution_recur`
+ CHANGE COLUMN `next_sched_contribution` `next_sched_contribution_date` DATETIME NULL DEFAULT NULL COMMENT 'At Groundspring this was used by the cron job which triggered payments. If we\'re not doing that but we know about payments, it might still be useful to store for display to org andor contributors.' AFTER `cycle_day`;
+

@@ -187,7 +187,12 @@ function civicrm_api3_create_success($values = 1, $params = array(
         $values[$key]['id'] = $item[$entity . "_id"];
       }
       if(!empty($item['financial_type_id'])){
+        //4.3 legacy handling
         $values[$key]['contribution_type_id'] = $item['financial_type_id'];
+      }
+      if(!empty($item['next_sched_contribution_date'])){
+        // 4.4 legacy handling
+        $values[$key]['next_sched_contribution'] = $item['next_sched_contribution_date'];
       }
     }
   }

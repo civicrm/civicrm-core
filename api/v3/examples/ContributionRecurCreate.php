@@ -59,7 +59,7 @@ function contribution_recur_create_expectedresult(){
           'contribution_status_id' => '1',
           'is_test' => '',
           'cycle_day' => '',
-          'next_sched_contribution' => '',
+          'next_sched_contribution_date' => '',
           'failure_count' => '',
           'failure_retry_date' => '',
           'auto_renew' => '',
