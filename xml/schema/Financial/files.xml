@@ -7,7 +7,6 @@
 <xi:include href="FinancialTrxn.xml"        parse="xml" />
 <xi:include href="PaymentProcessor.xml"     parse="xml" />
 <xi:include href="PaymentProcessorType.xml" parse="xml" />
-<xi:include href="Receipt.xml"              parse="xml" />
 <xi:include href="FinancialType.xml"          parse="xml" />
 <xi:include href="EntityFinancialAccount.xml" parse="xml" />
 <xi:include href="FinancialItem.xml"          parse="xml" />
