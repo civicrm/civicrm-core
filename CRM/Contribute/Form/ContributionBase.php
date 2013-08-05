@@ -152,6 +152,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public $_pcpInfo;
 
+  /**
+   * The contact id of the person for whom membership is being added or renewed based on the cid in the url,
+   * checksum, or session
+   * @var unknown_type
+   */
+  protected $_contactID;
+
   protected $_userID;
 
   /**
@@ -204,10 +211,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     else {
       $session->set('pastContributionID', $this->_id);
     }
-
+    // this was used prior to the cleverer this_>getContactID - unsure now
     $this->_userID = $session->get('userID');
+
+    $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;
-    if ($this->_userID) {
+    if ($this->_contactID) {
       $this->_mid = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
       if ($this->_mid) {
         $membership = new CRM_Member_DAO_Membership();
@@ -215,7 +224,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         if ($membership->find(TRUE)) {
           $this->_defaultMemTypeId = $membership->membership_type_id;
-          if ($membership->contact_id != $this->_userID) {
+          if ($membership->contact_id != $this->_contactID) {
             $employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($this->_userID);
             if (array_key_exists($membership->contact_id, $employers)) {
               $this->_membershipContactID = $membership->contact_id;
