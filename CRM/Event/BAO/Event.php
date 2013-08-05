@@ -1392,17 +1392,8 @@ WHERE civicrm_event.is_active = 1
             $values[$index] = '';
           }
         }
-        elseif ('gender' == substr($name, 0, 6)) {
-          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-          $values[$index] = $gender[$params[$name]];
-        }
-        elseif ('individual_prefix' == substr($name, 0, 17)) {
-          $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-          $values[$index] = $prefix[$params[$name]];
-        }
-        elseif ('individual_suffix' == substr($name, 0, 17)) {
-          $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
-          $values[$index] = $suffix[$params[$name]];
+        elseif (in_array(substr($name, 0, -3), array('gender', 'prefix', 'suffix'))) {
+          $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $params[$name]);
         }
         elseif (in_array($name, array(
           'addressee', 'email_greeting', 'postal_greeting'))) {
