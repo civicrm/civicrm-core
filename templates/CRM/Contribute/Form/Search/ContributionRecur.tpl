@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 
-  <div class="crm-accordion-wrapper crm-contactDetails-accordion {if $form.formName eq 'Advanced' AND $cd_edit.collapse_adv_display eq 1}collapsed{/if}" id="{$cd_edit.name}" >
+  <div class="crm-accordion-wrapper crm-contactDetails-accordion collapsed" id="{contribution_recur}" >
     <div class="crm-accordion-header">
         {ts}Recurring Contributions{/ts}
     </div>
