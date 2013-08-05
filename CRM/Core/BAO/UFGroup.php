@@ -1848,7 +1848,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           '' => ts('- select -')) + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'), $required
       );
     }
-    elseif ($fieldName === 'gender') {
+    elseif ($fieldName === 'gender_id') {
       $genderOptions = array();
       $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
       foreach ($gender as $key => $var) {
@@ -1859,13 +1859,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
       }
     }
-    elseif ($fieldName === 'individual_prefix') {
+    elseif ($fieldName === 'prefix_id') {
       $form->add('select', $name, $title,
         array(
           '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'), $required
       );
     }
-    elseif ($fieldName === 'individual_suffix') {
+    elseif ($fieldName === 'suffix_id') {
       $form->add('select', $name, $title,
         array(
           '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'), $required
