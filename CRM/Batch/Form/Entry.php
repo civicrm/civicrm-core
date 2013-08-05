@@ -193,7 +193,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
-      CRM_Contact_Form_NewContact::buildQuickForm($this, $rowNumber, NULL, TRUE, 'primary_');
+      CRM_Contact_Form_NewContact::buildQuickForm($this, $rowNumber, NULL, TRUE, 'primary_', ts('Contact'));
 
       // special field specific to membership batch udpate
       if ($this->_batchInfo['type_id'] == 2) {
