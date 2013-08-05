@@ -23,6 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{* include wysiwyg related files*}
+{if !$includeWysiwygEditor}
+  {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
+{/if}
 {* Custom Data view mode*}
 {foreach from=$viewCustomData item=customValues key=customGroupId}
   {foreach from=$customValues item=cd_edit key=cvID}
