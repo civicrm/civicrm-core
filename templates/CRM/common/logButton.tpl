@@ -45,13 +45,6 @@
 <script type="text/javascript">
 
 (function($, CRM) {
-  var options = {
-    cssDialogSelector: ".dialog-{/literal}{$snippet.css_class}{literal}",
-    contactId: {/literal}{$snippet.contact_id}{literal},
-    tableName: "{/literal}{$snippet.table_name}{literal}",
-    reportId: {/literal}{$snippet.instance_id}{literal}
-  };
-
   $.fn.crmRevisionLink = function(options) {
     return this.each(function(){
       $(this).on("click", function() {
@@ -84,7 +77,13 @@
       });
     }); // this.each
   }; // fn.crmRevisionLink
-  $(".{/literal}{$snippet.css_class}{literal}").crmRevisionLink(options);
+
+  $(".{/literal}{$snippet.css_class}{literal}").crmRevisionLink({
+    cssDialogSelector: ".dialog-{/literal}{$snippet.css_class}{literal}",
+    contactId: {/literal}{$snippet.contact_id}{literal},
+    tableName: "{/literal}{$snippet.table_name}{literal}",
+    reportId: {/literal}{$snippet.instance_id}{literal}
+  });
 })(cj, CRM);
 </script>
 {/literal}
