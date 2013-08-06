@@ -49,36 +49,42 @@
     cssDialogSelector: ".dialog-{/literal}{$snippet.css_class}{literal}",
     contactId: {/literal}{$snippet.contact_id}{literal},
     tableName: "{/literal}{$snippet.table_name}{literal}",
-    reportId: {/literal}{$snippet.instance_id}{literal},
+    reportId: {/literal}{$snippet.instance_id}{literal}
   };
-  $(document).on("click", ".{/literal}{$snippet.css_class}{literal}", function() {
-    $(options.cssDialogSelector).show( );
-    $(options.cssDialogSelector).dialog({
-      title: "{/literal}{ts}Revisions{/ts}{literal}",
-      modal: true,
-      width: "680px",
-      bgiframe: true,
-      overlay: { opacity: 0.5, background: "black" },
-      open:function() {
-        var ajaxurl = CRM.url("civicrm/report/instance/" + options.reportId);
-        cj.ajax({
-          data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value="+options.contactId+"&log_type_table_op=has&log_type_table_value=" + options.tableName,
-          url:  ajaxurl,
-          success: function (data) {
-            $(options.cssDialogSelector + " .revision-content").html(data);
-            if (!$(options.cssDialogSelector + " .revision-content .report-layout").length) {
-              $(options.cssDialogSelector + " .revision-content").html("Sorry, couldn't find any revisions.");
+
+  $.fn.crmRevisionLink = function(options) {
+    return this.each(function(){
+      $(this).on("click", function() {
+        $(options.cssDialogSelector).show( );
+        $(options.cssDialogSelector).dialog({
+          title: "{/literal}{ts}Revisions{/ts}{literal}",
+          modal: true,
+          width: "680px",
+          bgiframe: true,
+          overlay: { opacity: 0.5, background: "black" },
+          open:function() {
+            var ajaxurl = CRM.url("civicrm/report/instance/" + options.reportId);
+            cj.ajax({
+              data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value="+options.contactId+"&log_type_table_op=has&log_type_table_value=" + options.tableName,
+              url:  ajaxurl,
+              success: function (data) {
+                $(options.cssDialogSelector + " .revision-content").html(data);
+                if (!$(options.cssDialogSelector + " .revision-content .report-layout").length) {
+                  $(options.cssDialogSelector + " .revision-content").html("Sorry, couldn't find any revisions.");
+                }
+              }
+            });
+          },
+          buttons: {
+            "Done": function() {
+              $(this).dialog("destroy");
             }
           }
         });
-      },
-      buttons: {
-        "Done": function() {
-          $(this).dialog("destroy");
-        }
-      }
-    });
-  });
+      });
+    }); // this.each
+  }; // fn.crmRevisionLink
+  $(".{/literal}{$snippet.css_class}{literal}").crmRevisionLink(options);
 })(cj, CRM);
 </script>
 {/literal}
