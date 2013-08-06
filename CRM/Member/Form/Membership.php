@@ -1346,8 +1346,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $formValues["address_name-{$this->_bltID}"] = trim($formValues["address_name-{$this->_bltID}"]);
 
       $fields["address_name-{$this->_bltID}"] = 1;
-
-      $fields["email-{$this->_bltID}"] = 1;
+      //ensure we don't over-write the payer's email with the member's email
+      if($this->_contributorContactID == $this->_contactID) {
+        $fields["email-{$this->_bltID}"] = 1;
+      }
 
       $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type');
 
