@@ -43,34 +43,37 @@
 
 {literal}
 <script type="text/javascript">
-var cssDialogSelector = ".dialog-{/literal}{$snippet.css_class}{literal}";
-cj(document).on("click", ".{/literal}{$snippet.css_class}{literal}", function() {
-  cj(cssDialogSelector).show( );
-  cj(cssDialogSelector).dialog({
-    title: "{/literal}{ts}Revisions{/ts}{literal}",
-    modal: true,
-    width: "680px",
-    bgiframe: true,
-    overlay: { opacity: 0.5, background: "black" },
-    open:function() {
-      var ajaxurl = CRM.url("civicrm/report/instance/{/literal}{$snippet.instance_id}{literal}");
-      cj.ajax({
-        data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value={/literal}{$snippet.contact_id}{literal}&log_type_table_op=has&log_type_table_value={/literal}{$snippet.table_name}{literal}",
-        url:  ajaxurl,
-        success: function (data) {
-          cj(cssDialogSelector + " .revision-content").html(data);
-          if (!cj(cssDialogSelector + " .revision-content .report-layout").length) {
-            cj(cssDialogSelector + " .revision-content").html("Sorry, couldn't find any revisions.");
+
+(function($, CRM) {
+  var cssDialogSelector = ".dialog-{/literal}{$snippet.css_class}{literal}";
+  $(document).on("click", ".{/literal}{$snippet.css_class}{literal}", function() {
+    $(cssDialogSelector).show( );
+    $(cssDialogSelector).dialog({
+      title: "{/literal}{ts}Revisions{/ts}{literal}",
+      modal: true,
+      width: "680px",
+      bgiframe: true,
+      overlay: { opacity: 0.5, background: "black" },
+      open:function() {
+        var ajaxurl = CRM.url("civicrm/report/instance/{/literal}{$snippet.instance_id}{literal}");
+        cj.ajax({
+          data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value={/literal}{$snippet.contact_id}{literal}&log_type_table_op=has&log_type_table_value={/literal}{$snippet.table_name}{literal}",
+          url:  ajaxurl,
+          success: function (data) {
+            $(cssDialogSelector + " .revision-content").html(data);
+            if (!$(cssDialogSelector + " .revision-content .report-layout").length) {
+              $(cssDialogSelector + " .revision-content").html("Sorry, couldn't find any revisions.");
+            }
           }
+        });
+      },
+      buttons: {
+        "Done": function() {
+          $(this).dialog("destroy");
         }
-      });
-    },
-    buttons: {
-      "Done": function() {
-        cj(this).dialog("destroy");
       }
-    }
+    });
   });
-});
+})(cj, CRM);
 </script>
 {/literal}
