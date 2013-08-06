@@ -46,6 +46,9 @@
 
 (function($, CRM) {
   var cssDialogSelector = ".dialog-{/literal}{$snippet.css_class}{literal}";
+  var contactId = {/literal}{$snippet.contact_id}{literal};
+  var tableName = "{/literal}{$snippet.table_name}{literal}";
+  var reportId = {/literal}{$snippet.instance_id}{literal};
   $(document).on("click", ".{/literal}{$snippet.css_class}{literal}", function() {
     $(cssDialogSelector).show( );
     $(cssDialogSelector).dialog({
@@ -55,9 +58,9 @@
       bgiframe: true,
       overlay: { opacity: 0.5, background: "black" },
       open:function() {
-        var ajaxurl = CRM.url("civicrm/report/instance/{/literal}{$snippet.instance_id}{literal}");
+        var ajaxurl = CRM.url("civicrm/report/instance/" + reportId);
         cj.ajax({
-          data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value={/literal}{$snippet.contact_id}{literal}&log_type_table_op=has&log_type_table_value={/literal}{$snippet.table_name}{literal}",
+          data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value="+contactId+"&log_type_table_op=has&log_type_table_value=" + tableName,
           url:  ajaxurl,
           success: function (data) {
             $(cssDialogSelector + " .revision-content").html(data);
