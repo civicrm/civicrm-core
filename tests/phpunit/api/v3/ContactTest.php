@@ -252,14 +252,19 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
-    $this->assertEquals(1, $contact['id'], "In line " . __LINE__);
+    $result = $this->callAPISuccess('contact', 'getsingle', array('id' => $contact['id']));
+    $this->assertArrayKeyExists('prefix_id', $result);
+    $this->assertArrayKeyExists('gender_id', $result);
+    $this->assertArrayKeyExists('suffix_id', $result);
+    $this->assertEquals(4, $result['prefix_id']);
+    $this->assertEquals(1, $result['suffix_id']);
   }
 
   /**
    *  Verify that attempt to create individual contact with
    *  first and last names and old key values works
    */
-  function testCreateNameIndividualOldKeys2() {
+  function testCreateNameIndividualrecommendedKeys2() {
     $params = array(
       'prefix_id' => 'Dr.',
       'first_name' => 'abc1',
@@ -270,7 +275,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
-    $this->assertEquals(1, $contact['id'], "In line " . __LINE__);
+    $result = $this->callAPISuccess('contact', 'getsingle', array('id' => $contact['id']));
+    $this->assertArrayKeyExists('prefix_id', $result);
+    $this->assertArrayKeyExists('gender_id', $result);
+    $this->assertArrayKeyExists('suffix_id', $result);
+    $this->assertEquals(4, $result['prefix_id']);
+    $this->assertEquals(1, $result['suffix_id']);
+    $this->assertEquals(2, $result['gender_id']);
   }
 
   /**
