@@ -976,7 +976,7 @@ LEFT JOIN {$reminderJoinClause}
       if ($limitTo == 0) {
         $additionWhere = ' WHERE ';
         if ($actionSchedule->start_action_date) {
-          $additionWhere = $whereClause;
+          $additionWhere = $whereClause . ' AND ';
         }
 
         $insertAdditionalSql ="
@@ -988,7 +988,7 @@ LEFT JOIN civicrm_action_log reminder ON reminder.contact_id = c.id AND
         reminder.entity_table       = 'civicrm_contact' AND
         reminder.action_schedule_id = {$actionSchedule->id}
 {$addGroup}
-{$additionWhere} AND c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere}
+{$additionWhere} c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere}
 AND {$dateClause}
 AND c.id NOT IN (
      SELECT rem.contact_id
