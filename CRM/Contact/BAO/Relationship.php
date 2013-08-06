@@ -1338,8 +1338,10 @@ SELECT count(*)
    * Helper function to check whether to delete the membership or
    * not.
    *
+   * @static
+   *
    */
-  function isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
+  static function isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
     if (in_array($relTypeId, $relTypeIds)) {
       return TRUE;
     }
