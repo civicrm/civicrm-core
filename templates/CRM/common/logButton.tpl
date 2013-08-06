@@ -45,27 +45,29 @@
 <script type="text/javascript">
 
 (function($, CRM) {
-  var cssDialogSelector = ".dialog-{/literal}{$snippet.css_class}{literal}";
-  var contactId = {/literal}{$snippet.contact_id}{literal};
-  var tableName = "{/literal}{$snippet.table_name}{literal}";
-  var reportId = {/literal}{$snippet.instance_id}{literal};
+  var options = {
+    cssDialogSelector: ".dialog-{/literal}{$snippet.css_class}{literal}",
+    contactId: {/literal}{$snippet.contact_id}{literal},
+    tableName: "{/literal}{$snippet.table_name}{literal}",
+    reportId: {/literal}{$snippet.instance_id}{literal},
+  };
   $(document).on("click", ".{/literal}{$snippet.css_class}{literal}", function() {
-    $(cssDialogSelector).show( );
-    $(cssDialogSelector).dialog({
+    $(options.cssDialogSelector).show( );
+    $(options.cssDialogSelector).dialog({
       title: "{/literal}{ts}Revisions{/ts}{literal}",
       modal: true,
       width: "680px",
       bgiframe: true,
       overlay: { opacity: 0.5, background: "black" },
       open:function() {
-        var ajaxurl = CRM.url("civicrm/report/instance/" + reportId);
+        var ajaxurl = CRM.url("civicrm/report/instance/" + options.reportId);
         cj.ajax({
-          data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value="+contactId+"&log_type_table_op=has&log_type_table_value=" + tableName,
+          data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value="+options.contactId+"&log_type_table_op=has&log_type_table_value=" + options.tableName,
           url:  ajaxurl,
           success: function (data) {
-            $(cssDialogSelector + " .revision-content").html(data);
-            if (!$(cssDialogSelector + " .revision-content .report-layout").length) {
-              $(cssDialogSelector + " .revision-content").html("Sorry, couldn't find any revisions.");
+            $(options.cssDialogSelector + " .revision-content").html(data);
+            if (!$(options.cssDialogSelector + " .revision-content .report-layout").length) {
+              $(options.cssDialogSelector + " .revision-content").html("Sorry, couldn't find any revisions.");
             }
           }
         });
