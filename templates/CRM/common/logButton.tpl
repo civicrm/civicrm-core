@@ -37,9 +37,6 @@
 *}
 
 <a class="css_right {$snippet.css_class}" href="#" title="{ts}View Revisions{/ts}">View Revisions</a>
-<div class="dialog-{$snippet.css_class}">
-  <div class="revision-content"></div>
-</div>
 
 {literal}
 <script type="text/javascript">
@@ -47,6 +44,8 @@
 (function($, CRM) {
   $.fn.crmRevisionLink = function(options) {
     return this.each(function(){
+      var $dialog = $('<div class="'+options.cssDialogSelector.substr(1)+'"><div class="revision-content"></div></div>');
+      $('body').append($dialog);
       $(this).on("click", function() {
         $(options.cssDialogSelector).show( );
         $(options.cssDialogSelector).dialog({
