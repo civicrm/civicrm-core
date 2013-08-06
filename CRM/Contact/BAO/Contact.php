@@ -2052,17 +2052,8 @@ ORDER BY civicrm_email.is_primary DESC";
             $data['website'][$websiteField[1]]['url'] = $value;
           }
         }
-        elseif ($key === 'individual_suffix') {
-          $data['suffix_id'] = $value;
-        }
-        elseif ($key === 'individual_prefix') {
-          $data['prefix_id'] = $value;
-        }
-        elseif ($key === 'gender') {
-          $data['gender_id'] = $value;
-        }
-        //save email/postal greeting and addressee values if any, CRM-4575
         elseif (in_array($key, self::$_greetingTypes, TRUE)) {
+          //save email/postal greeting and addressee values if any, CRM-4575
           $data[$key . '_id'] = $value;
         }
         elseif (!$skipCustom && ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
