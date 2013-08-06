@@ -34,6 +34,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_RelationshipTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_cId_a;
+  /**
+   * second individual
+   * @var integer
+   */
+  protected $_cId_a_2;
   protected $_cId_b;
   protected $_cId_b2;// second org
   protected $_relTypeID;
@@ -53,10 +58,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->_cId_a      = $this->individualCreate();
-    $this->_cId_b      = $this->organizationCreate();
-    $this->_cId_b2      = $this->organizationCreate(array('organization_name' => ' Org 2'));
-    $this->_entity     = 'relationship';
+    $this->_cId_a = $this->individualCreate();
+    $this->_cId_a_2 = $this->individualCreate(array('last_name' => 'c2', 'email' => 'c@w.com', 'contact_type' => 'Individual'));
+    $this->_cId_b = $this->organizationCreate();
+    $this->_cId_b2 = $this->organizationCreate(array('organization_name' => ' Org 2'));
+    $this->_entity = 'relationship';
     //Create a relationship type
     $relTypeParams = array(
       'name_a_b' => 'Relation 1 for delete',
@@ -81,6 +87,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   function tearDown() {
     $this->contactDelete($this->_cId_a);
+    $this->contactDelete($this->_cId_a_2);
     $this->contactDelete($this->_cId_b);
     $this->contactDelete($this->_cId_b2);
     $this->quickCleanup(array('civicrm_relationship'), TRUE);
@@ -962,5 +969,109 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       $this->assertTrue(in_array($value['relationship_type_id'], array($this->_relTypeID, $relType3)));
     }
   }
-}
 
+  /**
+   * Checks that passing in 'contact_id_b' + a relationship type
+   * will filter by relationship type for contact b
+   *
+   * We should get 1 result without or with correct relationship type id & 0 with
+   * an incorrect one
+   */
+  function testGetRelationshipByMembershipTypeDAO() {
+    $created = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $org3 = $this->organizationCreate();
+
+    $relType2 = 5; // lets just assume built in ones aren't being messed with!
+    $relType3 = 6; // lets just assume built in ones aren't being messed with!
+    $relType1 = 1;
+    $memberType = $this->membershipTypeCreate(array(
+      'relationship_type_id' => CRM_Core_DAO::VALUE_SEPARATOR . $relType1 . CRM_Core_DAO::VALUE_SEPARATOR . $relType3 . CRM_Core_DAO::VALUE_SEPARATOR,
+      'relationship_direction' => CRM_Core_DAO::VALUE_SEPARATOR . 'a_b' . CRM_Core_DAO::VALUE_SEPARATOR . 'b_a' . CRM_Core_DAO::VALUE_SEPARATOR,
+    ));
+
+    //relationshp 2
+    $this->callAPISuccess($this->_entity, 'create',
+      array_merge($this->_params, array(
+        'relationship_type_id' => $relType2,
+        'contact_id_b' => $this->_cId_b2))
+    );
+
+    //relationshp 3
+    $this->callAPISuccess($this->_entity, 'create',
+      array_merge($this->_params, array(
+        'relationship_type_id' => $relType3,
+        'contact_id_b' => $org3))
+    );
+
+    //relationshp 4 with reveral
+    $this->callAPISuccess($this->_entity, 'create',
+      array_merge($this->_params, array(
+        'relationship_type_id' => $relType1,
+        'contact_id_a' => $this->_cId_a,
+        'contact_id_b' => $this->_cId_a_2))
+    );
+
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'contact_id_a' => $this->_cId_a,
+      'membership_type_id' => $memberType,
+    ));
+    // although our contact has more than one relationship we have passed them in as contact_id_a & can't get reciprocal
+    $this->assertEquals(1, $result['count']);
+    foreach ($result['values'] as $key => $value) {
+      $this->assertTrue(in_array($value['relationship_type_id'], array($relType1)));
+    }
+  }
+
+  /**
+   * Checks that passing in 'contact_id_b' + a relationship type
+   * will filter by relationship type for contact b
+   *
+   * We should get 1 result without or with correct relationship type id & 0 with
+   * an incorrect one
+   */
+  function testGetRelationshipByMembershipTypeReciprocal() {
+      $created = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $org3 = $this->organizationCreate();
+
+    $relType2 = 5; // lets just assume built in ones aren't being messed with!
+    $relType3 = 6; // lets just assume built in ones aren't being messed with!
+    $relType1 = 1;
+    $memberType = $this->membershipTypeCreate(array(
+      'relationship_type_id' => CRM_Core_DAO::VALUE_SEPARATOR . $relType1 . CRM_Core_DAO::VALUE_SEPARATOR . $relType3 . CRM_Core_DAO::VALUE_SEPARATOR,
+      'relationship_direction' => CRM_Core_DAO::VALUE_SEPARATOR . 'a_b' . CRM_Core_DAO::VALUE_SEPARATOR . 'b_a' . CRM_Core_DAO::VALUE_SEPARATOR,
+    ));
+
+    //relationshp 2
+    $this->callAPISuccess($this->_entity, 'create',
+      array_merge($this->_params, array(
+        'relationship_type_id' => $relType2,
+        'contact_id_b' => $this->_cId_b2))
+    );
+
+    //relationshp 3
+    $this->callAPISuccess($this->_entity, 'create',
+      array_merge($this->_params, array(
+        'relationship_type_id' => $relType3,
+        'contact_id_b' => $org3))
+    );
+
+    //relationshp 4 with reveral
+    $this->callAPISuccess($this->_entity, 'create',
+      array_merge($this->_params, array(
+        'relationship_type_id' => $relType1,
+        'contact_id_a' => $this->_cId_a,
+        'contact_id_b' => $this->_cId_a_2))
+    );
+
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'contact_id' => $this->_cId_a,
+      'membership_type_id' => $memberType,
+    ));
+    // although our contact has more than one relationship we have passed them in as contact_id_a & can't get reciprocal
+    $this->assertEquals(2, $result['count']);
+
+    foreach ($result['values'] as $key => $value) {
+      $this->assertTrue(in_array($value['relationship_type_id'], array($relType1, $relType3)));
+    }
+  }
+}

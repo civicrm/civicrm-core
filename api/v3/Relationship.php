@@ -137,7 +137,11 @@ function civicrm_api3_relationship_delete($params) {
  */
 function civicrm_api3_relationship_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
+
   if (!CRM_Utils_Array::value('contact_id', $params)) {
+    if(!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
+      CRM_Contact_BAO_Relationship::membershipTypeToRelationshipTypes($params);
+    }
     $relationships = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
   else {

@@ -887,6 +887,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
     // CRM-6181
     $where .= ' AND civicrm_contact.is_deleted = 0';
+    if(!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
+      $where .= self::membershipTypeToRelationshipTypes($params, $direction);
+    }
     if(!empty($params['relationship_type_id'])) {
       if(is_array($params['relationship_type_id'])) {
         $where .=  " AND " . CRM_Core_DAO::createSQLFilter('relationship_type_id', $params['relationship_type_id'], 'Integer');
@@ -1533,6 +1536,47 @@ cc.sort_name LIKE '%$name%'";
       }
     }
     return TRUE;
+  }
+
+  /**
+   * Function filters the query by possible relationships for the membership type
+   * It is intended to be called when constructing queries for the api (reciprocal & non-reciprocal)
+   * and to add clauses to limit the return to those relationships which COULD inherit a membership type
+   * (as opposed to those who inherit a particular membership
+   *
+   * @param array $params api input array
+   */
+  static function membershipTypeToRelationshipTypes(&$params, $direction = NULL) {
+    $membershipType = civicrm_api3('membership_type', 'getsingle', array('id' => $params['membership_type_id'], 'return' => 'relationship_type_id, relationship_direction'));
+    $relationshipTypes = $membershipType['relationship_type_id'];
+    // if we don't have any contact data we can only filter on type
+    if(empty($params['contact_id']) && empty($params['contact_id_a']) && empty($params['contact_id_a'])) {
+      $params['relationship_type_id'] = array('IN' => $relationshipTypes);
+      return;
+    }
+    else {
+      $relationshipDirections = $membershipType['relationship_direction'];
+      // if we have contact_id_a OR contact_id_b we can make a call here
+      // if we have contact??
+      foreach ($relationshipDirections as $index => $mtdirection) {
+        if(isset($params['contact_id_a']) && $mtdirection == 'a_b'  || $direction == 'a_b') {
+          $types[] = $relationshipTypes[$index];
+        }
+        if(isset($params['contact_id_b']) && $mtdirection == 'b_a'  || $direction == 'b_a') {
+          $types[] = $relationshipTypes[$index];
+        }
+      }
+      if(!empty($types)) {
+        $params['relationship_type_id'] = array('IN' => $types);
+      }
+      elseif(!empty($clauses)) {
+        return explode(' OR ', $clauses);
+      }
+      else{
+        // effectively setting it to return no results
+        $params['relationship_type_id'] = 0;
+      }
+    }
   }
 }
 
