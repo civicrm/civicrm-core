@@ -121,7 +121,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->_processors = array();
-
+    CRM_Core_Resources::singleton()->addSetting(array('ids' => array('contact' => $this->_contactID)));
 
     // check for edit permission
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
