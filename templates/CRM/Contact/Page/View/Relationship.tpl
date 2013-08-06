@@ -147,11 +147,14 @@
         <tr>
             <th>{ts}Relationship{/ts}</th>
             <th></th>
+            <th id="dis-start_date">{ts}Start{/ts}</th>
+            <th id="dis-end_date">{ts}End{/ts}</th>
             <th>{ts}City{/ts}</th>
             <th>{ts}State/Prov{/ts}</th>
+            <th>{ts}Email{/ts}</th>
             <th>{ts}Phone{/ts}</th>
-            <th id="dis-end_date">{ts}End Date{/ts}</th>
             <th></th>
+            <th class="hiddenElement"></th>
             <th class="hiddenElement"></th>
         </tr>
         </thead>
@@ -168,12 +171,15 @@
               {if $rel.description}<p class='description'>{$rel.description}</p>{/if}
             </td>
             <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$rel.cid`"}">{$rel.name}</a></td>
-            <td>{$rel.city}</td>
-            <td>{$rel.state}</td>
-            <td>{$rel.phone}</td>
-            <td>{$rel.end_date}</td>
-            <td class="nowrap">{$rel.action|replace:'xx':$rel.id}</td>
-            <td class="dis-end_date hiddenElement">{$rel.end_date|crmDate}</td>
+                <td class="dis-crm-rel-start_date">{$rel.start_date}</td>
+                <td class="dis-crm-rel-end_date">{$rel.end_date}</td>
+                <td>{$rel.city}</td>
+                <td>{$rel.state}</td>
+                <td>{$rel.email}</td>
+                <td>{$rel.phone}</td>
+                <td class="nowrap">{$rel.action|replace:'xx':$rel.id}</td>
+                <td class="dis-start_date hiddenElement">{$rel.start_date|crmDate}</td>
+                <td class="dis-end_date hiddenElement">{$rel.end_date|crmDate}</td>
           </tr>
         {/foreach}
         </table>
