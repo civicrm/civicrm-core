@@ -978,15 +978,18 @@ LEFT JOIN {$reminderJoinClause}
         if ($actionSchedule->start_action_date) {
           $additionWhere = $whereClause . ' AND ';
         }
+        $contactTable = "civicrm_contact c";
+        $addSelect  = "SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id";
+        $additionReminderClause = "civicrm_action_log reminder ON reminder.contact_id = c.id AND
+          reminder.entity_id          = c.id AND
+          reminder.entity_table       = 'civicrm_contact' AND
+          reminder.action_schedule_id = {$actionSchedule->id}";
 
         $insertAdditionalSql ="
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
-     SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id
-FROM (civicrm_contact c, {$table})
-LEFT JOIN civicrm_action_log reminder ON reminder.contact_id = c.id AND
-        reminder.entity_id          = c.id AND
-        reminder.entity_table       = 'civicrm_contact' AND
-        reminder.action_schedule_id = {$actionSchedule->id}
+{$addSelect}
+FROM ({$contactTable}, {$table})
+LEFT JOIN {$additionReminderClause}
 {$addGroup}
 {$additionWhere} c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere}
 AND {$dateClause}
@@ -1020,12 +1023,11 @@ GROUP BY c.id
         $havingClause = "HAVING TIMEDIFF({$now}, latest_log_time) >= TIME('{$hrs}:00:00')";
         $groupByClause = 'GROUP BY reminder.contact_id, reminder.entity_id, reminder.entity_table';
         $selectClause .= ', MAX(reminder.action_date_time) as latest_log_time';
-
         $sqlInsertValues = "{$selectClause}
 {$fromClause}
 {$joinClause}
 INNER JOIN {$reminderJoinClause}
-{$whereClause} AND {$repeatEventClause}
+{$whereClause} {$limitWhereClause} AND {$repeatEventClause}
 {$groupByClause}
 {$havingClause}";
 
@@ -1042,6 +1044,38 @@ INNER JOIN {$reminderJoinClause}
           $query = '
               INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id) VALUES ' . $valString;
           CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
+        }
+
+        if ($limitTo == 0) {
+          $addSelect .= ', MAX(reminder.action_date_time) as latest_log_time';
+          $sqlEndEventCheck = "
+SELECT * FROM {$table}
+{$whereClause} AND {$repeatEventClause} LIMIT 1";
+
+          $daoCheck = CRM_Core_DAO::executeQuery($sqlEndEventCheck);
+          if ($daoCheck->fetch()) {
+            $valSqlAdditionInsert = "
+{$addSelect}
+FROM  {$contactTable}
+{$addGroup}
+INNER JOIN {$additionReminderClause}
+WHERE {$addWhere} AND c.is_deleted = 0 AND c.is_deceased = 0
+GROUP BY reminder.contact_id
+{$havingClause}
+";
+            $daoForVals = CRM_Core_DAO::executeQuery($valSqlAdditionInsert);
+            $addValues = array();
+            while ($daoForVals->fetch()) {
+              $addValues[] = "( {$daoForVals->contact_id}, {$daoForVals->entity_id}, '{$daoForVals->entity_table}',{$daoForVals->action_schedule_id} )";
+            }
+            $valString = implode(',', $addValues);
+
+            if ($valString) {
+              $query = '
+                INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id) VALUES ' . $valString;
+              CRM_Core_DAO::executeQuery($query);
+            }
+          }
         }
       }
     }
