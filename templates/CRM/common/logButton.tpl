@@ -43,23 +43,24 @@
 
 {literal}
 <script type="text/javascript">
+var cssDialogSelector = ".dialog-{/literal}{$snippet.css_class}{literal}";
 cj(document).on("click", ".{/literal}{$snippet.css_class}{literal}", function() {
-  cj(".dialog-{/literal}{$snippet.css_class}{literal}").show( );
-  cj(".dialog-{/literal}{$snippet.css_class}{literal}").dialog({
+  cj(cssDialogSelector).show( );
+  cj(cssDialogSelector).dialog({
     title: "{/literal}{ts}Revisions{/ts}{literal}",
     modal: true,
     width: "680px",
     bgiframe: true,
     overlay: { opacity: 0.5, background: "black" },
     open:function() {
-      var ajaxurl = {/literal}'{crmURL p="civicrm/report/instance/`$snippet.instance_id`" h=0 }'{literal};
+      var ajaxurl = CRM.url("civicrm/report/instance/{/literal}{$snippet.instance_id}{literal}");
       cj.ajax({
         data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value={/literal}{$snippet.contact_id}{literal}&log_type_table_op=has&log_type_table_value={/literal}{$snippet.table_name}{literal}",
         url:  ajaxurl,
         success: function (data) {
-          cj(".dialog-{/literal}{$snippet.css_class}{literal} .revision-content").html(data);
-          if (!cj(".dialog-{/literal}{$snippet.css_class}{literal} .revision-content .report-layout").length) {
-            cj(".dialog-{/literal}{$snippet.css_class}{literal} .revision-content").html("Sorry, couldn't find any revisions.");
+          cj(cssDialogSelector + " .revision-content").html(data);
+          if (!cj(cssDialogSelector + " .revision-content .report-layout").length) {
+            cj(cssDialogSelector + " .revision-content").html("Sorry, couldn't find any revisions.");
           }
         }
       });
