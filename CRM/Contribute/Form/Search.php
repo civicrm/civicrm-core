@@ -78,9 +78,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
    * form values that we will be using
    *
    * @var array
-   * @access protected
+   * @access public
    */
-  protected $_formValues;
+  public $_formValues;
 
   /**
    * the params that are sent to the query
