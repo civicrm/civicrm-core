@@ -42,6 +42,8 @@
          <span class="description">{$form.honor_first_name.label}</span></td>
       <td>{$form.honor_last_name.html}<br />
          <span class="description">{$form.honor_last_name.label}</span></td>
+      <td>{$form.honor_last_name_1.html}<br />
+         <span class="description">{$form.honor_last_name_1.label}</span></td>
    </tr>
    <tr id="honorTypeEmail">
       <td></td>
@@ -69,6 +71,7 @@
       } else {
    cj('#honor_first_name').val('');
    cj('#honor_last_name').val('');
+   cj('#honor_last_name_1').val('');
    cj('#honor_email').val('');
    cj('#honor_prefix_id').val('');
    cj('#honorType').hide();

@@ -46,7 +46,9 @@
        <td class="html-adjust">{$form.email.html}</td>
     </tr>
 {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
-    <tr class="crm-contribution-form-block-_qf_Preview_next_express"><td></td><td>{$form._qf_Preview_next_express.html}</td>
+    <tr class="crm-contribution-form-block-_qf_Preview_next_express">
+       <td></td>
+       <td>{$form._qf_Preview_next_express.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-first_name">
        <td class="label">{$form.first_name.label}</td>
@@ -59,6 +61,10 @@
     <tr class="crm-contribution-form-block-last_name">
        <td class="label">{$form.last_name.label}</td>
        <td class="html-adjust">{$form.last_name.html}</td>
+    </tr>
+    <tr class="crm-contribution-form-block-last_name_1">
+       <td class="label">{$form.last_name_1.label}</td>
+       <td class="html-adjust">{$form.last_name_1.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-street1">
        <td class="label">{$form.street1.label}</td>

@@ -55,7 +55,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
     }
 
     // UI for selecting columns to appear in the report list
-    // array conatining the columns, group_bys and filters build and provided to Form
+    // array containing the columns, group_bys and filters build and provided to Form
     $this->_columns = array(
       'civicrm_contact' =>
       array(
@@ -82,7 +82,16 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
             'required' => TRUE,
           ),
           'last_name' =>
-          array('title' => ts('Last Name'),
+          array('title' => ts('Paternal Last Name'),
+            'no_repeat' => TRUE,
+          ),
+          'id' =>
+          array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+          'last_name_1' =>
+          array('title' => ts('Maternal Last Name'),
             'no_repeat' => TRUE,
           ),
           'id' =>

@@ -48,7 +48,8 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
       ts('Contact Id') => 'contact_id',
       ts('Full Name') => 'sort_name',
       ts('First Name') => 'first_name',
-      ts('Last Name') => 'last_name',
+      ts('Paternal Last Name') => 'last_name',
+      ts('Maternal Last Name') => 'last_name_1',
       ts('Tag') => 'tag_name',
       ts('Totals') => 'amount',
     );
@@ -103,6 +104,7 @@ contact_a.id as contact_id,
 contact_a.sort_name as sort_name,
 contact_a.first_name as first_name,
 contact_a.last_name as last_name,
+contact_a.last_name_1 as last_name_1,
 GROUP_CONCAT(DISTINCT civicrm_tag.name ORDER BY  civicrm_tag.name ASC ) as tag_name,
 sum(civicrm_contribution.total_amount) as amount
 ";

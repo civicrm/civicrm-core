@@ -554,7 +554,10 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'title' => ts('First Name'),
           ),
           'last_name' => array(
-            'title' => ts('Last Name'),
+            'title' => ts('Paternal Last Name'),
+          ),
+          'last_name_1' => array(
+            'title' => ts('Maternal Last Name'),
           ),
           'nick_name' => array(
             'title' => ts('Nickname'),
@@ -573,7 +576,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         'grouping' => 'contact-fields',
         'order_bys' => array(
           'sort_name' => array(
-            'title' => ts('Last Name, First Name'),
+            'title' => ts('Paternal Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
             'default_order' => 'ASC',

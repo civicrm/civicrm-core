@@ -779,6 +779,7 @@ SELECT  id
       'first_name',
       'middle_name',
       'last_name',
+      'last_name_1',
       'street_address',
       'supplemental_address_1',
       'city',

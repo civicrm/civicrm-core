@@ -70,7 +70,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ),
           'last_name' =>
-          array('title' => ts('Last Name'),
+          array('title' => ts('Paternal Last Name'),
+            'no_repeat' => TRUE,
+          ),
+          'last_name_1' =>
+          array('title' => ts('Maternal Last Name'),
             'no_repeat' => TRUE,
           ),
           'contact_type' =>

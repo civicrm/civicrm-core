@@ -85,7 +85,16 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'required' => TRUE,
           ),
           'last_name' =>
-          array('title' => ts('Last Name'),
+          array('title' => ts('Paternal Last Name'),
+            'no_repeat' => TRUE,
+          ),
+          'id' =>
+          array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+          'last_name_1' =>
+          array('title' => ts('Maternal Last Name'),
             'no_repeat' => TRUE,
           ),
           'id' =>
@@ -106,7 +115,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         'order_bys' =>
         array(
           'sort_name' => array(
-            'title' => ts('Last Name, First Name'),
+            'title' => ts('Paternal Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
             'default_order' => 'ASC'

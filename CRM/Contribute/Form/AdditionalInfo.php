@@ -172,7 +172,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $form->addGroup($honorTypes, 'honor_type_id', NULL);
     $form->add('select', 'honor_prefix_id', ts('Prefix'), array('' => ts('- prefix -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'));
     $form->add('text', 'honor_first_name', ts('First Name'));
-    $form->add('text', 'honor_last_name', ts('Last Name'));
+    $form->add('text', 'honor_last_name', ts('Paternal Last Name'));
     $form->add('text', 'honor_email', ts('Email'));
     $form->addRule("honor_email", ts('Email is not valid.'), 'email');
   }

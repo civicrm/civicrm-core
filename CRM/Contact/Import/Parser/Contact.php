@@ -290,7 +290,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         }
         if ($this->_lastNameIndex < 0 || !CRM_Utils_Array::value($this->_lastNameIndex, $values)) {
           $errorRequired = TRUE;
-          $missingNames[] = ts('Last Name');
+          $missingNames[] = ts('Paternal Last Name');
         }
         if ($errorRequired) {
           $and = ' ' . ts('and') . ' ';

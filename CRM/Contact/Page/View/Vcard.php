@@ -65,6 +65,7 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
 
     if ($defaults['contact_type'] == 'Individual') {
       $vcard->setName(CRM_Utils_Array::value('last_name', $defaults),
+        CRM_Utils_Array::value('last_name_1', $defaults),
         CRM_Utils_Array::value('first_name', $defaults),
         CRM_Utils_Array::value('middle_name', $defaults),
         CRM_Utils_Array::value('prefix', $defaults),

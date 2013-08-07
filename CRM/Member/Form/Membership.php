@@ -414,7 +414,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $fields[$name] = 1;
       }
       $names = array(
-        'first_name', 'middle_name', 'last_name', "street_address-{$this->_bltID}",
+        'first_name', 'middle_name', 'last_name', 'last_name_1', "street_address-{$this->_bltID}",
         "city-{$this->_bltID}", "postal_code-{$this->_bltID}", "country_id-{$this->_bltID}",
         "state_province_id-{$this->_bltID}",
       );
@@ -1353,7 +1353,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type');
 
-      $nameFields = array('first_name', 'middle_name', 'last_name');
+      $nameFields = array('first_name', 'middle_name', 'last_name', 'last_name_1');
 
       foreach ($nameFields as $name) {
         $fields[$name] = 1;

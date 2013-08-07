@@ -55,7 +55,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           ),
       'first_name' => array('title' => ts('First Name'),
           ),
-      'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Paternal Last Name'),
+          ),
+      'last_name_1' => array('title' => ts('Maternal Last Name'),
           ),
           'id' =>
           array(
@@ -77,7 +79,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'order_bys' =>
         array(
           'sort_name' =>
-          array('title' => ts('Last Name, First Name'), 'default' => '1', 'default_weight' => '0', 'default_order' => 'ASC'),
+          array('title' => ts('Paternal Last Name, First Name'), 'default' => '1', 'default_weight' => '0', 'default_order' => 'ASC'),
         ),
       ),
       'civicrm_address' =>

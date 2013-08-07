@@ -61,7 +61,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     // "null" value for example is passed by dedupe merge in order to empty.
     // Display name computation shouldn't consider such values.
     foreach (array(
-      'first_name', 'middle_name', 'last_name', 'nick_name') as $displayField) {
+      'first_name', 'middle_name', 'last_name', 'last_name_1', 'nick_name') as $displayField) {
       if (CRM_Utils_Array::value($displayField, $params) == "null") {
         $params[$displayField] = '';
       }
@@ -71,6 +71,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     $firstName  = CRM_Utils_Array::value('first_name', $params, '');
     $middleName = CRM_Utils_Array::value('middle_name', $params, '');
     $lastName   = CRM_Utils_Array::value('last_name', $params, '');
+    $lastName1   = CRM_Utils_Array::value('last_name_1', $params, '');
     $nickName   = CRM_Utils_Array::value('nick_name', $params, '');
     $prefix_id  = CRM_Utils_Array::value('prefix_id', $params, '');
     $suffix_id  = CRM_Utils_Array::value('suffix_id', $params, '');
@@ -179,17 +180,18 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
 
     //first trim before further processing.
     foreach (array(
-      'lastName', 'firstName', 'middleName') as $fld) {
+      'lastName1', 'lastName', 'firstName', 'middleName') as $fld) {
       $$fld = trim($$fld);
     }
 
-    if ($lastName || $firstName || $middleName) {
+    if ($lastName1 || $lastName || $firstName || $middleName) {
       // make sure we have values for all the name fields.
       $formatted = $params;
       $nameParams = array(
         'first_name' => $firstName,
         'middle_name' => $middleName,
         'last_name' => $lastName,
+        'last_name_1' => $lastName1,
         'nick_name' => $nickName,
         'individual_suffix' => $suffix,
         'individual_prefix' => $prefix,
@@ -385,7 +387,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   function displayName() {
     $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
     $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
-    return str_replace('  ', ' ', trim($prefix[$this->prefix_id] . ' ' . $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name . ' ' . $suffix[$this->suffix_id]));
+    return str_replace('  ', ' ', trim($prefix[$this->prefix_id] . ' ' . $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name . ' ' . $this->last_name_1 . ' ' . $suffix[$this->suffix_id]));
   }
 
   /**

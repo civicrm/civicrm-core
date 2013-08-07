@@ -73,7 +73,8 @@ to see a list of available tokens (including custom fields). Insert the token by
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.individual_suffix}{/literal}</td><td>{ts}Assigned name suffix, if any (e.g. 'II', 'Jr.', 'Sr.' etc.).{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.first_name}{/literal}</td><td>{ts}Contact's first name.{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.middle_name}{/literal}</td><td>{ts}Contact's middle name.{/ts}</td>
-  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.last_name}{/literal}</td><td>{ts}Contact's last name.{/ts}</td>
+  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.last_name}{/literal}</td><td>{ts}Contact's paternal last name.{/ts}</td>
+  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.last_name_1}{/literal}</td><td>{ts}Contact's maternal last name.{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.current_employer}{/literal}</td><td>{ts}Current employer name as configured in the individual contact edit form. You will probably want this on a separate line, so use the Enter key to create a line-break after the name fields.{/ts}</td></tr>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{, }{/literal}</td><td>{ts}Add spaces or punctuation to layout by surrounding them with brackets.{/ts}</td>
 </table>

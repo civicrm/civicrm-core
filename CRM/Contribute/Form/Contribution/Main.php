@@ -190,7 +190,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
 
       $names = array(
-        'first_name', 'middle_name', 'last_name', "street_address-{$this->_bltID}", "city-{$this->_bltID}",
+        'first_name', 'middle_name', 'last_name', 'last_name_1', "street_address-{$this->_bltID}", "city-{$this->_bltID}",
         "postal_code-{$this->_bltID}", "country_id-{$this->_bltID}", "state_province_id-{$this->_bltID}",
       );
       foreach ($names as $name) {
@@ -604,7 +604,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->addElement('text', 'honor_first_name', ts('First Name'), $attributes['first_name']);
 
     //last_name
-    $this->addElement('text', 'honor_last_name', ts('Last Name'), $attributes['last_name']);
+    $this->addElement('text', 'honor_last_name', ts('Paternal Last Name'), $attributes['last_name']);
+
+    //last_name_1
+    $this->addElement('text', 'honor_last_name_1', ts('Maternal Last Name'), $attributes['last_name_1']);
 
     //email
     $this->addElement('text', 'honor_email', ts('Email Address'), array('class' => 'email'));
@@ -908,7 +911,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         if (!CRM_Utils_Array::value('honor_first_name', $fields) ||
           !CRM_Utils_Array::value('honor_last_name', $fields)
         ) {
-          $errors['honor_last_name'] = ts('In Honor Of - First Name and Last Name, OR an Email Address is required.');
+          $errors['honor_last_name'] = ts('In Honor Of - First Name and Paternal Last Name, OR an Email Address is required.');
         }
       }
     }

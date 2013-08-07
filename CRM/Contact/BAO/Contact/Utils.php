@@ -534,8 +534,11 @@ WHERE id={$contactId}; ";
         $form->addElement('text', 'middle_name', ts('Middle Name'),
           $attributes['middle_name']
         );
-        $form->addElement('text', 'last_name', ts('Last Name'),
+        $form->addElement('text', 'last_name', ts('Paternal Last Name'),
           $attributes['last_name']
+        );
+        $form->addElement('text', 'last_name_1', ts('Maternal Last Name'),
+          $attributes['last_name_1']
         );
         $form->addElement('select', 'suffix_id', ts('Suffix'),
           array('' => ts('- suffix -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')

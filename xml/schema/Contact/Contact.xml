@@ -346,6 +346,23 @@
       <add>1.8</add>
   </index>
   <field>
+       <name>last_name_1</name>
+       <type>varchar</type>
+       <length>64</length>
+       <size>BIG</size>
+       <import>true</import>
+       <headerPattern>/^last|(l(ast\s)?name)$/i</headerPattern>
+       <dataPattern>/^\w+(\s\w+)?+$/</dataPattern>
+       <comment>Maternal Last Name.</comment>
+       <fulltext/>
+      <add>1.1</add>
+  </field>
+  <index>
+      <name>index_last_name_1</name>
+      <fieldName>last_name_1</fieldName>
+      <add>1.8</add>
+  </index>
+  <field>
       <name>prefix_id</name>
       <title>Individual Prefix</title>
       <type>int unsigned</type>

@@ -222,6 +222,13 @@
         </div>
         <div class="clear"></div>
       </div>
+      <div class="crm-section {$form.honor_last_name_1.name}-section">
+        <div class="label">{$form.honor_last_name_1.label}</div>
+        <div class="content">
+          {$form.honor_last_name_1.html}
+        </div>
+        <div class="clear"></div>
+      </div>
       <div id="honorTypeEmail" class="crm-section {$form.honor_email.name}-section">
         <div class="label">{$form.honor_email.label}</div>
         <div class="content">
@@ -393,6 +400,7 @@
     else {
       document.getElementById('honor_first_name').value = '';
       document.getElementById('honor_last_name').value  = '';
+      document.getElementById('honor_last_name_1').value  = '';
       document.getElementById('honor_email').value      = '';
       document.getElementById('honor_prefix_id').value  = '';
       cj('#honorType').hide();

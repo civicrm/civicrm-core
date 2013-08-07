@@ -95,8 +95,20 @@ cj(function($) {
       {$form.middle_name.html}
     </td>
     <td>
+      {$form.nick_name.label}<br />
+      {$form.nick_name.html}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    </td>
+    <td>
       {$form.last_name.label}<br />
       {$form.last_name.html}
+    </td>
+    <td>
+      {$form.last_name_1.label}<br />
+      {$form.last_name_1.html}
     </td>
     {if $form.suffix_id}
     <td>
@@ -115,10 +127,6 @@ cj(function($) {
     <td>
       {$form.job_title.label}<br />
       {$form.job_title.html}
-    </td>
-    <td>
-      {$form.nick_name.label}<br />
-      {$form.nick_name.html}
     </td>
     <td>
       {if $buildContactSubType}

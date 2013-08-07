@@ -35,6 +35,7 @@
     <td>{$form.first_name.label}</td>
     <td>{$form.middle_name.label}</td>
     <td>{$form.last_name.label}</td>
+    <td>{$form.last_name_1.label}</td>
     <td>{$form.suffix_id.label}</td>
   </tr>
   <tr>
@@ -42,6 +43,7 @@
     <td>{$form.first_name.html}</td>
     <td>{$form.middle_name.html|crmAddClass:eight}</td>
     <td>{$form.last_name.html}</td>
+    <td>{$form.last_name_1.html}</td>
     <td>{$form.suffix_id.html}</td>
   </tr>
 

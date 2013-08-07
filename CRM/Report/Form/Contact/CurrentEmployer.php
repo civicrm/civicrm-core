@@ -80,7 +80,9 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           ),
       'first_name' => array('title' => ts('First Name'),
           ),
-      'last_name' => array('title' => ts('Last Name'),
+      'last_name' => array('title' => ts('Paternal Last Name'),
+          ),
+      'last_name_1' => array('title' => ts('Maternal Last Name'),
           ),
           'job_title' =>
           array('title' => ts('Job Title'),

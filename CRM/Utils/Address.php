@@ -110,6 +110,7 @@ class CRM_Utils_Address {
         'contact.first_name' => CRM_Utils_Array::value('first_name', $fields),
         'contact.middle_name' => CRM_Utils_Array::value('middle_name', $fields),
         'contact.last_name' => CRM_Utils_Array::value('last_name', $fields),
+        'contact.last_name_1' => CRM_Utils_Array::value('last_name_1', $fields),
         'contact.individual_suffix' => CRM_Utils_Array::value('individual_suffix', $fields),
         'contact.address_name' => CRM_Utils_Array::value('address_name', $fields),
         'contact.street_address' => CRM_Utils_Array::value('street_address', $fields),

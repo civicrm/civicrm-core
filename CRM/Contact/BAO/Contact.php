@@ -1187,6 +1187,7 @@ WHERE id={$id}; ";
             'first_name',
             'middle_name',
             'last_name',
+            'last_name_1',
             'job_title',
             'gender_id',
             'prefix_id',
@@ -1204,6 +1205,7 @@ WHERE id={$id}; ";
             'first_name',
             'middle_name',
             'last_name',
+            'last_name_1',
             'job_title',
             'gender_id',
             'prefix_id',
@@ -1442,6 +1444,7 @@ WHERE id={$id}; ";
               'first_name',
               'middle_name',
               'last_name',
+              'last_name_1',
               'job_title',
               'gender_id',
               'prefix_id',
@@ -1465,6 +1468,7 @@ WHERE id={$id}; ";
               'first_name',
               'middle_name',
               'last_name',
+              'last_name_1',
               'job_title',
               'gender_id',
               'prefix_id',
@@ -1675,7 +1679,7 @@ WHERE  civicrm_contact.id = %1 ";
     // check if the contact type
     $contactType = self::getContactType($id);
 
-    $nameFields = ($contactType == 'Individual') ? "civicrm_contact.first_name, civicrm_contact.last_name, civicrm_contact.display_name" : "civicrm_contact.display_name";
+    $nameFields = ($contactType == 'Individual') ? "civicrm_contact.first_name, civicrm_contact.last_name, civicrm_contact.last_name_1, civicrm_contact.display_name" : "civicrm_contact.display_name";
 
     $sql = "
 SELECT $nameFields, civicrm_email.email, civicrm_contact.do_not_email, civicrm_email.on_hold, civicrm_contact.is_deceased
@@ -1687,8 +1691,8 @@ ORDER BY civicrm_email.is_primary DESC";
 
     if ($dao->fetch()) {
       if ($contactType == 'Individual') {
-        if ($dao->first_name || $dao->last_name) {
-          $name = "{$dao->first_name} {$dao->last_name}";
+        if ($dao->first_name || $dao->last_name || $dao->last_name_1) {
+          $name = "{$dao->first_name} {$dao->last_name} {$dao->last_name_1}";
         }
         else {
           $name = $dao->display_name;

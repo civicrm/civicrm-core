@@ -37,10 +37,19 @@
 
 <div class="form-item">
     <div>
-        <label for="qa_last_name">{ts}Last Name:{/ts}</label>
+        <label for="qa_last_name">{ts}Paternal Last Name:{/ts}</label>
     </div>
     <div>
         <input type="text" name="last_name" id="qa_last_name" class="form-text required" maxlength="64" />
+    </div>
+</div>
+
+<div class="form-item">
+    <div>
+        <label for="qa_last_name_1">{ts}Maternal Last Name:{/ts}</label>
+    </div>
+    <div>
+        <input type="text" name="last_name_1" id="qa_last_name_1" class="form-text" maxlength="64" />
     </div>
 </div>
 

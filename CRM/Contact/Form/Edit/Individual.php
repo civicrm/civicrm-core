@@ -70,7 +70,10 @@ class CRM_Contact_Form_Edit_Individual {
       $form->addElement('text', 'middle_name', ts('Middle Name'), $attributes['middle_name']);
 
       // last_name
-      $form->addElement('text', 'last_name', ts('Last Name'), $attributes['last_name']);
+      $form->addElement('text', 'last_name', ts('Paternal Last Name'), $attributes['last_name']);
+
+      // last_name_1
+      $form->addElement('text', 'last_name_1', ts('Maternal Last Name'), $attributes['last_name_1']);
 
       // suffix
       $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
@@ -145,7 +148,7 @@ class CRM_Contact_Form_Edit_Individual {
     if (!$primaryID && (!CRM_Utils_Array::value('first_name', $fields) ||
         !CRM_Utils_Array::value('last_name', $fields)
       )) {
-      $errors['_qf_default'] = ts('First Name and Last Name OR an email OR an OpenID in the Primary Location should be set.');
+      $errors['_qf_default'] = ts('First Name and Paternal Last Name OR an email OR an OpenID in the Primary Location should be set.');
     }
 
     //check for duplicate - dedupe rules

@@ -41,7 +41,8 @@
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="contact_id" name="quickSearchField">{ts}CiviCRM ID{/ts}</label></li>
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="external_identifier" name="quickSearchField">{ts}External ID{/ts}</label></li>
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="first_name" name="quickSearchField">{ts}First Name{/ts}</label></li>
-            <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="last_name" name="quickSearchField">{ts}Last Name{/ts}</label></li>
+            <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="last_name" name="quickSearchField">{ts}Paternal Last Name{/ts}</label></li>
+            <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="last_name_1" name="quickSearchField">{ts}Maternal Last Name{/ts}</label></li>
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="eml" value="email" name="quickSearchField">{ts}Email{/ts}</label></li>
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="phe" value="phone_numeric" name="quickSearchField">{ts}Phone{/ts}</label></li>
             <li><label class="crm-quickSearchField"><input type="radio" data-tablename="sts" value="street_address" name="quickSearchField">{ts}Street Address{/ts}</label></li>
@@ -75,7 +76,7 @@ cj(function( ) {
         fieldName:function () {
           return  cj('input[name=quickSearchField]:checked').val();
         },
-        tableName:function () {
+        tableName:function ()  {
            return  cj('input[name=quickSearchField]:checked').attr("data-tablename");
         }
       }
@@ -90,7 +91,7 @@ cj(function( ) {
     var label = cj(this).text();
     var value = cj('input', this).val();
     // These fields are not supported by advanced search
-    if (value === 'first_name' || value === 'last_name') {
+    if (value === 'first_name' || value === 'last_name' || value === 'last_name_1') {
       value = 'sort_name';
     }
     cj('#sort_name_navigation').attr({name: value, placeholder: label}).flushCache().focus();

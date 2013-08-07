@@ -48,6 +48,10 @@
       {$form.last_name.label}<br />
       {$form.last_name.html}
     </div>
+    <div class="crm-inline-edit-field">
+      {$form.last_name_1.label}<br />
+      {$form.last_name_1.html}
+    </div>
     {if $form.suffix_id}
       <div class="crm-inline-edit-field">
         {$form.suffix_id.label}<br/>
