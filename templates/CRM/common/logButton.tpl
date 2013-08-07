@@ -44,11 +44,11 @@
 (function($, CRM) {
   $.fn.crmRevisionLink = function(options) {
     return this.each(function(){
-      var $dialog = $('<div class="'+options.cssDialogSelector.substr(1)+'"><div class="revision-content"></div></div>');
+      var $dialog = $('<div><div class="revision-content"></div></div>');
       $('body').append($dialog);
       $(this).on("click", function() {
-        $(options.cssDialogSelector).show( );
-        $(options.cssDialogSelector).dialog({
+        $dialog.show( );
+        $dialog.dialog({
           title: "{/literal}{ts}Revisions{/ts}{literal}",
           modal: true,
           width: "680px",
@@ -60,9 +60,9 @@
               data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value="+options.contactId+"&log_type_table_op=has&log_type_table_value=" + options.tableName,
               url:  ajaxurl,
               success: function (data) {
-                $(options.cssDialogSelector + " .revision-content").html(data);
-                if (!$(options.cssDialogSelector + " .revision-content .report-layout").length) {
-                  $(options.cssDialogSelector + " .revision-content").html("Sorry, couldn't find any revisions.");
+                $dialog.find(".revision-content").html(data);
+                if (!$dialog.find(".revision-content .report-layout").length) {
+                  $dialog.find(".revision-content").html("Sorry, couldn't find any revisions.");
                 }
               }
             });
@@ -78,7 +78,6 @@
   }; // fn.crmRevisionLink
 
   $(".{/literal}{$snippet.css_class}{literal}").crmRevisionLink({
-    cssDialogSelector: ".dialog-{/literal}{$snippet.css_class}{literal}",
     contactId: {/literal}{$snippet.contact_id}{literal},
     tableName: "{/literal}{$snippet.table_name}{literal}",
     reportId: {/literal}{$snippet.instance_id}{literal}
