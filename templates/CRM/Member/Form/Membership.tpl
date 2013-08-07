@@ -674,6 +674,22 @@
       if ((memType > 0) && (allMemberships[memType]['has_related'])) {
         if (setDefault) cj('#max_related').val(allMemberships[memType]['max_related']);
         cj('#maxRelated').show();
+        if(CRM.ids.contact > 0) {
+          CRM.api('relationship', 'getcount', {'contact_id' : CRM.ids.contact, 'membership_type_id' : memType}, {
+            success: function(result) {
+              var relatable = ' ' + result.result + ts(' contacts are ');
+              if(result.result === 0) {
+                relatable = ts(' No contacts are ');
+              }
+              if(result.result === 1) {
+                relatable = ts(' One contact is ');
+              }
+
+              var others = relatable + ts('currently eligible to inherit this relationship');
+              cj('#max_related').siblings('.description').append(others);
+            }
+          });
+        }
       } else {
         cj('#max_related').val('');
         cj('#maxRelated').hide();

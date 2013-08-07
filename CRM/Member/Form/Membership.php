@@ -121,7 +121,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->_processors = array();
-
+    CRM_Core_Resources::singleton()->addSetting(array('ids' => array('contact' => $this->_contactID)));
 
     // check for edit permission
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
@@ -1346,8 +1346,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $formValues["address_name-{$this->_bltID}"] = trim($formValues["address_name-{$this->_bltID}"]);
 
       $fields["address_name-{$this->_bltID}"] = 1;
-
-      $fields["email-{$this->_bltID}"] = 1;
+      //ensure we don't over-write the payer's email with the member's email
+      if($this->_contributorContactID == $this->_contactID) {
+        $fields["email-{$this->_bltID}"] = 1;
+      }
 
       $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type');
 
