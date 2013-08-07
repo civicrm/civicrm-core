@@ -621,7 +621,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                 $setParams['extends'] = CRM_Core_Component::getComponentID('CiviEvent');
                 $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
 
-                $fieldParams['name'] = $fieldParams['label'] = $params['fee_label'];
+                $fieldParams['name'] = strtolower(CRM_Utils_String::munge($params['fee_label'], '_', 245));
                 $fieldParams['price_set_id'] = $priceSet->id;
               }
               else {
@@ -641,7 +641,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $priceSet->id, 'financial_type_id', $params['financial_type_id']);
                 }
               }
-
+              $fieldParams['label'] = $params['fee_label'];
               $fieldParams['html_type'] = 'Radio';
               CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_id, $priceSet->id);
               $fieldParams['option_label'] = $params['label'];
