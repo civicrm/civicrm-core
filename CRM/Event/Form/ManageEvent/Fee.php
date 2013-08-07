@@ -363,14 +363,6 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       );
 
       $this->add('hidden', "discount_price_set[$i]", '', array('id' => "discount_price_set[$i]"));
-      // add a rule to ensure that discount name is not more than 24 characters to prevent overflow
-      // in option group name, CRM-7915
-      // 24 characters will make the option group name less than 64 characters
-      $this->addRule("discount_name[$i]",
-        ts('Discount Name cannot be more than 24 characters'),
-        'maxlength',
-        24
-      );
 
       //discount start date
       $this->addDate('discount_start_date[' . $i . ']', ts('Discount Start Date'), FALSE, array('formatType' => 'activityDate'));
