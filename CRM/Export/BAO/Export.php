@@ -790,6 +790,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             $row[$field] = $dao->contact_id;
             // special case for calculated field
           }
+          elseif ($field == 'source_contact_id') {
+            $row[$field] = $dao->contact_id;
+          }
           elseif ($field == 'pledge_balance_amount') {
             $row[$field] = $dao->pledge_amount - $dao->pledge_total_paid;
             // special case for calculated field
