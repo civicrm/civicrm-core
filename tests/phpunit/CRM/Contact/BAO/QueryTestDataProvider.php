@@ -98,19 +98,19 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
       ),
     ),
 
-    // gender_id 1
+    // gender_id 1 = 'Female'
     array(
-      'fv' => array('gender' => 'Female'),
+      'fv' => array('gender_id' => 1),
       'id' => array('9', '20', '22'),
     ),
-    // prefix_id 2
+    // prefix_id 2 = 'Ms.'
     array(
-      'fv' => array('individual_prefix' => 'Ms.'),
+      'fv' => array('prefix_id' => 2),
       'id' => array('10', '13'),
     ),
-    // suffix_id 2
+    // suffix_id 6 = 'V'
     array(
-      'fv' => array('individual_suffix' => 'V'),
+      'fv' => array('suffix_id' => 6),
       'id' => array('16', '19', '20', '21'),
     ),
   );
