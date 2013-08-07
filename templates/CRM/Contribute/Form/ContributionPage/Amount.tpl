@@ -157,7 +157,11 @@
                 </td>
             </tr>
             {/if}
-
+	    	    
+	    <tr class="crm-contribution-form-block-amount_label">
+              <th scope="row" class="label" width="20%">{$form.amount_label.label}</th>
+	      <td>{$form.amount_label.html}</td>
+	    </tr>
             <tr class="crm-contribution-form-block-is_allow_other_amount"><th scope="row" class="label" width="20%">{$form.is_allow_other_amount.label}</th>
             <td>{$form.is_allow_other_amount.html}<br />
             <span class="description">{ts}Check this box if you want to give users the option to enter their own contribution amount. Your page will then include a text field labeled <strong>Other Amount</strong>.{/ts}</span></td></tr>
