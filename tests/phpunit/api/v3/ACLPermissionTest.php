@@ -158,11 +158,8 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     //prefix & suffix are inconsistent due to  CRM-7929
     // unsure about others but return doesn't work on them
     $elementsReturnDoesntSupport = array(
-      'prefix_id',
       'prefix',
-      'suffix_id',
       'suffix',
-      'gender_id',
       'gender',
       'current_employer',
       'phone_id',
