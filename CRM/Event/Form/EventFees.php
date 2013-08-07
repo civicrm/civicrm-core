@@ -78,7 +78,7 @@ class CRM_Event_Form_EventFees {
 
     if ($form->_eventId) {
       //get receipt text and financial type
-      $returnProperities = array( 'confirm_email_text', 'financial_type_id', 'campaign_id' );
+      $returnProperities = array( 'confirm_email_text', 'financial_type_id', 'campaign_id', 'start_date' );
       $details = array();
       CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $form->_eventId, $details, $returnProperities);
       if ( CRM_Utils_Array::value( 'financial_type_id', $details[$form->_eventId] ) ) {
@@ -121,7 +121,8 @@ class CRM_Event_Form_EventFees {
 
     //CRM-11601 we should keep the record contribution
     //true by default while adding participant
-     if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent) {
+     if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent
+       && strtotime(CRM_Utils_Array::value('start_date', $details[$form->_eventId])) >= time()) {
       $defaults[$form->_pId]['record_contribution'] = 1;
     }
 

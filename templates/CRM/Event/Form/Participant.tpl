@@ -216,9 +216,10 @@
           {/if}
           <tr class="crm-participant-form-block-event_id">
             <td class="label">{$form.event_id.label}</td><td class="view-value bold">{$form.event_id.html}&nbsp;
-            {if $action eq 1 && !$past }
-              <br /><a href="#" onclick="buildSelect('event_id'); return false;"
-                       id='past-event'>&raquo; {ts}Include past event(s) in this select list.{/ts}</a>
+            {if $action eq 1 && $past neq 1 }<span id='past-event-section'>
+              <br />&raquo; {ts}Include past event(s) in this select list:{/ts}
+              {if !$past}<a href="#" onclick="buildSelect('event_id', 2); return false;" class='3-mo-past-event'>{ts}past three months{/ts}</a> <span class='3-mo-past-event'>|</span>{/if}
+              <a href="#" onclick="buildSelect('event_id', 1); return false;">{ts}all{/ts}</a></span>
             {/if}
             {if $is_test}
               {ts}(test){/ts}
@@ -285,17 +286,22 @@
     {literal}
     <script type="text/javascript">
     // event select
-    function buildSelect( selectID ) {
+    function buildSelect( selectID, listallVal ) {
       var elementID = '#' + selectID;
       cj( elementID ).html('');
       var postUrl = "{/literal}{crmURL p='civicrm/ajax/eventlist' h=0}{literal}";
-      cj.post( postUrl, null, function ( response ) {
+      cj.post( postUrl, {listall:listallVal}, function ( response ) {
         response = eval( response );
         for (i = 0; i < response.length; i++) {
           cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
         }
-        cj('#past-event').hide( );
-        cj('input[name="past_event"]').val(1);
+        if (listallVal == 1) {
+          cj('#past-event-section').hide( );
+        }
+        else {
+          cj('.3-mo-past-event').hide( );
+        }
+        cj('input[name="past_event"]').val(listallVal);
         cj("#feeBlock").html( '' );
       });
     }

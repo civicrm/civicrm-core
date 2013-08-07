@@ -254,14 +254,16 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Function to get current/future Events
    *
-   * @param $all              boolean true if events all are required else returns current and future events
+   * @param $all              int     0 returns current and future events
+   *                                  1 if events all are required
+   *                                  2 returns events since 3 months ago
    * @param $id               int     id of a specific event to return
    * @param $isActive         boolean true if you need only active events
    * @param $checkPermission  boolean true if you need to check permission else false
    *
    * @static
    */
-  static function getEvents($all = FALSE,
+  static function getEvents($all = 0,
     $id              = FALSE,
     $isActive        = TRUE,
     $checkPermission = TRUE
@@ -274,9 +276,15 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
     if ($id) {
       $query .= " AND `id` = {$id}";
     }
-    elseif (!$all) {
+    elseif ($all == 0) {
+      // find only events ending in the future
       $endDate = date('YmdHis');
       $query .= " AND ( `end_date` >= {$endDate} OR end_date IS NULL )";
+    }
+    elseif ($all == 2) {
+      // find only events starting in the last 3 months
+      $startDate = date('YmdHis', strtotime('3 months ago'));
+      $query .= " AND ( `start_date` >= {$startDate} OR start_date IS NULL )";
     }
     if ($isActive) {
       $query .= " AND civicrm_event.is_active = 1";
