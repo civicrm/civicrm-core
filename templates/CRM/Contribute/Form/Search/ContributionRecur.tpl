@@ -24,43 +24,43 @@
  +--------------------------------------------------------------------+
 *}
 
-  <div class="crm-accordion-wrapper crm-contactDetails-accordion collapsed" id="{contribution_recur}" >
+  <div class="crm-accordion-wrapper crm-contactDetails-accordion {if empty($contribution_recur_pane_open)}collapsed{/if}" id="{contribution_recur}" >
     <div class="crm-accordion-header">
         {ts}Recurring Contributions{/ts}
     </div>
     <div class="crm-accordion-body">
     <table class="form-layout-compressed">
-      <tr><td>{ts}Recurring Payments Start Date{/ts}</td>
+      <tr><td>{ts}Start Date{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_start_date" from='_low' to='_high'}
         </td>
       </tr>
       <tr>
-        <td>{ts}Recurring Contribution End Date{/ts}</td>
+        <td>{ts}End Date{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_end_date" from='_low' to='_high'}
         </td>
       </tr>
       <tr>
-        <td>{ts}Recurring Contribution Modified Date{/ts}</td>
+        <td>{ts}Modified Date{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_modified_date" from='_low' to='_high'}
         </td>
       </tr>
       <tr>
-        <td>{ts}Next Scheduled Recurring Contribution{/ts}</td>
+        <td>{ts}Next Scheduled{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_next_sched_contribution_date" from='_low' to='_high'}
         </td>
       </tr>
       <tr>
-        <td>{ts}Retry Failed Recurring Contribution On{/ts}</td>
+        <td>{ts}Retry Date{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_failure_retry_date" from='_low' to='_high'}
         </td>
       </tr>
       <tr>
-        <td>{ts}Recurring Contribution Cancel Date{/ts}</td>
+        <td>{ts}Cancel Date{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_cancel_date" from='_low' to='_high'}
         </td>
