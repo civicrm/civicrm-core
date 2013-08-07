@@ -1549,6 +1549,9 @@ cc.sort_name LIKE '%$name%'";
   static function membershipTypeToRelationshipTypes(&$params, $direction = NULL) {
     $membershipType = civicrm_api3('membership_type', 'getsingle', array('id' => $params['membership_type_id'], 'return' => 'relationship_type_id, relationship_direction'));
     $relationshipTypes = $membershipType['relationship_type_id'];
+    if(empty($relationshipTypes)) {
+      return;
+    }
     // if we don't have any contact data we can only filter on type
     if(empty($params['contact_id']) && empty($params['contact_id_a']) && empty($params['contact_id_a'])) {
       $params['relationship_type_id'] = array('IN' => $relationshipTypes);
