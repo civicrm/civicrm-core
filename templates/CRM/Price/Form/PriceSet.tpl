@@ -34,8 +34,7 @@
             <div class="crm-section {$element.name}-section">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_"|cat:$field_id}
-                {* quickConfig price sets - use fee_label from event record *}
-                <div class="label">{if $quickConfig && $extends NEQ 'Membership'}{$event.fee_label} <span class="crm-marker" title="This field is required.">*</span>{else}{$form.$element_name.label}{/if}</div>
+	        <div class="label">{$form.$element_name.label}</div>
                 <div class="content {$element.name}-content">
                 {assign var="rowCount" value="1"}
                 {assign var="count" value="1"}
