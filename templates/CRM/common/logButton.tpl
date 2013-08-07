@@ -40,43 +40,7 @@
 
 {literal}
 <script type="text/javascript">
-
 (function($, CRM) {
-  $.fn.crmRevisionLink = function(options) {
-    return this.each(function(){
-      var $dialog = $('<div><div class="revision-content"></div></div>');
-      $('body').append($dialog);
-      $(this).on("click", function() {
-        $dialog.show( );
-        $dialog.dialog({
-          title: "{/literal}{ts}Revisions{/ts}{literal}",
-          modal: true,
-          width: "680px",
-          bgiframe: true,
-          overlay: { opacity: 0.5, background: "black" },
-          open:function() {
-            var ajaxurl = CRM.url("civicrm/report/instance/" + options.reportId);
-            cj.ajax({
-              data: "reset=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value="+options.contactId+"&log_type_table_op=has&log_type_table_value=" + options.tableName,
-              url:  ajaxurl,
-              success: function (data) {
-                $dialog.find(".revision-content").html(data);
-                if (!$dialog.find(".revision-content .report-layout").length) {
-                  $dialog.find(".revision-content").html("Sorry, couldn't find any revisions.");
-                }
-              }
-            });
-          },
-          buttons: {
-            "Done": function() {
-              $(this).dialog("destroy");
-            }
-          }
-        });
-      });
-    }); // this.each
-  }; // fn.crmRevisionLink
-
   $(".{/literal}{$snippet.css_class}{literal}").crmRevisionLink({
     contactId: {/literal}{$snippet.contact_id}{literal},
     tableName: "{/literal}{$snippet.table_name}{literal}",
