@@ -244,7 +244,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       array_push($customId, $custom1);
       $custom2 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[2]/td[8]/span/a[text()='Edit Field']/@href"));
       $custom2 = $custom2[1];
-      array_push($customId, $custom2); 
+      array_push($customId, $custom2);
     }
     else {
       // Create a custom data to add in profile
@@ -291,7 +291,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       $this->openCiviPage("admin/custom/group/field", array('action' => 'delete', 'reset' => '1', 'gid' => $customGrpId1, 'id' => $cValue));
       $this->clickLink("_qf_DeleteField_next-bottom");
     }
-  
+
     // delete custom group
     $this->openCiviPage("admin/custom/group", "action=delete&reset=1&id=" . $customGrpId1);
     $this->clickLink("_qf_DeleteGroup_next-bottom");
@@ -302,6 +302,11 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
    */
   function testCaseCustomNoteRichEditor() {
     $this->webtestLogin('admin');
+
+    //setting ckeditor as WYSIWYG
+    $this->openCiviPage('admin/setting/preferences/display', 'reset=1', '_qf_Display_next-bottom');
+    $this->select('editor_id', 'CKEditor');
+    $this->clickLink('_qf_Display_next-bottom');
 
     // Enable CiviCase module if necessary
     $this->enableComponents("CiviCase");
