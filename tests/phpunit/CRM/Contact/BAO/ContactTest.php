@@ -733,16 +733,16 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     );
     //get the common params
     $contactParams = $this->contactParams();
-    $unsetParams = array('location', 'gender_id', 'prefix_id', 'suffix_id', 'privacy');
+    $unsetParams = array('location', 'privacy');
     foreach ($unsetParams as $param) {
       unset($contactParams[$param]);
     }
 
     $profileParams = array(
       'organization_name' => 'Yahoo',
-      'gender' => '2',
-      'individual_prefix' => '3',
-      'individual_suffix' => '2',
+      'gender_id' => '2',
+      'prefix_id' => '3',
+      'suffix_id' => '2',
       'city-Primary' => 'Newark',
       'contact_type' => 'Individual',
       'country-Primary' => '1228',
@@ -943,9 +943,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $updatePfParams = array(
       'organization_name' => 'Google',
-      'gender' => '1',
-      'individual_prefix' => '2',
-      'individual_suffix' => '3',
       'city-Primary' => 'Mumbai',
       'contact_type' => 'Individual',
       'country-Primary' => '1228',
