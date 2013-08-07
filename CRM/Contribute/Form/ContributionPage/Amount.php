@@ -310,6 +310,10 @@ SELECT id
       }
     }
 
+    //check for the amount label (mandatory)
+    if (CRM_Utils_Array::value('amount_block_is_active', $fields) && empty($fields['amount_label'])) {
+      $errors['amount_label'] = ts('Please enter the contribution amount label.');
+    }
     $minAmount = CRM_Utils_Array::value('min_amount', $fields);
     $maxAmount = CRM_Utils_Array::value('max_amount', $fields);
     if (!empty($minAmount) && !empty($maxAmount)) {

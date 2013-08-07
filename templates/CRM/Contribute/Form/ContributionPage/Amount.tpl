@@ -159,7 +159,7 @@
             {/if}
 	    	    
 	    <tr class="crm-contribution-form-block-amount_label">
-              <th scope="row" class="label" width="20%">{$form.amount_label.label}</th>
+              <th scope="row" class="label" width="20%">{$form.amount_label.label}<span class="marker"> *</span></th>
 	      <td>{$form.amount_label.html}</td>
 	    </tr>
             <tr class="crm-contribution-form-block-is_allow_other_amount"><th scope="row" class="label" width="20%">{$form.is_allow_other_amount.label}</th>
