@@ -48,6 +48,11 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $params = CRM_Contact_BAO_Query::convertFormValues($fv);
     $obj    = new CRM_Contact_BAO_Query($params);
+
+    // let's set useGroupBy=true since we are listing contacts here who might belong to
+    // more than one group / tag / notes etc.
+    $obj->_useGroupBy = TRUE;
+
     $dao    = $obj->searchQuery();
 
     $contacts = array();
