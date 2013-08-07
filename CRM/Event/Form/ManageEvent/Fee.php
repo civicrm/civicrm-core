@@ -147,14 +147,16 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         $discountFields = current($val);
         $discountFields = current($discountFields['fields']);
 
+        $colCount = 1;
         foreach ($discountFields['options'] as $discountFieldsval) {
-          $defaults['discounted_label'][$discountFieldsval['weight']] = $discountFieldsval['label'];
-          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] =
+          $defaults['discounted_label'][$colCount] = $discountFieldsval['label'];
+          $defaults['discounted_value'][$colCount][$rowCount] =
             CRM_Utils_Money::format($discountFieldsval['amount'], NULL, '%a');
-          $defaults['discount_option_id'][$rowCount][$discountFieldsval['weight']]= $discountFieldsval['id'];
+          $defaults['discount_option_id'][$colCount][$rowCount]= $discountFieldsval['id'];
           if (CRM_Utils_Array::value('is_default', $discountFieldsval)) {
             $defaults['discounted_default'] = $discountFieldsval['weight'];
           }
+          $colCount++;
         }
         $rowCount++;
       }
@@ -542,7 +544,6 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    * @access public
    */
   public function postProcess() {
-    $params     = array();
     $eventTitle = '';
     $params     = $this->exportValues();
 
