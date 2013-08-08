@@ -390,7 +390,7 @@ WHERE   cas.entity_value = $id AND
       $smarty = CRM_Core_Smarty::singleton();
       $body_text = $smarty->fetch('string:' . $body_text);
       $body_html = $smarty->fetch('string:' . $body_html);
-      $body_subject = $smarty->fetch('string:' . $messageSubject);
+      $body_subject = $smarty->fetch('string:' . $body_subject);
 
       $params = array(array('contact_id', '=', $contactId, 0, 0));
       list($contact, $_) = CRM_Contact_BAO_Query::apiQuery($params);
