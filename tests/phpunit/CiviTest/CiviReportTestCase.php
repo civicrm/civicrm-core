@@ -45,7 +45,9 @@ class CiviReportTestCase extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
     $controller = new CRM_Core_Controller_Simple($reportClass, ts('some title'));
-    $reportObj =& $controller->_pages['Detail']; //FIXME - Detail is going to change
+    $tmpReportVal = explode('_', $reportClass);
+    $reportName = array_pop($tmpReportVal);
+    $reportObj =& $controller->_pages[$reportName];
 
     $tmpGlobals = array();
     $tmpGlobals['_REQUEST']['force'] = 1;
@@ -61,6 +63,11 @@ class CiviReportTestCase extends CiviUnitTestCase {
         $tmpGlobals['_GET'][$key] = $val;
       }
     }
+    if (!empty($inputParams['group_bys'])) {
+      $groupByFields = implode(' ', $inputParams['group_bys']);
+      $tmpGlobals['_GET']['gby'] = $groupByFields;
+    }
+
     CRM_Utils_GlobalStack::singleton()->push($tmpGlobals);
 
     try {
