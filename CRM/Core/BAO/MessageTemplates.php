@@ -166,6 +166,13 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
         $body_text = CRM_Utils_String::htmlToText($body_html);
       }
 
+      // Execute Smarty templates before token replacement, so templates do not
+      // interfere and we hit the compiled template cache.
+      $smarty = CRM_Core_Smarty::singleton();
+      $body_text = $smarty->fetch('string:' . $body_text);
+      $body_html = $smarty->fetch('string:' . $body_html);
+      $body_subject = $smarty->fetch('string:' . $body_subject);
+
       $params = array(array('contact_id', '=', $contactId, 0, 0));
       list($contact, $_) = CRM_Contact_BAO_Query::apiQuery($params);
 
@@ -217,19 +224,11 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
       $html = $body_html;
       $text = $body_text;
 
-      $smarty = CRM_Core_Smarty::singleton();
-      foreach (array(
-        'text', 'html') as $elem) {
-        $$elem = $smarty->fetch("string:{$$elem}");
-      }
-
       // do replacements in message subject
       $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, false, $tokens);
       $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, true, $tokens);
       $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens, true);
       $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, true);
-
-      $messageSubject = $smarty->fetch("string:{$messageSubject}");
 
       // set up the parameters for CRM_Utils_Mail::send
       $mailParams = array(
@@ -389,6 +388,19 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
       $testDao->free();
     }
 
+    // Strip whitespace from ends and turn into a single line.
+    $subject = "{strip}$subject{/strip}";
+
+    // Parse the three elements with Smarty.
+    $smarty = CRM_Core_Smarty::singleton();
+    foreach ($params['tplParams'] as $name => $value) {
+      $smarty->assign($name, $value);
+    }
+    foreach (array(
+      'subject', 'text', 'html') as $elem) {
+      $$elem = $smarty->fetch("string:{$$elem}");
+    }
+
     // replace tokens in the three elements (in subject as if it was the text body)
     $domain             = CRM_Core_BAO_Domain::getDomain();
     $hookTokens         = array();
@@ -449,21 +461,6 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
       $subject = CRM_Utils_Token::replaceHookTokens($subject, $contact, $categories, TRUE);
       $text    = CRM_Utils_Token::replaceHookTokens($text, $contact, $categories, TRUE);
       $html    = CRM_Utils_Token::replaceHookTokens($html, $contact, $categories, TRUE);
-    }
-
-    // strip whitespace from ends and turn into a single line
-    $subject = "{strip}$subject{/strip}";
-
-    // parse the three elements with Smarty
-
-
-    $smarty = CRM_Core_Smarty::singleton();
-    foreach ($params['tplParams'] as $name => $value) {
-      $smarty->assign($name, $value);
-    }
-    foreach (array(
-      'subject', 'text', 'html') as $elem) {
-      $$elem = $smarty->fetch("string:{$$elem}");
     }
 
     // send the template, honouring the target user’s preferences (if any)
