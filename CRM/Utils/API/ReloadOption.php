@@ -26,8 +26,8 @@
 */
 
 /**
- * Implement the "api.reload" option. This option can be used with "create" to
- * force the API to reload a clean copy of the entity before returning the result.
+ * Implement the "reload" option. This option can be used with "create" to force
+ * the API to reload a clean copy of the entity before returning the result.
  *
  * @code
  * $clean = civicrm_api('myentity', 'create', array(
