@@ -39,6 +39,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_MailingContactTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_entity = 'mailing';
+  
   function setUp() {
     parent::setUp();
     $params = array(

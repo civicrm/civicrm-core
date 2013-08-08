@@ -49,8 +49,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->_groupID    = $this->groupCreate(NULL);
-    $this->_email      = 'test@test.test';
+    $this->_groupID = $this->groupCreate(NULL);
+    $this->_email = 'test@test.test';
     $this->_params = array(
       'subject' => 'maild',
       'body_text' => 'bdkfhdskfhduew',
@@ -70,7 +70,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params, __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals(1, $jobs['count']);
-    unset($this->_params['created_id']);// return isn't working on this in getAndCheck so lets not check it for now
+    unset($this->_params['created_id']); // return isn't working on this in getAndCheck so lets not check it for now
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
   }
 
@@ -121,7 +121,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'hash' => 'Wrong Hash',
       'event_subscribe_id' => '123',
       'time_stamp' => '20111111010101',
-         );
+    );
     $result = $this->callAPIFailure('mailing_event', 'confirm', $params,
       'Confirmation failed'
     );
@@ -144,7 +144,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'bodyTxt' => 'Body...',
       'replyTo' => $this->_email,
       'time_stamp' => '20111111010101',
-         );
+    );
     $result = $this->callAPIFailure('mailing_event', 'reply', $params,
       'Queue event could not be found'
     );
@@ -166,12 +166,11 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'hash' => 'Wrong Hash',
       'email' => $this->_email,
       'time_stamp' => '20111111010101',
-         );
+    );
     $result = $this->callAPIFailure('mailing_event', 'forward', $params,
       'Queue event could not be found'
     );
   }
-
 
 //----------- civicrm_mailing_create ----------
 

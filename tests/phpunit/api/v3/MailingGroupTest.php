@@ -36,7 +36,8 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   protected $_groupID;
   protected $_email;
   protected $_apiversion;
-  public $_eNoticeCompliant = FALSE;
+  public $_eNoticeCompliant = TRUE;
+
   function get_info() {
     return array(
       'name' => 'Mailer Group',
@@ -48,8 +49,8 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();
     $this->_apiversion = 3;
-    $this->_groupID    = $this->groupCreate(NULL);
-    $this->_email      = 'test@test.test';
+    $this->_groupID = $this->groupCreate(NULL);
+    $this->_email = 'test@test.test';
   }
 
   function tearDown() {
@@ -65,7 +66,8 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $params = array(
       'email' => $this->_email,
       'group_id' => 'Wrong Group ID',
-      'contact_id' => '2121',      'time_stamp' => '20111111010101',
+      'contact_id' => '2121',
+      'time_stamp' => '20111111010101',
       'hash' => 'sasa',
     );
     $result = $this->callAPIFailure('mailing_event_subscribe', 'create', $params);
@@ -85,7 +87,8 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'first_name' => 'Test',
       'last_name' => 'Test',
       'email' => $this->_email,
-      'contact_type' => 'Individual',    );
+      'contact_type' => 'Individual',
+    );
     $contactID = $this->individualCreate($params);
 
     $params = array(
@@ -110,7 +113,8 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $params = array(
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
-      'hash' => 'Wrong Hash',      'time_stamp' => '20101212121212',
+      'hash' => 'Wrong Hash',
+      'time_stamp' => '20101212121212',
     );
 
     $result = $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
@@ -127,13 +131,13 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
       'hash' => 'Wrong Hash',
-      'org_unsubscribe' => 1,      'time_stamp' => '20101212121212',
+      'org_unsubscribe' => 1,
+      'time_stamp' => '20101212121212',
     );
 
     $result = $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
     $this->assertEquals($result['error_message'], 'Domain Queue event could not be found', 'In line ' . __LINE__);
   }
-
 
   //----------- civicrm_mailing_group_event_resubscribe methods--------
 
@@ -149,7 +153,8 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
       'hash' => 'Wrong Hash',
-      'org_unsubscribe' => 'test',      'time_stamp' => '20101212121212',
+      'org_unsubscribe' => 'test',
+      'time_stamp' => '20101212121212',
     );
     $result = $this->callAPIFailure('mailing_event_resubscribe', 'create', $params);
     $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
@@ -165,13 +170,15 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'first_name' => 'Test',
       'last_name' => 'Test',
       'email' => $this->_email,
-      'contact_type' => 'Individual',    );
+      'contact_type' => 'Individual',
+    );
     $contactID = $this->individualCreate($params);
 
     $params = array(
       'email' => $this->_email,
       'group_id' => $this->_groupID,
-      'contact_id' => $contactID,      'hash' => 'b15de8b64e2cec34',
+      'contact_id' => $contactID,
+      'hash' => 'b15de8b64e2cec34',
       'time_stamp' => '20101212121212',
     );
     $result = $this->callAPISuccess('mailing_event_subscribe', 'create', $params);
@@ -181,7 +188,8 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $result['values'][$result['id']]['contact_id'],
       'subscribe_id' => $result['values'][$result['id']]['subscribe_id'],
-      'hash' => $result['values'][$result['id']]['hash'],      'time_stamp' => '20101212121212',
+      'hash' => $result['values'][$result['id']]['hash'],
+      'time_stamp' => '20101212121212',
       'event_subscribe_id' => $result['values'][$result['id']]['subscribe_id'],
     );
 
