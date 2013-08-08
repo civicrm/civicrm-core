@@ -186,15 +186,7 @@ class CRM_Core_Smarty extends Smarty {
    * @param boolean $display
    */
   function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
-    if (preg_match( '/^(\s+)?string:/', $resource_name)) {
-      $old_security = $this->security;
-      $this->security = TRUE;
-    }
-    $output = parent::fetch($resource_name, $cache_id, $compile_id, $display);
-    if (isset($old_security)) {
-      $this->security = $old_security;
-    }
-    return $output;
+    return parent::fetch($resource_name, $cache_id, $compile_id, $display);
   }
 
   function appendValue($name, $value) {
