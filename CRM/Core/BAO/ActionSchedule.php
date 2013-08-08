@@ -385,13 +385,6 @@ WHERE   cas.entity_value = $id AND
         $body_text = CRM_Utils_String::htmlToText($body_html);
       }
 
-      // Execute Smarty templates before token replacement, so templates do not
-      // interfere and we hit the compiled template cache.
-      $smarty = CRM_Core_Smarty::singleton();
-      $body_text = $smarty->fetch('string:' . $body_text);
-      $body_html = $smarty->fetch('string:' . $body_html);
-      $body_subject = $smarty->fetch('string:' . $body_subject);
-
       $params = array(array('contact_id', '=', $contactId, 0, 0));
       list($contact, $_) = CRM_Contact_BAO_Query::apiQuery($params);
 
@@ -430,6 +423,12 @@ WHERE   cas.entity_value = $id AND
       $html = $body_html;
       $text = $body_text;
 
+      $smarty = CRM_Core_Smarty::singleton();
+      foreach (array(
+          'text', 'html') as $elem) {
+        $$elem = $smarty->fetch("string:{$$elem}");
+      }
+
       $matches = array();
       preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
         $body_subject,
@@ -454,6 +453,8 @@ WHERE   cas.entity_value = $id AND
       $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $tokens[$value]);
       $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens[$value], TRUE);
       $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, TRUE);
+
+      $messageSubject = $smarty->fetch("string:{$messageSubject}");
 
       // set up the parameters for CRM_Utils_Mail::send
       $mailParams = array(
