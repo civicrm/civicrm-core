@@ -646,7 +646,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, TRUE, TRUE);
 
       // hack to add custom data for components
-      $components = array('Contribution', 'Participant', 'Membership', 'Activity');
+      $components = array('Contribution', 'Participant', 'Membership', 'Activity', 'Grant');
       foreach ($components as $value) {
         $customFields = array_merge($customFields, CRM_Core_BAO_CustomField::getFieldsForImport($value));
       }
@@ -1660,7 +1660,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
 
       //allow special mix profiles for Contribution and Participant
-      $specialProfiles = array('Contribution', 'Participant', 'Membership');
+      $specialProfiles = array('Contribution', 'Participant', 'Membership', 'Grant');
 
       if (in_array($profileType, $specialProfiles)) {
         return TRUE;
@@ -1906,7 +1906,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $profileType = CRM_Core_BAO_UFField::getProfileType($gId, TRUE, FALSE, TRUE);
 
       if (empty($profileType) || in_array($profileType, array(
-        'Contact', 'Contribution', 'Participant', 'Membership'))) {
+            'Contact', 'Contribution', 'Participant', 'Membership', 'Grant'))) {
         $profileType = 'Individual';
       }
       if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
@@ -2242,7 +2242,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $details));
 
             // hack to add custom data for components
-            $components = array('Contribution', 'Participant', 'Membership', 'Activity');
+            $components = array('Contribution', 'Participant', 'Membership', 'Activity', 'Grant');
             foreach ($components as $value) {
               $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
                 CRM_Core_BAO_CustomField::getFieldsForImport($value)
@@ -2433,6 +2433,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
     //Handling Activity Part of the batch profile
     if ($component == 'Activity') {
+      self::setComponentDefaults($fields, $componentId, $component, $defaults);
+    }
+
+    //Handling Grant Part of the batch profile
+    if (CRM_Core_Permission::access('CiviGrant') && $component == 'Grant') {
       self::setComponentDefaults($fields, $componentId, $component, $defaults);
     }
   }
@@ -2964,7 +2969,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_UFGroup', $gId, 'group_type', 'null');
     }
 
-    $componentGroupTypes = array('Contribution', 'Participant', 'Membership', 'Activity');
+    $componentGroupTypes = array('Contribution', 'Participant', 'Membership', 'Activity', 'Grant');
     $validGroupTypes = array_merge(array('Contact', 'Individual', 'Organization', 'Household'), $componentGroupTypes, CRM_Contact_BAO_ContactType::subTypes());
 
     $gTypes = $gTypeValues = array();
@@ -3046,7 +3051,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
     if (!$componentId ||
-      !in_array($component, array('Contribute', 'Membership', 'Event', 'Activity'))
+      !in_array($component, array('Contribute', 'Membership', 'Event', 'Activity', 'Grant'))
     ) {
       return;
     }
@@ -3075,6 +3080,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $componentBAO     = 'CRM_Activity_BAO_Activity';
         $componentBAOName = 'Activity';
         $componentSubType = array('activity_type_id');
+        break;
+
+      case 'Grant':
+        $componentBAO     = 'CRM_Grant_BAO_Grant';
+        $componentBAOName = 'Grant';
+        $componentSubType = array('grant_type_id');
         break;
     }
 
@@ -3318,7 +3329,7 @@ SELECT  group_id
     $contactTypes = array('Individual', 'Household', 'Organization');
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
 
-    $components = array('Contribution', 'Participant', 'Membership', 'Activity');
+    $components = array('Contribution', 'Participant', 'Membership', 'Activity', 'Grant');
 
     $typeCount = array('ctype' => array(), 'subtype' => array());
     foreach ($profileIds as $gid) {

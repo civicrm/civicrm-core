@@ -86,6 +86,44 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     return $summary;
   }
 
+  function getProfileFields() {
+      $exportableFields = self::exportableFields('Grant');
+      
+      $skipFields = array('grant_id', 'grant_contact_id', 'grant_type', 'grant_note', 'grant_status' );
+      foreach ($skipFields as $field) {
+          if (isset($exportableFields[$field])) {
+              unset($exportableFields[$field]);
+          }
+      }
+      
+      return $exportableFields;
+  }
+ /**
+   * Function to get list of grant fields for profile
+   * For now we only allow custom grant fields to be in
+   * profile
+   *
+   * @param boolean $addExtraFields true if special fields needs to be added
+   *
+   * @return return the list of grant fields
+   * @static
+   * @access public
+   */
+  static function getGrantFields() {
+    $grantFields = CRM_Grant_DAO_Grant::export();
+    $grantFields = array_merge($grantFields, CRM_Core_OptionValue::getFields($mode = 'grant'));
+
+    $grantFields = array_merge($grantFields, CRM_Financial_DAO_FinancialType::export());
+    
+    foreach ($grantFields as $key => $var) {
+      $fields[$key] = $var;
+    }
+
+    $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Grant'));
+   
+    return $fields;
+  }
+
   /**
    * Function to get events Summary
    *

@@ -427,7 +427,12 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
             $typeName = 'Contribution';
             $valueLabels = CRM_Contribute_PseudoConstant::financialType();
             break;
-
+            
+          case 'GrantType':
+            $typeName = 'Grant';
+            $valueLabels = CRM_Core_OptionGroup::values('grant_type');
+            break;
+            
           case 'ParticipantRole':
             $typeName = 'Participant';
             $valueLabels = CRM_Event_PseudoConstant::participantRole();
