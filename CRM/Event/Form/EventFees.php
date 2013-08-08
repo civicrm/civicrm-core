@@ -110,7 +110,7 @@ class CRM_Event_Form_EventFees {
       $defaults[$form->_pId]['send_receipt'] = 0;
     }
     else {
-      $defaults[$form->_pId]['send_receipt'] = 1;
+      $defaults[$form->_pId]['send_receipt'] = (strtotime(CRM_Utils_Array::value('start_date', $details[$form->_eventId])) >= time()) ? 1 : 0;
       if ($form->_eventId && CRM_Utils_Array::value('confirm_email_text', $details[$form->_eventId])) {
         //set receipt text
         $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
@@ -121,8 +121,7 @@ class CRM_Event_Form_EventFees {
 
     //CRM-11601 we should keep the record contribution
     //true by default while adding participant
-     if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent
-       && strtotime(CRM_Utils_Array::value('start_date', $details[$form->_eventId])) >= time()) {
+     if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent) {
       $defaults[$form->_pId]['record_contribution'] = 1;
     }
 
