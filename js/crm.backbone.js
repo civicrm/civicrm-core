@@ -70,10 +70,13 @@
       switch (method) {
         case 'create': // pass-through
         case 'update':
+          var params = model.toJSON();
+          params.options || (params.options = {});
+          params.options.reload = 1;
           if (!model._isDuplicate) {
-            CRM.api(model.crmEntityName, 'create', model.toJSON(), apiOptions);
+            CRM.api(model.crmEntityName, 'create', params, apiOptions);
           } else {
-            CRM.api(model.crmEntityName, 'duplicate', model.toJSON(), apiOptions);
+            CRM.api(model.crmEntityName, 'duplicate', params, apiOptions);
           }
           break;
         case 'read':
