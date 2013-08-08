@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -75,11 +75,11 @@ class CRM_Grant_Form_GrantPage_Delete extends CRM_Grant_Form_GrantPage {
     //if there are contributions related to Contribution Page
     //then onle cancel button is displayed
     $buttons = array();
-      $buttons[] = array(
-        'type' => 'next',
-        'name' => ts('Delete Grant Application Page'),
-        'isDefault' => TRUE,
-      );
+    $buttons[] = array(
+      'type' => 'next',
+      'name' => ts('Delete Grant Application Page'),
+      'isDefault' => TRUE,
+    );
 
     $buttons[] = array(
       'type' => 'cancel',

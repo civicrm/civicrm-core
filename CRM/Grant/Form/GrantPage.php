@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -73,15 +73,15 @@ class CRM_Grant_Form_GrantPage extends CRM_Core_Form {
   public function preProcess() {
     // current contribution page id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, NULL, 'REQUEST'
-    );
+                                             $this, FALSE, NULL, 'REQUEST'
+                                             );
     $this->assign('contributionPageID', $this->_id);
 
     // get the requested action
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
-      // default to 'browse'
-      $this, FALSE, 'browse'
-    );
+                                                 // default to 'browse'
+                                                 $this, FALSE, 'browse'
+                                                 );
 
     // setting title and 3rd level breadcrumb for html page if contrib page exists
     if ($this->_id) {
@@ -140,50 +140,50 @@ class CRM_Grant_Form_GrantPage extends CRM_Core_Form {
 
     if ($this->_single) {
       $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Save'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'upload',
-            'name' => ts('Save and Done'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'subName' => 'done',
-          ),
-          array(
-            'type' => 'submit',
-            'name' => ts('Save and Next'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'subName' => 'savenext',
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'next',
+          'name' => ts('Save'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'upload',
+          'name' => ts('Save and Done'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'subName' => 'done',
+        ),
+        array(
+          'type' => 'submit',
+          'name' => ts('Save and Next'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'subName' => 'savenext',
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
+     );
     }
     else {
       $buttons = array();
       if (!$this->_first) {
         $buttons[] = array(
-          'type' => 'back',
-          'name' => ts('<< Previous'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        );
+                           'type' => 'back',
+                           'name' => ts('<< Previous'),
+                           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+                           );
       }
       $buttons[] = array(
-        'type' => 'next',
-        'name' => ts('Continue >>'),
-        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        'isDefault' => TRUE,
-      );
+                         'type' => 'next',
+                         'name' => ts('Continue >>'),
+                         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+                         'isDefault' => TRUE,
+                         );
       $buttons[] = array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      );
+                         'type' => 'cancel',
+                         'name' => ts('Cancel'),
+                         );
 
       $this->addButtons($buttons);
     }
@@ -268,45 +268,44 @@ class CRM_Grant_Form_GrantPage extends CRM_Core_Form {
       //this is quite painful because StateMachine is full of protected variables
       //so we have to retrieve all pages, find current page, and then retrieve next
       $stateMachine = new CRM_Grant_StateMachine_GrantPage($this);
-      $states       = $stateMachine->getStates();
-      $statesList   = array_keys($states);
+      $states = $stateMachine->getStates();
+      $statesList = array_keys($states);
       $currKey      = array_search($className, $statesList);
       $nextPage     = (array_key_exists($currKey + 1, $statesList)) ? $statesList[$currKey + 1] : '';
 
       //unfortunately, some classes don't map to subpage names, so we alter the exceptions
           
       if ($className) {
-      
-          $subPage     = strtolower($className);
-          $subPageName = $className;
-          $nextPage    = strtolower($nextPage);
+        $subPage     = strtolower($className);
+        $subPageName = $className;
+        $nextPage    = strtolower($nextPage);
         
-          if ( $subPage == "custom" ) {
-              $nextPage = "settings";
-          }
+        if ($subPage == "custom") {
+          $nextPage = "settings";
+        }
       }
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-          array(1 => $subPageName)
-        ));
+        array(1 => $subPageName)
+      ));
 
       $this->postProcessHook();
 
       if ($this->controller->getButtonName('submit') == "_qf_{$className}_next") {
-            CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/grant/{$subPage}",
-           "action=update&reset= &id={$this->_id}"
-          ));
+        CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/grant/{$subPage}",
+          "action=update&reset= &id={$this->_id}"
+        ));
       }
       elseif ($this->controller->getButtonName('submit') == "_qf_{$className}_submit_savenext") {
         if ($nextPage) {
           CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/grant/{$nextPage}",
-              "action=update&reset=1&id={$this->_id}"
-            ));
+            "action=update&reset=1&id={$this->_id}"
+          ));
         }
         else {
           CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/grant",
-              "reset=1"
-            ));
+            "reset=1"
+          ));
         }
       }
       else {
@@ -317,10 +316,10 @@ class CRM_Grant_Form_GrantPage extends CRM_Core_Form {
 
   function getTemplateFileName() {
     if ($this->controller->getPrint() == CRM_Core_Smarty::PRINT_NOFORM ||
-      $this->getVar('_id') <= 0 ||
-      ($this->_action & CRM_Core_Action::DELETE) ||
-      (CRM_Utils_String::getClassName($this->_name) == 'AddProduct')
-    ) {
+        $this->getVar('_id') <= 0 ||
+        ($this->_action & CRM_Core_Action::DELETE) ||
+        (CRM_Utils_String::getClassName($this->_name) == 'AddProduct')
+        ) {
       return parent::getTemplateFileName();
     }
     else {

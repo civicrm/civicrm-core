@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -89,8 +89,8 @@ class CRM_Grant_Form_Grant_ThankYou extends CRM_Grant_Form_GrantBase {
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
-    $productID        = $this->get('productID');
-    $option           = $this->get('option');
+    $productID = $this->get('productID');
+    $option = $this->get('option');
     $this->assign('receiptFromEmail', CRM_Utils_Array::value('receipt_from_email', $this->_values));
 
     $params = $this->_params;
@@ -110,7 +110,7 @@ class CRM_Grant_Form_Grant_ThankYou extends CRM_Grant_Form_GrantBase {
     $fields = array();
     $removeCustomFieldTypes = array('Grant');
     foreach ($this->_fields as $name => $dontCare) {
-        $fields[$name] = 1;
+      $fields[$name] = 1;
     }
     $fields['state_province'] = $fields['country'] = $fields['email'] = 1;
     $contact = $this->_params = $this->controller->exportValues('Main');

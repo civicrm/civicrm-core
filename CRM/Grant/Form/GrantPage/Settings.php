@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -61,8 +61,8 @@ class CRM_Grant_Form_GrantPage_Settings extends CRM_Grant_Form_GrantPage {
         'title'
       );
       CRM_Utils_System::setTitle(ts('Title and Settings (%1)',
-          array(1 => $title)
-        ));
+        array(1 => $title)
+      ));
     }
     else {
       CRM_Utils_System::setTitle(ts('Title and Settings'));
@@ -123,7 +123,7 @@ class CRM_Grant_Form_GrantPage_Settings extends CRM_Grant_Form_GrantPage {
    * @access public
    */
   static
-  function formRule($values) {
+    function formRule($values) {
     $errors = array();
 
     //CRM-4286
@@ -173,11 +173,11 @@ class CRM_Grant_Form_GrantPage_Settings extends CRM_Grant_Form_GrantPage {
         $url = 'civicrm/admin/grant';
         $urlParams = 'reset=1';
         CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-            array(1 => $this->getTitle())
-          ));
+                                       array(1 => $this->getTitle())
+                                       ));
       }
 
-       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
+      CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
     }
     parent::endPostProcess();
   }

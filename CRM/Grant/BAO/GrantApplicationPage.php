@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -39,11 +39,11 @@
 class CRM_Grant_BAO_GrantApplicationPage extends CRM_Grant_DAO_GrantApplicationPage {
 
   /**
-   * takes an associative array and creates a contribution page object
+   * takes an associative array and creates a grant application page object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return object CRM_Contribute_DAO_ContributionPage object
+   * @return object CRM_Grant_DAO_GrantApplicationPage object
    * @access public
    * @static
    */

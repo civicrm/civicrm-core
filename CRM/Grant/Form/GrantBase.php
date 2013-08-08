@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -117,8 +117,8 @@ class CRM_Grant_Form_GrantBase extends CRM_Core_Form {
 
     // current grant application page id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this
-    );
+                                             $this
+                                             );
    
     if (!$this->_id) {
       $pastGrantID = $session->get('pastGrantID');
@@ -143,8 +143,8 @@ class CRM_Grant_Form_GrantBase extends CRM_Core_Form {
 
     // action
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
-      $this, FALSE, 'add'
-    );
+                                                 $this, FALSE, 'add'
+                                                 );
     $this->assign('action', $this->_action);
   
     // current mode
@@ -155,7 +155,7 @@ class CRM_Grant_Form_GrantBase extends CRM_Core_Form {
     $this->_bltID = $this->get('bltID');
     $this->assign('title', $this->_values['title']);
     CRM_Utils_System::setTitle($this->_values['title']);
- if (!$this->_values) {
+    if (!$this->_values) {
       // get all the values from the dao object
       $this->_values = array();
       $this->_fields = array();
@@ -230,24 +230,24 @@ class CRM_Grant_Form_GrantBase extends CRM_Core_Form {
    * @access public
    */
   function assignToTemplate() {
-      $vars = array(
+    $vars = array(
       'default_amount_hidden'
     );
 
     $config = CRM_Core_Config::singleton();
  
     if (CRM_Utils_Array::value('default_amount_hidden', $this->_params)) {
-        $this->assign('default_amount_hidden', $this->_params['default_amount_hidden']);
+      $this->assign('default_amount_hidden', $this->_params['default_amount_hidden']);
     }
 
     // assign the address formatted up for display
     $addressParts = array(
-      "street_address-{$this->_bltID}",
-      "city-{$this->_bltID}",
-      "postal_code-{$this->_bltID}",
-      "state_province-{$this->_bltID}",
-      "country-{$this->_bltID}",
-    );
+                          "street_address-{$this->_bltID}",
+                          "city-{$this->_bltID}",
+                          "postal_code-{$this->_bltID}",
+                          "state_province-{$this->_bltID}",
+                          "country-{$this->_bltID}",
+                          );
 
     $addressFields = array();
     foreach ($addressParts as $part) {
@@ -257,8 +257,8 @@ class CRM_Grant_Form_GrantBase extends CRM_Core_Form {
 
     $this->assign('address', CRM_Utils_Address::format($addressFields));
     $this->assign('email',
-      $this->controller->exportValue('Main', "email-{$this->_bltID}")
-    );
+                  $this->controller->exportValue('Main', "email-{$this->_bltID}")
+                  );
 
     // also assign the receipt_text
     if (isset($this->_values['receipt_text'])) {
@@ -303,8 +303,8 @@ class CRM_Grant_Form_GrantBase extends CRM_Core_Form {
       }
       else {
         $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
-          NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
-        );
+                                                  NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
+                                                  );
       }
 
       if ($fields) {
@@ -326,9 +326,9 @@ class CRM_Grant_Form_GrantBase extends CRM_Core_Form {
         $addCaptcha = FALSE;
         foreach ($fields as $key => $field) {
           if ($viewOnly &&
-            isset($field['data_type']) &&
-            $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
-          ) {
+              isset($field['data_type']) &&
+              $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
+              ) {
             // ignore file upload fields
             continue;
           }
@@ -353,8 +353,8 @@ class CRM_Grant_Form_GrantBase extends CRM_Core_Form {
         CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
         if ($addCaptcha &&
-          !$viewOnly
-        ) {
+            !$viewOnly
+            ) {
           $captcha = CRM_Utils_ReCAPTCHA::singleton();
           $captcha->add($this);
           $this->assign('isCaptcha', TRUE);

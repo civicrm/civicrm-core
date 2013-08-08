@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -92,8 +92,7 @@ class CRM_Grant_Form_GrantPage_ThankYou extends CRM_Grant_Form_GrantPage {
    * @access public
    * @static
    */
-  static
-  function formRule($fields, $files, $options) {
+  static function formRule($fields, $files, $options) {
     $errors = array();
 
     // if is_email_receipt is set, the receipt message must be non-empty

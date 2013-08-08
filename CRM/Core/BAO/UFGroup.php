@@ -1906,7 +1906,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $profileType = CRM_Core_BAO_UFField::getProfileType($gId, TRUE, FALSE, TRUE);
 
       if (empty($profileType) || in_array($profileType, array(
-            'Contact', 'Contribution', 'Participant', 'Membership', 'Grant'))) {
+        'Contact', 'Contribution', 'Participant', 'Membership', 'Grant'))) {
         $profileType = 'Individual';
       }
       if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
@@ -3083,7 +3083,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         break;
 
       case 'Grant':
-        $componentBAO     = 'CRM_Grant_BAO_Grant';
+        $componentBAO = 'CRM_Grant_BAO_Grant';
         $componentBAOName = 'Grant';
         $componentSubType = array('grant_type_id');
         break;

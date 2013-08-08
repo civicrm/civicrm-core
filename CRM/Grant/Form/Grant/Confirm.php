@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -63,24 +63,25 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
 
     $this->_params['amount'] = $this->get('default_amount_hidden');
 
-        // we use this here to incorporate any changes made by folks in hooks
+    // we use this here to incorporate any changes made by folks in hooks
     $this->_params['currencyID'] = $config->defaultCurrency;
     $this->_params = $this->controller->exportValues('Main');
     
 
-      $this->_params['ip_address'] = $_SERVER['REMOTE_ADDR'];
-      // hack for safari
-      if ($this->_params['ip_address'] == '::1') {
-        $this->_params['ip_address'] = '127.0.0.1';
-      }
-      $this->_params['amount'] = $this->get('default_amount');
+    $this->_params['ip_address'] = $_SERVER['REMOTE_ADDR'];
+    // hack for safari
+    if ($this->_params['ip_address'] == '::1') {
+      $this->_params['ip_address'] = '127.0.0.1';
+    }
+    $this->_params['amount'] = $this->get('default_amount');
 
-      $this->_useForMember = $this->get('useForMember');
+    $this->_useForMember = $this->get('useForMember');
       
-      if (isset($this->_params['amount'])) 
+    if (isset($this->_params['amount'])) {
       $this->_params['currencyID'] = $config->defaultCurrency;
+    }
 
-      $this->set('params', $this->_params);
+    $this->set('params', $this->_params);
   }
 
   /**
@@ -103,26 +104,26 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
     $grantButton = ts('Continue >>');
     $this->assign('button', ts('Continue'));
     
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => $grantButton,
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-            'js' => array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"),
-          ),
-          array(
-            'type' => 'back',
-            'name' => ts('Go Back'),
-          ),
-        )
-      );
+    $this->addButtons(array(
+      array(
+        'type' => 'next',
+        'name' => $grantButton,
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+        'js' => array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"),
+      ),
+      array(
+        'type' => 'back',
+        'name' => ts('Go Back'),
+      ),
+     )
+    );
     $defaults = array();
     $options = array();
     $fields = array();
     $removeCustomFieldTypes = array('Grant');
     foreach ($this->_fields as $name => $dontCare) {
-           $fields[$name] = 1;
+      $fields[$name] = 1;
     }
 
     $contact = $this->_params;
@@ -139,13 +140,13 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
           }
         }
         elseif (in_array($name, array('addressee', 'email_greeting', 'postal_greeting'))
-          && CRM_Utils_Array::value($name . '_custom', $contact)
-        ) {
+                && CRM_Utils_Array::value($name . '_custom', $contact)
+                ) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];
         }
       }
     }
-     // now fix all state country selectors
+    // now fix all state country selectors
     CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
 
     $this->setDefaults($defaults);
@@ -318,21 +319,22 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
     else {
       $session->set('transaction.userID', NULL);
     }
-      // at this point we've created a contact and stored its address etc
-      // all the payment processors expect the name and address to be in the
-      // so we copy stuff over to first_name etc.
-      $paymentParams = $this->_params;
+    // at this point we've created a contact and stored its address etc
+    // all the payment processors expect the name and address to be in the
+    // so we copy stuff over to first_name etc.
+    $paymentParams = $this->_params;
      
-      $grantTypeId = $this->_values['grant_type_id'];
+    $grantTypeId = $this->_values['grant_type_id'];
      
-      $fieldTypes = array();
+    $fieldTypes = array();
         
-      CRM_Grant_BAO_Grant_Utils::processConfirm($this, $paymentParams,
-        $premiumParams, $contactID,
-        $grantTypeId,
-        'grant',
-        $fieldTypes
-      );
+    CRM_Grant_BAO_Grant_Utils::processConfirm($this, $paymentParams,
+      $premiumParams, 
+      $contactID,
+      $grantTypeId,
+      'grant',
+      $fieldTypes
+    );
      
     
     
@@ -344,16 +346,15 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
    * @return void
    * @access public
    */
-  static
-  function processContribution(&$form,
+  static function processContribution(&$form,
     $params,
     $result,
     $contactID,
     $grantTypeId,
     $deductibleMode = TRUE,
-    $pending        = FALSE,
-    $online         = TRUE
-  ) {
+    $pending = FALSE,
+    $online = TRUE
+    ) {
     $transaction = new CRM_Core_Transaction();
   
     $className   = get_class($form);
@@ -415,11 +416,11 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
     $grantParams['amount_total'] = trim(CRM_Utils_Money::format($nonDeductibleAmount, ' '));
 
     if ($nonDeductibleAmount) {
-        //add contribution record
-        $grant = &CRM_Grant_BAO_Grant::add($grantParams, $ids);
+      //add contribution record
+      $grant = &CRM_Grant_BAO_Grant::add($grantParams, $ids);
     }
     if ($online && $grant) {
-        CRM_Core_BAO_CustomValueTable::postProcess($form->_params,
+      CRM_Core_BAO_CustomValueTable::postProcess($form->_params,
         CRM_Core_DAO::$_nullArray,
         'civicrm_grant',
         $grant->id,
@@ -431,9 +432,9 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
       $params['contribution_id'] = $grant->id;
     
       if (CRM_Utils_Array::value('custom', $params) &&
-        is_array($params['custom']) &&
-        !is_a($grant, 'CRM_Core_Error')
-      ) {
+          is_array($params['custom']) &&
+          !is_a($grant, 'CRM_Core_Error')
+          ) {
         CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_grant', $grant->id);
       }
     }
@@ -444,7 +445,6 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
     elseif (isset($params['cms_contactID'])) {
       $contactID = $params['cms_contactID'];
     }
-
     CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params,
       $contactID,
       'email-' . $form->_bltID

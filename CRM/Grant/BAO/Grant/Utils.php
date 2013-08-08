@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -35,15 +35,10 @@
 class CRM_Grant_BAO_Grant_Utils {
 
   /**
-   * Function to process payment after confirmation
+   * Function to process grant after confirmation
    *
    * @param object  $form   form object
-   * @param array   $paymentParams   array with payment related key
-   * value pairs
-   * @param array   $premiumParams   array with premium related key
-   * value pairs
    * @param int     $contactID       contact id
-     * @param int     $contributionTypeId   financial type id
    * @param int     $component   component id
    *
    * @return array associated array
@@ -64,7 +59,6 @@ class CRM_Grant_BAO_Grant_Utils {
     //CRM-11456
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
 
-
     $payment = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
     if (CRM_Utils_Array::value('is_monetary', $form->_values) && $form->_amount > 0.0 && is_array($form->_paymentProcessor)) {
@@ -76,38 +70,35 @@ class CRM_Grant_BAO_Grant_Utils {
 
     $result = NULL;
    
-      // this is not going to come back, i.e. we fill in the other details
-      // when we get a callback from the payment processor
-      // also add the contact ID and contribution ID to the params list
-      $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
-      $grant = CRM_Grant_Form_Grant_Confirm::processContribution(
-        $form,
-        $paymentParams,
-        NULL,
-        $contactID,
-        $grantTypeId,
-        TRUE, TRUE, TRUE
+    // this is not going to come back, i.e. we fill in the other details
+    // when we get a callback from the payment processor
+    // also add the contact ID and contribution ID to the params list
+    $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
+    $grant = CRM_Grant_Form_Grant_Confirm::processContribution(
+      $form,
+      $paymentParams,
+      NULL,
+      $contactID,
+      $grantTypeId,
+      TRUE, TRUE, TRUE
+    );
+      
+    if ($grant) {
+      $form->_params['contributionID'] = $grant->id;
+    }
+      
+    $form->_params['contributionTypeID'] = $grantTypeId;
+    $form->_params['item_name'] = $form->_params['description'];
+    $form->_params['receive_date'] = $now;
+    $form->set('params', $form->_params);
+    // finally send an email receipt
+    if ($grant) {
+      $form->_values['contribution_id'] = $grant->id;
+      CRM_Grant_BAO_GrantApplicationPage::sendMail($contactID, 
+        $form->_values, FALSE,
+        FALSE, $fieldTypes
       );
-      
-      if ($grant) {
-        $form->_params['contributionID'] = $grant->id;
-      }
-      
-      $form->_params['contributionTypeID'] = $grantTypeId;
-      $form->_params['item_name'] = $form->_params['description'];
-      $form->_params['receive_date'] = $now;
-      $form->set('params', $form->_params);
-      // finally send an email receipt
-      if ($grant) {
-          
-          $form->_values['contribution_id'] = $grant->id;
-        
-          
-          CRM_Grant_BAO_GrantApplicationPage::sendMail($contactID, 
-                                                        $form->_values, FALSE,
-                                                        FALSE, $fieldTypes
-                                                        );
-      }
+    }
   }
 
  
@@ -175,10 +166,8 @@ class CRM_Grant_BAO_Grant_Utils {
     if (!$contribution->id) {
       return FALSE;
     }
-
     return TRUE;
   }
-  
-  }
+}
 
 

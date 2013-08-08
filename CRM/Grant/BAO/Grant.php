@@ -91,9 +91,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       
       $skipFields = array('grant_id', 'grant_contact_id', 'grant_type', 'grant_note', 'grant_status' );
       foreach ($skipFields as $field) {
-          if (isset($exportableFields[$field])) {
-              unset($exportableFields[$field]);
-          }
+        if (isset($exportableFields[$field])) {
+          unset($exportableFields[$field]);
+        }
       }
       
       return $exportableFields;
@@ -118,7 +118,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     foreach ($grantFields as $key => $var) {
       $fields[$key] = $var;
     }
-
+    
     $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Grant'));
    
     return $fields;

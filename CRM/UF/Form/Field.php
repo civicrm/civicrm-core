@@ -889,8 +889,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           || in_array('Organization', $groupType) || in_array('Household', $groupType) || in_array('Activity', $groupType)
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field type Participant with combination of Activity or Membership or Contribution or Household or Organization or Activity');
-        } elseif ( in_array('Grant', $groupType) ) {
-            $errors['field_name'] = ts('The profile has a grant field already, and this field is not a contact or grant field.');
+        } 
+        elseif (in_array('Grant', $groupType)) {
+          $errors['field_name'] = ts('The profile has a grant field already, and this field is not a contact or grant field.');
         }
         else {
           self::formRuleSubType($fieldType, $groupType, $errors);
@@ -907,8 +908,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           || ($profileId != $self->_gid && in_array('Organization', $groupType)) || in_array('Household', $groupType) || in_array('Activity', $groupType)
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field type Contribution with combination of Activity or Membership or Participant or Household or Organization');
-        } elseif ( in_array('Grant', $groupType) ) {
-            $errors['field_name'] = ts('The profile has a grant field already, and this field is not a contact or grant field.');
+        } 
+        elseif (in_array('Grant', $groupType)) {
+          $errors['field_name'] = ts('The profile has a grant field already, and this field is not a contact or grant field.');
         }
         else {
           self::formRuleSubType($fieldType, $groupType, $errors);
@@ -925,8 +927,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           || ($profileId != $self->_gid && in_array('Organization', $groupType)) || in_array('Household', $groupType) || in_array('Activity', $groupType)
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field type Membership with combination of Activity or Participant or Contribution or Household or Organization');
-        } elseif ( in_array('Grant', $groupType) ) {
-            $errors['field_name'] = ts('The profile has a grant field already, and this field is not a contact or grant field.');
+        } 
+        elseif (in_array('Grant', $groupType)) {
+          $errors['field_name'] = ts('The profile has a grant field already, and this field is not a contact or grant field.');
         }
         else {
           self::formRuleSubType($fieldType, $groupType, $errors);
@@ -938,11 +941,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         if ( in_array('Membership', $groupType) || 
              in_array('Activity', $groupType) || 
              in_array('Participant', $groupType) || 
-             in_array('Contribution', $groupType) ) 
-            {
-            $errors['field_name'] = ts('A grant field can only be added to a profile that has only contact and grant fields. This profile has fields that are not contact or grant fields');
+             in_array('Contribution', $groupType) ) {
+          $errors['field_name'] = ts('A grant field can only be added to a profile that has only contact and grant fields. This profile has fields that are not contact or grant fields');
         } else {
-            self::formRuleSubType($fieldType, $groupType, $errors);
+          self::formRuleSubType($fieldType, $groupType, $errors);
         }
 
       default:
