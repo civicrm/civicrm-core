@@ -71,15 +71,11 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
    * {@inheritDoc}
    */
   public function toApiOutput($apiRequest, $result) {
-    if ($result['is_error']) {
-      return $result;
-    }
-
+    $reloadMode = NULL;
     if ($apiRequest['action'] === 'create' && isset($apiRequest['params'], $apiRequest['params']['options'], $apiRequest['params']['options']['reload'])) {
-      $reloadMode = $apiRequest['params']['options']['reload'];
-    }
-    else {
-      $reloadMode = NULL;
+      if (!CRM_Utils_Array::value('is_error', $result, FALSE)) {
+        $reloadMode = $apiRequest['params']['options']['reload'];
+      }
     }
 
     switch ($reloadMode) {
