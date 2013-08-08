@@ -472,10 +472,6 @@ class CRM_Grant_BAO_GrantApplicationPage extends CRM_Grant_DAO_GrantApplicationP
         }
 
         CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
-        CRM_Core_Error::debug( '$params', $params );
-        CRM_Core_Error::debug( '$cid', $cid );
-        CRM_Core_Error::debug( '$values', $values );
-        exit;
 
         if (count($values)) {
           $template->assign($name, $values);

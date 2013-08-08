@@ -103,6 +103,7 @@
     <required>true</required>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <import>true</import>
+    <export>true</export>
     <comment>Requested grant amount, in default currency.</comment>
     <add>1.8</add>
   </field>
