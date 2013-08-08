@@ -57,13 +57,12 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   function tearDown() {
 
     $this->quickCleanup(array(
-        'civicrm_uf_field',
-        'civicrm_uf_join',
-        'civicrm_uf_group',
         'civicrm_contact',
         'civicrm_phone',
         'civicrm_address',
       ), TRUE);
+    // ok can't be bothered wring an api to do this & truncating is crazy
+    CRM_Core_DAO::executeQuery(' DELETE FROM civicrm_uf_group WHERE id IN (25, 26)');
   }
 
   ////////////// test $this->callAPISuccess3_profile_get //////////////////
@@ -102,15 +101,66 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'profile_id' => 25,
       'contact_id' => $contactId,
     );
-
-    $result = $this->callAPIAndDocument('profile', 'get', $params, __FUNCTION__, __FILE__);
-
+    $result = $this->callAPISuccess('profile', 'get', $params);
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"
       );
     }
   }
 
+  function testProfileGetMultiple() {
+    $pofileFieldValues = $this->_createIndividualContact();
+    $expected          = current($pofileFieldValues);
+    $contactId         = key($pofileFieldValues);
+    $params            = array(
+      'profile_id' => array(25, 1, 'Billing'),
+      'contact_id' => $contactId,
+    );
+
+    $result = $this->callAPIAndDocument('profile', 'get', $params, __FUNCTION__, __FILE__);
+    foreach ($expected as $profileField => $value) {
+      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values'][25]), " error message: " . "missing/mismatching value for {$profileField}");
+    }
+    $this->assertEquals('abc1', $result['values'][1]['first_name'], " error message: " . "missing/mismatching value for {$profileField}");
+    $this->assertFalse(array_key_exists('email-Primary', $result['values'][1]), 'profile 1 doesn not include email');
+    $this->assertEquals($result['values']['Billing'], array(
+      'billing_first_name' => 'abc1',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'xyz1',
+      'billing_street_address-5' => '',
+      'billing_city-5' => '',
+      'billing_state_province_id-5' => '',
+      'billing_country_id-5' => '',
+      'billing-email-5' => 'abc1.xyz1@yahoo.com',
+    ));
+  }
+
+  function testProfileGetMultipleHasBillingLocation() {
+    $individual = $this->_createIndividualContact();
+    $contactId  = key($individual);
+    $this->callAPISuccess('address', 'create', array('contact_id' => $contactId , 'street_address' => '25 Big Street', 'city' => 'big city', 'location_type_id' => 5));
+    $this->callAPISuccess('email', 'create', array('contact_id' => $contactId , 'email' => 'big@once.com', 'location_type_id' => 2, 'is_billing' => 1));
+
+    $expected = current($individual);
+
+    $params = array(
+      'profile_id' => array(25, 1, 'Billing'),
+      'contact_id' => $contactId,
+    );
+
+    $result = $this->callAPISuccess('profile', 'get', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals('abc1', $result['values'][1]['first_name']);
+    $this->assertEquals($result['values']['Billing'], array(
+      'billing_first_name' => 'abc1',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'xyz1',
+      'billing_street_address-5' => '25 Big Street',
+      'billing_city-5' => 'big city',
+      'billing_state_province_id-5' => '',
+      'billing_country_id-5' => '',
+      'billing-email-5' => 'big@once.com',
+    ));
+  }
   /**
    * check contact activity profile without activity id
    */

@@ -49,37 +49,44 @@ require_once 'api/v3/utils.php';
  *
  * @return Profile field values|CRM_Error
  *
- * @todo add example
- * @todo add test cases
- *
+ * NOTE this api is not standard & since it is tested we need to honour that
+ * but the correct behaviour is for it to return an id indexed array as this supports
+ * multiple instances
  */
 function civicrm_api3_profile_get($params) {
+  $nonStandardLegacyBehaviour = is_numeric($params['profile_id']) ?  TRUE : FALSE;
 
-  civicrm_api3_verify_mandatory($params, NULL, array('profile_id', 'contact_id'));
-
-  if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $params['profile_id'], 'is_active')) {
-    return civicrm_api3_create_error('Invalid value for profile_id');
-  }
-
-  $isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($params['profile_id']);
-
-  if (CRM_Core_BAO_UFField::checkProfileType($params['profile_id']) && !$isContactActivityProfile) {
-    return civicrm_api3_create_error('Can not retrieve values for profiles include fields for more than one record type.');
-  }
-
-  $profileFields = CRM_Core_BAO_UFGroup::getFields($params['profile_id'],
-    FALSE,
-    NULL,
-    NULL,
-    NULL,
-    FALSE,
-    NULL,
-    TRUE,
-    NULL,
-    CRM_Core_Permission::EDIT
-  );
-
+  $profiles = (array) $params['profile_id'];
   $values = array();
+  foreach ($profiles as $profileID) {
+    $values[$profileID] = array();
+    if (strtolower($profileID) == 'billing') {
+      $values[$profileID] = _civicrm_api3_profile_getbillingpseudoprofile($params);
+      continue;
+    }
+    if(!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileID, 'is_active')) {
+      throw new API_Exception('Invalid value for profile_id : ' . $profileID);
+    }
+
+    $isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($profileID);
+
+    if (CRM_Core_BAO_UFField::checkProfileType($profileID) && !$isContactActivityProfile) {
+      throw new API_Exception('Can not retrieve values for profiles include fields for more than one record type.');
+    }
+
+    $profileFields = CRM_Core_BAO_UFGroup::getFields($profileID,
+      FALSE,
+      NULL,
+      NULL,
+      NULL,
+      FALSE,
+      NULL,
+      TRUE,
+      NULL,
+      CRM_Core_Permission::EDIT
+    );
+
+
   if ($isContactActivityProfile) {
     civicrm_api3_verify_mandatory($params, NULL, array('activity_id'));
 
@@ -88,7 +95,7 @@ function civicrm_api3_profile_get($params) {
       $params['profile_id']
     );
     if (!empty($errors)) {
-      return civicrm_api3_create_error(array_pop($errors));
+      throw new API_Exception(array_pop($errors));
     }
 
     $contactFields = $activityFields = array();
@@ -101,22 +108,31 @@ function civicrm_api3_profile_get($params) {
       }
     }
 
-    CRM_Core_BAO_UFGroup::setProfileDefaults($params['contact_id'], $contactFields, $values, TRUE);
+    CRM_Core_BAO_UFGroup::setProfileDefaults($params['contact_id'], $contactFields, $values[$profileID], TRUE);
 
     if ($params['activity_id']) {
-      CRM_Core_BAO_UFGroup::setComponentDefaults($activityFields, $params['activity_id'], 'Activity', $values, TRUE);
+      CRM_Core_BAO_UFGroup::setComponentDefaults($activityFields, $params['activity_id'], 'Activity', $values[$profileID], TRUE);
     }
   }
   else {
-    CRM_Core_BAO_UFGroup::setProfileDefaults($params['contact_id'], $profileFields, $values, TRUE);
+    CRM_Core_BAO_UFGroup::setProfileDefaults($params['contact_id'], $profileFields, $values[$profileID], TRUE);
   }
-
-  $result = civicrm_api3_create_success();
-  $result['values'] = $values;
-
-  return $result;
+  }
+  if($nonStandardLegacyBehaviour) {
+    $result = civicrm_api3_create_success();
+    $result['values'] = $values[$profileID];
+    return $result;
+  }
+  else {
+    return civicrm_api3_create_success($values, $params, 'Profile', 'Get');
+  }
 }
 
+function _civicrm_api3_profile_get_spec(&$params) {
+  $params['profile_id']['api.required'] = TRUE;
+  // does this mean we use a different call to get a 'blank' profile?
+  $params['contact_id']['api.required'] = TRUE;
+}
 /**
  * Update Profile field values.
  *
@@ -134,13 +150,13 @@ function civicrm_api3_profile_set($params) {
   civicrm_api3_verify_mandatory($params, NULL, array('profile_id'));
 
   if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $params['profile_id'], 'is_active')) {
-    return civicrm_api3_create_error('Invalid value for profile_id');
+    throw new API_Exception('Invalid value for profile_id');
   }
 
   $isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($params['profile_id']);
 
   if (CRM_Core_BAO_UFField::checkProfileType($params['profile_id']) && !$isContactActivityProfile) {
-    return civicrm_api3_create_error('Can not retrieve values for profiles include fields for more than one record type.');
+    throw new API_Exception('Can not retrieve values for profiles include fields for more than one record type.');
   }
 
   $contactParams = $activityParams = $missingParams = array();
@@ -194,7 +210,7 @@ function civicrm_api3_profile_set($params) {
   }
 
   if (!empty($missingParams)) {
-    return civicrm_api3_create_error("Missing required parameters for profile id {$params['profile_id']}: " . implode(', ', $missingParams));
+    throw new API_Exception("Missing required parameters for profile id {$params['profile_id']}: " . implode(', ', $missingParams));
   }
 
   $contactParams['version'] = 3;
@@ -227,10 +243,7 @@ function civicrm_api3_profile_set($params) {
     unset($profileParams['tag']);
   }
 
-  $result = civicrm_api('contact', 'create', $profileParams);
-  if (CRM_Utils_Array::value('is_error', $result)) {
-    return $result;
-  }
+  return civicrm_api3('contact', 'create', $profileParams);
 
   $ufGroupDetails = array();
   $ufGroupParams = array('id' => $params['profile_id']);
@@ -318,3 +331,57 @@ function civicrm_api3_profile_getfields($params) {
   return civicrm_api3_create_success($fields);
 }
 
+/**
+ * This is a function to help us 'pretend' billing is a profile & treat it like it is one.
+ * It gets standard credit card address fields etc
+ * Note this is 'better' that the inbuilt version as it will pull in fallback values
+ *  billing location -> is_billing -> primary
+ */
+function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
+  $addressFields = array('street_address', 'city', 'state_province_id', 'country_id');
+  $result = civicrm_api3('contact', 'getsingle', array(
+    'id' => $params['contact_id'],
+    'api.address.getoptions' => array('field' => 'location_type_id',),
+    'api.address.get.1' => array('location_type_id' => 'Billing',  'return' => $addressFields),
+    // getting the is_billing required or not is an extra db call but probably cheap enough as this isn't an import api
+    'api.address.get.2' => array('is_billing' => True, 'return' => $addressFields),
+    'api.email.get.1' => array('location_type_id' => 'Billing',),
+    'api.email.get.2' => array('is_billing' => True,),
+    'return' => 'api.email.get, api.address.get, api.address.getoptions, email, first_name, last_name, middle_name,' . implode($addressFields, ','),
+   )
+  );
+  $locationTypeID = array_search('Billing', $result['api.address.getoptions']['values']);
+
+  $values = array(
+    'billing_first_name' => $result['first_name'],
+    'billing_middle_name' => $result['middle_name'],
+    'billing_last_name' => $result['last_name'],
+  );
+
+  if(!empty($result['api.address.get.1']['count'])) {
+    foreach ($addressFields as $fieldname) {
+      $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result['api.address.get.1']['values'][0][$fieldname])  ? $result['api.address.get.1']['values'][0][$fieldname] : '';
+    }
+  }
+  elseif(!empty($result['api.address.get.2']['count'])) {
+    foreach ($addressFields as $fieldname) {
+      $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result['api.address.get.2']['values'][0][$fieldname])  ? $result['api.address.get.2']['values'][0][$fieldname] : '';
+    }
+  }
+  else{
+    foreach ($addressFields as $fieldname) {
+      $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result[$fieldname]) ? $result[$fieldname] : '';
+    }
+  }
+
+  if(!empty($result['api.email.get.1']['count'])) {
+    $values['billing-email'. '-' . $locationTypeID] = $result['api.email.get.1']['values'][0]['email'];
+  }
+  elseif(!empty($result['api.email.get.2']['count'])) {
+    $values['billing-email'. '-' . $locationTypeID] = $result['api.email.get.2']['values'][0]['email'];
+  }
+  else{
+    $values['billing-email'. '-' . $locationTypeID] = $result['email'];
+  }
+  return $values;
+}
