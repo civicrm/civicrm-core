@@ -21,7 +21,8 @@
 function civicrm_api($entity, $action, $params, $extra = NULL) {
   $apiWrappers = array(
     CRM_Utils_API_HTMLInputCoder::singleton(),
-    CRM_Utils_API_NullOutputCoder::singleton()
+    CRM_Utils_API_NullOutputCoder::singleton(),
+    CRM_Utils_API_ReloadOption::singleton(),
   );
   try {
     require_once ('api/v3/utils.php');
