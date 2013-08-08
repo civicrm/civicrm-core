@@ -46,17 +46,24 @@ require_once 'api/Wrapper.php';
 class CRM_Utils_API_ReloadOption implements API_Wrapper {
 
   /**
-   * @var null|'null'|'default'|'selected'
+   * @var CRM_Utils_API_ReloadOption
    */
-  private $reloadMode = NULL;
+  private static $_singleton = NULL;
+
+  /**
+   * @return CRM_Utils_API_ReloadOption
+   */
+  public static function singleton() {
+    if (self::$_singleton === NULL) {
+      self::$_singleton = new CRM_Utils_API_ReloadOption();
+    }
+    return self::$_singleton;
+  }
 
   /**
    * {@inheritDoc}
    */
   public function fromApiInput($apiRequest) {
-    if ($apiRequest['action'] === 'create' && isset($apiRequest['params'], $apiRequest['params']['options'], $apiRequest['params']['options']['reload'])) {
-      $this->reloadMode = $apiRequest['params']['options']['reload'];
-    }
     return $apiRequest;
   }
 
@@ -67,7 +74,15 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
     if ($result['is_error']) {
       return $result;
     }
-    switch ($this->reloadMode) {
+
+    if ($apiRequest['action'] === 'create' && isset($apiRequest['params'], $apiRequest['params']['options'], $apiRequest['params']['options']['reload'])) {
+      $reloadMode = $apiRequest['params']['options']['reload'];
+    }
+    else {
+      $reloadMode = NULL;
+    }
+
+    switch ($reloadMode) {
       case NULL:
       case '0':
       case 'null':
@@ -79,6 +94,9 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
           'id' => $result['id'],
         );
         $reloadResult = civicrm_api3($apiRequest['entity'], 'get', $params);
+        if ($reloadResult['is_error']) {
+          throw new API_Exception($reloadResult['error_message']);
+        }
         $result['values'][$result['id']] = array_merge($result['values'][$result['id']], $reloadResult['values'][$result['id']]);
         return $result;
 
@@ -92,7 +110,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
         return $result;
 
       default:
-        throw new API_Exception("Unknown reload mode: " . var_export($this->reloadMode, TRUE));
+        throw new API_Exception("Unknown reload mode");
     }
   }
 
