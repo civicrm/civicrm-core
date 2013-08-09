@@ -1788,7 +1788,7 @@ SELECT  display_name
       $component = 'Membership';
     }
     elseif ($activity->__table == 'civicrm_participant') {
-      $event = CRM_Event_BAO_Event::getEvents(TRUE, $activity->event_id, TRUE, FALSE);
+      $event = CRM_Event_BAO_Event::getEvents(1, $activity->event_id, TRUE, FALSE);
 
       $roles = CRM_Event_PseudoConstant::participantRole();
       $status = CRM_Event_PseudoConstant::participantStatus();
