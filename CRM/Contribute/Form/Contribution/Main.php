@@ -34,7 +34,7 @@
  */
 
 /**
- * This class generates form components for processing a ontribution
+ * This class generates form components for processing a Contribution
  *
  */
 class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_ContributionBase {
@@ -1368,6 +1368,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         if ($payPalExpressId) {
           break;
         }
+      }
+      if (!$form->_snippet) {
+        // Add JS to show icons for the accepted credit cards
+        $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames();
+        CRM_Core_Resources::singleton()
+          ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)))
+          ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js');
       }
     }
     $form->assign('ppType', $form->_ppType);
