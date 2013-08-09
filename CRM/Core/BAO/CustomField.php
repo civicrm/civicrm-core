@@ -145,6 +145,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'column_name'
       );
     }
+    $columnName = $params['column_name'];
 
     $indexExist = FALSE;
     //as during create if field is_searchable we had created index.
@@ -284,9 +285,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       self::createField($customField, 'modify', $indexExist);
     }
     else {
-      if (!isset($params['column_name'])) {
-        $columnName .= "_{$customField->id}";
-      }
       $customField->column_name = $columnName;
       $customField->save();
       // make sure all values are present in the object
