@@ -1187,9 +1187,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       )) {
       $textBody = join('', $text);
       if ($useSmarty) {
-        $smarty->security = TRUE;
-        $textBody         = $smarty->fetch("string:$textBody");
-        $smarty->security = FALSE;
+        $textBody = $smarty->fetch("string:$textBody");
       }
       $mailParams['text'] = $textBody;
     }
@@ -1199,9 +1197,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         ))) {
       $htmlBody = join('', $html);
       if ($useSmarty) {
-        $smarty->security = TRUE;
-        $htmlBody         = $smarty->fetch("string:$htmlBody");
-        $smarty->security = FALSE;
+        $htmlBody = $smarty->fetch("string:$htmlBody");
       }
       $mailParams['html'] = $htmlBody;
     }
