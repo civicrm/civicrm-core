@@ -78,7 +78,7 @@ class CRM_Event_Form_EventFees {
 
     if ($form->_eventId) {
       //get receipt text and financial type
-      $returnProperities = array( 'confirm_email_text', 'financial_type_id', 'campaign_id' );
+      $returnProperities = array( 'confirm_email_text', 'financial_type_id', 'campaign_id', 'start_date' );
       $details = array();
       CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $form->_eventId, $details, $returnProperities);
       if ( CRM_Utils_Array::value( 'financial_type_id', $details[$form->_eventId] ) ) {
@@ -110,7 +110,7 @@ class CRM_Event_Form_EventFees {
       $defaults[$form->_pId]['send_receipt'] = 0;
     }
     else {
-      $defaults[$form->_pId]['send_receipt'] = 1;
+      $defaults[$form->_pId]['send_receipt'] = (strtotime(CRM_Utils_Array::value('start_date', $details[$form->_eventId])) >= time()) ? 1 : 0;
       if ($form->_eventId && CRM_Utils_Array::value('confirm_email_text', $details[$form->_eventId])) {
         //set receipt text
         $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
