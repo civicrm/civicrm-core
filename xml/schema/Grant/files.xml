@@ -2,4 +2,5 @@
 
 <tables xmlns:xi="http://www.w3.org/2001/XInclude">
 <xi:include href="Grant.xml"                 parse="xml" />
+<xi:include href="GrantAppPage.xml"                 parse="xml" />
 </tables>

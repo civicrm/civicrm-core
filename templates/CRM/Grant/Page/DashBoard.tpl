@@ -35,7 +35,7 @@
     <p>{ts 1=$findGrantsURL}This table provides a summary of <strong>Grant Totals</strong>, and includes shortcuts to view the Grant details for these commonly used search periods. Click the Grant Status to see a list of Contacts for that grant status. To run your own customized searches - click <a href='%1'>Find Grants</a>. You can search by Contact Name, Amount, Grant type and a variety of other criteria.{/ts}
     </p>
 </div>
-
+{include file="CRM/Grant/Page/GrantApplicationDashboard.tpl" context="DashBoard"}
 {if $grantSummary.total_grants}
 You have {$grantSummary.total_grants} grant(s) registered in your database.
 <table class="report">

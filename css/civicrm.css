@@ -2368,6 +2368,7 @@ div.grippie {
 #crm-participant-wrapper,
 #crm-event-links-wrapper,
 #crm-contribpage-links-wrapper,
+#crm-grantpage-links-wrapper,
 #crm-create-new-wrapper,
 #crm-contact-actions-wrapper {
   position: relative;
@@ -2376,6 +2377,7 @@ div.grippie {
 
 #crm-event-links-list,
 #crm-contribpage-links-list,
+#crm-grantpage-links-list,
 #crm-create-new-list,
 #crm-contact-actions-list,
 #crm-participant-list {
@@ -2413,6 +2415,9 @@ div.grippie {
 #crm-contribpage-links-list .crm-contribpage-contribution ul,
 #crm-contribpage-links-list .crm-contribpage-test ul,
 #crm-contribpage-links-list .crm-contribpage-live ul,
+#crm-grantpage-links-list .crm-grantpage-contribution ul,
+#crm-grantpage-links-list .crm-grantpage-test ul,
+#crm-grantpage-links-list .crm-grantpage-live ul,
 #crm-participant-list .crm-participant-counted ul,
 #crm-participant-list .crm-participant-not-counted ul,
 #crm-participant-list .crm-participant-listing ul,
@@ -3283,6 +3288,7 @@ div.m ul#civicrm-menu,
 .crm-participant-list-inner,
 .crm-event-links-list-inner,
 .crm-contribpage-links-list-inner,
+.crm-grantpage-links-list-inner,
 .crm-create-new-list-inner,
 .crm-contact-actions-list-inner {
   background-color: #2f2f2e;

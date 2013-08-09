@@ -30,6 +30,7 @@
   $ogNames = array(
     'case'         => ts('Message Template Workflow for Cases',          array('escape' => 'sql')),
     'contribution' => ts('Message Template Workflow for Contributions',  array('escape' => 'sql')),
+    'grant'         => ts('Message Template Workflow for Grant',          array('escape' => 'sql')),
     'event'        => ts('Message Template Workflow for Events',         array('escape' => 'sql')),
     'friend'       => ts('Message Template Workflow for Tell-a-Friend',  array('escape' => 'sql')),
     'membership'   => ts('Message Template Workflow for Memberships',    array('escape' => 'sql')),
@@ -53,6 +54,9 @@
       'pcp_notify'                    => ts('Personal Campaign Pages - Admin Notification',                   array('escape' => 'sql')),
       'pcp_status_change'             => ts('Personal Campaign Pages - Supporter Status Change Notification', array('escape' => 'sql')),
       'pcp_supporter_notify'          => ts('Personal Campaign Pages - Supporter Welcome',                    array('escape' => 'sql')),
+    ),
+    'grant' => array(
+      'grant_online_receipt' => ts('Grants - Receipt (on-line)', array('escape' => 'sql')),
     ),
     'event' => array(
       'event_offline_receipt' => ts('Events - Registration Confirmation and Receipt (off-line)', array('escape' => 'sql')),

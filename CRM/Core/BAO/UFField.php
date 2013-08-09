@@ -587,7 +587,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // profile types
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
-    $components = array('Contribution', 'Participant', 'Membership', 'Activity');
+    $components = array('Contribution', 'Participant', 'Membership', 'Activity', 'Grant');
 
     $profileTypes = array();
     if ($ufGroupType) {
@@ -893,6 +893,13 @@ SELECT  id
         else {
           $fields['Contribution'] = $contribFields;
         }
+      }
+    }
+
+    if (CRM_Core_Permission::access('CiviGrant')) {
+      $grantFields = CRM_Grant_BAO_Grant::getGrantFields();
+      if (!empty($grantFields)) {
+        $fields['Grant'] = $grantFields;
       }
     }
 
