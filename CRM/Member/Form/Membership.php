@@ -1357,12 +1357,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $formValues['preserveDBName'] = TRUE;
         }
       }
-      //here we are setting up the billing contact - if different from the member they are already created
-      // but they will get billing details assigned
-      CRM_Contact_BAO_Contact::createProfileContact($formValues, $fields,
-        $this->_contributorContactID, NULL, NULL, $ctype
-      );
-
+      if ($this->_contributorContactID == $this->_contactID) {
+        //see CRM-12869 for discussion of why we don't do this for separate payee payments
+        CRM_Contact_BAO_Contact::createProfileContact($formValues, $fields,
+          $this->_contributorContactID, NULL, NULL, $ctype
+        );
+      }
 
       // add all the additioanl payment params we need
       $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
