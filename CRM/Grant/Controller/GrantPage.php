@@ -53,7 +53,6 @@ class CRM_Grant_Controller_GrantPage extends CRM_Core_Controller {
 
     parent::__construct($title, $modal);
 
-
     $this->_stateMachine = new CRM_Grant_StateMachine_GrantPage($this, $action);
     
     // create and instantiate the pages

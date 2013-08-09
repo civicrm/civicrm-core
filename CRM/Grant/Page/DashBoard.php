@@ -118,9 +118,9 @@ class CRM_Grant_Page_DashBoard extends CRM_Core_Page {
   }
 
 /**
-   * Get the online contribution links.
+   * Get the online grant links.
    *
-   * @return array $_onlineContributionLinks.
+   * @return array $_onlineGrantLinks.
    *
    */
   function &onlineGrantLinks() {
@@ -174,83 +174,72 @@ class CRM_Grant_Page_DashBoard extends CRM_Core_Page {
      //get configure actions links.
      $configureActionLinks = self::configureActionLinks();
      $query = "
-         SELECT  id
-         FROM  civicrm_grant_app_page
-         WHERE  1";
-     $contribPage = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Grant_DAO_GrantApplicationPage');
-     $contribPageIds = array();
-     while ($contribPage->fetch()) {
-         $contribPageIds[$contribPage->id] = $contribPage->id;
+       SELECT  id
+       FROM  civicrm_grant_app_page
+       WHERE  1";
+     $grantAppPage = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Grant_DAO_GrantApplicationPage');
+     $grantAppPageIds = array();
+     while ($grantAppPage->fetch()) {
+         $grantAppPageIds[$grantAppPage->id] = $grantAppPage->id;
      }
     //get all section info.
-    $contriPageSectionInfo = CRM_Grant_BAO_GrantApplicationPage::getSectionInfo($contribPageIds);
-    $query = "
-          SELECT *
-          FROM civicrm_contribution_page 
-          WHERE 1
-          ORDER BY title asc";
+    $grantAppPageSectionInfo = CRM_Grant_BAO_GrantApplicationPage::getSectionInfo($grantAppPageIds);
+    
+    while ($grantPage->fetch()) {
+      $rows[$grantPage->id] = array();
+      CRM_Core_DAO::storeValues($grantPage, $rows[$grantPage->id]);
 
-    $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Grant_DAO_GrantApplicationPage');
-    /* while ($dao->fetch()) { */
+      // form all action links
+      $action = array_sum(array_keys($this->actionLinks()));
 
-    /*     $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, array()); */
-    /* } */
-     while ( $grantPage->fetch() ) {
-         $rows[$grantPage->id] = array();
-         CRM_Core_DAO::storeValues($grantPage, $rows[$grantPage->id]);
+      //add configure actions links.
+      $action += array_sum(array_keys($configureActionLinks));
 
-         // form all action links
-         $action = array_sum(array_keys($this->actionLinks()));
+      //add online grant links.
+      $action += array_sum(array_keys(self::onlineGrantLinks()));
 
-         //add configure actions links.
-         $action += array_sum(array_keys($configureActionLinks));
-
-         //add online grant links.
-         $action += array_sum(array_keys(self::onlineGrantLinks()));
-
-         if ($grantPage->is_active) {
-             $action -= CRM_Core_Action::ENABLE;
-         }
-         else {
-             $action -= CRM_Core_Action::DISABLE;
-         }
+      if ($grantPage->is_active) {
+        $action -= CRM_Core_Action::ENABLE;
+      }
+      else {
+        $action -= CRM_Core_Action::DISABLE;
+      }
          
-         //CRM-4418
-         if (!$allowToDelete) {
-             $action -= CRM_Core_Action::DELETE;
-         }
-        $sectionsInfo = CRM_Utils_Array::value($grantPage->id, $contriPageSectionInfo, array());
+      //CRM-4418
+      if (!$allowToDelete) {
+        $action -= CRM_Core_Action::DELETE;
+      }
+      $sectionsInfo = CRM_Utils_Array::value($grantPage->id, $grantAppPageSectionInfo, array());
 
-        $rows[$grantPage->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
-                                                                                     $action,
-                                                                                     array('id' => $grantPage->id),
-                                                                                     ts('Configure'),
-                                                                                     TRUE
-                                                                                     );
+      $rows[$grantPage->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
+        $action,
+        array('id' => $grantPage->id),
+        ts('Configure'),
+        TRUE
+      );
                   
-         //build the online grant application links.
-         $rows[$grantPage->id]['onlineGrantLinks'] = CRM_Core_Action::formLink(self::onlineGrantLinks(),
-                                                                                        $action,
-                                                                                        array('id' => $grantPage->id),
-                                                                                        ts('Grant Application (Live)'),
-                                                                                        FALSE
-                                                                                        );
+      //build the online grant application links.
+      $rows[$grantPage->id]['onlineGrantLinks'] = CRM_Core_Action::formLink(self::onlineGrantLinks(),
+        $action,
+        array('id' => $grantPage->id),
+        ts('Grant Application (Live)'),
+        FALSE
+      );
          
-         //build the normal action links.
-         $rows[$grantPage->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(),
-                                                                       $action,
-                                                                       array('id' => $grantPage->id),
-                                                                       ts('more'),
-                                                                       TRUE
-                                                                       );
+      //build the normal action links.
+      $rows[$grantPage->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(),
+        $action,
+        array('id' => $grantPage->id),
+        ts('more'),
+        TRUE
+      );
          
-         $rows[$grantPage->id]['title'] = $grantPage->title;
-         $rows[$grantPage->id]['is_active'] = $grantPage->is_active;
-         $rows[$grantPage->id]['id'] = $grantPage->id;
-      
-     }
+      $rows[$grantPage->id]['title'] = $grantPage->title;
+      $rows[$grantPage->id]['is_active'] = $grantPage->is_active;
+      $rows[$grantPage->id]['id'] = $grantPage->id;
+    }
      if (isset($grant)) {
-         $this->assign('', $grant);
+       $this->assign('', $grant);
      }
      $this->assign('fields', $rows);
   }
@@ -264,40 +253,29 @@ class CRM_Grant_Page_DashBoard extends CRM_Core_Page {
   function run() {
       
     $action = CRM_Utils_Request::retrieve('action', 'String',
-                                          // default to 'browse'
-                                          $this, FALSE, 'browse'
-                                          );
+      // default to 'browse'
+      $this, FALSE, 'browse'
+    );
   
     $this->preProcess();
 
-    $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_Search', ts('grants'), NULL);
-    $controller->setEmbedded(TRUE);
-    $controller->reset();
-    $controller->set('limit', 10);
-    $controller->set('force', 1);
-    $controller->set('context', 'dashboard');
-    $controller->process();
-    $controller->run();
-    // set breadcrumb to append to 2nd layer pages
     $breadCrumb = array(array('title' => ts('Add Grant Application Page'),
-                              'url' => CRM_Utils_System::url(CRM_Utils_System::currentPath(),
-                                                             'reset=1'
-                                                             ),
-                              ));
+      'url' => CRM_Utils_System::url(CRM_Utils_System::currentPath(),
+      'reset=1'
+     ),
+    ));
        
     // what action to take ?
     if ($action & CRM_Core_Action::ADD) {
-     
        $session = CRM_Core_Session::singleton();
        $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/grant/apply/settings',
-          'action=add&reset=1'
-        ));
+         'action=add&reset=1'
+       ));
 
       $controller = new CRM_Grant_Controller_GrantPage(NULL, $action);
-      CRM_Utils_System::setTitle(ts('Manage Contribution Page'));
+      CRM_Utils_System::setTitle(ts('Manage Grant Application Page'));
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
       return $controller->run();
-
     }
 
     if ($action & CRM_Core_Action::DELETE) {
@@ -305,8 +283,8 @@ class CRM_Grant_Page_DashBoard extends CRM_Core_Page {
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(),
-          'reset=1&action=browse'
-        ));
+        'reset=1&action=browse'
+      ));
 
       $id = CRM_Utils_Request::retrieve('id', 'Positive',
         $this, FALSE, 0
@@ -320,14 +298,12 @@ class CRM_Grant_Page_DashBoard extends CRM_Core_Page {
       $controller->process();
       return $controller->run();
     }else {
-        // finally browse the contribution pages
         $this->browse();
-
     }
     return parent::run();
   }
 
- function formatConfigureLinks($sectionsInfo) {
+  function formatConfigureLinks($sectionsInfo) {
     //build the formatted configure links.
     $formattedConfLinks = self::configureActionLinks();
     foreach ($formattedConfLinks as $act => & $link) {
@@ -352,6 +328,5 @@ class CRM_Grant_Page_DashBoard extends CRM_Core_Page {
 
     return $formattedConfLinks;
   }
-
 }
 

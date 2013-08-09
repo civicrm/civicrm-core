@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -34,7 +34,7 @@
 </div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div> 
 	<table class="form-layout-compressed">
-	<tr class="crm-grant-grantpage-settings-form-block-title"><td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='title' id=$contributionPageID}{/if}</td><td>{$form.title.html}<br/>
+	<tr class="crm-grant-grantpage-settings-form-block-title"><td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='title' id=$grantApplicationPageID}{/if}</td><td>{$form.title.html}<br/>
             <span class="description">{ts}This title will be displayed at the top of the page.<br />Please use only alphanumeric, spaces, hyphens and dashes for Title.{/ts}</td>
 	</tr>
 	<tr class="crm-grant-grantpage-settings-form-block-grant_type_id"><td class="label">{$form.grant_type_id.label}</td><td>{$form.grant_type_id.html}<br />	
@@ -44,22 +44,22 @@
         <td>&nbsp;</td>
         </td>
     </tr>
-	<tr class="crm-contribution-contributionpage-settings-form-block-intro_text">
-	    <td class ="label">{$form.intro_text.label}<br /> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='intro_text' id=$contributionPageID}{/if} {help id="id-intro_msg"}</td><td>{$form.intro_text.html}</td>
+	<tr class="crm-grant-grantpage-settings-form-block-intro_text">
+	    <td class ="label">{$form.intro_text.label}<br /> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='intro_text' id=$grantApplicationPageID}{/if} {help id="id-intro_msg"}</td><td>{$form.intro_text.html}</td>
 	</tr>
-	<tr class="crm-contribution-contributionpage-settings-form-block-footer_text">
-	    <td class ="label">{$form.footer_text.label}<br /> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='footer_text' id=$contributionPageID}{/if} {help id="id-footer_msg"}</td><td>{$form.footer_text.html}</td>
+	<tr class="crm-grant-grantpage-settings-form-block-footer_text">
+	    <td class ="label">{$form.footer_text.label}<br /> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='footer_text' id=$grantApplicationPageID}{/if} {help id="id-footer_msg"}</td><td>{$form.footer_text.html}</td>
 	</tr>
-	<tr class="crm-contribution-contributionpage-settings-form-block-default_amount">
+	<tr class="crm-grant-grantpage-settings-form-block-default_amount">
 	    <td class ="label">{$form.default_amount.label}</td><td>{$form.default_amount.html} {help id="id-default_amount"}</td>
 	</tr>
-	<tr class="crm-contribution-contributionpage-settings-form-block-start_date">
+	<tr class="crm-grant-grantpage-settings-form-block-start_date">
 	    <td class ="label">{$form.start_date.label} {help id="id-start_date"}</td>
 	    <td>
 	        {include file="CRM/common/jcalendar.tpl" elementName=start_date}
 	    </td>    
     </tr>
-	<tr class="crm-contribution-contributionpage-settings-form-block-end_date">
+	<tr class="crm-grant-grantpage-settings-form-block-end_date">
 	    <td class ="label">{$form.end_date.label}</td>
 	    <td>
 	        {include file="CRM/common/jcalendar.tpl" elementName=end_date}
@@ -67,14 +67,14 @@
     </tr>
 </table>
 <table class="form-layout-compressed">
-      		<tr class="crm-contribution-contributionpage-settings-form-block-is_active"><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>{$form.is_active.html} {$form.is_active.label}<br />
-	{if $contributionPageID}
+      		<tr class="crm-grant-grantpage-settings-form-block-is_active"><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>{$form.is_active.html} {$form.is_active.label}<br />
+	{if $grantPageID}
     		<span class="description">
         	{if $config->userSystem->is_drupal EQ '1'}
             	{ts}When your page is active, you can link people to the page by copying and pasting the following URL:{/ts}<br />
-            	<strong>{crmURL a=true p='civicrm/grant/transact' q="reset=1&id=`$contributionPageID`"}</strong>
+            	<strong>{crmURL a=true p='civicrm/grant/transact' q="reset=1&id=`$grantApplicationPageID`"}</strong>
         	{elseif $config->userFramework EQ 'Joomla'}
-            	{ts 1=$title}When your page is active, create front-end links to the contribution page using the Menu Manager. Select <strong>Administer CiviCRM &raquo; CiviContribute &raquo; Manage Contribution Pages</strong> and select <strong>%1</strong> for the contribution page.{/ts}
+            	{ts 1=$title}When your page is active, create front-end links to the grant application page using the Menu Manager. Select <strong>Grants &raquo; Dashboard</strong> and select <strong>%1</strong> for the grant application page.{/ts}
         	{/if}
 		</span>
     	{/if}
@@ -83,37 +83,6 @@
      	</table>
 	 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-
-{include file="CRM/common/showHideByFieldValue.tpl" 
-    trigger_field_id    ="is_organization"
-    trigger_value       = 1
-    target_element_id   ="for_org_text" 
-    target_element_type ="table-row"
-    field_type          ="radio"
-    invert              = 0
-}
-
-{include file="CRM/common/showHideByFieldValue.tpl" 
-    trigger_field_id    ="is_organization"
-    trigger_value       = 1
-    target_element_id   ="for_org_option" 
-    target_element_type ="table-row"
-    field_type          ="radio"
-    invert              = 0
-}
-<script type="text/javascript">
- showHonor();
- {literal}
-     function showHonor() {
-        var checkbox = document.getElementsByName("honor_block_is_active");
-        if (checkbox[0].checked) {
-            document.getElementById("honor").style.display = "block";
-        } else {
-            document.getElementById("honor").style.display = "none";
-        }  
-     } 
- {/literal} 
-</script>
 
 {* include jscript to warn if unsaved form field changes *}
 {include file="CRM/common/formNavigate.tpl"}

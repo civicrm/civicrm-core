@@ -104,8 +104,8 @@ class CRM_Grant_Form_GrantPage_Custom extends CRM_Grant_Form_GrantPage {
       'entity_id' => $this->_id,
     );
     list($defaults['custom_pre_id'],
-         $defaults['custom_post_id']
-         ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+      $defaults['custom_post_id']
+    ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
     return $defaults;
   }
@@ -165,7 +165,7 @@ class CRM_Grant_Form_GrantPage_Custom extends CRM_Grant_Form_GrantPage {
     return ts('Include Profiles');
   }
 
-  /**
+ /**
    * global form rule
    *
    * @param array $fields  the input form values
@@ -174,8 +174,7 @@ class CRM_Grant_Form_GrantPage_Custom extends CRM_Grant_Form_GrantPage {
    * @access public
    * @static
    */
-  static
-    function formRule($fields, $files, $contributionPageId) {
+  static function formRule($fields, $files, $grantApplicationPageId) {
     $errors = array();
     $preProfileType = $postProfileType = NULL;
 

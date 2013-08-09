@@ -34,7 +34,7 @@
  */
 
 /**
- * form to configure thank-you messages and receipting features for an online contribution page
+ * form to configure thank-you messages and receipting features for an online grant application page
  */
 class CRM_Grant_Form_GrantPage_ThankYou extends CRM_Grant_Form_GrantPage {
 
@@ -66,7 +66,7 @@ class CRM_Grant_Form_GrantPage_ThankYou extends CRM_Grant_Form_GrantPage {
     $this->addWysiwyg('thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Grant_DAO_GrantApplicationPage', 'thankyou_text'));
     $this->addWysiwyg('thankyou_footer', ts('Thank-you Page Footer'), CRM_Core_DAO::getAttribute('CRM_Grant_DAO_GrantApplicationPage', 'thankyou_footer'));
 
-    $this->addElement('checkbox', 'is_email_receipt', ts('Email Receipt to Contributor?'), NULL, array('onclick' => "showReceipt()"));
+    $this->addElement('checkbox', 'is_email_receipt', ts('Email Confirmation Receipt?'), NULL, array('onclick' => "showReceipt()"));
     $this->add('text', 'receipt_from_name', ts('Receipt From Name'), CRM_Core_DAO::getAttribute('CRM_Grant_DAO_GrantApplicationPage', 'receipt_from_name'));
     $this->add('text', 'receipt_from_email', ts('Receipt From Email'), CRM_Core_DAO::getAttribute('CRM_Grant_DAO_GrantApplicationPage', 'receipt_from_email'));
     $this->add('textarea', 'receipt_text', ts('Receipt Message'), CRM_Core_DAO::getAttribute('CRM_Grant_DAO_GrantApplicationPage', 'receipt_text'));
@@ -92,7 +92,8 @@ class CRM_Grant_Form_GrantPage_ThankYou extends CRM_Grant_Form_GrantPage {
    * @access public
    * @static
    */
-  static function formRule($fields, $files, $options) {
+  static
+  function formRule($fields, $files, $options) {
     $errors = array();
 
     // if is_email_receipt is set, the receipt message must be non-empty
@@ -100,7 +101,7 @@ class CRM_Grant_Form_GrantPage_ThankYou extends CRM_Grant_Form_GrantPage {
       //added for CRM-1348
       $email = trim(CRM_Utils_Array::value('receipt_from_email', $fields));
       if (empty($email) || !CRM_Utils_Rule::email($email)) {
-        $errors['receipt_from_email'] = ts('A valid Receipt From Email address must be specified if Email Receipt to Contributor is enabled');
+        $errors['receipt_from_email'] = ts('A valid Receipt From Email address must be specified if Email Confirmation Receipt is enabled');
       }
     }
     return $errors;

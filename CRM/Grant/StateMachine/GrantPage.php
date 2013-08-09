@@ -42,10 +42,10 @@ class CRM_Grant_StateMachine_GrantPage extends CRM_Core_StateMachine {
   /**
    * class constructor
    *
-   * @param object  CRM_Contribute_Controller_ContributionPage
+   * @param object  CRM_Grant_Controller_GrantPage
    * @param int     $action
    *
-   * @return object CRM_Contribute_StateMachine_ContributionPage
+   * @return object CRM_Grant_StateMachine_GrantPage
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
@@ -59,7 +59,7 @@ class CRM_Grant_StateMachine_GrantPage extends CRM_Core_StateMachine {
       'CRM_Grant_Form_GrantPage_Settings' => NULL,
       'CRM_Grant_Form_GrantPage_ThankYou' => NULL,
       'CRM_Grant_Form_GrantPage_Custom' => NULL,
-                          );
+    );
 
     $this->addSequentialPages($this->_pages, $action);
   }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -31,24 +31,24 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>				    
     <table class="form-layout-compressed">
     <tr class="crm-grant-grantpage-thankyou-form-block-thankyou_title">
-       <td class="label">{$form.thankyou_title.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='thankyou_title' id=$contributionPageID}{/if}</td>
+       <td class="label">{$form.thankyou_title.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='thankyou_title' id=$grantApplicationPageID}{/if}</td>
        <td class="html-adjust">{$form.thankyou_title.html}<br />
            <span class="description">{ts}This title will be displayed at the top of the thank-you / transaction confirmation page.{/ts}</span>
        </td>
     </tr>
-    <tr class="crm-contribution-contributionpage-thankyou-form-block-thankyou_text">
-       <td class="label">{$form.thankyou_text.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='thankyou_text' id=$contributionPageID}{/if}</td>
+    <tr class="crm-grant-grantpage-thankyou-form-block-thankyou_text">
+       <td class="label">{$form.thankyou_text.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='thankyou_text' id=$grantApplicationPageID}{/if}</td>
        <td class="html-adjust">{$form.thankyou_text.html}<br />
        	   <span class="description">{ts}Enter text (and optional HTML layout tags) for the thank-you message that will appear at the top of the confirmation page.{/ts}</span>
        </td>
     </tr>
-    <tr class="crm-contribution-contributionpage-thankyou-form-block-thankyou_footer">
-       <td class="label">{$form.thankyou_footer.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='thankyou_footer' id=$contributionPageID}{/if}</td>
+    <tr class="crm-grant-grantpage-thankyou-form-block-thankyou_footer">
+       <td class="label">{$form.thankyou_footer.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='thankyou_footer' id=$grantApplicationPageID}{/if}</td>
        <td class="html-adjust">{$form.thankyou_footer.html}<br />
-       	   <span class="description">{ts}Enter link(s) and/or text that you want to appear at the bottom of the thank-you page. You can use this content area to encourage contributors to visit a tell-a-friend page or take some other action.{/ts}</span>
+       	   <span class="description">{ts}Enter link(s) and/or text that you want to appear at the bottom of the thank-you page.{/ts}</span>
        </td>
     </tr>
-    <tr class="crm-contribution-contributionpage-thankyou-form-block-is_email_receipt">
+    <tr class="crm-grant-grantpage-thankyou-form-block-is_email_receipt">
        <td class="label"></td>
        <td class="html-adjust">{$form.is_email_receipt.html}{$form.is_email_receipt.label}<br />
        	   <span class="description">{ts}Check this box if you want an electronic acknowledgement of receipt of application to be sent automatically.{/ts}</span>
@@ -56,28 +56,28 @@
     </tr>
     </table>
     <table id="receiptDetails" class="form-layout-compressed">
-    <tr class="crm-contribution-contributionpage-thankyou-form-block-receipt_from_name">
-	<td class="label">{$form.receipt_from_name.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='receipt_from_name' id=$contributionPageID}{/if}
+    <tr class="crm-grant-grantpage-thankyou-form-block-receipt_from_name">
+	<td class="label">{$form.receipt_from_name.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='receipt_from_name' id=$grantApplicationPageID}{/if}
     	</td>
     	<td class="html-adjust">{$form.receipt_from_name.html}<br />
     	    <span class="description">{ts}Enter the FROM name to be used when receipts are emailed to grant applicants.{/ts}</span>
 	</td>
     </tr>
-    <tr class="crm-contribution-contributionpage-thankyou-form-block-receipt_from_email">
+    <tr class="crm-grant-grantpage-thankyou-form-block-receipt_from_email">
 	<td class="label">{$form.receipt_from_email.label}{$reqMark}
 	</td>
 	<td class="html-adjust">{$form.receipt_from_email.html}<br />
 	    <span class="description">{ts}Enter the FROM email address to be used when receipts are emailed to grant applicants.{/ts}</span>
 	</td>
     </tr>
-    <tr class="crm-contribution-contributionpage-thankyou-form-block-receipt_text">
-	<td class="label">{$form.receipt_text.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='receipt_text' id=$contributionPageID}{/if}
+    <tr class="crm-grant-grantpage-thankyou-form-block-receipt_text">
+	<td class="label">{$form.receipt_text.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='receipt_text' id=$grantApplicationPageID}{/if}
 	</td>
 	<td class="html-adjust">{$form.receipt_text.html}<br />
 	    <span class="description">{ts}Enter a message you want included at the beginning of emailed receipts. NOTE: This text will be included in both TEXT and HTML versions of receipt emails so we do not recommend including HTML tags / formatting here.{/ts}<br /></span>
 	</td>
     </tr>
-    <tr class="crm-contribution-contributionpage-thankyou-form-block-cc_receipt">
+    <tr class="crm-grant-grantpage-thankyou-form-block-cc_receipt">
 	<td class="label">{$form.cc_receipt.label}
     	</td>
 	<td class="html-adjust">{$form.cc_receipt.html}<br />
@@ -85,7 +85,7 @@
 	    </span>
 	</td>
     </tr>
-    <tr class="crm-contribution-contributionpage-thankyou-form-block-bcc_receipt">
+    <tr class="crm-grant-grantpage-thankyou-form-block-bcc_receipt">
 	<td class="label">{$form.bcc_receipt.label}
 	</td>
 	<td class="html-adjust">{$form.bcc_receipt.html}<br />
@@ -95,7 +95,7 @@
     </table>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-	 
+
 <script type="text/javascript">
  showReceipt();
  {literal}

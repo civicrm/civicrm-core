@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -33,8 +33,8 @@
     	        <div class="ac_results" id="crm-grantpage-links-list">
     	      	   <div class="crm-grantpage-links-list-inner">
     	      	   	<ul>
-                            <li><a class="crm-grantpage-contribution" href="{crmURL p='civicrm/grant/add' q="reset=1&action=add&context=standalone"}">{ts}New Grant{/ts}</a></li>
-                            <li><a class="crm-grant-live" href="{crmURL p='civicrm/grant/transact' q="reset=1&id=`$contributionPageID`" fe='true'}" target="_blank">{ts}Grant Application Page (Live){/ts}</a></li>
+                            <li><a class="crm-grantpage-grant" href="{crmURL p='civicrm/grant/add' q="reset=1&action=add&context=standalone"}">{ts}New Grant{/ts}</a></li>
+                            <li><a class="crm-grant-live" href="{crmURL p='civicrm/grant/transact' q="reset=1&id=`$grantApplicationPageID`" fe='true'}" target="_blank">{ts}Grant Application Page (Live){/ts}</a></li>
     		        </ul>
     	           </div>
     	      </div>

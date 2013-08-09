@@ -52,7 +52,6 @@ class CRM_Grant_Form_GrantPage_Delete extends CRM_Grant_Form_GrantPage {
    * @access public
    */
   public function preProcess() {
-    //Check if there are contributions related to Contribution Page
 
     parent::preProcess();
 
@@ -72,14 +71,12 @@ class CRM_Grant_Form_GrantPage_Delete extends CRM_Grant_Form_GrantPage {
     $this->_title = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_GrantApplicationPage', $this->_id, 'title');
     $this->assign('title', $this->_title);
 
-    //if there are contributions related to Contribution Page
-    //then onle cancel button is displayed
     $buttons = array();
-    $buttons[] = array(
-      'type' => 'next',
-      'name' => ts('Delete Grant Application Page'),
-      'isDefault' => TRUE,
-    );
+      $buttons[] = array(
+        'type' => 'next',
+        'name' => ts('Delete Grant Application Page'),
+        'isDefault' => TRUE,
+      );
 
     $buttons[] = array(
       'type' => 'cancel',
@@ -108,7 +105,7 @@ class CRM_Grant_Form_GrantPage_Delete extends CRM_Grant_Form_GrantPage {
     $dao->copyValues($params);
     $dao->delete();
            
-    // finally delete the contribution page
+    // finally delete the grant application page
     $dao = new CRM_Grant_DAO_GrantApplicationPage();
     $dao->id = $this->_id;
     $dao->delete();

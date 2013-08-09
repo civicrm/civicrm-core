@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/common/TrackingFields.tpl"}
 
 <div class="crm-block crm-grant-thankyou-form-block">
     {if $thankyou_text}
@@ -36,17 +35,12 @@
           <div>{ts}Your grant application has been sent for processing. Please print this page for your records.{/ts}</div>
             {if $is_email_receipt}
                 <div>
-		    {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
-			{ts 1=$email 2=$onBehalfEmail}An email receipt has also been sent to %1 and to %2{/ts}
-		    {else}
-			{ts 1=$email}An email receipt has also been sent to %1{/ts}
-		    {/if}
+		  {ts 1=$email}An email receipt has also been sent to %1{/ts}
 		</div>
             {/if}
-
     </div>
+
     <div class="spacer"></div>
-  
       {if $default_amount_hidden}
        <div class="crm-group amount_display-group">
         <div class="header-dark">
@@ -54,14 +48,13 @@
         </div>
         <div class="display-block">
              {ts}Requested Amount{/ts}: <strong>{$default_amount_hidden|crmMoney}</strong>
-      {/if} 
        </div>
-       <div class="display-block">
+      {/if} 
       {if $application_received_date}
+       <div class="display-block">
             {ts}Date{/ts}: <strong>{$application_received_date|crmDate}</strong><br />
        </div>
       {/if}
-   
     {if $customPre}
             <fieldset class="label-left">
                 {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
@@ -73,7 +66,7 @@
             </fieldset>
     {/if}
 
-    <div id="thankyou_footer" class="contribution_thankyou_footer-section">
+    <div id="thankyou_footer" class="grant_thankyou_footer-section">
         <p>
         {$thankyou_footer}
         </p>

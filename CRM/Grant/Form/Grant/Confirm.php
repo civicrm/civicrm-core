@@ -57,10 +57,6 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
    
     parent::preProcess();
 
-    // lineItem isn't set until Register postProcess
-    $this->_lineItem = $this->get('lineItem');
-    $this->_paymentProcessor = $this->get('paymentProcessor');
-
     $this->_params['amount'] = $this->get('default_amount_hidden');
 
     // we use this here to incorporate any changes made by folks in hooks
@@ -74,13 +70,11 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
       $this->_params['ip_address'] = '127.0.0.1';
     }
     $this->_params['amount'] = $this->get('default_amount');
-
-    $this->_useForMember = $this->get('useForMember');
-      
+    
     if (isset($this->_params['amount'])) {
       $this->_params['currencyID'] = $config->defaultCurrency;
     }
-
+    
     $this->set('params', $this->_params);
   }
 
@@ -140,13 +134,13 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
           }
         }
         elseif (in_array($name, array('addressee', 'email_greeting', 'postal_greeting'))
-                && CRM_Utils_Array::value($name . '_custom', $contact)
-                ) {
+          && CRM_Utils_Array::value($name . '_custom', $contact)
+        ) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];
         }
       }
     }
-    // now fix all state country selectors
+     // now fix all state country selectors
     CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
 
     $this->setDefaults($defaults);
@@ -191,16 +185,12 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
     $contactID = $this->_userID;
 
     // add a description field at the very beginning
-    $this->_params['description'] = ts('Online Grant Application') . ':' .$this->_values['title'];
+    $this->_params['description'] = ts('Online Grant Application') . ':' . $this->_values['title'];
 
     // fix currency ID
     $this->_params['currencyID'] = $config->defaultCurrency;
 
-    $premiumParams = $membershipParams = $tempParams = $params = $this->_params;
-
-    //carry payment processor id.
-
-    $now = date('YmdHis');
+    $params = $this->_params;
     $fields = array();
 
     if (CRM_Utils_Array::value('image_URL', $params)) {
@@ -209,9 +199,6 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
 
     // set email for primary location.
     $fields['email-Primary'] = 1;
-
-    // don't create primary email address, just add it to billing location
-    //$params["email-Primary"] = $params["email-{$this->_bltID}"];
 
     // get the add to groups
     $addToGroups = array();
@@ -247,7 +234,6 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
         }
       }
     }
-
 
     foreach ($addToGroups as $k) {
       if (array_key_exists($k, $subscribeGroupIds)) {
@@ -309,35 +295,20 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
     if (!empty($subscribeGroupIds) && $subscribtionEmail['email']) {
       CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($subscribeGroupIds, $subscribtionEmail, $contactID);
     }
-
-    // lets store the contactID in the session
-    // for things like tell a friend
-    $session = CRM_Core_Session::singleton();
-    if (!$session->get('userID')) {
-      $session->set('transaction.userID', $contactID);
-    }
-    else {
-      $session->set('transaction.userID', NULL);
-    }
-    // at this point we've created a contact and stored its address etc
-    // all the payment processors expect the name and address to be in the
-    // so we copy stuff over to first_name etc.
-    $paymentParams = $this->_params;
      
     $grantTypeId = $this->_values['grant_type_id'];
-     
+    
     $fieldTypes = array();
-        
-    CRM_Grant_BAO_Grant_Utils::processConfirm($this, $paymentParams,
-      $premiumParams, 
+    
+    $grantParams = $this->_params;
+    
+    CRM_Grant_BAO_Grant_Utils::processConfirm($this, 
+      $grantParams,
       $contactID,
       $grantTypeId,
       'grant',
       $fieldTypes
     );
-     
-    
-    
   }
 
   /**
@@ -346,24 +317,21 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
    * @return void
    * @access public
    */
-  static function processContribution(&$form,
+  static function processApplication(&$form,
     $params,
-    $result,
     $contactID,
     $grantTypeId,
-    $deductibleMode = TRUE,
-    $pending = FALSE,
     $online = TRUE
-    ) {
+  ) {
     $transaction = new CRM_Core_Transaction();
   
     $className   = get_class($form);
 
-    $params['is_email_receipt'] = CRM_Utils_Array::value( 'is_email_receipt', $form->_values );
+    $params['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $form->_values);
         
     $config = CRM_Core_Config::singleton();
   
-    $nonDeductibleAmount = isset($params['default_amount_hidden']) ? $params['default_amount_hidden'] : $params['amount_requested'];
+    $nonDeductibleAmount = isset($params['default_amount_hidden']) ? $params['default_amount_hidden'] : $params['amount_total'];
    
     $now = date('YmdHis');
     $receiptDate = CRM_Utils_Array::value('receipt_date', $params);
@@ -377,17 +345,12 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
     if ($online) {
       $grantPageId = $form->_id;
     }
-    else {
-      //also for offline we do support - CRM-7290
-      $grantPageId = CRM_Utils_Array::value('contribution_page_id', $params);
-      $campaignId = CRM_Utils_Array::value('campaign_id', $params);
-    }
 
     // first create the grant record
     $grantParams = array(
       'contact_id' => $contactID,
       'grant_type_id' => $grantTypeId,
-      'contribution_page_id' => $grantPageId,
+      'grant_page_id' => $grantPageId,
       'application_received_date' => (CRM_Utils_Array::value('receive_date', $params)) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
       'status_id' => 1,
       'amount_level' => CRM_Utils_Array::value('amount_level', $params),
@@ -406,7 +369,7 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
       $grantParams['thankyou_date'] = $params['thankyou_date'];
     }
 
-    $grantParams['contribution_status_id'] = $pending ? 2 : 1;
+    $grantParams['grant_status_id'] = CRM_Core_OptionGroup::getValue('grant_status', 'Submitted');
   
     $grantParams['is_test'] = 0;
      
@@ -416,11 +379,11 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
     $grantParams['amount_total'] = trim(CRM_Utils_Money::format($nonDeductibleAmount, ' '));
 
     if ($nonDeductibleAmount) {
-      //add contribution record
-      $grant = &CRM_Grant_BAO_Grant::add($grantParams, $ids);
+        //add grant record
+        $grant = &CRM_Grant_BAO_Grant::add($grantParams, $ids);
     }
     if ($online && $grant) {
-      CRM_Core_BAO_CustomValueTable::postProcess($form->_params,
+        CRM_Core_BAO_CustomValueTable::postProcess($form->_params,
         CRM_Core_DAO::$_nullArray,
         'civicrm_grant',
         $grant->id,
@@ -429,31 +392,22 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
     }
     elseif ($grant) {
       //handle custom data.
-      $params['contribution_id'] = $grant->id;
+      $params['grant_id'] = $grant->id;
     
       if (CRM_Utils_Array::value('custom', $params) &&
-          is_array($params['custom']) &&
-          !is_a($grant, 'CRM_Core_Error')
-          ) {
+        is_array($params['custom']) &&
+        !is_a($grant, 'CRM_Core_Error')
+      ) {
         CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_grant', $grant->id);
       }
     }
-  
-    if (isset($params['related_contact'])) {
-      $contactID = $params['related_contact'];
-    }
-    elseif (isset($params['cms_contactID'])) {
-      $contactID = $params['cms_contactID'];
-    }
+
+    // Re-using function defined in Contribution/Utils.php
     CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params,
       $contactID,
       'email-' . $form->_bltID
     );
 
-    // return if pending
-    if ($pending) {
-      return $grant;
-    }
     return $grant;
   }
 }

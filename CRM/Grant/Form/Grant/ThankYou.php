@@ -37,13 +37,6 @@
  * form for thank-you / success page - 3rd step of online grant application process
  */
 class CRM_Grant_Form_Grant_ThankYou extends CRM_Grant_Form_GrantBase {
-
-  /**
-   * membership price set status
-   *
-   */
-  public $_useForMember;
-
   /**
    * Function to set variables up before form is built
    *
@@ -58,11 +51,9 @@ class CRM_Grant_Form_Grant_ThankYou extends CRM_Grant_Form_GrantBase {
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
     $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->_values));
     $this->assign('thankyou_footer', CRM_Utils_Array::value('thankyou_footer', $this->_values));
-    $this->assign('max_reminders', CRM_Utils_Array::value('max_reminders', $this->_values));
-    $this->assign('initial_reminder_day', CRM_Utils_Array::value('initial_reminder_day', $this->_values));
     CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values));
-    // Make the contributionPageID avilable to the template
-    $this->assign('contributionPageID', $this->_id);
+    // Make the grantPageID avilable to the template
+    $this->assign('grantPageID', $this->_id);
   }
 
   /**
@@ -89,8 +80,6 @@ class CRM_Grant_Form_Grant_ThankYou extends CRM_Grant_Form_GrantBase {
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
-    $productID = $this->get('productID');
-    $option = $this->get('option');
     $this->assign('receiptFromEmail', CRM_Utils_Array::value('receipt_from_email', $this->_values));
 
     $params = $this->_params;
@@ -110,7 +99,7 @@ class CRM_Grant_Form_Grant_ThankYou extends CRM_Grant_Form_GrantBase {
     $fields = array();
     $removeCustomFieldTypes = array('Grant');
     foreach ($this->_fields as $name => $dontCare) {
-      $fields[$name] = 1;
+        $fields[$name] = 1;
     }
     $fields['state_province'] = $fields['country'] = $fields['email'] = 1;
     $contact = $this->_params = $this->controller->exportValues('Main');
