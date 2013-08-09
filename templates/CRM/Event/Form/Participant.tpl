@@ -216,10 +216,8 @@
           {/if}
           <tr class="crm-participant-form-block-event_id">
             <td class="label">{$form.event_id.label}</td><td class="view-value bold">{$form.event_id.html}&nbsp;
-            {if $action eq 1 && $past neq 1 }<span id='past-event-section'>
-              <br />&raquo; {ts}Include past event(s) in this select list:{/ts}
-              {if !$past}<a href="#" onclick="buildSelect('event_id', 2); return false;" class='3-mo-past-event'>{ts}past three months{/ts}</a> <span class='3-mo-past-event'>|</span>{/if}
-              <a href="#" onclick="buildSelect('event_id', 1); return false;">{ts}all{/ts}</a></span>
+            {if $action eq 1}<span id='past-event-section'>
+              <br />&raquo; <span id="showing-event-info"></span>
             {/if}
             {if $is_test}
               {ts}(test){/ts}
@@ -295,15 +293,28 @@
         for (i = 0; i < response.length; i++) {
           cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
         }
-        if (listallVal == 1) {
-          cj('#past-event-section').hide( );
-        }
-        else {
-          cj('.3-mo-past-event').hide( );
-        }
+        getShowEventInfo(listallVal);
         cj('input[name="past_event"]').val(listallVal);
         cj("#feeBlock").html( '' );
       });
+    }
+
+    {/literal}
+    {if $action eq 1}getShowEventInfo({$past});{/if}
+    {literal}
+
+    function getShowEventInfo (listallVal) {
+      switch(listallVal) {
+        case 1:
+          cj('#showing-event-info').html({/literal}'{ts}Showing all events: show{/ts}'{literal}+' <a href="#" onclick="buildSelect(\'event_id\', 0); return false;">'+{/literal}'{ts}current and future{/ts}'{literal}+'</a> | <a href="#" onclick="buildSelect(\'event_id\', 2); return false;">'+{/literal}'{ts}past three months{/ts}'{literal}+'</a>');
+          break;
+        case 2:
+          cj('#showing-event-info').html({/literal}'{ts}Showing events since three months ago: show{/ts}'{literal}+' <a href="#" onclick="buildSelect(\'event_id\', 0); return false;">'+{/literal}'{ts}current and future{/ts}'{literal}+'</a> | <a href="#" onclick="buildSelect(\'event_id\', 1); return false;">'+{/literal}'{ts}all{/ts}'{literal}+'</a>');
+          break;
+        default:
+          cj('#showing-event-info').html({/literal}'{ts}Showing current and future events: show{/ts}'{literal}+' <a href="#" onclick="buildSelect(\'event_id\', 2); return false;">'+{/literal}'{ts}past three months{/ts}'{literal}+'</a> | <a href="#" onclick="buildSelect(\'event_id\', 1); return false;">'+{/literal}'{ts}all{/ts}'{literal}+'</a>');
+          break;
+      }
     }
     {/literal}
 
