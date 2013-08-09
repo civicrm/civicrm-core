@@ -272,24 +272,6 @@ class CRM_Core_Payment_Form {
           'state_province' => "billing_state_province_id-{$form->_bltID}",
         ));
       CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-
-      // Add JS to show icons for the accepted credit cards
-      // the credit card pseudo constant results only the CC label, not the key ID
-      // so we normalize the name to use it as a CSS class.
-      $creditCardTypes = array();
-      foreach (CRM_Contribute_PseudoConstant::creditCard() as $key => $name) {
-        // Replace anything not css-friendly by an underscore
-        // Non-latin names will not like this, but so many things are wrong with
-        // the credit-card type configurations already.
-        $key = str_replace(' ', '', $key);
-        $key = preg_replace('/[^a-zA-Z0-9]/', '_', $key);
-        $key = strtolower($key);
-        $creditCardTypes[$key] = $name;
-      }
-
-      CRM_Core_Resources::singleton()
-        ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)))
-        ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10, 'billing-block');
     }
 
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
@@ -301,6 +283,24 @@ class CRM_Core_Payment_Form {
         array('class' => 'form-submit')
       );
     }
+  }
+
+  /**
+   * The credit card pseudo constant results only the CC label, not the key ID
+   * So we normalize the name to use it as a CSS class.
+   */
+  static function getCreditCardCSSNames() {
+    $creditCardTypes = array();
+    foreach (CRM_Contribute_PseudoConstant::creditCard() as $key => $name) {
+      // Replace anything not css-friendly by an underscore
+      // Non-latin names will not like this, but so many things are wrong with
+      // the credit-card type configurations already.
+      $key = str_replace(' ', '', $key);
+      $key = preg_replace('/[^a-zA-Z0-9]/', '_', $key);
+      $key = strtolower($key);
+      $creditCardTypes[$key] = $name;
+    }
+    return $creditCardTypes;
   }
 
   /**

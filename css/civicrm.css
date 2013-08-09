@@ -3962,7 +3962,7 @@ span.crm-status-icon {
 }
 
 /* Styles for credit card payment logos */
-#crm-container .credit_card_type-section .crm-credit_card_type-icons a {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons a {
   display: block;
   float: left;
   width: 50px;
@@ -3975,31 +3975,31 @@ span.crm-status-icon {
   border: 1px solid #FFFFFF;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-visa {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-visa {
   background-position: -50px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-mastercard {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-mastercard {
   background-position: -100px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-amex {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-amex {
   background-position: -150px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-discover {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-discover {
   background-position: -200px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-jcb {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-jcb {
   background-position: -250px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-unionpay {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-unionpay {
   background-position: -300px 0;
 }
 
-#crm-container .cvv2-icon {
+.crm-container .cvv2-icon {
   display: inline-block;
   width: 50px;
   height: 30px;
