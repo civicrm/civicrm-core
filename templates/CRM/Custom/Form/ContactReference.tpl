@@ -37,8 +37,8 @@ cj( function( ) {
         customObj.autocomplete( url,
             { width : 250, selectFirst : false, elementId: custom,  matchContains: true, formatResult: {/literal}validate{$element_name|replace:']':''|replace:'[':'_'|replace:'-':'_'}{literal}
             }).result(
-                function(event, data ) {
-                    customIdObj.val( data[1] );
+                function(event, data) {
+                  cj(custom_id).val(data[1]);
                 }
         );
         customObj.click( function( ) {
