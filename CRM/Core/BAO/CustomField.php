@@ -130,6 +130,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @static
    */
   static function create(&$params) {
+    $origParams = array_merge(array(), $params);
+
     if (!isset($params['id'])) {
       if (!isset($params['column_name'])) {
         // if add mode & column_name not present, calculate it.
@@ -285,6 +287,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       self::createField($customField, 'modify', $indexExist);
     }
     else {
+      if (!isset($origParams['column_name'])) {
+        $columnName .= "_{$customField->id}";
+        $params['column_name'] = $columnName;
+      }
       $customField->column_name = $columnName;
       $customField->save();
       // make sure all values are present in the object
