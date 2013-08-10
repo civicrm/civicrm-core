@@ -251,8 +251,6 @@
 
   <civicrm_financial_trxn />
 
-  <civicrm_official_receipt />
-
   <civicrm_membership />
 
   <civicrm_membership_log />
