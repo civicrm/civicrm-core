@@ -528,7 +528,7 @@ class CRM_Contribute_BAO_Query {
         return;
 
       case 'contribution_batch_id':
-        $batches = CRM_Batch_BAO_Batch::getBatches();
+        $batches = CRM_Contribute_PseudoConstant::batch();
         $query->_where[$grouping][] = " civicrm_entity_batch.batch_id $op $value";
         $query->_qill[$grouping][] = ts('Batch Name %1 %2', array(1 => $op, 2 => $batches[$value]));
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
@@ -851,7 +851,7 @@ class CRM_Contribute_BAO_Query {
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'contribution_campaign_id');
 
     // Add batch select
-    $batches = CRM_Batch_BAO_Batch::getBatches();
+    $batches = CRM_Contribute_PseudoConstant::batch();
 
     if ( !empty( $batches ) ) {
       $form->add('select', 'contribution_batch_id',
