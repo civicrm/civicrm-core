@@ -528,7 +528,7 @@ class CRM_Contribute_BAO_Query {
         return;
 
       case 'contribution_batch_id':
-        $batches = CRM_Batch_BAO_Batch::getBatches();
+        $batches = CRM_Contribute_PseudoConstant::batch();
         $query->_where[$grouping][] = " civicrm_entity_batch.batch_id $op $value";
         $query->_qill[$grouping][] = ts('Batch Name %1 %2', array(1 => $op, 2 => $batches[$value]));
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
@@ -678,8 +678,16 @@ class CRM_Contribute_BAO_Query {
         break;
 
       case 'contribution_batch':
-        $from .= " $side JOIN civicrm_entity_batch ON ( civicrm_entity_batch.entity_table = 'civicrm_contribution' AND
-          civicrm_contribution.id = civicrm_entity_batch.entity_id )";
+        $from .= " $side JOIN civicrm_entity_financial_trxn ON (
+        civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution'
+        AND civicrm_contribution.id = civicrm_entity_financial_trxn.entity_id )";
+
+        $from .= " $side JOIN civicrm_financial_trxn ON (
+        civicrm_entity_financial_trxn.financial_trxn_id = civicrm_financial_trxn.id )";
+
+        $from .= " $side JOIN civicrm_entity_batch ON ( civicrm_entity_batch.entity_table = 'civicrm_financial_trxn'
+        AND civicrm_financial_trxn.id = civicrm_entity_batch.entity_id )";
+
         $from .= " $side JOIN civicrm_batch ON civicrm_entity_batch.batch_id = civicrm_batch.id";
         break;
     }
@@ -851,7 +859,7 @@ class CRM_Contribute_BAO_Query {
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'contribution_campaign_id');
 
     // Add batch select
-    $batches = CRM_Batch_BAO_Batch::getBatches();
+    $batches = CRM_Contribute_PseudoConstant::batch();
 
     if ( !empty( $batches ) ) {
       $form->add('select', 'contribution_batch_id',
