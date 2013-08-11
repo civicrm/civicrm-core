@@ -121,7 +121,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       array('Contribute', 'Contribution'),
       array('Contribute', 'ContributionPage'),
       array('Member', 'MembershipType'),
-      array('Price', 'FieldValue'),
+      array('Price', 'PriceFieldValue'),
       array('Grant', 'Grant'),
       array('Contribute', 'PremiumsProduct'),
       array('Contribute', 'Product'),
