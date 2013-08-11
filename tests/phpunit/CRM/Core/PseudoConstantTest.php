@@ -292,14 +292,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'max' => 200,
         ),
       ),
-      'CRM_Financial_DAO_OfficialReceipt' => array(
-        array(
-          'fieldName' => 'currency',
-          'sample' => array('USD' => 'US Dollar'),
-          'max' => 200,
-        ),
-      ),
-      'CRM_Pledge_DAO_PledgePayment' => array(
+     'CRM_Pledge_DAO_PledgePayment' => array(
         array(
           'fieldName' => 'currency',
           'sample' => array('USD' => 'US Dollar'),
