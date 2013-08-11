@@ -155,7 +155,7 @@ class CRM_Core_Page {
 
     self::$_template->assign('mode', $this->_mode);
 
-    $pageTemplateFile = $this->getTemplateFileName();
+    $pageTemplateFile = $this->getHookedTemplateFileName();
     self::$_template->assign('tplFile', $pageTemplateFile);
 
     // invoke the pagRun hook, CRM-3906
@@ -295,6 +295,16 @@ class CRM_Core_Page {
       DIRECTORY_SEPARATOR,
       CRM_Utils_System::getClassName($this)
     ) . '.tpl';
+  }
+
+  /**
+   * A wrapper for getTemplateFileName that includes calling the hook to
+   * prevent us from having to copy & paste the logic of calling the hook
+   */
+  function getHookedTemplateFileName() {
+    $pageTemplateFile = $this->getTemplateFileName();
+    CRM_Utils_Hook::alterTemplateFile(get_class($this), $this, 'page', $pageTemplateFile);
+    return $pageTemplateFile;
   }
 
   /**

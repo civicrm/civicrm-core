@@ -1057,6 +1057,23 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hooks allows alteration of the tpl file used to generate content. It differs from the
+   * altercontent hook as the content has already been rendered through the tpl at that point
+   *
+   * @param $formName  previously generated content
+   * @param $form reference to the form object
+   * @param $context  context of content - page or form
+   * @param $tplName reference the file name of the tpl
+   *
+   * @access public
+   */
+  static function alterTemplateFile($formName, &$form, $context, &$tplName) {
+    return self::singleton()->invoke(4, $formName, $form, $context, $tplName,
+      self::$_nullObject,
+      'civicrm_alterTemplateFile'
+    );
+  }
+  /**
    * This hook collects the trigger definition from all components
    *
    * @param $triggerInfo reference to an array of trigger information
