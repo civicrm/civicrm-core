@@ -34,12 +34,13 @@
  */
 
 /**
- * Delegate query functions based on hook system
+ * Report hooks that allow extending a particular report.
+ * Example: Adding new tables to log reports 
  */
-class CRM_Contact_BAO_Query_Hook {
+class CRM_Report_BAO_Hook {
 
   /**
-   * @var array of CRM_Contact_BAO_Query_Interface objects
+   * @var array of CRM_Report_BAO_HookInterface objects
    */
   protected $_queryObjects = NULL;
 
@@ -53,7 +54,7 @@ class CRM_Contact_BAO_Query_Hook {
   public static function singleton() {
     static $singleton = NULL;
     if (!$singleton) {
-      $singleton = new CRM_Contact_BAO_Query_Hook();
+      $singleton = new CRM_Report_BAO_Hook();
     }
     return $singleton;
   }
@@ -61,60 +62,20 @@ class CRM_Contact_BAO_Query_Hook {
  /**
   * Get or build the list of search objects (via hook)
   *
-  * @return array of CRM_Contact_BAO_Query_Interface objects
+  * @return array of CRM_Report_BAO_Hook_Interface objects
   */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
       $this->_queryObjects = array();
-      CRM_Utils_Hook::queryObjects($this->_queryObjects, 'Contact');
+      CRM_Utils_Hook::queryObjects($this->_queryObjects, 'Report');
     }
+    CRM_Core_Error::debug( '$this->_queryObjects', $this->_queryObjects );
     return $this->_queryObjects;
   }
 
-  public function &getFields() {
-    $extFields = array();
+  public function alterLogTables(&$logTables) {
     foreach (self::getSearchQueryObjects() as $obj) {
-      $flds = $obj->getFields();
-      $extFields = array_merge($extFields, $flds);
-    }
-    return $extFields;
-  }
-
-  public function alterSearchQuery(&$query, $fnName) {
-    foreach (self::getSearchQueryObjects() as $obj) {
-      $obj->$fnName($query);
-    }
-  }
-
-  public function buildSearchfrom($fieldName, $mode, $side) {
-    $from = '';
-    foreach (self::getSearchQueryObjects() as $obj) {
-      $from .= $obj->from($fieldName, $mode, $side);
-    }
-    return $from;
-  }
-
-  public function setTableDependency(&$tables) {
-    foreach (self::getSearchQueryObjects() as $obj) {
-      $obj->setTableDependency($tables);
-    }
-  }
-
-  public function registerAdvancedSearchPane(&$panes) {
-    foreach (self::getSearchQueryObjects() as $obj) {
-      $obj->registerAdvancedSearchPane($panes);
-    }
-  }
-
-  public function buildAdvancedSearchPaneForm(&$form, $type) {
-    foreach (self::getSearchQueryObjects() as $obj) {
-      $obj->buildAdvancedSearchPaneForm($form, $type);
-    }
-  }
-
-  public function setAdvancedSearchPaneTemplatePath(&$paneTemplatePathArray, $type) {
-    foreach (self::getSearchQueryObjects() as $obj) {
-      $obj->setAdvancedSearchPaneTemplatePath($paneTemplatePathArray, $type);
+      $obj->alterLogTables($logTables);
     }
   }
 }
