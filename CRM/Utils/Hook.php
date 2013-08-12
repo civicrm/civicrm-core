@@ -1324,7 +1324,7 @@ abstract class CRM_Utils_Hook {
    * @param Array $queryObjects
    * @return void
    */
-  static function queryObjects(&$queryObjects) {
-    return self::singleton()->invoke(1, $queryObjects, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_queryObjects');
+  static function queryObjects(&$queryObjects, $type = 'Contact') {
+    return self::singleton()->invoke(2, $queryObjects, $type, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_queryObjects');
   }
 }

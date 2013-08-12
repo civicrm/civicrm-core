@@ -176,6 +176,9 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       $this->_logTables[$table] = array('fk' => 'entity_id', 'log_type' => 'Contact');
     }
 
+    // allow log tables to be extended via report hooks
+    CRM_Report_BAO_Hook::singleton()->alterLogTables($this->_logTables);
+
     parent::__construct();
   }
 
