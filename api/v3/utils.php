@@ -1093,7 +1093,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $errorMode = 
         break;
 
       case CRM_Utils_Type::T_MONEY:
-        if (!CRM_Utils_Rule::money($params[$fieldName])) {
+        if (!CRM_Utils_Rule::money($params[$fieldName]) && !empty($params[$fieldName])) {
           throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
         }
     }
