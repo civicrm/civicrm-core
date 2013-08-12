@@ -891,7 +891,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       if ($payLater) {
         $this->click('is_pay_later');
         $this->type('pay_later_text', "Pay later label $hash");
-        $this->type('pay_later_receipt', "Pay later instructions $hash");
+        $this->fillRichTextField('pay_later_receipt', "Pay later instructions $hash");
       }
 
       if ($pledges) {
