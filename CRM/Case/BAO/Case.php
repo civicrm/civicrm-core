@@ -3216,5 +3216,25 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
     return $clients;
   }
+
+  /**
+   * Get options for a given case field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $className = __CLASS__;
+    $params = array();
+    switch ($fieldName) {
+      // This field is not part of this object but the api supports it
+      case 'medium_id':
+        $className = 'CRM_Activity_BAO_Activity';
+        break;
+    }
+    return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
+  }
 }
 

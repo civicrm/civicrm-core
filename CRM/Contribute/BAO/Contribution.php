@@ -2855,4 +2855,31 @@ WHERE  contribution_id = %1 ";
       self::deleteContribution($contribution->id);
     }
   }
+
+  /**
+   * Get options for a given contribution field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $className = __CLASS__;
+    $params = array();
+    switch ($fieldName) {
+      // This field is not part of this object but the api supports it
+      case 'payment_processor':
+        $className = 'CRM_Contribute_BAO_ContributionPage';
+        // Filter results by contribution page
+        if (!empty($props['contribution_page_id'])) {
+          $page = civicrm_api('contribution_page', 'getsingle', array('version' => 3, 'id' => ($props['contribution_page_id'])));
+          $types = (array) CRM_Utils_Array::value('payment_processor', $page, 0);
+          $params['condition'] = 'id IN (' . implode(',', $types) . ')';
+        }
+    }
+    return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
+  }
 }
+
+
