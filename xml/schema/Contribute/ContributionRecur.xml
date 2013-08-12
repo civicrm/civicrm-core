@@ -164,7 +164,7 @@
   <field>
     <name>next_sched_contribution</name>
     <type>datetime</type>
-    <comment>At Groundspring this was used by the cron job which triggered payments. If we\'re not doing that but we know about payments, it might still be useful to store for display to org andor contributors.</comment>
+    <comment>At Groundspring this was used by the cron job which triggered payments. If we''re not doing that but we know about payments, it might still be useful to store for display to org andor contributors.</comment>
     <add>1.6</add>
   </field>
   <field>
@@ -241,7 +241,7 @@
     <add>4.1</add>
   </field>
   <index>
-    <name>UI_contrib_payment_instrument_id</name>
+    <name>UI_contribution_recur_payment_instrument_id</name>
     <fieldName>payment_instrument_id</fieldName>
     <add>4.1</add>
   </index>
