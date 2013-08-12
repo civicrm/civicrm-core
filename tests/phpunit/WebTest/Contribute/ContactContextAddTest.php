@@ -180,7 +180,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $searchParams, $compareParams);
 
     // go to soft creditor contact view page
-    $this->click( "xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[17]/td[2]/a[text()='{$softCreditFname} {$softCreditLname}']" );
+    $this->click("css=table.crm-soft-credit-listing tbody tr td a");
 
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
