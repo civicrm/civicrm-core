@@ -77,7 +77,6 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('campaign', 'reset=1', "link=Add Campaign");
     if ($this->isTextPresent('No campaigns found.')) {
-
       $this->openCiviPage('contribute/add', 'reset=1&action=add&context=standalone', '_qf_Contribution_cancel-bottom');
       $this->assertElementContainsText('crm-container', 'There are currently no active Campaigns.');
     }
@@ -137,8 +136,9 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->click("link=Record Contribution (Check, Cash, EFT ...)");
 
     $this->waitForElementPresent("_qf_Contribution_cancel-bottom");
-        // fill financial type.
-        $this->select("financial_type_id", "Donation");
+
+    // fill financial type.
+    $this->select("financial_type_id", "Donation");
 
     // fill in Received Date
     $this->webtestFillDate('receive_date');
@@ -168,11 +168,10 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->click("soft_credit_to");
-    $this->type("soft_credit_to", $softCreditFname);
-    $this->typeKeys("soft_credit_to", $softCreditFname);
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->click("soft_credit_contact_1");
+    $this->type("soft_credit_contact_1", $softCreditFname);
+    $this->typeKeys("soft_credit_contact_1", $softCreditFname);
+    $this->waitForElementPresent("soft_credit_amount_1");
 
     //Additional Detail section
     $this->click("AdditionalDetail");
