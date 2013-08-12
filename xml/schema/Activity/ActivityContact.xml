@@ -55,6 +55,9 @@
     <type>int unsigned</type>
     <title>Record Type ID</title>
     <comment>The record type id for this row</comment>
+    <pseudoconstant>
+      <optionGroupName>activity_contacts</optionGroupName>
+    </pseudoconstant>
     <add>4.4</add>
   </field>
   <index>

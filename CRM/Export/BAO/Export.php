@@ -455,9 +455,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           $relIDs = $ids;
         }
         elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
-          $activityContacts = $activityContacts = CRM_Core_OptionGroup::values('activity_contacts',
-            FALSE, FALSE, FALSE, NULL, 'name');
-          $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+          $sourceID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityAssignment', 'record_type_id', 'Activity Source');
           $query = "SELECT contact_id FROM civicrm_activity_contact
                               WHERE activity_id IN ( " . implode(',', $ids) . ") AND
                               record_type_id = {$sourceID}";
