@@ -455,7 +455,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           $relIDs = $ids;
         }
         elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
-          $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+          $activityContacts = $activityContacts = CRM_Core_OptionGroup::values('activity_contacts',
+            FALSE, FALSE, FALSE, NULL, 'name');
           $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
           $query = "SELECT contact_id FROM civicrm_activity_contact
                               WHERE activity_id IN ( " . implode(',', $ids) . ") AND
@@ -632,8 +633,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $count++;
         $row = array();
 
-        //convert the pseudo constants
-        $query->convertToPseudoNames($dao);
+        if ($exportMode == CRM_Export_Form_Select::CONTACT_EXPORT) {
+          //convert the pseudo constants
+          $query->convertToPseudoNames($dao);
+        }
 
         //first loop through returnproperties so that we return what is required, and in same order.
         $relationshipField = 0;
@@ -1797,7 +1800,7 @@ LIMIT $offset, $limit
    * Function to manipulate header rows for relationship fields
    *
    */
-  function manipulateHeaderRows(&$headerRows, $contactRelationshipTypes) {
+  public static function manipulateHeaderRows(&$headerRows, $contactRelationshipTypes) {
     foreach ($headerRows as & $header) {
       $split = explode('-', $header);
       if ($relationTypeName = CRM_Utils_Array::value($split[0], $contactRelationshipTypes)) {
