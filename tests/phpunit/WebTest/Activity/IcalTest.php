@@ -107,7 +107,6 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
           if ($mailPart->subType == 'calendar') {
             // For now we just check for existence.
             self::$foundIt = TRUE;
-
           }
         }
       }
