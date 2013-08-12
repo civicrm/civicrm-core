@@ -326,6 +326,8 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
   }
 
   function upgrade_4_3_6($rev) {
+    //CRM-13094
+    $this->addTask(ts('Add mising contraints'), 'addMissingConstraints', $rev);
     $this->addTask(ts('Upgrade DB to 4.3.6: SQL'), 'task_4_3_x_runSql', $rev);
     // CRM-12844
     // update line_item, financial_trxn and financial_item table for recurring contributions
@@ -871,11 +873,42 @@ ALTER TABLE civicrm_financial_account
   }
   
   /**
+   * change index and add missing constraints for civicrm_contribution_recur
+   */
+  function addMissingConstraints(CRM_Queue_TaskContext $ctx) {
+    $query = "SHOW KEYS FROM `civicrm_contribution_recur` WHERE key_name = 'UI_contrib_payment_instrument_id'";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    if ($dao->N) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contribution_recur DROP INDEX UI_contrib_payment_instrument_id');
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contribution_recur ADD INDEX UI_contribution_recur_payment_instrument_id (payment_instrument_id)');
+    }
+    $constraintArray = array(
+      'contact_id' => " ADD CONSTRAINT `FK_civicrm_contribution_recur_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE ", 
+      'payment_processor_id' => " ADD CONSTRAINT `FK_civicrm_contribution_recur_payment_processor_id` FOREIGN KEY (`payment_processor_id`) REFERENCES `civicrm_payment_processor` (`id`) ON DELETE SET NULL ", 
+      'financial_type_id' => " ADD CONSTRAINT `FK_civicrm_contribution_recur_financial_type_id` FOREIGN KEY (`financial_type_id`) REFERENCES `civicrm_financial_type` (`id`) ON DELETE SET NULL ", 
+      'campaign_id' => " ADD CONSTRAINT `FK_civicrm_contribution_recur_campaign_id` FOREIGN KEY (`campaign_id`) REFERENCES `civicrm_campaign` (`id`) ON DELETE SET NULL ",
+    );
+    $constraint = array();
+    foreach ($constraintArray as $constraintKey => $value) {
+      $foreignKeyExists = CRM_Core_DAO::checkFKConstraintInFormat('civicrm_contribution_recur', $constraintKey);
+      if (!$foreignKeyExists) {
+        $constraint[] = $value;
+      }
+    }
+    if (!empty($constraint)) {
+      $query = "ALTER TABLE civicrm_contribution_recur " . implode(' , ', $constraint);
+      CRM_Core_DAO::executeQuery($query);
+    }
+    return TRUE;    
+  }
+
+  /**
    * Update financial_account_id for bad data in financial_trxn table
    * CRM-12844
    * 
    */
   function updateFinancialTrxnData(CRM_Queue_TaskContext $ctx) {
+    $upgrade = new CRM_Upgrade_Form();
     $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id, cft.payment_processor_id, 
 cft.id financial_trxn_id, cfi.entity_table, cft.from_financial_account_id, cft.to_financial_account_id
 
@@ -937,7 +970,7 @@ id IN (' . implode(',', $val) . ')';
    * 
    */
   function updateLineItemData(CRM_Queue_TaskContext $ctx) {
-     $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id,
+    $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id,
 cc.financial_type_id contribution_financial_type, 
 cli.financial_type_id line_financial_type_id,
 cli.price_field_id, cli.price_field_value_id, cli.label, cli.id line_item_id,
