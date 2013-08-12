@@ -228,7 +228,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $scenario1 = array(
       'financial_type' => 'Campaign Contribution',
       'total_amount' => 111,
-      'non_deductible_amount' => 15
+      'non_deductible_amount' => 15,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario1, $firstName, $lastName, $processorName);
 
@@ -236,7 +237,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Campaign Contribution',
       'Total Amount' => 111,
-      'Non-deductible Amount' => 15
+      'Non-deductible Amount' => 15,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario1);
 
@@ -244,7 +246,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $scenario2 = array(
       'financial_type' => 'Donation',
       'total_amount' => 10,
-      'premium' => "{$premiumName} ( SKU )"
+      'premium' => "{$premiumName} ( SKU )",
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario2, $firstName, $lastName, $processorName);
 
@@ -252,7 +255,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       'Total Amount' => 10,
-      'Non-deductible Amount' => 10
+      'Non-deductible Amount' => 10,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario2);
 
@@ -260,7 +264,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $scenario3 = array(
       'financial_type' => 'Donation',
       'total_amount' => 123,
-      'premium' => "{$premiumName} ( SKU )"
+      'premium' => "{$premiumName} ( SKU )",
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario3, $firstName, $lastName, $processorName);
 
@@ -268,7 +273,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       'Total Amount' => 123,
-      'Non-deductible Amount' => 12
+      'Non-deductible Amount' => 12,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario3);
 
@@ -276,6 +282,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $scenario4 = array(
       'financial_type' => 'Donation',
       'total_amount' => 123,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario4, $firstName, $lastName, $processorName);
 
@@ -283,7 +290,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       'Total Amount' => 123,
-      'Non-deductible Amount' => '0.00'
+      'Non-deductible Amount' => '0.00',
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario4);
 
@@ -291,6 +299,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $scenario5 = array(
       'financial_type' => 'Campaign Contribution',
       'total_amount' => 555,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario5, $firstName, $lastName, $processorName);
 
@@ -298,7 +307,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Campaign Contribution',
       'Total Amount' => 555,
-      'Non-deductible Amount' => 555
+      'Non-deductible Amount' => 555,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario5);
   }
@@ -357,18 +367,33 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
   //common function for verifing total_amount, and non_deductible_amount
   function _verifyAmounts($verifyData) {
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // since we are doing test contributions we need to search for test contribution and select first contribution
+    // record for the contact
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
+    $this->type("sort_name", $verifyData['sort_name']);
+
+    // select show test contributions
+    $this->click("contribution_test", "value=1");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     foreach ($verifyData as $label => $value) {
+      if ( $label == 'sort_name' ) {
+        continue;
+      }
       $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
         preg_quote($value)
       );
     }
 
-    $this->click("_qf_ContributionView_cancel-top");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // now find contact and go back to contact summary
+    $this->openCiviPage("contact/search", "reset=1", "sort_name");
+    $this->type("sort_name", $verifyData['sort_name']);
+    $this->clickLink("_qf_Basic_refresh",
+      "xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']");
+
+    $this->clickLink("xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']",
+    'crm-contact-actions-link');
   }
 
   function testOnlineContributionWithZeroAmount() {
