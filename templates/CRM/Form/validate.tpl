@@ -27,6 +27,9 @@
 {* Initialize jQuery validate *}
 {* Extra params and functions may be added to the CRM.validate object before this template is loaded *}
 
+{if !$crm_form_validate_included}
+{assign var=crm_form_validate_included value=1}
+
 {literal}
 <script type="text/javascript" >
 cj(function($) {
@@ -82,3 +85,4 @@ cj(function($) {
   {/if}
 });
 </script>
+{/if}
