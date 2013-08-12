@@ -638,12 +638,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @access public
    */
-  public static function buildRecur($form) {
+  public static function buildRecur(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur');
     $className = get_class($form);
 
-    $this->assign('is_recur_interval', CRM_Utils_Array::value('is_recur_interval', $this->_values));
-    $this->assign('is_recur_installments', CRM_Utils_Array::value('is_recur_installments', $this->_values));
+    $form->assign('is_recur_interval', CRM_Utils_Array::value('is_recur_interval', $form->_values));
+    $form->assign('is_recur_installments', CRM_Utils_Array::value('is_recur_installments', $form->_values));
 
     $form->add('checkbox', 'is_recur', ts('I want to contribute this amount'), NULL);
 
@@ -669,15 +669,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // CRM 10860, display text instead of a dropdown if there's only 1 frequency unit
     if(sizeof($unitVals) == 1) {
-      $this->assign('one_frequency_unit', true);
+      $form->assign('one_frequency_unit', true);
       $unit = $unitVals[0];
       $form->add('hidden', 'frequency_unit', $unit);
       if (CRM_Utils_Array::value('is_recur_interval', $form->_values) || $className == 'CRM_Contribute_Form_Contribution') {
         $unit .= "(s)";
       }
-      $this->assign('frequency_unit', $unit);
+      $form->assign('frequency_unit', $unit);
     } else {
-      $this->assign('one_frequency_unit', false);
+      $form->assign('one_frequency_unit', false);
       $units = array();
       $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
       foreach ($unitVals as $key => $val) {
