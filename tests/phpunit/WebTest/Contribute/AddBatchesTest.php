@@ -90,7 +90,6 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'last_name' => 'An'.substr(sha1(rand()), 0, 7),
         'membership_type' => 'Default Organization',
         'amount' => 100,
-
         'financial_type' => 'Member Dues',
       );
       $this->_fillData($data[$i], $i, "Membership");
@@ -103,7 +102,8 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
 
   function _fillData($data, $row, $type) {
     $email = $data['first_name'] . '@example.com';
-    $this->webtestNewDialogContact($data['first_name'], $data['last_name'], $email, 4, "primary_profiles_{$row}", "primary_{$row}");
+    $this->webtestNewDialogContact($data['first_name'], $data['last_name'], $email, 4,
+      "primary_profiles_{$row}", $row, 'primary');
 
     if ($type == "Contribution") {
       $this->select("field_{$row}_financial_type", $data['financial_type']);
@@ -185,36 +185,5 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     foreach ($data as $value) {
       $this->_checkResult($value, $type);
     }
-  }
-
-  function webtestNewDialogContact($fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz', $type = 4, $row) {
-    // 4 - Individual profile
-    // 5 - Organization profile
-    // 6 - Household profile
-    $this->select("{$row}", "value={$type}");
-    // create new contact using dialog
-    //   $this->waitForElementPresent('#first_name');
-    $this->waitForElementPresent('_qf_Edit_next');
-
-    switch ($type) {
-      case 4:
-        $this->type('first_name', $fname);
-        $this->type('last_name', $lname);
-        break;
-
-      case 5:
-        $this->type('organization_name', $fname);
-        break;
-
-      case 6:
-        $this->type('household_name', $fname);
-        break;
-    }
-
-    $this->type('email-Primary', $email);
-    $this->click('_qf_Edit_next');
-
-    // Is new contact created?
-    $this->assertTrue($this->isTextPresent("{$lname}, {$fname} has been created."), "Status message didn't show up after saving!");
   }
 }
