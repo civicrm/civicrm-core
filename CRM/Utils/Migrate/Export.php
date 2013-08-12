@@ -478,10 +478,19 @@ class CRM_Utils_Migrate_Export {
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
             $values = array();
             foreach ($types as $type) {
-              $values[] = $this->_xml['optionValue']['idNameMap']["$key.{$type}"];
+              if (in_array($key, array('activity_type', 'event_type'))) {
+                $ogID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $key, 'id', 'name');
+                $ovParams = array('option_group_id' => $ogID, 'value' => $type);
+                CRM_Core_BAO_OptionValue::retrieve($ovParams, $oValue);
+                $values[] = $oValue['name'];
+              }
+              else {
+                $relTypeName = CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_RelationshipType', $type, 'name_a_b', 'id');
+                $values[] = $relTypeName;
+              }
             }
             $value = implode(',', $values);
-            $keyValues['extends_entity_column_value_option_value'] = $value;
+            $object->extends_entity_column_value = $value;
           }
           else {
             echo "This extension: {$object->extends} is not yet handled";
