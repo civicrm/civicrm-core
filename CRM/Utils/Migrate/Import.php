@@ -194,8 +194,8 @@ WHERE      v.option_group_id = %1
 
         // fix extends stuff if it exists
         if (isset($customGroupXML->extends_entity_column_value_option_group) &&
-          isset($customGroupXML->extends_entity_column_value)
-            ) {
+          isset($customGroupXML->extends_entity_column_value)) {
+          $valueIDs = array();
           $optionValues = explode(",", $customGroupXML->extends_entity_column_value);
           $optValues = implode("','", $optionValues);
           if (trim($customGroup->extends) != 'Participant') {
@@ -204,6 +204,9 @@ WHERE      v.option_group_id = %1
                 $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_RelationshipType', $value, 'id', 'name_a_b');
                 $valueIDs[] = $relTypeId;
               }
+            }
+            elseif (in_array($customGroup->extends, array('Individual', 'Organization', 'Household'))) {
+              $valueIDs = $optionValues;
             }
             else {
               $sql = "
@@ -221,7 +224,6 @@ AND        v.name IN ('$optValues')
               );
               $dao = & CRM_Core_DAO::executeQuery($sql, $params);
 
-              $valueIDs = array();
               while ($dao->fetch()) {
                 $valueIDs[] = $dao->value;
               }
