@@ -44,8 +44,7 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
    *
    * @static
    */
-  static function getPetitionSummary($params = array(
-    ), $onlyCount = FALSE) {
+  static function getPetitionSummary($params = array(), $onlyCount = FALSE) {
     //build the limit and order clause.
     $limitClause = $orderByClause = $lookupTableJoins = NULL;
     if (!$onlyCount) {
@@ -126,7 +125,7 @@ SELECT  petition.id                         as id,
     $query = "{$selectClause} {$fromClause} {$whereClause} {$orderByClause} {$limitClause}";
 
     if ($onlyCount) {
-      return (int)CRM_Core_DAO::singleValueQuery($query, $queryParams);
+      return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
     }
 
     $petitions = array();
@@ -156,8 +155,8 @@ SELECT  petition.id                         as id,
    * @static
    */
   static function getPetitionCount() {
-    $whereClause    = 'WHERE ( 1 )';
-    $queryParams    = array();
+    $whereClause = 'WHERE ( 1 )';
+    $queryParams = array();
     $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
     if ($petitionTypeID) {
       $whereClause = "WHERE ( petition.activity_type_id = %1 )";
@@ -165,13 +164,13 @@ SELECT  petition.id                         as id,
     }
     $query = "SELECT COUNT(*) FROM civicrm_survey petition {$whereClause}";
 
-    return (int)CRM_Core_DAO::singleValueQuery($query, $queryParams);
+    return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
   }
 
   /**
    * takes an associative array and creates a petition signature activity
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return object CRM_Campaign_BAO_Petition
    * @access public
@@ -254,7 +253,8 @@ DELETE FROM civicrm_entity_tag
 WHERE       entity_table = 'civicrm_contact'
 AND         entity_id = %1
 AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
-    $params = array(1 => array($contact_id, 'Integer'),
+    $params = array(
+      1 => array($contact_id, 'Integer'),
       2 => array($tag_name, 'String'),
     );
     CRM_Core_DAO::executeQuery($sql, $params);
@@ -295,7 +295,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $params = array(
       1 => array($surveyId, 'Integer'),
-      2 => array($sourceID, 'Integer'));
+      2 => array($sourceID, 'Integer')
+    );
     $sql .= " GROUP BY civicrm_address.country_id";
     $fields = array('total', 'country_id', 'country_iso', 'country');
 
@@ -328,8 +329,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
             source_record_id = " . (int) $surveyId . " AND activity_type_id = " . (int) $surveyInfo['activity_type_id'] . " GROUP BY status_id";
 
     $statusTotal = array();
-    $total       = 0;
-    $dao         = CRM_Core_DAO::executeQuery($sql);
+    $total = 0;
+    $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $total += $dao->total;
       $statusTotal['status'][$dao->status_id] = $dao->total;
@@ -348,7 +349,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
             s.title,
             ov.label AS activity_type
             FROM  civicrm_survey s, civicrm_option_value ov, civicrm_option_group og
-            WHERE s.id = " . (int) $surveyId ."
+            WHERE s.id = " . (int) $surveyId . "
             AND s.activity_type_id = ov.value
             AND ov.option_group_id = og.id
             AND og.name = 'activity_type'";
@@ -375,7 +376,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   static function getPetitionSignature($surveyId, $status_id = NULL) {
 
     // sql injection protection
-    $surveyId = (int)$surveyId;
+    $surveyId = (int) $surveyId;
     $signature = array();
 
     $sql = "
@@ -414,11 +415,20 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $params[3] = array($sourceID, 'Integer');
 
     $fields = array(
-      'id', 'survey_id', 'contact_id',
-      'activity_date_time', 'activity_type_id',
-      'status_id', 'first_name', 'last_name',
-      'sort_name', 'gender_id', 'country_id',
-      'state_province_id', 'country_iso', 'country',
+      'id',
+      'survey_id',
+      'contact_id',
+      'activity_date_time',
+      'activity_type_id',
+      'status_id',
+      'first_name',
+      'last_name',
+      'sort_name',
+      'gender_id',
+      'country_id',
+      'state_province_id',
+      'country_iso',
+      'country',
     );
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -435,7 +445,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * This function returns all entities assigned to a specific tag
    *
-   * @param object  $tag    an object of a tag.
+   * @param object $tag    an object of a tag.
    *
    * @return  array   $contactIds    array of contact ids
    * @access public
@@ -480,7 +490,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
             AND a.activity_type_id = %3
             AND ac.contact_id = %4
 ";
-    $params = array(1 => array($surveyInfo['title'], 'String'),
+    $params = array(
+      1 => array($surveyInfo['title'], 'String'),
       2 => array($surveyId, 'Integer'),
       3 => array($surveyInfo['activity_type_id'], 'Integer'),
       4 => array($contactId, 'Integer'),
@@ -505,23 +516,23 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * takes an associative array and sends a thank you or email verification email
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return
    * @access public
    * @static
    */
-  function sendEmail($params, $sendEmailMode) {
+  public static function sendEmail($params, $sendEmailMode) {
 
-     /* sendEmailMode
-      * CRM_Campaign_Form_Petition_Signature::EMAIL_THANK
-      *   connected user via login/pwd - thank you
-      *    or dedupe contact matched who doesn't have a tag CIVICRM_TAG_UNCONFIRMED - thank you
-      *   or login using fb connect - thank you + click to add msg to fb wall
-      *
-      * CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM
-      *  send a confirmation request email
-      */
+    /* sendEmailMode
+     * CRM_Campaign_Form_Petition_Signature::EMAIL_THANK
+     *   connected user via login/pwd - thank you
+     *    or dedupe contact matched who doesn't have a tag CIVICRM_TAG_UNCONFIRMED - thank you
+     *   or login using fb connect - thank you + click to add msg to fb wall
+     *
+     * CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM
+     *  send a confirmation request email
+     */
 
     // check if the group defined by CIVICRM_PETITION_CONTACTS exists, else create it
     $petitionGroupName = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -602,13 +613,13 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
         $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
 
         $replyTo = implode($config->verpSeparator,
-          array(
-            $localpart . 'c',
-            $se->contact_id,
-            $se->id,
-            $se->hash,
-          )
-        ) . "@$emailDomain";
+            array(
+              $localpart . 'c',
+              $se->contact_id,
+              $se->id,
+              $se->hash,
+            )
+          ) . "@$emailDomain";
 
 
         $confirmUrl = CRM_Utils_System::url('civicrm/petition/confirm',
