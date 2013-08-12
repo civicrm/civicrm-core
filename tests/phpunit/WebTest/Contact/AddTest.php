@@ -34,7 +34,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
   function testIndividualAdd() {
     $this->webtestLogin();
 
-    $this->WebtestAddGroup();
+    $groupName = $this->WebtestAddGroup();
 
     // go to display preferences to enable Open ID field
     $this->openCiviPage('admin/setting/preferences/display', "reset=1", "_qf_Display_next-bottom");
@@ -101,7 +101,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
     if ($this->assertElementContainsText('address_1', "Latitude")) {
-
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -157,7 +156,8 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     //Tags and Groups section
     $this->click("tagGroup");
 
-    $this->click("group[{$this->webtestGetValidEntityID('Group')}]");
+    // select group
+    $this->select("crmasmSelect0", "label=$groupName");
     $this->click("tag[{$this->webtestGetValidEntityID('Tag')}]");
 
     // Clicking save.
@@ -169,6 +169,8 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
   function testHouseholdAdd() {
     $this->webtestLogin();
+
+    $groupName = $this->WebtestAddGroup();
 
     // go to display preferences to enable Open ID field
     $this->openCiviPage('admin/setting/preferences/display', "reset=1", "_qf_Display_next-bottom");
@@ -260,8 +262,10 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->type("subject", "Grant's note");
     $this->type("note", "This is a household contact webtest note.");
 
-    //Tags and Groups section
-    $this->click("group[{$this->webtestGetValidEntityID('Group')}]");
+    // select group
+    $this->select("crmasmSelect0", "label=$groupName");
+
+    //tags section
     $this->click("tag[{$this->webtestGetValidEntityID('Tag')}]");
 
     // Clicking save.
@@ -273,6 +277,8 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
   function testOrganizationAdd() {
     $this->webtestLogin();
+
+    $groupName = $this->WebtestAddGroup();
 
     // go to display preferences to enable Open ID field
     $this->openCiviPage('admin/setting/preferences/display', "reset=1", "_qf_Display_next-bottom");
@@ -360,7 +366,10 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
     //Tags and Groups section
     $this->click("tagGroup");
-    $this->click("group[{$this->webtestGetValidEntityID('Group')}]");
+
+    // select group
+    $this->select("crmasmSelect0", "label=$groupName");
+
     $this->click("tag[{$this->webtestGetValidEntityID('Tag')}]");
 
     // Clicking save.
