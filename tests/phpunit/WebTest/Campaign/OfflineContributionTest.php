@@ -168,10 +168,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->click("soft_credit_contact_1");
-    $this->type("soft_credit_contact_1", $softCreditFname);
-    $this->typeKeys("soft_credit_contact_1", $softCreditFname);
-    $this->waitForElementPresent("soft_credit_amount_1");
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
 
     //Additional Detail section
     $this->click("AdditionalDetail");

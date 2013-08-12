@@ -360,13 +360,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    */
-  function webtestFillAutocomplete($sortName) {
-    $this->click('contact_1');
-    $this->type('contact_1', $sortName);
-    $this->typeKeys('contact_1', $sortName);
+  function webtestFillAutocomplete($sortName, $fieldName = 'contact_1') {
+    $this->click($fieldName);
+    $this->type($fieldName, $sortName);
+    $this->typeKeys($fieldName, $sortName);
     $this->waitForElementPresent("css=div.ac_results-inner li");
     $this->click("css=div.ac_results-inner li");
-    $this->assertContains($sortName, $this->getValue('contact_1'), "autocomplete expected $sortName but didn’t find it in " . $this->getValue('contact_1'));
+    $this->assertContains($sortName, $this->getValue($fieldName), "autocomplete expected $sortName but didn’t find it in " . $this->getValue($fieldName));
   }
 
   /**
