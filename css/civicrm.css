@@ -2988,6 +2988,11 @@ div#crm-container form {
   color: #f5f6f1;
 }
 
+/* add border to jQuery ui-dialog box CRM-13177 */
+div.ui-dialog {
+  border: 1px solid black !important;
+}
+
 #Tag .tree .collapsable .hit,
 #Tag .tree .expandable .hit {
   padding-left: 16px;
