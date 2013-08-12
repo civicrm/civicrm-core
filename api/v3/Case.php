@@ -146,6 +146,10 @@ function _civicrm_api3_case_create_spec(&$params) {
   $params['contact_id']['title'] = 'Case Client';
   $params['contact_id']['api.required'] = 1;
   $params['status_id']['api.default'] = 1;
+  $params['medium_id'] = array(
+    'name' => 'medium_id',
+    'title' => 'Activity Medium',
+  );
 }
 
 /**
