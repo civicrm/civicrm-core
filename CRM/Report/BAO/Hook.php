@@ -69,7 +69,6 @@ class CRM_Report_BAO_Hook {
       $this->_queryObjects = array();
       CRM_Utils_Hook::queryObjects($this->_queryObjects, 'Report');
     }
-    CRM_Core_Error::debug( '$this->_queryObjects', $this->_queryObjects );
     return $this->_queryObjects;
   }
 
