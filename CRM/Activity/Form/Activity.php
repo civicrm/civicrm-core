@@ -324,28 +324,28 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       //set the appropriate action
       $url = CRM_Utils_System::currentPath();
       $urlArray = explode('/', $url);
-      $seachPath = array_pop($urlArray);
+      $searchPath = array_pop($urlArray);
       $searchType = 'basic';
       $this->_action = CRM_Core_Action::BASIC;
-      switch ($seachPath) {
+      switch ($searchPath) {
         case 'basic':
-          $searchType = $seachPath;
+          $searchType = $searchPath;
           $this->_action = CRM_Core_Action::BASIC;
           break;
 
         case 'advanced':
-          $searchType = $seachPath;
+          $searchType = $searchPath;
           $this->_action = CRM_Core_Action::ADVANCED;
           break;
 
         case 'builder':
-          $searchType = $seachPath;
+          $searchType = $searchPath;
           $this->_action = CRM_Core_Action::PROFILE;
           break;
 
         case 'custom':
           $this->_action = CRM_Core_Action::COPY;
-          $searchType = $seachPath;
+          $searchType = $searchPath;
           break;
       }
 
@@ -544,7 +544,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           ) = CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
       }
 
-      //set the assigneed contact count to template
+      //set the assignee contact count to template
       if (!empty($defaults['assignee_contact'])) {
         $this->assign('assigneeContactCount', count($defaults['assignee_contact']));
       }
