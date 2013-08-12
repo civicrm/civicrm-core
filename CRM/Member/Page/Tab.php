@@ -523,7 +523,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  function associatedContribution($contactId = NULL, $membershipId = NULL) {
+  public static function associatedContribution($contactId = NULL, $membershipId = NULL) {
     if (!$contactId) {
       $contactId = $this->_contactId;
     }

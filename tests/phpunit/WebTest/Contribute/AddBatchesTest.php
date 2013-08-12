@@ -88,7 +88,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $data[$i] = array(
         'first_name' => 'Ma' . substr(sha1(rand()), 0, 7),
         'last_name' => 'An' . substr(sha1(rand()), 0, 7),
-        'membership_type' => 'Default Organization',
+        'membership_type' => 'General',
         'amount' => 100,
         'financial_type' => 'Member Dues',
       );
@@ -118,7 +118,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
 
     }
     elseif ($type == "Membership") {
-      $this->select("field[{$row}][membership_type][0]", $data['membership_type']);
+      $this->select("field[{$row}][membership_type][1]", $data['membership_type']);
       $this->webtestFillDate("field_{$row}_join_date", "now");
       $this->webtestFillDate("field_{$row}_membership_start_date", "now");
       $this->webtestFillDate("field_{$row}_membership_end_date", "+1 month");
