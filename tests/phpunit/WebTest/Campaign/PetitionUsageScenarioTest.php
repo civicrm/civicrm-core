@@ -267,7 +267,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
 
     foreach ($expected as $column => $value) {
       $this->verifyText("xpath=//table[@class='selector']/tbody/tr[2]/td[$column]", preg_quote($value));
+    }
   }
-}
 }
 
