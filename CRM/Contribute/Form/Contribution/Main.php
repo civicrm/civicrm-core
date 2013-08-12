@@ -638,7 +638,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @access public
    */
-  function buildRecur($form) {
+  public static function buildRecur($form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur');
     $className = get_class($form);
 
