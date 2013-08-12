@@ -1633,7 +1633,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * This function returns all contribution related object ids.
    */
-  function getComponentDetails($contributionId) {
+  public static function getComponentDetails($contributionId) {
     $componentDetails = $pledgePayment = array();
     if (!$contributionId) {
       return $componentDetails;

@@ -583,10 +583,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     $this->type('trxn_id', 'P20901X1' . rand(100, 10000));
 
-    $this->type('soft_credit_to', "$lastNameSoft, $firstNameSoft");
-    $this->click('soft_credit_to');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->webtestFillAutocomplete("{$lastNameSoft}, {$firstNameSoft}", 'soft_credit_contact_1');
+
     //Additional Detail section
     $this->click('AdditionalDetail');
     $this->waitForElementPresent('thankyou_date');

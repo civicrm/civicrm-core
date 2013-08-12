@@ -94,11 +94,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->click("soft_credit_to");
-    $this->type("soft_credit_to", $softCreditFname);
-    $this->typeKeys("soft_credit_to", $softCreditFname);
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
 
     //Custom Data
     //$this->click('CIVICRM_QFID_3_6');
