@@ -114,6 +114,13 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $pcpStatus;
 
   /**
+   * contribution / financial batches
+   * @var array
+   * @static
+   */
+  private static $batch;
+
+  /**
    * Get all the financial types
    *
    * @access public
@@ -414,6 +421,35 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     return self::$financialTypeAccount[$financialTypeId];
+  }
+
+  /**
+   * Get all batches
+   *
+   * @access public
+   *
+   * @return array - array reference of all batches if any
+   * @static
+   */
+  public static function &batch($id = NULL) {
+    if (!self::$batch) {
+      $orderBy = " id DESC ";
+      CRM_Core_PseudoConstant::populate(
+        self::$batch,
+        'CRM_Batch_DAO_Batch',
+        TRUE,
+        'title',
+        NULL,
+        NULL,
+        $orderBy
+      );
+    }
+
+    if ($id) {
+      $result = CRM_Utils_Array::value($id, self::$batch);
+      return $result;
+    }
+    return self::$batch;
   }
 }
 
