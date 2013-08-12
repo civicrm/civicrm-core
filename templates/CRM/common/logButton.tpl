@@ -36,16 +36,26 @@
   Note: This file is used by CivHR
 *}
 
-<a class="css_right {$snippet.css_class}" href="#" title="{ts}View Revisions{/ts}">View Revisions</a>
+{if !$onlyScript}
+  <a class="css_right {$snippet.css_class}" href="#" title="{ts}View Revisions{/ts}">View Revisions</a>
+{/if}
 
 {literal}
 <script type="text/javascript">
 (function($, CRM) {
-  $(".{/literal}{$snippet.css_class}{literal}").crmRevisionLink({
-    contactId: {/literal}{$snippet.contact_id}{literal},
-    tableName: "{/literal}{$snippet.table_name}{literal}",
-    reportId: {/literal}{$snippet.instance_id}{literal}
-  });
+  {/literal}{if $onajax}{literal}
+    $(document).ajaxSuccess(function() {
+  {/literal}{/if}{literal}
+      if ($(".{/literal}{$snippet.css_class}{literal}").length) {
+         $(".{/literal}{$snippet.css_class}{literal}").crmRevisionLink({
+           contactId: {/literal}{$snippet.contact_id}{literal},
+           tableName: "{/literal}{$snippet.table_name}{literal}",
+           reportId: {/literal}{$snippet.instance_id}{literal}
+         });
+      }
+  {/literal}{if $onajax}{literal}
+    });
+  {/literal}{/if}{literal}
 })(cj, CRM);
 </script>
 {/literal}
