@@ -27,10 +27,6 @@
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
 
-  protected $captureScreenshotOnFailure = TRUE;
-  protected $screenshotPath = '/tmp/';
-  protected $screenshotUrl = 'http://api.dev.civicrm.org/sc/';
-
   protected function setUp() {
     parent::setUp();
   }
@@ -271,7 +267,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
 
     foreach ($expected as $column => $value) {
       $this->verifyText("xpath=//table[@class='selector']/tbody/tr[2]/td[$column]", preg_quote($value));
+    }
   }
-}
 }
 
