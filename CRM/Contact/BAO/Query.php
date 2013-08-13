@@ -790,8 +790,14 @@ class CRM_Contact_BAO_Query {
           $this->_tables['civicrm_group'] = 1;
         }
         elseif ($name === 'notes') {
+          // if note field is subject then return subject else body of the note
+          $noteColumn = 'note';
+          if (isset($noteField) && $noteField == 'note_subject') {
+            $noteColumn = 'subject';
+          }
+
           $this->_useGroupBy = TRUE;
-          $this->_select[$name] = "GROUP_CONCAT(DISTINCT(civicrm_note.note)) as notes";
+          $this->_select[$name] = "GROUP_CONCAT(DISTINCT(civicrm_note.$noteColumn)) as notes";
           $this->_element[$name] = 1;
           $this->_tables['civicrm_note'] = 1;
         }
