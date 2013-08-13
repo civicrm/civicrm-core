@@ -174,6 +174,9 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->open($registerUrl);
 
     $this->select("additional_participants", "value=" . $numberRegistrations);
+    $this->type("first_name", "Jane");
+    $lastName = "Smith" . substr(sha1(rand()), 0, 7);
+    $this->type("last_name", $lastName);
     $this->type("email-Primary", "smith" . substr(sha1(rand()), 0, 7) . "@example.org");
 
     $this->select("credit_card_type", "value=Visa");
@@ -182,7 +185,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->select("credit_card_exp_date[M]", "value=1");
     $this->select("credit_card_exp_date[Y]", "value=2020");
     $this->type("billing_first_name", "Jane");
-    $this->type("billing_last_name", "Smith" . substr(sha1(rand()), 0, 7));
+    $this->type("billing_last_name", $lastName);
     $this->type("billing_street_address-5", "15 Main St.");
     $this->type(" billing_city-5", "San Jose");
     $this->select("billing_country_id-5", "value=1228");
@@ -196,6 +199,9 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
         $this->waitForPageToLoad($this->getTimeoutMsec());
         // Look for continue button
         $this->waitForElementPresent("_qf_Participant_{$i}_next");
+        $this->type("first_name", "Jane Add {$i}");
+        $lastName = "Smith" . substr(sha1(rand()), 0, 7);
+        $this->type("last_name", $lastName);
         $this->type("email-Primary", "smith" . substr(sha1(rand()), 0, 7) . "@example.org");
         $this->click("_qf_Participant_{$i}_next");
       }
