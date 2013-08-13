@@ -921,7 +921,7 @@ WHERE ceft.entity_table = 'civicrm_contribution'  AND cc.contribution_recur_id I
 AND ceft1.entity_table = 'civicrm_financial_item' AND cft.id IS NOT NULL AND cft.payment_instrument_id = %1
 
 ORDER BY cft.id ";
-    $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
+    $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument('name');
     $param = array(1 => array(array_search('Credit Card', $paymentInstrument), 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($sql, $param);
     $financialTrxn = array();
