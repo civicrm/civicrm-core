@@ -301,33 +301,14 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
   }
   
   function upgrade_4_3_5($rev) {
-    // CRM-12156
-    $config = CRM_Core_Config::singleton();
-    $dbname  = DB::parseDSN($config->dsn);
-    $sql = "SELECT DELETE_RULE
-FROM information_schema.REFERENTIAL_CONSTRAINTS
-WHERE CONSTRAINT_NAME = 'FK_civicrm_financial_item_contact_id'
-AND CONSTRAINT_SCHEMA = %1";
-    $params = array(1 => array($dbname['database'], 'String'));
-    $onDelete = CRM_Core_DAO::singleValueQuery($sql, $params, TRUE, FALSE);
-    
-    if ($onDelete != 'CASCADE') {
-      $query = "ALTER TABLE `civicrm_financial_item`
-DROP FOREIGN KEY FK_civicrm_financial_item_contact_id,
-DROP INDEX FK_civicrm_financial_item_contact_id;";
-      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
-      $query = "
-ALTER TABLE `civicrm_financial_item`
-ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE;
-";
-      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
-    }
     $this->addTask(ts('Upgrade DB to 4.3.5: SQL'), 'task_4_3_x_runSql', $rev);
   }
 
   function upgrade_4_3_6($rev) {
     //CRM-13094
     $this->addTask(ts('Add mising contraints'), 'addMissingConstraints', $rev);
+    //CRM-13088
+    $this->addTask(ts('Add ON DELETE Options for constraints'), 'task_4_3_x_checkConstraints', $rev);
     $this->addTask(ts('Upgrade DB to 4.3.6: SQL'), 'task_4_3_x_runSql', $rev);
     // CRM-12844
     // update line_item, financial_trxn and financial_item table for recurring contributions
@@ -1101,6 +1082,63 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
       $saveDao->form_values = serialize($formValues);
 
       $saveDao->save();
+    }
+    return TRUE;
+  }
+
+  /**
+   * Add ON DELETE options for constraint if not present
+   * CRM-13088 && CRM-12156
+   *
+   * @return bool TRUE for success
+   */
+  function task_4_3_x_checkConstraints(CRM_Queue_TaskContext $ctx) {
+    $config = CRM_Core_Config::singleton();
+    $dbname  = DB::parseDSN($config->dsn);
+    $constraintArray = array(
+      "'FK_civicrm_financial_account_contact_id'",
+      "'FK_civicrm_financial_item_contact_id'",
+      "'FK_civicrm_contribution_recur_financial_type_id'",
+      "'FK_civicrm_line_item_financial_type_id'",
+      "'FK_civicrm_product_financial_type_id'",
+      "'FK_civicrm_premiums_product_financial_type_id'",
+      "'FK_civicrm_price_field_value_financial_type_id'",
+      "'FK_civicrm_contribution_product_financial_type_id'",
+      "'FK_civicrm_price_set_financial_type_id'",
+      "'FK_civicrm_grant_financial_type_id'",
+    );
+
+    $sql = "SELECT DELETE_RULE, TABLE_NAME, CONSTRAINT_NAME 
+FROM information_schema.REFERENTIAL_CONSTRAINTS
+WHERE CONSTRAINT_NAME IN (" . implode(',', $constraintArray) . ")
+AND CONSTRAINT_SCHEMA = %1";
+    $params = array(1 => array($dbname['database'], 'String'));
+    $onDelete = CRM_Core_DAO::executeQuery($sql, $params, TRUE, FALSE);
+    while ($onDelete->fetch()) {
+      if (($onDelete->TABLE_NAME != 'civicrm_financial_item' && $onDelete->DELETE_RULE != 'SET NULL') || 
+        ($onDelete->TABLE_NAME == 'civicrm_financial_item' && $onDelete->DELETE_RULE != 'CASCADE')) {
+        $tableName = 'civicrm_financial_type';
+        $onDeleteOption = ' SET NULL ';
+        $columnName = 'financial_type_id';
+        if (preg_match('/contact_id/', $onDelete->CONSTRAINT_NAME)) {
+          $tableName = 'civicrm_contact';
+          $columnName = 'contact_id';
+          if ($onDelete->TABLE_NAME == 'civicrm_financial_item') {
+            $onDeleteOption = 'CASCADE';
+          }
+        }
+      }
+      else {
+        continue;
+      }
+      $query = "ALTER TABLE {$onDelete->TABLE_NAME}
+        DROP FOREIGN KEY {$onDelete->CONSTRAINT_NAME},
+        DROP INDEX {$onDelete->CONSTRAINT_NAME};";
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+      $query = " ALTER TABLE  {$onDelete->TABLE_NAME}
+        ADD CONSTRAINT  {$onDelete->CONSTRAINT_NAME} FOREIGN KEY (`" . $columnName . "`) REFERENCES {$tableName} (`id`) ON DELETE {$onDeleteOption};
+        ";
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
     }
     return TRUE;
   }
