@@ -36,26 +36,18 @@
   Note: This file is used by CivHR
 *}
 
-{if !$onlyScript}
-  <a class="css_right {$snippet.css_class}" href="#" title="{ts}View Revisions{/ts}">View Revisions</a>
-{/if}
+<a class="css_right {$snippet.css_class}" href="#" title="{ts}View Revisions{/ts}">View Revisions</a>
 
 {literal}
 <script type="text/javascript">
 (function($, CRM) {
-  {/literal}{if $onajax}{literal}
-    $(document).ajaxSuccess(function() {
-  {/literal}{/if}{literal}
-      if ($(".{/literal}{$snippet.css_class}{literal}").length) {
-         $(".{/literal}{$snippet.css_class}{literal}").crmRevisionLink({
-           contactId: {/literal}{$snippet.contact_id}{literal},
-           tableName: "{/literal}{$snippet.table_name}{literal}",
-           reportId: {/literal}{$snippet.instance_id}{literal}
-         });
-      }
-  {/literal}{if $onajax}{literal}
+  if ($(".{/literal}{$snippet.css_class}{literal}").length) {
+    $(".{/literal}{$snippet.css_class}{literal}").crmRevisionLink({
+      contactId: {/literal}{$snippet.contact_id}{literal},
+      tableName: "{/literal}{$snippet.table_name}{literal}",
+      reportId: {/literal}{$snippet.instance_id}{literal}
     });
-  {/literal}{/if}{literal}
+  }
 })(cj, CRM);
 </script>
 {/literal}
