@@ -685,7 +685,7 @@
                 relatable = ts(' One contact is ');
               }
 
-              var others = relatable + ts('currently eligible to inherit this relationship');
+              var others = relatable + ts('currently eligible to inherit this relationship.');
               cj('#max_related').siblings('.description').append(others);
             }
           });
