@@ -107,7 +107,6 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   function testParticipantCountWithPriceset() {
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -121,14 +120,16 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     // create price fields
     $fields = array(
-      'Full Conference' => array('type' => 'Text',
+      'Full Conference' => array(
+        'type' => 'Text',
         'amount' => '525.00',
         'count' => '2',
       ),
       'Meal Choice' => array(
         'type' => 'Select',
         'options' => array(
-          1 => array('label' => 'Chicken',
+          1 => array(
+            'label' => 'Chicken',
             'amount' => '525.00',
             'count' => '2',
           ),
@@ -142,7 +143,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
       'Pre-conference Meetup?' => array(
         'type' => 'Radio',
         'options' => array(
-          1 => array('label' => 'Yes',
+          1 => array(
+            'label' => 'Yes',
             'amount' => '50.00',
             'count' => '2',
           ),
@@ -155,7 +157,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
       'Evening Sessions' => array(
         'type' => 'CheckBox',
         'options' => array(
-          1 => array('label' => 'First Five',
+          1 => array(
+            'label' => 'First Five',
             'amount' => '100.00',
             'count' => '5',
           ),
@@ -169,7 +172,6 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     );
 
     foreach ($fields as $label => $field) {
-
       $this->type('label', $label);
       $this->select('html_type', "value={$field['type']}");
 
@@ -346,7 +348,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Fee_upload-bottom');
     $this->click('CIVICRM_QFID_1_is_monetary');
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='" . $params['payment_processor'] . "']");
-    $this->select('financial_type_id','Event Fee');
+    $this->select('financial_type_id', 'Event Fee');
     if (array_key_exists('price_set', $params)) {
       $this->select('price_set_id', 'label=' . $params['price_set']);
     }
@@ -389,8 +391,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
-  function _testRegisterWithBillingInfo($participant = array(
-    )) {
+  function _testRegisterWithBillingInfo($participant = array()) {
     $this->waitForElementPresent("credit_card_type");
     $this->select('credit_card_type', 'value=Visa');
     $this->type('credit_card_number', '4111111111111111');
