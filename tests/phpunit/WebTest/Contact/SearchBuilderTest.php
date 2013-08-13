@@ -479,9 +479,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Builder_refresh');
     $this->waitForText('search-status', "1 Contact");
 
-    $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
-    $this->waitForElementPresent("xpath=//span[@id='crm_search_value_1_1']/select");
-    $this->select("xpath=//span[@id='crm_search_value_1_1']/select", "label=Grace");
+    $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, '=', array('Grace'));
     $this->clickLink('_qf_Builder_refresh');
     $this->waitForText('search-status', "1 Contact");
 
