@@ -99,6 +99,18 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     $form->add('select', 'preferred_mail_format', ts('Email Format'), CRM_Core_SelectValues::pmf());
     $form->add('checkbox', 'is_opt_out', ts('NO BULK EMAILS (User Opt Out)'));
 
+    $communicationStyleOptions = array();
+    $communicationStyle = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id', array('localize' => TRUE));
+    foreach ($communicationStyle as $key => $var) {
+      $communicationStyleOptions[$key] = $form->createElement('radio', NULL,
+        ts('Communication Style'), $var, $key,
+        array('id' => "civicrm_communication_style_{$var}_{$key}")
+      );
+    }
+    if (!empty($communicationStyleOptions)) {
+      $form->addGroup($communicationStyleOptions, 'communication_style_id', ts('Communication Style'));
+    }
+
     //check contact type and build filter clause accordingly for greeting types, CRM-4575
     $greetings = self::getGreetingFields($form->_contactType);
 
@@ -169,6 +181,10 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     if (empty($defaults['preferred_language'])) {
       $config = CRM_Core_Config::singleton();
       $defaults['preferred_language'] = $config->lcMessages;
+    }
+
+    if (empty($defaults['communication_style_id'])) {
+      $defaults['communication_style_id'] = array_pop(CRM_Core_OptionGroup::values('communication_style', TRUE, NULL, NULL, 'AND is_default = 1'));
     }
 
     //set default from greeting types CRM-4575, CRM-9739

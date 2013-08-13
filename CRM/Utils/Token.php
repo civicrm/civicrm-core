@@ -1496,6 +1496,7 @@ class CRM_Utils_Token {
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
       'gender' => 'gender_id',
+      'communication_style' => 'communication_style_id',
     );
   }
 

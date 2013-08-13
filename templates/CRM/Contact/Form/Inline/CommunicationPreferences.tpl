@@ -72,6 +72,17 @@
       </div>
       {/if}
 
+      {if !empty($form.communication_style_id)}
+      <div class="crm-summary-row">
+        <div class="crm-label">
+          {$form.communication_style_id.label} {help id="id-communication_style" file="CRM/Contact/Form/Contact.hlp"}
+        </div>
+        <div class="crm-content">
+          {$form.communication_style_id.html}
+        </div>
+      </div>
+      {/if}
+
       {if !empty($form.email_greeting_id)}
       <div class="crm-summary-row">
         <div class="crm-label">{$form.email_greeting_id.label}</div>

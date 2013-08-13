@@ -799,7 +799,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           elseif ($field == 'pledge_next_pay_amount') {
             $row[$field] = $dao->pledge_next_pay_amount + $dao->pledge_outstanding_amount;
           }
-          elseif (in_array(substr($field, 0, -3), array('gender', 'prefix', 'suffix'))) {
+          elseif (in_array(substr($field, 0, -3), array('gender', 'prefix', 'suffix', 'communication_style'))) {
             $row[$field] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $field, $dao->$field);
           }
           elseif (is_array($value) && $field == 'location') {
@@ -971,6 +971,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                 case 'gender':
                 case 'preferred_communication_method':
                 case 'preferred_mail_format':
+                case 'communication_style':
                   $row[$field] = $i18n->crm_translate($fieldValue);
                   break;
 

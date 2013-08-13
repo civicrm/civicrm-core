@@ -391,6 +391,22 @@
       <add>4.5</add>
   </field>
   <field>
+      <name>communication_style_id</name>
+      <title>Communication Style</title>
+      <type>int unsigned</type>
+      <pseudoconstant>
+        <optionGroupName>communication_style</optionGroupName>
+      </pseudoconstant>
+      <export>true</export>
+      <comment>Communication style (e.g. formal vs. familiar) to use with this contact. FK to communication styles in civicrm_option_value.</comment>
+      <add>4.4</add>
+  </field>
+  <index>
+      <name>index_communication_style_id</name>
+      <fieldName>communication_style_id</fieldName>
+      <add>4.4</add>
+  </index>
+  <field>
        <name>greeting_type</name>
        <type>varchar</type>
        <length>128</length>

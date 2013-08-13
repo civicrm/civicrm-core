@@ -1272,6 +1272,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $names['gender'] = array('newName' => 'gender_id', 'groupName' => 'gender');
     $names['individual_prefix'] = array('newName' => 'prefix_id', 'groupName' => 'individual_prefix');
     $names['individual_suffix'] = array('newName' => 'suffix_id', 'groupName' => 'individual_suffix');
+    $names['communication_style'] = array('newName' => 'communication_style_id', 'groupName' => 'communication_style');
     $names['addressee'] = array('newName' => 'addressee_id', 'groupName' => 'addressee');
     $names['email_greeting'] = array('newName' => 'email_greeting_id', 'groupName' => 'email_greeting');
     $names['postal_greeting'] = array('newName' => 'postal_greeting_id', 'groupName' => 'postal_greeting');

@@ -149,6 +149,7 @@ class CRM_Utils_Address {
         'contact.organization_name' => CRM_Utils_Array::value('display_name', $fields),
         'contact.legal_name' => CRM_Utils_Array::value('legal_name', $fields),
         'contact.preferred_communication_method' => CRM_Utils_Array::value('preferred_communication_method', $fields),
+        'contact.communication_style' => CRM_Utils_Array::value('communication_style', $fields),
         'contact.addressee' => CRM_Utils_Array::value('addressee_display', $fields),
         'contact.email_greeting' => CRM_Utils_Array::value('email_greeting_display', $fields),
         'contact.postal_greeting' => CRM_Utils_Array::value('postal_greeting_display', $fields),

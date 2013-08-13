@@ -120,6 +120,7 @@ class CRM_Utils_Migrate_ExportJSON {
       'status_id' => 'activity_status_id',
       'priority_id' => 'activity_priority_id',
       'medium_id' => 'encounter_medium',
+      'communication_style_id' => 'communication_style',
       'email_greeting' => 'email_greeting',
       'postal_greeting' => 'postal_greeting',
       'addressee_id' => 'addressee',
