@@ -1180,7 +1180,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $subject = "'" . $params['subject'] . "'";
     }
 
-    CRM_Core_Session::setStatus(ts('Activity %1 has been saved. %2. %3',
+    CRM_Core_Session::setStatus(ts('Activity %1 has been saved. %2 %3',
       array(
         1 => $subject,
         2 => $followupStatus,
