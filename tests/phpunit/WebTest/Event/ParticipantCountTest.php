@@ -32,7 +32,6 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   function testParticipantCountWithFeelevel() {
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -69,6 +68,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click("xpath=//input[@class='form-radio']");
 
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jones'. substr(sha1(rand()), 0, 5));
     $this->type('email-Primary', $email);
 
     // fill billing details and register
@@ -84,6 +85,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     $this->click("xpath=//input[@class='form-radio']");
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jones'. substr(sha1(rand()), 0, 5));
     $this->type('email-Primary', $email);
 
     // fill billing details and register
@@ -217,13 +220,15 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@class='form-text four required']", '1');
 
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
-    $this->type('email-Primary', $email);
-
     $participants[1] = array(
       'email' => $email,
       'first_name' => 'Jane_' . substr(sha1(rand()), 0, 5),
       'last_name' => 'San_' . substr(sha1(rand()), 0, 5),
     );
+
+    $this->type('first_name', $participants[1]['first_name']);
+    $this->type('last_name', $participants[1]['last_name']);
+    $this->type('email-Primary', $email);
 
     // fill billing related info and register
     $this->_testRegisterWithBillingInfo($participants[1]);
@@ -249,13 +254,16 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     $this->type("xpath=//input[@class='form-text four required']", '2');
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
-    $this->type('email-Primary', $email);
 
     $participants[2] = array(
       'email' => $email,
       'first_name' => 'Jane_' . substr(sha1(rand()), 0, 5),
       'last_name' => 'San_' . substr(sha1(rand()), 0, 5),
     );
+
+    $this->type('first_name', $participants[2]['first_name']);
+    $this->type('last_name', $participants[2]['last_name']);
+    $this->type('email-Primary', $email);
 
     // fill billing related info and register
     $this->_testRegisterWithBillingInfo($participants[2]);
