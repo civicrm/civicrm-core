@@ -564,7 +564,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   function getUFLocale() {
     if (defined('_JEXEC')) {
       $conf = JFactory::getConfig();
-      $locale = $conf->getValue('config.language');
+      $locale = $conf->get('language');
       return str_replace('-', '_', $locale);
     }
     return NULL;
