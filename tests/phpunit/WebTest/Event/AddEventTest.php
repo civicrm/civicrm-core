@@ -66,12 +66,12 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $numberRegistrations = 3;
     $anonymous = TRUE;
     $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous);
-    
+
     // Now test making a copy of the event
     $this->webtestLogin();
     $this->openCiviPage("event/manage", "reset=1&action=copy&id=$eventId");
-    $copyEventId = $this->_testVerifyEventInfo('Copy of ' . $eventTitle, $eventInfoStrings);
-    $registerUrl = $this->_testVerifyRegisterPage($registerStrings);    
+    $this->_testVerifyEventInfo('Copy of ' . $eventTitle, $eventInfoStrings);
+    $this->_testVerifyRegisterPage($registerStrings);
   }
 
   function testAddPaidEventDiscount() {
@@ -292,7 +292,6 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   }
 
   function testUnpaidPaid() {
-
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -447,8 +446,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $this->webtestFillDate("discount_end_date_1", "-2 week");
       $this->clickLink("_qf_Fee_submit", "discounted_value_1_1");
 
-      $this->type("discounted_value_1_1","225.00");
-      $this->type("discounted_value_2_1","300.00");
+      $this->type("discounted_value_1_1", "225.00");
+      $this->type("discounted_value_2_1", "300.00");
 
       if ($double) {
         $discount2 = "Early-bird" . substr(sha1(rand()), 0, 7);
@@ -459,9 +458,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
         $this->webtestFillDate("discount_start_date_2", "-1 week");
         $this->webtestFillDate("discount_end_date_2", "+1 week");
         $this->clickLink("_qf_Fee_submit", "discounted_value_2_1");
-        $this->type("discounted_value_1_2","225.00");
-        $this->type("discounted_value_2_2","300.00");
-    }
+        $this->type("discounted_value_1_2", "225.00");
+        $this->type("discounted_value_2_2", "300.00");
+      }
       $this->click("xpath=//fieldset[@id='discount']/fieldset/table/tbody/tr[2]/td[3]/input");
     }
     $this->click("_qf_Fee_upload-bottom");
@@ -544,8 +543,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", $email);
     if (!$isPayLater) {
       if ($paymentProcessor) {
-       $paymentProcessorEle = $this->getAttribute("xpath=//form[@id='Register']//label[contains(text(), '{$paymentProcessor}')]/@for");
-       $this->check($paymentProcessorEle);
+        $paymentProcessorEle = $this->getAttribute("xpath=//form[@id='Register']//label[contains(text(), '{$paymentProcessor}')]/@for");
+        $this->check($paymentProcessorEle);
       }
       $this->select("credit_card_type", "value=Visa");
       $this->type("credit_card_number", "4111111111111111");
@@ -578,15 +577,15 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
-    $confirmStrings = array("Event Fee(s)");    
-    if (!$isPayLater) { 
-      $confirmStrings += array("Billing Name and Address", "Credit Card Information");   
+    $confirmStrings = array("Event Fee(s)");
+    if (!$isPayLater) {
+      $confirmStrings += array("Billing Name and Address", "Credit Card Information");
     }
     $this->assertStringsPresent($confirmStrings);
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $thankStrings = array("Thank You for Registering", "Event Total"); 
-    if (!$isPayLater) { 
+    $thankStrings = array("Thank You for Registering", "Event Total");
+    if (!$isPayLater) {
       $thankStrings = array("Transaction Date");
     }
     else {
@@ -718,12 +717,13 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->click('_qf_Participant_upload-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->verifyFinancialRecords($contributionID);
-    
+
     // add participant and 3 additional participant and change status of participant from edit contribution
     $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous, TRUE);
-    $this->webtestLogin(); 
+    $this->webtestLogin();
 
-    $this->openCiviPage("event/search?reset=1", "reset=1"); $this->type('event_name', $eventTitle);
+    $this->openCiviPage("event/search?reset=1", "reset=1");
+    $this->type('event_name', $eventTitle);
     $this->click("event_name");
     $this->waitForElementPresent("css=div.ac_results-inner li");
     $this->click("css=div.ac_results-inner li");
@@ -752,7 +752,7 @@ WHERE c1.entity_table  = 'civicrm_contribution' AND c1.entity_id = %1 AND cfi.st
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $dao->fetch();
     $this->assertEquals('2', $dao->civicrm_contribution, 'civicrm_financial_trxn count does not match');
-    $this->assertEquals('8',$dao->civicrm_financial_item, 'civicrm_financial_item count does not match');
+    $this->assertEquals('8', $dao->civicrm_financial_item, 'civicrm_financial_item count does not match');
     $query = "SELECT COUNT(cft.id) civicrm_financial_trxn FROM civicrm_entity_financial_trxn ceft 
 INNER JOIN civicrm_financial_trxn cft ON ceft.financial_trxn_id = cft.id 
 WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
