@@ -2522,7 +2522,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    *  Although this function is super-short it is useful to keep separate so it can be over-ridden by report classes.
    */
   function compileContent(){
-    $templateFile = $this->getTemplateFileName();
+    $templateFile = $this->getHookedTemplateFileName();
     return $this->_formValues['report_header'] . CRM_Core_Form::$_template->fetch($templateFile) . $this->_formValues['report_footer'];
   }
 
