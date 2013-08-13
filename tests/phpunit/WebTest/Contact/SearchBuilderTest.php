@@ -196,14 +196,13 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
     $firstName8 = "abcc" . substr(sha1(rand()), 0, 7);
     $this->_createContact('Individual', $firstName8, "$firstName8@advsearch.co.in", NULL);
-    $this->_searchBuilder('Note(s): Body and Subject', "this is subject by $firstName8", $firstName8, 'LIKE');
     $this->_searchBuilder('Note(s): Body and Subject', "this is notes by $firstName8", $firstName8, 'LIKE');
     $this->_searchBuilder('Note(s): Subject only', "this is subject by $firstName8", $firstName8, 'LIKE');
     $this->_searchBuilder('Note(s): Body only', "this is notes by $firstName8", $firstName8, 'LIKE');
     $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_body', 'notes');
     $this->_advancedSearch("this is subject by $firstName8", $firstName8, NULL, NULL, 'note_subject', 'notes');
     $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
-    $this->_advancedSearch("this is subject by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
+    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
   }
 
   function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
