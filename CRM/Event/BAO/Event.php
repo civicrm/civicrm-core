@@ -791,7 +791,7 @@ WHERE civicrm_event.is_active = 1
     );
     if ($enable_cart) {}
     while ($dao->fetch()) {
-      if (in_array($dao->event_id, $permissions)) {
+      if (!empty($permissions) && in_array($dao->event_id, $permissions)) {
         $info = array();
         $info['uid'] = "CiviCRM_EventID_{$dao->event_id}_" . md5($config->userFrameworkBaseURL) . $url;
 
