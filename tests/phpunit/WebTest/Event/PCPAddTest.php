@@ -251,6 +251,8 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $registerUrl = "civicrm/event/register?id={$pageId}&reset=1";
     $this->open($this->sboxPath . $registerUrl);
 
+    $this->type("first_name", "{$firstNameParticipants}");
+    $this->type("last_name", "{$lastNameParticipants}");
     $this->select("additional_participants", "value=" . $numberRegistrations);
     $this->type("email-Primary", $emailParticipants);
     $this->select("credit_card_type", "value=Visa");
