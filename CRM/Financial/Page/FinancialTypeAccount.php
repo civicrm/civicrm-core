@@ -51,7 +51,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * @var array
    * @static
    */
-  static $_aid = null;
+  protected $_aid = null;
 
   /**
    * Get BAO Name
