@@ -284,6 +284,9 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@class='form-text four required']", "1");
     $this->click("xpath=//input[@class='form-radio']");
     $this->click("xpath=//input[@class='form-checkbox']");
+    $this->type("first_name", "Jane");
+    $lastName = "Smith" . substr(sha1(rand()), 0, 7);
+    $this->type("last_name", $lastName);
     $this->type('email-Primary', $email);
 
     $this->waitForElementPresent('credit_card_type');
@@ -293,7 +296,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('credit_card_exp_date[M]', 'value=1');
     $this->select('credit_card_exp_date[Y]', 'value=2020');
     $this->type('billing_first_name', 'Jane');
-    $this->type('billing_last_name', 'San');
+    $this->type('billing_last_name', $lastName);
     $this->type('billing_street_address-5', '15 Main St.');
     $this->type(' billing_city-5', 'San Jose');
     $this->select('billing_country_id-5', 'value=1228');
@@ -704,7 +707,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //assert the message
-    $this->waitForText('price_set_used_by', "it is currently in use by one or more active events or contribution pages or contributions or event templates. If you no longer want to use this price set, click the event template title below, and modify the fees for that event.");
+    $this->waitForText('price_set_used_by',
+      "it is currently in use by one or more active events or contribution pages or contributions or event templates.");
     
     //check the delete for priceset
     $this->openCiviPage("admin/price", "reset=1");
@@ -716,14 +720,13 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //assert the message
-    $this->waitForText('price_set_used_by', "it is currently in use by one or more active events or contribution pages or contributions or event templates. If you no longer want to use this price set, click the event template title below, and modify the fees for that event. ");
+    $this->waitForText('price_set_used_by',
+      "it is currently in use by one or more active events or contribution pages or contributions or event templates.");
   }
  
   function _checkLineItems($expectedLineItems) {
     foreach ($expectedLineItems as $lineKey => $lineValue) {
-
       foreach ($lineValue as $key => $value) {
-
         $this->verifyText("xpath=//table/tbody/tr/td[text()='Event Fees']/following-sibling::td/table/tbody/tr[$lineKey]/td[$key]", preg_quote($value));
       }
     }
