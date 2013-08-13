@@ -322,7 +322,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     }
 
     // also get the search tpl name
-    $this->assign('searchTPL', $formController->getTemplateFileName());
+    $this->assign('searchTPL', $formController->getHookedTemplateFileName());
 
     $this->assign('search', $this->_search);
 

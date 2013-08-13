@@ -371,7 +371,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     // invoke the pagRun hook, CRM-3906
     CRM_Utils_Hook::pageRun($this);
 
-    return trim($template->fetch($this->getTemplateFileName()));
+    return trim($template->fetch($this->getHookedTemplateFileName()));
   }
 
   function checkTemplateFileExists($suffix = '') {

@@ -138,7 +138,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       ) {
 
         $userDashboard = $component->getUserDashboardObject();
-        $dashboardElements[] = array('templatePath' => $userDashboard->getTemplateFileName(),
+        $dashboardElements[] = array('templatePath' => $userDashboard->getHookedTemplateFileName(),
           'sectionTitle' => $elem['title'],
           'weight' => $elem['weight'],
         );

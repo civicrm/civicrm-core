@@ -73,7 +73,7 @@ class CRM_Financial_BAO_ExportFormat {
       break;
 
       case 'iif':
-        $tplFile = $this->getTemplateFileName();
+        $tplFile = $this->getHookedTemplateFileName(();
         $out = self::getTemplate()->fetch($tplFile);
         $fileName = $this->putFile($out);
         self::createActivityExport($this->_batchIds, $fileName);
