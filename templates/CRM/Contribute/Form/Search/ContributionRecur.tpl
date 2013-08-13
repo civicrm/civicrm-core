@@ -24,13 +24,15 @@
  +--------------------------------------------------------------------+
 *}
 
-  <div class="crm-accordion-wrapper crm-contactDetails-accordion {if empty($contribution_recur_pane_open)}collapsed{/if}" id="{contribution_recur}" >
-    <div class="crm-accordion-header">
-        {ts}Recurring Contributions{/ts}
-    </div>
-    <div class="crm-accordion-body">
+<div class="crm-accordion-wrapper crm-contactDetails-accordion
+   {if empty($contribution_recur_pane_open)} collapsed{/if}" id="contribution_recur">
+  <div class="crm-accordion-header">
+    {ts}Recurring Contributions{/ts}
+  </div>
+  <div class="crm-accordion-body">
     <table class="form-layout-compressed">
-      <tr><td>{ts}Start Date{/ts}</td>
+      <tr>
+        <td>{ts}Start Date{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_start_date" from='_low' to='_high'}
         </td>
@@ -65,8 +67,9 @@
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_cancel_date" from='_low' to='_high'}
         </td>
       </tr>
-     </table>
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+    </table>
+  </div>
+  <!-- /.crm-accordion-body -->
+</div><!-- /.crm-accordion-wrapper -->
 
 

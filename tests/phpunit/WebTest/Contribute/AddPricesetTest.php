@@ -57,7 +57,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'Pre-conference Meetup?' => 'Radio',
       'Evening Sessions' => 'CheckBox',
     );
-    $this->_testAddPriceFields( $fields, $validateStrings, $financialType );
+    $this->_testAddPriceFields($fields, $validateStrings, $financialType);
     // var_dump($validateStrings);
 
     // load the Price Set Preview and check for expected values
@@ -94,68 +94,71 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       $this->select('html_type', "value={$type}");
 
       switch ($type) {
-      case 'Text':
-        $validateStrings[] = '525.00';
-        $this->type('price', '525.00');
-        if ($dateSpecificFields == TRUE) {
-          $this->webtestFillDateTime('active_on', '+1 week');
-        }
-        else {
+        case 'Text':
+          $validateStrings[] = '525.00';
+          $this->type('price', '525.00');
+          if ($dateSpecificFields == TRUE) {
+            $this->webtestFillDateTime('active_on', '+1 week');
+          }
+          else {
+            $this->check('is_required');
+          }
+          break;
+
+        case 'Select':
+          $options = array(
+            1 => array(
+              'label' => 'Chicken',
+              'amount' => '30.00',
+            ),
+            2 => array(
+              'label' => 'Vegetarian',
+              'amount' => '25.00',
+            ),
+          );
+          $this->addMultipleChoiceOptions($options, $validateStrings);
+          if ($dateSpecificFields == TRUE) {
+            $this->webtestFillDateTime('expire_on', '-1 week');
+          }
+          break;
+
+        case 'Radio':
+          $options = array(
+            1 => array(
+              'label' => 'Yes',
+              'amount' => '50.00',
+            ),
+            2 => array(
+              'label' => 'No',
+              'amount' => '0',
+            ),
+          );
+          $this->addMultipleChoiceOptions($options, $validateStrings);
           $this->check('is_required');
-        }
-        break;
+          if ($dateSpecificFields == TRUE) {
+            $this->webtestFillDateTime('active_on', '-1 week');
+          }
+          break;
 
-      case 'Select':
-        $options = array(
-          1 => array('label' => 'Chicken',
-            'amount' => '30.00',
-          ),
-          2 => array(
-            'label' => 'Vegetarian',
-            'amount' => '25.00',
-          ),
-        );
-        $this->addMultipleChoiceOptions($options, $validateStrings);
-        if ($dateSpecificFields == TRUE) {
-          $this->webtestFillDateTime('expire_on', '-1 week');
-        }
-        break;
+        case 'CheckBox':
+          $options = array(
+            1 => array(
+              'label' => 'First Night',
+              'amount' => '15.00',
+            ),
+            2 => array(
+              'label' => 'Second Night',
+              'amount' => '15.00',
+            ),
+          );
+          $this->addMultipleChoiceOptions($options, $validateStrings);
+          if ($dateSpecificFields == TRUE) {
+            $this->webtestFillDateTime('expire_on', '+1 week');
+          }
+          break;
 
-      case 'Radio':
-        $options = array(
-          1 => array('label' => 'Yes',
-            'amount' => '50.00',
-          ),
-          2 => array(
-            'label' => 'No',
-            'amount' => '0',
-          ),
-        );
-        $this->addMultipleChoiceOptions($options, $validateStrings);
-        $this->check('is_required');
-        if ($dateSpecificFields == TRUE) {
-          $this->webtestFillDateTime('active_on', '-1 week');
-        }
-        break;
-
-      case 'CheckBox':
-        $options = array(
-          1 => array('label' => 'First Night',
-            'amount' => '15.00',
-          ),
-          2 => array(
-            'label' => 'Second Night',
-            'amount' => '15.00',
-          ),
-        );
-        $this->addMultipleChoiceOptions($options, $validateStrings);
-        if ($dateSpecificFields == TRUE) {
-          $this->webtestFillDateTime('expire_on', '+1 week');
-        }
-        break;
-
-      default:
-        break;
+        default:
+          break;
       }
       $this->select('financial_type_id', "label={$financialType}");
       $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
@@ -164,7 +167,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
   function _testAddFinancialType() {
     //Add new Financial Type
-    $financialType['name'] = 'FinancialType '.substr(sha1(rand()), 0, 4);
+    $financialType['name'] = 'FinancialType ' . substr(sha1(rand()), 0, 4);
     $financialType['is_deductible'] = TRUE;
     $financialType['is_reserved'] = FALSE;
     $this->addeditFinancialType($financialType);
@@ -410,7 +413,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     //add financial type of account type expense
-    $financialType= $this->_testAddFinancialType();
+    $financialType = $this->_testAddFinancialType();
 
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
     $usedFor = 'Contribution';
@@ -526,8 +529,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     //create a contact and return the contact id
-    $firstNameSoft = "John_".substr(sha1(rand()), 0, 5);
-    $lastNameSoft = "Doe_".substr(sha1(rand()), 0, 5);
+    $firstNameSoft = "John_" . substr(sha1(rand()), 0, 5);
+    $lastNameSoft = "Doe_" . substr(sha1(rand()), 0, 5);
     $this->webtestAddContact($firstNameSoft, $lastNameSoft);
     $url = $this->parseURL();
     $cid = $url['queryString']['cid'];
@@ -609,7 +612,6 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'Paid By' => 'Check',
       'Check Number' => '1041',
       'Contribution Status' => 'Completed',
-      'Soft Credit To' => "$firstNameSoft $lastNameSoft",
     );
     $this->webtestVerifyTabularData($expected);
 
@@ -625,6 +627,16 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       );
     }
 
+    // verify if soft credit was created successfully
+    $softCreditValues = array(
+      'Soft Credit To' => "{$firstNameSoft} {$lastNameSoft}",
+      'Amount' => '65.00',
+    );
+
+    foreach ($softCreditValues as $value) {
+      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+    }
+
     // Check for Soft contact created
     $this->click("css=input#sort_name_navigation");
     $this->type("css=input#sort_name_navigation", "$lastNameSoft, $firstNameSoft");
@@ -635,7 +647,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     // visit contact summary page
     $this->click("css=div.ac_results-inner li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click( 'css=li#tab_contribute a' );
+    $this->click('css=li#tab_contribute a');
     $this->waitForElementPresent('link=Record Contribution (Check, Cash, EFT ...)');
 
     $id = explode('id=', $this->getAttribute("xpath=id('rowid')/td[7]/a[text()='View']@href"));
@@ -645,13 +657,14 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     $this->webtestVerifyTabularData($expected);
 
-    $params = array('contribution_id' => $id,
+    $params = array(
+      'contribution_id' => $id,
       'version' => 3,
     );
 
     // Retrieve contribution from the DB via api and verify DB values against view contribution page
     require_once 'api/api.php';
-    $fields = $this->webtest_civicrm_api('contribution','get',$params );
+    $fields = $this->webtest_civicrm_api('contribution', 'get', $params);
 
     $params['id'] = $params['contact_id'] = $fields['values'][$fields['id']]['soft_credit_to'];
     $softCreditContact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, TRUE);
@@ -664,9 +677,19 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'Contribution Status' => $fields['values'][$fields['id']]['contribution_status'],
       'Paid By' => $fields['values'][$fields['id']]['contribution_payment_instrument'],
       'Check Number' => $fields['values'][$fields['id']]['contribution_check_number'],
-      'Soft Credit To' => $softCreditContact->display_name,
     );
+
     $this->webtestVerifyTabularData($expected);
+
+    // verify if soft credit
+    $softCreditValues = array(
+      'Soft Credit To' => $softCreditContact->display_name,
+      'Amount' => '65.00',
+    );
+
+    foreach ($softCreditValues as $value) {
+      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+    }
   }
 }
 
