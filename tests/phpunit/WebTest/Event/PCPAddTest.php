@@ -353,6 +353,13 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $lastNameDonar = 'Roger' . substr(sha1(rand()), 0, 7);
     $middleNameDonar = 'Nicholas' . substr(sha1(rand()), 0, 7);
 
+    if ($this->isElementPresent("first_name")) {
+      $this->type('first_name', $firstNameDonar);
+    }
+
+    if ($this->isElementPresent("last_name")) {
+      $this->type('last_name', $lastNameDonar);
+    }
     $this->type("{$emailElement}", $firstNameDonar . "@example.com");
     $this->webtestAddCreditCardDetails();
     $this->webtestAddBillingDetails($firstNameDonar, $middleNameDonar, $lastNameDonar);
@@ -445,9 +452,10 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
         'From' => "{$firstNameDonar} {$lastNameDonar}",
         'Total Amount' => $amount,
         'Contribution Status' => 'Completed',
-        'Soft Credit To' => "{$firstNameCreator} {$lastNameCreator}",
       )
     );
+    $softCreditor = "{$firstNameCreator} {$lastNameCreator}";
+    $this->verifyText("xpath=//table[@class='crm-info-panel crm-soft-credit-listing']/tbody/tr/td[1]", preg_quote($softCreditor), 'In line ' . __LINE__);
   }
 
   function _testSearchTest($firstName, $lastName, $pcpCreatorFirstName, $pcpCreatorLastName, $amount) {
@@ -477,9 +485,10 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
         'From' => "{$firstName} {$lastName}",
         'Net Amount' => $amount,
         'Contribution Status' => 'Completed',
-        'Soft Credit To' => "{$pcpCreatorFirstName} {$pcpCreatorLastName}",
       )
     );
+    $softCreditor = "{$pcpCreatorFirstName} {$pcpCreatorLastName}";
+    $this->verifyText("xpath=//table[@class='crm-info-panel crm-soft-credit-listing']/tbody/tr/td[1]", preg_quote($softCreditor), 'In line ' . __LINE__);
   }
 }
 
