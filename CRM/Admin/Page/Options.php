@@ -116,6 +116,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
         array(
           'from_email_address', 'email_greeting',
           'postal_greeting', 'addressee',
+          'communication_style',
           'case_status', 'encounter_medium',
           'case_type',
         )
