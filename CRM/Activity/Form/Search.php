@@ -343,7 +343,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
     if ($buttonName == $this->_actionButtonName || $buttonName == $this->_printButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
       // hack, make sure we reset the task values
-      $stateMachine = &$this->controller->getStateMachine();
+      $stateMachine = $this->controller->getStateMachine();
       $formName = $stateMachine->getTaskFormName();
       $this->controller->resetPage($formName);
       return;
