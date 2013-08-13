@@ -295,7 +295,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     if ($ids) {
       $this->_contactID = $ids['0'];
     }
-    $contactID = &CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
     $this->set('contactID', $contactID);
 
     if (!empty($params['email'])) {

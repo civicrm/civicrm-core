@@ -1078,7 +1078,7 @@ WHERE  v.option_group_id = g.id
    * @return array $optionsCount, array of each option w/ count total.
    * @access public
    */
-  function getPriceSetOptionCount(&$form) {
+  public static function getPriceSetOptionCount(&$form) {
     $params     = $form->get('params');
     $priceSet   = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
