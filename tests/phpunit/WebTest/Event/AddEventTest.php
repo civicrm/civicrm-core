@@ -416,7 +416,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     if ($payLater) {
       $this->check('is_pay_later');
-      $this->type('pay_later_receipt', 'testing later instructions');
+      $this->fillRichTextField('pay_later_receipt', 'testing later instructions');
     }
     else {
       $this->uncheck('is_pay_later');
@@ -538,6 +538,11 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->select("additional_participants", "value=" . $numberRegistrations);
 
+    $primaryParticipantInfo['first_name'] = "Jane";
+    $primaryParticipantInfo['last_name'] = "Smith" . substr(sha1(rand()), 0, 7);
+    $this->type("first_name", $primaryParticipantInfo['first_name']);
+    $this->type("last_name", $primaryParticipantInfo['last_name']);
+
     $email = $infoPassed ? $participantEmailInfo[0] : "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
     $primaryParticipantInfo['email'] = $email;
     $this->type("email-Primary", $email);
@@ -551,8 +556,6 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $this->type("cvv2", "000");
       $this->select("credit_card_exp_date[M]", "value=1");
       $this->select("credit_card_exp_date[Y]", "value=2020");
-      $primaryParticipantInfo['first_name'] = "Jane";
-      $primaryParticipantInfo['last_name'] = "Smith" . substr(sha1(rand()), 0, 7);
       $this->type("billing_first_name", $primaryParticipantInfo['first_name']);
       $this->type("billing_last_name", $primaryParticipantInfo['last_name']);
       $this->type("billing_street_address-5", "15 Main St.");
@@ -569,6 +572,10 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
         $this->waitForPageToLoad($this->getTimeoutMsec());
         // Look for Skip button
         $this->waitForElementPresent("_qf_Participant_{$i}_next_skip-Array");
+
+        $this->type("first_name", 'Jane Add');
+        $this->type("last_name", "Smith" . substr(sha1(rand()), 0, 7));
+
         $addtlEmail = $infoPassed ? $participantEmailInfo[$i] : "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
         $this->type("email-Primary", $addtlEmail);
         $this->click("_qf_Participant_{$i}_next");
