@@ -781,7 +781,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $status = implode(',', $status);
 
       if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
-        $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient);
+        $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
       }
       $from = "{$mapping->entity} e";
 
@@ -840,7 +840,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $rList = implode(',', $rList);
 
           switch ($recipientOptions[$actionSchedule->recipient]) {
-            case 'Participant Role':
+            case 'participant_role':
               $where[] = "e.role_id IN ({$rList})";
               break;
 
@@ -1153,7 +1153,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
         if (!CRM_Utils_Array::value($recipientType, $eventContacts)) {
           return $options;
         }
-        if ($eventContacts[$recipientType] == 'Participant Role') {
+        if ($eventContacts[$recipientType] == 'participant_role') {
           $options = CRM_Event_PseudoConstant::participantRole();
         }
         break;
