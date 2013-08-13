@@ -41,7 +41,7 @@ cj(function($) {
       email: "{ts escape='js'}Please enter a valid email address.{/ts}",
       url: "{ts escape='js'}Please enter a valid URL.{/ts}",
       date: "{ts escape='js'}Please enter a valid date.{/ts}",
-      dateISO: "{ts escape='js'}Please enter a valid date (ISO).{/ts}",
+      dateISO: "{ts escape='js'}Please enter a valid date (YYYY-MM-DD).{/ts}",
       number: "{ts escape='js'}Please enter a valid number.{/ts}",
       digits: "{ts escape='js'}Please enter only digits.{/ts}",
       creditcard: "{ts escape='js'}Please enter a valid credit card number.{/ts}",
@@ -70,6 +70,7 @@ cj(function($) {
 
   CRM.validate.params = CRM.validate.params || {};
   $.extend(CRM.validate.params, params);
+  $.extend($.validator.messages, CRM.validate.params.messages);
 
   {/literal}
   {if $form && $form.formName}
