@@ -538,14 +538,21 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->select("additional_participants", "value=" . $numberRegistrations);
 
-    $primaryParticipantInfo['first_name'] = "Jane";
-    $primaryParticipantInfo['last_name'] = "Smith" . substr(sha1(rand()), 0, 7);
+    if ($infoPassed) {
+      $primaryParticipantInfo['first_name'] = $participantEmailInfo[0]['first_name'];
+      $primaryParticipantInfo['last_name'] = $participantEmailInfo[0]['last_name'];
+      $primaryParticipantInfo['email'] = $participantEmailInfo[0]['email'];
+    }
+    else {
+      $primaryParticipantInfo['first_name'] = "Jane";
+      $primaryParticipantInfo['last_name'] = "Smith" . substr(sha1(rand()), 0, 7);
+      $primaryParticipantInfo['email'] = "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
+    }
+
     $this->type("first_name", $primaryParticipantInfo['first_name']);
     $this->type("last_name", $primaryParticipantInfo['last_name']);
+    $this->type("email-Primary", $primaryParticipantInfo['email']);
 
-    $email = $infoPassed ? $participantEmailInfo[0] : "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
-    $primaryParticipantInfo['email'] = $email;
-    $this->type("email-Primary", $email);
     if (!$isPayLater) {
       if ($paymentProcessor) {
         $paymentProcessorEle = $this->getAttribute("xpath=//form[@id='Register']//label[contains(text(), '{$paymentProcessor}')]/@for");
@@ -573,11 +580,17 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
         // Look for Skip button
         $this->waitForElementPresent("_qf_Participant_{$i}_next_skip-Array");
 
-        $this->type("first_name", 'Jane Add');
-        $this->type("last_name", "Smith" . substr(sha1(rand()), 0, 7));
+        if ($infoPassed) {
+          $this->type("first_name", $participantEmailInfo[$i]['first_name']);
+          $this->type("last_name", $participantEmailInfo[$i]['last_name']);
+          $this->type("email-Primary", $participantEmailInfo[$i]['email']);
+        }
+        else {
+          $this->type("first_name", "Jane Add $i");
+          $this->type("last_name", "Smith" . substr(sha1(rand()), 0, 7));
+          $this->type("email-Primary", "smith" . substr(sha1(rand()), 0, 7) . "@example.org");
+        }
 
-        $addtlEmail = $infoPassed ? $participantEmailInfo[$i] : "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
-        $this->type("email-Primary", $addtlEmail);
         $this->click("_qf_Participant_{$i}_next");
       }
     }
@@ -668,12 +681,26 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $anonymous = TRUE;
 
     // CRM-12615 add additional participants and check email, amount
-    $primaryParticipant = "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
-    $secParticipant = "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
-    $thirdParticipant = "smith" . substr(sha1(rand()), 0, 7) . "@example.org";
+    $primaryParticipant = array(
+      'email' => "smith" . substr(sha1(rand()), 0, 7) . "@example.org",
+      'first_name' => "Kate",
+      'last_name' => "Simth" . substr(sha1(rand()), 0, 7),
+    );
+    $secParticipant = array(
+      'email' => "smith" . substr(sha1(rand()), 0, 7) . "@example.org",
+      'first_name' => "Kate Add 1",
+      'last_name' => "Simth" . substr(sha1(rand()), 0, 7),
+    );
+    $thirdParticipant = array(
+      'email' => "smith" . substr(sha1(rand()), 0, 7) . "@example.org",
+      'first_name' => "Kate Add 2",
+      'last_name' => "Simth" . substr(sha1(rand()), 0, 7),
+    );
+
     $participantEmails = array($primaryParticipant, $secParticipant, $thirdParticipant);
     $addtlPart = array($secParticipant, $thirdParticipant);
-    $primaryParticipantInfo = $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
+    $primaryParticipantInfo =
+      $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
     $primaryDisplayName = "{$primaryParticipantInfo['first_name']} {$primaryParticipantInfo['last_name']}";
     $this->webtestLogin();
     $this->openCiviPage("event/search?reset=1", "reset=1");
@@ -682,18 +709,28 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=div.ac_results-inner li");
     $this->click("css=div.ac_results-inner li");
     $this->clickLink('_qf_Search_refresh');
-    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(), '{$secParticipant}')]/../../td[6]", preg_quote('225.00'));
-    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(), '{$thirdParticipant}')]/../../td[6]", preg_quote('225.00'));
+    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
+     '{$secParticipant['last_name']}, {$secParticipant['first_name']}')]/../../td[6]", preg_quote('225.00'));
+    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
+    '{$thirdParticipant['last_name']}, {$thirdParticipant['first_name']}')]/../../td[6]", preg_quote('225.00'));
 
     //CRM-12618 check edit screen of additional participant and ensuring record_contribution not present
     foreach ($addtlPart as $value) {
-      $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(), '{$value}')]/../../td[11]/span/a[2][contains(text(), 'Edit')]", '_qf_Participant_upload-bottom');
-      $this->assertTrue($this->isElementPresent("xpath=//tr[@class='crm-participant-form-block-registered-by']/td[2]/a[contains(text(), '$primaryDisplayName')]"), 'Registered By info is wrong on additional participant edit form');
+      $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
+       '{$value['last_name']}, {$value['first_name']}')]/../../td[11]/span/a[2][contains(text(), 'Edit')]",
+        '_qf_Participant_upload-bottom');
+      $this->assertTrue(
+        $this->isElementPresent("xpath=//tr[@class='crm-participant-form-block-registered-by']/td[2]/a[contains(text(),
+         '$primaryDisplayName')]"), 'Registered By info is wrong on additional participant edit form');
       $this->assertElementContainsText("xpath=//form[@id='Participant']/h3", 'Edit Event Registration');
-      $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[@class='crm-participant-form-block-displayName']/td[2][contains(text(), '{$value}')]"),
+      $this->assertTrue(
+        $this->isElementPresent(
+          "xpath=//table/tbody/tr[@class='crm-participant-form-block-displayName']/td[2][contains(text(),
+           '{$value['first_name']} {$value['last_name']}')]"),
         'Wrong Participant edit form'
       );
-      $this->assertFalse($this->isElementPresent('record_contribution'), 'Record Payment checkbox showed up wrongly for additional participant edit screen');
+      $this->assertFalse($this->isElementPresent('record_contribution'),
+        'Record Payment checkbox showed up wrongly for additional participant edit screen');
       $this->clickLink("_qf_Participant_cancel-top");
     }
 
