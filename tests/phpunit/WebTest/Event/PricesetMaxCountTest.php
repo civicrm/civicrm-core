@@ -46,7 +46,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // create price fields
     $fields = array(
-      'Full Conference' => array('type' => 'Text',
+      'Full Conference' => array(
+        'type' => 'Text',
         'amount' => '525.00',
         'max_count' => 2,
         'is_required' => TRUE,
@@ -55,7 +56,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Meal Choice' => array(
         'type' => 'Select',
         'options' => array(
-          1 => array('label' => 'Chicken',
+          1 => array(
+            'label' => 'Chicken',
             'amount' => '525.00',
             'max_count' => 1,
             'financial_type_id' => 1,
@@ -71,7 +73,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Pre-conference Meetup?' => array(
         'type' => 'Radio',
         'options' => array(
-          1 => array('label' => 'Yes',
+          1 => array(
+            'label' => 'Yes',
             'amount' => '50.00',
             'max_count' => 1,
             'financial_type_id' => 1,
@@ -87,7 +90,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Evening Sessions' => array(
         'type' => 'CheckBox',
         'options' => array(
-          1 => array('label' => 'First Five',
+          1 => array(
+            'label' => 'First Five',
             'amount' => '100.00',
             'max_count' => 2,
             'financial_type_id' => 1,
@@ -233,7 +237,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // create price fields
     $fields = array(
-      'Full Conference' => array('type' => 'Text',
+      'Full Conference' => array(
+        'type' => 'Text',
         'amount' => '525.00',
         'max_count' => 4,
         'count' => 2,
@@ -243,7 +248,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Meal Choice' => array(
         'type' => 'Select',
         'options' => array(
-          1 => array('label' => 'Chicken',
+          1 => array(
+            'label' => 'Chicken',
             'amount' => '525.00',
             'max_count' => 2,
             'count' => 2,
@@ -261,7 +267,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Pre-conference Meetup?' => array(
         'type' => 'Radio',
         'options' => array(
-          1 => array('label' => 'Yes',
+          1 => array(
+            'label' => 'Yes',
             'amount' => '50.00',
             'max_count' => 2,
             'count' => 1,
@@ -279,7 +286,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Evening Sessions' => array(
         'type' => 'CheckBox',
         'options' => array(
-          1 => array('label' => 'First Five',
+          1 => array(
+            'label' => 'First Five',
             'amount' => '100.00',
             'max_count' => 4,
             'count' => 2,
@@ -427,7 +435,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // create price fields
     $fields = array(
-      'Full Conference' => array('type' => 'Text',
+      'Full Conference' => array(
+        'type' => 'Text',
         'amount' => '525.00',
         'max_count' => 6,
         'is_required' => TRUE,
@@ -436,7 +445,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Meal Choice' => array(
         'type' => 'Select',
         'options' => array(
-          1 => array('label' => 'Chicken',
+          1 => array(
+            'label' => 'Chicken',
             'amount' => '525.00',
             'max_count' => 3,
             'financial_type_id' => 1,
@@ -452,7 +462,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Pre-conference Meetup?' => array(
         'type' => 'Radio',
         'options' => array(
-          1 => array('label' => 'Yes',
+          1 => array(
+            'label' => 'Yes',
             'amount' => '50.00',
             'max_count' => 4,
             'financial_type_id' => 1,
@@ -468,7 +479,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Evening Sessions' => array(
         'type' => 'CheckBox',
         'options' => array(
-          1 => array('label' => 'First Five',
+          1 => array(
+            'label' => 'First Five',
             'amount' => '100.00',
             'max_count' => 6,
             'financial_type_id' => 1,
@@ -701,7 +713,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // create price fields
     $fields = array(
-      'Full Conference' => array('type' => 'Text',
+      'Full Conference' => array(
+        'type' => 'Text',
         'amount' => '525.00',
         'count' => 2,
         'max_count' => 12,
@@ -711,7 +724,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Meal Choice' => array(
         'type' => 'Select',
         'options' => array(
-          1 => array('label' => 'Chicken',
+          1 => array(
+            'label' => 'Chicken',
             'amount' => '525.00',
             'count' => 1,
             'max_count' => 3,
@@ -729,7 +743,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Pre-conference Meetup?' => array(
         'type' => 'Radio',
         'options' => array(
-          1 => array('label' => 'Yes',
+          1 => array(
+            'label' => 'Yes',
             'amount' => '50.00',
             'count' => 2,
             'max_count' => 8,
@@ -747,7 +762,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       'Evening Sessions' => array(
         'type' => 'CheckBox',
         'options' => array(
-          1 => array('label' => 'First Five',
+          1 => array(
+            'label' => 'First Five',
             'amount' => '100.00',
             'count' => 2,
             'max_count' => 16,
@@ -1053,7 +1069,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       }
 
       if (!empty($oValue['financial_type_id'])) {
-        $this->select( "option_financial_type_id_{$oIndex}", "value={$oValue['financial_type_id']}" );
+        $this->select("option_financial_type_id_{$oIndex}", "value={$oValue['financial_type_id']}");
       }
 
       $this->click('link=another choice');
