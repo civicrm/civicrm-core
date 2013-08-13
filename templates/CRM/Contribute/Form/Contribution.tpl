@@ -88,7 +88,8 @@
       {if !$contributionMode and !$email and $outBound_option != 2}
         {assign var='profileCreateCallback' value=1 }
       {/if}
-      {include file="CRM/Contact/Form/NewContact.tpl"}
+      {* note that if we are using multiple instances of NewContact always pass values for blockNo and prefix *}
+      {include file="CRM/Contact/Form/NewContact.tpl" blockNo=1 prefix=''}
     {/if}
     {if $contributionMode}
     <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
