@@ -222,7 +222,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
          'activity' =>
         array(
           'headerLocator' => 'div#activity',
-          'bodyLocator' => 'input#activity_contact_name',
+          'bodyLocator' => 'select#activity_date_relative',
           'title' => 'Activities',
           'fields' =>
           array(
