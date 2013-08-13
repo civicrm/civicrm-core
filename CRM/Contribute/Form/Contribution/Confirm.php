@@ -1738,7 +1738,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @access public
    */
   static function processPcp(&$page, $params) {
-    $params['pcp_made_through_id'] = $page->_pcpInfo['pcp_id'];
+    $params['pcp_made_through_id'] = $page->_pcpId;
     $page->assign('pcpBlock', TRUE);
     if (CRM_Utils_Array::value('pcp_display_in_roll', $params) &&
       !CRM_Utils_Array::value('pcp_roll_nickname', $params)
@@ -1750,7 +1750,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $params['pcp_is_anonymous'] = 0;
     }
     foreach (array(
-      'pcp_display_in_roll', 'pcp_is_anonymous', 'pcp_roll_nickname', 'pcp_personal_note') as $val) {
+               'pcp_display_in_roll',
+               'pcp_is_anonymous',
+               'pcp_roll_nickname',
+               'pcp_personal_note'
+             ) as $val) {
       if (CRM_Utils_Array::value($val, $params)) {
         $page->assign($val, $params[$val]);
       }
