@@ -523,7 +523,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * return null
    * @access public
    */
-  public static function associatedContribution($contactId = NULL, $membershipId = NULL) {
+  public function associatedContribution($contactId = NULL, $membershipId = NULL) {
     if (!$contactId) {
       $contactId = $this->_contactId;
     }
@@ -532,7 +532,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $membershipId = $this->_id;
     }
 
-    // retrieive membership contributions if the $membershipId is set
+    // retrieve membership contributions if the $membershipId is set
     if (CRM_Core_Permission::access('CiviContribute') && $membershipId) {
       $this->assign('accessContribution', TRUE);
       $controller = new CRM_Core_Controller_Simple(
