@@ -612,7 +612,6 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'Paid By' => 'Check',
       'Check Number' => '1041',
       'Contribution Status' => 'Completed',
-      'Soft Credit To' => "$firstNameSoft $lastNameSoft",
     );
     $this->webtestVerifyTabularData($expected);
 
@@ -626,6 +625,16 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[3]/td[2]/table/tbody/tr[$lab]/td[3]",
         preg_quote($val)
       );
+    }
+
+    // verify if soft credit was created successfully
+    $softCreditValues = array(
+      'Soft Credit To' => "{$firstNameSoft} {$lastNameSoft}",
+      'Amount' => '65.00',
+    );
+
+    foreach ($softCreditValues as $value) {
+      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
     }
 
     // Check for Soft contact created
@@ -668,9 +677,19 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'Contribution Status' => $fields['values'][$fields['id']]['contribution_status'],
       'Paid By' => $fields['values'][$fields['id']]['contribution_payment_instrument'],
       'Check Number' => $fields['values'][$fields['id']]['contribution_check_number'],
-      'Soft Credit To' => $softCreditContact->display_name,
     );
+
     $this->webtestVerifyTabularData($expected);
+
+    // verify if soft credit
+    $softCreditValues = array(
+      'Soft Credit To' => $softCreditContact->display_name,
+      'Amount' => '65.00',
+    );
+
+    foreach ($softCreditValues as $value) {
+      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+    }
   }
 }
 
