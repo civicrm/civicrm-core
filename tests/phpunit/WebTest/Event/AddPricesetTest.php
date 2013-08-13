@@ -707,7 +707,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //assert the message
-    $this->waitForText('price_set_used_by', "it is currently in use by one or more active events or contribution pages or contributions or event templates. If you no longer want to use this price set, click the event template title below, and modify the fees for that event.");
+    $this->waitForText('price_set_used_by',
+      "it is currently in use by one or more active events or contribution pages or contributions or event templates.");
     
     //check the delete for priceset
     $this->openCiviPage("admin/price", "reset=1");
@@ -719,14 +720,13 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     //assert the message
-    $this->waitForText('price_set_used_by', "it is currently in use by one or more active events or contribution pages or contributions or event templates. If you no longer want to use this price set, click the event template title below, and modify the fees for that event. ");
+    $this->waitForText('price_set_used_by',
+      "it is currently in use by one or more active events or contribution pages or contributions or event templates.");
   }
  
   function _checkLineItems($expectedLineItems) {
     foreach ($expectedLineItems as $lineKey => $lineValue) {
-
       foreach ($lineValue as $key => $value) {
-
         $this->verifyText("xpath=//table/tbody/tr/td[text()='Event Fees']/following-sibling::td/table/tbody/tr[$lineKey]/td[$key]", preg_quote($value));
       }
     }
