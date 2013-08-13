@@ -544,8 +544,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             $this->_params[$v] = $frequencyUnits[$this->_params[$v]];
           }
         }
-        if ($v == "amount") {
-          $this->_params[$v] = CRM_Utils_Money::format($this->_params[$v], ' ');
+        if ($v == "amount" && $this->_params[$v] === 0) {
+          $this->_params[$v] = CRM_Utils_Money::format($this->_params[$v], NULL, NULL, TRUE);
         }
         $this->assign($v, $this->_params[$v]);
       }
