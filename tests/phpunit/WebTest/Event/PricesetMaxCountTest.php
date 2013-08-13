@@ -169,6 +169,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     $this->select("price_{$selectFieldId}", "value={$selectFieldOp1}");
 
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jones'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -195,6 +197,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '2');
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -364,6 +368,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -392,6 +398,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
     // check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '2');
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -561,6 +569,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '7');
 
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -580,6 +590,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '6');
 
+    $this->type('first_name', 'Mary Add 2');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -599,6 +611,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
+    $this->type('first_name', 'Mary Add 2');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -641,6 +655,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -670,6 +686,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '2');
 
+    $this->type('first_name', 'Mary Add 1');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -847,6 +865,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '7');
 
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -866,6 +886,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '6');
 
+    $this->type('first_name', 'Mary Add 1');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -885,6 +907,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
+    $this->type('first_name', 'Mary Add 2');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -927,6 +951,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
+    $this->type('first_name', 'Mary');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -956,6 +982,8 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '2');
 
+    $this->type('first_name', 'Mary Add 1');
+    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -1191,4 +1219,3 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($thankStrings);
   }
 }
-
