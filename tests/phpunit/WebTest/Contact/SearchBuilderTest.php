@@ -105,7 +105,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$firstName adv$firstName"));
   }
 
-  function testSearchBuilderContacts(){
+  function testSearchBuilderContacts() {
     $this->webtestLogin();
 
     //Individual
@@ -118,25 +118,25 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->_advancedSearch($streetName, $sortName, 'Individual', '1', 'street_address');
 
     //Organization
-    $orgName = substr(sha1(rand()), 0, 7)."org";
-    $orgEmail = "ab".rand()."@{$orgName}.com";
-    $this->_createContact('Organization', $orgName, $orgEmail,"street $orgName");
+    $orgName = substr(sha1(rand()), 0, 7) . "org";
+    $orgEmail = "ab" . rand() . "@{$orgName}.com";
+    $this->_createContact('Organization', $orgName, $orgEmail, "street $orgName");
     // search using search builder and advanced search
-    $this->_searchBuilder('Email',$orgEmail, $orgName,'=','1');
-    $this->_advancedSearch($orgEmail, $orgName, 'Organization','1','email');
+    $this->_searchBuilder('Email', $orgEmail, $orgName, '=', '1');
+    $this->_advancedSearch($orgEmail, $orgName, 'Organization', '1', 'email');
 
     //Household
-    $householdName = "household".substr(sha1(rand()), 0, 7);
-    $householdEmail = "h1".rand()."@{$householdName}.com";
-    $this->_createContact('Household', $householdName, $householdEmail,"street $householdName");
+    $householdName = "household" . substr(sha1(rand()), 0, 7);
+    $householdEmail = "h1" . rand() . "@{$householdName}.com";
+    $this->_createContact('Household', $householdName, $householdEmail, "street $householdName");
     // search using search builder and advanced search
-    $this->_searchBuilder('Email',$householdEmail, $householdName,'=','1');
-    $this->_advancedSearch($householdEmail, $householdName, 'Household','1','email');
+    $this->_searchBuilder('Email', $householdEmail, $householdName, '=', '1');
+    $this->_advancedSearch($householdEmail, $householdName, 'Household', '1', 'email');
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     // searching contacts whose email is not set
-    $firstName1 = "00a1".substr(sha1(rand()), 0, 7);
+    $firstName1 = "00a1" . substr(sha1(rand()), 0, 7);
     $this->type("first_name", $firstName1);
     $this->type("last_name", "01adv$firstName1");
     // save contact
@@ -144,7 +144,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
-    $firstName2 = "00a2".substr(sha1(rand()), 0, 7);
+    $firstName2 = "00a2" . substr(sha1(rand()), 0, 7);
     $this->type("first_name", $firstName2);
     $this->type("last_name", "02adv$firstName2");
     // save contact
@@ -152,57 +152,57 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
-    $firstName3 = "00a3".substr(sha1(rand()), 0, 7);
+    $firstName3 = "00a3" . substr(sha1(rand()), 0, 7);
     $this->type("first_name", $firstName3);
     $this->type("last_name", "03adv$firstName3");
     // save contact
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->_searchBuilder('Email',NULL,NULL,'IS NULL');
+    $this->_searchBuilder('Email', NULL, NULL, 'IS NULL');
     $this->click("xpath=//div[@class='crm-search-results']/div[4]/a[2]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $names = array( 1 => $firstName1,
-                    2 => $firstName2,
-                    3 => $firstName3,
-                    );
-    foreach($names as $key => $value){
+    $names = array(
+      1 => $firstName1,
+      2 => $firstName2,
+      3 => $firstName3,
+    );
+    foreach ($names as $key => $value) {
       $this->assertTrue($this->isTextPresent($value));
     }
     //searching contacts whose phone field is empty
-    $this->_searchBuilder('Phone',NULL,NULL,'IS EMPTY');
-    foreach($names as $key => $value){
+    $this->_searchBuilder('Phone', NULL, NULL, 'IS EMPTY');
+    foreach ($names as $key => $value) {
       $this->assertTrue($this->isTextPresent($value));
     }
     //searching contacts whose phone field is not empty
-    $this->_searchBuilder('Phone',NULL,$firstName,'IS NOT EMPTY');
+    $this->_searchBuilder('Phone', NULL, $firstName, 'IS NOT EMPTY');
     $this->click("xpath=//div[@class='crm-search-results']/div[4]/a[2]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent($firstName));
 
-    $firstName4 = "AB".substr(sha1(rand()), 0, 7);
+    $firstName4 = "AB" . substr(sha1(rand()), 0, 7);
     $postalCode = rand();
-    $this->_createContact('Individual', $firstName4,"$firstName4@advsearch.co.in",NULL, $postalCode);
-    $firstName5 = "CD".substr(sha1(rand()), 0, 7);
-    $this->_createContact('Individual', $firstName5,"$firstName5@advsearch.co.in",NULL, $postalCode);
-    $firstName6 = "EF".substr(sha1(rand()), 0, 7);
-    $this->_createContact('Organization', $firstName6,"$firstName6@advsearch.co.in",NULL, $postalCode);
-    $firstName7 = "GH".substr(sha1(rand()), 0, 7);
-    $this->_createContact('Household', $firstName7,"$firstName7@advsearch.co.in",NULL, $postalCode);
+    $this->_createContact('Individual', $firstName4, "$firstName4@advsearch.co.in", NULL, $postalCode);
+    $firstName5 = "CD" . substr(sha1(rand()), 0, 7);
+    $this->_createContact('Individual', $firstName5, "$firstName5@advsearch.co.in", NULL, $postalCode);
+    $firstName6 = "EF" . substr(sha1(rand()), 0, 7);
+    $this->_createContact('Organization', $firstName6, "$firstName6@advsearch.co.in", NULL, $postalCode);
+    $firstName7 = "GH" . substr(sha1(rand()), 0, 7);
+    $this->_createContact('Household', $firstName7, "$firstName7@advsearch.co.in", NULL, $postalCode);
 
     // check if the resultset of search builder and advanced search match for the postal code
-    $this->_searchBuilder('Postal Code',$postalCode,NULL,'LIKE','4');
-    $this->_advancedSearch($postalCode,NULL,NULL,'4','postal_code');
+    $this->_searchBuilder('Postal Code', $postalCode, NULL, 'LIKE', '4');
+    $this->_advancedSearch($postalCode, NULL, NULL, '4', 'postal_code');
 
-    $firstName8 = "abcc".substr(sha1(rand()), 0, 7);
-    $this->_createContact('Individual', $firstName8,"$firstName8@advsearch.co.in",NULL);
-    $this->_searchBuilder('Note(s): Body and Subject', "this is subject by $firstName8", $firstName8, 'LIKE');
+    $firstName8 = "abcc" . substr(sha1(rand()), 0, 7);
+    $this->_createContact('Individual', $firstName8, "$firstName8@advsearch.co.in", NULL);
     $this->_searchBuilder('Note(s): Body and Subject', "this is notes by $firstName8", $firstName8, 'LIKE');
     $this->_searchBuilder('Note(s): Subject only', "this is subject by $firstName8", $firstName8, 'LIKE');
     $this->_searchBuilder('Note(s): Body only', "this is notes by $firstName8", $firstName8, 'LIKE');
-    $this->_advancedSearch( "this is notes by $firstName8", $firstName8, NULL, NULL, 'note_body', 'notes');
-    $this->_advancedSearch( "this is subject by $firstName8", $firstName8, NULL, NULL, 'note_subject', 'notes');
-    $this->_advancedSearch( "this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
-    $this->_advancedSearch( "this is subject by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
+    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_body', 'notes');
+    $this->_advancedSearch("this is subject by $firstName8", $firstName8, NULL, NULL, 'note_subject', 'notes');
+    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
+    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
   }
 
   function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
@@ -264,10 +264,10 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
   }
 
-  function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field){
+  function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field) {
     //advanced search by selecting the contactType
     $this->openCiviPage("contact/search/advanced", "reset=1");
-    if (isset($contactType)){
+    if (isset($contactType)) {
       $this->select("id=crmasmSelect0", "value=$contactType");
     }
     if (substr($field, 0, 5) == 'note_') {
@@ -282,16 +282,16 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
       else {
         $this->click("CIVICRM_QFID_6_note_option");
       }
-      $this->type("note",$fieldValue );
+      $this->type("note", $fieldValue);
     }
     else {
       $this->click("location");
       $this->waitForElementPresent("xpath=//div[@id='location']/table/tbody/tr[2]/td/table/tbody/tr[4]/td[2]/select");
       if ($contactType == 'Individual') {
-        $this->type("$field",$fieldValue );
+        $this->type("$field", $fieldValue);
       }
       else {
-        $this->type("$field",$fieldValue);
+        $this->type("$field", $fieldValue);
       }
     }
     $this->click("_qf_Advanced_refresh");
@@ -309,26 +309,28 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
   }
 
-  function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL){
+  function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL) {
     $this->openCiviPage('contact/add', array('reset' => 1, 'ct' => $contactType), '_qf_Contact_cancel');
 
-    if ($contactType == 'Individual'){
+    if ($contactType == 'Individual') {
       $this->type("first_name", "$name");
       $this->type("last_name", "adv$name");
       $name = "$name adv$name";
-    } elseif ($contactType == 'Organization') {
-      $this->type("organization_name",$name);
-    } else {
-      $this->type("household_name",$name);
+    }
+    elseif ($contactType == 'Organization') {
+      $this->type("organization_name", $name);
+    }
+    else {
+      $this->type("household_name", $name);
     }
     $this->click("//form[@id='Contact']/div[2]/div[4]/div[1]");
     $this->waitForElementPresent("address_1_geo_code_2");
-    $this->type("email_1_email",$email);
-    $this->type("phone_1_phone","9876543210");
+    $this->type("email_1_email", $email);
+    $this->type("phone_1_phone", "9876543210");
     $this->type("address_1_street_address", $streetName);
     $this->select("address_1_country_id", "United States");
     $this->select("address_1_state_province_id", "Alaska");
-    $this->type("address_1_postal_code",$postalCode);
+    $this->type("address_1_postal_code", $postalCode);
 
     $this->click("//form[@id='Contact']/div[2]/div[6]/div[1]");
     $this->waitForElementPresent("note");
@@ -395,7 +397,10 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('3 Contacts'), 'Missing text: ' . '3 Contacts');
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
-    $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, 'IN', array($financialTypeName1, $financialTypeName2));
+    $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, 'IN', array(
+      $financialTypeName1,
+      $financialTypeName2
+    ));
     $this->click('_qf_Builder_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent('6 Contacts'), 'Missing text: ' . '6 Contacts');
@@ -474,21 +479,19 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Builder_refresh');
     $this->waitForText('search-status', "1 Contact");
 
-    $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
-    $this->waitForElementPresent("xpath=//span[@id='crm_search_value_1_1']/select");
-    $this->select("xpath=//span[@id='crm_search_value_1_1']/select", "label=Grace");
+    $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, '=', array('Grace'));
     $this->clickLink('_qf_Builder_refresh');
     $this->waitForText('search-status', "1 Contact");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->click("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
-    $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, 'IN', array('New','Grace'));
+    $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, 'IN', array('New', 'Grace'));
     $this->clickLink('_qf_Builder_refresh');
     $this->waitForText('search-status', "2 Contacts");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->click("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
-    $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, 'IN', array('Current','Expired'));
+    $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, 'IN', array('Current', 'Expired'));
     $this->clickLink('_qf_Builder_refresh');
     $this->waitForText("xpath=//form[@id='Builder']/div[3]/div/div", "No matches found for");
 

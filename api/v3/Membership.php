@@ -149,6 +149,7 @@ function _civicrm_api3_membership_create_spec(&$params) {
   $params['membership_type_id']['api.required'] = 1;
   $params['is_test']['api.default'] = 0;
   $params['membership_type_id']['api.aliases'] = array('membership_type');
+  $params['status_id']['api.aliases'] = array('membership_status');
   $params['skipStatusCal'] = array(
     'title' => 'Skip status calculation. By default this is 0 if id is not set and 1 if it is set.'
   );
