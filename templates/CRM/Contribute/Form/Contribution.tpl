@@ -88,7 +88,7 @@
       {if !$contributionMode and !$email and $outBound_option != 2}
         {assign var='profileCreateCallback' value=1 }
       {/if}
-      {* note that if we are using multiple instances of NewContact always pass values for block and prefix *}
+      {* note that if we are using multiple instances of NewContact always pass values for blockNo and prefix *}
       {include file="CRM/Contact/Form/NewContact.tpl" blockNo=1 prefix=''}
     {/if}
     {if $contributionMode}
