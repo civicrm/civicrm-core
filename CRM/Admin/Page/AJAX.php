@@ -511,7 +511,7 @@ LIMIT $limit";
         $values = CRM_Event_PseudoConstant::participantStatus();
         break;
 
-      case 'Participant Role':
+      case 'participant_role':
         $values = CRM_Event_PseudoConstant::participantRole();
         break;
 
