@@ -1105,6 +1105,7 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
       "'FK_civicrm_price_field_value_financial_type_id'",
       "'FK_civicrm_contribution_product_financial_type_id'",
       "'FK_civicrm_price_set_financial_type_id'",
+      "'FK_civicrm_grant_financial_type_id'",
     );
 
     $sql = "SELECT DELETE_RULE, TABLE_NAME, CONSTRAINT_NAME 
