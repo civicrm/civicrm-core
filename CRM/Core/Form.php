@@ -1318,15 +1318,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
  */
   function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    if(isset($this->_params) && isset($this->_params['select_contact_id '])) {
+      $tempID = $this->_params['select_contact_id'];
+    }
 
     // force to ignore the authenticated user
     if ($tempID === '0') {
       return $tempID;
     }
 
-    // check if the user is logged in and has a contact ID
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $userID = $this->getLoggedInUserContactID();
 
     if ($tempID == $userID) {
       return $userID;
@@ -1347,6 +1348,87 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     return $userID;
+  }
+
+ /**
+  * Get the contact id of the logged in user
+  */
+  function getLoggedInUserContactID() {
+    // check if the user is logged in and has a contact ID
+    $session = CRM_Core_Session::singleton();
+    return $session->get('userID');
+  }
+
+  /**
+   * add autoselector field -if user has permission to view contacts
+   * If adding this to a form you also need to add to the tpl e.g
+   *
+   * {if !empty($selectable)}
+   * <div class="crm-summary-row">
+   *   <div class="crm-label">{$form.select_contact.label}</div>
+   *   <div class="crm-content">
+   *     {$form.select_contact.html}
+   *   </div>
+   * </div>
+   * {/if}
+   * @param array $profiles ids of profiles that are on the form (to be autofilled)
+   * @param array $field metadata of field to use as selector including
+   *  - name_field
+   *  - id_field
+   *  - url (for ajax lookup)
+   *
+   *  @todo add data attributes so we can deal with multiple instances on a form
+   */
+  function addAutoSelector($profiles = array(), $autoCompleteField = array()) {
+    $autoCompleteField = array_merge(array(
+        'name_field' => 'select_contact',
+        'id_field' => 'select_contact_id',
+        'field_text' => ts('Select Contact'),
+        'show_hide' => TRUE,
+        'show_text' => ts('to select someone already in our database'),
+        'hide_text' => ts('to clear this person and fill the form in for someone else'),
+        'url' => array('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1'),
+        'max' => civicrm_api3('setting', 'getvalue', array(
+        'name' => 'search_autocomplete_count',
+        'group' => 'Search Preferences',
+        ))
+      ), $autoCompleteField);
+
+    if(0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1)))) {
+      $this->addElement('text', $autoCompleteField['name_field'] , $autoCompleteField['field_text']);
+      $this->addElement('hidden',  $autoCompleteField['id_field'], '', array('id' => $autoCompleteField['id_field']));      $this->assign('selectable', $autoCompleteField['id_field']);
+
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/common/AutoComplete.js')
+      ->addSetting(array(
+      'form' => array('autocompletes' => $autoCompleteField),
+      'ids' => array('profile' => $profiles),
+      ));
+    }
+  }
+
+  /**
+   * Add the options appropriate to cid = zero - ie. autocomplete
+   *
+   * @todo there is considerable code duplication between the contribution forms & event forms. It is apparent
+   * that small pieces of duplication are not being refactored into separate functions because their only shared parent
+   * is this form. Inserting a class FrontEndForm.php between the contribution & event & this class would allow functions like this
+   * and a dozen other small ones to be refactored into a shared parent with the reduction of much code duplication
+   */
+  function addCIDZeroOptions($onlinePaymentProcessorEnabled) {
+    $this->assign('nocid', TRUE);
+    $profiles = array();
+    if($this->_values['custom_pre_id']) {
+      $profiles[] = $this->_values['custom_pre_id'];
+    }
+    if($this->_values['custom_post_id']) {
+      $profiles[] = $this->_values['custom_post_id'];
+    }
+    if($onlinePaymentProcessorEnabled) {
+      $profiles[] = 'billing';
+    }
+    if(!empty($this->_values)) {
+      $this->addAutoSelector($profiles);
+    }
   }
 }
 

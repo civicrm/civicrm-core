@@ -44,7 +44,6 @@
 {/if}
 
 {include file="CRM/common/TrackingFields.tpl"}
-
 {capture assign='reqMark'}<span class="marker"  title="{ts}This field is required.{/ts}">*</span>{/capture}
 <div class="crm-event-id-{$event.id} crm-block crm-event-register-form-block">
 
@@ -69,7 +68,7 @@
         <p>{$event.intro_text}</p>
     </div>
 {/if}
-
+{include file="CRM/common/cidzero.tpl"}
 {if $pcpSupporterText}
     <div class="crm-section pcpSupporterText-section">
         <div class="content">{$pcpSupporterText}</div>
