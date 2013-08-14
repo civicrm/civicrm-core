@@ -1318,10 +1318,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
  */
   function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    if(isset($this->_params) && isset($this->_params['select_contact_id '])) {
+    if(isset($this->_params) && isset($this->_params['select_contact_id'])) {
       $tempID = $this->_params['select_contact_id'];
     }
-
+    if(isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
+      // event form stores as an indexed array, contribution form not so much...
+      $tempID = $this->_params[0]['select_contact_id'];
+    }
     // force to ignore the authenticated user
     if ($tempID === '0') {
       return $tempID;

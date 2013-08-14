@@ -437,7 +437,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $pps[$key] = $name['name'];
       }
     }
-    if($this->getContactID() === '0') {
+    if($this->getContactID() === '0' && !$this->_values['event']['is_multiple_registrations']) {
+      //@todo we are blocking for multiple registrations because we haven't tested
       $this->addCidZeroOptions($onlinePaymentProcessorEnabled);
     }
     if (CRM_Utils_Array::value('is_pay_later', $this->_values['event']) &&
