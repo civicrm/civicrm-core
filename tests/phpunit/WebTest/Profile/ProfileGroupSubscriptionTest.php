@@ -116,7 +116,8 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // assert for subscription message
-    $this->assertElementContainsText('css=div.messages', "Your subscription request has been submitted for group ", "Subscription message is not shown");
+    $this->waitForText('messages', "Your subscription request has been submitted for group ",
+      "Subscription message is not shown");
 
     //check if profile is saved
     $this->assertElementContainsText('css=span.msg-text', 'Your information has been saved.', 'Profile is not saved');
