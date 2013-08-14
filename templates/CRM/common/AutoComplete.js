@@ -114,6 +114,7 @@ cj(function ($) {
       else{
         $('#crm-contact-toggle-text-'  + id_field).text(hidden_text);
         $('#' + id_field).val('');
+        $('#' + name_field).val('');
         CRM.api('profile', 'get', {'profile_id' : profileids}, {
           success: function(result) {
             $.each(result.values, function (id, values){
