@@ -879,4 +879,33 @@ CRM.validate = CRM.validate || {
       $(this).toggleClass('collapsed');
     });
   };
+
+  /**
+   * Clientside currency formatting
+   * @param value
+   * @param format
+   * @return string
+   */
+  var currencyTemplate;
+  CRM.formatMoney = function(value, format) {
+    var decimal, separator, sign, i, j, result;
+    if (value === 'init' && format) {
+      currencyTemplate = format;
+      return;
+    }
+    format = format || currencyTemplate;
+    result = /1(.?)234(.?)56/.exec(format);
+    if (result === null) {
+      return 'Invalid format passed to CRM.formatMoney';
+    }
+    separator = result[1];
+    decimal = result[2];
+    sign = (value < 0) ? '-' : '';
+    //extracting the absolute value of the integer part of the number and converting to string
+    i = parseInt(value = Math.abs(value).toFixed(2)) + '';
+
+    j = ((j = i.length) > 3) ? j % 3 : 0;
+    result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
+    return format.replace(/1.*234.*56/, result);
+  };
 })(jQuery);
