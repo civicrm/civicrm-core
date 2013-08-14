@@ -353,7 +353,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param  array   $params associated array for params
    * @access public
    */
-  static function getBatchCount(&$params) {
+  public static function getBatchCount(&$params) {
     $args = array();
     $whereClause = self::whereClause($params, $args);
     $query = " SELECT COUNT(*) FROM civicrm_batch batch
@@ -368,7 +368,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param  array   $params associated array for params
    * @access public
    */
-  function whereClause($params) {
+  public static function whereClause($params) {
     $clauses = array();
     // Exclude data-entry batches
     if (empty($params['status_id'])) {

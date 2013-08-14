@@ -315,7 +315,7 @@ SELECT     civicrm_email.id as email_id
    * @return array $groups    array of group ids
    * @access public
    */
-  function getContactGroups($email, $contactID = NULL) {
+  public static function getContactGroups($email, $contactID = NULL) {
     if ($contactID) {
       $query = "
                  SELECT DISTINCT group_a.group_id, group_a.status, civicrm_group.title

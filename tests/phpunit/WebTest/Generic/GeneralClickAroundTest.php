@@ -130,7 +130,6 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->assertTextPresent("Event Summary");
-    $this->assertTextPresent("Fall Fundraiser Dinner");
     $this->assertTextPresent("Counted:");
     $this->assertTextPresent("Not Counted:");
     $this->assertTextPresent("Not Counted Due To Status:");
@@ -141,6 +140,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Cancelled:");
     $this->assertTextPresent("Recent Registrations");
     $this->assertTextPresent("Find more event participants...");
+    $this->assertTextPresent("Configure");
   }
 
   function testMembershipsDashboard() {

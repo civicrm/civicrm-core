@@ -37,18 +37,18 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     // Add new individual using Quick Add block on the main page
     $firstName1 = "John_" . substr(sha1(rand()), 0, 7);
-    $lastName1  = "Smiths_x" . substr(sha1(rand()), 0, 7);
-    $Name1      = $lastName1 . ', ' . $firstName1;
+    $lastName1 = "Smiths_x" . substr(sha1(rand()), 0, 7);
+    $Name1 = $lastName1 . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName1, "$firstName1.$lastName1@example.com");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Add new individual using Quick Add block on the main page
     $firstName2 = "James_" . substr(sha1(rand()), 0, 7);
-    $lastName2  = "Smiths_x" . substr(sha1(rand()), 0, 7);
+    $lastName2 = "Smiths_x" . substr(sha1(rand()), 0, 7);
     $Name2 = $lastName2 . ', ' . $firstName2;
 
     $firstName3 = "James_" . substr(sha1(rand()), 0, 7);
-    $lastName3  = "Smiths_x" . substr(sha1(rand()), 0, 7);
+    $lastName3 = "Smiths_x" . substr(sha1(rand()), 0, 7);
     $Name3 = $lastName3 . ', ' . $firstName3;
 
     $this->webtestAddContact($firstName2, $lastName2, "$firstName2.$lastName2@example.com", "Student");
@@ -56,7 +56,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($firstName3, $lastName3, "$firstName3.$lastName3@example.com", "Staff");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $profileTitle  = 'Batch Profile test_' . substr(sha1(rand()), 0, 7);
+    $profileTitle = 'Batch Profile test_' . substr(sha1(rand()), 0, 7);
     $profileFields = array(
       array(
         'type' => 'Individual',
@@ -103,7 +103,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     // Find contact and assert for contact sub type
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
-    $this->type('sort_name',  $firstName2);
+    $this->type('sort_name', $firstName2);
     $this->click('_qf_Basic_refresh');
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']/table/tbody//td/span/a[text()='View']");
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody//td/span/a[text()='View']");
@@ -113,7 +113,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->verifyText($xpath, preg_quote("Student"));
 
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
-    $this->type('sort_name',  $firstName3);
+    $this->type('sort_name', $firstName3);
     $this->click('_qf_Basic_refresh');
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']/table/tbody//td/span/a[text()='View']");
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody//td/span/a[text()='View']");
@@ -129,8 +129,8 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     // Add new individual using Quick Add block on the main page
     $firstName1 = "John_" . substr(sha1(rand()), 0, 7);
-    $lastName   = "Smith_" . substr(sha1(rand()), 0, 7);
-    $Name1      = $lastName . ', ' . $firstName1;
+    $lastName = "Smith_" . substr(sha1(rand()), 0, 7);
+    $Name1 = $lastName . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName, "$firstName1.$lastName@example.com");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -139,8 +139,8 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $Name2 = $lastName . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName, "$firstName1.$lastName@example.com");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $profileTitle  = 'Batch Profile test for contacts ' . substr(sha1(rand()), 0, 7);
-    $profileFor    = 'Contacts';
+    $profileTitle = 'Batch Profile test for contacts ' . substr(sha1(rand()), 0, 7);
+    $profileFor = 'Contacts';
     $customDataArr = $this->_addCustomData($profileFor);
     $this->_addProfile($profileTitle, $customDataArr, $profileFor);
 
@@ -199,7 +199,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     ) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'copy rows for field one failed');
 
@@ -222,7 +224,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     ) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'copy rows for field two failed');
 
@@ -239,7 +243,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     if ($this->getValue("{$dateElementIdFirstRow}_time") == $this->getValue("{$dateElementIdSecondRow}_time") && $this->getValue("{$dateElementIdFirstRow}_display") == $this->getValue("{$dateElementIdSecondRow}_display")) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'date / time coping failed');
 
@@ -256,7 +262,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     if ($this->getValue($richTextAreaIdOne) == $this->getValue($richTextAreaIdTwo)) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'Rich Text Area coping failed');
 
@@ -286,7 +294,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     ) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'copy rows for field one failed[radio button]');
 
@@ -309,7 +319,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     ) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'copy rows for field two failed[radio button]');
 
@@ -357,7 +369,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     if ($this->getValue($richTextAreaIdOne) == $this->getValue($richTextAreaIdTwo)) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'Rich Text Area coping failed [TinyMCE]');
 
@@ -383,7 +397,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->click('_qf_Results_upload_done-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //Reserve and interview responsedents
+    //Reserve and interview respondents
     $this->openCiviPage('campaign', 'reset=1&subPage=survey');
     $this->waitForElementPresent("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class='crm-campaign-voterLinks']/span/ul/li/a");
     $this->click("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class='crm-campaign-voterLinks']/span/ul/li/a");
@@ -393,7 +407,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('sort_name', $lastName);
     $this->waitForElementPresent('_qf_Search_refresh');
     $this->clickLink('_qf_Search_refresh', 'Go');
-    $this->click('CIVICRM_QFID_ts_all_4');
+    $this->click('toggleSelect');
     $this->click('Go');
     $this->waitForElementPresent('_qf_Reserve_next_reserveToInterview-top');
     $this->clickLink('_qf_Reserve_next_reserveToInterview-top', '_qf_Interview_cancel_interview');
@@ -428,7 +442,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     ) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'copy rows for field one failed for inteview (campaign)');
 
@@ -451,7 +467,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     ) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'copy rows for field two failed for inteview (campaign)');
 
@@ -468,7 +486,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     if ($this->getValue("{$dateElementIdFirstRow}_time") == $this->getValue("{$dateElementIdSecondRow}_time") && $this->getValue("{$dateElementIdFirstRow}_display") == $this->getValue("{$dateElementIdSecondRow}_display")) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'date / time coping failed for inteview (campaign)');
 
@@ -482,7 +502,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     if ($this->getValue("xpath=//table[@id='voterRecords']/tbody/tr/td[@class='note']/input") == $this->getValue("xpath=//table[@id='voterRecords']/tbody/tr[2]/td[@class='note']/input")) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'Note Custom field coping failed');
 
@@ -511,7 +533,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     ) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'copy rows for field one failed for inteview (campaign)[radio button]');
 
@@ -534,7 +558,9 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     ) {
       $assertCheck = TRUE;
     }
-    else $assertCheck = FALSE;
+    else {
+      $assertCheck = FALSE;
+    }
 
     $this->assertTrue($assertCheck, 'copy rows for field two failed for inteview (campaign)[radio button]');
 
