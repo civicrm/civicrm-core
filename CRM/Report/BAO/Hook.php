@@ -72,9 +72,21 @@ class CRM_Report_BAO_Hook {
     return $this->_queryObjects;
   }
 
-  public function alterLogTables(&$logTables) {
+  public function alterLogTables(&$reportObj, &$logTables) {
     foreach (self::getSearchQueryObjects() as $obj) {
-      $obj->alterLogTables($logTables);
+      $obj->alterLogTables($reportObj, $logTables);
     }
+  }
+
+  public function logDiffClause(&$reportObj, $table) {
+    $contactIdClause = $join = '';
+    foreach (self::getSearchQueryObjects() as $obj) {
+      list($cidClause, $joinClause) = $obj->logDiffClause($reportObj, $table);
+      if ($joinClause) 
+        $join .= $joinClause;
+      if ($cidClause) 
+        $contactIdClause .= $cidClause;
+    }
+    return array($contactIdClause, $join);
   }
 }
