@@ -304,23 +304,15 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[3]");
 
     // check description is displayed on profile listing page
-    $this->assertEquals($this->getText("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[3]"), $profileDescription);
+    $this->assertEquals(
+      $this->getText("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[3]"),
+      $profileDescription);
+
     // fetch created by
     $createdBy = $this->getText("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[2]/a");
 
-    // check if created by contact exists
-    $this->openCiviPage("dashboard", "reset=1");
-
-    // type sortname in autocomplete
-    $this->click("css=input#sort_name_navigation");
-    $this->type("css=input#sort_name_navigation", $createdBy);
-    $this->typeKeys("css=input#sort_name_navigation", $createdBy);
-
-    // wait for result list
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-
-    // visit contact summary page
-    $this->clickLink("css=div.ac_results-inner li");
+    // click on created by
+    $this->click("xpath=id('UFGroup-$id')/td[2]/a");
 
     // Is contact present?
     $this->assertTrue($this->isTextPresent("$createdBy"), "Contact did not find!");
