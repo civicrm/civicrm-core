@@ -97,7 +97,12 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
         $contactIdClause = "AND id = (select case_id FROM civicrm_case_contact WHERE contact_id = %3 LIMIT 1)";
         break;
       default:
-        $contactIdClause = "AND contact_id = %3";
+        // allow tables to be extended by report hook query objects
+        list($contactIdClause, $join) = CRM_Report_BAO_Hook::singleton()->logDiffClause($this, $table);
+
+        if (empty($contactIdClause)) {
+          $contactIdClause = "AND contact_id = %3";
+        }
         if ( strpos($table, 'civicrm_value') !== false ) {
           $contactIdClause = "AND entity_id = %3";
         }
@@ -272,6 +277,8 @@ WHERE log_conn_id = %1 AND
       }
       elseif (substr($table, 0, 14) == 'civicrm_value_') {
         list($titles[$table], $values[$table]) = $this->titlesAndValuesForCustomDataTable($table);
+      } else {
+        $titles[$table] = $values[$table] = array();
       }
     }
 
