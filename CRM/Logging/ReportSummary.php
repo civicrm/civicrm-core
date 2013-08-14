@@ -177,7 +177,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     }
 
     // allow log tables to be extended via report hooks
-    CRM_Report_BAO_Hook::singleton()->alterLogTables($this->_logTables);
+    CRM_Report_BAO_Hook::singleton()->alterLogTables($this, $this->_logTables);
 
     parent::__construct();
   }

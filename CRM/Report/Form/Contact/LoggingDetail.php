@@ -49,6 +49,9 @@ class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
     $this->tables[] = 'civicrm_activity';
     $this->tables[] = 'civicrm_case';
 
+    // allow tables to be extended by report hook query objects
+    CRM_Report_BAO_Hook::singleton()->alterLogTables($this, $this->tables);
+
     $this->detail = 'logging/contact/detail';
     $this->summary = 'logging/contact/summary';
 
