@@ -570,29 +570,37 @@ class CRM_Utils_Array {
   /**
    * Like explode() but assumes that the $value is padded with $delim on left and right
    *
-   * @param string|NULL $value
+   * @param mixed $values
    * @param string $delim
    * @return array|NULL
    */
-  static function explodePadded($value, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
-    if ($value === NULL) {
+  static function explodePadded($values, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
+    if ($values === NULL) {
       return NULL;
     }
-    return explode($delim, trim($value, $delim));
+    // If we already have an array, no need to continue
+    if (is_array($values)) {
+      return $values;
+    }
+    return explode($delim, trim((string) $values, $delim));
   }
 
   /**
-   * Like implode() but assumes that the $value is padded with $delim on left and right
+   * Like implode() but creates a string that is padded with $delim on left and right
    *
-   * @param string|NULL $value
+   * @param mixed $values
    * @param string $delim
-   * @return array|NULL
+   * @return string|NULL
    */
   static function implodePadded($values, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
     if ($values === NULL) {
       return NULL;
     }
-    return $delim . implode($delim, $values) . $delim;
+    // If we already have a string, strip $delim off the ends so it doesn't get added twice
+    if (is_string($values)) {
+      $values = trim($values, $delim);
+    }
+    return $delim . implode($delim, (array) $values) . $delim;
   }
 
   /**
