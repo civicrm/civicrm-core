@@ -104,9 +104,13 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    *
    * @return array (reference) of tab links
    */
-  function &tabs($enableCart) {
+  static function &tabs($enableCart) {
+    $cacheKey = $enableCart ? 1 : 0;
     if (!(self::$_tabLinks)) {
-      self::$_tabLinks = array(
+      self::$_tabLinks = array();
+    }
+    if (!isset(self::$_tabLinks[$cacheKey])) {
+      self::$_tabLinks[$cacheKey] = array(
         'settings' => array(
           'title' => ts('Info and Settings'),
           'url' => 'civicrm/event/manage/settings',
@@ -151,11 +155,11 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     }
 
     if (!$enableCart) {
-      unset(self::$_tabLinks['conference']);
+      unset(self::$_tabLinks[$cacheKey]['conference']);
     }
 
-    CRM_Utils_Hook::tabset('civicrm/event/manage', self::$_tabLinks, array());
-    return self::$_tabLinks;
+    CRM_Utils_Hook::tabset('civicrm/event/manage', self::$_tabLinks[$cacheKey], array());
+    return self::$_tabLinks[$cacheKey];
   }
 
   /**
