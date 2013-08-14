@@ -397,7 +397,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->click('_qf_Results_upload_done-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //Reserve and interview responsedents
+    //Reserve and interview respondents
     $this->openCiviPage('campaign', 'reset=1&subPage=survey');
     $this->waitForElementPresent("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class='crm-campaign-voterLinks']/span/ul/li/a");
     $this->click("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class='crm-campaign-voterLinks']/span/ul/li/a");
@@ -407,7 +407,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('sort_name', $lastName);
     $this->waitForElementPresent('_qf_Search_refresh');
     $this->clickLink('_qf_Search_refresh', 'Go');
-    $this->click('CIVICRM_QFID_ts_all_4');
+    $this->click('toggleSelect');
     $this->click('Go');
     $this->waitForElementPresent('_qf_Reserve_next_reserveToInterview-top');
     $this->clickLink('_qf_Reserve_next_reserveToInterview-top', '_qf_Interview_cancel_interview');
