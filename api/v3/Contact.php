@@ -186,6 +186,7 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['worldregion_id']['title'] = 'Primary Address World Region ID';
   $params['worldregion']['title'] = 'Primary Address World Region';
   $params['phone_id']['title'] = 'Primary Phone ID';
+  $params['phone']['title'] = 'Primary Phone';
   $params['phone_type_id']['title'] = 'Primary Phone Type ID';
   $params['provider_id']['title'] = 'Primary Phone Provider ID';
   $params['email_id']['title'] = 'Primary Email ID';
