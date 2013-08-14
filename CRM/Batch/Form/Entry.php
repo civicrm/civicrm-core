@@ -192,6 +192,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     );
 
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
+    $contactReturnProperties = array();
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
       CRM_Contact_Form_NewContact::buildQuickForm($this, $rowNumber, NULL, TRUE, 'primary_', ts('Contact'));
 
