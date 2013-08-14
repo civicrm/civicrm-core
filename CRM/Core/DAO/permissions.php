@@ -83,7 +83,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'edit all contacts',
     ),
     'getquick' => array(
-      'access CiviCRM',
+
     ),
   );
 
@@ -369,6 +369,10 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   );
 
   // Profile permissions
+  $permissions['profile'] = array(
+    'get' => array(), // the profile will take care of this
+  );
+
   $permissions['uf_group'] = array(
     'get' => array(
       'access CiviCRM',

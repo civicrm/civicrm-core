@@ -55,7 +55,9 @@ require_once 'api/v3/utils.php';
  */
 function civicrm_api3_profile_get($params) {
   $nonStandardLegacyBehaviour = is_numeric($params['profile_id']) ?  TRUE : FALSE;
-
+  if(!empty($params['check_permissions']) && !1 === civicrm_api3('contact', 'getcount', array('contact_id' => 1, 'check_permissions' => 1))) {
+    throw new API_Exception('permission denied');
+  }
   $profiles = (array) $params['profile_id'];
   $values = array();
   foreach ($profiles as $profileID) {
@@ -81,7 +83,7 @@ function civicrm_api3_profile_get($params) {
       NULL,
       FALSE,
       NULL,
-      TRUE,
+      empty($params['check_permissions']) ? FALSE : TRUE,
       NULL,
       CRM_Core_Permission::EDIT
     );
