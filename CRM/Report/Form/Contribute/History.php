@@ -683,14 +683,12 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
-  static function getOperationPair($type = "string", $fieldName = NULL) {
-      if ($fieldName == 'this_year' || $fieldName == 'other_year') {
-          return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
-      }
-      return parent::getOperationPair($type, $fieldName);
+  function getOperationPair($type = "string", $fieldName = NULL) {
+    if ($fieldName == 'this_year' || $fieldName == 'other_year') {
+      return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
+    }
+    return parent::getOperationPair($type, $fieldName);
   }
-
-
 
   function alterDisplay(&$rows) {
     if (empty($rows)) {
