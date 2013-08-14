@@ -338,6 +338,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->set('id', $event->id);
 
+    $this->postProcessHook();
+
     if ($this->_action & CRM_Core_Action::ADD) {
       $url = 'civicrm/event/manage/location';
       $urlParams = "action=update&reset=1&id={$event->id}";
