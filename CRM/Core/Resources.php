@@ -453,9 +453,10 @@ class CRM_Core_Resources {
         }
       }
 
-      // Initialize CRM.url
+      // Initialize CRM.url and CRM.formatMoney
       $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
-      $js = "CRM.url('init', '$url');";
+      $js = "CRM.url('init', '$url');\n";
+      $js .= "CRM.formatMoney('init', '" . CRM_Utils_Money::format(1234.56) . "');";
       $this->addScript($js, $jsWeight++, $region);
 
       // Add global settings
