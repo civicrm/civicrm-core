@@ -298,6 +298,11 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
     break;
   }
 
+  // Fixme: This really needs to be handled at a lower level. @See CRM-13123
+  if (isset($params['preferred_communication_method'])) {
+    $params['preferred_communication_method'] = CRM_Utils_Array::implodePadded($params['preferred_communication_method']);
+  }
+
   if (CRM_Utils_Array::value('contact_sub_type', $params) && CRM_Utils_Array::value('contact_type', $params)) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
         throw new API_Exception("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$params['contact_sub_type']));
