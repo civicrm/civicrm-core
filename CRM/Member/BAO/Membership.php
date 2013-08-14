@@ -158,7 +158,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           'source_contact_id' => $membershipLog['modified_id'],
           'target_contact_id' => $membership->contact_id,
           'source_record_id' => $membership->id,
-          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Membership Status'),
+          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Membership Type'),
           'status_id' => 2,
           'priority_id' => 2,
           'activity_date_time' => date('Y-m-d H:i:s'),
