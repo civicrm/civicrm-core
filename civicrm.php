@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                              |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -35,9 +35,9 @@
 /*
 Plugin Name: CiviCRM
 Plugin URI: http://civicrm.org/
-Description: CiviCRM WP Plugin
+Description: CiviCRM - Growing and Sustaining Relationships
 Author: CiviCRM LLC
-Version: 4.3
+Version: 4.4
 Author URI: http://civicrm.org/
 License: AGPL3
 */
@@ -67,7 +67,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 
 // set version here: when it changes, will force JS to reload
-define( 'CIVICRM_PLUGIN_VERSION', '4.3' );
+define( 'CIVICRM_PLUGIN_VERSION', '4.4' );
 
 // define commonly used items as constants
 define( 'CIVICRM_PLUGIN_DIR', plugin_dir_path(__FILE__) );
@@ -128,14 +128,14 @@ class CiviCRM_For_WordPress {
    * @description: dummy magic method to prevent CiviCRM_For_WordPress from being cloned
    */
   public function __clone() {
-    _doing_it_wrong( __FUNCTION__, __( 'Only one instance of CiviCRM_For_WordPress please', 'civicrm-wordpress' ), '4.3' );
+    _doing_it_wrong( __FUNCTION__, __( 'Only one instance of CiviCRM_For_WordPress please', 'civicrm-wordpress' ), '4.4' );
   }
 
   /**
    * @description: dummy magic method to prevent CiviCRM_For_WordPress from being unserialized
    */
   public function __wakeup() {
-    _doing_it_wrong( __FUNCTION__, __( 'Please do not serialize CiviCRM_For_WordPress', 'civicrm-wordpress' ), '4.3' );
+    _doing_it_wrong( __FUNCTION__, __( 'Please do not serialize CiviCRM_For_WordPress', 'civicrm-wordpress' ), '4.4' );
   }
 
 
