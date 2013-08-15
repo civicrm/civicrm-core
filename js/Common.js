@@ -618,7 +618,7 @@ CRM.validate = CRM.validate || {
   };
 
   var h;
-  CRM.help = function (title, params) {
+  CRM.help = function (title, params, url) {
     h && h.close && h.close();
     var options = {
       expires: 0
@@ -626,7 +626,7 @@ CRM.validate = CRM.validate || {
     h = CRM.alert('...', title, 'crm-help crm-msg-loading', options);
     params.class_name = 'CRM_Core_Page_Inline_Help';
     params.type = 'page';
-    $.ajax(CRM.url('civicrm/ajax/inline'),
+    $.ajax(url || CRM.url('civicrm/ajax/inline'),
       {
         data: params,
         dataType: 'html',

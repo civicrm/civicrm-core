@@ -2831,7 +2831,6 @@ div.crm-accordion-header a.helpicon {
 
 div a.helpicon:hover,
 div a.helpicon:focus {
-  background-image: url(../i/icons/jquery-ui-91CE00.png);
   opacity: 1;
 }
 
@@ -3683,14 +3682,14 @@ div.m ul#civicrm-menu,
 }
 
 /* Notifications */
-#crm-container .ui-notify {
+#crm-notification-container {
   width: 350px;
   position: fixed;
   top: 45px;
   right: 15px;
   z-index: 999999;
 }
-#crm-container div.ui-notify-message {
+.crm-container div.ui-notify-message {
   padding: 10px;
   margin-bottom: 15px;
   color: #fff;
@@ -3700,14 +3699,14 @@ div.m ul#civicrm-menu,
   max-height: 600px;
   overflow: auto;
 }
-#crm-container div.ui-notify-message h1 {
+.crm-container div.ui-notify-message h1 {
   font-size: 14px;
   margin: 0;
   padding: 4px;
   font-weight: bold;
   color: #fff;
 }
-#crm-container div.ui-notify-message p {
+.crm-container div.ui-notify-message p {
   margin: 3px 0;
   padding: 0;
   line-height: 18px;
@@ -3734,7 +3733,7 @@ div.m ul#civicrm-menu,
 .crm-container div.ui-notify-message .ui-notify-close {
   cursor: pointer;
 }
-#crm-container div.ui-notify-message a.ui-notify-cross {
+.crm-container div.ui-notify-message a.ui-notify-cross {
   margin-top: -4px;
   float: right;
   text-decoration: none;
@@ -3744,29 +3743,29 @@ div.m ul#civicrm-menu,
   padding: 2px;
   color: #FDFDFD;
 }
-#crm-container div.ui-notify-message .ui-notify-cross:hover,
-#crm-container div.ui-notify-message .ui-notify-cross:focus {
+.crm-container div.ui-notify-message .ui-notify-cross:hover,
+.crm-container div.ui-notify-message .ui-notify-cross:focus {
   color: #ffffab;
 }
-#crm-container div.ui-notify-message table,
-#crm-container div.ui-notify-message tbody,
-#crm-container div.ui-notify-message tr {
+.crm-container div.ui-notify-message table,
+.crm-container div.ui-notify-message tbody,
+.crm-container div.ui-notify-message tr {
   border: 0 none;
   font-size: 11px;
 }
-#crm-container div.ui-notify-message td {
+.crm-container div.ui-notify-message td {
   background: rgba(255,255,255,0.1);
   border: 1px solid #111;
   font-size: 11px;
 }
-#crm-container div.ui-notify-message th {
+.crm-container div.ui-notify-message th {
   background: rgba(200,200,200,0.2);
   border: 1px solid #111;
   color: #eee;
   font-size: 11px;
 }
-#crm-container div.ui-notify-message ul,
-#crm-container div.ui-notify-message ol {
+.crm-container div.ui-notify-message ul,
+.crm-container div.ui-notify-message ol {
   margin: 0.5em 0 1em;
   padding: 0 0 0 0.5em;
 }
