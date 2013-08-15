@@ -556,75 +556,40 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
    *  contactID, ufID, unique string ) if success
    * @access public
    */
-   static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    require_once 'DB.php';
-
-    $config = CRM_Core_Config::singleton();
-
-    $dbDrupal = DB::connect($config->userFrameworkDSN);
-    if (DB::isError($dbDrupal)) {
-      CRM_Core_Error::fatal("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
-    }
-
-    $account = $userUid = $userMail = NULL;
+  static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     if ($loadCMSBootstrap) {
-      $bootStrapParams = array();
-      if ($name && $password) {
-        $bootStrapParams = array(
-          'name' => $name,
-          'pass' => $password,
-        );
-      }
-      CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath);
-
-      global $user;
-      if ($user) {
-        $userUid = $user->uid;
-        $userMail = $user->mail;
-      }
-    }
-    else {
-      // CRM-8638
-      // SOAP cannot load drupal bootstrap and hence we do it the old way
-      // Contact CiviSMTP folks if we run into issues with this :)
-      $cmsPath = $config->userSystem->cmsRootPath($realPath);
-
-      require_once ("$cmsPath/includes/bootstrap.inc");
-      require_once ("$cmsPath/includes/password.inc");
-
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $name       = $dbDrupal->escapeSimple($strtolower($name));
-      $sql        = "
-SELECT u.*
-FROM   {$config->userFrameworkUsersTableName} u
-WHERE  LOWER(u.name) = '$name'
-AND    u.status = 1
-";
-
-      $query = $dbDrupal->query($sql);
-      $row = $query->fetchRow(DB_FETCHMODE_ASSOC);
-
-      if ($row) {
-        $fakeDrupalAccount = drupal_anonymous_user();
-        $fakeDrupalAccount->name = $name;
-        $fakeDrupalAccount->pass = $row['pass'];
-        $passwordCheck = user_check_password($password, $fakeDrupalAccount);
-        if ($passwordCheck) {
-          $userUid = $row['uid'];
-          $userMail = $row['mail'];
-        }
-      }
-    }
-
-    if ($userUid && $userMail) {
-      CRM_Core_BAO_UFMatch::synchronizeUFMatch($account, $userUid, $userMail, 'Drupal');
-      $contactID = CRM_Core_BAO_UFMatch::getContactId($userUid);
-      if (!$contactID) {
+      $bootStrapParams = array(
+        'name' => $name,
+        'pass' => $password,
+      );
+      if (!CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath)) {
         return FALSE;
       }
-      return array($contactID, $userUid, mt_rand());
+      global $user;
+      $account = $user;
     }
-    return FALSE;
+    else {
+      $uid = user_authenticate($name, $password);
+      if (!$uid) {
+        return FALSE;
+      }
+
+      $account = user_load($uid);
+      if (!$account || !$account->uid) {
+        return FALSE;
+      }
+      global $user;
+      $user = $account;
+    }
+
+    $userUid = $account->uid;
+    $userMail = $account->mail;
+    CRM_Core_BAO_UFMatch::synchronizeUFMatch($account, $userUid, $userMail, 'Drupal');
+    $contactID = CRM_Core_BAO_UFMatch::getContactId($userUid);
+    if (!$contactID) {
+      return FALSE;
+    }
+    return array($contactID, $userUid, mt_rand());
   }
 
   /*

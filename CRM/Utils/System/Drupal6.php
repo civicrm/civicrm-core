@@ -520,44 +520,39 @@ SELECT name, mail
    * @access public
    */
   function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    require_once 'DB.php';
-
-    $config = CRM_Core_Config::singleton();
-
-    $dbDrupal = DB::connect($config->userFrameworkDSN);
-    if (DB::isError($dbDrupal)) {
-      CRM_Core_Error::fatal("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
-    }
-
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-    $dbpassword   = md5($password);
-    $name       = $dbDrupal->escapeSimple($strtolower($name));
-    $sql        = 'SELECT u.* FROM ' . $config->userFrameworkUsersTableName . " u WHERE LOWER(u.name) = '$name' AND u.pass = '$dbpassword' AND u.status = 1";
-    $query      = $dbDrupal->query($sql);
-
-    $user = NULL;
-    // need to change this to make sure we matched only one row
-    while ($row = $query->fetchRow(DB_FETCHMODE_ASSOC)) {
-      CRM_Core_BAO_UFMatch::synchronizeUFMatch($user, $row['uid'], $row['mail'], 'Drupal');
-      $contactID = CRM_Core_BAO_UFMatch::getContactId($row['uid']);
-      if (!$contactID) {
+    if ($loadCMSBootstrap) {
+      $bootStrapParams = array(
+        'name' => $name,
+        'pass' => $password,
+      );
+      if (!CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath)) {
         return FALSE;
       }
-      else{//success
-        if ($loadCMSBootstrap) {
-          $bootStrapParams = array();
-          if ($name && $password) {
-            $bootStrapParams = array(
-                'name' => $name,
-                'pass' => $password,
-            );
-          }
-          CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath);
-        }
-        return array($contactID, $row['uid'], mt_rand());
-      }
+      global $user;
+      $account = $user;
     }
-    return FALSE;
+    else {
+      $uid = user_authenticate(array('name' => $name, 'pass' => $password));
+      if (!$uid) {
+        return FALSE;
+      }
+
+      $account = user_load($uid);
+      if (!$account || !$account->uid) {
+        return FALSE;
+      }
+      global $user;
+      $user = $account;
+    }
+
+    $userUid = $account->uid;
+    $userMail = $account->mail;
+    CRM_Core_BAO_UFMatch::synchronizeUFMatch($account, $userUid, $userMail, 'Drupal');
+    $contactID = CRM_Core_BAO_UFMatch::getContactId($userUid);
+    if (!$contactID) {
+      return FALSE;
+    }
+    return array($contactID, $userUid, mt_rand());
   }
 
   /*
