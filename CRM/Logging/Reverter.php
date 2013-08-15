@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -109,7 +109,7 @@ class CRM_Logging_Reverter {
         // DAO-based tables
 
         case in_array($table, array_keys($daos)):
-          $dao = new {$daos[$table]};
+          $dao = new $daos[$table];
           foreach ($row as $id => $changes) {
             $dao->id = $id;
             foreach ($changes as $field => $value) {

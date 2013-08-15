@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                             |
+ | CiviCRM version 4.4                                             |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -73,7 +73,7 @@ class CRM_Financial_BAO_ExportFormat {
       break;
 
       case 'iif':
-        $tplFile = $this->getHookedTemplateFileName(();
+        $tplFile = $this->getHookedTemplateFileName();
         $out = self::getTemplate()->fetch($tplFile);
         $fileName = $this->putFile($out);
         self::createActivityExport($this->_batchIds, $fileName);

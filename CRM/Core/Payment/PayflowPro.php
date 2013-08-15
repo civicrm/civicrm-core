@@ -1,7 +1,7 @@
 <?php
 /*
    +----------------------------------------------------------------------------+
-   | PayflowPro Core Payment Module for CiviCRM version 4.3                     |
+   | PayflowPro Core Payment Module for CiviCRM version 4.4                     |
    +----------------------------------------------------------------------------+
    | Licensed to CiviCRM under the Academic Free License version 3.0            |
    |                                                                            |
