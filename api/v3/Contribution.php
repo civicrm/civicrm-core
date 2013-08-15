@@ -336,7 +336,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for sendconfirmation action
  *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
@@ -348,8 +348,19 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
   );
   $params['receipt_from_email'] = array(
     'api.required' =>1,
-    'title' => 'From Email (required until someone provides a patch :-)',
-
+    'title' => 'From Email address (string) required until someone provides a patch :-)',
+  );
+  $params['receipt_from_name'] = array(
+    'title' => 'From Name (string)',
+  );
+  $params['cc_receipt'] = array(
+    'title' => 'CC Email address (string)',
+  );
+  $params['bcc_receipt'] = array(
+    'title' => 'BCC Email address (string)',
+  );
+  $params['receipt_text'] = array(
+    'title' => 'Message (string)',
   );
 }
 
