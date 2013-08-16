@@ -63,7 +63,6 @@ class api_v3_MessageTemplatesTest extends CiviUnitTestCase {
    */
   public function testCreate() {
     $result = $this->callAPIAndDocument('MessageTemplates', 'create', $this->params, __FUNCTION__, __FILE__);
-    var_dump($result);
     $this->getAndCheck($this->params, $result['id'], $this->entity);
   }
 
