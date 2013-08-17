@@ -1344,4 +1344,16 @@ abstract class CRM_Utils_Hook {
   static function queryObjects(&$queryObjects, $type = 'Contact') {
     return self::singleton()->invoke(2, $queryObjects, $type, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_queryObjects');
   }
+  
+  /**
+   * This hook is called during the processing of schedule reminders, extending
+   * the subject entities and related tokens which can be used for them.
+   *
+   * @param CRM_Core_DAO_ActionMapping $mapping
+   * @param stdClass $more : structure containing the additional stuff you want done
+   * @return void
+   */
+  static function getReminderTokens($mapping,$op,&$more) {
+    return self::singleton()->invoke(3, $mapping, $op, $more, self::$_nullObject, self::$_nullObject, 'civicrm_getReminderTokens');
+  }
 }
