@@ -2441,7 +2441,13 @@ class CRM_Contact_BAO_Query {
 
     // fix for CRM-771
     if (!empty($clause)) {
-      $this->_where[$grouping][] = 'contact_a.contact_type IN (' . implode(',', $clause) . ')';
+      if ($op == 'IN' || $op == 'NOT IN') {
+        $this->_where[$grouping][] = "contact_a.contact_type $op (" . implode(',', $clause) . ')';
+      }
+      else {
+        $type = array_pop($clause);
+        $this->_where[$grouping][] = "contact_a.contact_type $op $type";
+      }
       $this->_qill[$grouping][] = ts('Contact Type') . ' - ' . implode(' ' . ts('or') . ' ', $clause);
 
       if (!empty($subTypes)) {
