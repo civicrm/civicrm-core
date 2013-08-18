@@ -1487,6 +1487,10 @@ AND civicrm_membership.is_test = %2";
   }
 
   /**
+   * @todo - this form method needs to have the interaction with the form layer removed from it
+   * as a BAO function. Note that the api now supports membership renewals & it is not clear this function does anything
+   * not done by the membership.create api (with a lot less unit tests)
+   *
    * This method will renew / create the membership depending on
    * whether the given contact has a membership or not. And will add
    * the modified dates for membership and in the log table.
@@ -1526,6 +1530,8 @@ AND civicrm_membership.is_test = %2";
 
     // check is it pending. - CRM-4555
     $pending = FALSE;
+    //@todo this is a BAO function & should not inspect the form - the form should do this
+    // & pass required params to the BAO
     if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
       if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') ||
           CRM_Utils_Array::value('is_pay_later', $form->_params) ||
