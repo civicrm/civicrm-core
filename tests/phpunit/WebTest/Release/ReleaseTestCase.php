@@ -29,7 +29,7 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
 // name of the class doesn't end with Test on purpose - this way this
 // webtest is not picked up by the suite, since it needs to run
 // on specially prepare sandbox
-// more details: http://wiki.civicrm.org/confluence/display/CRMDOC40/Release+testing+script+documentation
+// more details: http://wiki.civicrm.org/confluence/display/CRMDOC/Release+testing+script
 class WebTest_Release_ReleaseTestCase extends CiviSeleniumTestCase {
 
   /**

@@ -201,7 +201,7 @@ class CRM_Core_Resources {
    * From javascript:
    * CRM.myNamespace.foo // "bar"
    *
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/Javascript+Reference
+   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Javascript+Reference
    *
    * @param $settings array
    * @return CRM_Core_Resources
