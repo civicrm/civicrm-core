@@ -127,8 +127,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'billing_first_name' => 'abc1',
       'billing_middle_name' => 'J.',
       'billing_last_name' => 'xyz1',
-      'billing_street_address-5' => '',
-      'billing_city-5' => '',
+      'billing_street_address-5' => '5 Saint Helier St',
+      'billing_city-5' => 'Gotham City',
       'billing_state_province_id-5' => '1021',
       'billing_country_id-5' => '',
       'billing-email-5' => 'abc1.xyz1@yahoo.com',
@@ -136,6 +136,39 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'billing-email-5' => 'abc1.xyz1@yahoo.com',
       'email-5' => 'abc1.xyz1@yahoo.com',
     ));
+  }
+
+  function testProfileGetBillingUseIsBillingLocation() {
+    $individual = $this->_createIndividualContact();
+    $contactId  = key($individual);
+    $this->callAPISuccess('address', 'create', array(
+      'is_billing' => 1,
+      'street_address' => 'is billing st',
+      'location_type_id' => 2,
+      'contact_id' => $contactId,
+      ));
+
+    $expected = current($individual);
+
+    $params = array(
+      'profile_id' => array(25, 1, 'Billing'),
+      'contact_id' => $contactId,
+    );
+
+    $result = $this->callAPISuccess('profile', 'get', $params);
+    $this->assertEquals('abc1', $result['values'][1]['first_name']);
+    $this->assertEquals(array(
+      'billing_first_name' => 'abc1',
+      'billing_middle_name' => 'J.',
+      'billing_last_name' => 'xyz1',
+      'billing_street_address-5' => 'is billing st',
+      'billing_city-5' => '',
+      'billing_state_province_id-5' => '',
+      'billing_country_id-5' => '',
+      'billing-email-5' => 'abc1.xyz1@yahoo.com',
+      'email-5' => 'abc1.xyz1@yahoo.com',
+      'billing_postal_code-5' => '',
+    ), $result['values']['Billing']);
   }
 
   function testProfileGetMultipleHasBillingLocation() {
@@ -166,6 +199,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'billing_postal_code-5' => '',
     ));
   }
+
+
   /**
    * check contact activity profile without activity id
    */
@@ -511,13 +546,15 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'api.address.create' => array(
         'location_type_id' => 1,
         'is_primary' => 1,
-        'name' => 'Saint Helier St',
+        'street_address' => '5 Saint Helier St',
         'county' => 'Marin',
         'country' => 'United States',
         'state_province' => 'Michigan',
         'supplemental_address_1' => 'Hallmark Ct',
         'supplemental_address_2' => 'Jersey Village',
         'postal_code' => '90210',
+        'city' => 'Gotham City',
+        'is_billing' => 0,
       ),
       'api.phone.create' => array(
         'location_type_id' => '1',
