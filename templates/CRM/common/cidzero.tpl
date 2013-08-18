@@ -1,4 +1,4 @@
-  <div class="crm-create-relationship-row">
+  <div class="crm-other-contact-row messages status">
   {if !empty($nocid)}
     <span>{ts}You are completing this form on behalf of someone else. Please enter their details.</span>{/ts}
   {/if}
