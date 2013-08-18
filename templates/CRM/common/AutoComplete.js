@@ -1,20 +1,5 @@
-/**
- * This is our closure - all of our code goes inside it
- *
- * This style of closure is provided by jquery and automatically
- * waits for document.ready. It also provides us with a local
- * alias of jQuery as $.
- *
- * ES5 specifies that the first line inside our closure
- * should be 'use strict';
- */
-/*jslint indent: 2 */
-/*global CRM, cj, ts */
-
 cj(function ($) {
   'use strict';
-
-  // Variables declared here will be globally available within this closure
 
   // Behind the scenes method deals with browser for setting cursor position
   $.caretTo = function (el, index) {
@@ -127,7 +112,6 @@ cj(function ($) {
       }
 
     });
-    //  append(ts("Click") + " <a href='#' id= crm-contact-toggle-" + autocomplete.id_field + ("> " +  ts('here') + '</a> ' + ts("to clear this and add a new contact"));
   }
 
   var autocompletes = CRM.form.autocompletes;
