@@ -75,10 +75,6 @@ function civicrm_api3_profile_get($params) {
 
     $isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($profileID);
 
-    if (CRM_Core_BAO_UFField::checkProfileType($profileID) && !$isContactActivityProfile) {
-      throw new API_Exception('Can not retrieve values for profiles include fields for more than one record type.');
-    }
-
     $profileFields = CRM_Core_BAO_UFGroup::getFields($profileID,
       FALSE,
       NULL,
