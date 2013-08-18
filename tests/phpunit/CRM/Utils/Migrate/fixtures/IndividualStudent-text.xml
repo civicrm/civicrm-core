@@ -3,8 +3,8 @@
 <CustomData>
   <CustomGroups>
     <CustomGroup>
-      <name>indiv_text_ex</name>
-      <title>indiv_text_ex</title>
+      <name>example</name>
+      <title>example</title>
       <extends>Individual</extends>
       <extends_entity_column_value_option_group>contact_type</extends_entity_column_value_option_group>
       <extends_entity_column_value>Student</extends_entity_column_value>
@@ -14,7 +14,7 @@
       <help_post></help_post>
       <weight>1</weight>
       <is_active>1</is_active>
-      <table_name>civicrm_value_indiv_text_ex_1</table_name>
+      <table_name>civicrm_value_example_1</table_name>
       <is_multiple>0</is_multiple>
       <collapse_adv_display>0</collapse_adv_display>
       <is_reserved>0</is_reserved>
@@ -34,7 +34,7 @@
       <is_active>1</is_active>
       <is_view>0</is_view>
       <column_name>name1_1</column_name>
-      <custom_group_name>indiv_text_ex</custom_group_name>
+      <custom_group_name>example</custom_group_name>
     </CustomField>
   </CustomFields>
 </CustomData>
