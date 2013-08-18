@@ -344,7 +344,7 @@ function civicrm_api3_profile_getfields($params) {
  *  interim solution is just to return an empty array
  */
 function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
-  $addressFields = array('street_address', 'city', 'state_province_id', 'country_id');
+  $addressFields = array('street_address', 'city', 'state_province_id', 'country_id', 'postal_code');
   $locations = civicrm_api3('address', 'getoptions', array('field' => 'location_type_id'));
   $locationTypeID = array_search('Billing', $locations['values']);
 
