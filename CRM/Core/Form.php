@@ -1388,8 +1388,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'id_field' => 'select_contact_id',
         'field_text' => ts('Select Contact'),
         'show_hide' => TRUE,
-        'show_text' => ts('to select someone already in our database'),
-        'hide_text' => ts('to clear this person and fill the form in for someone else'),
+        'show_text' => ts('to select someone already in our database.'),
+        'hide_text' => ts('to clear this person\'s information, and fill the form in for someone else'),
         'url' => array('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1'),
         'max' => civicrm_api3('setting', 'getvalue', array(
         'name' => 'search_autocomplete_count',
@@ -1399,9 +1399,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     if(0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1)))) {
       $this->addElement('text', $autoCompleteField['name_field'] , $autoCompleteField['field_text']);
-      $this->addElement('hidden',  $autoCompleteField['id_field'], '', array('id' => $autoCompleteField['id_field']));      $this->assign('selectable', $autoCompleteField['id_field']);
+      $this->addElement('hidden',  $autoCompleteField['id_field'], '', array('id' => $autoCompleteField['id_field']));
+      $this->assign('selectable', $autoCompleteField['id_field']);
 
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/common/AutoComplete.js')
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AutoComplete.js')
       ->addSetting(array(
       'form' => array('autocompletes' => $autoCompleteField),
       'ids' => array('profile' => $profiles),
