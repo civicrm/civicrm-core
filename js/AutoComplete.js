@@ -57,13 +57,14 @@ cj(function ($) {
       customObj.autocomplete(url,
         { width : 250, selectFirst : false, matchContains: true, max: varmax }).result(
         function (event, data) {
-          customIdObj.val(data[1]);
+          var contactID = data[1];
+          customIdObj.val(contactID);
           customObj.caretTo(0);
           var namefields = ['first_name', 'last_name', 'middle_name'];
-          CRM.api('profile', 'get', {'profile_id' : profileids, 'contact_id' : data[1]}, {
+          CRM.api('profile', 'get', {'profile_id' : profileids, 'contact_id' : contactID}, {
             success: function(result) {
-              $.each(result.values, function (id, values){
-              $.each(values, function (fieldname, fieldvalue) {
+              $.each(result.values, function (id, value){
+              $.each(value, function (fieldname, fieldvalue) {
                 $('#' + fieldname).val(fieldvalue);
               });
               });
