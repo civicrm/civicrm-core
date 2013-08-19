@@ -386,7 +386,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
       else {
         $options = NULL;
-        if ($hasLocationTypes[$key]) {
+        if (CRM_Utils_Array::value($key, $hasLocationTypes)) {
           $options = $this->_location_types;
         }
         elseif ($key == 'url') {
