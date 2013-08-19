@@ -236,7 +236,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     ) {
       $dates = array('start_date', 'end_date', 'join_date');
       foreach ($dates as $date) {
-        $$date = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, TRUE, 'Ymd');
+        $$date = $params[$date] = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, TRUE, 'Ymd');
       }
 
       //fix for CRM-3570, during import exclude the statuses those having is_admin = 1
