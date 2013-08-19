@@ -62,6 +62,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->onlyIDNonZeroCount['get'] = array('ActivityType', 'Entity', 'Domain','Setting');
     $this->deprecatedAPI = array('Location', 'ActivityType', 'SurveyRespondant');
     $this->deletableTestObjects = array();
+    //restrict extension fields that requires no update
+    $this->extensionEntitiesWithoutUpdate = array();
   }
 
   function tearDown() {
@@ -612,6 +614,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function testCreateSingleValueAlter($entityName) {
     if (in_array($entityName, $this->toBeImplemented['create'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
+      return;
+    }
+
+    //restrict extension fields that requires no update
+    if (!empty($this->extensionEntitiesWithoutUpdate) && in_array($entityName, $this->extensionEntitiesWithoutUpdate)) {
       return;
     }
 
