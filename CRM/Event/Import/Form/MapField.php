@@ -56,7 +56,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->_dataValues = $this->get('dataValues');
     $this->assign('dataValues', $this->_dataValues);
 
-    $skipColumnHeader   = $this->controller->exportValue('UploadFile', 'skipColumnHeader');
+    $skipColumnHeader   = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_onDuplicate = $this->get('onDuplicate');
     $highlightedFields  = array();
     if ($skipColumnHeader) {
@@ -397,8 +397,8 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       return;
     }
 
-    $fileName = $this->controller->exportValue('UploadFile', 'uploadFile');
-    $skipColumnHeader = $this->controller->exportValue('UploadFile', 'skipColumnHeader');
+    $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
+    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
     $config = CRM_Core_Config::singleton();
     $seperator = $config->fieldSeparator;
