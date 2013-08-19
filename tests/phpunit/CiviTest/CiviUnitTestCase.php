@@ -875,7 +875,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'suffix_id' => 3,
         'email' => 'anthony_anderson@civicrm.org',
         'contact_type' => 'Individual',
-      ),$params);
+      ), $params);
 
     return $this->_contactCreate($params);
   }

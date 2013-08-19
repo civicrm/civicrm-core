@@ -125,14 +125,50 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertFalse(array_key_exists('email-Primary', $result['values'][1]), 'profile 1 doesn not include email');
     $this->assertEquals($result['values']['Billing'], array(
       'billing_first_name' => 'abc1',
-      'billing_middle_name' => '',
+      'billing_middle_name' => 'J.',
       'billing_last_name' => 'xyz1',
-      'billing_street_address-5' => '',
+      'billing_street_address-5' => '5 Saint Helier St',
+      'billing_city-5' => 'Gotham City',
+      'billing_state_province_id-5' => '1021',
+      'billing_country_id-5' => '',
+      'billing-email-5' => 'abc1.xyz1@yahoo.com',
+      'billing_postal_code-5' => '90210',
+      'billing-email-5' => 'abc1.xyz1@yahoo.com',
+      'email-5' => 'abc1.xyz1@yahoo.com',
+    ));
+  }
+
+  function testProfileGetBillingUseIsBillingLocation() {
+    $individual = $this->_createIndividualContact();
+    $contactId  = key($individual);
+    $this->callAPISuccess('address', 'create', array(
+      'is_billing' => 1,
+      'street_address' => 'is billing st',
+      'location_type_id' => 2,
+      'contact_id' => $contactId,
+      ));
+
+    $expected = current($individual);
+
+    $params = array(
+      'profile_id' => array(25, 1, 'Billing'),
+      'contact_id' => $contactId,
+    );
+
+    $result = $this->callAPISuccess('profile', 'get', $params);
+    $this->assertEquals('abc1', $result['values'][1]['first_name']);
+    $this->assertEquals(array(
+      'billing_first_name' => 'abc1',
+      'billing_middle_name' => 'J.',
+      'billing_last_name' => 'xyz1',
+      'billing_street_address-5' => 'is billing st',
       'billing_city-5' => '',
       'billing_state_province_id-5' => '',
       'billing_country_id-5' => '',
       'billing-email-5' => 'abc1.xyz1@yahoo.com',
-    ));
+      'email-5' => 'abc1.xyz1@yahoo.com',
+      'billing_postal_code-5' => '',
+    ), $result['values']['Billing']);
   }
 
   function testProfileGetMultipleHasBillingLocation() {
@@ -152,15 +188,19 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals('abc1', $result['values'][1]['first_name']);
     $this->assertEquals($result['values']['Billing'], array(
       'billing_first_name' => 'abc1',
-      'billing_middle_name' => '',
+      'billing_middle_name' => 'J.',
       'billing_last_name' => 'xyz1',
       'billing_street_address-5' => '25 Big Street',
       'billing_city-5' => 'big city',
       'billing_state_province_id-5' => '',
       'billing_country_id-5' => '',
       'billing-email-5' => 'big@once.com',
+      'email-5' => 'big@once.com',
+      'billing_postal_code-5' => '',
     ));
   }
+
+
   /**
    * check contact activity profile without activity id
    */
@@ -498,21 +538,23 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /*
      * Helper function to create an Individual with address/email/phone info. Import UF Group and UF Fields
      */
-  function _createIndividualContact() {
-    $contactParams = array(
+  function _createIndividualContact($params = array()) {
+    $contactParams = array_merge(array(
       'first_name' => 'abc1',
       'last_name' => 'xyz1',
-      'contact_type' => 'Individual',
       'email' => 'abc1.xyz1@yahoo.com',
       'api.address.create' => array(
         'location_type_id' => 1,
         'is_primary' => 1,
-        'name' => 'Saint Helier St',
+        'street_address' => '5 Saint Helier St',
         'county' => 'Marin',
         'country' => 'United States',
         'state_province' => 'Michigan',
         'supplemental_address_1' => 'Hallmark Ct',
         'supplemental_address_2' => 'Jersey Village',
+        'postal_code' => '90210',
+        'city' => 'Gotham City',
+        'is_billing' => 0,
       ),
       'api.phone.create' => array(
         'location_type_id' => '1',
@@ -520,17 +562,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
         'phone_type_id' => '1',
         'is_primary' => '1',
       ),
+     ), $params
     );
 
-    $contact = $this->callAPISuccess('contact', 'create', $contactParams);
-
-    $keys  = array_keys($contact['values']);
-    $contactId = array_pop($keys);
-
-    $this->assertEquals(0, $contact['values'][$contactId]['api.address.create']['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $contact['values'][$contactId]['api.address.create'])
-    );
-    $this->assertEquals(0, $contact['values'][$contactId]['api.phone.create']['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $contact['values'][$contactId]['api.phone.create'])
-    );
+    $contactID = $this->individualCreate($contactParams);
 
     // Create new profile having group_type: Contact,Individual
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -549,7 +584,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
 
     // expected result of above created profile with contact Id $contactId
-    $profileData[$contactId] = array(
+    $profileData[$contactID] = array(
       'first_name' => 'abc1',
       'last_name' => 'xyz1',
       'email-Primary' => 'abc1.xyz1@yahoo.com',

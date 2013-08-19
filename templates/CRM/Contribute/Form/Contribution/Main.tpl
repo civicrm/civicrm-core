@@ -53,7 +53,7 @@
     {/if}
   {/if}
 
-{* Main Form *}  
+{* Main Form *}
 {else}
   {literal}
   <script type="text/javascript">
@@ -99,6 +99,7 @@
   <div id="intro_text" class="crm-section intro_text-section">
     {$intro_text}
   </div>
+  {include file="CRM/common/cidzero.tpl"}
   {if $islifetime or $ispricelifetime }
   <div id="help">{ts}You have a current Lifetime Membership which does not need to be renewed.{/ts}</div>
   {/if}

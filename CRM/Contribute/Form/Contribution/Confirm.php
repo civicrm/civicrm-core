@@ -798,6 +798,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // Make the contact ID associated with the contribution available at the Class level.
     // Also make available to the session.
+    //@todo consider handling this in $this->getContactID();
     $this->set('contactID', $contactID);
     $this->_contactID = $contactID;
 
