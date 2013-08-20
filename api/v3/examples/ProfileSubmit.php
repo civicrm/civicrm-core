@@ -1,9 +1,9 @@
 <?php
 /**
- * Test Generated example of using profile set API
+ * Test Generated example of using profile submit API
  * *
  */
-function profile_set_example(){
+function profile_submit_example(){
 $params = array(
   'profile_id' => 25,
   'contact_id' => 1,
@@ -16,7 +16,7 @@ $params = array(
 );
 
 try{
-  $result = civicrm_api3('profile', 'set', $params);
+  $result = civicrm_api3('profile', 'submit', $params);
 }
 catch (CiviCRM_API3_Exception $e) {
   // handle error here
@@ -32,7 +32,7 @@ return $result;
 /**
  * Function returns array of result expected from previous function
  */
-function profile_set_expectedresult(){
+function profile_submit_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
@@ -99,7 +99,7 @@ function profile_set_expectedresult(){
 /*
 * This example has been generated from the API test suite. The test that created it is called
 *
-* testProfileSet and can be found in
+* testProfileSubmit and can be found in
 * http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/ProfileTest.php
 *
 * You can see the outcome of the API tests at
