@@ -468,23 +468,32 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
 
     $realFieldName = $field['field_name'];
     //see function notes
+    // as we build up a list of these we should be able to determine a generic approach
+    //
     $hardCodedEntityFields = array(
       'state_province' => 'state_province_id',
       'country' => 'country_id',
       'participant_status' => 'status_id',
       'gender' => 'gender_id',
+      'financial_type' => 'financial_type_id',
+      'soft_credit' => 'soft_credit_to',
+      'group' => 'group_id',
+      'tag' => 'tag_id',
     );
+
     if(array_key_exists($realFieldName, $hardCodedEntityFields)) {
       $realFieldName = $hardCodedEntityFields[$realFieldName];
     }
+
     $entities[$entity][$fieldName] = $realFieldName;
   }
 
   foreach ($entities as $entity => $entityFields) {
     $result = civicrm_api3($entity, 'getfields', array('action' => 'create'));
+    $entityGetFieldsResult = _civicrm_api3_profile_appendaliases($result['values'], $entity);
     foreach ($entityFields as $entityfield => $realName) {
-      $profileFields[$profileID][$entityfield] = $result['values'][$realName];
-      if($optionsBehaviour && !empty($result['values'][$realName]['pseudoconstant'])) {
+      $profileFields[$profileID][$entityfield] = $entityGetFieldsResult[$realName];
+      if($optionsBehaviour && !empty($entityGetFieldsResult[$realName]['pseudoconstant'])) {
         if($optionsBehaviour > 1  || !in_array($realName, array('state_province_id', 'county_id', 'country_id'))) {
           $options = civicrm_api3($entity, 'getoptions', array('field' => $realName));
           $profileFields[$profileID][$entityfield]['options'] = $options['values'];
@@ -527,8 +536,11 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     $fieldName .= '-' . $field['location_type_id'];
     $entity = 'Phone';
   }
+  // @todo - sort this out!
   //here we do a hard-code list of known fields that don't map to where they are mapped to
-  // not a great solution but probably if we looked in the BAO we'd find a scary switch
+  // not a great solution but probably if we looked in the BAO we'd find a scary switch statement
+  // in a perfect world the uf_field table would hold the correct entity for each item
+  // & only the relationships between entities would need to be coded
   $hardCodedEntityMappings = array(
     'street_address' => 'Address',
     'street_number' => 'Address',
@@ -541,6 +553,18 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     'state_province' => 'Address',
     'country' => 'Address',
     'county' => 'Address',
+    //note that in discussions about how to restructure the api we discussed making these membership
+    // fields into 'membership_payment' fields - which would entail declaring them in getfields
+    // & renaming them in existing profiles
+    'financial_type' => 'Contribution',
+    'total_amount' => 'Contribution',
+    'receive_date' => 'Contribution',
+    'payment_instrument' => 'Contribution',
+    'check_number' => 'Contribution',
+    'contribution_status_id' => 'Contribution',
+    'soft_credit' => 'Contribution',
+    'group' => 'GroupContact',
+    'tag' => 'EntityTag',
    );
   if(array_key_exists($fieldName, $hardCodedEntityMappings)) {
     $entity = $hardCodedEntityMappings[$fieldName];
@@ -557,4 +581,30 @@ function _civicrm_api3_profile_getProfileID($profileID) {
     $profileID = civicrm_api3('uf_group', 'getvalue', array('return' => 'id', 'name' => $profileID));
   }
   return $profileID;
+}
+
+/**
+ * helper function to add all aliases as keys to getfields response so we can look for keys within it
+ * since the relationship between profile fields & api / metadata based fields is a bit inconsistent
+ * @param array $values
+ *
+ * e.g getfields response incl 'membership_type_id' - with api.aliases = 'membership_type'
+ * returned array will include both as keys (with the same values)
+ */
+function _civicrm_api3_profile_appendaliases($values, $entity) {
+  foreach ($values as $field => $spec) {
+    if(!empty($spec['api.aliases'])) {
+      foreach ($spec['api.aliases'] as $alias) {
+        $values[$alias] = $spec;
+      }
+    }
+    if(!empty($spec['uniqueName'])) {
+      $values[$spec['uniqueName']] = $spec;
+    }
+  }
+  //special case on membership & contribution - can't see how to handle in a generic way
+  if(in_array($entity, array('Membership', 'Contribution'))) {
+    $values['send_receipt'] = array('title' => 'Send Receipt', 'type' => 16);
+  }
+  return $values;
 }
