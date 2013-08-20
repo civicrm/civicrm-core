@@ -412,7 +412,12 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       );
     }
   }
-
+ /**
+  * Check we can submit membership batch profiles (create mode)
+  */
+  function testProfileSubmitMembershipBatch() {
+    $this->callAPISuccess('profile', 'submit', array('profile_id' => 'membership_batch_entry'));
+  }
   /**
    * set is deprecated but we need to ensure it still works
    */
