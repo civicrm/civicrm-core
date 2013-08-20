@@ -287,7 +287,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertFalse(array_key_exists('participant_status', $result['values']));
   }
   /**
-   * Check getfields works & gives us our fields
+   * Check getfields works & gives us our fields - partipant profile
    */
   function testGetFieldsParticipantProfile() {
     $result = $this->callAPISuccess('profile', 'getfields', array(
@@ -297,6 +297,36 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     );
     $this->assertTrue(array_key_exists('participant_status', $result['values']));
     $this->assertEquals('Attended', $result['values']['participant_status']['options'][2]);
+  }
+
+  /**
+   * Check getfields works & gives us our fields - membership_batch_entry
+   * (getting to the end with no e-notices is pretty good evidence it's working)
+   */
+  function testGetFieldsMembershipBatchProfile() {
+    $result = $this->callAPISuccess('profile', 'getfields', array(
+      'action' => 'submit',
+      'profile_id' => 'membership_batch_entry',
+      'get_options' => 'all')
+    );
+    $this->assertTrue(array_key_exists('total_amount', $result['values']));
+    $this->assertEquals(12, $result['values']['receive_date']['type']);
+  }
+
+  /**
+   * Check getfields works & gives us our fields - do them all
+   * (getting to the end with no e-notices is pretty good evidence it's working)
+   */
+  function testGetFieldsAllProfiles() {
+    $result = $this->callAPISuccess('uf_group', 'get', array('return' => 'id'));
+    $profileIDs = array_keys($result['values']);
+    foreach ($profileIDs as $profileID) {
+    $result = $this->callAPISuccess('profile', 'getfields', array(
+      'action' => 'submit',
+      'profile_id' => $profileID,
+      'get_options' => 'all')
+    );
+    }
   }
   /////////////// test $this->callAPISuccess3_profile_set //////////////////
 
@@ -382,7 +412,12 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       );
     }
   }
-
+ /**
+  * Check we can submit membership batch profiles (create mode)
+  */
+  function testProfileSubmitMembershipBatch() {
+    $this->callAPISuccess('profile', 'submit', array('profile_id' => 'membership_batch_entry'));
+  }
   /**
    * set is deprecated but we need to ensure it still works
    */

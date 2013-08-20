@@ -320,6 +320,10 @@ function contact_getfields_expectedresult(){
           'pseudoconstant' => array(
               'optionGroupName' => 'individual_prefix',
             ),
+          'api.aliases' => array(
+              '0' => 'individual_prefix',
+              '1' => 'individual_prefix_id',
+            ),
         ),
       'suffix_id' => array(
           'name' => 'suffix_id',
@@ -332,6 +336,10 @@ function contact_getfields_expectedresult(){
           'export' => true,
           'pseudoconstant' => array(
               'optionGroupName' => 'individual_suffix',
+            ),
+          'api.aliases' => array(
+              '0' => 'individual_suffix',
+              '1' => 'individual_suffix_id',
             ),
         ),
       'email_greeting_id' => array(
@@ -552,6 +560,7 @@ function contact_getfields_expectedresult(){
           'groupTitle' => 'select_test_g',
           'data_type' => 'String',
           'html_type' => 'Select',
+          'default_value' => '',
           'text_length' => '',
           'options_per_line' => '',
           'custom_group_id' => '1',

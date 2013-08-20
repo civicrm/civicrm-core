@@ -1704,14 +1704,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $customGroup = $this->CustomGroupMultipleCreateByParams($params);
     $ids['custom_group_id'] = $customGroup['id'];
 
-    $customField = $this->customFieldCreate($ids['custom_group_id']);
+    $customField = $this->customFieldCreate(array('custom_group_id' => $ids['custom_group_id'], 'label' => 'field_1' . $ids['custom_group_id']));
 
     $ids['custom_field_id'][] = $customField['id'];
 
-    $customField = $this->customFieldCreate($ids['custom_group_id'], 'field_2');
+    $customField = $this->customFieldCreate(array('custom_group_id' => $ids['custom_group_id'], 'default_value' => '', 'label' => 'field_2' . $ids['custom_group_id']));
     $ids['custom_field_id'][] = $customField['id'];
 
-    $customField = $this->customFieldCreate($ids['custom_group_id'], 'field_3');
+    $customField = $this->customFieldCreate(array('custom_group_id' => $ids['custom_group_id'], 'default_value' => '', 'label' => 'field_3' . $ids['custom_group_id']));
     $ids['custom_field_id'][] = $customField['id'];
 
     return $ids;
@@ -1732,7 +1732,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
     $params['extends'] =  $entity ? $entity : 'Contact';
     $customGroup = $this->CustomGroupCreate($params);
-    $customField = $this->customFieldCreate($customGroup['id'], $function);
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'label' => $function));
     CRM_Core_PseudoConstant::flush();
 
     return array('custom_group_id' => $customGroup['id'], 'custom_field_id' => $customField['id']);
@@ -1744,7 +1744,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param int    $customGroupID
    */
   function customGroupDelete($customGroupID) {
-
     $params['id'] = $customGroupID;
     return $this->callAPISuccess('custom_group', 'delete', $params);
   }
@@ -1752,22 +1751,19 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create custom field
    *
-   * @param int    $customGroupID
+   * @param array $params (custom_group_id) is required
    * @param string $name  name of custom field
    * @param int $apiversion API  version to use
    */
-  function customFieldCreate($customGroupID, $name = "Cust Field") {
-
-    $params = array(
-      'label' => $name,
-      'name' => $name,
-      'custom_group_id' => $customGroupID,
+  function customFieldCreate($params) {
+    $params = array_merge(array(
+      'label' => 'Custom Field',
       'data_type' => 'String',
       'html_type' => 'Text',
       'is_searchable' => 1,
       'is_active' => 1,
       'default_value' => 'defaultValue',
-    );
+    ), $params);
 
     $result = $this->callAPISuccess('custom_field', 'create', $params);
 
