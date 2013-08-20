@@ -147,7 +147,7 @@ function _civicrm_api3_profile_get_spec(&$params) {
  * @return array API result array
  */
 function civicrm_api3_profile_submit($params) {
-
+  $profileID = _civicrm_api3_profile_getProfileID($params['profile_id']);
   if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $params['profile_id'], 'is_active')) {
     throw new API_Exception('Invalid value for profile_id');
   }
