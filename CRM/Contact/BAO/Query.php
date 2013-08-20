@@ -4998,7 +4998,14 @@ AND   displayRelType.is_active = 1
     $dataType = 'String',
     $useIDsOnly = FALSE
   ) {
-    $qill = $value;
+
+    if (!empty($selectValues)) {
+      $qill = $selectValues[$value];
+    }
+    else {
+      $qill = $value;
+    }
+
     $pseudoFields = array('email_greeting', 'postal_greeting', 'addressee', 'gender_id', 'prefix_id', 'suffix_id');
 
     if (is_numeric($value)) {
