@@ -45,7 +45,7 @@ function custom_field_create_expectedresult(){
       '1' => array(
           'id' => '1',
           'custom_group_id' => '1',
-          'name' => 'Name1',
+          'name' => 'test_textfield2',
           'label' => 'Name1',
           'data_type' => 'String',
           'html_type' => 'Text',

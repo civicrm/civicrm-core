@@ -61,7 +61,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     $this->CustomGroupIndividual = $this->customGroupCreate($groupIndividual);
 
-    $this->IndividualField = $this->customFieldCreate($this->CustomGroupIndividual['id'], "Custom Field" . substr(sha1(rand()), 0, 7));
+    $this->IndividualField = $this->customFieldCreate(array('custom_group_id' => $this->CustomGroupIndividual['id']));
 
     //  Create Group For Individual-Student  Contact Sub  Type
     $groupIndiStudent = array(
@@ -73,7 +73,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     $this->CustomGroupIndiStudent = $this->customGroupCreate($groupIndiStudent);
 
-    $this->IndiStudentField = $this->customFieldCreate($this->CustomGroupIndiStudent['id'], "Custom Field" . substr(sha1(rand()), 0, 7));
+    $this->IndiStudentField = $this->customFieldCreate(array('custom_group_id' => $this->CustomGroupIndiStudent['id']));
 
     $params = array(
       'first_name' => 'Mathev',
