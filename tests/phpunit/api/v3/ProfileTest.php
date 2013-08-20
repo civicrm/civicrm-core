@@ -38,6 +38,7 @@ require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
  */
 class api_v3_ProfileTest extends CiviUnitTestCase {
   protected $_apiversion;
+  protected $_profileID;
   function get_info() {
     return array(
       'name' => 'Profile Test',
@@ -270,25 +271,43 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     }
   }
 
-  /////////////// test $this->callAPISuccess3_profile_set //////////////////
-
   /**
-   * check with no array
+   * Check getfields works & gives us our fields
    */
-  function testProfileSetNoArray() {
-    $params = NULL;
-    $result = $this->callAPIFailure('profile', 'set', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
+  function testGetFields() {
+    $this->_createIndividualProfile();
+    $this->_addCustomFieldToProfile($this->_profileID);
+    $result = $this->callAPIAndDocument('profile', 'getfields', array('action' => 'submit', 'profile_id' => 25), __FUNCTION__, __FILE__,
+      'demonstrates retrieving profile fields passing in an id');
+    $this->assertArrayKeyExists('first_name', $result['values']);
+    $this->assertEquals('2', $result['values']['first_name']['type']);
+    $this->assertEquals('Email', $result['values']['email']['title']);
+    $this->assertEquals('civicrm_state_province', $result['values']['state_province-1']['pseudoconstant']['table']);
+    $this->assertEquals('defaultValue', $result['values']['custom_1']['default_value']);
+    $this->assertFalse(array_key_exists('participant_status', $result['values']));
   }
+  /**
+   * Check getfields works & gives us our fields
+   */
+  function testGetFieldsParticipantProfile() {
+    $result = $this->callAPISuccess('profile', 'getfields', array(
+      'action' => 'submit',
+      'profile_id' => 'participant_status',
+      'get_options' => 'all')
+    );
+    $this->assertTrue(array_key_exists('participant_status', $result['values']));
+    $this->assertEquals('Attended', $result['values']['participant_status']['options'][2]);
+  }
+  /////////////// test $this->callAPISuccess3_profile_set //////////////////
 
   /**
    * check Without ProfileId
    */
-  function testProfileSetWithoutProfileId() {
+  function testProfileSubmitWithoutProfileId() {
     $params = array(
       'contact_id' => 1,
     );
-    $result = $this->callAPIFailure('profile', 'set', $params,
+    $result = $this->callAPIFailure('profile', 'submit', $params,
       'Mandatory key(s) missing from params array: profile_id'
     );
   }
@@ -296,18 +315,18 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * check with no invalid profile Id
    */
-  function testProfileSetInvalidProfileId() {
+  function testProfileSubmitInvalidProfileId() {
     $params = array(
       'contact_id' => 1,
       'profile_id' => 1000,
     );
-    $result = $this->callAPIFailure('profile', 'set', $params);
+    $result = $this->callAPIFailure('profile', 'submit', $params);
   }
 
   /**
    * check with missing required field in profile
    */
-  function testProfileSetCheckProfileRequired() {
+  function testProfileSubmitCheckProfileRequired() {
     $pofileFieldValues = $this->_createIndividualContact();
     current($pofileFieldValues);
     $contactId = key($pofileFieldValues);
@@ -323,7 +342,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       $updateParams
     );
 
-    $result = $this->callAPIFailure('profile', 'set', $params,
+    $result = $this->callAPIFailure('profile', 'submit', $params,
       'Missing required parameters for profile id 25: email-Primary'
     );
   }
@@ -331,7 +350,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * check with success
    */
-  function testProfileSet() {
+  function testProfileSubmit() {
     $pofileFieldValues = $this->_createIndividualContact();
     current($pofileFieldValues);
     $contactId = key($pofileFieldValues);
@@ -350,7 +369,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
         'contact_id' => $contactId,
       ), $updateParams);
 
-    $result = $this->callAPIAndDocument('profile', 'set', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('profile', 'submit', $params, __FUNCTION__, __FILE__);
 
     $getParams = array(
       'profile_id' => 25,
@@ -367,35 +386,30 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /*
      * check contact activity profile without activity id
      */
-  function testContactActivitySetWithoutActivityId() {
+  function testContactActivitySubmitWithoutActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
 
     $params = array_merge($params, $expected);
     unset($params['activity_id']);
-    $result = $this->callAPIFailure('profile', 'set', $params);
+    $result = $this->callAPIFailure('profile', 'submit', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: activity_id');
-
-    $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
   }
 
   /*
      * check contact activity profile wrong activity id
      */
-  function testContactActivitySetWrongActivityId() {
+  function testContactActivitySubmitWrongActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
-
     $params = array_merge($params, $expected);
     $params['activity_id'] = 100001;
-    $result = $this->callAPIFailure('profile', 'set', $params);
+    $result = $this->callAPIFailure('profile', 'submit', $params);
     $this->assertEquals($result['error_message'], 'Invalid Activity Id (aid).');
-
-    $this->quickCleanup(array('civicrm_uf_field', 'civicrm_uf_join', 'civicrm_uf_group', 'civicrm_custom_field', 'civicrm_custom_group', 'civicrm_contact'));
   }
 
   /*
      * check contact activity profile with wrong activity type
      */
-  function testContactActivitySetWrongActivityType() {
+  function testContactActivitySubmitWrongActivityType() {
     //flush cache by calling with reset
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
 
@@ -421,14 +435,14 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     $params = array_merge($params, $expected);
     $params['activity_id'] = $activityValues['id'];
-    $result = $this->callAPIFailure('profile', 'set', $params,
+    $result = $this->callAPIFailure('profile', 'submit', $params,
       'This activity cannot be edited or viewed via this profile.');
   }
 
   /*
      * check contact activity profile with success
      */
-  function testContactActivitySetSuccess() {
+  function testContactActivitySubmitSuccess() {
     list($params, $expected) = $this->_createContactWithActivity();
 
     $updateParams = array(
@@ -442,7 +456,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'activity_status_id' => '2',
     );
     $profileParams = array_merge($params, $updateParams);
-    $profile       = $this->callAPISuccess('profile', 'set', $profileParams);
+    $profile       = $this->callAPISuccess('profile', 'submit', $profileParams);
     $result        = $this->callAPISuccess('profile', 'get', $params);
 
     foreach ($updateParams as $profileField => $value) {
@@ -566,23 +580,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     );
 
     $contactID = $this->individualCreate($contactParams);
-
-    // Create new profile having group_type: Contact,Individual
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
-        dirname(__FILE__) . "/dataset/uf_group_25.xml"
-      )
-    );
-    // Create Contact + Idividual fields for profile
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
-        dirname(__FILE__) . "/dataset/uf_field_uf_group_25.xml"
-      )
-    );
-
-
+    $this->_createIndividualProfile();
     // expected result of above created profile with contact Id $contactId
     $profileData[$contactID] = array(
       'first_name' => 'abc1',
@@ -670,6 +668,31 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     );
 
     return array($profileParams, $expected);
+  }
+  /**
+   * Create a profile
+   */
+  function _createIndividualProfile() {
+    // Create new profile having group_type: Contact,Individual
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $op->execute($this->_dbconn,
+      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+        dirname(__FILE__) . "/dataset/uf_group_25.xml"
+      )
+    );
+    // Create Contact + Idividual fields for profile
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $op->execute($this->_dbconn,
+      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+        dirname(__FILE__) . "/dataset/uf_field_uf_group_25.xml"
+      )
+    );
+    $this->_profileID = 25;
+  }
+
+  function _addCustomFieldToProfile($profileID) {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, '');
+    $this->uFFieldCreate(array('uf_group_id' => $profileID, 'field_name' => 'custom_' . $ids['custom_field_id'], 'contact_type' => 'Contact'));
   }
 }
 
