@@ -51,7 +51,8 @@ require_once 'api/v3/utils.php';
  *
  * NOTE this api is not standard & since it is tested we need to honour that
  * but the correct behaviour is for it to return an id indexed array as this supports
- * multiple instances
+ * multiple instances - if a  single profile is passed in we will not return a normal api result array
+ * in order to avoid breaking code. (This could still be confusing :-( but we have to keep the tested behaviour working
  *
  * Note that if contact_id is empty an array of defaults is returned
  *
@@ -64,6 +65,7 @@ function civicrm_api3_profile_get($params) {
   $profiles = (array) $params['profile_id'];
   $values = array();
   foreach ($profiles as $profileID) {
+    $profileID = _civicrm_api3_profile_getProfileID($profileID);
     $values[$profileID] = array();
     if (strtolower($profileID) == 'billing') {
       $values[$profileID] = _civicrm_api3_profile_getbillingpseudoprofile($params);
@@ -136,21 +138,15 @@ function _civicrm_api3_profile_get_spec(&$params) {
   $params['profile_id']['api.required'] = TRUE;
   $params['contact_id']['description'] = 'If no contact is specified an array of defaults will be returned';
 }
-/**
- * Update Profile field values.
- *
- * @param array  $params       Associative array of property name/value
- *                             pairs to update profile field values
- *
- * @return Updated Contact/ Activity object|CRM_Error
- *
- * @todo add example
- * @todo add test cases
- *
- */
-function civicrm_api3_profile_set($params) {
 
-  civicrm_api3_verify_mandatory($params, NULL, array('profile_id'));
+/**
+ * Submit a set of fields against a profile.
+ * Note choice of submit versus create is discussed CRM-13234 & related to the fact
+ * 'profile' is being treated as a data-entry entity
+ * @param array $params
+ * @return array API result array
+ */
+function civicrm_api3_profile_submit($params) {
 
   if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $params['profile_id'], 'is_active')) {
     throw new API_Exception('Invalid value for profile_id');
@@ -184,7 +180,7 @@ function civicrm_api3_profile_set($params) {
       $params['profile_id']
     );
     if (!empty($errors)) {
-      return civicrm_api3_create_error(array_pop($errors));
+      throw new API_Exception(array_pop($errors));
     }
   }
 
@@ -275,9 +271,47 @@ function civicrm_api3_profile_set($params) {
   }
 
   return $result;
+
+}
+/**
+ * metadata for submit action
+ * @param array $params
+ * @param array $apirequest
+ */
+function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
+  if(isset($apirequest['params']['profile_id'])) {
+    // we will return what is required for this profile
+    // note the problem with simply over-riding getfields & then calling generic if needbe is we don't have the
+    // api request array to pass to it.
+    //@todo - it may make more sense just to pass the apiRequest to getfields
+    //@todo get_options should take an array - @ the moment it is only takes 'all' - which is supported
+    // by other getfields fn
+    // we don't resolve state, country & county for performance reasons
+    $resolveOptions = CRM_Utils_Array::value('get_options',$apirequest['params']) == 'all' ? True : False;
+    $profileID = _civicrm_api3_profile_getProfileID($apirequest['params']['profile_id']);
+    $params = _civicrm_api3_buildprofile_submitfields($profileID, $resolveOptions);
+  }
+  $params['profile_id']['api.required'] = TRUE;
 }
 
 /**
+ * @deprecated - calling this function directly is deprecated as 'set' is not a clear action
+ * use submit
+ * Update Profile field values.
+ *
+ * @param array  $params       Associative array of property name/value
+ *                             pairs to update profile field values
+ *
+ * @return Updated Contact/ Activity object|CRM_Error
+ *
+ *
+ */
+function civicrm_api3_profile_set($params) {
+  return civicrm_api3('profile', 'submit', $params);
+}
+
+/**
+ * @deprecated - appears to be an internal function - should not be accessible via api
  * Provide formatted values for profile fields.
  *
  * @param array  $params       Associative array of property name/value
@@ -324,15 +358,6 @@ function civicrm_api3_profile_apply($params) {
   return civicrm_api3_create_success($data);
 }
 
-/**
- * Return UFGroup fields
- */
-function civicrm_api3_profile_getfields($params) {
-  $dao = _civicrm_api3_get_DAO('UFGroup');
-  $d = new $dao();
-  $fields = $d->fields();
-  return civicrm_api3_create_success($fields);
-}
 
 /**
  * This is a function to help us 'pretend' billing is a profile & treat it like it is one.
@@ -404,4 +429,132 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
   // return both variants of email to reflect inconsistencies in form layer
   $values['email'. '-' . $locationTypeID] = $values['billing-email'. '-' . $locationTypeID];
   return $values;
+}
+
+/**
+ * Here we will build  up getfields type data for all the fields in the profile. Because the integration with the
+ * form layer in core is so hard-coded we are not going to attempt to re-use it
+ * However, as this function is unit-tested & hence 'locked in' we can aspire to extract sharable
+ * code out of the form-layer over time.
+ *
+ * The function deciphers which fields belongs to which entites & retrieves metadata about the entities
+ * Unfortunately we have inconsistencies such as 'contribution' uses contribution_status_id
+ * & participant has 'participant_status' so we have to standardise from the outside in here -
+ * find the oddities, 'mask them' at this layer, add tests & work to standardise over time so we can remove this handling
+ *
+ * @param integer $profileID
+ * @param integer $optionsBehaviour 0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state
+ */
+
+function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour = 1) {
+  static $profileFields = array();
+  if(isset($profileFields[$profileID])) {
+    return $profileFields[$profileID];
+  }
+  $fields = civicrm_api3('uf_field', 'get', array('uf_group_id' => $profileID));
+  $entities = array();
+
+  foreach ($fields['values'] as $id => $field) {
+    if(!$field['is_active']) {
+      continue;
+    }
+    list($entity, $fieldName) = _civicrm_api3_map_profile_fields_to_entity($field);
+    $profileFields[$profileID][$fieldName] = array(
+      'api.required' => $field['is_required'],
+      'title' => $field['label'],
+      'help_pre' => CRM_Utils_Array::value('help_pre', $field),
+      'help_post' => CRM_Utils_Array::value('help_post', $field),
+    );
+
+    $realFieldName = $field['field_name'];
+    //see function notes
+    $hardCodedEntityFields = array(
+      'state_province' => 'state_province_id',
+      'country' => 'country_id',
+      'participant_status' => 'status_id',
+      'gender' => 'gender_id',
+    );
+    if(array_key_exists($realFieldName, $hardCodedEntityFields)) {
+      $realFieldName = $hardCodedEntityFields[$realFieldName];
+    }
+    $entities[$entity][$fieldName] = $realFieldName;
+  }
+
+  foreach ($entities as $entity => $entityFields) {
+    $result = civicrm_api3($entity, 'getfields', array('action' => 'create'));
+    foreach ($entityFields as $entityfield => $realName) {
+      $profileFields[$profileID][$entityfield] = $result['values'][$realName];
+      if($optionsBehaviour && !empty($result['values'][$realName]['pseudoconstant'])) {
+        if($optionsBehaviour > 1  || !in_array($realName, array('state_province_id', 'county_id', 'country_id'))) {
+          $options = civicrm_api3($entity, 'getoptions', array('field' => $realName));
+          $profileFields[$profileID][$entityfield]['options'] = $options['values'];
+        }
+      }
+      /**
+       * putting this on hold -this would cause the api to set the default - but could have unexpected behaviour
+      if(isset($result['values'][$realName]['default_value'])) {
+        //this would be the case for a custom field with a configured default
+        $profileFields[$profileID][$entityfield]['api.default'] = $result['values'][$realName]['default_value'];
+      }
+      */
+    }
+  }
+  return $profileFields[$profileID];
+}
+
+/**
+ * Here we map the profile fields as stored in the uf_field table to their 'real entity'
+ * we also return the profile fieldname
+ *
+ */
+function _civicrm_api3_map_profile_fields_to_entity(&$field) {
+  $entity = $field['field_type'];
+  $contactTypes = civicrm_api3('contact', 'getoptions', array('field' => 'contact_type'));
+  if(in_array($entity, $contactTypes['values'])) {
+    $entity = 'Contact';
+  }
+  $fieldName = $field['field_name'];
+  if(!empty($field['location_type_id'])) {
+    if($fieldName == 'email') {
+      $entity = 'Email';
+    }
+    else{
+      $entity = 'Address';
+    }
+    $fieldName .= '-' . $field['location_type_id'];
+  }
+  if(!empty($field['phone_type_id'])) {
+    $fieldName .= '-' . $field['location_type_id'];
+    $entity = 'Phone';
+  }
+  //here we do a hard-code list of known fields that don't map to where they are mapped to
+  // not a great solution but probably if we looked in the BAO we'd find a scary switch
+  $hardCodedEntityMappings = array(
+    'street_address' => 'Address',
+    'street_number' => 'Address',
+    'supplemental_address_1' => 'Address',
+    'supplemental_address_2' => 'Address',
+    'supplemental_address_3' => 'Address',
+    'postal_code' => 'Address',
+    'city' => 'Address',
+    'email' => 'Email',
+    'state_province' => 'Address',
+    'country' => 'Address',
+    'county' => 'Address',
+   );
+  if(array_key_exists($fieldName, $hardCodedEntityMappings)) {
+    $entity = $hardCodedEntityMappings[$fieldName];
+  }
+  return array($entity, $fieldName);
+}
+
+/**
+ * @todo this should be handled by the api wrapper using getfields info - need to check
+ * how we add a a pseudoconstant to this pseudoapi to make that work
+ */
+function _civicrm_api3_profile_getProfileID($profileID) {
+  if(!empty($profileID) && !strtolower($profileID) == 'billing' && !is_numeric($profileID)) {
+    $profileID = civicrm_api3('uf_group', 'getvalue', array('return' => 'id', 'name' => $profileID));
+  }
+  return $profileID;
 }

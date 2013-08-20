@@ -113,7 +113,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
   $helper = '_' . $hypApiRequest['function'] . '_spec';
   if (function_exists($helper)) {
     // alter
-    $helper($metadata);
+    $helper($metadata, $apiRequest);
   }
 
   $fieldsToResolve = (array) CRM_Utils_Array::value('get_options', $apiOptions, array());
