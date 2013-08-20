@@ -193,6 +193,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ),
           'payment_instrument_id' => array('title' => ts('Payment Type'),
           ),
+          'check_number' => array('title' => ts('Check Number'),
+          ),
           'currency' =>
           array('required' => TRUE,
             'no_display' => TRUE,
