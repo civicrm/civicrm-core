@@ -212,18 +212,20 @@
     });
 
     function skipPaymentMethod() {
-    cj('#priceset input').change(function() {
-      if (cj(this).attr('data-amount') == '0') {
-        cj(".payment_options-group").hide();
-        cj("div.payment_processor-section").hide();
-        cj("div#payment_information").hide();
-      } else {
-        cj(".payment_options-group").show();
-        cj("div.payment_processor-section").show();
-        cj("div#payment_information").show();
-      }
+      var symbol = '{/literal}{$currencySymbol}{literal}';
+      cj('#priceset input').change(function () {
+        if ((cj(this).attr('data-amount') == '0') || (cj('#pricevalue').text() == symbol + " 0.00" )) {
+          cj(".payment_options-group").hide();
+          cj("div.payment_processor-section").hide();
+          cj("div#payment_information").hide();
+        }
+        else {
+          cj(".payment_options-group").show();
+          cj("div.payment_processor-section").show();
+          cj("div#payment_information").show();
+        }
 
-    });
+      });
     }
     {/literal}
   </script>
