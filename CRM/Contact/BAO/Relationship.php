@@ -1558,7 +1558,7 @@ cc.sort_name LIKE '%$name%'";
       return;
     }
     else {
-      $relationshipDirections = $membershipType['relationship_direction'];
+      $relationshipDirections = (array) $membershipType['relationship_direction'];
       // if we have contact_id_a OR contact_id_b we can make a call here
       // if we have contact??
       foreach ($relationshipDirections as $index => $mtdirection) {

@@ -393,9 +393,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     );
     $this->addRule("email-{$this->_bltID}", ts('Email is not valid.'), 'email');
     $pps = array();
+    $onlinePaymentProcessorEnabled = FALSE;
     if (!empty($this->_paymentProcessors)) {
-      $pps = $this->_paymentProcessors;
-      foreach ($pps as $key => & $name) {
+      foreach ($this->_paymentProcessors as $key => $name) {
+        if($name['billing_mode'] == 1) {
+          $onlinePaymentProcessorEnabled = TRUE;
+        }
         $pps[$key] = $name['name'];
       }
     }
@@ -416,6 +419,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->assign('is_pay_later', $this->_values['is_pay_later']);
         $this->assign('pay_later_text', $this->_values['pay_later_text']);
       }
+    }
+
+    $contactID = $this->getContactID();
+    if($this->getContactID() === '0') {
+      $this->addCidZeroOptions($onlinePaymentProcessorEnabled);
     }
     //build pledge block.
     $this->_useForMember = 0;

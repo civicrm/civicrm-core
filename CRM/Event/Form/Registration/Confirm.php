@@ -452,6 +452,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     $this->_params = $this->get('params');
     if (CRM_Utils_Array::value('contact_id', $this->_params[0])) {
+      // unclear when this would be set & whether it could be checked in getContactID.
+      // perhaps it relates to when cid is in the url
+      //@todo someone who knows add comments on the various contactIDs in this form
       $contactID = $this->_params[0]['contact_id'];
     }
     else {
@@ -1083,6 +1086,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $contactID,
         'contact_type'
       );
+
+      if(array_key_exists('contact_id', $params) && empty($params['contact_id'])) {
+        // we unset this here because the downstream function ignores the contactID we give it
+        // if it is set & it is difficult to understand the implications of 'fixing' this downstream
+        // but if we are passing a contact id into this function it's reasonable to assume we don't
+        // want it ignored
+        unset($params['contact_id']);
+      }
+
       $contactID = CRM_Contact_BAO_Contact::createProfileContact(
         $params,
         $fields,

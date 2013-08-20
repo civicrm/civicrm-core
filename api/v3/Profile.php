@@ -52,10 +52,15 @@ require_once 'api/v3/utils.php';
  * NOTE this api is not standard & since it is tested we need to honour that
  * but the correct behaviour is for it to return an id indexed array as this supports
  * multiple instances
+ *
+ * Note that if contact_id is empty an array of defaults is returned
+ *
  */
 function civicrm_api3_profile_get($params) {
   $nonStandardLegacyBehaviour = is_numeric($params['profile_id']) ?  TRUE : FALSE;
-
+  if(!empty($params['check_permissions']) && !empty($params['contact_id']) && !1 === civicrm_api3('contact', 'getcount', array('contact_id' => $params['contact_id'], 'check_permissions' => 1))) {
+    throw new API_Exception('permission denied');
+  }
   $profiles = (array) $params['profile_id'];
   $values = array();
   foreach ($profiles as $profileID) {
@@ -70,10 +75,6 @@ function civicrm_api3_profile_get($params) {
 
     $isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($profileID);
 
-    if (CRM_Core_BAO_UFField::checkProfileType($profileID) && !$isContactActivityProfile) {
-      throw new API_Exception('Can not retrieve values for profiles include fields for more than one record type.');
-    }
-
     $profileFields = CRM_Core_BAO_UFGroup::getFields($profileID,
       FALSE,
       NULL,
@@ -81,7 +82,7 @@ function civicrm_api3_profile_get($params) {
       NULL,
       FALSE,
       NULL,
-      TRUE,
+      empty($params['check_permissions']) ? FALSE : TRUE,
       NULL,
       CRM_Core_Permission::EDIT
     );
@@ -114,8 +115,11 @@ function civicrm_api3_profile_get($params) {
       CRM_Core_BAO_UFGroup::setComponentDefaults($activityFields, $params['activity_id'], 'Activity', $values[$profileID], TRUE);
     }
   }
-  else {
+  elseif(!empty($params['contact_id'])) {
     CRM_Core_BAO_UFGroup::setProfileDefaults($params['contact_id'], $profileFields, $values[$profileID], TRUE);
+  }
+  else{
+    $values[$profileID] = array_fill_keys(array_keys($profileFields), '');
   }
   }
   if($nonStandardLegacyBehaviour) {
@@ -130,8 +134,7 @@ function civicrm_api3_profile_get($params) {
 
 function _civicrm_api3_profile_get_spec(&$params) {
   $params['profile_id']['api.required'] = TRUE;
-  // does this mean we use a different call to get a 'blank' profile?
-  $params['contact_id']['api.required'] = TRUE;
+  $params['contact_id']['description'] = 'If no contact is specified an array of defaults will be returned';
 }
 /**
  * Update Profile field values.
@@ -336,21 +339,36 @@ function civicrm_api3_profile_getfields($params) {
  * It gets standard credit card address fields etc
  * Note this is 'better' that the inbuilt version as it will pull in fallback values
  *  billing location -> is_billing -> primary
+ *
+ *  Note that that since the existing code for deriving a blank profile is not easily accessible our
+ *  interim solution is just to return an empty array
  */
 function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
-  $addressFields = array('street_address', 'city', 'state_province_id', 'country_id');
+  $addressFields = array('street_address', 'city', 'state_province_id', 'country_id', 'postal_code');
+  $locations = civicrm_api3('address', 'getoptions', array('field' => 'location_type_id'));
+  $locationTypeID = array_search('Billing', $locations['values']);
+
+  if(empty($params['contact_id'])) {
+    $blanks =  array(
+      'billing_first_name' => '',
+      'billing_middle_name' => '',
+      'billing_last_name' => '',
+    );
+    foreach ($addressFields as $field) {
+      $blanks['billing_' . $field . '_' . $locationTypeID] = '';
+    }
+    return $blanks;
+  }
   $result = civicrm_api3('contact', 'getsingle', array(
     'id' => $params['contact_id'],
-    'api.address.getoptions' => array('field' => 'location_type_id',),
     'api.address.get.1' => array('location_type_id' => 'Billing',  'return' => $addressFields),
     // getting the is_billing required or not is an extra db call but probably cheap enough as this isn't an import api
     'api.address.get.2' => array('is_billing' => True, 'return' => $addressFields),
     'api.email.get.1' => array('location_type_id' => 'Billing',),
     'api.email.get.2' => array('is_billing' => True,),
-    'return' => 'api.email.get, api.address.get, api.address.getoptions, email, first_name, last_name, middle_name,' . implode($addressFields, ','),
+    'return' => 'api.email.get, api.address.get, api.address.getoptions, state_province, email, first_name, last_name, middle_name, ' . implode($addressFields, ','),
    )
   );
-  $locationTypeID = array_search('Billing', $result['api.address.getoptions']['values']);
 
   $values = array(
     'billing_first_name' => $result['first_name'],
@@ -383,5 +401,7 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
   else{
     $values['billing-email'. '-' . $locationTypeID] = $result['email'];
   }
+  // return both variants of email to reflect inconsistencies in form layer
+  $values['email'. '-' . $locationTypeID] = $values['billing-email'. '-' . $locationTypeID];
   return $values;
 }
