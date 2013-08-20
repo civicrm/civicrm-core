@@ -490,7 +490,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
         $query = "SELECT $cfTable.id, $cfTable.label,
                             $cgTable.title,
-                            $cfTable.data_type, $cfTable.html_type,
+                            $cfTable.data_type,
+                            $cfTable.html_type,
+                            $cfTable.default_value,
                             $cfTable.options_per_line, $cfTable.text_length,
                             $cfTable.custom_group_id,
                             $cgTable.extends, $cfTable.is_search_range,
@@ -554,6 +556,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['groupTitle'] = $dao->title;
           $fields[$dao->id]['data_type'] = $dao->data_type;
           $fields[$dao->id]['html_type'] = $dao->html_type;
+          $fields[$dao->id]['default_value'] = $dao->default_value;
           $fields[$dao->id]['text_length'] = $dao->text_length;
           $fields[$dao->id]['options_per_line'] = $dao->options_per_line;
           $fields[$dao->id]['custom_group_id'] = $dao->custom_group_id;
