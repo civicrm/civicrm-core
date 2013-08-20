@@ -50,13 +50,18 @@
  */
 function civicrm_api3_entity_tag_get($params) {
 
-
-  $values = CRM_Core_BAO_EntityTag::getTag($params['entity_id'], $params['entity_table']);
-  $result = array();
-  foreach ($values as $v) {
-    $result[$v] = array('tag_id' => $v);
+  if(empty($params['entity_id'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
-  return civicrm_api3_create_success($result, $params);
+  else{
+    //do legacy non-standard behaviour
+    $values = CRM_Core_BAO_EntityTag::getTag($params['entity_id'], $params['entity_table']);
+    $result = array();
+    foreach ($values as $v) {
+      $result[$v] = array('tag_id' => $v);
+    }
+    return civicrm_api3_create_success($result, $params);
+  }
 }
 
 /**
@@ -66,7 +71,6 @@ function civicrm_api3_entity_tag_get($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_entity_tag_get_spec(&$params) {
-  $params['entity_id']['api.required'] = 1;
   $params['entity_id']['api.aliases'] = array('contact_id');
   $params['entity_table']['api.default'] = 'civicrm_contact';
 }
