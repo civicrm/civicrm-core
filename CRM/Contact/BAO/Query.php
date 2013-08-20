@@ -394,7 +394,7 @@ class CRM_Contact_BAO_Query {
   static $_relationshipTempTable = NULL;
 
   public $_pseudoConstantsSelect = array();
-  
+
   /**
    * class constructor which also does all the work
    *
@@ -5018,7 +5018,7 @@ AND   displayRelType.is_active = 1
         $qill = implode(', ', $newValues);
       }
     }
-    else {
+    elseif (!array_key_exists($value, $selectValues)) {
       // its a string, lets get the int value
       $value = array_search($value, $selectValues);
     }
