@@ -1155,6 +1155,12 @@ class CRM_Utils_Token {
           $details[$dao->id]['campaign'] = $campaigns[$campaignId];
         }
 
+        if (CRM_Utils_Array::value('financial_type_id', $details[$dao->id])) {
+          $financialtypeId = $details[$dao->id]['financial_type_id'];
+          $ftis = CRM_Contribute_PseudoConstant::financialType();
+          $details[$dao->id]['financial_type'] = $ftis[$financialtypeId];
+        }
+
         // TODO: call a hook to get token contribution details
       }
     }
