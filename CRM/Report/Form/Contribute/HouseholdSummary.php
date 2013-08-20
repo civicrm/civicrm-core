@@ -131,6 +131,8 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             'title' => 'Contribution Status',
             'default' => TRUE,
           ),
+          'check_number' => array('title' => ts('Check Number'),
+          ),
           'currency' => array(
             'required' => TRUE,
             'no_display' => TRUE,
