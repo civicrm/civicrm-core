@@ -1493,6 +1493,24 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Create a UFField
+   * @param array $params
+   */
+  function uFFieldCreate($params = array()) {
+    $params = array_merge(array(
+      'uf_group_id' => 1,
+      'field_name' => 'first_name',
+      'is_active' => 1,
+      'is_required' => 1,
+      'visibility' => 'Public Pages and Listings',
+      'is_searchable' => '1',
+      'label' => 'first_name',
+      'field_type' => 'Individual',
+      'weight' => 1,
+    ), $params);
+    $this->callAPISuccess('uf_field', 'create', $params);
+  }
+  /**
    * Function to add a UF Join Entry
    *
    * @return int $id of created UF Join
@@ -1748,22 +1766,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'html_type' => 'Text',
       'is_searchable' => 1,
       'is_active' => 1,
-      'version' => $this->_apiversion,
+      'default_value' => 'defaultValue',
     );
 
-    $result = civicrm_api('custom_field', 'create', $params);
+    $result = $this->callAPISuccess('custom_field', 'create', $params);
 
     if ($result['is_error'] == 0 && isset($result['id'])) {
       CRM_Core_BAO_CustomField::getTableColumnGroup($result['id'], 1);
       // force reset of enabled components to help grab custom fields
       CRM_Core_Component::getEnabledComponents(1);
       return $result;
-    }
-
-    if (civicrm_error($result)
-      || !(CRM_Utils_Array::value('customFieldId', $result['result']))
-    ) {
-      throw new Exception('Could not create Custom Field ' . $result['error_message']);
     }
   }
 
@@ -1834,6 +1846,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         $action = empty($action) ? 'getcount' : $action;
         $entityAction = 'GetCount';
       }
+      elseif (strstr($function, 'GetFields')) {
+        $action = empty($action) ? 'getfields' : $action;
+        $entityAction = 'GetFields';
+      }
       elseif (strstr($function, 'Get')) {
         $action = empty($action) ? 'get' : $action;
         $entityAction = 'Get';
@@ -1850,9 +1866,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         $action = empty($action) ? 'subscribe' : $action;
         $entityAction = 'Subscribe';
       }
-      elseif (strstr($function, 'Set')) {
-        $action = empty($action) ? 'set' : $action;
-        $entityAction = 'Set';
+      elseif (strstr($function, 'Submit')) {
+        $action = empty($action) ? 'submit' : $action;
+        $entityAction = 'Submit';
       }
       elseif (strstr($function, 'Apply')) {
         $action = empty($action) ? 'apply' : $action;
