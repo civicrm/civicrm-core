@@ -2551,10 +2551,12 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = "contact_a.contact_type $op (" . implode(',', $clause) . ')';
       }
       else {
+        $quill = $clause;
         $type = array_pop($clause);
         $this->_where[$grouping][] = "contact_a.contact_type $op $type";
       }
-      $this->_qill[$grouping][] = ts('Contact Type') . ' - ' . implode(' ' . ts('or') . ' ', $clause);
+
+      $this->_qill[$grouping][] = ts('Contact Type') . ' - ' . implode(' ' . ts('or') . ' ', $quill);
 
       if (!empty($subTypes)) {
         $this->includeContactSubTypes($subTypes, $grouping);
