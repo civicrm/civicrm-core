@@ -143,6 +143,11 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
           }
           $sel2[$key] = $valueLabel + $membershipType;
           break;
+
+        default:
+          $sel1Val = ts('SDD File');
+          $sel2[$key] = $valueLabel + array(1 =>'one', 2 => 'two');
+          break;
       }
       $sel1[$key] = $sel1Val;
 
@@ -212,6 +217,10 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
           $sel3[$id] = '';
           break;
 
+        default :
+          foreach ($sel3[$id] as $kkey => & $vval) {
+            $vval = $statusLabel + array( 1=>'unknown',2=>'busy');
+          }
       }
     }
     return array(
@@ -565,6 +574,15 @@ WHERE   cas.entity_value = $id AND
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_ActionSchedule', $id, 'is_active', $is_active);
   }
 
+  /**
+   * send all reminder emails
+   * 
+   * @param int $mappingID
+   * @param datetime $now
+   * 
+   * @void
+   * @static
+   */
   static function sendMailings($mappingID, $now) {
     $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
     $fromEmailAddress = "$domainValues[0] <$domainValues[1]>";
@@ -598,62 +616,108 @@ WHERE   cas.entity_value = $id AND
           CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
       }
 
-      if ($mapping->entity == 'civicrm_activity') {
-        $tokenEntity = 'activity';
-        $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
-        $extraSelect = ', ov.label as activity_type, e.id as activity_id';
-        $extraJoin   = "
-INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
-INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
-        $extraOn = ' AND e.is_current_revision = 1 AND e.is_deleted = 0 ';
-        if ($actionSchedule->limit_to == 0) {
-          $extraJoin   = "
-LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
-LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
+      // refactored this section to use a switch/case syntax
+      $more = new stdClass;
+      $more->tokens = array();
+      $more->extraWhere = '';
+
+      switch ($mapping->entity) {
+  
+        // get additional information for Activities
+        
+        case 'civicrm_activity' :
+          $tokenEntity = 'activity';
+          $more->extraFields = array(
+              'activity_id'         =>  'e.id as activity_id', 
+              'activity_type'       =>  'ov.label as activity_type', 
+              'subject'             =>  'subject', 
+              'details'             =>  'details', 
+              'activity_date_time'  =>  'activity_date_time',
+              );
+          $more->extraJoins = array(
+              "INNER JOIN civicrm_option_group og ON og.name = 'activity_type'",
+              "INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id",
+              );
+          $extraOn = ' AND e.is_current_revision = 1 AND e.is_deleted = 0 ';
+          if ($actionSchedule->limit_to == 0) {
+            $more->extraJoins = array(
+                "LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'",
+                "LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id",
+                );
+          }
+          break;
+
+        // get additional information for Event participants
+          
+        case 'civicrm_participant' :
+          $tokenEntity = 'event';
+          $more->extraFields = array(
+              'event_type'        =>  'event_type', 
+              'location'          =>  'location', 
+              'info_url'          =>  'info_url', 
+              'registration_url'  =>  'registration_url', 
+              'fee_amount'        =>  'fee_amount',  
+              'event_type'        =>  'ov.label as event_type', 
+              'title'             =>  'ev.title', 
+              'event_id'          =>  'ev.id as event_id', 
+              'start_date'        =>  'ev.start_date', 
+              'end_date'          =>  'ev.end_date', 
+              'summary'           =>  'ev.summary', 
+              'description'       =>  'ev.description', 
+              'street_address'    =>  'address.street_address', 
+              'city'              =>  'address.city', 
+              'state_province_id' =>  'address.state_province_id', 
+              'postal_code'       =>  'address.postal_code', 
+              'contact_email'     =>  'email.email as contact_email', 
+              'contact_phone'     =>  'phone.phone as contact_phone ',
+            );
+          $more->extraJoins = array(
+              "INNER JOIN civicrm_event ev ON e.event_id = ev.id",
+              "INNER JOIN civicrm_option_group og ON og.name = 'event_type'",
+              "INNER JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id",
+              "LEFT  JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id",
+              "LEFT  JOIN civicrm_address address ON address.id = lb.address_id",
+              "LEFT  JOIN civicrm_email email ON email.id = lb.email_id",
+              "LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id",
+              );
+          if ($actionSchedule->limit_to == 0) {
+            $more->extraJoins = array(
+                "LEFT JOIN civicrm_event ev ON e.event_id = ev.id",
+                "LEFT JOIN civicrm_option_group og ON og.name = 'event_type'",
+                "LEFT JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id",
+                "LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id",
+                "LEFT JOIN civicrm_address address ON address.id = lb.address_id",
+                "LEFT JOIN civicrm_email email ON email.id = lb.email_id",
+                "LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id",
+                );
+            }
+          break;
+
+        // get additional information for Memberships
+
+        case 'civicrm_membership' : 
+          $tokenEntity = 'membership';
+          $more->extraFields = array(
+              'fee'         =>  'mt.minimum_fee as fee', 
+              'id'          =>  'e.id as id', 
+              'join_date'   =>  'e.join_date', 
+              'start_date'  =>  'e.start_date', 
+              'end_date'    =>  'e.end_date', 
+              'status'      =>  'ms.name as status', 
+              'type'        =>  'mt.name as type',
+              );
+          $more->extraJoins = array(
+              "INNER JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id",
+              "INNER JOIN civicrm_membership_status ms ON e.status_id = ms.id",
+              );
+          if ($actionSchedule->limit_to == 0) {
+            $more->extraJoins = array(
+                "LEFT JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id",
+                "LEFT JOIN civicrm_membership_status ms ON e.status_id = ms.id",
+                );
+          }
+          break;
         }
-      }
-
-      if ($mapping->entity == 'civicrm_participant') {
-        $tokenEntity = 'event';
-        $tokenFields = array('event_type', 'title', 'event_id', 'start_date', 'end_date', 'summary', 'description', 'location', 'info_url', 'registration_url', 'fee_amount', 'contact_email', 'contact_phone');
-        $extraSelect = ', ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone ';
-
-        $extraJoin   = "
-INNER JOIN civicrm_event ev ON e.event_id = ev.id
-INNER JOIN civicrm_option_group og ON og.name = 'event_type'
-INNER JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
-LEFT  JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
-LEFT  JOIN civicrm_address address ON address.id = lb.address_id
-LEFT  JOIN civicrm_email email ON email.id = lb.email_id
-LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id
-";
-        if ($actionSchedule->limit_to == 0) {
-          $extraJoin   = "
-LEFT JOIN civicrm_event ev ON e.event_id = ev.id
-LEFT JOIN civicrm_option_group og ON og.name = 'event_type'
-LEFT JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
-LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
-LEFT JOIN civicrm_address address ON address.id = lb.address_id
-LEFT JOIN civicrm_email email ON email.id = lb.email_id
-LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
-";
-        }
-      }
-
-      if ($mapping->entity == 'civicrm_membership') {
-        $tokenEntity = 'membership';
-        $tokenFields = array('fee', 'id', 'join_date', 'start_date', 'end_date', 'status', 'type');
-        $extraSelect = ', mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, ms.name as status, mt.name as type';
-        $extraJoin   = '
- INNER JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
- INNER JOIN civicrm_membership_status ms ON e.status_id = ms.id';
-
-        if ($actionSchedule->limit_to == 0) {
-          $extraJoin   = '
- LEFT JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
- LEFT JOIN civicrm_membership_status ms ON e.status_id = ms.id';
-        }
-      }
 
       $entityJoinClause = "INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
       if ($actionSchedule->limit_to == 0) {
@@ -661,6 +725,15 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
         $extraWhere .= " AND (e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact')";
       }
       $entityJoinClause .= $extraOn;
+
+      // new : allow loading of additional entities/tokens
+      CRM_Utils_Hook::getReminderTokens($mapping,'pre',$more);
+      
+      $extraSelect = ', ' . implode(', ', array_values($more->extraFields));
+      $extraJoin = implode("\n",$more->extraJoins);
+      $extraWhere .= $more->extraWhere;
+
+      $tokenFields = array_keys($more->extraFields);
 
       $query = "
 SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.*, e.id as entityID, e.* {$extraSelect}
@@ -673,9 +746,13 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $dao = CRM_Core_DAO::executeQuery($query,
         array(1 => array($actionSchedule->id, 'Integer'))
       );
-
       while ($dao->fetch()) {
-        $entityTokenParams = array();
+        $more->dao = $dao;
+        CRM_Utils_Hook::getReminderTokens($mapping,'post',$more);
+        $extraTokens = $more->tokens;
+
+//        $entityTokenParams = array();
+        $entityTokenParams = $extraTokens;
         foreach ($tokenFields as $field) {
           if ($field == 'location') {
             $loc = array();
