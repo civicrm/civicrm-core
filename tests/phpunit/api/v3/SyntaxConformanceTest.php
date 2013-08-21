@@ -90,11 +90,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   public static function entities_get() {
     // all the entities, beside the ones flagged
-    return api_v3_SyntaxConformanceTest::entities(api_v3_SyntaxConformanceTest::toBeSkipped_get(TRUE));
+    return api_v3_SyntaxConformanceTest::entities(static::toBeSkipped_get(TRUE));
   }
 
   public static function entities_create() {
-    return api_v3_SyntaxConformanceTest::entities(api_v3_SyntaxConformanceTest::toBeSkipped_create(TRUE));
+    return api_v3_SyntaxConformanceTest::entities(static::toBeSkipped_create(TRUE));
   }
 
   public static function entities_updatesingle() {
@@ -102,7 +102,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   public static function entities_delete() {
-    return api_v3_SyntaxConformanceTest::entities(api_v3_SyntaxConformanceTest::toBeSkipped_delete(TRUE));
+    return api_v3_SyntaxConformanceTest::entities(static::toBeSkipped_delete(TRUE));
   }
 
   public static function toBeSkipped_get($sequential = FALSE) {
