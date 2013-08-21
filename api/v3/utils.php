@@ -1360,6 +1360,7 @@ function _getStandardTypeFromCustomDataType($dataType) {
     'File' => CRM_Utils_Type::T_STRING,
     'Link' => CRM_Utils_Type::T_STRING,
     'ContactReference' => CRM_Utils_Type::T_INT,
+    'Country' => CRM_Utils_Type::T_INT,
   );
   return $mapping[$dataType];
 }
@@ -1369,10 +1370,9 @@ function _getStandardTypeFromCustomDataType($dataType) {
 function _civicrm_api3_getdefaults($apiRequest) {
   $defaults = array();
 
-  $result = civicrm_api($apiRequest['entity'],
+  $result = civicrm_api3($apiRequest['entity'],
     'getfields',
     array(
-      'version' => 3,
       'action' => $apiRequest['action'],
     )
   );
@@ -1420,10 +1420,9 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest) {
     }
     return;
   }
-  $result = civicrm_api($apiRequest['entity'],
+  $result = civicrm_api3($apiRequest['entity'],
     'getfields',
     array(
-      'version' => 3,
       'action' => $apiRequest['action'],
     )
   );
