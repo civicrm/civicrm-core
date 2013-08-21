@@ -44,6 +44,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   protected $_tagID;
   protected $_apiversion = 3;
   protected $_tag;
+  protected $_entity = 'entity_tag';
   public $_eNoticeCompliant = TRUE;
 
   function setUp() {
@@ -118,7 +119,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_entity_tag_get methods
-  function testGetWrongParamsType() {
+  function testGetNoEntityID() {
     $ContactId = $this->_individualID;
     $tagID     = $this->_tagID;
     $params    = array(
@@ -128,13 +129,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
     $individualEntity = $this->callAPISuccess('entity_tag', 'create', $params);
     $this->assertEquals($individualEntity['added'], 1);
-  }
-
-  function testIndividualEntityTagGetWithoutContactID() {
-    $paramsEntity = array();
-    $entity = $this->callAPIFailure('entity_tag', 'get', $paramsEntity,
-      'Mandatory key(s) missing from params array: entity_id'
-    );
+    $result = $this->callAPISuccess($this->_entity, 'get', array('sequential' => 1, 'tag_id' => $tagID));
+    $this->assertEquals($ContactId, $result['values'][0]['entity_id']);
   }
 
   function testIndividualEntityTagGet() {
@@ -154,10 +150,6 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $entity = $this->callAPISuccess('entity_tag', 'get', $paramsEntity);
   }
 
-  function testHouseholdEntityGetWithoutContactID() {
-    $entity = $this->callAPIFailure('entity_tag', 'get', array());
-  }
-
   function testHouseholdEntityGet() {
     $ContactId = $this->_householdID;
     $tagID     = $this->_tagID;
@@ -168,10 +160,6 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
     $householdEntity = $this->callAPISuccess('entity_tag', 'create', $params);
     $this->assertEquals($householdEntity['added'], 1);
-  }
-
-  function testOrganizationEntityGetWithoutContactID() {
-    $entity = $this->callAPIFailure('entity_tag', 'get', array());
   }
 
   function testOrganizationEntityGet() {
@@ -189,8 +177,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $entity = $this->callAPISuccess('entity_tag', 'get', $paramsEntity);
   }
 
-  ///////////////// civicrm_entity_tag_remove methods
-  function testEntityTagRemoveNoTagId() {
+  ///////////////// civicrm_entity_tag_Delete methods
+  function testEntityTagDeleteNoTagId() {
     $entityTagParams = array(
       'contact_id_i' => $this->_individualID,
       'contact_id_h' => $this->_householdID,
@@ -208,7 +196,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     );
   }
 
-  function testEntityTagRemoveINDHH() {
+  function testEntityTagDeleteINDHH() {
     $entityTagParams = array(
       'contact_id_i' => $this->_individualID,
       'contact_id_h' => $this->_householdID,
@@ -244,7 +232,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $this->assertEquals($result['removed'], 1);
   }
 
-  function testEntityTagRemoveHHORG() {
+  function testEntityTagDeleteHHORG() {
     $entityTagParams = array(
       'contact_id_i' => $this->_individualID,
       'contact_id_h' => $this->_householdID,
@@ -276,7 +264,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   }
 
 
-  function testEntityTagCommonRemoveINDHH() {
+  function testEntityTagCommonDeleteINDHH() {
     $entityTagParams = array(
       'contact_id_i' => $this->_individualID,
       'contact_id_h' => $this->_householdID,
@@ -294,7 +282,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $this->assertEquals($result['removed'], 2);
   }
 
-  function testEntityTagCommonRemoveHH() {
+  function testEntityTagCommonDeleteHH() {
     $entityTagParams = array(
       'contact_id_i' => $this->_individualID,
       'contact_id_h' => $this->_householdID,
@@ -311,7 +299,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $this->assertEquals($result['removed'], 1);
   }
 
-  function testEntityTagCommonRemoveHHORG() {
+  function testEntityTagCommonDeleteHHORG() {
     $entityTagParams = array(
       'contact_id_i' => $this->_individualID,
       'contact_id_h' => $this->_householdID,

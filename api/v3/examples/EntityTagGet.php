@@ -5,7 +5,7 @@
  */
 function entity_tag_get_example(){
 $params = array(
-  'contact_id' => 24,
+  'contact_id' => 21,
   'tag_id' => '1',
 );
 
