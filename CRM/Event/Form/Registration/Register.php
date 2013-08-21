@@ -858,6 +858,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     if ($self->_values['event']['is_monetary']) {
+      if (($fields['amount'] > 0) && !isset($fields['payment_processor'])) {
+        $errors['payment_processor'] = ts('Please select a Payment Method');
+      }
       if (is_array($self->_paymentProcessor)) {
         $payment = CRM_Core_Payment::singleton($self->_mode, $self->_paymentProcessor, $this);
         $error = $payment->checkConfig($self->_mode);
@@ -877,7 +880,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
 
-      $isZeroAmount = $skipPayementValidation = FALSE;
+      $isZeroAmount = $skipPaymentValidation = FALSE;
       if (CRM_Utils_Array::value('priceSetId', $fields)) {
         if (CRM_Utils_Array::value('amount', $fields) == 0) {
           $isZeroAmount = TRUE;
@@ -899,13 +902,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
 
       if ($isZeroAmount && !($self->_forcePayement && CRM_Utils_Array::value('additional_participants', $fields))) {
-        $skipPayementValidation = TRUE;
+        $skipPaymentValidation = TRUE;
       }
 
       // also return if paylater mode or zero fees for valid members
       if (CRM_Utils_Array::value('is_pay_later', $fields) ||
         CRM_Utils_Array::value('bypass_payment', $fields) ||
-        $skipPayementValidation ||
+        $skipPaymentValidation ||
         (!$self->_allowConfirmation && ($self->_requireApproval || $self->_allowWaitlist))
       ) {
         return empty($errors) ? TRUE : $errors;
