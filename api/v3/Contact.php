@@ -192,6 +192,8 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['provider_id']['title'] = 'Primary Phone Provider ID';
   $params['email_id']['title'] = 'Primary Email ID';
   $params['email']['title'] = 'Primary Email';
+  $params['gender_id']['title'] = 'Gender ID';
+  $params['gender']['title'] = 'Gender';
   $params['on_hold']['title'] = 'Primary Email On Hold';
   $params['im']['title'] = 'Primary Instant Messanger';
   $params['im_id']['title'] = 'Primary Instant Messanger ID';
