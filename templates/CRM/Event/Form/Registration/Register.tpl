@@ -213,8 +213,15 @@
 
     function skipPaymentMethod() {
       var symbol = '{/literal}{$currencySymbol}{literal}';
+      var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
+
+      var flag = 1;
+      if (isMultiple && cj("#additional_participants").val()) {
+        flag = 0;
+      }
+
       cj('#priceset input').change(function () {
-        if ((cj(this).attr('data-amount') == '0') || (cj('#pricevalue').text() == symbol + " 0.00" )) {
+        if (((cj(this).attr('data-amount') == '0') || (cj('#pricevalue').text() == symbol + " 0.00" )) && flag ) {
           cj(".payment_options-group").hide();
           cj("div.payment_processor-section").hide();
           cj("div#payment_information").hide();
