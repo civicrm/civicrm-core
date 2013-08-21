@@ -4198,17 +4198,6 @@ civicrm_relationship.start_date > {$today}
     }
     $this->generatePermissionClause($onlyDeleted, $count);
 
-    if (empty($where)) {
-      $where = "WHERE $this->_permissionWhereClause";
-    }
-    else {
-      $where = "$where AND $this->_permissionWhereClause";
-    }
-
-    if ($additionalWhereClause) {
-      $where = $where . ' AND ' . $additionalWhereClause;
-    }
-
     // building the query string
     $groupBy = NULL;
     if (!$count) {
@@ -4310,7 +4299,20 @@ civicrm_relationship.start_date > {$today}
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
 
-    //additional from clause should be w/ proper joins.
+    if(!empty($this->_permissionWhereClause)){
+      if (empty($where)) {
+        $where = "WHERE $this->_permissionWhereClause";
+      }
+      else {
+        $where = "$where AND $this->_permissionWhereClause";
+      }
+    }
+
+    if ($additionalWhereClause) {
+      $where = $where . ' AND ' . $additionalWhereClause;
+    }
+
+     //additional from clause should be w/ proper joins.
     if ($additionalFromClause) {
       $from .= "\n" . $additionalFromClause;
     }
