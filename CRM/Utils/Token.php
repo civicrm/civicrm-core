@@ -663,6 +663,11 @@ class CRM_Utils_Token {
     }
     else {
       $value = CRM_Utils_Array::retrieveValueRecursive($contact, $token);
+
+      // note that incase of pseudoconstants we get array ( 0 => id, 1 => label )
+      if (is_array($value)) {
+        $value = $value[1];
+      }
     }
 
     if (!$html) {
@@ -1185,6 +1190,10 @@ class CRM_Utils_Token {
     if (!empty($greetingTokens)) {
       // first use the existing contact object for token replacement
       if (!empty($contactDetails)) {
+        // unset id's to get labels for the pseudoconstants
+        foreach ( array('individual_prefix', 'individual_suffix', 'gender') as $field ) {
+          unset($contactDetails[0][$contactId][$field]);
+        }
         $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE);
       }
 
