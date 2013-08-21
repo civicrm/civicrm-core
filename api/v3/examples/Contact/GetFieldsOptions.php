@@ -574,6 +574,7 @@ function contact_getfields_expectedresult(){
           'date_format' => '',
           'time_format' => '',
           'name' => 'custom_1',
+          'type' => 2,
           'options' => array(
               '1' => 'Label1',
               '2' => 'Label2',
@@ -582,6 +583,7 @@ function contact_getfields_expectedresult(){
       'current_employer' => array(
           'title' => 'Current Employer',
           'description' => 'Name of Current Employer',
+          'type' => 2,
         ),
       'dupe_check' => array(
           'title' => 'Check for Duplicates',
