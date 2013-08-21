@@ -148,19 +148,21 @@ function _civicrm_api3_profile_get_spec(&$params) {
  */
 function civicrm_api3_profile_submit($params) {
   $profileID = _civicrm_api3_profile_getProfileID($params['profile_id']);
-  if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $params['profile_id'], 'is_active')) {
+
+  if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileID, 'is_active')) {
+    //@todo declare pseudoconstant & let api do this
     throw new API_Exception('Invalid value for profile_id');
   }
 
-  $isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($params['profile_id']);
+  $isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($profileID);
 
-  if (CRM_Core_BAO_UFField::checkProfileType($params['profile_id']) && !$isContactActivityProfile) {
-    throw new API_Exception('Can not retrieve values for profiles include fields for more than one record type.');
+  if (!empty($params['id']) && CRM_Core_BAO_UFField::checkProfileType($profileID) && !$isContactActivityProfile) {
+    throw new API_Exception('Update profiles including more than one entity not currently supported');
   }
 
   $contactParams = $activityParams = $missingParams = array();
 
-  $profileFields = CRM_Core_BAO_UFGroup::getFields($params['profile_id'],
+  $profileFields = CRM_Core_BAO_UFGroup::getFields($profileID,
     FALSE,
     NULL,
     NULL,
@@ -177,7 +179,7 @@ function civicrm_api3_profile_submit($params) {
 
     $errors = CRM_Profile_Form::validateContactActivityProfile($params['activity_id'],
       $params['contact_id'],
-      $params['profile_id']
+      $profileID
     );
     if (!empty($errors)) {
       throw new API_Exception(array_pop($errors));
@@ -212,9 +214,8 @@ function civicrm_api3_profile_submit($params) {
     throw new API_Exception("Missing required parameters for profile id {$params['profile_id']}: " . implode(', ', $missingParams));
   }
 
-  $contactParams['version'] = 3;
   $contactParams['contact_id'] = CRM_Utils_Array::value('contact_id', $params);
-  $contactParams['profile_id'] = $params['profile_id'];
+  $contactParams['profile_id'] = $profileID;
   $contactParams['skip_custom'] = 1;
 
   $contactProfileParams = civicrm_api3_profile_apply($contactParams);
@@ -245,7 +246,7 @@ function civicrm_api3_profile_submit($params) {
   return civicrm_api3('contact', 'create', $profileParams);
 
   $ufGroupDetails = array();
-  $ufGroupParams = array('id' => $params['profile_id']);
+  $ufGroupParams = array('id' => $profileID);
   CRM_Core_BAO_UFGroup::retrieve($ufGroupParams, $ufGroupDetails);
 
   if (isset($profileFields['group'])) {
@@ -324,12 +325,6 @@ function civicrm_api3_profile_set($params) {
  *
  */
 function civicrm_api3_profile_apply($params) {
-
-  civicrm_api3_verify_mandatory($params, NULL, array('profile_id'));
-
-  if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $params['profile_id'], 'is_active')) {
-    return civicrm_api3_create_error('Invalid value for profile_id');
-  }
 
   $profileFields = CRM_Core_BAO_UFGroup::getFields($params['profile_id'],
     FALSE,
@@ -577,7 +572,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
  * how we add a a pseudoconstant to this pseudoapi to make that work
  */
 function _civicrm_api3_profile_getProfileID($profileID) {
-  if(!empty($profileID) && !strtolower($profileID) == 'billing' && !is_numeric($profileID)) {
+  if(!empty($profileID) && strtolower($profileID) != 'billing' && !is_numeric($profileID)) {
     $profileID = civicrm_api3('uf_group', 'getvalue', array('return' => 'id', 'name' => $profileID));
   }
   return $profileID;
@@ -604,7 +599,7 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
   }
   //special case on membership & contribution - can't see how to handle in a generic way
   if(in_array($entity, array('Membership', 'Contribution'))) {
-    $values['send_receipt'] = array('title' => 'Send Receipt', 'type' => 16);
+    $values['send_receipt'] = array('title' => 'Send Receipt', 'type' => (int) 16);
   }
   return $values;
 }
