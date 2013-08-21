@@ -663,24 +663,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
     if ($createNewContact) {
-
       //CRM-4430, don't carry if not submitted.
       foreach (array(
-        'prefix',
-        'suffix',
-        'gender',
-      ) as $name) {
+          'prefix',
+          'suffix'
+        ) as $name) {
         if (array_key_exists($name, $formatted)) {
-          if (in_array($name, array(
-                'prefix',
-                'suffix',
-              ))) {
-            $formattedName = "individual_{$name}";
-            $formatted[$formattedName] = CRM_Core_OptionGroup::getValue($formattedName, (string) $formatted[$name]);
-          }
-          else {
-            $formatted[$name] = CRM_Core_OptionGroup::getValue($name, (string) $formatted[$name]);
-          }
+          $formattedName = "individual_{$name}";
+          $formatted[$formattedName] = CRM_Core_OptionGroup::getValue($formattedName, (string) $formatted[$name]);
         }
       }
       $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, NULL, TRUE, $this->_dedupeRuleGroupID);
@@ -1826,6 +1816,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //add custom fields for contact sub type
     if (!empty($this->_contactSubType)) {
       $csType = $this->_contactSubType;
+    }
+
+    // CRM-13226 - fixing the $params key value pairing
+    // for individual_prefix, individual_suffix and gender
+    $replaceKeys = array(
+      'gender_id' => 'gender',
+      'prefix_id' => 'individual_prefix',
+      'suffix_id' => 'individual_suffix'
+    );
+    foreach ($replaceKeys as $from => $to) {
+      if ($val = CRM_Utils_Array::value($from, $params)) {
+        $params[$to] = $val;
+        unset($params[$from]);
+      }
     }
 
     if ($relCsType = CRM_Utils_Array::value('contact_sub_type', $formatted)) {
