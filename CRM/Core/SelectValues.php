@@ -97,8 +97,7 @@ class CRM_Core_SelectValues {
   static function &contactType() {
     static $contactType = NULL;
     if (!$contactType) {
-      $contactType = array('' => ts('- any contact type -'));
-      $contactType = $contactType + CRM_Contact_BAO_ContactType::basicTypePairs();
+      $contactType = CRM_Contact_BAO_ContactType::basicTypePairs();
     }
     return $contactType;
   }
@@ -248,7 +247,6 @@ class CRM_Core_SelectValues {
         'Campaign' => ts('Campaigns'),
       );
       $contactTypes = self::contactType();
-      unset($contactTypes['']);
       $contactTypes       = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
       $extendObjs         = CRM_Core_OptionGroup::values('cg_extend_objects');
       $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs);

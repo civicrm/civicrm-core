@@ -65,6 +65,9 @@ class CRM_Logging_Differ {
       2 => array($this->log_date, 'String'),
     );
 
+    $logging = new CRM_Logging_Schema;
+    $addressCustomTables = $logging->entityCustomDataLogTables('Address');
+
     $contactIdClause = $join = '';
     if ( $contactID ) {
       $params[3] = array($contactID, 'Integer');
@@ -97,6 +100,12 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
         $contactIdClause = "AND id = (select case_id FROM civicrm_case_contact WHERE contact_id = %3 LIMIT 1)";
         break;
       default:
+        if (array_key_exists($table, $addressCustomTables)) {
+          $join  = "INNER JOIN `{$this->db}`.`log_civicrm_address` et ON et.id = lt.entity_id";
+          $contactIdClause = "AND contact_id = %3";
+          break;
+        }
+
         // allow tables to be extended by report hook query objects
         list($contactIdClause, $join) = CRM_Report_BAO_Hook::singleton()->logDiffClause($this, $table);
 
@@ -113,8 +122,8 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
     $sql = "
 SELECT DISTINCT lt.id FROM `{$this->db}`.`log_$table` lt
 {$join}
-WHERE log_conn_id = %1 AND
-      log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval})
+WHERE lt.log_conn_id = %1 AND
+      lt.log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval})
       {$contactIdClause}";
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
