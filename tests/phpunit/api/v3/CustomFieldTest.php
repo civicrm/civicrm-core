@@ -247,7 +247,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   function testCustomFieldGetReturnOptions(){
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
-    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
 
     $result = $this->callAPISuccess('custom_field', 'getsingle', array(
       'id' => $customField['id'],
@@ -262,7 +262,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   function testCustomFieldGetReturnArray(){
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
-    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
 
     $result = $this->callAPISuccess('custom_field', 'getsingle', array(
            'id' => $customField['id'],
@@ -277,7 +277,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   function testCustomFieldGetReturnTwoOptions(){
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'test_group'));
-    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
 
     $result = $this->callAPISuccess('custom_field', 'getsingle', array(
            'id' => $customField['id'],
@@ -365,7 +365,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   function testCustomFieldDelete() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
-    $customField = $this->customFieldCreate($customGroup['id'], 'test_name');
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
     $this->assertNotNull($customField['id'], 'in line ' . __LINE__);
 
     $params = array(

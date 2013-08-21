@@ -63,7 +63,7 @@ function custom_value_get_expectedresult(){
           'entity_id' => '2',
           'latest' => 'coffee',
           'id' => '5',
-          '1' => '',
+          '1' => 'defaultValue',
           '2' => 'coffee',
         ),
       '6' => array(

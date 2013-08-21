@@ -32,31 +32,52 @@ function custom_value_get_expectedresult(){
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 4,
+  'count' => 7,
   'values' => array(
       'mySingleField' => array(
           'entity_id' => '2',
           'latest' => 'value 1',
           'id' => 'mySingleField',
         ),
-      'Cust_Field' => array(
+      'field_12' => array(
+          'entity_id' => '2',
+          'latest' => 'value 3',
+          'id' => 'field_12',
+          '1' => 'value 2',
+          '2' => 'value 3',
+        ),
+      'field_22' => array(
+          'entity_id' => '2',
+          'latest' => '',
+          'id' => 'field_22',
+          '1' => 'warm beer',
+          '2' => '',
+        ),
+      'field_32' => array(
+          'entity_id' => '2',
+          'latest' => '',
+          'id' => 'field_32',
+          '1' => 'fl* w*',
+          '2' => '',
+        ),
+      'field_13' => array(
           'entity_id' => '2',
           'latest' => 'coffee',
-          'id' => 'Cust_Field',
-          '1' => '',
+          'id' => 'field_13',
+          '1' => 'defaultValue',
           '2' => 'coffee',
         ),
-      'field_2' => array(
+      'field_23' => array(
           'entity_id' => '2',
           'latest' => 'value 4',
-          'id' => 'field_2',
+          'id' => 'field_23',
           '1' => '',
           '2' => 'value 4',
         ),
-      'field_3' => array(
+      'field_33' => array(
           'entity_id' => '2',
           'latest' => '',
-          'id' => 'field_3',
+          'id' => 'field_33',
           '1' => 'vegemite',
           '2' => '',
         ),

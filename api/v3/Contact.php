@@ -123,6 +123,7 @@ function _civicrm_api3_contact_create_spec(&$params) {
   $params['current_employer'] = array(
     'title' => 'Current Employer',
     'description' => 'Name of Current Employer',
+    'type' => CRM_Utils_Type::T_STRING,
   );
   $params['dupe_check'] = array(
     'title' => 'Check for Duplicates',

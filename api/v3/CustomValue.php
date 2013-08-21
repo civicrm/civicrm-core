@@ -176,7 +176,7 @@ function civicrm_api3_custom_value_get($params) {
       return civicrm_api3_create_success($values, $params);
     }
     else {
-      return civicrm_api3_create_error($result['error_message']);
+      throw new API_Exception($result['error_message']);
     }
   }
   else {
