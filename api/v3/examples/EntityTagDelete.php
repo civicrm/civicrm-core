@@ -5,7 +5,7 @@
  */
 function entity_tag_delete_example(){
 $params = array(
-  'contact_id_h' => 46,
+  'contact_id_h' => 37,
   'tag_id' => '1',
 );
 
