@@ -589,19 +589,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $groupID = CRM_Utils_Array::key('1', $this->_formValues['group']);
 
     $pseudoconstants = array();
-    if (!empty($this->_fields)) {
-      // get all the pseudoconstant values
-      foreach ($this->_fields as $name => $values) {
-        if (isset($this->_fields[$name]['pseudoconstant'])) {
-          $pseudoconstants[$name] =
-            array(
-              'dbName' => $this->_fields[$name]['name'],
-              'values' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name),
-            );
-        }
-      }
-    }
-
     // for CRM-3157 purposes
     if (in_array('world_region', $names)) {
       $pseudoconstants['world_region'] = array(
@@ -638,13 +625,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
           CRM_Core_OptionGroup::lookupValues($paramsNew, $name, FALSE);
           $row[$key] = $paramsNew[$key];
-        }
-        elseif ($property == 'gender_id') {
-          $row['gender'] = $result->gender;
-        }
-        elseif ($property == 'prefix_id' || $property == 'suffix_id') {
-          $newProperty = 'individual_' . substr($property, 0, -3);
-          $row[$newProperty] = $result->$newProperty;
         }
         elseif (strpos($property, '-im')) {
           $row[$property] = $result->$property;
