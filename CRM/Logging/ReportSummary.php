@@ -40,6 +40,15 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   protected $loggingDB;
 
   function __construct() {
+    // don’t display the ‘Add these Contacts to Group’ button
+    $this->_add2groupSupported = FALSE;
+
+    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+    $this->loggingDB = $dsn['database'];
+
+    // used for redirect back to contact summary
+    $this->cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
+
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -161,19 +170,26 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         ),
       );
 
-    // don’t display the ‘Add these Contacts to Group’ button
-    $this->_add2groupSupported = FALSE;
-
-    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
-    $this->loggingDB = $dsn['database'];
-
-    // used for redirect back to contact summary
-    $this->cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
-
     $logging = new CRM_Logging_Schema;
-    $customTables = $logging->customDataLogTables();
+
+    // build _logTables for contact custom tables
+    $customTables = $logging->entityCustomDataLogTables('Contact');
     foreach ($customTables as $table) {
       $this->_logTables[$table] = array('fk' => 'entity_id', 'log_type' => 'Contact');
+    }
+
+    // build _logTables for address custom tables
+    $customTables = $logging->entityCustomDataLogTables('Address');
+    foreach ($customTables as $table) {
+      $this->_logTables[$table] = 
+        array(
+          'fk' => 'contact_id',// for join of fk_table with contact table
+          'joins' => array(
+            'table' => 'log_civicrm_address', // fk_table
+            'join'  => 'entity_log_civireport.entity_id = fk_table.id'
+          ),
+          'log_type' => 'Contact'
+        );
     }
 
     // allow log tables to be extended via report hooks
