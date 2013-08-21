@@ -112,6 +112,19 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   }
 
   /**
+   * Return custom data tables for specified entity / extends.
+   */
+  function entityCustomDataLogTables($extends) {
+    $customGroupTables = array();
+    $customGroupDAO = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($extends);
+    $customGroupDAO->find();
+    while ($customGroupDAO->fetch()) {
+      $customGroupTables[$customGroupDAO->table_name] = $this->logs[$customGroupDAO->table_name];
+    }
+    return $customGroupTables;
+  }
+
+  /**
    * Disable logging by dropping the triggers (but keep the log tables intact).
    */
   function disableLogging() {
