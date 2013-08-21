@@ -85,15 +85,17 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('Contact', 'create', $params);
     $contact_id = $result['id'];
-    $result = $this->callAPISuccess('Contact', 'create',
-      array(
-        'contact_type' => 'Individual',
-        'id' => $contact_id,
-        'custom_' . $this->ids['multi']['custom_field_id'][0] => "value 3",
-        'custom_' . $this->ids['multi2']['custom_field_id'][0] => "coffee",
-        'custom_' . $this->ids['multi2']['custom_field_id'][1] => "value 4",
-      )
+    $firstCustomField = $this->ids['multi']['custom_field_id'][0];
+    $secondCustomField = $this->ids['multi2']['custom_field_id'][0];
+    $thirdCustomField = $this->ids['multi2']['custom_field_id'][1];
+    $createParams = array(
+      'contact_type' => 'Individual',
+      'id' => $contact_id,
+       'custom_' . $firstCustomField => "value 3",
+       'custom_' . $secondCustomField => "coffee",
+       'custom_' . $thirdCustomField => "value 4",
     );
+    $result = $this->callAPISuccess('Contact', 'create', $createParams);
 
     $params = array(
       'id' => $result['id'],
@@ -105,15 +107,16 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $resultformatted = $this->callAPIAndDocument('CustomValue', 'Get', $params, __FUNCTION__, __FILE__, "utilises field names", 'formatFieldName');
     // delete the contact
     $this->callAPISuccess('contact', 'delete', array('id' => $contact_id));
-
-    $this->assertEquals('coffee', $result['values'][$this->ids['multi2']['custom_field_id'][0]]['2'], "In line " . __LINE__);
-    $this->assertEquals('coffee', $result['values'][$this->ids['multi2']['custom_field_id'][0]]['latest'], "In line " . __LINE__);
-    $this->assertEquals($this->ids['multi2']['custom_field_id'][0], $result['values'][$this->ids['multi2']['custom_field_id'][0]]['id'], "In line " . __LINE__);
-    $this->assertEquals('', $result['values'][$this->ids['multi2']['custom_field_id'][0]]['1'], "In line " . __LINE__);
-    $this->assertEquals($contact_id, $result['values'][$this->ids['multi2']['custom_field_id'][0]]['entity_id'], "In line " . __LINE__);
-    $this->assertEquals('value 1', $result['values'][$this->ids['single']['custom_field_id']]['0'], "In line " . __LINE__);
-    $this->assertEquals('value 1', $result['values'][$this->ids['single']['custom_field_id']]['latest'], "In line " . __LINE__);
-    $this->assertEquals('value 1', $resultformatted['values']['mySingleField']['latest'], "In line " . __LINE__);
+    $this->assertEquals('coffee', $result['values'][$secondCustomField]['2']);
+    $this->assertEquals('coffee', $result['values'][$secondCustomField]['latest']);
+    $this->assertEquals($secondCustomField, $result['values'][$secondCustomField]['id']);
+    $this->assertEquals('defaultValue', $result['values'][$secondCustomField]['1']);
+    $this->assertEquals($contact_id, $result['values'][$secondCustomField]['entity_id']);
+    $this->assertEquals('value 1', $result['values'][$this->ids['single']['custom_field_id']]['0']);
+    $this->assertEquals('value 1', $result['values'][$this->ids['single']['custom_field_id']]['latest']);
+    $this->assertEquals('value 1', $resultformatted['values']['mySingleField']['latest']);
+    $this->assertEquals('', $result['values'][$thirdCustomField]['1']);
+    $this->assertEquals('value 4', $result['values'][$thirdCustomField]['2']);
   }
 }
 

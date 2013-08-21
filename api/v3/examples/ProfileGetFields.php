@@ -138,6 +138,7 @@ function profile_getfields_expectedresult(){
           'date_format' => '',
           'time_format' => '',
           'name' => 'custom_1',
+          'type' => 2,
         ),
       'profile_id' => array(
           'api.required' => true,

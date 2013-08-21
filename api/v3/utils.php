@@ -1335,6 +1335,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
   foreach ($customfields as $key => $value) {
     // Regular fields have a 'name' property
     $value['name'] = 'custom_' . $key;
+    $value['type'] = _getStandardTypeFromCustomDataType($value['data_type']);
     $customfields['custom_' . $key] = $value;
     if (in_array('custom_' . $key, $getoptions)) {
       $customfields['custom_' . $key]['options'] = CRM_Core_BAO_CustomOption::valuesByID($key);
@@ -1343,7 +1344,25 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
   }
   return $customfields;
 }
-
+/**
+ * Translate the custom field data_type attribute into a std 'type'
+ */
+function _getStandardTypeFromCustomDataType($dataType) {
+  $mapping = array(
+    'String' => CRM_Utils_Type::T_STRING,
+    'Int' => CRM_Utils_Type::T_INT,
+    'Money' => CRM_Utils_Type::T_MONEY,
+    'Memo' => CRM_Utils_Type::T_LONGTEXT,
+    'Float' => CRM_Utils_Type::T_FLOAT,
+    'Date' => CRM_Utils_Type::T_DATE,
+    'Boolean' => CRM_Utils_Type::T_BOOLEAN,
+    'StateProvince' => CRM_Utils_Type::T_INT,
+    'File' => CRM_Utils_Type::T_STRING,
+    'Link' => CRM_Utils_Type::T_STRING,
+    'ContactReference' => CRM_Utils_Type::T_INT,
+  );
+  return $mapping[$dataType];
+}
 /**
  * Return array of defaults for the given API (function is a wrapper on getfields)
  */

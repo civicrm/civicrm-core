@@ -1329,7 +1329,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params['custom_' . $ids['custom_field_id']] = "custom string";
     $moreids = $this->CustomGroupMultipleCreateWithFields();
-    $andmoreids = $this->CustomGroupMultipleCreateWithFields(array('title' => "another group"));
+    $andmoreids = $this->CustomGroupMultipleCreateWithFields(array('title' => "another group", 'name' => 'another name'));
     $description = "/*this demonstrates the usage of chained api functions. A variety of techniques are used";
     $subfile = "APIChainedArrayMultipleCustom";
     $params = array(
