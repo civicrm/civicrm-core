@@ -47,12 +47,13 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
 
   protected $_summary = NULL;
   protected $_totalPaid = FALSE;
+  protected $_pledgeStatuses = array();
   protected $_customGroupExtends = array(
     'Pledge',
     'Individual'
   );
   function __construct() {
-
+  $this->_pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
   // Check if CiviCampaign is a) enabled and b) has active campaigns
   $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
@@ -243,16 +244,18 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
         'title' => $field['title'],
         'type' => $field['type']
       );
-      return "sum({$this->_aliases[$tableName]}.actual_amount) as {$tableName}_{$fieldName}";
+      return "COALESCE(sum({$this->_aliases[$tableName]}.actual_amount), 0) as {$tableName}_{$fieldName}";
     }
     if($fieldName == 'balance_due'){
+      $cancelledStatus = array_search('Cancelled', $this->_pledgeStatuses);
+      $completedStatus = array_search('Completed', $this->_pledgeStatuses);
       $this->_totalPaid = TRUE; // add pledge_payment join
       $this->_columnHeaders["{$tableName}_{$fieldName}"] = $field['title'];
       $this->_columnHeaders["{$tableName}_{$fieldName}"] = array(
         'title' => $field['title'],
         'type' => $field['type']
       );
-        return "sum({$this->_aliases[$tableName]}.actual_amount) - COALESCE({$this->_aliases['civicrm_pledge']}.amount, 0) as {$tableName}_{$fieldName}";
+        return "IF({$this->_aliases['civicrm_pledge']}.status_id IN({$cancelledStatus}, $completedStatus), 0, COALESCE({$this->_aliases['civicrm_pledge']}.amount, 0) - COALESCE(sum({$this->_aliases[$tableName]}.actual_amount),0)) as {$tableName}_{$fieldName}";
     }
     return FALSE;
   }
@@ -301,36 +304,39 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       $totalAmount = $average = array();
       $count = 0;
       $select = "
-            SELECT COUNT({$this->_aliases['civicrm_pledge']}.amount )       as count,
-                   SUM({$this->_aliases['civicrm_pledge']}.amount )         as amount,
-                   ROUND(AVG({$this->_aliases['civicrm_pledge']}.amount), 2) as avg,
-                   {$this->_aliases['civicrm_pledge']}.currency as currency
-            ";
+        SELECT COUNT({$this->_aliases['civicrm_pledge']}.amount )       as count,
+          SUM({$this->_aliases['civicrm_pledge']}.amount )         as amount,
+          ROUND(AVG({$this->_aliases['civicrm_pledge']}.amount), 2) as avg,
+          {$this->_aliases['civicrm_pledge']}.currency as currency
+        ";
 
-      $group = "\nGROUP BY {$this->_aliases['civicrm_pledge']}.currency";
+      $group = "GROUP BY {$this->_aliases['civicrm_pledge']}.currency";
       $sql = "{$select} {$this->_from} {$this->_where} {$group}";
       $dao = CRM_Core_DAO::executeQuery($sql);
-
-      while ($dao->fetch()) {
-       $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)."(".$dao->count.")";
-       $average[] =   CRM_Utils_Money::format($dao->avg, $dao->currency);
-       $count += $dao->count;
+      $count = $index = 0;
+      // this will run once per currency
+      while($dao->fetch()) {
+        $totalAmount = CRM_Utils_Money::format($dao->amount, $dao->currency);
+        $average =   CRM_Utils_Money::format($dao->avg, $dao->currency);
+        $count = $dao->count;
+        $statistics['counts']['amount' . $index] = array(
+          'title' => ts('Total Amount Pledged (') . $dao->currency . ')',
+          'value' => $totalAmount,
+          'type' => CRM_Utils_Type::T_STRING,
+        );
+        $statistics['counts']['avg' . $index] = array(
+          'title' => ts('Average (') . $dao->currency . ')',
+          'value' => $average,
+          'type' => CRM_Utils_Type::T_STRING,
+        );
+        $index ++;
       }
 
-      $statistics['counts']['amount'] = array(
-        'title' => ts('Total Pledged (Number of Pledge)'),
-        'value' => implode(',  ', $totalAmount),
-        'type' => CRM_Utils_Type::T_STRING,
-      );
       $statistics['counts']['count'] = array(
         'title' => ts('Total No Pledges'),
         'value' => $count,
       );
-      $statistics['counts']['avg'] = array(
-        'title' => ts('Average'),
-        'value' => implode(',  ', $average),
-        'type' => CRM_Utils_Type::T_STRING,
-     );
+
     }
     return $statistics;
   }
@@ -383,7 +389,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     }
     else {
       $this->_where = "WHERE  ({$this->_aliases['civicrm_pledge']}.is_test=0 )  AND
-                                      " . implode(' AND ', $clauses);
+      " . implode(' AND ', $clauses);
     }
 
     if ($this->_aclWhere) {
@@ -399,7 +405,6 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     $sql   = $this->buildQuery();
     $rows  = $payment = array();
-    $count = $due = $paid = 0;
 
     $dao = CRM_Core_DAO::executeQuery($sql);
 
@@ -477,34 +482,6 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
             $display[$daoPayment->pledge_id]['scheduled_amount'] = $daoPayment->scheduled_amount;
           }
         }
-      }
-
-      // Do calculations for Total amount paid AND
-      // Balance Due, based on Pledge Status either
-      // In Progress, Pending or Completed
-      //?q - what does this add compared to calculating the amount paid & subtracting it from
-      // the amount committed? The only thing I can see if it the pledge was not fully paid but
-      // had been set to completed? In which case this could be done more simply either @ the php or mysql level
-      foreach ($display as $pledgeID => $data) {
-        $count = $due = $paid = 0;
-        $totalPaidAmt = CRM_Utils_Array::value('civicrm_pledge_payment_total_paid', $display[$pledgeID]);
-
-        if (CRM_Utils_Array::value('civicrm_pledge_status_id', $data) == 5) {
-          $due = $data['civicrm_pledge_amount'] - $totalPaidAmt;
-          $paid = $totalPaidAmt;
-          $count++; // ?? why?? I can't see any use for this
-        }
-        elseif (CRM_Utils_Array::value('civicrm_pledge_status_id', $data) == 2) {
-          $due = $data['civicrm_pledge_amount'];
-          $paid = 0;
-        }
-        elseif (CRM_Utils_Array::value('civicrm_pledge_status_id', $data) == 1) {
-          $due = 0;
-          $paid = $paid + $data['civicrm_pledge_amount'];
-        }
-
-        $display[$pledgeID]['civicrm_pledge_payment_total_paid'] = $paid;
-        $display[$pledgeID]['civicrm_pledge_payment_balance_due'] = $due;
       }
     }
 
