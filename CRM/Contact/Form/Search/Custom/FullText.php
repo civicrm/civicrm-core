@@ -58,14 +58,12 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
 
   protected $_limitDetailClause = NULL;
 
-  protected $_limitNumber      = 10;
+  protected $_limitNumber = 10;
   protected $_limitNumberPlus1 = 11; // this should be one more than self::LIMIT
 
   protected $_foundRows = array();
 
   function __construct(&$formValues) {
-    $this->_formValues = &$formValues;
-
     $this->_text = CRM_Utils_Array::value('text', $formValues);
     $this->_table = CRM_Utils_Array::value('table', $formValues);
 
@@ -84,7 +82,7 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       }
     }
 
-    // fix text to include wild card characters at begining and end
+    // fix text to include wild card characters at beginning and end
     if ($this->_text) {
       if (is_numeric($this->_text)) {
         $this->_textID = $this->_text;
@@ -119,6 +117,8 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       $this->_limitRowClause = " LIMIT $rowCount";
       $this->_limitDetailClause = " LIMIT $offset, $rowCount";
     }
+
+    $this->_formValues = $formValues;
   }
 
   function __destruct() {
@@ -160,7 +160,7 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       'subject' => 'varchar(255)',
       'details' => 'varchar(255)',
       'contribution_id' => 'int unsigned',
-      'financial_type'         => 'varchar(255)',
+      'financial_type' => 'varchar(255)',
       'contribution_page' => 'varchar(255)',
       'contribution_receive_date' => 'datetime',
       'contribution_total_amount' => 'decimal(20,2)',
@@ -302,10 +302,7 @@ WHERE      t.table_name = 'Activity' AND
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
-  function fillCustomInfo(&$tables,
-    $extends
-  ) {
-
+  function fillCustomInfo(&$tables, $extends) {
     $sql = "
 SELECT     cg.table_name, cf.column_name
 FROM       civicrm_custom_group cg
@@ -338,44 +335,45 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
       if ($tableName == 'final') {
         continue;
       }
-      else if ($tableName == 'sql') {
-        foreach ($tableValues as $sqlStatement) {
-          $sql = "
+      else {
+        if ($tableName == 'sql') {
+          foreach ($tableValues as $sqlStatement) {
+            $sql = "
 REPLACE INTO {$this->_entityIDTableName} ( entity_id )
 $sqlStatement
 {$this->_limitClause}
 ";
-          CRM_Core_DAO::executeQuery($sql);
+            CRM_Core_DAO::executeQuery($sql);
+          }
         }
-      }
-      else {
-        $clauses = array();
+        else {
+          $clauses = array();
 
-        foreach ($tableValues['fields'] as $fieldName => $fieldType) {
-          if ($fieldType == 'Int') {
-            if ($this->_textID) {
-              $clauses[] = "$fieldName = {$this->_textID}";
+          foreach ($tableValues['fields'] as $fieldName => $fieldType) {
+            if ($fieldType == 'Int') {
+              if ($this->_textID) {
+                $clauses[] = "$fieldName = {$this->_textID}";
+              }
+            }
+            else {
+              $clauses[] = "$fieldName LIKE {$this->_text}";
             }
           }
-          else {
-            $clauses[] = "$fieldName LIKE {$this->_text}";
+
+          if (empty($clauses)) {
+            continue;
           }
-        }
 
-        if (empty($clauses)) {
-          continue;
-        }
+          $whereClause = implode(' OR ', $clauses);
 
-        $whereClause = implode(' OR ', $clauses);
+          //resolve conflict between entity tables.
+          if ($tableName == 'civicrm_note' &&
+            $entityTable = CRM_Utils_Array::value('entity_table', $tableValues)
+          ) {
+            $whereClause .= " AND entity_table = '{$entityTable}'";
+          }
 
-        //resolve conflict between entity tables.
-        if ($tableName == 'civicrm_note' &&
-          $entityTable = CRM_Utils_Array::value('entity_table', $tableValues)
-        ) {
-          $whereClause .= " AND entity_table = '{$entityTable}'";
-        }
-
-        $sql = "
+          $sql = "
 REPLACE  INTO {$this->_entityIDTableName} ( entity_id )
 SELECT   {$tableValues['id']}
 FROM     $tableName
@@ -384,7 +382,8 @@ AND      {$tableValues['id']} IS NOT NULL
 GROUP BY {$tableValues['id']}
 {$this->_limitClause}
 ";
-        CRM_Core_DAO::executeQuery($sql);
+          CRM_Core_DAO::executeQuery($sql);
+        }
       }
     }
 
@@ -451,7 +450,7 @@ GROUP BY   et.entity_id
           'note' => NULL,
         ),
       ),
-      'sql'   => $contactSQL,
+      'sql' => $contactSQL,
       'final' => $final,
     );
 
@@ -512,7 +511,7 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
     $final = array();
 
     $tables = array(
-      'civicrm_activity' => array( 'fields' => array() ),
+      'civicrm_activity' => array('fields' => array()),
       'sql' => $contactSQL,
       'final' => $final,
     );
@@ -530,13 +529,13 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
   }
 
   function fillCase() {
-    $this->fillCaseIDs( );
+    $this->fillCaseIDs();
 
     //move data from entity table to detail table
     $this->moveEntityToDetail('Case');
   }
 
-  function fillCaseIDs( ) {
+  function fillCaseIDs() {
     $contactSQL = array();
 
     $contactSQL[] = "
@@ -570,7 +569,7 @@ GROUP BY   et.entity_id
 ";
 
     $tables = array(
-      'civicrm_case' => array( 'fields' => array( ) ),
+      'civicrm_case' => array('fields' => array()),
       'sql' => $contactSQL,
     );
 
@@ -598,7 +597,8 @@ WHERE      (c.sort_name LIKE {$this->_text} OR
            c.display_name LIKE {$this->_text})
 ";
     $tables = array(
-      'civicrm_contribution' => array('id' => 'id',
+      'civicrm_contribution' => array(
+        'id' => 'id',
         'fields' => array(
           'source' => NULL,
           'amount_level' => NULL,
@@ -644,7 +644,8 @@ INNER JOIN civicrm_contact c ON cp.contact_id = c.id
 WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text})
 ";
     $tables = array(
-      'civicrm_participant' => array('id' => 'id',
+      'civicrm_participant' => array(
+        'id' => 'id',
         'fields' => array(
           'source' => NULL,
           'fee_level' => NULL,
@@ -688,7 +689,8 @@ INNER JOIN civicrm_contact c ON cm.contact_id = c.id
 WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text})
 ";
     $tables = array(
-      'civicrm_membership' => array('id' => 'id',
+      'civicrm_membership' => array(
+        'id' => 'id',
         'fields' => array('source' => NULL),
       ),
       'sql' => $contactSQL,
@@ -730,16 +732,28 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
       $tables['Membership'] = ts('Memberships');
     }
 
-    $form->add('select',
-      'table',
-      ts('Tables'),
-      $tables
-    );
+    $form->add('select', 'table', ts('Tables'), $tables );
 
     $form->assign('csID', $form->get('csid'));
 
     // also add the limit constant
     $form->assign('limit', self::LIMIT);
+
+    // set form defaults
+    if (!empty($form->_formValues)) {
+      $defaults = array();
+
+      if (isset($form->_formValues['text'])) {
+        $defaults['text'] = $form->_formValues['text'];
+      }
+
+      if (isset($form->_formValues['table'])) {
+        $defaults['table'] = $form->_formValues['table'];
+        $form->assign('table', $form->_formValues['table']);
+      }
+
+      $form->setDefaults($defaults);
+    }
 
     /**
      * You can define a custom title for the search form
@@ -759,7 +773,8 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
   function summary() {
     $this->initialize();
 
-    $summary = array('Contact' => array(),
+    $summary = array(
+      'Contact' => array(),
       'Activity' => array(),
       'Case' => array(),
       'Contribution' => array(),
@@ -829,9 +844,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     return CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM {$this->_tableName}");
   }
 
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
-    $includeContactIDs = FALSE, $justIDs = FALSE
-  ) {
+  function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     $this->initialize();
 
     if ($justIDs) {
@@ -868,7 +881,8 @@ FROM   {$this->_tableName} contact_a
     return array();
   }
 
-  function alterRow(&$row) {}
+  function alterRow(&$row) {
+  }
 
   function setTitle($title) {
     if ($title) {
@@ -980,7 +994,6 @@ LEFT JOIN  civicrm_contact c ON ccc.contact_id = c.id
 {$this->_limitDetailClause}
 ";
         break;
-
     }
 
     if ($sql) {
