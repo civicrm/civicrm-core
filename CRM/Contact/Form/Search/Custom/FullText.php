@@ -84,7 +84,7 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       }
     }
 
-    // fix text to include wild card characters at begining and end
+    // fix text to include wild card characters at beginning and end
     if ($this->_text) {
       if (is_numeric($this->_text)) {
         $this->_textID = $this->_text;
