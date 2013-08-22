@@ -64,8 +64,6 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
   protected $_foundRows = array();
 
   function __construct(&$formValues) {
-    $this->_formValues = $formValues;
-
     $this->_text = CRM_Utils_Array::value('text', $formValues);
     $this->_table = CRM_Utils_Array::value('table', $formValues);
 
@@ -119,6 +117,8 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       $this->_limitRowClause = " LIMIT $rowCount";
       $this->_limitDetailClause = " LIMIT $offset, $rowCount";
     }
+
+    $this->_formValues = $formValues;
   }
 
   function __destruct() {
@@ -732,16 +732,28 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
       $tables['Membership'] = ts('Memberships');
     }
 
-    $form->add('select',
-      'table',
-      ts('Tables'),
-      $tables
-    );
+    $form->add('select', 'table', ts('Tables'), $tables );
 
     $form->assign('csID', $form->get('csid'));
 
     // also add the limit constant
     $form->assign('limit', self::LIMIT);
+
+    // set form defaults
+    if (!empty($form->_formValues)) {
+      $defaults = array();
+
+      if (isset($form->_formValues['text'])) {
+        $defaults['text'] = $form->_formValues['text'];
+      }
+
+      if (isset($form->_formValues['table'])) {
+        $defaults['table'] = $form->_formValues['table'];
+        $form->assign('table', $form->_formValues['table']);
+      }
+
+      $form->setDefaults($defaults);
+    }
 
     /**
      * You can define a custom title for the search form

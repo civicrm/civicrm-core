@@ -40,7 +40,7 @@
   </div>
 </div>
 <div class="crm-block crm-content-block">
-{include file="CRM/common/pager.tpl" location="top"}
+{if !$table}{include file="CRM/common/pager.tpl" location="top"}{/if}
 {include file="CRM/common/jsortable.tpl"}
 {if $rowsEmpty}
   {include file="CRM/Contact/Form/Search/Custom/EmptyResults.tpl"}
@@ -372,5 +372,5 @@
     {* END Actions/Results section *}
   </div>
 {/if}
-{include file="CRM/common/pager.tpl" location="bottom"}
+{if !$table}{include file="CRM/common/pager.tpl" location="bottom"}{/if}
 </div>
