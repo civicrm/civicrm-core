@@ -1216,6 +1216,20 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called before running an api call.
+   *
+   * @param $wrappers array of implements API_Wrapper(see CRM/Utils/API/ReloadOption.php as an example)
+   *
+   * @return null the return value is ignored
+   * @access public
+   */
+  static function apiWrappers (&$wrappers,$apiRequest) {
+    return self::singleton()->invoke(2, $wrappers, $apiRequest, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_apiWrapper'
+    );
+  }
+
+  /**
    * This hook is called before running pending cron jobs.
    *
    * @param CRM_Core_JobManager $jobManager
