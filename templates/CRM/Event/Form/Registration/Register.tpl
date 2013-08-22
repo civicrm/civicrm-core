@@ -212,20 +212,25 @@
         flag = 0;
       }
 
-      cj('#priceset input').change(function () {
-        if (((cj(this).attr('data-amount') == 0) || (cj('#pricevalue').text() == symbol + " 0.00" )) && flag ) {
-          cj(".payment_options-group").hide();
-          cj("div.payment_processor-section").hide();
-          cj("div#payment_information").hide();
-        }
-        else {
-          cj(".payment_options-group").show();
-          cj("div.payment_processor-section").show();
-          cj("div#payment_information").show();
-        }
-
-      });
+      if (((cj('#priceset input:checked').attr('data-amount') == 0) ||
+        (cj('#pricevalue').text() == symbol + " 0.00" )) && flag) {
+        cj(".payment_options-group").hide();
+        cj("div.payment_processor-section").hide();
+        cj("div#payment_information").hide();
+        // also unset selected payment methods
+        cj('input[name="payment_processor"]').removeProp('checked');
+      }
+      else {
+        cj(".payment_options-group").show();
+        cj("div.payment_processor-section").show();
+        cj("div#payment_information").show();
+      }
     }
+
+    cj('#priceset input').change(function () {
+      skipPaymentMethod();
+    });
+
     {/literal}
   </script>
 {/if}
