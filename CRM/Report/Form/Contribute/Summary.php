@@ -572,19 +572,38 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
   function buildChart(&$rows) {
     $graphRows = array();
-    $count = 0;
 
     if (CRM_Utils_Array::value('charts', $this->_params)) {
-      foreach ($rows as $key => $row) {
-        if ($row['civicrm_contribution_receive_date_subtotal']) {
-          $graphRows['receive_date'][] = $row['civicrm_contribution_receive_date_start'];
-          $graphRows[$this->_interval][] = $row['civicrm_contribution_receive_date_interval'];
-          $graphRows['value'][] = $row['civicrm_contribution_total_amount_sum'];
-          $count++;
-        }
-      }
-
       if (CRM_Utils_Array::value('receive_date', $this->_params['group_bys'])) {
+
+        $contrib = CRM_Utils_Array::value('total_amount', $this->_params['fields']) ? TRUE : FALSE;
+        $softContrib = CRM_Utils_Array::value('soft_amount', $this->_params['fields']) ? TRUE : FALSE;
+
+        foreach ($rows as $key => $row) {
+          if ($row['civicrm_contribution_receive_date_subtotal']) {
+            $graphRows['receive_date'][] = $row['civicrm_contribution_receive_date_start'];
+            $graphRows[$this->_interval][] = $row['civicrm_contribution_receive_date_interval'];
+            if ($softContrib && $contrib) {
+              // both contri & soft contri stats are present
+              $graphRows['multiValue'][0][] = $row['civicrm_contribution_total_amount_sum'];
+              $graphRows['multiValue'][1][] = $row['civicrm_contribution_soft_soft_amount_sum'];
+            } else if ($softContrib) {
+              // only soft contributions
+              $graphRows['multiValue'][0][] = $row['civicrm_contribution_soft_soft_amount_sum'];
+            } else {
+              // only contributions
+              $graphRows['multiValue'][0][] = $row['civicrm_contribution_total_amount_sum'];
+            }
+          }
+        }
+
+        if ($softContrib && $contrib) {
+          $graphRows['barKeys'][0] = ts('Contributions');
+          $graphRows['barKeys'][1] = ts('Soft Credits');
+          $graphRows['legend'] = ts('Contributions and Soft Credits');
+        } else if ($softContrib) {
+          $graphRows['legend'] = ts('Soft Credits');
+        }
 
         // build the chart.
         $config             = CRM_Core_Config::Singleton();
