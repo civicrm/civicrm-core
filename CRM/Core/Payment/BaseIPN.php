@@ -326,10 +326,13 @@ class CRM_Core_Payment_BaseIPN {
         $values['amount'] = $recurContrib->amount;
         $values['financial_type_id'] = $objects['contributionType']->id;
         $values['title'] = $source = ts('Offline Recurring Contribution');
-        $values['is_email_receipt'] = $recurContrib->is_email_receipt;
         $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
         $values['receipt_from_name'] = $domainValues[0];
         $values['receipt_from_email'] = $domainValues[1];
+      }
+      if($recurContrib->id){
+        //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
+        $values['is_email_receipt'] = $recurContrib->is_email_receipt;
       }
 
       $contribution->source = $source;
