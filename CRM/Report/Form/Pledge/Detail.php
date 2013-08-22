@@ -313,12 +313,13 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       $group = "GROUP BY {$this->_aliases['civicrm_pledge']}.currency";
       $sql = "{$select} {$this->_from} {$this->_where} {$group}";
       $dao = CRM_Core_DAO::executeQuery($sql);
-      $count = $index = 0;
+      $count = $index = $totalCount = 0;
       // this will run once per currency
       while($dao->fetch()) {
         $totalAmount = CRM_Utils_Money::format($dao->amount, $dao->currency);
         $average =   CRM_Utils_Money::format($dao->avg, $dao->currency);
         $count = $dao->count;
+        $totalCount .= $count;
         $statistics['counts']['amount' . $index] = array(
           'title' => ts('Total Amount Pledged (') . $dao->currency . ')',
           'value' => $totalAmount,
@@ -329,14 +330,20 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           'value' => $average,
           'type' => CRM_Utils_Type::T_STRING,
         );
+        $statistics['counts']['count' . $index] = array(
+          'title' => ts('Total No Pledges (') . $dao->currency . ')',
+          'value' => $count,
+          'type' => CRM_Utils_Type::T_INT,
+        );
         $index ++;
       }
-
-      $statistics['counts']['count'] = array(
-        'title' => ts('Total No Pledges'),
-        'value' => $count,
-      );
-
+      if($totalCount > $count) {
+        $statistics['counts']['count' . $index] = array(
+          'title' => ts('Total No Pledges'),
+          'value' => $totalCount,
+          'type' => CRM_Utils_Type::T_INT,
+        );
+      }
     }
     return $statistics;
   }
