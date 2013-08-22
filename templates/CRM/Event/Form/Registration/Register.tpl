@@ -97,14 +97,6 @@
       {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
-
-      {if $form.is_pay_later}
-        <div class="crm-section pay_later-section">
-          <div class="label">&nbsp;</div>
-          <div class="content">{$form.is_pay_later.html}&nbsp;{$form.is_pay_later.label}</div>
-          <div class="clear"></div>
-        </div>
-      {/if}
     {/if}
     {if $pcp && $is_honor_roll }
       <fieldset class="crm-group pcp-group">
@@ -254,15 +246,13 @@
     {/literal}{/if}{literal}
   }
 
-  {/literal}{if ($form.is_pay_later or $bypassPayment) and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
+  {/literal}{if ($bypassPayment) and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
   {literal}
   showHidePayPalExpressOption();
   {/literal}{/if}{literal}
 
   function showHidePayPalExpressOption() {
-    var payLaterElement = {/literal}{if $form.is_pay_later}true{else}false{/if}{literal};
-    if (( cj("#bypass_payment").val() == 1 ) ||
-      ( payLaterElement && document.getElementsByName('is_pay_later')[0].checked )) {
+    if (( cj("#bypass_payment").val() == 1 )) {
       cj("#crm-submit-buttons").show();
       cj("#paypalExpress").hide();
     }
@@ -272,15 +262,12 @@
     }
   }
 
-  {/literal}{if ($form.is_pay_later or $bypassPayment) and $showHidePaymentInformation}{literal}
+  {/literal}{if ($bypassPayment and $showHidePaymentInformation)}{literal}
   showHidePaymentInfo();
   {/literal} {/if}{literal}
 
   function showHidePaymentInfo() {
-    var payLater = {/literal}{if $form.is_pay_later}true{else}false{/if}{literal};
-
-    if (( cj("#bypass_payment").val() == 1 ) ||
-      ( payLater && document.getElementsByName('is_pay_later')[0].checked )) {
+    if (( cj("#bypass_payment").val() == 1 )) {
       cj('#billing-payment-block').hide();
     }
     else {
@@ -321,12 +308,6 @@
 
       //set the value for hidden bypass payment.
       cj("#bypass_payment").val(1);
-
-      //hide pay later.
-      {/literal}{if $form.is_pay_later}{literal}
-      cj("#is-pay-later").hide();
-      {/literal} {/if}{literal}
-
     }
     else {
       if (isrequireApproval) {
@@ -338,21 +319,16 @@
       }
       //reset value since user don't want or not eligible for waitlist
       cj("#bypass_payment").val(0);
-
-      //need to show paylater if exists.
-      {/literal}{if $form.is_pay_later}{literal}
-      cj("#is-pay-later").show();
-      {/literal} {/if}{literal}
     }
 
     //now call showhide payment info.
     {/literal}
-    {if ($form.is_pay_later or $bypassPayment) and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}{literal}
+    {if ($bypassPayment) and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}{literal}
     showHidePayPalExpressOption();
     {/literal}{/if}
     {literal}
 
-    {/literal}{if ($form.is_pay_later or $bypassPayment) and $showHidePaymentInformation}{literal}
+    {/literal}{if ($bypassPayment) and $showHidePaymentInformation}{literal}
     showHidePaymentInfo();
     {/literal}{/if}{literal}
   }

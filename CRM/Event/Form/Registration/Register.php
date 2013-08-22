@@ -450,7 +450,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_values['event']['is_monetary']) {
       if (count($pps) > 1) {
         $this->addRadio('payment_processor', ts('Payment Method'), $pps,
-          NULL, "&nbsp;", FALSE
+          NULL, "&nbsp;"
         );
       }
       elseif (!empty($pps)) {
