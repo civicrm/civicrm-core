@@ -317,7 +317,7 @@ function _event_survey_civicrm_buildForm_Profile($formName, &$form) {
   );
   // simplified formatted groupTree
   $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $form);
-  CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, 1, 'event_survey_');
+  CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, 'event_survey_');
 
   if (isset($groupTree) && is_array($groupTree)) {
     $participantId = CRM_Utils_Request::retrieve('pid', 'Positive', $form, TRUE, 0, 'REQUEST');
