@@ -61,13 +61,6 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
   protected $_componentIds;
 
   /**
-   * The array that holds all the contact ids
-   *
-   * @var array
-   */
-  public $_contactIds;
-
-  /**
    * build all the data structures needed to build the form
    *
    * @param
@@ -80,14 +73,13 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
   }
 
   static function preProcessCommon(&$form, $useTable = FALSE) {
-    $form->_contactIds = array();
-
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
     $form->_task = CRM_Utils_Array::value('task', $values);
     $mailingTasks = CRM_Mailing_Task::tasks();
     $form->assign('taskName', CRM_Utils_Array::value('task', $values));
 
+    // ids are mailing event queue ids
     $ids = array();
     if ($values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
@@ -109,16 +101,15 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
 
       $result = $query->searchQuery(0, 0, $sortOrder);
       while ($result->fetch()) {
-        $ids[] = $result->contact_id;
+        $ids[] = $result->mailing_event_queue_id;
       }
       $form->assign('totalSelectedMailingRecipients', $form->get('rowCount'));
     }
 
     if (!empty($ids)) {
-      $form->_componentClause =  ' contact_a.id IN ( ' . implode(',', $ids) . ' ) ';
+      $form->_componentClause =  ' civicrm_mailing_event_queue.id IN ( ' . implode(',', $ids) . ' ) ';
     }
 
-    $form->_contactIds = $ids;
     //set the context for redirection for any task actions
     $session = CRM_Core_Session::singleton();
 

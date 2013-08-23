@@ -111,6 +111,11 @@ class CRM_Mailing_BAO_Query {
         $query->_select['mailing_job_end_date']  = "civicrm_mailing_job.end_date as mailing_job_end_date";
         $query->_element['mailing_job_end_date'] = 1;
       }
+
+      if (CRM_Utils_Array::value('mailing_event_queue_id', $query->_returnProperties)) {
+        $query->_select['mailing_event_queue_id'] = " civicrm_mailing_event_queue.id as mailing_event_queue_id";
+        $query->_element['mailing_event_queue_id'] = 1;
+      }
     }
   }
 
@@ -179,7 +184,8 @@ class CRM_Mailing_BAO_Query {
         'mailing_job_status' => 1,
         'mailing_job_end_date' => 1,
         'contact_type' => 1,
-        'contact_sub_type' => 1
+        'contact_sub_type' => 1,
+        'mailing_event_queue_id' => 1
       );
     }
     return $properties;

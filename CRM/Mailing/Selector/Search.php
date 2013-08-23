@@ -299,7 +299,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
         }
       }
 
-      $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->contact_id;
+      $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->mailing_event_queue_id;
 
       $actions = array(
         'cid' => $result->contact_id,
