@@ -73,12 +73,12 @@
     <span class="crm-clear-link">
       (<a href="#" title="unselect"
           onclick="unselectRadio('activity_role', '{$form.formName}');
-            cj('#activity_contact_name').val('').parent().hide(); return false;" >
+            return false;">
         {ts}clear{/ts}
       </a>)
     </span>
+
     <div>
-    {$form.activity_contact_name.html}
       <div class="description font-italic">{ts}Complete OR partial name{/ts}
         <span class="contact-name-option option-1">{ts} of the Source Contact{/ts}</span>
         <span class="contact-name-option option-2">{ts} of the Assignee Contact{/ts}</span>
@@ -162,14 +162,9 @@ campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
 cj('[name=activity_role]:input').change(function() {
   cj('.description .contact-name-option').hide();
   if (cj(this).is(':checked')) {
-    cj('#activity_contact_name').parent().show();
     cj('.description .option-' + cj(this).val()).show();
   }
 }).change();
-
-if (cj('[name=activity_role]:checked').length < 1) {
-  cj('#activity_contact_name').parent().hide();
-}
 
 function showCustomData(chkbox) {
   if (document.getElementById(chkbox).checked) {
