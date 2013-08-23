@@ -140,38 +140,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // see function comment block for explanation of this
       return;
     }
-
+    $this->_defaults = array();
     $contactID = $this->getContactID();
     if ($contactID) {
       //@todo CRM-11915 I observed that even when the billing block is not present the routine to retrieve the billing defaults is still called - which seems a bit redundant.
-      $names = array(
-        'first_name', 'middle_name', 'last_name',
-        "street_address-{$this->_bltID}", "city-{$this->_bltID}", "postal_code-{$this->_bltID}",
-        "country_id-{$this->_bltID}", "state_province_id-{$this->_bltID}",
-      );
-
-      foreach ($names as $name) {
-        $fields[$name] = 1;
-      }
-      $fields["state_province-{$this->_bltID}"] = 1;
-      $fields["country-{$this->_bltID}"] = 1;
-      $fields["email-{$this->_bltID}"] = 1;
-      $fields['email-Primary'] = 1;
-
-      CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $this->_defaults);
-
-      // use primary email address if billing email address is empty
-      if (empty($this->_defaults["email-{$this->_bltID}"]) &&
-        !empty($this->_defaults['email-Primary'])
-      ) {
-        $this->_defaults["email-{$this->_bltID}"] = $this->_defaults['email-Primary'];
-      }
-
-      foreach ($names as $name) {
-        if (isset($this->_defaults[$name])) {
-          $this->_defaults['billing_' . $name] = $this->_defaults[$name];
-        }
-      }
+      $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
+      $this->_defaults = array_merge($this->_defaults, $billingDefaults);
     }
     $config = CRM_Core_Config::singleton();
     // set default country from config if no country set
