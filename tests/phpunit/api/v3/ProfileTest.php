@@ -131,7 +131,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'billing_street_address-5' => '5 Saint Helier St',
       'billing_city-5' => 'Gotham City',
       'billing_state_province_id-5' => '1021',
-      'billing_country_id-5' => '',
+      'billing_country_id-5' => '1228',
       'billing-email-5' => 'abc1.xyz1@yahoo.com',
       'billing_postal_code-5' => '90210',
       'billing-email-5' => 'abc1.xyz1@yahoo.com',
