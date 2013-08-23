@@ -178,6 +178,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
       NULL, FALSE, FALSE,
       CRM_Contact_BAO_Query::MODE_MAILING
     );
+    $this->_query->_distinctComponentClause = " civicrm_mailing_event_queue.id ";
   }
   //end of constructor
 
