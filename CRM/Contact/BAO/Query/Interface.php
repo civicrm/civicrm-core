@@ -68,8 +68,14 @@ abstract class CRM_Contact_BAO_Query_Interface {
   /**
    * Describe options for available for use in the search-builder.
    *
+   * The search builder determines its options by examining the API metadata corresponding to each
+   * search field. This approach assumes that each field has a unique-name (ie that the field's
+   * unique-name in the API matches the unique-name in the search-builder).
+   *
    * @param array $apiEntities list of entities whose options should be automatically scanned using API metadata
    * @param array $fieldOptions keys are field unique-names; values describe how to lookup the options
+   *   For boolean options, use value "yesno". For pseudoconstants/FKs, use the name of an API entity
+   *   from which the metadata of the field may be queried. (Yes - that is a mouthful.)
    * @void
    */
   public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
