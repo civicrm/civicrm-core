@@ -1261,6 +1261,7 @@ WHERE  id = %1";
       while ($relationshipTypeDAO->fetch()) {
 
         self::$relationshipType[$valueColumnName][$relationshipTypeDAO->id] = array(
+          'id' => $relationshipTypeDAO->id,
           $column_a_b => $relationshipTypeDAO->$column_a_b,
           $column_b_a => $relationshipTypeDAO->$column_b_a,
           'contact_type_a' => "$relationshipTypeDAO->contact_type_a",
