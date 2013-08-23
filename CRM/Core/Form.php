@@ -1452,6 +1452,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       echo $e->getMessage();
       // the try catch block gives us silent failure -not 100% sure this is a good idea
       // as silent failures are often worse than noisy ones
+      return array();
     }
   }
 }
