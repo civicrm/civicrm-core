@@ -433,10 +433,11 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'membership_type' => 'membership',
     );
     $entities = array('contact', 'activity', 'participant', 'pledge', 'member', 'contribution');
+    CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     foreach ($entities as $entity) {
       $fields = civicrm_api($entity, 'getfields', array('version' => 3));
       foreach ($fields['values'] as $field => $info) {
-        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id'])) {
+        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id']) || !empty($info['enumValues'])) {
           $options[$field] = $entity;
           if (substr($field, -3) == '_id') {
             $options[substr($field, 0, -3)] = $entity;

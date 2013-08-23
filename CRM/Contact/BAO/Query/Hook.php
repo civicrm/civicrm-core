@@ -80,6 +80,12 @@ class CRM_Contact_BAO_Query_Hook {
     return $extFields;
   }
 
+  public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
+    foreach (self::getSearchQueryObjects() as $obj) {
+      $obj->alterSearchBuilderOptions($apiEntities, $fieldOptions);
+    }
+  }
+
   public function alterSearchQuery(&$query, $fnName) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->$fnName($query);
