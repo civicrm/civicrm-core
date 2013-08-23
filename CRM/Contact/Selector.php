@@ -911,6 +911,13 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
 
     $sql = str_replace($replaceSQL, $insertSQL, $sql);
 
+    // The prevnext_cache does not need to be in order, and the ORDER BY clause
+    // can break the query if it we're in advanced search and we are using a
+    // search view that uses fields not in the civicrm_contact table.
+    // See: 12840.
+    if(preg_match('/(.*) ORDER BY .*/is',$sql, $matches)) {
+      $sql = $matches[1];
+    }
 
     CRM_Core_Error::ignoreException();
     $result = CRM_Core_DAO::executeQuery($sql);
