@@ -77,6 +77,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           array('title' => ts('Contact Type'),
             'no_repeat' => TRUE,
           ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
+            'no_repeat' => TRUE,
+          ),
           'do_not_email' =>
           array('title' => ts('Do Not Email'),
             'no_repeat' => TRUE,

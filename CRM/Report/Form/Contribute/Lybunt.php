@@ -77,9 +77,19 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'default' => TRUE,
             'required' => TRUE,
           ),
-      'first_name' => array('title' => ts('First Name'),
+          'first_name' => array(
+            'title' => ts('First Name'),
           ),
-      'last_name' => array('title' => ts('Last Name'),
+          'last_name' => array(
+            'title' => ts('Last Name'),
+          ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
           ),
         ),
         'filters' =>

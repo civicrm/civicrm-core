@@ -67,6 +67,16 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+            'no_repeat' => TRUE,
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
+            'no_repeat' => TRUE,
+          ),
         ),
         'filters' =>
         array(
@@ -454,6 +464,8 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
         'sort_name',
         'display_name',
         'addressee_display',
+        'contact_type',
+        'contact_sub_type',
         'email',
         'phone',
         'state_province_id',

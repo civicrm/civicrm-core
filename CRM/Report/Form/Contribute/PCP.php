@@ -51,6 +51,14 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
             'required' => TRUE,
             'no_display' => TRUE,
           ),
+          'contact_type' =>
+          array(
+            'title' => ts('Supporter Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Supporter Contact SubType'),
+          ),
         ),
         'filters' =>
         array(

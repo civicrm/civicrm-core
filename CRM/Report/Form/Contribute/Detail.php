@@ -74,6 +74,14 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
+          ),
         ),
         'filters' =>
         array(
