@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.2                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,42 +27,58 @@
 <script type="text/javascript">
 
 function buildPaymentBlock( type ) {
-    if ( type == 0 ) {
-     if (cj("#billing-payment-block").length) {
-           cj("#billing-payment-block").html('');
-   }
-        return;
+  if ( type == 0 ) { 
+    if (cj("#billing-payment-block").length) {
+      cj("#billing-payment-block").html('');
     }
-
-  var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
-
-  {/literal}
-    {if $urlPathVar}
-      dataUrl = dataUrl + '&' + '{$urlPathVar}'
-    {/if}
-
-    {if $contributionPageID}
-            dataUrl = dataUrl + '&id=' + '{$contributionPageID}'
-        {/if}
-
-    {if $qfKey}
-      dataUrl = dataUrl + '&qfKey=' + '{$qfKey}'
-    {/if}
+    return;
+  } 
+	//Modified by BOT
+	var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type; 
+	{/literal}
+	{if $isConfirm} {literal}
+		var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='_qf_Confirm_display=true&snippet=4&type='}"{literal} + type; {/literal}
+	{/if}
+	{literal}	
+	 
+	{/literal}
+	{if $urlPathVar}
+    dataUrl = dataUrl + '&' + '{$urlPathVar}'
+  {/if}
+		
+	{if $contributionPageID}
+    dataUrl = dataUrl + '&id=' + '{$contributionPageID}'
+  {/if}
+	
+	{if $qfKey}
+    dataUrl = dataUrl + '&qfKey=' + '{$qfKey}'
+	{/if}
   {literal}
 
-  var response = cj.ajax({
+	var fname = '#billing-payment-block';	
+	var response = cj.ajax({	
                         url: dataUrl,
                         async: false
                         }).responseText;
 
-  cj('#billing-payment-block').html(response).trigger('crmFormLoad');
+  cj( fname ).html( response );	
 }
 
 cj( function() {
-    cj('.crm-group.payment_options-group').show();
+    var processorTypeObj = cj('input[name="payment_processor"]');
+
+    if ( processorTypeObj.attr('type') == 'hidden' ) {
+      var processorTypeValue = processorTypeObj.val( );
+    } else {
+      var processorTypeValue = processorTypeObj.filter(':checked').val();
+    }
+
+    if ( processorTypeValue ) {
+      buildPaymentBlock( processorTypeValue );
+    }
 
     cj('input[name="payment_processor"]').change( function() {
-        buildPaymentBlock( cj(this).val() );
+      buildPaymentBlock( cj(this).val() );    
     });
 });
 
