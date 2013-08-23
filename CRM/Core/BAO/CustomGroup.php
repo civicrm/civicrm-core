@@ -1454,39 +1454,28 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * generic function to build all the form elements for a specific group tree
    *
-   * @param CRM_Core_Form $form      the form object
-   * @param array         $groupTree the group tree object
-   * @param string        $showName
-   * @param string        $hideName
+   * @param object    $form             the form object
+   * @param array     $groupTree        the group tree object
+   * @param boolean   $inactiveNeeded   return inactive custom groups
+   * @param string    $prefix           prefix for custom grouptree assigned to template
    *
    * @return void
    * @access public
    * @static
    */
-  static function buildQuickForm(&$form,
-    &$groupTree,
-    $inactiveNeeded = FALSE,
-    $groupCount     = 1,
-    $prefix         = ''
-  ) {
-
+  static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '' ) {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
-    $sBlocks = array();
-    $hBlocks = array();
 
     // this is fix for date field
     $form->assign('currentYear', date('Y'));
 
     foreach ($groupTree as $id => $group) {
-
       CRM_Core_ShowHideBlocks::links($form, $group['title'], '', '');
-
-      $groupId = CRM_Utils_Array::value('id', $group);
       foreach ($group['fields'] as $field) {
         $required = CRM_Utils_Array::value('is_required', $field);
         //fix for CRM-1620
         if ($field['data_type'] == 'File') {
-          if (isset($field['customValue']['data'])) {
+          if (!empty($field['element_value']['data'])) {
             $required = 0;
           }
         }

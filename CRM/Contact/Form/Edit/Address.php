@@ -272,7 +272,7 @@ class CRM_Contact_Form_Edit_Address {
 
       // we setting the prefix to 'dnc_' below, so that we don't overwrite smarty's grouptree var.
       // And we can't set it to 'address_' because we want to set it in a slightly different format.
-      CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, 1, 'dnc_');
+      CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, 'dnc_');
 
       $template     = CRM_Core_Smarty::singleton();
       $tplGroupTree = $template->get_template_vars('address_groupTree');
