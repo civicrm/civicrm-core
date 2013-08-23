@@ -315,34 +315,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
       }
 
-      $names = array(
-        'first_name',
-        'middle_name',
-        'last_name',
-        "street_address-{$this->_bltID}",
-        "city-{$this->_bltID}",
-        "postal_code-{$this->_bltID}",
-        "country_id-{$this->_bltID}",
-        "state_province_id-{$this->_bltID}",
-        "state_province-{$this->_bltID}",
-        "country-{$this->_bltID}"
-      );
+      $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
+      $defaults = array_merge($defaults, $billingDefaults);
 
-      foreach ($names as $name) {
-        $fields[$name] = 1;
-      }
-
-      if ($this->_contactID) {
-        CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $defaults);
-      }
-
-      foreach ($names as $name) {
-        if (!empty($defaults[$name])) {
-          $defaults['billing_' . $name] = $defaults[$name];
-        }
-      }
-
-      // now fix all state country selectors
+      // now fix all state country selectors (FIXME: what does this do ?? dgg)
       CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     }
 
