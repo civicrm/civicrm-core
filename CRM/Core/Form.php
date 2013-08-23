@@ -1434,5 +1434,25 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->addAutoSelector($profiles);
     }
   }
+
+  /**
+   * Set default values on form for given contact (or no contact defaults)
+   * @param mixed $profile_id (can be id, or profile name)
+   * @param integer $contactID
+   */
+  function getProfileDefaults($profile_id = 'Billing', $contactID = NULL) {
+    try{
+      $defaults = civicrm_api3('profile', 'getsingle', array(
+        'profile_id' => (array) $profile_id,
+        'contact_id' => $contactID,
+      ));
+      return $defaults;
+    }
+    catch (Exception $e) {
+      echo $e->getMessage();
+      // the try catch block gives us silent failure -not 100% sure this is a good idea
+      // as silent failures are often worse than noisy ones
+    }
+  }
 }
 
