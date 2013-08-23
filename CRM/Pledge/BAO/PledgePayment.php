@@ -776,8 +776,18 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
           $oldScheduledAmount = $oldestPayment['amount'];
           $newScheduledAmount = $oldScheduledAmount + ($pledgeScheduledAmount - $actualAmount);
           //store new amount in oldest pending payment record.
-          CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $oldestPayment['id'], 'scheduled_amount', $newScheduledAmount);
-          CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $oldestPayment['id'], 'contribution_id', $paymentContributionId);
+          CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment',
+            $oldestPayment['id'],
+            'scheduled_amount',
+            $newScheduledAmount
+          );
+          if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment', $oldestPayment['id'], 'contribution_id', 'id')) {
+            CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment',
+              $oldestPayment['id'],
+              'contribution_id',
+              $paymentContributionId
+            );
+          }
         }
         elseif (($actualAmount > $pledgeScheduledAmount) && (($actualAmount - $pledgeScheduledAmount) >= $oldestPayment['amount'])) {
           // here the actual amount is greater than expected and also greater than the next installment amount, so update the next installment as complete and again add it to next subsequent pending payment
