@@ -64,4 +64,14 @@ abstract class CRM_Contact_BAO_Query_Interface {
   public function setAdvancedSearchPaneTemplatePath(&$paneTemplatePathArray, $type) {
     return NULL;
   }
+
+  /**
+   * Describe options for available for use in the search-builder.
+   *
+   * @param array $apiEntities list of entities whose options should be automatically scanned using API metadata
+   * @param array $fieldOptions keys are field unique-names; values describe how to lookup the options
+   * @void
+   */
+  public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
+  }
 }
