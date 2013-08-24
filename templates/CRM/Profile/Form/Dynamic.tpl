@@ -34,40 +34,21 @@
 cj(function($) {
   $('#profile-dialog .crm-container-snippet #Edit').validate(CRM.validate.params);
   var formOptions = {
-    beforeSubmit:  proccessMultiRecordForm //pre-submit callback
+    success:       checkResponse  // post-submit callback 
   };
 
   //binding the callback to snippet profile form
   $('.crm-container-snippet #Edit').ajaxForm(formOptions);
 });
 
-// pre-submit callback
-function proccessMultiRecordForm(formData, jqForm, options) {
-  var queryString = cj.param(formData);
-  queryString = queryString + '{/literal}{$urlParams}{literal}' + '&snippet=1';
-
-  if (cj('#profile-dialog')) {
-    var postUrl = {/literal}"{crmURL p='civicrm/profile/edit' h=0 }"{literal};
-    var response = cj.ajax({
-      type: "POST",
-      url: postUrl,
-      async: false,
-      data: queryString,
-      dataType: "json",
-
-    }).responseText;
-
-    //if there is any form error show the dialog
-    //else redirect to post url
-    if (!cj(response).find('.crm-error').html()) {
-      window.location = '{/literal}{$postUrl}{literal}';
-    }
-
-    // here we could return false to prevent the form from being submitted;
-    // returning anything other than false will allow the form submit to continue
-    return false;
+// post-submit callback 
+function checkResponse(responseText, statusText, xhr, $form) { 
+  //if there is any form error show the dialog
+  //else redirect to post url
+  if (!cj(responseText).find('.crm-error').html()) {
+    window.location = '{/literal}{$postUrl}{literal}';
   }
-}
+} 
 </script>
 {/literal}
 {include file="CRM/Form/validate.tpl"}
