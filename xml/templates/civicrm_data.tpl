@@ -460,6 +460,7 @@ VALUES
   (@option_group_id_ceOpt, '{ts escape="sql"}Instant Messenger{/ts}'        ,   9, 'IM', NULL, 1, NULL, 9, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_ceOpt, '{ts escape="sql"}Open ID{/ts}'                  ,   10, 'OpenID', NULL, 1, NULL, 10, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_ceOpt, '{ts escape="sql"}Website{/ts}'                  ,   11, 'Website', NULL, 1, NULL, 11, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_ceOpt, '{ts escape="sql"}Maternal Last name{/ts}'       ,   12, 'LastName1', NULL, 1, NULL, 12, NULL, 0, 0, 1, NULL, NULL),
 
   (@option_group_id_asOpt, '{ts escape="sql"}Address Fields{/ts}'          ,   1, 'location', NULL, 0, NULL,  1, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_asOpt, '{ts escape="sql"}Custom Fields{/ts}'           ,   2, 'custom', NULL, 0, NULL,  2, NULL, 0, 0, 1, NULL, NULL),

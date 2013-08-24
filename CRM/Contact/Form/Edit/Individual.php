@@ -72,9 +72,6 @@ class CRM_Contact_Form_Edit_Individual {
       // last_name
       $form->addElement('text', 'last_name', ts('Paternal Last Name'), $attributes['last_name']);
 
-      // last_name_1
-      $form->addElement('text', 'last_name_1', ts('Maternal Last Name'), $attributes['last_name_1']);
-
       // suffix
       $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
       if ($suffix) {
