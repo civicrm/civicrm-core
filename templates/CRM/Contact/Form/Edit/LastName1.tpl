@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
@@ -23,29 +22,5 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
- */
-Class CRM_Contact_Form_Edit_LastName1 {
-
-  /**
-   * This function is to build form elements
-   * params object $form object of the form
-   *
-   * @static
-   * @access public
-   */
-  static function buildQuickForm(&$form) {
-
-      $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
-
-      $form->addElement('text', 'last_name_1', ts('Maternal Last Name'), $attributes['last_name_1']);
-  }
-}
-
+*}
+{* blank tpl *}
