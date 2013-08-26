@@ -324,6 +324,15 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
           'resultContext' => NULL,
           'taskClassName' => 'CRM_Contact_Task',
         ),
+        8 => array(
+          'selectorName' => 'CRM_Mailing_Selector_Search',
+          'selectorLabel' => ts('Mailings'),
+          'taskFile' => "CRM/common/searchResultTasks.tpl",
+          'taskContext' => NULL,
+          'resultFile' => 'CRM/Mailing/Form/Selector.tpl',
+          'resultContext' => 'Search',
+          'taskClassName' => 'CRM_Mailing_Task',
+        ),
       );
     }
   }
