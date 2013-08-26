@@ -120,6 +120,34 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_address' =>
+      array(
+        'dao' => 'CRM_Core_DAO_Address',
+        'grouping' => 'contact-fields',
+        'fields' =>
+        array(
+          'street_address' => array('default' => TRUE),
+          'city' => array('default' => TRUE),
+          'postal_code' => NULL,
+          'state_province_id' => array('title' => ts('State/Province')),
+          'country_id' => array('title' => ts('Country')),
+        ),
+        'filters' =>
+        array(
+          'country_id' =>
+          array(
+            'title' => ts('Country'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::country(),
+          ),
+          'state_province_id' =>
+          array(
+            'title' => ts('State / Province'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::stateProvince(),
+          ),
+        ),
+      ),
       'civicrm_contribution' =>
       array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -260,17 +288,30 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
   function from() {
 
-    $this->_from = "
+    $this->_from = " 
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
-             INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
-             {$this->_aclFrom}
-             LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
-                         AND {$this->_aliases['civicrm_email']}.is_primary = 1
-             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                            {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
+              INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
+             {$this->_aclFrom}";
+
+    if ($this->isTableSelected('civicrm_email')) {
+      $this->_from .= "
+              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
+                     AND {$this->_aliases['civicrm_email']}.is_primary = 1";
+    }
+    if ($this->isTableSelected('civicrm_phone')) {
+      $this->_from .= "
+              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
+                         {$this->_aliases['civicrm_phone']}.is_primary = 1";
+    }
+    if ($this->isTableSelected('civicrm_address')) {
+      $this->_from .= "
+              LEFT  JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
+                         {$this->_aliases['civicrm_address']}.is_primary = 1";
+    }
   }
 
   function where() {
@@ -483,6 +524,15 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
           $entryFound = TRUE;
         }
+      }
+
+      if ($value = CRM_Utils_Array::value('civicrm_address_state_province_id', $row)) {
+        $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
+        $entryFound = TRUE;
+      }
+      if ($value = CRM_Utils_Array::value('civicrm_address_country_id', $row)) {
+        $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
+        $entryFound = TRUE;
       }
     }
   }
