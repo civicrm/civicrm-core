@@ -73,9 +73,19 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           array('title' => ts('Donor Name'),
             'required' => TRUE,
           ),
-      'first_name' => array('title' => ts('First Name'),
+          'first_name' => array(
+            'title' => ts('First Name'),
           ),
-      'last_name' => array('title' => ts('Last Name'),
+          'last_name' => array(
+            'title' => ts('Last Name'),
+          ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
           ),
         ),
         'filters' =>
