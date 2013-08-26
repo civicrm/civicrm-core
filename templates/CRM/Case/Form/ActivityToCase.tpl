@@ -163,7 +163,7 @@ function fileOnCase( action, activityID, currentCaseId ) {
                                     //hide current activity row.
                                     cj( "#crm-activity_" + activityID ).hide( );
                       var visibleRowCount = 0;
-                      cj('[id^="'+ 'crm-activity' +'"]::visible').each(function() {
+                      cj('[id^="'+ 'crm-activity' +'"]:visible').each(function() {
                             visibleRowCount++;
                       } );
                       if ( visibleRowCount < 1 ) {
