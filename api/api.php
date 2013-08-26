@@ -19,11 +19,20 @@
  *   array to be passed to function
  */
 function civicrm_api($entity, $action, $params, $extra = NULL) {
+  $apiRequest = array();
+  $apiRequest['entity'] = CRM_Utils_String::munge($entity);
+  $apiRequest['action'] = CRM_Utils_String::munge($action);
+  $apiRequest['version'] = civicrm_get_api_version($params);
+  $apiRequest['params'] = $params;
+  $apiRequest['extra'] = $extra;
+
   $apiWrappers = array(
     CRM_Utils_API_HTMLInputCoder::singleton(),
     CRM_Utils_API_NullOutputCoder::singleton(),
     CRM_Utils_API_ReloadOption::singleton(),
   );
+  CRM_Utils_Hook::apiWrappers($apiWrappers,$apiRequest);
+
   try {
     require_once ('api/v3/utils.php');
     require_once 'api/Exception.php';
@@ -32,12 +41,6 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     }
     _civicrm_api3_initialize();
     $errorScope = CRM_Core_TemporaryErrorScope::useException();
-    $apiRequest = array();
-    $apiRequest['entity'] = CRM_Utils_String::munge($entity);
-    $apiRequest['action'] = CRM_Utils_String::munge($action);
-    $apiRequest['version'] = civicrm_get_api_version($params);
-    $apiRequest['params'] = $params;
-    $apiRequest['extra'] = $extra;
     // look up function, file, is_generic
     $apiRequest += _civicrm_api_resolve($apiRequest);
     if (strtolower($action) == 'create' || strtolower($action) == 'delete') {
