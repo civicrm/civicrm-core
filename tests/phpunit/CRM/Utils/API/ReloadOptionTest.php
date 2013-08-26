@@ -13,7 +13,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    CRM_utils_Hook_UnitTests::singleton()->setHook('civicrm_post', array($this, 'onPost'));
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_post', array($this, 'onPost'));
   }
 
   /**
