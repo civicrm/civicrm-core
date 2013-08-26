@@ -455,12 +455,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           $relIDs = $ids;
         }
         elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
-          $query = "SELECT source_contact_id FROM civicrm_activity
-                              WHERE id IN ( " . implode(',', $ids) . ")";
-          $dao = CRM_Core_DAO::executeQuery($query);
-          while ($dao->fetch()) {
-            $relIDs[] = $dao->source_contact_id;
-          }
+	    $query = "SELECT target_contact_id FROM civicrm_activity ca 
+                INNER JOIN civicrm_activity_target cat 
+                on ca.id = cat.activity_id
+                WHERE ca.id IN ( " . implode(',', $ids) . ")";
+            $dao = CRM_Core_DAO::executeQuery($query);
+            while ($dao->fetch()) {
+              $relIDs[] = $dao->target_contact_id;
+            }
         }
         else {
           switch ($exportMode) {
