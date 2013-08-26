@@ -176,6 +176,19 @@ WHERE       source_contact_id IS NOT NULL";
    $query = "ALTER  TABLE civicrm_activity DROP COLUMN source_contact_id";
    $dao = CRM_Core_DAO::executeQuery($query);
 
+   $query = "
+CREATE TABLE IF NOT EXISTS 'civicrm_word_replacement' (
+  'id' int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Word replacement ID',
+  'find_word' varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Word which need to be replaced',
+  'replace_word' varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Word which will replace the word in find',
+  'is_active' tinyint(4) DEFAULT NULL COMMENT 'Is this entry active?',
+  'domain_id' int(10) unsigned DEFAULT NULL COMMENT 'FK to Domain ID. This is for Domain specific word replacement',
+  PRIMARY KEY ('id'),
+  UNIQUE KEY 'UI_find' ('find_word'),
+  KEY 'FK_civicrm_word_replacement_domain_id' ('domain_id')
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4";
+   $dao = CRM_Core_DAO::executeQuery($query);
+
    return TRUE;
   }
 
