@@ -256,7 +256,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     if (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel'
       && ($form->_action != CRM_Core_Action::COPY)
     ) {
-      $params = array();
       $sel = CRM_Utils_Array::value('radio_ts', self::$_searchFormValues);
       $form->assign('searchtype', $sel);
       $result = CRM_Core_BAO_PrevNextCache::getSelectedContacts();
@@ -299,9 +298,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
 
     // fix for CRM-5165
     $sortByCharacter = $this->get('sortByCharacter');
-    if ($sortByCharacter &&
-      $sortByCharacter != 1
-    ) {
+    if ($sortByCharacter && $sortByCharacter != 1) {
       $params[] = array('sortByCharacter', '=', $sortByCharacter, 0, 0);
     }
     $queryOperator = $this->get('queryOperator');
