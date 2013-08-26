@@ -328,7 +328,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
       // exclude the address options disabled in the Address Settings
       $fields[$value] = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
-
+      ksort($fields[$value]);
       if ($mappingType == 'Export') {
         $relationships = array();
         $relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $value);
@@ -560,7 +560,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     foreach ($sel1 as $key => $sel) {
       if ($key) {
-        asort($mapperFields[$key]);
         $sel2[$key] = array('' => ts('- select field -')) + $mapperFields[$key];
       }
     }
