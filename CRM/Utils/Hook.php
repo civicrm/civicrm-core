@@ -1223,9 +1223,10 @@ abstract class CRM_Utils_Hook {
    * @return null the return value is ignored
    * @access public
    */
-  static function apiWrappers (&$wrappers,$apiRequest) {
-    return self::singleton()->invoke(2, $wrappers, $apiRequest, self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_apiWrapper'
+  static function apiWrappers(&$wrappers, $apiRequest) {
+    return self::singleton()
+      ->invoke(2, $wrappers, $apiRequest, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_apiWrappers'
     );
   }
 
