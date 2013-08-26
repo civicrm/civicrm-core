@@ -553,6 +553,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
           unset($tag_params);
           $tag_params['contact_id'] = $this->_contactId;
           $tag_params['tag_id'] = $this->_tagId;
+          $tag_params['version'] = 3;
           $tag_value = civicrm_api('entity_tag', 'create', $tag_params);
         }
         break;
@@ -561,9 +562,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     //send email
     $params['activityId'] = $result->id;
     $params['tagId'] = $this->_tagId;
-    $this->bao->sendEmail($params, $this->_sendEmailMode);
 
     $transaction->commit();
+
+    $this->bao->sendEmail($params, $this->_sendEmailMode);
 
     if ($result) {
       // call the hook before we redirect
