@@ -93,6 +93,14 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
             'default' => TRUE,
             'required' => TRUE,
           ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
+          ),
         ),
         'grouping' => 'contact-fields',
         'filters' =>

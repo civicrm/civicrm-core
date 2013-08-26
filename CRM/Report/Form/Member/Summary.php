@@ -137,6 +137,14 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           array(
             'no_display' => TRUE,
           ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
+          ),
         ),
       ),
       'civicrm_contribution' =>
