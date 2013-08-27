@@ -34,7 +34,7 @@
  */
 
 /**
- * This class provides the functionality to print contribution records
+ * This class provides the functionality to print mailing recipient records
  */
 class CRM_Mailing_Form_Task_Print extends CRM_Mailing_Form_Task {
 
