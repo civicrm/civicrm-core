@@ -62,12 +62,15 @@
     {else}
        {$form._qf_Search_next_print.html} &nbsp; &nbsp;
      {/if}
-     {$form.task.html}
-    {if $actionButtonName}
-       {$form.$actionButtonName.html} &nbsp; &nbsp;
-    {else}
-     {$form._qf_Search_next_action.html}
-   {/if}
+   
+      <span id='task-section'>
+        {$form.task.html}
+        {if $actionButtonName}
+          {$form.$actionButtonName.html} &nbsp; &nbsp;
+        {else}
+          {$form._qf_Search_next_action.html}
+        {/if}
+      </span>
     </td>
   </tr>
   </table>
@@ -75,5 +78,10 @@
 {literal}
 <script type="text/javascript">
 toggleTaskAction( );
+cj(function() {
+  if (cj('#task option').length == 1 && !cj('#task option').val()) {
+    cj('#task-section').remove();
+  }
+});
 </script>
 {/literal}
