@@ -44,9 +44,7 @@ class CRM_Mailing_BAO_Query {
         'where' => 'civicrm_mailing.id',
       );
     }
-
     return self::$_mailingFields;
-
   }
 
   /**
@@ -134,7 +132,6 @@ class CRM_Mailing_BAO_Query {
 
   static function from($name, $mode, $side) {
     $from = NULL;
-
     switch ($name) {
       case 'civicrm_mailing_event_queue':
         $from = " $side JOIN civicrm_mailing_event_queue ON civicrm_mailing_event_queue.contact_id = contact_a.id";
