@@ -249,6 +249,21 @@ WHERE  id IN ( $groupIDs )
     CRM_Core_DAO::executeQuery($sql);
   }
 
+  /**
+   * Removes all the cache entries pertaining to a specific group
+   * If no groupID is passed in, removes cache entries for all groups
+   * Has an optimization to bypass repeated invocations of this function.
+   * Note that this function is an advisory, i.e. the removal respects the
+   * cache date, i.e. the removal is not done if the group was recently
+   * loaded into the cache.
+   *
+   * @param $groupID  int the groupID to delete cache entries, NULL for all groups
+   * @param $onceOnly boolean run the function exactly once for all groups.
+   *
+   * @public
+   * @return void
+   * @static
+   */
   static function remove($groupID = NULL, $onceOnly = TRUE) {
     static $invoked = FALSE;
 
