@@ -178,9 +178,30 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccess('membership', 'get', $params);
     $this->assertEquals(1, $membership['count']);
     $this->assertEquals(array($this->_membershipID2), array_keys($membership['values']));
-
   }
-
+  /**
+   * Test civicrm_membership_get with params not array.
+   * Gets treated as contact_id, memberships expected.
+   */
+  function testGetInSyntaxOnContactID() {
+    $this->_membershipID = $this->contactMembershipCreate($this->_params);
+    $contact2 = $this->individualCreate();
+    $contact3 = $this->individualCreate(array('first_name' => 'Scout', 'last_name' => 'Canine'));
+    $this->_membershipID2 = $this->contactMembershipCreate(array_merge($this->_params, array('contact_id' => $contact2)));
+    $this->_membershipID3 = $this->contactMembershipCreate(array_merge($this->_params, array('contact_id' => $contact3)));
+    $params = array(
+      'contact_id' => array('IN' => array($this->_contactID, $contact3)),
+    );
+    $membership = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(2, $membership['count']);
+    $this->assertEquals(array($this->_membershipID, $this->_membershipID3), array_keys($membership['values']));
+    $params = array(
+      'contact_id' => array('NOT IN' => array($this->_contactID, $contact3)),
+    );
+    $membership = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(1, $membership['count']);
+    $this->assertEquals(array($this->_membershipID2), array_keys($membership['values']));
+  }
   /**
    * Test civicrm_membership_get with params not array.
    * Gets treated as contact_id, memberships expected.
