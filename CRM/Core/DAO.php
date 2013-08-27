@@ -1822,8 +1822,19 @@ EOS;
    * @param $filter array filter to be applied indexed by operator
    * @param $type String type of field (not actually used - nor in api @todo )
    * @param $alias String alternative field name ('as') @todo- not actually used
-   */
-  public function createSQLFilter($fieldName, $filter, $type, $alias = NULL) {
+   * @param bool $returnSanitisedArray return a sanitised array instead of a clause
+   *  this is primarily so we can add filters @ the api level to the Query object based fields
+   *  @todo a better solutution would be for the query object to apply these filters based on the
+   *  api supported format (but we don't want to risk breakage in alpha stage & query class is scary
+   *  @todo @time of writing only IN & NOT IN are supported for the array style syntax (as test is
+   *  required to extend further & it may be the comments per above should be implemented. It may be
+   *  preferable to not double-banger the return context next refactor of this - but keeping the attention
+   *  in one place has some advantages as we try to extend this format
+   *
+   *  @return NULL|string|array a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
+   *   depending on whether it is supported as yet
+   **/
+  public function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
     // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
     // support for other syntaxes is discussed in ticket but being put off for now
     $acceptedSQLOperators = array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN');
@@ -1833,7 +1844,12 @@ EOS;
           // unary operators
           case 'IS NULL':
           case 'IS NOT NULL':
-            return (sprintf('%s %s', $fieldName, $operator));
+            if(!$returnSanitisedArray) {
+              return (sprintf('%s %s', $fieldName, $operator));
+            }
+            else{
+              return NULL;  // not yet implemented (tests required to implement)
+            }
             break;
 
           // ternary operators
@@ -1842,7 +1858,12 @@ EOS;
             if (empty($criteria[0]) || empty($criteria[1])) {
               throw new exception("invalid criteria for $operator");
             }
-            return (sprintf('%s ' . $operator . ' "%s" AND "%s"', $fieldName, CRM_Core_DAO::escapeString($criteria[0]), CRM_Core_DAO::escapeString($criteria[1])));
+            if(!$returnSanitisedArray) {
+              return (sprintf('%s ' . $operator . ' "%s" AND "%s"', $fieldName, CRM_Core_DAO::escapeString($criteria[0]), CRM_Core_DAO::escapeString($criteria[1])));
+            }
+            else{
+              return NULL;  // not yet implemented (tests required to implement)
+            }
             break;
 
           // n-ary operators
@@ -1855,13 +1876,21 @@ EOS;
               'CRM_Core_DAO',
               'escapeString'
             ), $criteria);
-            return (sprintf('%s %s ("%s")', $fieldName, $operator, implode('", "', $escapedCriteria)));
+            if(!$returnSanitisedArray) {
+              return (sprintf('%s %s ("%s")', $fieldName, $operator, implode('", "', $escapedCriteria)));
+            }
+            return $escapedCriteria;
             break;
 
           // binary operators
 
           default:
-            return(sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
+            if(!$returnSanitisedArray) {
+              return(sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
+            }
+            else{
+              return NULL; // not yet implemented (tests required to implement)
+            }
         }
       }
     }
