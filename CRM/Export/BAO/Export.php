@@ -370,9 +370,7 @@ class CRM_Export_BAO_Export {
       }
     }
 
-    if ($componentTable &&
-      CRM_Utils_Array::value('additional_group', $exportParams)
-    ) {
+    if (!$selectAll && $componentTable && CRM_Utils_Array::value('additional_group', $exportParams)) {
       // If an Additional Group is selected, then all contacts in that group are
       // added to the export set (filtering out duplicates).
       $query = "
@@ -496,10 +494,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         }
 
         $relationshipJoin = $relationshipClause = '';
-        if ($componentTable) {
-          $relationshipJoin = " INNER JOIN $componentTable ctTable ON ctTable.contact_id = {$contactA}";
+        if (!$selectAll && $componentTable) {
+          $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.contact_id = {$contactA}";
         }
-        else {
+        elseif (!empty($relIDs)) {
           $relID = implode(',', $relIDs);
           $relationshipClause = " AND crel.{$contactA} IN ( {$relID} )";
         }
@@ -539,7 +537,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       );
     }
 
-    if ($componentTable) {
+    if (!$selectAll && $componentTable) {
       $from .= " INNER JOIN $componentTable ctTable ON ctTable.contact_id = contact_a.id ";
     }
     elseif ($componentClause) {
