@@ -191,8 +191,8 @@ function civicrm_api3_membership_get($params) {
   }
   $activeOnly = CRM_Utils_Array::value('active_only', $params, $activeOnly);
 
-  if (CRM_Utils_Array::value('contact_id', $params)) {
-    $membershipValues = _civicrm_api3_membership_get_customv2behaviour($params, $contactID, $membershipTypeId, $activeOnly );
+  if (CRM_Utils_Array::value('contact_id', $params) && !is_array($params['contact_id'])) {
+    $membershipValues = _civicrm_api3_membership_get_customv2behaviour($params, $membershipTypeId, $activeOnly );
   }
   else {
     //legacy behaviour only ever worked when contact_id passed in - use standard api function otherwise
@@ -206,8 +206,9 @@ function civicrm_api3_membership_get($params) {
 
   $relationships = array();
   foreach ($membershipValues as $membershipId => $values) {
+    $membershipTypeID = CRM_Utils_Array::value('membership_type_id', values);
     // populate the membership type name for the membership type id
-    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($values['membership_type_id']);
+    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
 
     $membershipValues[$membershipId]['membership_name'] = $membershipType['name'];
 
@@ -222,7 +223,7 @@ function civicrm_api3_membership_get($params) {
       $membershipValues[$membershipId]['relationship_name'] = $relationshipType->name_a_b;
     }
 
-    _civicrm_api3_custom_data_get($membershipValues[$membershipId], 'Membership', $membershipId, NULL, $values['membership_type_id']);
+    _civicrm_api3_custom_data_get($membershipValues[$membershipId], 'Membership', $membershipId, NULL, $membershipTypeID);
   }
 
   $members = $membershipValues;
@@ -260,9 +261,9 @@ function civicrm_api3_membership_get($params) {
  * @param array $params parameters passed into get function
  * @return array result for calling function
  */
-function _civicrm_api3_membership_get_customv2behaviour(&$params, $contactID, $membershipTypeId, $activeOnly) {
+function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTypeId, $activeOnly) {
   // get the membership for the given contact ID
-  $membershipParams = array('contact_id' => $contactID);
+  $membershipParams = array('contact_id' => $params['contact_id']);
   if ($membershipTypeId) {
     $membershipParams['membership_type_id'] = $membershipTypeId;
   }

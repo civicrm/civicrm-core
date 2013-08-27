@@ -383,6 +383,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('new employer org', $result['current_employer']);
 
   }
+  /**
+   * Check deceased contacts are not retrieved
+   * Note at time of writing the default is to return default. This should possibly be changed & test added
+   *
+   */
+  function testGetDeceasedNotRetrieved() {
+    $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $c2 = $this->callAPISuccess($this->_entity, 'create', array('first_name' => 'bb', 'last_name' => 'ccc', 'contact_type' => 'Individual', 'is_deceased' => 1));
+    $result = $this->callAPISuccess($this->_entity, 'get', array('is_deceased' => 0));
+    $this->assertFalse(array_key_exists($c2['id'], $result['values']));
+  }
 
   /*
      * Test that sort works - old syntax
@@ -408,6 +419,21 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $c1['id']));
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $c2['id']));
+  }
+  /*
+   * Test that we can retrieve contacts using
+   * 'id' => array('IN' => array('3,4')) syntax
+  */
+  function testGetINIDArray() {
+    $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $c2 = $this->callAPISuccess($this->_entity, 'create', array('first_name' => 'bb', 'last_name' => 'ccc', 'contact_type' => 'Individual'));
+    $c3 = $this->callAPISuccess($this->_entity, 'create', array('first_name' => 'hh', 'last_name' => 'll', 'contact_type' => 'Individual'));
+    $result = $this->callAPISuccess($this->_entity, 'get', array('id' => array('IN' => array($c1['id'], $c3['id']))));
+    $this->assertEquals(2, $result['count']);
+    $this->assertEquals(array($c1['id'], $c3['id']), array_keys($result['values']));
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $c1['id']));
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $c2['id']));
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $c3['id']));
   }
   /*
    * Test variants on deleted behaviour
