@@ -5,14 +5,14 @@
  */
 function membership_update_example(){
 $params = array(
-  'contact_id' => 31,
-  'membership_type_id' => 54,
+  'contact_id' => 35,
+  'membership_type_id' => 58,
   'join_date' => '2009-01-21',
   'start_date' => '2009-01-21',
   'end_date' => '2009-12-21',
   'source' => 'Payment',
   'is_override' => 1,
-  'status_id' => 34,
+  'status_id' => 36,
   'custom_1' => 'custom string',
 );
 
@@ -43,17 +43,17 @@ function membership_update_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'contact_id' => '31',
-          'membership_type_id' => '54',
+          'contact_id' => '35',
+          'membership_type_id' => '58',
           'join_date' => '20090121000000',
           'start_date' => '2013-07-29 00:00:00',
           'end_date' => '2013-08-04 00:00:00',
           'source' => 'Payment',
-          'status_id' => '34',
+          'status_id' => '36',
           'is_override' => '1',
           'owner_membership_id' => '',
           'max_related' => '',
-          'is_test' => '',
+          'is_test' => 0,
           'is_pay_later' => '',
           'contribution_recur_id' => '',
           'campaign_id' => '',
