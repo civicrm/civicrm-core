@@ -211,7 +211,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                       'rule'      => '{$field.rule}',
 {/if} {* field.rule *}
 {if $field.default}
-                          'default'   => '{$field.default|substring:1:-1}',
+                         'default'   => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
 {/if} {* field.default *}
 {if $field.enumValues}
                           'enumValues' => '{$field.enumValues}',
