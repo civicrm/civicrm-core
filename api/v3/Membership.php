@@ -206,8 +206,9 @@ function civicrm_api3_membership_get($params) {
 
   $relationships = array();
   foreach ($membershipValues as $membershipId => $values) {
+    $membershipTypeID = CRM_Utils_Array::value('membership_type_id', values);
     // populate the membership type name for the membership type id
-    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($values['membership_type_id']);
+    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
 
     $membershipValues[$membershipId]['membership_name'] = $membershipType['name'];
 
@@ -222,7 +223,7 @@ function civicrm_api3_membership_get($params) {
       $membershipValues[$membershipId]['relationship_name'] = $relationshipType->name_a_b;
     }
 
-    _civicrm_api3_custom_data_get($membershipValues[$membershipId], 'Membership', $membershipId, NULL, $values['membership_type_id']);
+    _civicrm_api3_custom_data_get($membershipValues[$membershipId], 'Membership', $membershipId, NULL, $membershipTypeID);
   }
 
   $members = $membershipValues;
