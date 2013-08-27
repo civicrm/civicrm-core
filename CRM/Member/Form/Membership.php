@@ -408,46 +408,19 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('is_pay_later', TRUE);
     }
     if ($this->_mode) {
-      $fields = array();
-
-      foreach ($this->_fields as $name => $dontCare) {
-        $fields[$name] = 1;
-      }
-      $names = array(
-        'first_name',
-        'middle_name',
-        'last_name',
-        "street_address-{$this->_bltID}",
-        "city-{$this->_bltID}",
-        "postal_code-{$this->_bltID}",
-        "country_id-{$this->_bltID}",
-        "state_province_id-{$this->_bltID}",
-      );
-      foreach ($names as $name) {
-        $fields[$name] = 1;
-      }
-      $fields["state_province-{$this->_bltID}"] = 1;
-      $fields["country-{$this->_bltID}"] = 1;
-      $fields["email-{$this->_bltID}"] = 1;
-      $fields['email-Primary'] = 1;
-
-      if ($this->_contactID) {
-        CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
+      // set default country from config if no country set
+      $config = CRM_Core_Config::singleton();
+      if (!CRM_Utils_Array::value("billing_country_id-{$this->_bltID}", $defaults)) {
+        $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
       }
 
-      // use primary email address if billing email address is empty
-      if (empty($this->_defaults["email-{$this->_bltID}"]) &&
-        !empty($this->_defaults['email-Primary'])
-      ) {
-        $defaults["email-{$this->_bltID}"] = $this->_defaults['email-Primary'];
+      if (!CRM_Utils_Array::value("billing_state_province_id-{$this->_bltID}", $defaults)) {
+        $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
       }
 
-      foreach ($names as $name) {
-        if (!empty($this->_defaults[$name])) {
-          $defaults['billing_' . $name] = $this->_defaults[$name];
-        }
-      }
-
+      $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
+      $defaults = array_merge($defaults, $billingDefaults);
+      
       //             // hack to simplify credit card entry for testing
       //             $defaults['credit_card_type']     = 'Visa';
       //             $defaults['credit_card_number']   = '4807731747657838';
