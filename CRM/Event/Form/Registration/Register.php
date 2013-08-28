@@ -142,13 +142,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
     $this->_defaults = array();
     $contactID = $this->getContactID();
-    if ($contactID) {
-      //@todo CRM-11915 I observed that even when the billing block is not present the routine to retrieve the billing defaults is still called - which seems a bit redundant.
-      $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
-      $this->_defaults = array_merge($this->_defaults, $billingDefaults);
-    }
+    $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
+    $this->_defaults = array_merge($this->_defaults, $billingDefaults);
+
     $config = CRM_Core_Config::singleton();
     // set default country from config if no country set
+    // note the effect of this is to set the billing country to default to the site default
+    // country if the person has an address but no country (for anonymous country is set above)
+    // this could have implications if the billing profile is filled but hidden.
+    // this behaviour has been in place for a while but the use of js to hide things has increased
     if (!CRM_Utils_Array::value("billing_country_id-{$this->_bltID}", $this->_defaults)) {
       $this->_defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
     }
