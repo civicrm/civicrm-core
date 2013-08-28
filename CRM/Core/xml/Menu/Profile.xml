@@ -17,6 +17,14 @@
      <weight>0</weight>
   </item>
   <item>
+     <path>civicrm/profile/edit</path>
+     <title>CiviCRM Profile Edit</title>
+     <access_callback>1</access_callback>
+     <page_callback>CRM_Core_Invoke::profile</page_callback>
+     <is_public>false</is_public>
+     <weight>0</weight>
+  </item>
+  <item>
      <path>civicrm/profile/view</path>
      <page_callback>CRM_Profile_Page_View</page_callback>
      <is_public>true</is_public>
