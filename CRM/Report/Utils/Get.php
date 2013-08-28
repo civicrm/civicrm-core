@@ -181,6 +181,7 @@ class CRM_Report_Utils_Get {
       foreach ($fields as $fieldName => $field) {
         switch (CRM_Utils_Array::value('type', $field)) {
           case CRM_Utils_Type::T_INT:
+          case CRM_Utils_Type::T_FLOAT:
           case CRM_Utils_Type::T_MONEY:
             self::intParam($fieldName, $field, $defaults);
             break;
