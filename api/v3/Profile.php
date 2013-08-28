@@ -364,21 +364,28 @@ function civicrm_api3_profile_apply($params) {
  *  interim solution is just to return an empty array
  */
 function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
-  $addressFields = array('street_address', 'city', 'state_province_id', 'country_id', 'postal_code');
+
   $locations = civicrm_api3('address', 'getoptions', array('field' => 'location_type_id'));
   $locationTypeID = array_search('Billing', $locations['values']);
 
   if(empty($params['contact_id'])) {
+    $config = CRM_Core_Config::singleton();
     $blanks =  array(
       'billing_first_name' => '',
       'billing_middle_name' => '',
       'billing_last_name' => '',
+      'email-' . $locationTypeID => '',
+      'billing_email-' . $locationTypeID => '',
+      'billing_city-' . $locationTypeID => '',
+      'billing_postal_code-' . $locationTypeID => '',
+      'billing_street_address-' . $locationTypeID => '',
+      'billing_country_id-' . $locationTypeID => $config->defaultContactCountry,
+      'billing_state_province_id-' . $locationTypeID => $config->defaultContactStateProvince,
     );
-    foreach ($addressFields as $field) {
-      $blanks['billing_' . $field . '_' . $locationTypeID] = '';
-    }
     return $blanks;
   }
+
+  $addressFields = array('street_address', 'city', 'state_province_id', 'country_id', 'postal_code');
   $result = civicrm_api3('contact', 'getsingle', array(
     'id' => $params['contact_id'],
     'api.address.get.1' => array('location_type_id' => 'Billing',  'return' => $addressFields),
