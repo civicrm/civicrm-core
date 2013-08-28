@@ -64,6 +64,9 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         'created_date' => array(
           'title' => ts('Date Created'),
         ),
+        'subject' => array(
+          'title' => ts('Subject'),
+        ),
       ),
       'filters' => array(
         'is_completed' => array(
