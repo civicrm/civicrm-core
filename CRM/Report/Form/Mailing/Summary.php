@@ -89,7 +89,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     );
 
     $this->_columns['civicrm_mailing_job'] = array(
-      'dao' => 'CRM_Mailing_DAO_Job',
+      'dao' => 'CRM_Mailing_DAO_MailingJob',
       'fields' => array(
         'start_date' => array(
           'title' => ts('Start Date'),
