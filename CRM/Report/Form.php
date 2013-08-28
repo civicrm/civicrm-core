@@ -2387,13 +2387,13 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 $value = $pair[$op];
               }
               elseif (is_array($val) && (!empty($val))) {
-                $options = $field['options'];
+                $options = CRM_Utils_Array::value('options', $field, array());
                 foreach ($val as $key => $valIds) {
                   if (isset($options[$valIds])) {
                     $val[$key] = $options[$valIds];
                   }
                 }
-                $pair[$op] = (count($val) == 1) ? (($op == 'notin') ? ts('Is Not') : ts('Is')) : $pair[$op];
+                $pair[$op] = (count($val) == 1) ? (($op == 'notin') ? ts('Is Not') : ts('Is')) : CRM_Utils_Array::value($op, $pair);
                 $val       = implode(', ', $val);
                 $value     = "{$pair[$op]} " . $val;
               }
