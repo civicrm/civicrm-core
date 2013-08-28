@@ -613,12 +613,14 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
 
       /* First look for missing tokens */
 
-      $err = CRM_Utils_Token::requiredTokens($str);
-      if ($err !== TRUE) {
-        foreach ($err as $token => $desc) {
-          $dataErrors[] = '<li>' . ts('This message is missing a required token - {%1}: %2',
-            array(1 => $token, 2 => $desc)
-          ) . '</li>';
+      if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'disable_mandatory_tokens_check')) {
+        $err = CRM_Utils_Token::requiredTokens($str);
+        if ($err !== TRUE) {
+          foreach ($err as $token => $desc) {
+            $dataErrors[] = '<li>' . ts('This message is missing a required token - {%1}: %2',
+              array(1 => $token, 2 => $desc)
+            ) . '</li>';
+          }
         }
       }
 
