@@ -153,14 +153,11 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       ($form->_task == CRM_Contact_Task::SAVE_SEARCH)
     ) {
       $sortByCharacter = $form->get('sortByCharacter');
-      $cacheKey        = ($sortByCharacter && $sortByCharacter != 'all') ? "{$cacheKey}_alphabet" : $cacheKey;
+      $cacheKey = ($sortByCharacter && $sortByCharacter != 'all') ? "{$cacheKey}_alphabet" : $cacheKey;
 
-      if ($form->_action == CRM_Core_Action::COPY) {
-        $allCids[$cacheKey] = $form->getContactIds( );
-      }
-      else {
-      $allCids         = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
-      }
+      // since we don't store all contacts in prevnextcache, when user selects "all" use query to retrieve contacts
+      // rather than prevnext cache table
+      $allCids[$cacheKey] = $form->getContactIds();
 
       $form->_contactIds = array();
       if ($useTable) {
@@ -216,16 +213,16 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
         }
       }
       else {
-      // fetching selected contact ids of passed cache key
-      $selectedCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey);
-      foreach ($selectedCids[$cacheKey] as $selectedCid => $ignore) {
-        if ($useTable) {
-          $insertString[] = " ( {$selectedCid} ) ";
+        // fetching selected contact ids of passed cache key
+        $selectedCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey);
+        foreach ($selectedCids[$cacheKey] as $selectedCid => $ignore) {
+          if ($useTable) {
+            $insertString[] = " ( {$selectedCid} ) ";
+          }
+          else {
+            $form->_contactIds[] = $selectedCid;
+          }
         }
-        else {
-          $form->_contactIds[] = $selectedCid;
-        }
-      }
       }
 
       if (!empty($insertString)) {
@@ -254,10 +251,10 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
 
 
     if (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel'
-    && ($form->_action != CRM_Core_Action::COPY) ) {
-      $params = array();
+      && ($form->_action != CRM_Core_Action::COPY)
+    ) {
       $sel = CRM_Utils_Array::value('radio_ts', self::$_searchFormValues);
-      $form->assign('searchtype',$sel);
+      $form->assign('searchtype', $sel);
       $result = CRM_Core_BAO_PrevNextCache::getSelectedContacts();
       $form->assign("value", $result);
     }
@@ -285,37 +282,33 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     }
 
     $selectorName = $this->controller->selectorName();
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php');
+    require_once(str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php');
 
     $fv = $this->get('formValues');
     $customClass = $this->get('customSearchClass');
     require_once 'CRM/Core/BAO/Mapping.php';
     $returnProperties = CRM_Core_BAO_Mapping::returnProperties(self::$_searchFormValues);
 
-    $selector   = new $selectorName(
-      $customClass, $fv, null, $returnProperties
-    );
+    $selector = new $selectorName($customClass, $fv, NULL, $returnProperties);
 
     $params = $this->get('queryParams');
 
     // fix for CRM-5165
     $sortByCharacter = $this->get('sortByCharacter');
-    if ($sortByCharacter &&
-      $sortByCharacter != 1
-    ) {
+    if ($sortByCharacter && $sortByCharacter != 1) {
       $params[] = array('sortByCharacter', '=', $sortByCharacter, 0, 0);
     }
     $queryOperator = $this->get('queryOperator');
     if (!$queryOperator) {
       $queryOperator = 'AND';
     }
-    $dao = &$selector->contactIDQuery($params, $this->_action, $sortID,
-      CRM_Utils_Array::value('display_relationship_type', $fv ),
+    $dao = $selector->contactIDQuery($params, $this->_action, $sortID,
+      CRM_Utils_Array::value('display_relationship_type', $fv),
       $queryOperator
     );
 
     $contactIds = array();
-    while( $dao->fetch()) {
+    while ($dao->fetch()) {
       $contactIds[$dao->contact_id] = $dao->contact_id;
     }
 
@@ -342,7 +335,8 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function addRules() {}
+  function addRules() {
+  }
 
   /**
    * Function to actually build the form
@@ -361,7 +355,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    *
    * @return void
    */
-  public function postProcess() {}
+  public function postProcess() {
+  }
+
   //end of function
 
   /**
