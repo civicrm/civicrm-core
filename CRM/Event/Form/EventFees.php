@@ -126,48 +126,21 @@ class CRM_Event_Form_EventFees {
     }
 
     if ($form->_mode) {
-      $fields = array();
-
-      foreach ($form->_fields as $name => $dontCare) {
-        $fields[$name] = 1;
-      }
-
-      $names = array(
-        'first_name', 'middle_name', 'last_name', "street_address-{$form->_bltID}",
-        "city-{$form->_bltID}", "postal_code-{$form->_bltID}", "country_id-{$form->_bltID}",
-        "state_province_id-{$form->_bltID}",
-      );
-      foreach ($names as $name) {
-        $fields[$name] = 1;
-      }
-
-      $fields["state_province-{$form->_bltID}"] = 1;
-      $fields["country-{$form->_bltID}"] = 1;
-      $fields["email-{$form->_bltID}"] = 1;
-      $fields['email-Primary'] = 1;
-
-      if ($form->_contactId) {
-        CRM_Core_BAO_UFGroup::setProfileDefaults($form->_contactId, $fields, $form->_defaults);
-      }
-
-      // use primary email address if billing email address is empty
-      if (empty($form->_defaults["email-{$form->_bltID}"]) &&
-        !empty($form->_defaults['email-Primary'])
-      ) {
-        $defaults[$form->_pId]["email-{$form->_bltID}"] = $form->_defaults['email-Primary'];
-      }
-
-      foreach ($names as $name) {
-        if (!empty($form->_defaults[$name])) {
-          $defaults[$form->_pId]['billing_' . $name] = $form->_defaults[$name];
-        }
-      }
-
       $config = CRM_Core_Config::singleton();
       // set default country from config if no country set
       if (!CRM_Utils_Array::value("billing_country_id-{$form->_bltID}", $defaults[$form->_pId])) {
         $defaults[$form->_pId]["billing_country_id-{$form->_bltID}"] = $config->defaultContactCountry;
       }
+
+      if (!CRM_Utils_Array::value("billing_state_province_id-{$form->_bltID}", $defaults)) {
+        $defaults[$form->_pId]["billing_state_province_id-{$form->_bltID}"] = $config->defaultContactStateProvince;
+      }
+
+      $billingDefaults = $form->getProfileDefaults('Billing', $form->_contactId);
+      $defaults[$form->_pId] = array_merge($defaults[$form->_pId], $billingDefaults);
+
+      // now fix all state country selectors, set correct state based on country
+      CRM_Core_BAO_Address::fixAllStateSelects($form, $defaults[$form->_pId]);
 
       //             // hack to simplify credit card entry for testing
       //             $defaults[$form->_pId]['credit_card_type']     = 'Visa';
