@@ -101,13 +101,13 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
 
       $result = $query->searchQuery(0, 0, $sortOrder);
       while ($result->fetch()) {
-        $ids[] = $result->mailing_event_queue_id;
+        $ids[] = $result->mailing_recipients_id;
       }
       $form->assign('totalSelectedMailingRecipients', $form->get('rowCount'));
     }
 
     if (!empty($ids)) {
-      $form->_componentClause =  ' civicrm_mailing_event_queue.id IN ( ' . implode(',', $ids) . ' ) ';
+      $form->_componentClause =  ' civicrm_mailing_recipients.id IN ( ' . implode(',', $ids) . ' ) ';
     }
 
     //set the context for redirection for any task actions
