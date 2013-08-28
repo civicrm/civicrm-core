@@ -370,4 +370,65 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $pageUrl = array('url' => 'contact/view/rel', 'args' => "cid={$contactId[1]}&action=add&reset=1");
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
+  
+  function testRelationshipAddCurrentEmployerTest() {
+    $this->webtestLogin();
+
+    //create a New Individual
+    $firstName = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, "Anderson", "$firstName@anderson.name");
+
+    // visit relationship tab of the Individual
+    $this->click("css=li#tab_rel a");
+
+    // wait for add Relationship link
+    $this->waitForElementPresent('link=Add Relationship');
+    $this->click('link=Add Relationship');
+
+    //choose the created relationship type
+    $this->waitForElementPresent("relationship_type_id");
+    $this->select('relationship_type_id', "label=Employee of");
+
+    // Because it tends to cause problems, all uses of sleep() must be justified in comments
+    // Sleep should never be used for wait for anything to load from the server
+    // Justification for this instance: wait until new contact dialog select is built
+    sleep(2);
+
+    // create a new organization
+    $orgName = 'WestsideCoop' . substr(sha1(rand()), 0, 7);
+    $this->webtestNewDialogContact($orgName, "", "info@" . $orgName . ".com", 5);
+
+    $this->waitForElementPresent("quick-save");
+
+    //fill in the relationship start date
+    $this->webtestFillDate('start_date', '-2 year');
+    $this->webtestFillDate('end_date', '+1 year');
+
+    $description = "Current employee test.";
+    $this->type("description", $description);
+
+    $this->waitForElementPresent("add_current_employee");
+    $this->click("add_current_employee");
+
+    //save the relationship
+    //$this->click("_qf_Relationship_upload");
+    $this->click("quick-save");
+    $this->waitForElementPresent("current-relationships");
+
+    //check the status message
+    $this->assertTrue($this->isTextPresent("New relationship created."));
+
+    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
+
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->webtestVerifyTabularData(
+      array(
+        'Description' => $description,
+        'Current Employee?' => 'Yes',
+        'Status' => 'Enabled',
+      )
+    );
+    $this->assertTrue($this->isTextPresent("Employee of"),"Employee of relationship type not visible on View Relationship page.");
+  }
 }
