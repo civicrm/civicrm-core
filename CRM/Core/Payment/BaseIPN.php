@@ -330,7 +330,7 @@ class CRM_Core_Payment_BaseIPN {
         $values['receipt_from_name'] = $domainValues[0];
         $values['receipt_from_email'] = $domainValues[1];
       }
-      if($recurContrib->id){
+      if($recurContrib && $recurContrib->id){
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
       }
