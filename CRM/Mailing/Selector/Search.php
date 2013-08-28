@@ -170,7 +170,6 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
 
     // type of selector
     $this->_action = $action;
-
     $this->_query = new CRM_Contact_BAO_Query($this->_queryParams,
       CRM_Mailing_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_MAILING,
         FALSE
@@ -178,7 +177,8 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
       NULL, FALSE, FALSE,
       CRM_Contact_BAO_Query::MODE_MAILING
     );
-    $this->_query->_distinctComponentClause = " civicrm_mailing_event_queue.id ";
+
+    $this->_query->_distinctComponentClause = " civicrm_mailing_recipients.id ";
   }
   //end of constructor
 
@@ -299,7 +299,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
         }
       }
 
-      $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->mailing_event_queue_id;
+      $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->mailing_recipients_id;
 
       $actions = array(
         'cid' => $result->contact_id,
