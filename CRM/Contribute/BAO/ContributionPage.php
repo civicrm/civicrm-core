@@ -57,7 +57,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     $dao->save();
     if ($financialTypeId && CRM_Utils_Array::value('financial_type_id', $params) 
       && $financialTypeId != $params['financial_type_id']) {
-      CRM_Price_BAO_FieldValue::updateFinancialType($params['id'], 'civicrm_contribution_page', $params['financial_type_id']);
+      CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_contribution_page', $params['financial_type_id']);
     }
     return $dao;
   }
