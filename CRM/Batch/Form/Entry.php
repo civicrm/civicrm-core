@@ -337,10 +337,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       }
     }
     else {
-      // get the existing batch values from cache table
-      $cacheKeyString = CRM_Batch_BAO_Batch::getCacheKeyForBatch($this->_batchId);
-      $defaults = CRM_Core_BAO_Cache::getItem('batch entry', $cacheKeyString);
+      // get the cached info from data column of civicrm_batch
+      $data = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', $this->_batchId, 'data');
+      $defaults = json_decode($data, TRUE);
     }
+
     return $defaults;
   }
 
