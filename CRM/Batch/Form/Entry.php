@@ -340,6 +340,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       // get the cached info from data column of civicrm_batch
       $data = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', $this->_batchId, 'data');
       $defaults = json_decode($data, TRUE);
+      $defaults = $defaults['values'];
     }
 
     return $defaults;
@@ -371,7 +372,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       // close status
       'status_id' => 2,
       'total' => $params['actualBatchTotal'],
-      'data' => 'NULL',
     );
 
     CRM_Batch_BAO_Batch::create($paramValues);

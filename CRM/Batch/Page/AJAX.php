@@ -46,7 +46,7 @@ class CRM_Batch_Page_AJAX {
     $batchId = CRM_Utils_Type::escape($_POST['batch_id'], 'Positive');
 
     unset($_POST['qfKey']);
-    CRM_Core_DAO::setFieldValue('CRM_Batch_DAO_Batch', $batchId, 'data', json_encode($_POST));
+    CRM_Core_DAO::setFieldValue('CRM_Batch_DAO_Batch', $batchId, 'data', json_encode(array('values' => $_POST)));
 
     CRM_Utils_System::civiExit();
   }
