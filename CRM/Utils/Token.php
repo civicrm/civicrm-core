@@ -1411,7 +1411,14 @@ class CRM_Utils_Token {
        $value = $statuses[$membership['status_id']];
        break;
      case 'fee':
-       $value = civicrm_api3('membership_type', 'getvalue', array('id' => $membership['membership_type_id'], 'return' => 'minimum_fee'));
+       try{
+         $value = civicrm_api3('membership_type', 'getvalue', array('id' => $membership['membership_type_id'], 'return' => 'minimum_fee'));
+       }
+       catch (CiviCRM_API3_Exception $e) {
+         // we can anticipate we will get an error if the minimum fee is set to 'NULL' because of the way the
+         // api handles NULL (4.4)
+         $value = 0;
+       }
        break;
      default:
        if (in_array($token, self::$_tokens[$entity])) {
