@@ -124,6 +124,8 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection($this->_mappingID);
     extract($selectionOptions);
 
+    $this->assign('recipientMapping', json_encode($recipientMapping));
+
     $entity = $this->add('select', 'entity', ts('Recipient(s)'), $sel3[$this->_mappingID][0], TRUE);
     $entity->setMultiple(TRUE);
 

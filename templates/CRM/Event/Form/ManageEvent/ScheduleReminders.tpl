@@ -197,12 +197,13 @@
      });
 
      function populateRecipient( ) {
-         var recipient = cj("#recipient option:selected").text();
+         var recipientMapping = eval({/literal}{$recipientMapping}{literal});
+         var recipient = cj("#recipient option:selected").val();
     var postUrl = "{/literal}{crmURL p='civicrm/ajax/populateRecipient' h=0}{literal}";
-    if(recipient == 'Participant Status' || recipient == 'Participant Role'){
+    if(recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role'){
        var elementID = '#recipient_listing';
           cj( elementID ).html('');
-      cj.post(postUrl, {recipient: recipient},
+      cj.post(postUrl, {recipient: recipientMapping[recipient]},
         function ( response ) {
       response = eval( response );
       for (iota = 0; iota < response.length; iota++) {
