@@ -18,7 +18,7 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
 
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
 
-    $html = self::generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message);
+    $html = self::generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories);
     self::createActivities($form, $html_message, $contactIDs);
 
     CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
@@ -38,7 +38,7 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    * @param unknown_type $messageToken
    * @return unknown
    */
-  static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message) {
+  static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
     $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
 
     foreach ($memberships as $membershipID => $membership) {
@@ -59,8 +59,8 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
 
       $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contacts[$contactId], TRUE, $messageToken);
       $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $membership, $tokenHtml, $messageToken);
-      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact[$contactId], $categories, TRUE);
-      $tokenHtml = CRM_Utils_Token::parseThroughSmarty($tokenHtml, $contact);
+      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contacts[$contactId], $categories, TRUE);
+      $tokenHtml = CRM_Utils_Token::parseThroughSmarty($tokenHtml, $contacts[$contactId]);
 
       $html[] = $tokenHtml;
 
