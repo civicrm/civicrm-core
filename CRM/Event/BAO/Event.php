@@ -114,7 +114,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     }
     if ($financialTypeId && CRM_Utils_Array::value('financial_type_id', $params) 
       && $financialTypeId != $params['financial_type_id']) {
-      CRM_Price_BAO_FieldValue::updateFinancialType($params['id'], 'civicrm_event', $params['financial_type_id']);
+      CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_event', $params['financial_type_id']);
     }
     return $result;
   }
