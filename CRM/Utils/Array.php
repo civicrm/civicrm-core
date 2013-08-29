@@ -622,5 +622,18 @@ class CRM_Utils_Array {
     $elementArray = array_combine($keys, array_values($elementArray));
     return $elementArray;
   }
+
+  /*
+   * function to get value of first matched
+   * regex key element of an array
+   */
+  static function valueByRegexKey($regexKey, $list, $default = NULL) {
+    if (is_array($list) && $regexKey) {
+      $matches = preg_grep($regexKey, array_keys($list));
+      $key = reset($matches);
+      return ($key && array_key_exists($key, $list)) ? $list[$key] : $default;
+    }
+    return $default;
+  }
 }
 
