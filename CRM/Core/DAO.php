@@ -1834,7 +1834,7 @@ EOS;
    *  @return NULL|string|array a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
    *   depending on whether it is supported as yet
    **/
-  public function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
+  public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
     // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
     // support for other syntaxes is discussed in ticket but being put off for now
     $acceptedSQLOperators = array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN');
