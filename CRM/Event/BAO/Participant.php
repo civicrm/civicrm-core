@@ -469,7 +469,7 @@ SELECT  event.event_full_text,
       return ($returnEmptySeats) ? (int) $eventMaxSeats : FALSE;
     }
 
-    return $evenFullText;
+    return $eventFullText;
   }
 
   /**
