@@ -162,4 +162,10 @@
     <type>datetime</type>
     <add>4.3</add>
   </field>
+  <field>
+    <name>data</name>
+    <type>longtext</type>
+    <comment>cache entered data</comment>
+    <add>4.4</add>
+  </field>
 </table>
