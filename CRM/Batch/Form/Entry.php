@@ -371,13 +371,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       // close status
       'status_id' => 2,
       'total' => $params['actualBatchTotal'],
+      'data' => 'NULL',
     );
 
     CRM_Batch_BAO_Batch::create($paramValues);
-
-    // delete from cache table
-    $cacheKeyString = CRM_Batch_BAO_Batch::getCacheKeyForBatch($this->_batchId);
-    CRM_Core_BAO_Cache::deleteGroup('batch entry', $cacheKeyString, FALSE);
 
     // set success status
     CRM_Core_Session::setStatus("", ts("Batch Processed."), "success");
