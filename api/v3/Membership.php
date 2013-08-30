@@ -199,11 +199,49 @@ function civicrm_api3_membership_get($params) {
     $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
 
-  if (empty($membershipValues)) {
-    // No results is NOT an error!
-    return civicrm_api3_create_success($membershipValues, $params);
+  $options = _civicrm_api3_get_options_from_params($params, TRUE,'membership','get');
+  $return = $options['return'];
+  if(empty($membershipValues) ||
+    (!empty($return)
+      && !array_key_exists('related_contact_id', $return)
+      && !array_key_exists('relationship_name', $return)
+    )
+    ) {
+    return civicrm_api3_create_success($membershipValues, $params, 'membership', 'get');
   }
 
+  $members =  _civicrm_api3_membership_relationsship_get_customv2behaviour($params, $membershipValues, $contactID );
+  return civicrm_api3_create_success($members, $params, 'membership', 'get');
+}
+
+/**
+ * When we copied apiv3 from api v2 we brought across some custom behaviours - in the case of
+ * membership a complicated return array is constructed. The original
+ * behaviour made contact_id a required field. We still need to keep this for v3 when contact_id
+ * is passed in as part of the reasonable expectation developers have that we will keep the api
+ * as stable as possible
+ *
+ * @param array $params parameters passed into get function
+ * @return array result for calling function
+ */
+function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTypeId, $activeOnly) {
+  // get the membership for the given contact ID
+  $membershipParams = array('contact_id' => $params['contact_id']);
+  if ($membershipTypeId) {
+    $membershipParams['membership_type_id'] = $membershipTypeId;
+  }
+  $membershipValues = array();
+  CRM_Member_BAO_Membership::getValues($membershipParams, $membershipValues, $activeOnly);
+  return $membershipValues;
+}
+
+
+/**
+ * non-standard behaviour inherited from v2
+* @param array $params parameters passed into get function
+* @return array result for calling function
+*/
+function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, $membershipValues, $contactID) {
   $relationships = array();
   foreach ($membershipValues as $membershipId => $values) {
     // populate the membership type name for the membership type id
@@ -246,27 +284,5 @@ function civicrm_api3_membership_get($params) {
 
     }
   }
-
-  return civicrm_api3_create_success($members, $params, 'membership', 'get');
-}
-
-/**
- * When we copied apiv3 from api v2 we brought across some custom behaviours - in the case of
- * membership a complicated return array is constructed. The original
- * behaviour made contact_id a required field. We still need to keep this for v3 when contact_id
- * is passed in as part of the reasonable expectation developers have that we will keep the api
- * as stable as possible
- *
- * @param array $params parameters passed into get function
- * @return array result for calling function
- */
-function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTypeId, $activeOnly) {
-  // get the membership for the given contact ID
-  $membershipParams = array('contact_id' => $params['contact_id']);
-  if ($membershipTypeId) {
-    $membershipParams['membership_type_id'] = $membershipTypeId;
-  }
-  $membershipValues = array();
-  CRM_Member_BAO_Membership::getValues($membershipParams, $membershipValues, $activeOnly);
-  return $membershipValues;
+  return $members;
 }
