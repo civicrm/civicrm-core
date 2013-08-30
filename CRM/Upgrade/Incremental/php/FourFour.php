@@ -77,6 +77,26 @@ class CRM_Upgrade_Incremental_php_FourFour {
     return TRUE;
   }
 
+  function upgrade_4_4_beta1($rev) {
+    $this->addTask(ts('Upgrade DB to 4.4.beta1: SQL'), 'task_4_4_x_runSql', $rev);
+
+    // check if batch entry data exists in civicrm_cache table
+    $query = 'select path, data from civicrm_cache where group_name = "batch entry"';
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      // get batch id $batchId[2]
+      $batchId = explode('-', $dao->path);
+      $data = unserialize($dao->data);
+
+      // move the data to civicrm_batch table
+      CRM_Core_DAO::setFieldValue('CRM_Batch_DAO_Batch', $batchId[2], 'data', json_encode(array('values' => $data)));
+    }
+
+    // delete entries from civicrm_cache table
+    $query = 'DELETE from civicrm_cache where group_name = "batch entry"';
+    CRM_Core_DAO::executeQuery($query);
+  }
+
   /**
    * Update activity contacts CRM-12274
    *

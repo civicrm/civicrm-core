@@ -177,19 +177,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * function to get cachekey for batch
-   *
-   * @param int $batchId batch id
-   *
-   * @retun string $cacheString
-   * @static
-   * @access public
-   */
-  static function getCacheKeyForBatch($batchId) {
-    return "batch-entry-{$batchId}";
-  }
-
-  /**
    * This function is a wrapper for ajax batch selector
    *
    * @param  array   $params associated array for params record id.
