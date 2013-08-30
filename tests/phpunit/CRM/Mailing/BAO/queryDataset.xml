@@ -47,6 +47,23 @@
   <civicrm_email id="103" contact_id="112" location_type_id="1" email="test08@civicrm.org" is_primary="1" is_billing="0" on_hold="0" is_bulkmail="0" signature_text="" signature_html=""/>
   <civicrm_mailing id="14" domain_id="1" header_id="1" footer_id="2" reply_id="8" unsubscribe_id="5" resubscribe_id="6" optout_id="7" name="First Mailing Events" from_name="FIXME" from_email="info@cividev.yook.civicrm.org" replyto_email="info@cividev.yook.civicrm.org" subject="Hello {contact.display_name}" body_text="" body_html="&lt;p&gt;&#13;&#10;&#9;Hello {contact.display_name},&lt;/p&gt;&#13;&#10;&lt;p&gt;&#13;&#10;&#9;You should check &lt;a href=&quot;http://drupal.org&quot;&gt;drupal.org&lt;/a&gt; and &lt;a href=&quot;http://civicrm.org&quot;&gt;civicrm.org&lt;/a&gt;.&lt;/p&gt;&#13;&#10;" url_tracking="1" forward_replies="0" auto_responder="0" open_tracking="1" is_completed="1" override_verp="0" created_id="102" created_date="2011-05-26 13:03:50" scheduled_id="102" scheduled_date="2011-05-25 13:06:08" approver_id="102" approval_date="2011-05-25 13:06:08" approval_status_id="1" approval_note="" is_archived="0" visibility="User and User Admin Only" />
   <civicrm_mailing id="15" domain_id="1" header_id="1" footer_id="2" reply_id="8" unsubscribe_id="5" resubscribe_id="6" optout_id="7" name="Second Test Mailing Events" from_name="FIXME" from_email="info@cividev.yook.civicrm.org" replyto_email="info@cividev.yook.civicrm.org" subject="Hello again, {contact.display_name}" body_text="" body_html="&lt;p&gt;&#13;&#10;&#9;Hello {contact.display_name},&lt;/p&gt;&#13;&#10;&lt;p&gt;&#13;&#10;&#9;You should check &lt;a href=&quot;http://drupal.org&quot;&gt;drupal.org&lt;/a&gt; and &lt;a href=&quot;http://civicrm.org&quot;&gt;civicrm.org&lt;/a&gt;.&lt;/p&gt;&#13;&#10;" url_tracking="1" forward_replies="0" auto_responder="0" open_tracking="1" is_completed="1" override_verp="0" created_id="102" created_date="2011-05-26 13:08:05" scheduled_id="102" scheduled_date="2011-05-26 13:08:46" approver_id="102" approval_date="2011-05-26 13:08:46" approval_status_id="1" approval_note="" is_archived="0" visibility="User and User Admin Only" />
+  <civicrm_mailing_recipients id="1" mailing_id="14" email_id="96" contact_id="105"/>
+  <civicrm_mailing_recipients id="2" mailing_id="14" email_id="93" contact_id="102"/>
+  <civicrm_mailing_recipients id="3" mailing_id="14" email_id="94" contact_id="103"/>
+  <civicrm_mailing_recipients id="4" mailing_id="14" email_id="95" contact_id="104"/>
+  <civicrm_mailing_recipients id="5" mailing_id="14" email_id="99" contact_id="108"/>
+  <civicrm_mailing_recipients id="6" mailing_id="14" email_id="100" contact_id="109"/>
+  <civicrm_mailing_recipients id="7" mailing_id="14" email_id="101" contact_id="110"/>
+  <civicrm_mailing_recipients id="8" mailing_id="14" email_id="102" contact_id="111"/>
+  <civicrm_mailing_recipients id="9" mailing_id="14" email_id="103" contact_id="112"/>
+  <civicrm_mailing_recipients id="10" mailing_id="15" email_id="93" contact_id="102"/>
+  <civicrm_mailing_recipients id="11" mailing_id="15" email_id="94" contact_id="103"/>
+  <civicrm_mailing_recipients id="12" mailing_id="15" email_id="95" contact_id="104"/>
+  <civicrm_mailing_recipients id="13" mailing_id="15" email_id="99" contact_id="108"/>
+  <civicrm_mailing_recipients id="14" mailing_id="15" email_id="100" contact_id="109"/>
+  <civicrm_mailing_recipients id="15" mailing_id="15" email_id="101" contact_id="110"/>
+  <civicrm_mailing_recipients id="16" mailing_id="15" email_id="102" contact_id="111"/>
+  <civicrm_mailing_recipients id="17" mailing_id="15" email_id="103" contact_id="112"/>
   <civicrm_mailing_job id="23" mailing_id="14" scheduled_date="2011-05-25 13:06:08" start_date="2011-05-25 13:06:34" end_date="2011-05-25 13:06:35" status="Complete" is_test="0" job_type="" job_offset="0" job_limit="0"/>
   <civicrm_mailing_job id="24" mailing_id="14" scheduled_date="2011-05-25 13:06:08" start_date="2011-05-25 13:06:34" end_date="2011-05-25 13:06:35" status="Complete" is_test="0" job_type="child" parent_id="23" job_offset="0" job_limit="9"/>
   <civicrm_mailing_job id="25" mailing_id="15" scheduled_date="2011-05-26 13:08:46" start_date="2011-05-26 13:08:49" end_date="2011-05-26 13:08:51" status="Complete" is_test="0" job_type="" job_offset="0" job_limit="0"/>
