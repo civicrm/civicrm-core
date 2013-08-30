@@ -264,43 +264,42 @@ CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
     );
     $queue->createItem($task, array('weight' => -1));
   }
-  
-  /*
-   *    Function will retrun Word Replacement for word_replacement create API
-  */
-  
+
+  /**
+   * Function will retrun Word Replacement for word_replacement create API
+   */
   static function getWordReplacementCreateParams() {
-  	$wordReplacementCreateParams = array();
-  	$params = array(
-                    'version' => 3
-                    );
-  	// get all domains
-  	$result = civicrm_api('domain', 'get', $params);
-  	if (!empty($result["values"])) {
-  		foreach ($result["values"] as $value) {
-  			$params = array();
-  			$params["version"] = 3;
-  			$params["is_active"] = TRUE;
-  			$params["domain_id"] = $value["id"];
-  			// unserialize word match string
-  			$localeCustomArray = unserialize($value["locale_custom_strings"]);
-  			if(!empty($localeCustomArray)) {
-  				$wordMatchArray = array();
-  				foreach ($localeCustomArray as $localCustomData) {
-  					$wordMatchArray = $localCustomData["enabled"]["wildcardMatch"];
-  				}
-  
-  				if(!empty($wordMatchArray)) {
-  					foreach ($wordMatchArray as $word=>$replace) {
-  						$params["find_word"] = $word;
-  						$params["replace_word"] = $replace;
-  						$wordReplacementCreateParams[] = $params;
-  					}
-  				}
-  			}
-  		}
-  	}
-  	return $wordReplacementCreateParams;
+    $wordReplacementCreateParams = array();
+    $params = array(
+      'version' => 3
+    );
+    // get all domains
+    $result = civicrm_api('domain', 'get', $params);
+    if (!empty($result["values"])) {
+      foreach ($result["values"] as $value) {
+        $params = array();
+        $params["version"] = 3;
+        $params["is_active"] = TRUE;
+        $params["domain_id"] = $value["id"];
+        // unserialize word match string
+        $localeCustomArray = unserialize($value["locale_custom_strings"]);
+        if (!empty($localeCustomArray)) {
+          $wordMatchArray = array();
+          foreach ($localeCustomArray as $localCustomData) {
+            $wordMatchArray = $localCustomData["enabled"]["wildcardMatch"];
+          }
+
+          if (!empty($wordMatchArray)) {
+            foreach ($wordMatchArray as $word => $replace) {
+              $params["find_word"] = $word;
+              $params["replace_word"] = $replace;
+              $wordReplacementCreateParams[] = $params;
+            }
+          }
+        }
+      }
+    }
+    return $wordReplacementCreateParams;
   }
 
   public static function saveWordReplacements($wordReplacementCreateParams) {
