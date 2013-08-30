@@ -108,7 +108,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     }
 
     // Submit form.
-    $this->click('_qf_UploadFile_upload');
+    $this->click('_qf_DataSource_upload');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Select matching field for cvs data.
