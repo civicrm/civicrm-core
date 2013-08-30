@@ -382,10 +382,10 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_SearchContribution_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->isElementPresent("xpath=//table[@id='option11_wrapper']/tbody/tr/td/strong[text()='$pageTitle']");
-    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
-    $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
-    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
-    $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
+    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[5]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
+    $this->click("xpath=//table[@id='option11']/tbody/tr/td[5]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
+    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[5]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
+    $this->click("xpath=//table[@id='option11']/tbody/tr/td[5]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('premiums_active');
     $this->waitForElementPresent('_qf_Premium_cancel-bottom');
