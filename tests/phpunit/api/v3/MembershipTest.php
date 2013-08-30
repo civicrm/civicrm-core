@@ -413,6 +413,16 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($memberContactId);
   }
 
+  /**
+   * We are checking for no enotices + only id & end_date returned
+   */
+  function testMembershipGetWithReturn() {
+    $membershipID = $this->contactMembershipCreate($this->_params);
+    $result = $this->callAPISuccess('membership', 'get', array('return' => 'end_date'));
+    foreach ($result['values']  as $membership) {
+      $this->assertEquals(array('id', 'end_date'), array_keys($membership));
+    }
+  }
   ///////////////// civicrm_membership_create methods
 
   /**
