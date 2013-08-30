@@ -95,6 +95,16 @@ class CRM_Member_Task {
           ),
           'result' => TRUE,
         ),
+        6 => array('title' => ts('Mailing Labels'),
+          'class' => array(
+            'CRM_Member_Form_Task_Label',
+          ),
+          'result' => TRUE,
+        ),
+        7 => array('title' => ts('Print PDF Letters for Memberships'),
+          'class' => 'CRM_Member_Form_Task_PDFLetter',
+          'result' => FALSE,
+        ),
       );
 
       //CRM-4418, check for delete
