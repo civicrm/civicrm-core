@@ -64,7 +64,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @access public
    * @static
    */
-  static function getWordReplacement($reset = null) {
+  static function getWordReplacement($reset = NULL) {
     static $wordReplacement = NULL;
     if (!$wordReplacement || $reset) {
       $wordReplacement = new CRM_Core_BAO_WordRepalcement();
@@ -99,7 +99,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @access public
    */
   static function create($params) {
-    if(array_key_exists("domain_id",$params) === false) {
+    if(array_key_exists("domain_id",$params) === FALSE) {
       $params["domain_id"] = CRM_Core_Config::domainID();  
     }  
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
@@ -124,23 +124,25 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     self::rebuild();
     return $dao;
   }
-  
-  /*
-   *   Rebuild 
-   */
 
-  static function rebuild() {
-    $id = CRM_Core_Config::domainID();  
+  /**
+   * Get all word-replacements in the form of an array
+   *
+   * @param int $id domain ID
+   * @return array
+   * @see civicrm_domain.locale_custom_strings
+   */
+  public static function getAllAsConfigArray($id) {
     $query = "SELECT find_word,replace_word FROM civicrm_word_replacement WHERE is_active = 1 AND domain_id = ".CRM_Utils_Type::escape($id, 'Integer');
     $dao = CRM_Core_DAO::executeQuery($query);
-    $wordReplacement = array(); 
-    
+    $wordReplacement = array();
+
     while ($dao->fetch()) {
       $wordReplacement[$dao->find_word] = $dao->replace_word;
     }
-    
+
     $overrides['enabled']['wildcardMatch'] = $wordReplacement;
-    
+
     $config = CRM_Core_Config::singleton();
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -149,16 +151,23 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
       // for multilingual
       $addReplacements = $config->localeCustomStrings;
       $addReplacements[$config->lcMessages] = $overrides;
-      $stringOverride = serialize($addReplacements);
+      $stringOverride = $addReplacements;
     }
     else {
       // for single language
-      $stringOverride = serialize(array($config->lcMessages => $overrides));
+      $stringOverride = array($config->lcMessages => $overrides);
     }
 
-    $params = array('locale_custom_strings' => $stringOverride);
-    
+    return $stringOverride;
+  }
 
+  /**
+   * Rebuild
+   */
+  static function rebuild() {
+    $id = CRM_Core_Config::domainID();
+    $stringOverride = self::getAllAsConfigArray($id);
+    $params = array('locale_custom_strings' => serialize($stringOverride));
     $wordReplacementSettings = CRM_Core_BAO_Domain::edit($params, $id);
 
     if ($wordReplacementSettings) {
@@ -166,13 +175,12 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
       CRM_Core_BAO_Navigation::resetNavigation();
       // Clear js string cache
       CRM_Core_Resources::singleton()->flushStrings();
-      
-      return true;
+
+      return TRUE;
     }
-    
-    return false;
-   
+
+    return FALSE;
   }
-    
+
 }
 
