@@ -364,7 +364,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     $profilefield = array(
       'middle_name' => 'middle_name',
-      'gender' => 'gender_id',
+      'gender' => 'gender',
     );
     $location = 0;
     $type = "Individual";
@@ -627,7 +627,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("custom_" . $customId[2], "lname_custom1");
 
     $this->type("middle_name", "xyz");
-    $this->click("name=gender_id value=2");
+    $this->click("name=gender value=2");
     $this->select("participant_role", "value=2");
 
     $this->click("_qf_Register_upload-bottom");
@@ -705,7 +705,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("custom_" . $customId[2], "lname_custom1");
 
     $this->type("middle_name", "xyz");
-    $this->click("name=gender_id value=2");
+    $this->click("name=gender value=2");
     $this->select("participant_role", "value=2");
 
     $this->click("_qf_Register_upload-bottom");
