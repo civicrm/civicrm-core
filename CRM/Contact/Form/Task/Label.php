@@ -78,7 +78,17 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     $this->add('checkbox', 'merge_same_address', ts('Merge labels for contacts with the same address'), NULL);
     $this->add('checkbox', 'merge_same_household', ts('Merge labels for contacts belonging to the same household'), NULL);
 
-    $this->addDefaultButtons(ts('Make Mailing Labels'));
+    $this->addButtons(array(
+      array(
+        'type' => 'submit',
+        'name' => ts('Make Mailing Labels'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Done'),
+      ),
+    ));
   }
 
   /**
