@@ -318,7 +318,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
       $defaults = array_merge($defaults, $billingDefaults);
 
-      // now fix all state country selectors (FIXME: what does this do ?? dgg)
+      // now fix all state country selectors, set correct state based on country
       CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     }
 

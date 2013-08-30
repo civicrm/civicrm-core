@@ -201,6 +201,29 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * get Billing empty contact - this will return generic defaults
+   */
+  function testProfileGetBillingEmptyContact() {
+
+    $params = array(
+      'profile_id' => array('Billing'),
+    );
+
+    $result = $this->callAPISuccess('profile', 'get', $params);
+    $this->assertEquals(array(
+      'billing_first_name' => '',
+      'billing_middle_name' => '',
+      'billing_last_name' => '',
+      'billing_street_address-5' => '',
+      'billing_city-5' => '',
+      'billing_state_province_id-5' => '',
+      'billing_country_id-5' => '1228',
+      'billing_email-5' => '',
+      'email-5' => '',
+      'billing_postal_code-5' => '',
+    ), $result['values']['Billing']);
+  }
 
   /**
    * check contact activity profile without activity id

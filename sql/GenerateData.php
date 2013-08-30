@@ -111,14 +111,6 @@ class CRM_GCD {
   CONST NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
   CONST NUM_ACTIVITY = 150;
 
-  // Relationship types from the table crm_relationship_type
-  CONST CHILD_OF = 1;
-  CONST SPOUSE_OF = 2;
-  CONST SIBLING_OF = 3;
-  CONST EMPLOYEE_OF = 4;
-  CONST HEAD_OF_HOUSEHOLD = 6;
-  CONST MEMBER_OF_HOUSEHOLD = 7;
-
   // Location types from the table crm_location_type
   CONST HOME = 1;
   CONST WORK = 2;
@@ -142,6 +134,10 @@ class CRM_GCD {
     }
     // Init DB
     $config = CRM_Core_Config::singleton();
+    
+    // Relationship types indexed by name_a_b from the table civicrm_relationship_type
+    $this->relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
+    
   }
 
   /**
@@ -750,7 +746,7 @@ class CRM_GCD {
       $relationship->is_active = 1;
 
       // add child_of relationship for each child
-      $relationship->relationship_type_id = self::CHILD_OF;
+      $relationship->relationship_type_id = $this->relTypes['Child of']['id'];
       foreach (array(0, 1) as $parent) {
         foreach (array(2, 3) as $child) {
           $relationship->contact_id_a = $household_member[$child];
@@ -760,13 +756,13 @@ class CRM_GCD {
       }
 
       // add sibling_of relationship
-      $relationship->relationship_type_id = self::SIBLING_OF;
+      $relationship->relationship_type_id = $this->relTypes['Sibling of']['id'];
       $relationship->contact_id_a = $household_member[3];
       $relationship->contact_id_b = $household_member[2];
       $this->_insert($relationship);
 
       // add member_of_household relationships and shared address
-      $relationship->relationship_type_id = self::MEMBER_OF_HOUSEHOLD;
+      $relationship->relationship_type_id = $this->relTypes['Household Member of']['id'];
       $relationship->contact_id_b = $household_id;
       for ($i = 1; $i < 4; ++$i) {
         $relationship->contact_id_a = $household_member[$i];
@@ -784,13 +780,13 @@ class CRM_GCD {
       }
 
       // add head_of_household relationship 1 for head of house
-      $relationship->relationship_type_id = self::HEAD_OF_HOUSEHOLD;
+      $relationship->relationship_type_id = $this->relTypes['Head of Household for']['id'];
       $relationship->contact_id_a = $household_member[0];
       $relationship->contact_id_b = $household_id;
       $this->_insert($relationship);
 
       // add spouse_of relationship 1 for both the spouses
-      $relationship->relationship_type_id = self::SPOUSE_OF;
+      $relationship->relationship_type_id = $this->relTypes['Spouse of']['id'];
       $relationship->contact_id_a = $household_member[1];
       $relationship->contact_id_b = $household_member[0];
       $this->_insert($relationship);
@@ -799,7 +795,7 @@ class CRM_GCD {
     // Add current employer relationships
     $this->_query("INSERT INTO civicrm_relationship
       (contact_id_a, contact_id_b, relationship_type_id, is_active)
-      (SELECT id, employer_id, " . self::EMPLOYEE_OF . ", 1 FROM civicrm_contact WHERE employer_id IN (" . implode(',', $this->Organization) . "))"
+      (SELECT id, employer_id, " . $this->relTypes['Employee of']['id'] . ", 1 FROM civicrm_contact WHERE employer_id IN (" . implode(',', $this->Organization) . "))"
     );
   }
 

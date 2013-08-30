@@ -125,7 +125,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         // other emails, this job might have changed under us
         // lets get the job status again and check
         $job->status = CRM_Core_DAO::getFieldValue(
-          'CRM_Mailing_DAO_Job',
+          'CRM_Mailing_DAO_MailingJob',
           $job->id,
           'status',
           'id',
@@ -328,7 +328,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       // changed between the first query and now
       // to avoid race conditions
       $job->status = CRM_Core_DAO::getFieldValue(
-        'CRM_Mailing_DAO_Job',
+        'CRM_Mailing_DAO_MailingJob',
         $job->id,
         'status',
         'id',
@@ -382,7 +382,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     );
 
     // create one child job if the mailing size is less than the offset
-    // probably use a CRM_Mailing_DAO_Job( );
+    // probably use a CRM_Mailing_DAO_MailingJob( );
     if (empty($offset) ||
       $recipient_count <= $offset
     ) {
@@ -722,7 +722,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           // to avoid making too many DB calls for this rare case
           // lets do it when we snapshot
           $status = CRM_Core_DAO::getFieldValue(
-            'CRM_Mailing_DAO_Job',
+            'CRM_Mailing_DAO_MailingJob',
             $this->id,
             'status',
             'id',

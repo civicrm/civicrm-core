@@ -612,6 +612,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
         elseif (CRM_Utils_Array::value('is_primary', $value)) {
           CRM_Core_Payment_Form::mapParams($this->_bltID, $value, $value, TRUE);
+          // payment email param can be empty for _bltID mapping
+          // thus provide mapping for it with a different email value
+          if (empty($value['email'])) {
+            $value['email'] = CRM_Utils_Array::valueByRegexKey('/^email-/', $value);
+          }
+
           if (is_object($payment)) {
             $result = $payment->doDirectPayment($value);
           }
