@@ -78,7 +78,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
     //assert created by in the edit page
     $this->assertTrue($this->isElementPresent(
-      "xpath=id('Edit')/div[2]/div/table/tbody/tr[2]/td[contains(text(), '{$createdBy}')]"));
+      "xpath=//form[@id='Edit']/div[2]/div/table/tbody/tr[2]/td[contains(text(), '{$createdBy}')]"));
     $this->openCiviPage('group', 'reset=1');
 
     //search groups using created by
