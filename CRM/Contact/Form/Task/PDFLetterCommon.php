@@ -190,7 +190,17 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       }
     }
     else {
-      $form->addDefaultButtons(ts('Make PDF Letters'));
+      $form->addButtons(array(
+        array(
+          'type' => 'submit',
+          'name' => ts('Make PDF Letters'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Done'),
+        ),
+      ));
     }
 
     $form->addFormRule(array('CRM_Contact_Form_Task_PDFLetterCommon', 'formRule'), $form);

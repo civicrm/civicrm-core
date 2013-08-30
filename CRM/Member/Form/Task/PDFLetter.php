@@ -82,23 +82,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   public function buildQuickForm() {
     //enable form element
     $this->assign('suppressForm', FALSE);
-
-    // use contact form as a base
     CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
-
-    $this->addButtons(array(
-        array(
-          'type' => 'submit',
-          'name' => ts('Make PDF Letters'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Done'),
-        ),
-      )
-    );
-
   }
 
   /**
