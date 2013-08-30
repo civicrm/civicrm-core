@@ -110,7 +110,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Contributions → Dashboard
     $this->click("css=ul#civicrm-menu li.crm-Contributions");
     $this->click("css=ul#civicrm-menu li.crm-Contributions li.crm-Dashboard a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('chart_type');
 
     $this->assertTextPresent("Contribution Summary");
     $this->assertTextPresent("Select Year (for monthly breakdown)");
