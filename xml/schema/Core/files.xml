@@ -52,4 +52,5 @@
   <xi:include href="ActionLog.xml"            parse="xml" />
   <xi:include href="Setting.xml"              parse="xml" />
   <xi:include href="PrintLabel.xml"           parse="xml" />
+  <xi:include href="WordReplacement.xml"      parse="xml" />
 </tables>
