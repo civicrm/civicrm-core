@@ -33,6 +33,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
       'civicrm_mailing_trackable_url',
       'civicrm_mailing_job',
       'civicrm_mailing',
+      'civicrm_mailing_recipients',
       'civicrm_email',
       'civicrm_contact',
     );
