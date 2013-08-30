@@ -167,7 +167,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $expected = array(
       2 => 'Petition',
       3 => "$title Petition",
-      4 => "$firstName $lastName",
+      4 => "$lastName, $firstName",
       5 => "$lastName, $firstName",
       8 => 'Scheduled',
     );
@@ -260,7 +260,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $expected = array(
       2 => 'Petition',
       3 => "$title Petition",
-      4 => "$firstName $lastName",
+      4 => "$lastName, $firstName",
       5 => "$lastName, $firstName",
       8 => 'Completed',
     );
