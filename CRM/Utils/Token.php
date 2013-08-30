@@ -1333,7 +1333,7 @@ class CRM_Utils_Token {
    */
   protected static function _buildMembershipTokens() {
     $key = 'membership';
-    if (self::$_tokens[$key] == NULL) {
+    if (!isset(self::$_tokens[$key]) || self::$_tokens[$key] == NULL) {
       $membershipTokens = array();
       $tokens = CRM_Core_SelectValues::membershipTokens();
       foreach ($tokens as $token => $dontCare) {
