@@ -80,6 +80,10 @@ class CRM_Upgrade_Incremental_php_FourFour {
   function upgrade_4_4_beta1($rev) {
     $this->addTask(ts('Upgrade DB to 4.4.beta1: SQL'), 'task_4_4_x_runSql', $rev);
 
+    // add new 'data' column in civicrm_batch
+    $query = 'ALTER TABLE civicrm_batch ADD data LONGTEXT NULL COMMENT "cache entered data"';
+    CRM_Core_DAO::executeQuery($query);
+
     // check if batch entry data exists in civicrm_cache table
     $query = 'SELECT path, data FROM civicrm_cache WHERE group_name = "batch entry"';
     $dao = CRM_Core_DAO::executeQuery($query);
