@@ -225,9 +225,7 @@ CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4";
     $dao = CRM_Core_DAO::executeQuery($query);
 
-    // get word replacement create params
-    $wordReplacementCreateParams = self::getWordReplacementCreateParams();
-    self::saveWordReplacements($wordReplacementCreateParams);
+    self::rebuildWordReplacementTable();
     return TRUE;
   }
 
@@ -266,19 +264,21 @@ CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
   }
 
   /**
-   * Function will retrun Word Replacement for word_replacement create API
+   * Get all the word-replacements stored in config-arrays
+   * and convert them to params for the WordReplacement.create API.
+   *
+   * @return array Each item is $params for WordReplacement.create
+   * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
-  static function getWordReplacementCreateParams() {
+  static function getConfigArraysAsAPIParams() {
     $wordReplacementCreateParams = array();
-    $params = array(
-      'version' => 3
-    );
     // get all domains
-    $result = civicrm_api('domain', 'get', $params);
+    $result = civicrm_api3('domain', 'get', array(
+      'return' => array('locale_custom_strings'),
+    ));
     if (!empty($result["values"])) {
       foreach ($result["values"] as $value) {
         $params = array();
-        $params["version"] = 3;
         $params["is_active"] = TRUE;
         $params["domain_id"] = $value["id"];
         // unserialize word match string
@@ -302,9 +302,15 @@ CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
     return $wordReplacementCreateParams;
   }
 
-  public static function saveWordReplacements($wordReplacementCreateParams) {
-    foreach ($wordReplacementCreateParams as $wordReplacementCreateParam) {
-      civicrm_api3('word_replacement', 'create', $wordReplacementCreateParam);
-    }
+  /**
+   * Get all the word-replacements stored in config-arrays
+   * and write them out as records in civicrm_word_replacement.
+   */
+  public static function rebuildWordReplacementTable() {
+    civicrm_api3('word_replacement', 'replace', array(
+      'options' => array('match' => array('domain_id', 'find_word')),
+      'values' => self::getConfigArraysAsAPIParams(FALSE),
+    ));
+    CRM_Core_BAO_WordReplacement::rebuild();
   }
 }
