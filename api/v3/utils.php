@@ -1220,9 +1220,7 @@ function _civicrm_api3_generic_replace($entity, $params) {
     }
 
     // Extract the keys -- somewhat scary, don't think too hard about it
-    $baseParams = $params;
-    unset($baseParams['values']);
-    unset($baseParams['sequential']);
+    $baseParams = _civicrm_api3_generic_replace_base_params($params);
 
     // Lookup pre-existing records
     $preexisting = civicrm_api($entity, 'get', $baseParams, $params);
@@ -1273,6 +1271,14 @@ function _civicrm_api3_generic_replace($entity, $params) {
     $transaction->rollback();
     return civicrm_api3_create_error($e->getMessage());
   }
+}
+
+function _civicrm_api3_generic_replace_base_params($params) {
+  $baseParams = $params;
+  unset($baseParams['values']);
+  unset($baseParams['sequential']);
+  unset($baseParams['options']);
+  return $baseParams;
 }
 
 /**
