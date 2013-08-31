@@ -251,7 +251,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
  WHERE r.contact_id_y = {$values['contact_id']} AND r.is_active = 1  AND c.is_deleted = 0";
         $query = '';
         foreach (array('a', 'b') as $dir) {
-          if (CRM_Utils_Array::value($dir, $relTypeDir)) {
+          if (isset($relTypeDir[$dir])) {
             $query .= ($query ? ' UNION ' : '')
               . str_replace('_y', '_' . $dir, str_replace('_x', '_' . ($dir == 'a' ? 'b' : 'a'), $select))
               . ' AND r.relationship_type_id IN (' . implode(',', $relTypeDir[$dir]) . ')';
