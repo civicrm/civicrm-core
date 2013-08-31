@@ -267,10 +267,11 @@ CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
    * Get all the word-replacements stored in config-arrays
    * and convert them to params for the WordReplacement.create API.
    *
+   * @param bool $rebuildEach whether to perform rebuild after each individual API call
    * @return array Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
-  static function getConfigArraysAsAPIParams() {
+  static function getConfigArraysAsAPIParams($rebuildEach) {
     $wordReplacementCreateParams = array();
     // get all domains
     $result = civicrm_api3('domain', 'get', array(
@@ -281,6 +282,7 @@ CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
         $params = array();
         $params["is_active"] = TRUE;
         $params["domain_id"] = $value["id"];
+        $params["options"] = array('wp-rebuild' => $rebuildEach);
         // unserialize word match string
         $localeCustomArray = unserialize($value["locale_custom_strings"]);
         if (!empty($localeCustomArray)) {
