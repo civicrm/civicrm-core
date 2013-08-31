@@ -73,6 +73,12 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'birth_date' =>
+          array('title' => ts('Birth Date'),
+          ),
+          'gender_id' =>
+          array('title' => ts('Gender'),
+          ),
           'employer_id' =>
           array('title' => ts('Organization'),
           ),
@@ -180,7 +186,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'options' => CRM_Event_PseudoConstant::participantRole(),
           ),
           'participant_register_date' => array(
-            'title' => ' Registration Date',
+            'title' => 'Registration Date',
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'fee_currency' =>
@@ -495,6 +501,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $honorTypes = CRM_Core_OptionGroup::values('honor_type', FALSE, FALSE, FALSE, NULL, 'label');
+    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
 
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
@@ -638,6 +645,13 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
       if (array_key_exists('civicrm_contribution_honor_type_id', $row)) {
         if ($value = $row['civicrm_contribution_honor_type_id']) {
           $rows[$rowNum]['civicrm_contribution_honor_type_id'] = $honorTypes[$value];
+        }
+        $entryFound = TRUE;
+      }
+      
+      if (array_key_exists('civicrm_contact_gender_id', $row)) {
+        if ($value = $row['civicrm_contact_gender_id']) {
+          $rows[$rowNum]['civicrm_contact_gender_id'] = $genders[$value];
         }
         $entryFound = TRUE;
       }
