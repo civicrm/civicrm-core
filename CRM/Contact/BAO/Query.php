@@ -1546,7 +1546,6 @@ class CRM_Contact_BAO_Query {
         return;
 
       case 'group':
-        list($name, $op, $value, $grouping, $wildcard) = $values;
         $this->group($values);
         return;
       case 'group_type':
@@ -1739,8 +1738,6 @@ class CRM_Contact_BAO_Query {
   function whereClause() {
     $this->_where[0] = array();
     $this->_qill[0] = array();
-
-    $config = CRM_Core_Config::singleton();
 
     $this->includeContactIds();
     if (!empty($this->_params)) {
@@ -4295,12 +4292,6 @@ civicrm_relationship.start_date > {$today}
 
         if ($field) {
           switch ($field) {
-            case 'sort_name':
-            case 'id':
-            case 'contact_a.sort_name':
-            case 'contact_a.id':
-              break;
-
             case 'city':
             case 'postal_code':
               $this->_whereTables["civicrm_address"] = 1;
@@ -4328,7 +4319,7 @@ civicrm_relationship.start_date > {$today}
       }
     }
 
-    // note : this modifies _fromClause and _simpleFromClaus
+    // note : this modifies _fromClause and _simpleFromClause
     $this->includePseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
