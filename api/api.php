@@ -30,6 +30,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     CRM_Utils_API_HTMLInputCoder::singleton(),
     CRM_Utils_API_NullOutputCoder::singleton(),
     CRM_Utils_API_ReloadOption::singleton(),
+    CRM_Utils_API_MatchOption::singleton(),
   );
   CRM_Utils_Hook::apiWrappers($apiWrappers,$apiRequest);
 
