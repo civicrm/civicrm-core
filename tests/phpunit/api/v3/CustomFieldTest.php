@@ -388,5 +388,56 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $customField = $this->callAPISuccess('custom_field', 'delete', $customOptionValueFields);
   }
+
+  /**
+   * If there's one custom group for "Contact" and one for "Activity", then "Contact.getfields"
+   * and "Activity.getfields" should return only their respective fields (not the other's fields),
+   * and unrelated entities should return no custom fields.
+   */
+  function testGetfields_CrossEntityPollution() {
+    $auxEntities = array('Email', 'Address', 'LocBlock', 'Membership', 'ContributionPage', 'ReportInstance');
+    $allEntities = array_merge(array('Contact', 'Activity'), $auxEntities);
+
+    // Baseline - getfields doesn't reporting any customfields for any entities
+    foreach ($allEntities as $entity) {
+      $this->assertEquals(
+        array(),
+        $this->getCustomFieldKeys($this->callAPISuccess($entity, 'getfields', array())),
+        "Baseline custom fields for $entity should be empty"
+      );
+    }
+
+    // Add some fields
+    $contactGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'test_group'));
+    $contactField = $this->customFieldCreate(array('custom_group_id' => $contactGroup['id'], 'label' => 'For Contacts'));
+    $activityGroup = $this->customGroupCreate(array('extends' => 'Activity', 'title' => 'test_group'));
+    $activityField = $this->customFieldCreate(array('custom_group_id' => $activityGroup['id'], 'label' => 'For Activities'));
+
+    // getfields reports exactly one custom field for each entity
+    $this->assertEquals(
+      array('custom_' . $contactField['id']),
+      $this->getCustomFieldKeys($this->callAPISuccess('Contact', 'getfields', array())),
+      'Contact custom fields'
+    );
+    $this->assertEquals(
+      array('custom_' . $activityField['id']),
+      $this->getCustomFieldKeys($this->callAPISuccess('Activity', 'getfields', array())),
+      'Activity custom fields'
+    );
+    foreach ($auxEntities as $entity) {
+      $this->assertEquals(
+        array(),
+        $this->getCustomFieldKeys($this->callAPISuccess($entity, 'getfields', array())),
+        "Custom fields for $entity should be empty"
+      );
+    }
+  }
+
+  function getCustomFieldKeys($getFieldsResult) {
+    $isCustom = function($key) {
+      return preg_match('/^custom_/', $key);
+    };
+    return array_values(array_filter(array_keys($getFieldsResult['values']), $isCustom));
+  }
 }
 
