@@ -17,7 +17,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
   /**
    * If there's no pre-existing record, then insert a new one.
    */
-  function testMatch_none() {
+  function testCreateMatch_none() {
     $result = $this->callAPISuccess('contact', 'create', array(
       'options' => array(
         'match' => array('first_name', 'last_name'),
@@ -35,7 +35,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
   /**
    * If there's no pre-existing record, then throw an error.
    */
-  function testMatchMandatory_none() {
+  function testCreateMatchMandatory_none() {
     $this->callAPIFailure('contact', 'create', array(
       'options' => array(
         'match-mandatory' => array('first_name', 'last_name'),
@@ -61,7 +61,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * @dataProvider apiOptionNames
    * @param string $apiOptionName e.g. "match" or "match-mandatory"
    */
-  function testMatch_one($apiOptionName) {
+  function testCreateMatch_one($apiOptionName) {
     // create basic record
     $result1 = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -99,7 +99,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * @dataProvider apiOptionNames
    * @param string $apiOptionName e.g. "match" or "match-mandatory"
    */
-  function testMatch_many($apiOptionName) {
+  function testCreateMatch_many($apiOptionName) {
     // create the first Lebowski
     $result1 = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -131,6 +131,83 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'nick_name' => '',
       'external_identifier' => 'new',
     ), 'Ambiguous match criteria');
+  }
+
+  /**
+   * When replacing one set with another set, match items within
+   * the set using a key.
+   */
+  function testReplaceMatch() {
+    // Create contact with two emails (j1,j2)
+    $createResult = $this->callAPISuccess('contact', 'create', array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Jeffrey',
+      'last_name' => 'Lebowski',
+      'api.Email.replace' => array(
+        'options' => array('match' => 'location_type_id'),
+        'values' => array(
+          array('location_type_id' => 1, 'email' => 'j1-a@example.com', 'signature_text' => 'The Dude abides.'),
+          array('location_type_id' => 2, 'email' => 'j2@example.com', 'signature_text' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'),
+        ),
+      ),
+    ));
+    $this->assertEquals(1, $createResult['count']);
+    foreach ($createResult['values'] as $value) {
+      $this->assertAPISuccess($value['api.Email.replace']);
+      $this->assertEquals(2, $value['api.Email.replace']['count']);
+      foreach ($value['api.Email.replace']['values'] as $v2) {
+        $this->assertEquals($createResult['id'], $v2['contact_id']);
+      }
+      $createEmailValues = array_values($value['api.Email.replace']['values']);
+    }
+
+    // Update contact's emails -- specifically, modify j1, delete j2, add j3
+    $updateResult = $this->callAPISuccess('contact', 'create', array(
+      'id' => $createResult['id'],
+      'nick_name' => 'The Dude',
+      'api.Email.replace' => array(
+        'options' => array('match' => 'location_type_id'),
+        'values' => array(
+          array('location_type_id' => 1, 'email' => 'j1-b@example.com'),
+          array('location_type_id' => 3, 'email' => 'j3@example.com'),
+        ),
+      ),
+    ));
+    $this->assertEquals(1, $updateResult['count']);
+    foreach ($updateResult['values'] as $value) {
+      $this->assertAPISuccess($value['api.Email.replace']);
+      $this->assertEquals(2, $value['api.Email.replace']['count']);
+      foreach ($value['api.Email.replace']['values'] as $v2) {
+        $this->assertEquals($createResult['id'], $v2['contact_id']);
+      }
+      $updateEmailValues = array_values($value['api.Email.replace']['values']);
+    }
+
+    // Re-read from DB
+    $getResult = $this->callAPISuccess('Email', 'get', array(
+      'contact_id' => $createResult['id'],
+    ));
+    $this->assertEquals(2, $getResult['count']);
+    $getValues = array_values($getResult['values']);
+
+    // The first email (j1@example.com) is updated (same ID#) because it matched on contact_id+location_type_id.
+    $this->assertTrue(is_numeric($createEmailValues[0]['id']));
+    $this->assertTrue(is_numeric($updateEmailValues[0]['id']));
+    $this->assertTrue(is_numeric($getValues[0]['id']));
+    $this->assertEquals($createEmailValues[0]['id'], $updateEmailValues[0]['id']);
+    $this->assertEquals($createEmailValues[0]['id'], $getValues[0]['id']);
+    $this->assertEquals('j1-b@example.com', $getValues[0]['email']);
+    $this->assertEquals('The Dude abides.', $getValues[0]['signature_text']); // preserved from original creation; proves that we updated existing record
+
+    // The second email (j2@example.com) is deleted because contact_id+location_type_id doesn't appear in new list.
+    // The third email (j3@example.com) is inserted (new ID#) because it doesn't match an existing contact_id+location_type_id.
+    $this->assertTrue(is_numeric($createEmailValues[1]['id']));
+    $this->assertTrue(is_numeric($updateEmailValues[1]['id']));
+    $this->assertTrue(is_numeric($getValues[1]['id']));
+    $this->assertNotEquals($createEmailValues[1]['id'], $updateEmailValues[1]['id']);
+    $this->assertEquals($updateEmailValues[1]['id'], $getValues[1]['id']);
+    $this->assertEquals('j3@example.com', $getValues[1]['email']);
+    $this->assertTrue(empty($getValues[1]['signature_text']));
   }
 
 }
