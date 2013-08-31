@@ -200,6 +200,26 @@ WHERE       source_contact_id IS NOT NULL";
    $query = "ALTER  TABLE civicrm_activity DROP COLUMN source_contact_id";
    $dao = CRM_Core_DAO::executeQuery($query);
 
+   $query = "
+CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
+  id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Word replacement ID',
+  find_word varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Word which need to be replaced',
+  replace_word varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Word which will replace the word in find',
+  is_active tinyint(4) DEFAULT NULL COMMENT 'Is this entry active?',
+  domain_id int(10) unsigned DEFAULT NULL COMMENT 'FK to Domain ID. This is for Domain specific word replacement',
+  PRIMARY KEY (id),
+  UNIQUE KEY UI_find (find_word),
+  KEY FK_civicrm_word_replacement_domain_id (domain_id)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4";
+   $dao = CRM_Core_DAO::executeQuery($query);
+   
+   // get word replacement create params
+   $wordReplacementCreateParams = self::getWordReplacementCreateParams();
+   if(!empty($wordReplacementCreateParams)) {
+     foreach($wordReplacementCreateParams as $wordReplacementCreateParam) {
+       $result = civicrm_api('word_replacement', 'create', $wordReplacementCreateParam);
+     }
+   }
    return TRUE;
   }
 
@@ -235,5 +255,43 @@ WHERE       source_contact_id IS NOT NULL";
       $title
     );
     $queue->createItem($task, array('weight' => -1));
+  }
+  
+  /*
+   *    Function will retrun Word Replacement for word_replacement create API
+  */
+  
+  static function getWordReplacementCreateParams() {
+  	$wordReplacementCreateParams = array();
+  	$params = array(
+                    'version' => 3
+                    );
+  	// get all domains
+  	$result = civicrm_api('domain', 'get', $params);
+  	if (!empty($result["values"])) {
+  		foreach ($result["values"] as $value) {
+  			$params = array();
+  			$params["version"] = 3;
+  			$params["is_active"] = true;
+  			$params["domain_id"] = $value["id"];
+  			// unserialize word match string
+  			$localeCustomArray = unserialize($value["locale_custom_strings"]);
+  			if(!empty($localeCustomArray)) {
+  				$wordMatchArray = array();
+  				foreach ($localeCustomArray as $localCustomData) {
+  					$wordMatchArray = $localCustomData["enabled"]["wildcardMatch"];
+  				}
+  
+  				if(!empty($wordMatchArray)) {
+  					foreach ($wordMatchArray as $word=>$replace) {
+  						$params["find_word"] = $word;
+  						$params["replace_word"] = $replace;
+  						$wordReplacementCreateParams[] = $params;
+  					}
+  				}
+  			}
+  		}
+  	}
+  	return $wordReplacementCreateParams;
   }
 }
