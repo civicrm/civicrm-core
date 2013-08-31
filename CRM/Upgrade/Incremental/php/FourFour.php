@@ -267,6 +267,12 @@ CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
    * Get all the word-replacements stored in config-arrays
    * and convert them to params for the WordReplacement.create API.
    *
+   * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
+   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * step behaves consistently even as the BAO evolves in future versions.
+   * However, if there's a bug in here prior to 4.4.0, we should apply the
+   * bugfix in both places.
+   *
    * @param bool $rebuildEach whether to perform rebuild after each individual API call
    * @return array Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
@@ -307,6 +313,12 @@ CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
   /**
    * Get all the word-replacements stored in config-arrays
    * and write them out as records in civicrm_word_replacement.
+   *
+   * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
+   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * step behaves consistently even as the BAO evolves in future versions.
+   * However, if there's a bug in here prior to 4.4.0, we should apply the
+   * bugfix in both places.
    */
   public static function rebuildWordReplacementTable() {
     civicrm_api3('word_replacement', 'replace', array(

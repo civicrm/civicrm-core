@@ -177,6 +177,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     $wordReplacementSettings = CRM_Core_BAO_Domain::edit($params, $id);
 
     if ($wordReplacementSettings) {
+      CRM_Core_Config::singleton()->localeCustomStrings = $stringOverride;
+
       // Reset navigation
       CRM_Core_BAO_Navigation::resetNavigation();
       // Clear js string cache
@@ -186,6 +188,71 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Get all the word-replacements stored in config-arrays
+   * and convert them to params for the WordReplacement.create API.
+   *
+   * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
+   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * step behaves consistently even as the BAO evolves in future versions.
+   * However, if there's a bug in here prior to 4.4.0, we should apply the
+   * bugfix in both places.
+   *
+   * @param bool $rebuildEach whether to perform rebuild after each individual API call
+   * @return array Each item is $params for WordReplacement.create
+   * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
+   */
+  static function getConfigArraysAsAPIParams($rebuildEach) {
+    $wordReplacementCreateParams = array();
+    // get all domains
+    $result = civicrm_api3('domain', 'get', array(
+      'return' => array('locale_custom_strings'),
+    ));
+    if (!empty($result["values"])) {
+      foreach ($result["values"] as $value) {
+        $params = array();
+        $params["is_active"] = TRUE;
+        $params["domain_id"] = $value["id"];
+        $params["options"] = array('wp-rebuild' => $rebuildEach);
+        // unserialize word match string
+        $localeCustomArray = unserialize($value["locale_custom_strings"]);
+        if (!empty($localeCustomArray)) {
+          $wordMatchArray = array();
+          foreach ($localeCustomArray as $localCustomData) {
+            $wordMatchArray = $localCustomData["enabled"]["wildcardMatch"];
+          }
+
+          if (!empty($wordMatchArray)) {
+            foreach ($wordMatchArray as $word => $replace) {
+              $params["find_word"] = $word;
+              $params["replace_word"] = $replace;
+              $wordReplacementCreateParams[] = $params;
+            }
+          }
+        }
+      }
+    }
+    return $wordReplacementCreateParams;
+  }
+
+  /**
+   * Get all the word-replacements stored in config-arrays
+   * and write them out as records in civicrm_word_replacement.
+   *
+   * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
+   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * step behaves consistently even as the BAO evolves in future versions.
+   * However, if there's a bug in here prior to 4.4.0, we should apply the
+   * bugfix in both places.
+   */
+  public static function rebuildWordReplacementTable() {
+    civicrm_api3('word_replacement', 'replace', array(
+      'options' => array('match' => array('domain_id', 'find_word')),
+      'values' => self::getConfigArraysAsAPIParams(FALSE),
+    ));
+    CRM_Core_BAO_WordReplacement::rebuild();
   }
 }
 
