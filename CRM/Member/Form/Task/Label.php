@@ -59,28 +59,8 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    * @return void
    */
   function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Make Mailing Labels'));
-
-    //add select for label
-    $label = CRM_Core_BAO_LabelFormat::getList(TRUE);
-
-    $this->add('select', 'label_name', ts('Select Label'), array('' => ts('- select label -')) + $label, TRUE);
-
-
-    // add select for Location Type
-    $this->addElement('select', 'location_type_id', ts('Select Location'),
-      array(
-        '' => ts('Primary')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'), TRUE
-    );
+    CRM_Contact_Form_Task_Label::buildQuickForm($this);
     $this->addElement('checkbox', 'per_membership', ts('Print one label per Membership (rather than per contact)'));
-
-    // checkbox for SKIP contacts with Do Not Mail privacy option
-    $this->addElement('checkbox', 'do_not_mail', ts('Do not print labels for contacts with "Do Not Mail" privacy option checked'));
-
-    $this->add('checkbox', 'merge_same_address', ts('Merge labels for contacts with the same address'), NULL);
-    $this->add('checkbox', 'merge_same_household', ts('Merge labels for contacts belonging to the same household'), NULL);
-
-    $this->addDefaultButtons(ts('Make Mailing Labels'));
   }
 
   /**

@@ -386,7 +386,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     );
     $activityParams = array(
       'subject' => $formValues['subject'],
-      'campaign_id' => $formValues['campaign_id'],
+      'campaign_id' => CRM_Utils_Array::value('campaign_id', $formValues),
       'source_contact_id' => $userID,
       'activity_type_id' => $activityTypeID,
       'activity_date_time' => date('YmdHis'),
