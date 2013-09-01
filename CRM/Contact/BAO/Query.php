@@ -4012,10 +4012,10 @@ civicrm_relationship.start_date > {$today}
           'first_name' => 1,
           'middle_name' => 1,
           'last_name' => 1,
-          'individual_prefix' => 1,
-          'individual_suffix' => 1,
+          'prefix_id' => 1,
+          'suffix_id' => 1,
           'birth_date' => 1,
-          'gender' => 1,
+          'gender_id' => 1,
           'street_address' => 1,
           'supplemental_address_1' => 1,
           'supplemental_address_2' => 1,
@@ -4047,6 +4047,8 @@ civicrm_relationship.start_date > {$today}
           'do_not_trade' => 1,
           'is_opt_out' => 1,
           'contact_is_deleted' => 1,
+          'preferred_communication_method' => 1,
+          'preferred_language' => 1,
         );
       }
     }
@@ -4104,7 +4106,7 @@ civicrm_relationship.start_date > {$today}
    * @param bool $count return count obnly
    * @param bool $skipPermissions Should permissions be ignored or should the logged in user's permissions be applied
    *
-   * @return void
+   * @return array
    * @access public
    */
   static function apiQuery(
