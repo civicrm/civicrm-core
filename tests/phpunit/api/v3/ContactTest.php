@@ -254,11 +254,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $result = $this->callAPISuccess('contact', 'getsingle', array('id' => $contact['id']));
 
-    $this->assertArrayKeyExists('individual_prefix', $result);
-    $this->assertArrayKeyExists('individual_suffix', $result);
-    $this->assertArrayKeyExists('gender', $result);
-    $this->assertEquals(4, $result['individual_prefix'][0]);
-    $this->assertEquals(1, $result['individual_suffix'][0]);
+    $this->assertArrayKeyExists('prefix_id', $result);
+    $this->assertArrayKeyExists('suffix_id', $result);
+    $this->assertArrayKeyExists('gender_id', $result);
+    $this->assertEquals(4, $result['prefix_id']);
+    $this->assertEquals(1, $result['suffix_id']);
   }
 
   /**
@@ -278,11 +278,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $result = $this->callAPISuccess('contact', 'getsingle', array('id' => $contact['id']));
 
-    $this->assertArrayKeyExists('individual_prefix', $result);
-    $this->assertArrayKeyExists('individual_suffix', $result);
-    $this->assertArrayKeyExists('gender', $result);
-    $this->assertEquals(4, $result['individual_prefix'][0]);
-    $this->assertEquals(1, $result['individual_suffix'][0]);
+    $this->assertArrayKeyExists('prefix_id', $result);
+    $this->assertArrayKeyExists('suffix_id', $result);
+    $this->assertArrayKeyExists('gender_id', $result);
+    $this->assertEquals(4, $result['prefix_id']);
+    $this->assertEquals(1, $result['suffix_id']);
   }
 
   /**
