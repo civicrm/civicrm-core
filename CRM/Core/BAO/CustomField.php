@@ -386,9 +386,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                                     $onlySubType = FALSE,
                                     $checkPermission = TRUE
   ) {
-    if (empty($customDataType)) {
-      throw new CRM_Core_Exception("Cannot lookup fields for blank entity");
-    }
     if ($customDataType && !is_array($customDataType)) {
 
       if (in_array($customDataType, CRM_Contact_BAO_ContactType::subTypes())) {
@@ -478,7 +475,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
         }
 
-        if (empty($extends)) {
+        if (!empty($customDataType) && empty($extends)) {
           // $customDataType did not include any customizable/extendable entities.
           self::$_importFields[$cacheKey] = array();
           return self::$_importFields[$cacheKey];
