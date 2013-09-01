@@ -378,31 +378,28 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @static
    */
   public static function &getFields($customDataType = 'Individual',
-    $showAll           = FALSE,
-    $inline            = FALSE,
-    $customDataSubType = NULL,
-    $customDataSubName = NULL,
-    $onlyParent        = FALSE,
-    $onlySubType       = FALSE,
-    $checkPermission   = TRUE
+                                    $showAll = FALSE,
+                                    $inline = FALSE,
+                                    $customDataSubType = NULL,
+                                    $customDataSubName = NULL,
+                                    $onlyParent = FALSE,
+                                    $onlySubType = FALSE,
+                                    $checkPermission = TRUE
   ) {
-    if ($customDataType &&
-      !is_array($customDataType)
-    ) {
+    if (empty($customDataType)) {
+      throw new CRM_Core_Exception("Cannot lookup fields for blank entity");
+    }
+    if ($customDataType && !is_array($customDataType)) {
 
-      if (in_array($customDataType,
-          CRM_Contact_BAO_ContactType::subTypes()
-        )) {
+      if (in_array($customDataType, CRM_Contact_BAO_ContactType::subTypes())) {
         // This is the case when getFieldsForImport() requires fields
         // limited strictly to a subtype.
         $customDataSubType = $customDataType;
-        $customDataType    = CRM_Contact_BAO_ContactType::getBasicType($customDataType);
-        $onlySubType       = TRUE;
+        $customDataType = CRM_Contact_BAO_ContactType::getBasicType($customDataType);
+        $onlySubType = TRUE;
       }
 
-      if (in_array($customDataType,
-          array_keys(CRM_Core_SelectValues::customGroupExtends())
-        )) {
+      if (in_array($customDataType, array_keys(CRM_Core_SelectValues::customGroupExtends()))) {
         // this makes the method flexible to support retrieving fields
         // for multiple extends value.
         $customDataType = array($customDataType);
@@ -466,11 +463,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if (is_array($customDataType)) {
           $value = NULL;
           foreach ($customDataType as $dataType) {
-            if (in_array($dataType,
-                array_keys(CRM_Core_SelectValues::customGroupExtends())
-              )) {
-              if (in_array($dataType, array(
-                'Individual', 'Household', 'Organization'))) {
+            if (in_array($dataType, array_keys(CRM_Core_SelectValues::customGroupExtends()))) {
+              if (in_array($dataType, array('Individual', 'Household', 'Organization'))) {
                 $val = "'" . CRM_Utils_Type::escape($dataType, 'String') . "', 'Contact' ";
               }
               else {
@@ -482,6 +476,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           if ($value) {
             $extends = "AND   $cgTable.extends IN ( $value ) ";
           }
+        }
+
+        if (empty($extends)) {
+          // $customDataType did not include any customizable/extendable entities.
+          self::$_importFields[$cacheKey] = array();
+          return self::$_importFields[$cacheKey];
         }
 
         if ($onlyParent) {
