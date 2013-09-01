@@ -414,11 +414,13 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $activityField = $this->customFieldCreate(array('custom_group_id' => $activityGroup['id'], 'label' => 'For Activities'));
 
     // getfields reports exactly one custom field for each entity
-    $this->assertEquals(
-      array('custom_' . $contactField['id']),
-      $this->getCustomFieldKeys($this->callAPISuccess('Contact', 'getfields', array())),
-      'Contact custom fields'
-    );
+    foreach (array('Contact', 'Individual', 'Organization') as $entity) {
+      $this->assertEquals(
+        array('custom_' . $contactField['id']),
+        $this->getCustomFieldKeys($this->callAPISuccess($entity, 'getfields', array())),
+        'Contact custom fields'
+      );
+    }
     $this->assertEquals(
       array('custom_' . $activityField['id']),
       $this->getCustomFieldKeys($this->callAPISuccess('Activity', 'getfields', array())),
