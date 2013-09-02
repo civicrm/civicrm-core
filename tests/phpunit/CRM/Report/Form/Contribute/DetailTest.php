@@ -47,6 +47,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
         'CRM_Report_Form_Contribute_Detail',
         array(
           'fields' => array(
+            'sort_name',
             'first_name',
             'email',
             'total_amount',
