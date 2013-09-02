@@ -993,26 +993,34 @@ class CRM_Utils_System {
   }
 
   /*
-     * Get logged in user's IP address.
-     *
-     * Get IP address from HTTP Header. If the CMS is Drupal then use the Drupal function
-     * as this also handles reverse proxies (based on proper configuration in settings.php)
-     *
-     * @return string ip address of logged in user
-     */
-
-  static function ipAddress() {
+   * Get logged in user's IP address.
+   *
+   * Get IP address from HTTP Header. If the CMS is Drupal then use the Drupal function
+   * as this also handles reverse proxies (based on proper configuration in settings.php)
+   *
+   * @return string ip address of logged in user
+   */
+  static function ipAddress($strictIPV4 = TRUE) {
     $address = CRM_Utils_Array::value('REMOTE_ADDR', $_SERVER);
 
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal) {
       //drupal function handles the server being behind a proxy securely
-      return ip_address();
+      $address = ip_address();
     }
 
     // hack for safari
     if ($address == '::1') {
       $address = '127.0.0.1';
+    }
+
+    // when we need to have strictly IPV4 ip address
+    // convert ipV6 to ipV4
+    if ($strictIPV4) {
+      // this converts 'IPV4 mapped IPV6 address' to IPV4
+      if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && strstr($address, '::ffff:')) {
+        $address = ltrim($address, '::ffff:');
+      }
     }
 
     return $address;
