@@ -377,8 +377,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   }
 
   function select() {
-    $select = array();
-
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -386,61 +384,31 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           if (CRM_Utils_Array::value('required', $field) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
-            if ($tableName == 'civicrm_address') {
-              $this->_addressField = TRUE;
-            }
-            if ($tableName == 'civicrm_email') {
-              $this->_emailField = TRUE;
-            }
-            elseif ($tableName == 'civicrm_email_honor') {
+            if ($tableName == 'civicrm_email_honor') {
               $this->_emailFieldHonor = TRUE;
             }
-
             if ($tableName == 'civicrm_contact_honor') {
               $this->_nameFieldHonor = TRUE;
-            }
-
-            // only include statistics columns if set
-            if (CRM_Utils_Array::value('statistics', $field)) {
-              foreach ($field['statistics'] as $stat => $label) {
-                switch (strtolower($stat)) {
-                  case 'sum':
-                    $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}_{$stat}";
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = $field['type'];
-                    $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
-                    $this->_selectAliases[] = "{$tableName}_{$fieldName}_{$stat}";
-                    break;
-
-                  case 'count':
-                    $select[] = "COUNT({$field['dbAlias']}) as {$tableName}_{$fieldName}_{$stat}";
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
-                    $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
-                    $this->_selectAliases[] = "{$tableName}_{$fieldName}_{$stat}";
-                    break;
-
-                  case 'avg':
-                    $select[] = "ROUND(AVG({$field['dbAlias']}),2) as {$tableName}_{$fieldName}_{$stat}";
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = $field['type'];
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
-                    $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
-                    $this->_selectAliases[] = "{$tableName}_{$fieldName}_{$stat}";
-                    break;
-                }
-              }
-            }
-            else {
-              $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-              $this->_selectAliases[] = "{$tableName}_{$fieldName}";
             }
           }
         }
       }
     }
 
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
+    parent::select();
+  }
+
+  function orderBy() {
+    parent::orderBy();
+
+    // please note this will just add the order-by columns to select query, and not display in column-headers.
+    // This is a solution to not throw fatal errors when there is a column in order-by, not present in select/display columns.
+    foreach ($this->_orderByFields as $orderBy) {
+      if (!array_key_exists($orderBy['name'], $this->_params['fields'])
+        && !CRM_Utils_Array::value('section', $orderBy)) {
+        $this->_select .= ", {$orderBy['dbAlias']} as {$orderBy['tplField']}";
+      }
+    }
   }
 
   function from($softcredit = false) {
