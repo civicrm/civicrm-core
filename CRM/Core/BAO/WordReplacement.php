@@ -141,8 +141,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   public static function getAllAsConfigArray($id) {
     $query = "SELECT find_word,replace_word,is_active,match_type FROM civicrm_word_replacement WHERE domain_id = ".CRM_Utils_Type::escape($id, 'Integer');
     $dao = CRM_Core_DAO::executeQuery($query);
-    $wordReplacementEnabled = array();
-    $wordReplacementDisabled = array();
     
     while ($dao->fetch()) {
       if ($dao->is_active==1) {
