@@ -3898,4 +3898,9 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1119, "064", "Naukšēnu novads"),
 (NULL, 1119, "106", "Ventspils novads"),
 (NULL, 1119, "JKB", "Jēkabpils"),
-(NULL, 1119, "VMR", "Valmiera");
+(NULL, 1119, "VMR", "Valmiera"),
+
+-- CRM-13314 Added States for Uruguay
+(NULL, 1229, "FL", "Florida"),
+(NULL, 1229, "RN", "Rio Negro"),
+(NULL, 1229, "SJ", "San Jose");
