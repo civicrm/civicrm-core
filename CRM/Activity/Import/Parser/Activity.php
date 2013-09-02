@@ -69,13 +69,18 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    * @access public
    */
   function init() {
+    $activityContact = CRM_Activity_BAO_ActivityContact::import();
+    $activityTarget['target_contact_id'] = $activityContact['contact_id'];
     $fields = array_merge(CRM_Activity_BAO_Activity::importableFields(),
-      CRM_Activity_BAO_ActivityTarget::import()
+      $activityTarget
     );
 
-    $fields = array_merge($fields, array('activity_label' => array('title' => ts('Activity Type Label'),
-          'headerPattern' => '/(activity.)?type label?/i',
-        )));
+    $fields = array_merge($fields, array(
+      'activity_label' => array(
+        'title' => ts('Activity Type Label'),
+        'headerPattern' => '/(activity.)?type label?/i',
+      )
+    ));
 
     foreach ($fields as $name => $field) {
       $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
