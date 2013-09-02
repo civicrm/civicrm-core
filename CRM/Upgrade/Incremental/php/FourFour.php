@@ -99,6 +99,8 @@ class CRM_Upgrade_Incremental_php_FourFour {
     // delete entries from civicrm_cache table
     $query = 'DELETE FROM civicrm_cache WHERE group_name = "batch entry"';
     CRM_Core_DAO::executeQuery($query);
+
+    $this->addTask(ts('Migrate custom word-replacements'), 'wordReplacements');
   }
 
   /**
@@ -204,6 +206,30 @@ WHERE       source_contact_id IS NOT NULL";
   }
 
   /**
+   * Migrate word-replacements from $config to civicrm_word_replacement
+   *
+   * @return bool TRUE for success
+   * @see http://issues.civicrm.org/jira/browse/CRM-13187
+   */
+  static function wordReplacements(CRM_Queue_TaskContext $ctx) {
+    $query = "
+CREATE TABLE IF NOT EXISTS civicrm_word_replacement (
+  id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Word replacement ID',
+  find_word varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Word which need to be replaced',
+  replace_word varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Word which will replace the word in find',
+  is_active tinyint(4) DEFAULT NULL COMMENT 'Is this entry active?',
+  domain_id int(10) unsigned DEFAULT NULL COMMENT 'FK to Domain ID. This is for Domain specific word replacement',
+  PRIMARY KEY (id),
+  UNIQUE KEY UI_find (find_word),
+  KEY FK_civicrm_word_replacement_domain_id (domain_id)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4";
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    self::rebuildWordReplacementTable();
+    return TRUE;
+  }
+
+  /**
    * (Queue Task Callback)
    */
   static function task_4_4_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
@@ -235,5 +261,70 @@ WHERE       source_contact_id IS NOT NULL";
       $title
     );
     $queue->createItem($task, array('weight' => -1));
+  }
+
+  /**
+   * Get all the word-replacements stored in config-arrays
+   * and convert them to params for the WordReplacement.create API.
+   *
+   * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
+   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * step behaves consistently even as the BAO evolves in future versions.
+   * However, if there's a bug in here prior to 4.4.0, we should apply the
+   * bugfix in both places.
+   *
+   * @param bool $rebuildEach whether to perform rebuild after each individual API call
+   * @return array Each item is $params for WordReplacement.create
+   * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
+   */
+  static function getConfigArraysAsAPIParams($rebuildEach) {
+    $wordReplacementCreateParams = array();
+    // get all domains
+    $result = civicrm_api3('domain', 'get', array(
+      'return' => array('locale_custom_strings'),
+    ));
+    if (!empty($result["values"])) {
+      foreach ($result["values"] as $value) {
+        $params = array();
+        $params["is_active"] = TRUE;
+        $params["domain_id"] = $value["id"];
+        $params["options"] = array('wp-rebuild' => $rebuildEach);
+        // unserialize word match string
+        $localeCustomArray = unserialize($value["locale_custom_strings"]);
+        if (!empty($localeCustomArray)) {
+          $wordMatchArray = array();
+          foreach ($localeCustomArray as $localCustomData) {
+            $wordMatchArray = $localCustomData["enabled"]["wildcardMatch"];
+          }
+
+          if (!empty($wordMatchArray)) {
+            foreach ($wordMatchArray as $word => $replace) {
+              $params["find_word"] = $word;
+              $params["replace_word"] = $replace;
+              $wordReplacementCreateParams[] = $params;
+            }
+          }
+        }
+      }
+    }
+    return $wordReplacementCreateParams;
+  }
+
+  /**
+   * Get all the word-replacements stored in config-arrays
+   * and write them out as records in civicrm_word_replacement.
+   *
+   * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
+   * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
+   * step behaves consistently even as the BAO evolves in future versions.
+   * However, if there's a bug in here prior to 4.4.0, we should apply the
+   * bugfix in both places.
+   */
+  public static function rebuildWordReplacementTable() {
+    civicrm_api3('word_replacement', 'replace', array(
+      'options' => array('match' => array('domain_id', 'find_word')),
+      'values' => self::getConfigArraysAsAPIParams(FALSE),
+    ));
+    CRM_Core_BAO_WordReplacement::rebuild();
   }
 }
