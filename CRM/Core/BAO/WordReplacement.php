@@ -139,16 +139,18 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @see civicrm_domain.locale_custom_strings
    */
   public static function getAllAsConfigArray($id) {
-    $query = "SELECT find_word,replace_word FROM civicrm_word_replacement WHERE is_active = 1 AND domain_id = ".CRM_Utils_Type::escape($id, 'Integer');
+    $query = "SELECT find_word,replace_word,is_active,match_type FROM civicrm_word_replacement WHERE domain_id = ".CRM_Utils_Type::escape($id, 'Integer');
     $dao = CRM_Core_DAO::executeQuery($query);
-    $wordReplacement = array();
-
+    $wordReplacementEnabled = array();
+    $wordReplacementDisabled = array();
+    
     while ($dao->fetch()) {
-      $wordReplacement[$dao->find_word] = $dao->replace_word;
+      if ($dao->is_active==1) {
+      	$overrides['enabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
+      }	else {
+      	$overrides['disabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
+      }
     }
-
-    $overrides['enabled']['wildcardMatch'] = $wordReplacement;
-
     $config = CRM_Core_Config::singleton();
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -175,7 +177,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     $stringOverride = self::getAllAsConfigArray($id);
     $params = array('locale_custom_strings' => serialize($stringOverride));
     $wordReplacementSettings = CRM_Core_BAO_Domain::edit($params, $id);
-
     if ($wordReplacementSettings) {
       CRM_Core_Config::singleton()->localeCustomStrings = $stringOverride;
 
@@ -208,28 +209,32 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     $wordReplacementCreateParams = array();
     // get all domains
     $result = civicrm_api3('domain', 'get', array(
-      'return' => array('locale_custom_strings'),
-    ));
+                                                  'return' => array('locale_custom_strings'),
+                                                  ));
     if (!empty($result["values"])) {
       foreach ($result["values"] as $value) {
         $params = array();
-        $params["is_active"] = TRUE;
         $params["domain_id"] = $value["id"];
         $params["options"] = array('wp-rebuild' => $rebuildEach);
         // unserialize word match string
         $localeCustomArray = unserialize($value["locale_custom_strings"]);
         if (!empty($localeCustomArray)) {
           $wordMatchArray = array();
+          // Traverse Language array
           foreach ($localeCustomArray as $localCustomData) {
-            $wordMatchArray = $localCustomData["enabled"]["wildcardMatch"];
-          }
-
-          if (!empty($wordMatchArray)) {
-            foreach ($wordMatchArray as $word => $replace) {
-              $params["find_word"] = $word;
-              $params["replace_word"] = $replace;
-              $wordReplacementCreateParams[] = $params;
-            }
+          	// Traverse status array "enabled" "disabled"
+          	foreach ($localCustomData as $status => $matchTypes) {
+          		$params["is_active"] = ($status == "enabled")?TRUE:FALSE;
+          		// Traverse Match Type array "wildcardMatch" "exactMatch"
+          		foreach ($matchTypes as $matchType => $words) {
+          			$params["match_type"] = $matchType;
+          			foreach ($words as $word => $replace) {
+          				$params["find_word"] = $word;
+          				$params["replace_word"] = $replace;
+          				$wordReplacementCreateParams[] = $params;
+          			}
+          		}
+          	}
           }
         }
       }

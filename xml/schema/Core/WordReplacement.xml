@@ -45,6 +45,13 @@
     <add>4.4</add>
   </index>
   <field>
+       <name>match_type</name>
+       <type>enum</type>
+       <values>wildcardMatch, exactMatch</values>
+       <default>"wildcardMatch"</default>
+       <add>4.4</add>
+  </field>
+  <field>
     <name>domain_id</name>
     <type>int unsigned</type>
     <comment>FK to Domain ID. This is for Domain specific word replacement</comment>
