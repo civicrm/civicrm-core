@@ -353,7 +353,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     if (self::isError($eWAYResponse)) {
       $eWayTrxnError = $eWAYResponse->Error();
-
+      CRM_Core_Error::debug_var('eWay Error', $eWayTrxnError, TRUE, TRUE);
       if (substr($eWayTrxnError, 0, 6) == "Error:") {
         return self::errorExit(9008, $eWayTrxnError);
       }
