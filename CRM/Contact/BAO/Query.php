@@ -1303,7 +1303,6 @@ class CRM_Contact_BAO_Query {
             $this->_element['group_contact_id'] = 1;
             $this->_select['status'] = "$tbName.status as status";
             $this->_element['status'] = 1;
-            $this->_tables[$tbName] = 1;
           }
         }
         $this->_useGroupBy = TRUE;
