@@ -211,8 +211,8 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('css=div.action-link');
     $this->click("//li[@id='tab_rel']/a");
 
-    $this->waitForElementPresent("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[7]/span/a[text()='Edit']");
-    $this->click("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[7]/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[9]/span/a[text()='Edit']");
+    $this->click("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[9]/span/a[text()='Edit']");
     $this->waitForElementPresent('is_active');
     if (!$this->isChecked('is_active')) {
       $this->click('is_active');
@@ -250,8 +250,8 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('css=li#tab_rel a');
     $this->waitForElementPresent('css=div.action-link');
 
-    $this->waitForElementPresent("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[7]/span[2][text()='more']/ul/li[1]/a[text()='Enable']");
-    $this->click("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[7]/span[2][text()='more']/ul/li[1]/a[text()='Enable']");
+    $this->waitForElementPresent("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Enable']");
+    $this->click("xpath=//div[@id='inactive-relationships']//div//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Enable']");
 
     $this->assertTrue((bool)preg_match("/^Are you sure you want to re-enable this relationship?[\s\S]$/",
         $this->getConfirmation()
