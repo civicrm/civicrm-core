@@ -739,7 +739,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     $field = self::getFieldObject($fieldId);
-
+    
+    // Custom field HTML should indicate group+field name
+    $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',$field->custom_group_id);
+    $dataCrmCustomAttr = 'data-crm-custom="'.$groupName.':'.$field->name.'"';
+    $field->attributes .= $dataCrmCustomAttr;
+    
     // Fixed for Issue CRM-2183
     if ($field->html_type == 'TextArea' && $search) {
       $field->html_type = 'Text';
@@ -768,7 +773,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'TextArea':
-        $attributes = '';
+        $attributes = $dataCrmCustomAttr;
         if ($field->note_rows) {
           $attributes .= 'rows=' . $field->note_rows;
         }
@@ -800,6 +805,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
               'timeFormat' => $field->time_format,
               'startOffset' => $field->start_date_years,
               'endOffset' => $field->end_date_years,
+              'data-crm-custom' =>$groupName.':'.$field->name,
             )
           );
 
@@ -809,6 +815,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
               'timeFormat' => $field->time_format,
               'startOffset' => $field->start_date_years,
               'endOffset' => $field->end_date_years,
+              'data-crm-custom' =>$groupName.':'.$field->name,
             )
           );
         }
@@ -820,6 +827,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
               'timeFormat' => $field->time_format,
               'startOffset' => $field->start_date_years,
               'endOffset' => $field->end_date_years,
+          	  'data-crm-custom' =>$groupName.':'.$field->name,
             ));
         }
         break;
@@ -852,7 +860,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $qf->add('select', $elementName, $label,
           array(
             '' => ts('- select -')) + $selectOption,
-          $useRequired && !$search
+          $useRequired && !$search,
+          $dataCrmCustomAttr
         );
         break;
 
@@ -876,6 +885,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             'size' => 5,
             'style' => '',
             'class' => 'advmultiselect',
+          	'data-crm-custom' =>$groupName.':'.$field->name,
           )
         );
 
@@ -896,7 +906,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         ) {
           $selectOption['CiviCRM_OP_OR'] = ts('Select to match ANY; unselect to match ALL');
         }
-        $qf->addElement('select', $elementName, $label, $selectOption, array('size' => '5', 'multiple'));
+        $qf->addElement('select', $elementName, $label, $selectOption, array('size' => '5', 'multiple','data-crm-custom' =>$groupName.':'.$field->name));
 
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
@@ -909,12 +919,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         );
         $check = array();
         foreach ($customOption as $v => $l) {
-          $check[] = &$qf->addElement('advcheckbox', $v, NULL, $l);
+          $check[] = &$qf->addElement('advcheckbox', $v, NULL, (string)$l,array('data-crm-custom' =>$groupName.':'.$field->name));
         }
         if ($search &&
           count($check) > 1
         ) {
-          $check[] = &$qf->addElement('advcheckbox', 'CiviCRM_OP_OR', NULL, ts('Check to match ANY; uncheck to match ALL'));
+          $check[] = &$qf->addElement('advcheckbox', 'CiviCRM_OP_OR', NULL, ts('Check to match ANY; uncheck to match ALL'),$field->attributes,array('data-crm-custom' =>$groupName.':'.$field->name));
         }
         $qf->addGroup($check, $elementName, $label);
         if ($useRequired && !$search) {
@@ -941,7 +951,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         //Add State
         $stateOption = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvince();
         $qf->add('select', $elementName, $label, $stateOption,
-          $useRequired && !$search
+          $useRequired && !$search,
+          $dataCrmCustomAttr
         );
         break;
 
@@ -949,7 +960,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         //Add Multi-select State/Province
         $stateOption = CRM_Core_PseudoConstant::stateProvince();
 
-        $qf->addElement('select', $elementName, $label, $stateOption, array('size' => '5', 'multiple'));
+        $qf->addElement('select', $elementName, $label, $stateOption, array('size' => '5', 'multiple','data-crm-custom' =>$groupName.':'.$field->name));
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
@@ -959,21 +970,22 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         //Add Country
         $countryOption = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
         $qf->add('select', $elementName, $label, $countryOption,
-          $useRequired && !$search
+          $useRequired && !$search,
+          $dataCrmCustomAttr
         );
         break;
 
       case 'Multi-Select Country':
         //Add Country
         $countryOption = CRM_Core_PseudoConstant::country();
-        $qf->addElement('select', $elementName, $label, $countryOption, array('size' => '5', 'multiple'));
+        $qf->addElement('select', $elementName, $label, $countryOption, array('size' => '5', 'multiple','data-crm-custom' =>$groupName.':'.$field->name));
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
         break;
 
       case 'RichTextEditor':
-        $attributes = array('rows' => $field->note_rows, 'cols' => $field->note_columns);
+        $attributes = array('rows' => $field->note_rows, 'cols' => $field->note_columns,'data-crm-custom' =>$groupName.':'.$field->name);
         if ($field->text_length) {
           $attributes['maxlength'] = $field->text_length;
         }
