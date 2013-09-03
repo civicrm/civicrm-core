@@ -363,7 +363,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * Store and return an array of all active custom fields.
    *
-   * @param string      $customDataType      type of Custom Data
+   * @param string      $customDataType      type of Custom Data; empty is a synonym for "all contact data types"
    * @param boolean     $showAll             If true returns all fields (includes disabled fields)
    * @param boolean     $inline              If true returns all inline fields (includes disabled fields)
    * @param int         $customDataSubType   Custom Data sub type value
@@ -386,6 +386,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                                     $onlySubType = FALSE,
                                     $checkPermission = TRUE
   ) {
+    if (empty($customDataType)) {
+      $customDataType = array('Contact', 'Individual', 'Organization', 'Household');
+    }
     if ($customDataType && !is_array($customDataType)) {
 
       if (in_array($customDataType, CRM_Contact_BAO_ContactType::subTypes())) {
@@ -476,7 +479,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
 
         if (!empty($customDataType) && empty($extends)) {
-          // $customDataType did not include any customizable/extendable entities.
+          // $customDataType specified a filter, but there is no corresponding SQL ($extends)
           self::$_importFields[$cacheKey] = array();
           return self::$_importFields[$cacheKey];
         }

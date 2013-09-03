@@ -408,19 +408,29 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     }
 
     // Add some fields
-    $contactGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'test_group'));
+    $contactGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'test_group_c'));
     $contactField = $this->customFieldCreate(array('custom_group_id' => $contactGroup['id'], 'label' => 'For Contacts'));
-    $activityGroup = $this->customGroupCreate(array('extends' => 'Activity', 'title' => 'test_group'));
+    $indivGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group_i'));
+    $indivField = $this->customFieldCreate(array('custom_group_id' => $indivGroup['id'], 'label' => 'For Individuals'));
+    $activityGroup = $this->customGroupCreate(array('extends' => 'Activity', 'title' => 'test_group_a'));
     $activityField = $this->customFieldCreate(array('custom_group_id' => $activityGroup['id'], 'label' => 'For Activities'));
 
-    // getfields reports exactly one custom field for each entity
-    foreach (array('Contact', 'Individual', 'Organization') as $entity) {
-      $this->assertEquals(
-        array('custom_' . $contactField['id']),
-        $this->getCustomFieldKeys($this->callAPISuccess($entity, 'getfields', array())),
-        'Contact custom fields'
-      );
-    }
+    // Check getfields
+    $this->assertEquals(
+      array('custom_' . $contactField['id'], 'custom_' . $indivField['id']),
+      $this->getCustomFieldKeys($this->callAPISuccess('Contact', 'getfields', array())),
+      'Contact custom fields'
+    );
+    $this->assertEquals(
+      array('custom_' . $contactField['id'], 'custom_' . $indivField['id']),
+      $this->getCustomFieldKeys($this->callAPISuccess('Individual', 'getfields', array())),
+      'Individual custom fields'
+    );
+    $this->assertEquals(
+      array('custom_' . $contactField['id']),
+      $this->getCustomFieldKeys($this->callAPISuccess('Organization', 'getfields', array())),
+      'Organization custom fields'
+    );
     $this->assertEquals(
       array('custom_' . $activityField['id']),
       $this->getCustomFieldKeys($this->callAPISuccess('Activity', 'getfields', array())),
@@ -439,7 +449,9 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $isCustom = function($key) {
       return preg_match('/^custom_/', $key);
     };
-    return array_values(array_filter(array_keys($getFieldsResult['values']), $isCustom));
+    $r = array_values(array_filter(array_keys($getFieldsResult['values']), $isCustom));
+    sort($r);
+    return $r;
   }
 }
 

@@ -1330,7 +1330,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
   $entity = _civicrm_api_get_camel_name($entity);
   if (strtolower($entity) == 'contact') {
     // Use sub-type if available, otherwise stick with 'Contact'
-    $entity = CRM_Utils_Array::value('contact_type', $params, $entity);
+    $entity = CRM_Utils_Array::value('contact_type', $params);
   }
   $retrieveOnlyParent = FALSE;
   // we could / should probably test for other subtypes here - e.g. activity_type_id
