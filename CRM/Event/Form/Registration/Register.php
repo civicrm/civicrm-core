@@ -155,6 +155,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->_defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
     }
 
+    // set default state/province from config if no state/province set
+    if (!CRM_Utils_Array::value("billing_state_province_id-{$this->_bltID}", $this->_defaults)) {
+      $this->_defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
+    }
+
     if ($this->_snippet) {
       // now fix all state country selectors
       CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
