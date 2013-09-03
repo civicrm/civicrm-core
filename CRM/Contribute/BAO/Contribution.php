@@ -1691,22 +1691,36 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       return 0;
     }
 
-    $fromClause = "civicrm_contribution contribution";
-    $whereConditions = array("contribution.contact_id = {$contactId}");
-    if ($includeSoftCredit) {
-      $fromClause .= " LEFT JOIN civicrm_contribution_soft softContribution
-                                             ON ( contribution.id = softContribution.contribution_id )";
-      $whereConditions[] = " softContribution.contact_id = {$contactId}";
-    }
-    if ($includeHonoree) {
-      $whereConditions[] = " contribution.honor_contact_id = {$contactId}";
-    }
-    $whereClause = " contribution.is_test = 0 AND ( " . implode(' OR ', $whereConditions) . " )";
+    $contactContributionsSQL = "
+      SELECT contribution.id AS id
+      FROM civicrm_contribution contribution
+      WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId} ";
 
-    $query = "
-   SELECT  count( contribution.id ) count
-     FROM  {$fromClause}
-    WHERE  {$whereClause}";
+    $contactHonoreeContributionsSQL = "
+      SELECT contribution.id
+      FROM civicrm_contribution contribution
+      WHERE contribution.is_test = 0 AND contribution.honor_contact_id = {$contactId} ";
+
+    $contactSoftCreditContributionsSQL = "
+      SELECT contribution.id
+      FROM civicrm_contribution contribution INNER JOIN civicrm_contribution_soft softContribution
+      ON ( contribution.id = softContribution.contribution_id )
+      WHERE contribution.is_test = 0 AND softContribution.contact_id = {$contactId} ";
+    $query = "SELECT count( x.id ) count FROM ( ";
+    $query .= $contactContributionsSQL;
+
+    if ($includeSoftCredit) {
+      $query .= " UNION ";
+      $query .= $contactSoftCreditContributionsSQL;
+    }
+
+    if ($includeHonoree) {
+      $query .= " UNION ";
+      $query .= $contactHonoreeContributionsSQL;
+    }
+
+    $query .= ") x";
+    CRM_Core_Error::debug( '$query', $query );
 
     return CRM_Core_DAO::singleValueQuery($query);
   }
