@@ -153,8 +153,9 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->select("other_activity", "label=Interview");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('_qf_Activity_upload-bottom');
-    $this->waitForElementPresent("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr/td[9]/span/a[2]");
-    $this->click("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr/td[9]/span/a[2]");
+    $this->waitForElementPresent("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr/td[8]/span/a[2]");
+    sleep(10);
+    $this->click("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr/td[8]/span/a[2]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->select("status_id","value=2");
     $this->click('_qf_Activity_upload-bottom');
