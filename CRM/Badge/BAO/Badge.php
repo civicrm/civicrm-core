@@ -108,9 +108,21 @@ class CRM_Badge_BAO_Badge {
     if (CRM_Utils_Array::value('image_1', $layout['data'])) {
       $formattedRow['image_1'] = $layout['data']['image_1'];
     }
+    if (CRM_Utils_Array::value('width_image_1', $layout['data'])) {
+      $formattedRow['width_image_1'] = $layout['data']['width_image_1'];
+    }
+    if (CRM_Utils_Array::value('height_image_1', $layout['data'])) {
+      $formattedRow['height_image_1'] = $layout['data']['height_image_1'];
+    }
 
     if (CRM_Utils_Array::value('image_2', $layout['data'])) {
       $formattedRow['image_2'] = $layout['data']['image_2'];
+    }
+    if (CRM_Utils_Array::value('width_image_2', $layout['data'])) {
+      $formattedRow['width_image_2'] = $layout['data']['width_image_2'];
+    }
+    if (CRM_Utils_Array::value('height_image_2', $layout['data'])) {
+      $formattedRow['height_image_2'] = $layout['data']['height_image_2'];
     }
 
     if (CRM_Utils_Array::value('add_barcode', $layout['data'])) {
@@ -144,13 +156,15 @@ class CRM_Badge_BAO_Badge {
 
     $titleWidth = $titleLeftMargin = 0;
     if (CRM_Utils_Array::value('image_1', $formattedRow)) {
-      $this->printImage($formattedRow['image_1']);
+      $this->printImage($formattedRow['image_1'], NULL, NULL, CRM_Utils_Array::value('width_image_1', $formattedRow),
+        CRM_Utils_Array::value('height_image_1', $formattedRow));
       $titleWidth = $titleLeftMargin = $this->lMarginLogo;
     }
 
     $titleRightMargin = 0;
     if (CRM_Utils_Array::value('image_2', $formattedRow)) {
-      $this->printImage($formattedRow['image_2'], $x + 68);
+      $this->printImage($formattedRow['image_2'], $x + 68, NULL, CRM_Utils_Array::value('width_image_2', $formattedRow),
+        CRM_Utils_Array::value('height_image_2', $formattedRow));
       $titleRightMargin = 36;
       $titleWidth = $this->lMarginLogo;
     }
@@ -282,7 +296,7 @@ class CRM_Badge_BAO_Badge {
    * @return void
    * @access public
    */
-  function printImage($img, $x = '', $y = '') {
+  function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
     if (!$x) {
       $x = $this->pdf->GetAbsX();
     }
@@ -294,15 +308,19 @@ class CRM_Badge_BAO_Badge {
     $this->imgRes = 300;
 
     if ($img) {
-      $imgsize = getimagesize($img);
-      // mm
-      $f = $this->imgRes / 25.4;
-      $w = $imgsize[0] / $f;
-      $h = $imgsize[1] / $f;
+      list($w, $h) = self::getImageProperties($img, $this->imgRes, $w, $h);
       $this->pdf->Image($img, $x, $y, $w, $h, '', '', '', FALSE, 72, '', FALSE,
         FALSE, $this->debug, FALSE, FALSE, FALSE);
     }
     $this->pdf->SetXY($x, $y);
+  }
+
+  static function getImageProperties($img, $imgRes = 300, $w = NULL, $h = NULL) {
+    $imgsize = getimagesize($img);
+    $f = $imgRes / 25.4;
+    $w = !empty($w) ? $w : $imgsize[0] / $f;
+    $h = !empty($h) ? $h : $imgsize[1] / $f;
+    return array($w, $h);
   }
 
   /**
