@@ -77,8 +77,8 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->click('is_override');
     $this->waitForElementPresent('status_id');
     $this->select('status_id', 'label=Current');
-    $this->select('membership_type_id[0]', 'label=Default Organization');
-    $this->select('membership_type_id[1]', 'label=General');
+    $this->select('membership_type_id[0]', 'value=1');
+    $this->select('membership_type_id[1]', 'value=1');
     $this->click('_qf_Membership_upload-bottom');
 
     $this->waitForElementPresent("access");
