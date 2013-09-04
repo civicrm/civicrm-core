@@ -1720,7 +1720,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     }
 
     $query .= ") x";
-    CRM_Core_Error::debug( '$query', $query );
 
     return CRM_Core_DAO::singleValueQuery($query);
   }
