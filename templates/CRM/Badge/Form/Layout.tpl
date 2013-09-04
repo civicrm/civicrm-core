@@ -75,6 +75,7 @@
               <td>{ts}Label{/ts}</td>
               <td>{ts}Font{/ts}</td>
               <td>{ts}Size{/ts}</td>
+              <td>{ts}Style{/ts}</td>
               <td>{ts}Alignment{/ts}</td>
             </tr>
             {section name='i' start=1 loop=$rowCount}
@@ -84,6 +85,7 @@
                 <td>{$form.token.$rowNumber.html|crmAddClass:twenty}</td>
                 <td>{$form.font_name.$rowNumber.html}</td>
                 <td>{$form.font_size.$rowNumber.html}</td>
+                <td>{$form.font_style.$rowNumber.html}</td>
                 <td>{$form.text_alignment.$rowNumber.html}</td>
               </tr>
             {/section}
