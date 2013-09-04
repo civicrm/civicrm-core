@@ -179,23 +179,21 @@ class civicrm_api3 {
         return $res;
       }
       curl_close($ch);
-      $res = json_decode($result);
-      if (!$res) {
-        $res = new stdClass;
-        $res->is_error = 1;
-        $res->error_message = "not a valid json returned by the server";
-        $res->level = "json_decode";
-        $res->row_result = $result;
-        
-      }
-      return $res;
     }
     else {
       // Should be discouraged, because the API credentials and data
       // are submitted as GET data, increasing chance of exposure..
       $result = file_get_contents($query . '&' . $fields);
-      return json_decode($result);
     }
+    if (!$res = json_decode($result)) {
+      $res = new stdClass;
+      $res->is_error = 1;
+      $res->error_message = 'Unable to parse returned JSON';
+      $res->level = 'json_decode';
+      $res->error = array('Unable to parse returned JSON' => $result);
+      $res->row_result = $result;
+    }
+    return $res;
   }
 
   function call($entity, $action = 'Get', $params = array()) {
