@@ -4011,10 +4011,10 @@ civicrm_relationship.start_date > {$today}
           'first_name' => 1,
           'middle_name' => 1,
           'last_name' => 1,
-          'prefix_id' => 1,
-          'suffix_id' => 1,
+          'individual_prefix' => 1,
+          'individual_suffix' => 1,
           'birth_date' => 1,
-          'gender_id' => 1,
+          'gender' => 1,
           'street_address' => 1,
           'supplemental_address_1' => 1,
           'supplemental_address_2' => 1,
@@ -4174,7 +4174,7 @@ civicrm_relationship.start_date > {$today}
       $convertedVals = $query->convertToPseudoNames($dao, TRUE);
 
       if (!empty($convertedVals)) {
-        $val = array_merge_recursive($val, $convertedVals);
+        $val = $convertedVals + $val;
       }
       $values[$dao->contact_id] = $val;
     }
@@ -5146,6 +5146,7 @@ AND   displayRelType.is_active = 1
 
       if (property_exists($dao, $value['idCol'])) {
         $val = $dao->$value['idCol'];
+        $idColumn = $key;
 
         if (CRM_Utils_System::isNull($val)) {
           $dao->$key = NULL;
@@ -5153,6 +5154,9 @@ AND   displayRelType.is_active = 1
         elseif ($baoName = CRM_Utils_Array::value('bao', $value, NULL)) {
           //preserve id value
           $idColumn = "{$key}_id";
+          if (!empty($this->_fields[$key]['name'])) {
+            $idColumn = $this->_fields[$key]['name'];
+          }
           $dao->$idColumn = $val;
           $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
         }
@@ -5179,6 +5183,7 @@ AND   displayRelType.is_active = 1
             $current[$lastElement] = $dao->$key;
           }
           else {
+            $values[$idColumn] = $dao->$idColumn;
             $values[$key] = $dao->$key;
           }
         }
