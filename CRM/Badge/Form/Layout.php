@@ -90,6 +90,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     asort($tokens);
 
     $fontSizes = CRM_Core_BAO_LabelFormat::getFontSizes();
+    $fontStyles = CRM_Core_BAO_LabelFormat::getFontStyles();
     $fontNames = CRM_Core_BAO_LabelFormat::getFontNames('name_badge');
     $textAlignment = CRM_Core_BAO_LabelFormat::getTextAlignments();
 
@@ -98,6 +99,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       $this->add('select', "token[$i]", ts('Token'), array('' => ts('- none -')) + $tokens);
       $this->add('select', "font_name[$i]", ts('Font Name'), $fontNames);
       $this->add('select', "font_size[$i]", ts('Font Size'), $fontSizes);
+      $this->add('select', "font_style[$i]", ts('Font Style'), $fontStyles);
       $this->add('select', "text_alignment[$i]", ts('Alignment'), $textAlignment);
     }
     $rowCount++;
