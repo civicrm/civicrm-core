@@ -39,6 +39,7 @@
  */
 class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
+  const FIELD_ROWCOUNT = 6;
   /**
    * Function to build the form
    *
@@ -94,7 +95,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $fontNames = CRM_Core_BAO_LabelFormat::getFontNames('name_badge');
     $textAlignment = CRM_Core_BAO_LabelFormat::getTextAlignments();
 
-    $rowCount = 4;
+    $rowCount = self::FIELD_ROWCOUNT;
     for ( $i =1; $i <= $rowCount; $i++ ) {
       $this->add('select', "token[$i]", ts('Token'), array('' => ts('- none -')) + $tokens);
       $this->add('select', "font_name[$i]", ts('Font Name'), $fontNames);
@@ -190,7 +191,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
         CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
     }
     else {
-      for ($i = 1; $i <= 4; $i++) {
+      for ($i = 1; $i <= self::FIELD_ROWCOUNT; $i++) {
         $defaults['text_alignment'][$i] = "C";
       }
     }
